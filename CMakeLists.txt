@@ -3,7 +3,7 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 2.8.0)
-project(MotionPlanner)
+project(motion_manager)
 
 ##############################################################################
 # Catkin
@@ -37,7 +37,7 @@ rosbuild_prepare_qt4(QtCore QtGui QApplication) # Add the appropriate components
 
 file(GLOB QT_FORMS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ui/*.ui)
 file(GLOB QT_RESOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} resources/*.qrc)
-file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS include/MotionPlanner/*.hpp)
+file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS include/motion_manager/*.hpp)
 
 QT4_ADD_RESOURCES(QT_RESOURCES_CPP ${QT_RESOURCES})
 QT4_WRAP_UI(QT_FORMS_HPP ${QT_FORMS})
@@ -74,25 +74,25 @@ link_directories(
 ##############################################################################
 # Binaries
 ##############################################################################
-add_executable(MotionPlanner ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(MotionPlanner ${QT_LIBRARIES} ${catkin_LIBRARIES})
+add_executable(motion_manager ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(motion_manager ${QT_LIBRARIES} ${catkin_LIBRARIES})
 
 # ********** link external libraries ********
 # Human-like Upper-limbs Motion Library (HUML)
-target_link_libraries(MotionPlanner HUML)
+target_link_libraries(motion_manager HUML)
 # -- IPOPT Solver
-target_link_libraries(MotionPlanner libipopt.a)
-target_link_libraries(MotionPlanner libcoinmumps.a)
-target_link_libraries(MotionPlanner libcoinlapack.a)
-target_link_libraries(MotionPlanner libcoinasl.a)
-target_link_libraries(MotionPlanner libcoinblas.a)
-target_link_libraries(MotionPlanner libcoinmetis.a)
-target_link_libraries(MotionPlanner libipoptamplinterface.a)
-target_link_libraries(MotionPlanner dl) # this has to be the last one
-target_link_libraries(MotionPlanner gfortran)# this has to be the last one
+target_link_libraries(motion_manager libipopt.a)
+target_link_libraries(motion_manager libcoinmumps.a)
+target_link_libraries(motion_manager libcoinlapack.a)
+target_link_libraries(motion_manager libcoinasl.a)
+target_link_libraries(motion_manager libcoinblas.a)
+target_link_libraries(motion_manager libcoinmetis.a)
+target_link_libraries(motion_manager libipoptamplinterface.a)
+target_link_libraries(motion_manager dl) # this has to be the last one
+target_link_libraries(motion_manager gfortran)# this has to be the last one
 
-target_link_libraries(MotionPlanner ${Boost_LIBRARIES})
+target_link_libraries(motion_manager ${Boost_LIBRARIES})
 
 
-install(TARGETS MotionPlanner RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(TARGETS motion_manager RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 

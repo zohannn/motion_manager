@@ -8,7 +8,7 @@
 #include <ui_toldialoghuml.h>
 #include <eigen3/Eigen/Dense>
 
-namespace MotionPlanner{
+namespace motion_manager{
 
 using namespace std;
 using namespace Eigen;
@@ -58,6 +58,6 @@ private:
     string infoLine;
 };
 
-} // namespace MotionPlanner
+} // namespace motion_manager
 
 #endif // TOLDIALOGHUML_H

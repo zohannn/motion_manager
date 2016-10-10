@@ -12,14 +12,14 @@
 #include <QtGui>
 #include <QMessageBox>
 #include <iostream>
-#include "../include/MotionPlanner/main_window.hpp"
+#include "../include/motion_manager/main_window.hpp"
 
 
 /*****************************************************************************
 ** Namespaces
 *****************************************************************************/
 
-namespace MotionPlanner {
+namespace motion_manager {
 
 using namespace Qt;
 using namespace std;
@@ -49,7 +49,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
 
     ReadSettings();
-    setWindowIcon(QIcon(":/images/MotionPlannerIcon.png"));
+    setWindowIcon(QIcon(":/images/motion_managerIcon.png"));
 
     QObject::connect(&qnode, SIGNAL(rosShutdown()), this, SLOT(close()));
 
@@ -1531,7 +1531,7 @@ void MainWindow::onListScenarioItemClicked(QListWidgetItem *item){
  * @brief MainWindow::ReadSettings
  */
 void MainWindow::ReadSettings() {
-    QSettings settings("Qt-Ros Package", "MotionPlanner");
+    QSettings settings("Qt-Ros Package", "motion_manager");
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
     QString master_url = settings.value("master_url",QString("http://192.168.1.2:11311/")).toString();
@@ -1556,7 +1556,7 @@ void MainWindow::ReadSettings() {
  * @brief MainWindow::WriteSettings
  */
 void MainWindow::WriteSettings() {
-    QSettings settings("Qt-Ros Package", "MotionPlanner");
+    QSettings settings("Qt-Ros Package", "motion_manager");
     settings.setValue("master_url", mrosCommdlg->getMasterUrl());
     settings.setValue("host_url", mrosCommdlg->getHostUrl());
     settings.setValue("use_environment_variables",QVariant(mrosCommdlg->getUseEnvCheckbox()));
@@ -1579,5 +1579,5 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 
 
-}  // namespace MotionPlanner
+}  // namespace motion_manager
 

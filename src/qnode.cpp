@@ -18,7 +18,7 @@
 #include <std_msgs/Float64.h>
 #include <sstream>
 #include <time.h>
-#include "../include/MotionPlanner/qnode.hpp"
+#include "../include/motion_manager/qnode.hpp"
 #include <vrep_common/simRosLoadScene.h>
 #include <vrep_common/simRosCloseScene.h>
 #include <vrep_common/simRosStartSimulation.h>
@@ -44,7 +44,7 @@
 
 
 
-#include "../include/MotionPlanner/v_repConst.hpp"
+#include "../include/motion_manager/v_repConst.hpp"
 
 
 
@@ -52,7 +52,7 @@
 ** Namespaces
 *****************************************************************************/
 
-namespace MotionPlanner {
+namespace motion_manager {
 
 int h_detobj;
 //std::vector<float> r_traj = std::vector<float>(11);
@@ -100,7 +100,7 @@ QNode::QNode(int argc, char** argv ) :
 	init_argc(argc),
 	init_argv(argv)
     {
-    nodeName = "MotionPlanner";
+    nodeName = "motion_manager";
     TotalTime = 0.0;
 
 
@@ -124,7 +124,7 @@ QNode::~QNode() {
  * @return
  */
 bool QNode::on_init() {
-	ros::init(init_argc,init_argv,"MotionPlanner");
+    ros::init(init_argc,init_argv,"motion_manager");
 	if ( ! ros::master::check() ) {
 		return false;
 	}
@@ -145,7 +145,7 @@ bool QNode::on_init(const std::string &master_url, const std::string &host_url) 
 	std::map<std::string,std::string> remappings;
 	remappings["__master"] = master_url;
 	remappings["__hostname"] = host_url;
-	ros::init(remappings,"MotionPlanner");
+    ros::init(remappings,"motion_manager");
 	if ( ! ros::master::check() ) {
 		return false;
 	}
@@ -4004,4 +4004,4 @@ for (size_t i = 0; i < HAND_FINGERS; i++){
 }
 
 
-}  // namespace MotionPlanner
+}  // namespace motion_manager

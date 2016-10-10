@@ -14,7 +14,7 @@
 *****************************************************************************/
 #include <QtGui>
 #include <QApplication>
-#include "../include/MotionPlanner/main_window.hpp"
+#include "../include/motion_manager/main_window.hpp"
 
 /*****************************************************************************
 ** Main
@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     ** Qt
     **********************/
     QApplication app(argc, argv);
-    MotionPlanner::MainWindow w(argc,argv);
+    motion_manager::MainWindow w(argc,argv);
     w.show();
     app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
     int result = app.exec();

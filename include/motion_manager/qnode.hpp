@@ -1,5 +1,5 @@
 /**
- * @file /include/MotionPlanner/qnode.hpp
+ * @file /include/motion_manager/qnode.hpp
  *
  * @brief Communications central!
  *
@@ -9,8 +9,8 @@
 ** Ifdefs
 *****************************************************************************/
 
-#ifndef MotionPlanner_QNODE_HPP_
-#define MotionPlanner_QNODE_HPP_
+#ifndef motion_manager_QNODE_HPP_
+#define motion_manager_QNODE_HPP_
 
 /*****************************************************************************
 ** Includes
@@ -46,7 +46,7 @@
 ** Namespaces
 *****************************************************************************/
 
-namespace MotionPlanner {
+namespace motion_manager {
 
 bool getArmsHandles(int humanoid); // get the handles of both arms
 
@@ -188,6 +188,6 @@ private:
 
 };
 
-}  // namespace MotionPlanner
+}  // namespace motion_manager
 
-#endif /* MotionPlanner_QNODE_HPP_ */
+#endif /* motion_manager_QNODE_HPP_ */

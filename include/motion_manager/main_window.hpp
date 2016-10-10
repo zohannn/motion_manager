@@ -1,12 +1,12 @@
 /**
- * @file /include/MotionPlanner/main_window.hpp
+ * @file /include/motion_manager/main_window.hpp
  *
- * @brief Qt based gui for MotionPlanner.
+ * @brief Qt based gui for motion_manager.
  *
  * @date November 2010
  **/
-#ifndef MotionPlanner_MAIN_WINDOW_H
-#define MotionPlanner_MAIN_WINDOW_H
+#ifndef motion_manager_MAIN_WINDOW_H
+#define motion_manager_MAIN_WINDOW_H
 
 /*****************************************************************************
 ** Includes
@@ -30,7 +30,7 @@
 ** Namespace
 *****************************************************************************/
 
-namespace MotionPlanner {
+namespace motion_manager {
 
 using namespace std;
 
@@ -175,6 +175,6 @@ private:
 
 };
 
-}  // namespace MotionPlanner
+}  // namespace motion_manager
 
-#endif // MotionPlanner_MAIN_WINDOW_H
+#endif // motion_manager_MAIN_WINDOW_H

@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/" >
-        <file>images/MotionPlannerIcon.png</file>
+        <file>images/motion_managerIcon.png</file>
 	<file>images/logo_eeng.png</file>
     </qresource>
 </RCC>

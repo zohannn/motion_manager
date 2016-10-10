@@ -5,7 +5,7 @@
 #include <ui_vrepcommdialog.h>
 #include "qnode.hpp"
 
-namespace MotionPlanner{
+namespace motion_manager{
 
 class VrepCommDialog : public QDialog
 {
@@ -26,6 +26,6 @@ private:
     QNode *qnode;
 };
 
-} // namespace MotionPlanner
+} // namespace motion_manager
 
 #endif // VREPCOMMDIALOG_HPP

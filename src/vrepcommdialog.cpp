@@ -1,7 +1,7 @@
-#include "../include/MotionPlanner/vrepcommdialog.hpp"
+#include "../include/motion_manager/vrepcommdialog.hpp"
 
 
-namespace MotionPlanner {
+namespace motion_manager {
 
 using namespace Qt;
 
@@ -51,4 +51,4 @@ void VrepCommDialog::on_button_check_clicked(bool check){
     Q_EMIT vrepConnected(bstatus);
 }
 
-} // namespace MotionPlanner
+} // namespace motion_manager

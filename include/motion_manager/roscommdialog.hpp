@@ -5,7 +5,7 @@
 #include <ui_roscommdialog.h>
 #include "qnode.hpp"
 
-namespace MotionPlanner{
+namespace motion_manager{
 
 class RosCommDialog : public QDialog
 {
@@ -44,6 +44,6 @@ private:
     QNode *qnode;
 };
 
-} // namespace MotionPlanner
+} // namespace motion_manager
 
 #endif // ROSCOMMDIALOG_HPP

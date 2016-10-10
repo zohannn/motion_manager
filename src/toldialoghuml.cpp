@@ -1,7 +1,7 @@
-#include "../include/MotionPlanner/toldialoghuml.hpp"
+#include "../include/motion_manager/toldialoghuml.hpp"
 
 
-namespace MotionPlanner {
+namespace motion_manager {
 
 using namespace Qt;
 
@@ -553,4 +553,4 @@ void TolDialogHUML::on_pushButton_load_clicked(){
 
 
 
-} // namespace MotionPlanner
+} // namespace motion_manager
