@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package>
+  <name>motion_manager</name>
+  <version>0.1.0</version>
+  <description>
+
+	This is the the Motion Manager. This software is meant to contain several movement planners, a movement learner and a movement controller. 
+	The communication is managed by ROS and for this reason it is meant as a ROS package.
+
+  </description>
+  <maintainer email="gianpaologulletta@gmail.com">Gianpaolo Gulletta</maintainer>
+  <author>Gianpaolo Gulletta</author>
+  <license>MIT</license>
+  <url type="repository">https://github.com/zohannn/motion_manager.git</url> 
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>qt_build</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>libqt4-dev</build_depend>
+  <run_depend>qt_build</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>libqt4-dev</run_depend>
+ 
+</package>
