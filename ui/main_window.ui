@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Motion Planner</string>
+   <string>The Motion Manager</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -44,7 +44,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_vrep">
     <property name="geometry">
      <rect>
       <x>230</x>
@@ -53,7 +53,7 @@
       <height>17</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="horizontalLayout_VREP_status">
      <item>
       <widget class="QLabel" name="labelStatusVrep">
        <property name="enabled">
@@ -127,7 +127,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_ros">
     <property name="geometry">
      <rect>
       <x>11</x>
@@ -136,7 +136,7 @@
       <height>17</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_ROS_status">
      <item>
       <widget class="QLabel" name="labelStatusRos">
        <property name="font">
@@ -217,7 +217,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -382,7 +382,7 @@ p, li { white-space: pre-wrap; }
       <property name="title">
        <string>Specifications</string>
       </property>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QWidget" name="layoutWidget_task">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -393,7 +393,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <layout class="QHBoxLayout" name="horizontalLayout_task">
           <item>
            <widget class="QLabel" name="label_2">
             <property name="text">
@@ -418,7 +418,7 @@ p, li { white-space: pre-wrap; }
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <layout class="QHBoxLayout" name="horizontalLayout_arms">
           <item>
            <widget class="QRadioButton" name="radioButton_right">
             <property name="text">
@@ -440,7 +440,7 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QWidget" name="layoutWidget_mov">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -449,7 +449,7 @@ p, li { white-space: pre-wrap; }
          <height>33</height>
         </rect>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <layout class="QHBoxLayout" name="horizontalLayout_mov">
         <item>
          <widget class="QLabel" name="label_3">
           <property name="text">
@@ -493,7 +493,7 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QWidget" name="layoutWidget_obj">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -502,7 +502,7 @@ p, li { white-space: pre-wrap; }
          <height>54</height>
         </rect>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <layout class="QVBoxLayout" name="verticalLayout_obj">
         <item>
          <widget class="QLabel" name="label_objects">
           <property name="text">
@@ -533,7 +533,7 @@ p, li { white-space: pre-wrap; }
        <property name="title">
         <string>Select the type of grip</string>
        </property>
-       <widget class="QWidget" name="layoutWidget">
+       <widget class="QWidget" name="layoutWidget_grip">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -542,7 +542,7 @@ p, li { white-space: pre-wrap; }
           <height>62</height>
          </rect>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
+        <layout class="QVBoxLayout" name="verticalLayout_grip">
          <item>
           <widget class="QComboBox" name="comboBox_grip">
            <item>
@@ -601,7 +601,7 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QWidget" name="layoutWidget_planner">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -610,7 +610,7 @@ p, li { white-space: pre-wrap; }
          <height>33</height>
         </rect>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <layout class="QHBoxLayout" name="horizontalLayout_planner">
         <item>
          <widget class="QLabel" name="label_5">
           <property name="text">
@@ -642,7 +642,7 @@ p, li { white-space: pre-wrap; }
         <string>Add Movement</string>
        </property>
       </widget>
-      <widget class="QWidget" name="layoutWidget_2">
+      <widget class="QWidget" name="layoutWidget_eng_obj">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -651,7 +651,7 @@ p, li { white-space: pre-wrap; }
          <height>54</height>
         </rect>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <layout class="QVBoxLayout" name="verticalLayout_eng_obj">
         <item>
          <widget class="QLabel" name="label_objects_eng">
           <property name="text">
@@ -778,7 +778,7 @@ p, li { white-space: pre-wrap; }
           </rect>
          </property>
         </widget>
-        <widget class="QWidget" name="layoutWidget">
+        <widget class="QWidget" name="layoutWidget_time_mov">
          <property name="geometry">
           <rect>
            <x>400</x>
@@ -787,7 +787,7 @@ p, li { white-space: pre-wrap; }
            <height>17</height>
           </rect>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <layout class="QHBoxLayout" name="horizontalLayout_time_mov">
           <item>
            <widget class="QLabel" name="label_totalTime_mov">
             <property name="text">
@@ -804,7 +804,7 @@ p, li { white-space: pre-wrap; }
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="layoutWidget">
+        <widget class="QWidget" name="layoutWidget_action_mov">
          <property name="geometry">
           <rect>
            <x>11</x>
@@ -813,7 +813,7 @@ p, li { white-space: pre-wrap; }
            <height>28</height>
           </rect>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_11">
+         <layout class="QHBoxLayout" name="horizontalLayout_action_move">
           <item>
            <widget class="QPushButton" name="pushButton_execMov">
             <property name="text">
@@ -865,7 +865,7 @@ p, li { white-space: pre-wrap; }
           </rect>
          </property>
         </widget>
-        <widget class="QWidget" name="layoutWidget_3">
+        <widget class="QWidget" name="layoutWidget_time_task">
          <property name="geometry">
           <rect>
            <x>370</x>
@@ -874,7 +874,7 @@ p, li { white-space: pre-wrap; }
            <height>17</height>
           </rect>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <layout class="QHBoxLayout" name="horizontalLayout_time_task">
           <item>
            <widget class="QLabel" name="label_totalTime_task">
             <property name="text">
@@ -891,7 +891,7 @@ p, li { white-space: pre-wrap; }
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="layoutWidget">
+        <widget class="QWidget" name="layoutWidget_action_task">
          <property name="geometry">
           <rect>
            <x>2</x>
@@ -900,7 +900,7 @@ p, li { white-space: pre-wrap; }
            <height>28</height>
           </rect>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <layout class="QHBoxLayout" name="horizontalLayout_action_task">
           <item>
            <widget class="QPushButton" name="pushButton_execTask">
             <property name="text">

@@ -7,8 +7,6 @@ namespace motion_manager {
 
 using namespace Qt;
 
-// constructors
-
 RosCommDialog::RosCommDialog(QNode *q, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::RosCommDialogDesign)
@@ -18,7 +16,6 @@ RosCommDialog::RosCommDialog(QNode *q, QWidget *parent) :
 
 }
 
-// destructors
 
 RosCommDialog::~RosCommDialog()
 {
@@ -26,23 +23,26 @@ RosCommDialog::~RosCommDialog()
 
 }
 
-// setters
-void RosCommDialog::setMasterUrl(QString& master_url){
+void RosCommDialog::setMasterUrl(QString& master_url)
+{
 
     ui->line_edit_master->setText(master_url);
 }
 
-void RosCommDialog::setHostUrl(QString& host_url){
+void RosCommDialog::setHostUrl(QString& host_url)
+{
 
     ui->line_edit_host->setText(host_url);
 }
 
-void RosCommDialog::setRememberCheckbox(bool r){
+void RosCommDialog::setRememberCheckbox(bool r)
+{
 
     ui->checkbox_remember_settings->setChecked(r);
 }
 
-void RosCommDialog::setUseEnvCheckbox(bool r){
+void RosCommDialog::setUseEnvCheckbox(bool r)
+{
 
     ui->checkbox_use_environment->setChecked(r);
 
@@ -50,8 +50,8 @@ void RosCommDialog::setUseEnvCheckbox(bool r){
 
 
 
-// enablers
-void RosCommDialog::enableMasterUrl(bool e){
+void RosCommDialog::enableMasterUrl(bool e)
+{
 
     ui->line_edit_master->setEnabled(e);
 }
@@ -62,29 +62,32 @@ void RosCommDialog::enableHostUrl(bool e){
     ui->line_edit_host->setEnabled(e);
 }
 
-// getters
 
-QString RosCommDialog::getMasterUrl(){
+QString RosCommDialog::getMasterUrl()
+{
 
 
    return ui->line_edit_master->text();
 
 }
 
-QString RosCommDialog::getHostUrl(){
+QString RosCommDialog::getHostUrl()
+{
 
 
    return ui->line_edit_host->text();
 
 }
 
-bool RosCommDialog::getRememberCheckbox(){
+bool RosCommDialog::getRememberCheckbox()
+{
 
 
     return ui->checkbox_remember_settings->isChecked();
 }
 
-bool RosCommDialog::getUseEnvCheckbox(){
+bool RosCommDialog::getUseEnvCheckbox()
+{
 
     return ui->checkbox_use_environment->isChecked();
 }
@@ -93,18 +96,17 @@ bool RosCommDialog::getUseEnvCheckbox(){
 ** Implementation [Slots]
 *****************************************************************************/
 
-void RosCommDialog::showNoMasterMessage() {
+void RosCommDialog::showNoMasterMessage()
+{
     QMessageBox msgBox;
     msgBox.setText("Couldn't find the ros master.");
     msgBox.exec();
     //qnode->on_end();
     //close();
 }
-/**
- * @brief RosCommDialog::on_button_connect_clicked
- * @param check
- */
-void RosCommDialog::on_button_connect_clicked(bool check){
+
+void RosCommDialog::on_button_connect_clicked(bool check)
+{
 
     std::string status;
     bool bstatus;

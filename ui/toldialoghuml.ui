@@ -307,85 +307,6 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox_2">
-   <property name="geometry">
-    <rect>
-     <x>780</x>
-     <y>40</y>
-     <width>211</width>
-     <height>131</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Tolerance with the table [mm]</string>
-   </property>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>20</y>
-      <width>181</width>
-      <height>95</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_6">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>againt the wrist</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEdit_table_1">
-         <property name="text">
-          <string>0.0</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>againt the hand</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEdit_table_2">
-         <property name="text">
-          <string>0.0</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_7">
-       <item>
-        <widget class="QLabel" name="label_10">
-         <property name="text">
-          <string>againt the fingers</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEdit_table_3">
-         <property name="text">
-          <string>0.0</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
-  </widget>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
@@ -827,7 +748,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>550</y>
+     <y>600</y>
      <width>221</width>
      <height>91</height>
     </rect>
@@ -1232,7 +1153,7 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>580</x>
      <y>680</y>
      <width>178</width>
      <height>28</height>
@@ -1258,8 +1179,8 @@
   <widget class="QGroupBox" name="groupBox_eng_params">
    <property name="geometry">
     <rect>
-     <x>770</x>
-     <y>210</y>
+     <x>780</x>
+     <y>30</y>
      <width>211</width>
      <height>231</height>
     </rect>
@@ -1431,8 +1352,8 @@
   <widget class="QGroupBox" name="groupBox_diseng_params">
    <property name="geometry">
     <rect>
-     <x>780</x>
-     <y>430</y>
+     <x>790</x>
+     <y>280</y>
      <width>181</width>
      <height>141</height>
     </rect>
@@ -1535,8 +1456,8 @@
   <widget class="QGroupBox" name="groupBox_constraints">
    <property name="geometry">
     <rect>
-     <x>520</x>
-     <y>580</y>
+     <x>780</x>
+     <y>450</y>
      <width>201</width>
      <height>91</height>
     </rect>
@@ -1544,7 +1465,7 @@
    <property name="title">
     <string>Constraints</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>

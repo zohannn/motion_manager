@@ -6,8 +6,6 @@ namespace motion_manager {
 using namespace Qt;
 
 
-// constructors
-
 VrepCommDialog::VrepCommDialog(QNode *q, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::VrepCommDialogDesign)
@@ -17,7 +15,6 @@ VrepCommDialog::VrepCommDialog(QNode *q, QWidget *parent) :
 }
 
 
-// descructors
 VrepCommDialog::~VrepCommDialog()
 {
     delete ui;
@@ -27,11 +24,8 @@ VrepCommDialog::~VrepCommDialog()
 ** Implementation [Slots]
 *****************************************************************************/
 
-/**
- * @brief VrepCommDialog::on_button_check_clicked
- * @param check
- */
-void VrepCommDialog::on_button_check_clicked(bool check){
+void VrepCommDialog::on_button_check_clicked(bool check)
+{
 
     bool bstatus = false;
 

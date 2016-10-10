@@ -17,15 +17,9 @@ TolDialogHUML::~TolDialogHUML()
     delete ui;
 }
 
-//getters
 
-/**
- * @brief TolDialogHUML::getEngageParams
- * @param dist
- * @param dir
- * @param tols
- */
-void TolDialogHUML::getEngageParams(float& dist, int& dir, std::vector<float> &tols){
+void TolDialogHUML::getEngageParams(float& dist, int& dir, std::vector<float> &tols)
+{
 
     dist = ui->lineEdit_eng_dist->text().toFloat();
     dir = ui->comboBox_eng_dir->currentIndex();
@@ -36,31 +30,24 @@ void TolDialogHUML::getEngageParams(float& dist, int& dir, std::vector<float> &t
 
 }
 
-/**
- * @brief TolDialogHUML::getDisengageParams
- * @param dist
- * @param dir
- */
-void TolDialogHUML::getDisengageParams(float &dist, int &dir){
+
+void TolDialogHUML::getDisengageParams(float &dist, int &dir)
+{
 
     dist = ui->lineEdit_diseng_dist->text().toFloat();
     dir = ui->comboBox_diseng_dir->currentIndex();
 
 }
 
-/**
- * @brief TolDialogHUML::getTolStop
- */
-float TolDialogHUML::getTolStop(){
+float TolDialogHUML::getTolStop()
+{
 
     return ui->lineEdit_tol_stop->text().toFloat();
 }
 
-/**
- * @brief TolDialogHUML::getTolsArm
- * @param tols
- */
-void TolDialogHUML::getTolsArm(std::vector<float> &tols){
+
+void TolDialogHUML::getTolsArm(std::vector<float> &tols)
+{
 
     tols.push_back(ui->lineEdit_shoulder_r->text().toFloat());
     tols.push_back(ui->lineEdit_elbow_r->text().toFloat());
@@ -68,11 +55,9 @@ void TolDialogHUML::getTolsArm(std::vector<float> &tols){
     tols.push_back(ui->lineEdit_hand_r->text().toFloat());
 }
 
-/**
- * @brief TolDialogHUML::getTolsHand
- * @param tols
- */
-void TolDialogHUML::getTolsHand(MatrixXf &tols){
+
+void TolDialogHUML::getTolsHand(MatrixXf &tols)
+{
 
    tols = MatrixXf::Constant(4,3,1);
 
@@ -82,11 +67,10 @@ void TolDialogHUML::getTolsHand(MatrixXf &tols){
     tols(3,0) = ui->lineEdit_hand_tip_1->text().toFloat(); tols(3,1) = ui->lineEdit_hand_tip_2->text().toFloat(); tols(3,2) = ui->lineEdit_hand_tip_3->text().toFloat();
 }
 
-/**
- * @brief TolDialogHUML::getTolsTable
- * @param tols
- */
-void TolDialogHUML::getTolsTable(std::vector<float> &tols){
+/*
+
+void TolDialogHUML::getTolsTable(std::vector<float> &tols)
+{
 
 
     tols.push_back(ui->lineEdit_table_1->text().toFloat());
@@ -94,12 +78,10 @@ void TolDialogHUML::getTolsTable(std::vector<float> &tols){
     tols.push_back(ui->lineEdit_table_3->text().toFloat());
 
 }
+*/
 
-/**
- * @brief TolDialogHUML::getLambda
- * @param lambda
- */
-void TolDialogHUML::getLambda(std::vector<float> &lambda){
+void TolDialogHUML::getLambda(std::vector<float> &lambda)
+{
 
    lambda.push_back(ui->lineEdit_lambda_1->text().toFloat());
    lambda.push_back(ui->lineEdit_lambda_2->text().toFloat());
@@ -115,11 +97,9 @@ void TolDialogHUML::getLambda(std::vector<float> &lambda){
 
 }
 
-/**
- * @brief TolDialogHUML::getTolsObstacles
- * @param tols
- */
-void TolDialogHUML::getTolsObstacles(MatrixXf &tols){
+
+void TolDialogHUML::getTolsObstacles(MatrixXf &tols)
+{
 
     tols = MatrixXf::Constant(3,6,1);
 
@@ -129,11 +109,9 @@ void TolDialogHUML::getTolsObstacles(MatrixXf &tols){
 
 }
 
-/**
- * @brief TolDialogHUML::getTolsTarget
- * @param tols
- */
-void TolDialogHUML::getTolsTarget(MatrixXf &tols){
+
+void TolDialogHUML::getTolsTarget(MatrixXf &tols)
+{
 
     tols = MatrixXf::Constant(3,6,1);
 
@@ -144,85 +122,63 @@ void TolDialogHUML::getTolsTarget(MatrixXf &tols){
 
 }
 
-/**
- * @brief TolDialogHUML::getSteps
- * @return
- */
-int TolDialogHUML::getSteps(){
+
+int TolDialogHUML::getSteps()
+{
 
     return ui->lineEdit_steps->text().toInt();
 }
 
-/**
- * @brief TolDialogHUML::getWMax
- * @return
- */
-float TolDialogHUML::getWMax(){
+
+float TolDialogHUML::getWMax()
+{
 
     return ui->lineEdit_w_max->text().toFloat();
 }
 
-/**
- * @brief TolDialogHUML::getApproachAxis
- * @return
- */
-int TolDialogHUML::getApproachAxis(){
+
+int TolDialogHUML::getApproachAxis()
+{
 
     return ui->comboBox_approach_axis->currentIndex();
-
-
 }
 
-/**
- * @brief TolDialogHUML::getTolTarPos
- * @return
- */
-float TolDialogHUML::getTolTarPos(){
+
+float TolDialogHUML::getTolTarPos()
+{
 
     return ui->lineEdit_tar_pos->text().toFloat();
 }
 
-/**
- * @brief TolDialogHUML::getTolTarOr
- * @return
- */
-float TolDialogHUML::getTolTarOr(){
+
+float TolDialogHUML::getTolTarOr()
+{
 
     return ui->lineEdit_tar_or->text().toFloat();
 }
-/**
- * @brief TolDialogHUML::setInfo
- * @param info
- */
-void TolDialogHUML::setInfo(string info){
+
+void TolDialogHUML::setInfo(string info)
+{
 
     this->infoLine = info;
 }
 
-/**
- * @brief TolDialogHUML::getTargetAvoidance
- * @return
- */
-bool TolDialogHUML::getTargetAvoidance(){
+bool TolDialogHUML::getTargetAvoidance()
+{
 
    return !ui->checkBox_tar_av->isChecked();
 }
 
-
-/**
- * @brief TolDialogHUML::getObstacleAvoidance
- * @return
- */
-bool TolDialogHUML::getObstacleAvoidance(){
+bool TolDialogHUML::getObstacleAvoidance()
+{
 
     return !ui->checkBox_ob_av->isChecked();
 }
 
 // Q_SLOTS
-/**
- * @brief TolDialogHUML::on_pushButton_save_clicked
- */
-void TolDialogHUML::on_pushButton_save_clicked(){
+
+void TolDialogHUML::on_pushButton_save_clicked()
+{
 
    QString filename = QFileDialog::getSaveFileName(this,
                                                    tr("Save the file of tolerances"),
@@ -252,9 +208,9 @@ void TolDialogHUML::on_pushButton_save_clicked(){
        stream << "Hand_tip_2=" << ui->lineEdit_hand_tip_2->text().toStdString().c_str() << endl;
        stream << "Hand_tip_3=" << ui->lineEdit_hand_tip_3->text().toStdString().c_str() << endl;
        stream << "# Tolerance with the table [mm]" << endl;
-       stream << "against_wrist="<< ui->lineEdit_table_1->text().toStdString().c_str() << endl;
-       stream << "against_hand="<< ui->lineEdit_table_2->text().toStdString().c_str() << endl;
-       stream << "against_fingers="<< ui->lineEdit_table_3->text().toStdString().c_str() << endl;
+       //stream << "against_wrist="<< ui->lineEdit_table_1->text().toStdString().c_str() << endl;
+       //stream << "against_hand="<< ui->lineEdit_table_2->text().toStdString().c_str() << endl;
+       //stream << "against_fingers="<< ui->lineEdit_table_3->text().toStdString().c_str() << endl;
        stream << "# Joint Expanse factors" << endl;
        stream << "lambda_1=" << ui->lineEdit_lambda_1->text().toStdString().c_str() << endl;
        stream << "lambda_2=" << ui->lineEdit_lambda_2->text().toStdString().c_str() << endl;
@@ -342,10 +298,9 @@ void TolDialogHUML::on_pushButton_save_clicked(){
 
 
 }
-/**
- * @brief TolDialogHUML::on_pushButton_load_clicked
- */
-void TolDialogHUML::on_pushButton_load_clicked(){
+
+void TolDialogHUML::on_pushButton_load_clicked()
+{
 
     QString filename = QFileDialog::getOpenFileName(this,
                                                     tr("Load the file of tolerances"),
@@ -400,12 +355,12 @@ void TolDialogHUML::on_pushButton_load_clicked(){
                     ui->lineEdit_hand_tip_2->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Hand_tip_3"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_hand_tip_3->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("against_wrist"),Qt::CaseInsensitive)==0){
-                    ui->lineEdit_table_1->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("against_hand"),Qt::CaseInsensitive)==0){
-                    ui->lineEdit_table_2->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("against_fingers"),Qt::CaseInsensitive)==0){
-                    ui->lineEdit_table_3->setText(fields.at(1));
+                //}else if(QString::compare(fields.at(0),QString("against_wrist"),Qt::CaseInsensitive)==0){
+                    //ui->lineEdit_table_1->setText(fields.at(1));
+                //}else if(QString::compare(fields.at(0),QString("against_hand"),Qt::CaseInsensitive)==0){
+                    //ui->lineEdit_table_2->setText(fields.at(1));
+                //}else if(QString::compare(fields.at(0),QString("against_fingers"),Qt::CaseInsensitive)==0){
+                    //ui->lineEdit_table_3->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("lambda_1"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_lambda_1->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("lambda_2"),Qt::CaseInsensitive)==0){
@@ -549,8 +504,6 @@ void TolDialogHUML::on_pushButton_load_clicked(){
     }
 
 }
-
-
 
 
 } // namespace motion_manager

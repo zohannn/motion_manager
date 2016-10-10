@@ -20,6 +20,12 @@
 ** Main
 *****************************************************************************/
 
+/**
+ * @brief This is the main function of the program
+ * @param argc
+ * @param argv
+ * @return
+ */
 int main(int argc, char **argv) {
 
     /*********************

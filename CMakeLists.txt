@@ -50,6 +50,15 @@ QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
 file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS src/*.cpp)
 
 ##############################################################################
+# Settings
+##############################################################################
+
+## Documentation
+# DOC=0. do not make the documentation
+# DOC=1, make the documentation
+set(DOC 1)
+
+##############################################################################
 # External libraries
 ##############################################################################
 
@@ -93,6 +102,23 @@ target_link_libraries(motion_manager gfortran)# this has to be the last one
 
 target_link_libraries(motion_manager ${Boost_LIBRARIES})
 
-
 install(TARGETS motion_manager RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+##############################################################################
+# Documenting
+##############################################################################
+if(DOC)
+    find_package(Doxygen)
+    if(NOT DOXYGEN_FOUND)
+        message(WARNING "Doxygen not found, unable to generate documentation")
+    else()
+        add_custom_target(doc COMMAND ${DOXYGEN_EXECUTABLE} "doxyconfig/doxyfile.ini"
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+            COMMENT "Building user's documentation into the doc directory ..."
+        )
+    endif()
+endif()
+
+
+
 

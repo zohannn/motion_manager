@@ -106,7 +106,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
 
 
 
@@ -118,23 +119,14 @@ MainWindow::~MainWindow() {
 
 
 
-/*****************************************************************************
-** Implemenation [Slots][manually connected]
-*****************************************************************************/
 
-/**
- * This function is signalled by the underlying model. When the model changes,
- * this will drop the cursor down to the last line in the QListview to ensure
- * the user can always see the latest log message.
- */
-void MainWindow::updateLoggingView() {
+void MainWindow::updateLoggingView()
+{
         ui.view_logging->scrollToBottom();
 }
-/**
- * @brief MainWindow::updateRosStatus
- * @param c
- */
-void MainWindow::updateRosStatus(bool c) {
+
+void MainWindow::updateRosStatus(bool c)
+{
 
     if (c){
         ui.labelRosComm->setText(QString("connected"));
@@ -151,12 +143,9 @@ void MainWindow::updateRosStatus(bool c) {
 
 
 }
-/**
- * @brief MainWindow::updateVrepStatus
- * @param c
- */
 
-void MainWindow::updateVrepStatus(bool c){
+void MainWindow::updateVrepStatus(bool c)
+{
 
     if (c){
         ui.labelVrepComm->setText(QString("on-line"));
@@ -172,22 +161,17 @@ void MainWindow::updateVrepStatus(bool c){
     ui.pushButton_loadScenario->setEnabled(false);
     ui.groupBox_getElements->setEnabled(false);
 }
-/**
- * @brief MainWindow::addElement
- * @param value
- */
-void MainWindow::addElement(string value){
+
+void MainWindow::addElement(string value)
+{
 
     ui.listWidget_elements->addItem(QString(value.c_str()));
     ui.listWidget_elements->setCurrentRow(0);
 
 }
-/**
- * @brief MainWindow::updateElement
- * @param id
- * @param value
- */
-void MainWindow::updateElement(int id, string value){
+
+void MainWindow::updateElement(int id, string value)
+{
 
     QListWidgetItem* curr_item = ui.listWidget_elements->takeItem(id);
     delete curr_item;
@@ -195,21 +179,17 @@ void MainWindow::updateElement(int id, string value){
 
 }
 
-/**
- * @brief MainWindow::addObject
- * @param value
- */
-void MainWindow::addObject(string value){
+
+void MainWindow::addObject(string value)
+{
 
    ui.comboBox_objects->addItem(QString(value.c_str()));
    ui.comboBox_objects_eng->addItem(QString(value.c_str()));
 }
 
-/**
- * @brief MainWindow::updateHomePosture
- * @param value
- */
-void MainWindow::updateHomePosture(string value){
+
+void MainWindow::updateHomePosture(string value)
+{
 
     ui.listWidget_homePosture->addItem(QString(value.c_str()));
     ui.listWidget_homePosture->setCurrentRow(0);
@@ -219,26 +199,21 @@ void MainWindow::updateHomePosture(string value){
 /*****************************************************************************
 ** Implementation [Menu]
 *****************************************************************************/
-/**
- * @brief MainWindow::on_actionAbout_triggered
- */
 
-void MainWindow::on_actionAbout_triggered() {
-    QMessageBox::about(this, tr("About Motion Planner"),tr("<h2>Motion Planner version 0.10</h2><p>Copyright: Gianpaolo Gulletta</p><p>The Motion Planner is a ROS package."
+
+void MainWindow::on_actionAbout_triggered()
+{
+    QMessageBox::about(this, tr("About the motion manager"),tr("<h2>motion_manager version 0.10</h2><p>Copyright: Gianpaolo Gulletta</p><p>The motion manager is a ROS package."
                                                            "This software is designed to plan the movements of the arms for any humanoid robot</p>"));
 }
-/**
- * @brief MainWindow::on_actionRos_Communication_triggered
- */
-void MainWindow::on_actionRos_Communication_triggered(){
 
+void MainWindow::on_actionRos_Communication_triggered()
+{
 
     mrosCommdlg->show();
 
 }
-/**
- * @brief MainWindow::on_actionVrep_Communication_triggered
- */
+
 void MainWindow::on_actionVrep_Communication_triggered(){
 
     mvrepCommdlg->show();
@@ -249,17 +224,15 @@ void MainWindow::on_actionVrep_Communication_triggered(){
 ** Implementation [Configuration]
 *****************************************************************************/
 
-void MainWindow::on_pushButton_tuning_clicked(){
+void MainWindow::on_pushButton_tuning_clicked()
+{
 
     mTolHumldlg->show();
 }
 
-/**
- * @brief MainWindow::on_pushButton_loadScenario_clicked
- */
-void MainWindow::on_pushButton_loadScenario_clicked(){
 
-
+void MainWindow::on_pushButton_loadScenario_clicked()
+{
 
     // scenarios
     QVector<QString> scenarios;
@@ -359,10 +332,9 @@ void MainWindow::on_pushButton_loadScenario_clicked(){
     }
 
 }
-/**
- * @brief MainWindow::on_pushButton_getElements_pressed
- */
-void MainWindow::on_pushButton_getElements_pressed(){
+
+void MainWindow::on_pushButton_getElements_pressed()
+{
 
     qnode.log(QNode::Info,string("getting the elements of the scenario . . ."));
     ui.pushButton_getElements->setCheckable(true);
@@ -370,10 +342,9 @@ void MainWindow::on_pushButton_getElements_pressed(){
 
 
 }
-/**
- * @brief MainWindow::on_pushButton_plan_pressed
- */
-void MainWindow::on_pushButton_plan_pressed(){
+
+void MainWindow::on_pushButton_plan_pressed()
+{
 
     qnode.log(QNode::Info,string("planning the selected movement. . ."));
     ui.pushButton_plan->setCheckable(true);
@@ -382,10 +353,9 @@ void MainWindow::on_pushButton_plan_pressed(){
 }
 
 
-/**
- * @brief MainWindow::on_pushButton_getElements_clicked
- */
-void MainWindow::on_pushButton_getElements_clicked(){
+
+void MainWindow::on_pushButton_getElements_clicked()
+{
 
 scenarioPtr scene = this->hum_planner->getScenario();
 
@@ -420,10 +390,9 @@ scenarioPtr scene = this->hum_planner->getScenario();
 
 }
 
-/**
- * @brief MainWindow::on_pushButton_addMov_clicked
- */
-void MainWindow::on_pushButton_addMov_clicked(){
+
+void MainWindow::on_pushButton_addMov_clicked()
+{
 
     ui.pushButton_save_task->setEnabled(false);
 
@@ -592,10 +561,9 @@ void MainWindow::on_pushButton_addMov_clicked(){
 
 }
 
-/**
- * @brief MainWindow::on_pushButton_plan_clicked
- */
-void MainWindow::on_pushButton_plan_clicked(){
+
+void MainWindow::on_pushButton_plan_clicked()
+{
 
     ui.tabWidget_sol->setCurrentIndex(0);    
     problemPtr prob = hum_planner->getProblem(ui.listWidget_movs->currentRow());
@@ -787,19 +755,17 @@ void MainWindow::on_pushButton_plan_clicked(){
 
 }
 
-/**
- * @brief MainWindow::on_pushButton_execMov_pressed
- */
-void MainWindow::on_pushButton_execMov_pressed(){
+
+void MainWindow::on_pushButton_execMov_pressed()
+{
 
     qnode.log(QNode::Info,std::string("Executing the movement . . ."));
 
 }
 
-/**
- * @brief MainWindow::on_pushButton_execMov_clicked
- */
-void MainWindow::on_pushButton_execMov_clicked(){
+
+void MainWindow::on_pushButton_execMov_clicked()
+{
 
     MatrixXf vel = this->jointsVelocity_mov;
     MatrixXf traj = this->jointsPosition_mov;
@@ -811,19 +777,17 @@ void MainWindow::on_pushButton_execMov_clicked(){
 
 
 }
-/**
- * @brief MainWindow::on_pushButton_stop_mov_clicked
- */
-void MainWindow::on_pushButton_stop_mov_clicked(){
+
+void MainWindow::on_pushButton_stop_mov_clicked()
+{
 
     qnode.stopSim();
     qnode.resetSimTime();
     qnode.resetGlobals();
 }
-/**
- * @brief MainWindow::on_pushButton_stop_task_clicked
- */
-void MainWindow::on_pushButton_stop_task_clicked(){
+
+void MainWindow::on_pushButton_stop_task_clicked()
+{
 
     qnode.stopSim();
     qnode.resetSimTime();
@@ -835,10 +799,9 @@ void MainWindow::on_pushButton_execTask_pressed(){
     qnode.log(QNode::Info,std::string("Executing the task . . ."));
 }
 
-/**
- * @brief MainWindow::on_pushButton_execTask_clicked
- */
-void MainWindow::on_pushButton_execTask_clicked(){
+
+void MainWindow::on_pushButton_execTask_clicked()
+{
 
     MatrixXf traj = this->jointsPosition_task;
     MatrixXf vel = this->jointsVelocity_task;
@@ -851,10 +814,9 @@ void MainWindow::on_pushButton_execTask_clicked(){
 
 }
 
-/**
- * @brief MainWindow::on_pushButton_load_task_clicked
- */
-void MainWindow::on_pushButton_load_task_clicked(){
+
+void MainWindow::on_pushButton_load_task_clicked()
+{
 
     int mov_id; QString mov_type;
     int arm_code; QString arm_type;
@@ -1167,10 +1129,9 @@ void MainWindow::on_pushButton_load_task_clicked(){
 
 }
 
-/**
- * @brief MainWindow::on_pushButton_save_task_clicked
- */
-void MainWindow::on_pushButton_save_task_clicked(){
+
+void MainWindow::on_pushButton_save_task_clicked()
+{
 
     QString filename = QFileDialog::getSaveFileName(this,
                                                     tr("Save the task trajectory"),
@@ -1207,10 +1168,9 @@ void MainWindow::on_pushButton_save_task_clicked(){
 
 }
 
-/**
- * @brief MainWindow::on_pushButton_scene_reset_clicked
- */
-void MainWindow::on_pushButton_scene_reset_clicked(){
+
+void MainWindow::on_pushButton_scene_reset_clicked()
+{
 
     // reset the movements
     ui.listWidget_sol_mov->clear();
@@ -1284,10 +1244,9 @@ void MainWindow::on_pushButton_scene_reset_clicked(){
 
 
 }
-/**
- * @brief MainWindow::on_pushButton_append_mov_clicked
- */
-void MainWindow::on_pushButton_append_mov_clicked(){
+
+void MainWindow::on_pushButton_append_mov_clicked()
+{
 
     ui.pushButton_save_task->setEnabled(true);
 
@@ -1354,10 +1313,9 @@ void MainWindow::on_pushButton_append_mov_clicked(){
 
 
 }
-/**
- * @brief MainWindow::on_pushButton_clear_task_clicked
- */
-void MainWindow::on_pushButton_clear_task_clicked(){
+
+void MainWindow::on_pushButton_clear_task_clicked()
+{
 
     this->jointsVelocity_task.resize(0,0);
     this->jointsPosition_task.resize(0,0);
@@ -1376,11 +1334,9 @@ void MainWindow::on_pushButton_clear_task_clicked(){
 
 }
 
-/**
- * @brief on_comboBox_Task_currentIndexChanged
- * @param a
- */
-void MainWindow::on_comboBox_Task_currentIndexChanged(int i){
+
+void MainWindow::on_comboBox_Task_currentIndexChanged(int i)
+{
 
    switch (i){
 
@@ -1403,11 +1359,9 @@ void MainWindow::on_comboBox_Task_currentIndexChanged(int i){
    }
 }
 
-/**
- * @brief MainWindow::on_comboBox_mov_currentIndexChanged
- * @param i
- */
-void MainWindow::on_comboBox_mov_currentIndexChanged(int i){
+
+void MainWindow::on_comboBox_mov_currentIndexChanged(int i)
+{
 
     switch (i){
 
@@ -1458,11 +1412,9 @@ void MainWindow::on_comboBox_mov_currentIndexChanged(int i){
 
 
 }
-/**
- * @brief MainWindow::onListScenarioItemClicked
- * @param item
- */
-void MainWindow::onListScenarioItemClicked(QListWidgetItem *item){
+
+void MainWindow::onListScenarioItemClicked(QListWidgetItem *item)
+{
 
     ui.pushButton_loadScenario->setEnabled(true);
 
@@ -1527,10 +1479,9 @@ void MainWindow::onListScenarioItemClicked(QListWidgetItem *item){
 }
 
 
-/**
- * @brief MainWindow::ReadSettings
- */
-void MainWindow::ReadSettings() {
+
+void MainWindow::ReadSettings()
+{
     QSettings settings("Qt-Ros Package", "motion_manager");
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
@@ -1552,10 +1503,9 @@ void MainWindow::ReadSettings() {
 
 }
 
-/**
- * @brief MainWindow::WriteSettings
- */
-void MainWindow::WriteSettings() {
+
+void MainWindow::WriteSettings()
+{
     QSettings settings("Qt-Ros Package", "motion_manager");
     settings.setValue("master_url", mrosCommdlg->getMasterUrl());
     settings.setValue("host_url", mrosCommdlg->getHostUrl());
@@ -1565,10 +1515,7 @@ void MainWindow::WriteSettings() {
     settings.setValue("windowState", saveState());
 
 }
-/**
- * @brief MainWindow::closeEvent
- * @param event
- */
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
 	WriteSettings();

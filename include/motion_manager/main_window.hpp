@@ -1,10 +1,3 @@
-/**
- * @file /include/motion_manager/main_window.hpp
- *
- * @brief Qt based gui for motion_manager.
- *
- * @date November 2010
- **/
 #ifndef motion_manager_MAIN_WINDOW_H
 #define motion_manager_MAIN_WINDOW_H
 
@@ -26,98 +19,260 @@
 #include <humplanner.hpp>
 // ************ //
 
-/*****************************************************************************
-** Namespace
-*****************************************************************************/
 
+/** This is the main namespace of the program */
 namespace motion_manager {
 
 using namespace std;
+typedef boost::shared_ptr<HUMotion::HUMPlanner> humplannerPtr; /**< shared pointer to a human-like motion planner */
 
-typedef boost::shared_ptr<HUMotion::HUMPlanner> humplannerPtr;
-
-/*****************************************************************************
-** Interface [MainWindow]
-*****************************************************************************/
+//! The MainWindow class
 /**
  * @brief Qt central, all operations relating to the view part here.
  */
-class MainWindow : public QMainWindow {
-Q_OBJECT
+class MainWindow : public QMainWindow
+{
+
+    Q_OBJECT
 
 public:
+        /**
+         * @brief MainWindow, a contructor
+         * @param argc
+         * @param argv
+         * @param parent
+         */
 	MainWindow(int argc, char** argv, QWidget *parent = 0);
+
+        /**
+         * @brief ~MainWindow, a destructor
+         */
 	~MainWindow();
 
-	void ReadSettings(); // Load up qt program settings at startup
-	void WriteSettings(); // Save qt program settings when closing
+        /**
+         * @brief This method loads up qt program settings at startup
+         */
+        void ReadSettings();
 
-	void closeEvent(QCloseEvent *event); // Overloaded function
+        /**
+         * @brief This method saves qt program settings when closing
+         */
+        void WriteSettings();
+
+        /**
+         * @brief This method menages the close event
+         * @param event
+         */
+        void closeEvent(QCloseEvent *event);
 
 public Q_SLOTS:
-	/******************************************
-	** Auto-connections (connectSlotsByName())
-	*******************************************/
-        void on_actionAbout_triggered(); // About Dialog
-        void on_actionRos_Communication_triggered(); // Ros Comm Dialog
-        void on_actionVrep_Communication_triggered(); // Vrep Comm Dialog
-        void on_pushButton_loadScenario_clicked(); // load the scenario
-        void on_pushButton_getElements_clicked(); // get the elements of the scenario
-        void on_pushButton_getElements_pressed(); // get the elements of the scenario
-        void on_pushButton_addMov_clicked(); // add a movement to the task
-        void on_comboBox_Task_currentIndexChanged(int i); // select the type of task
-        void on_comboBox_mov_currentIndexChanged(int i); // select the type of movement
-        void on_pushButton_plan_clicked(); // plan the selected movement
-        void on_pushButton_plan_pressed(); // plan the selected movement
-        void on_pushButton_execMov_clicked(); // execute the movement
-        void on_pushButton_execMov_pressed(); // execute the movement
-        void on_pushButton_scene_reset_clicked(); // reset the scene
-        void on_pushButton_tuning_clicked(); // tuning the optimization problem
-        void on_pushButton_append_mov_clicked(); // append the movement to the task
-        void on_pushButton_clear_task_clicked(); //clear the current task
-        void on_pushButton_execTask_clicked(); // execute the current task
-        void on_pushButton_execTask_pressed(); // execute the current task
-        void on_pushButton_save_task_clicked(); // save the current task
-        void on_pushButton_load_task_clicked();  // load the current task
-        void on_pushButton_stop_mov_clicked(); // stop the simulation
-        void on_pushButton_stop_task_clicked(); // stop the simulation
 
-        /******************************************
-        ** Manual connections
-        *******************************************/
-        void updateLoggingView(); // no idea why this can't connect automatically
+        /**
+         * @brief This method shows the about dialog
+         */
+        void on_actionAbout_triggered();
+
+        /**
+         * @brief This method shows the ROS communication dialog
+         */
+        void on_actionRos_Communication_triggered();
+
+        /**
+         * @brief This method shows the V-REP communication dialog
+         */
+        void on_actionVrep_Communication_triggered();
+
+        /**
+         * @brief This method loads the selected scenario
+         */
+        void on_pushButton_loadScenario_clicked();
+
+        /**
+         * @brief This method retrievies the information about
+         * the elements in the scenario
+         */
+        void on_pushButton_getElements_clicked();
+
+        /**
+         * @brief This method retrievies the information about
+         * the elements in the scenario
+         */
+        void on_pushButton_getElements_pressed();
+
+        /**
+         * @brief This method adds a movement to the task
+         */
+        void on_pushButton_addMov_clicked();
+
+        /**
+         * @brief This method selects the type of task
+         * @param i
+         * index of the task. Single-arm task: i=0. Dual-arm task: i=1;
+         */
+        void on_comboBox_Task_currentIndexChanged(int i);
+
+        /**
+         * @brief This method selects the type of task
+         * @param i
+         * <table>
+         * <caption id="multi_row">Types of the movement</caption>
+         * <tr><th>Type      <th>index
+         * <tr><td>Reach-to-grasp <td>0
+         * <tr><td>Reaching <td>1
+         * <tr><td>Transport <td>2
+         * <tr><td>Engage <td>3
+         * <tr><td>Disengage <td>4
+         * <tr><td>Go home <td>5
+         * </table>
+         */
+        void on_comboBox_mov_currentIndexChanged(int i);
+
+        /**
+         * @brief This method plans the selected movement
+         */
+        void on_pushButton_plan_clicked();
+
+        /**
+         * @brief This method plans the selected movement
+         */
+        void on_pushButton_plan_pressed();
+
+        /**
+         * @brief This method executes the selected movement
+         */
+        void on_pushButton_execMov_clicked();
+
+        /**
+         * @brief This method executes the selected movement
+         */
+        void on_pushButton_execMov_pressed();
+
+        /**
+         * @brief This method reload the scenario and resets the related variables
+         */
+        void on_pushButton_scene_reset_clicked();
+
+        /**
+         * @brief This method shows the tuning dialog
+         */
+        void on_pushButton_tuning_clicked();
+
+        /**
+         * @brief This method appends the movement to the current task
+         */
+        void on_pushButton_append_mov_clicked();
+
+        /**
+         * @brief This method deletes the current task
+         */
+        void on_pushButton_clear_task_clicked();
+
+        /**
+         * @brief This method executes the current task
+         */
+        void on_pushButton_execTask_clicked();
+
+        /**
+         * @brief This method executes the current task
+         */
+        void on_pushButton_execTask_pressed();
+
+        /**
+         * @brief This method saves the current task to file
+         */
+        void on_pushButton_save_task_clicked();
+
+        /**
+         * @brief This method loads the current task from file
+         */
+        void on_pushButton_load_task_clicked();
+
+        /**
+         * @brief This method stops the execution of the movement
+         */
+        void on_pushButton_stop_mov_clicked();
+
+        /**
+         * @brief This method stops the execution of the task
+         */
+        void on_pushButton_stop_task_clicked();
+
+        /**
+         * This method is signalled by the underlying model. When the model changes,
+         * this will drop the cursor down to the last line in the QListview to ensure
+         * the user can always see the latest log message.
+         */
+        void updateLoggingView();
+
+        /**
+         * @brief This method updates the ROS status
+         * @param c
+         * c=true => "connected", c=false => "disconnected"
+         */
         void updateRosStatus(bool c);
+
+        /**
+         * @brief This method updates the V-REP status
+         * @param c
+         * c=true => "connected", c=false => "disconnected"
+         */
         void updateVrepStatus(bool c);
+
+        /**
+         * @brief This method adds a new element to the widget
+         * @param value
+         */
         void addElement(string value);
+
+        /**
+         * @brief This method updates the info of the element with index id
+         * @param id
+         * @param value
+         */
         void updateElement(int id,string value);
+
+        /**
+         * @brief This method add an object to the lists of
+         * available objects for manipulation
+         * @param value
+         */
         void addObject(string value);
+
+        /**
+         * @brief This methods updates the home posture of the humanoid
+         * @param value
+         */
         void updateHomePosture(string value);
+
+        /**
+         * @brief This method lists the available scenarios
+         * @param item
+         */
         void onListScenarioItemClicked(QListWidgetItem* item);
 
 
 
 private:
-	Ui::MainWindowDesign ui;
-        QNode qnode;
-        RosCommDialog *mrosCommdlg;
-        VrepCommDialog *mvrepCommdlg;
-        TolDialogHUML *mTolHumldlg;
-        int scenario_id;
+        Ui::MainWindowDesign ui; /**< handles of the main user interface */
+        QNode qnode; /**< ROS node handle */
+        RosCommDialog *mrosCommdlg; /**< handle of the ROS communication dialog */
+        VrepCommDialog *mvrepCommdlg; /**< handle of the V-REP communication dialog */
+        TolDialogHUML *mTolHumldlg; /**< handle of the tuning dialog */
+        int scenario_id; /**< id of the current scenario */
+        humplannerPtr hum_planner; /**< human-like upper-limbs movement planner */
+        float timeStep; /**< current time step of the trajectory */
+        MatrixXf jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
+        MatrixXf jointsPosition_mov; /**< trajectory of the joint position of the movement */
+        MatrixXf jointsVelocity_task; /**< trajectory of the joint velocity of the task */
+        MatrixXf jointsPosition_task; /**< trajectory of the joint position of the task */
+        std::vector<float> timeSteps_task; /**< vector of time steps of each movement in the task */
+        std::vector<int> nSteps_task; /**< vector of number of steps of each movement in the task */
+        std::vector<string> vel_steps; /**< steps of the trajectory for saving/loading file */
+        std::vector<float> tols_stop; /**< vector of the tolerances to stop each movement in the task */
+        movementPtr mov; /**< current movement */
+        scenarioPtr init_scene; /**< initial scenario */
 
-        humplannerPtr hum_planner; // human-like upper-limbs planner
-        float timeStep; // current tiemStep
-        MatrixXf jointsVelocity_mov; // joint velocity of the movement
-        MatrixXf jointsPosition_mov; // joint position of the movement
-        MatrixXf jointsVelocity_task; // joint velocity of the task
-        MatrixXf jointsPosition_task; // joint position of the task
-        std::vector<float> timeSteps_task; // vector of time steps of each movement
-        std::vector<int> nSteps_task; // vector of number of steps of each movement
-        std::vector<string> vel_steps; // steps of the trajectory for the file
-        std::vector<float> tols_stop; // vector of the tolerances to stop the movement
-        movementPtr mov; // current movement
-        scenarioPtr init_scene; // initial scene
-
-        // --- Home postures for ARoS --- //
+        // --- Park postures for ARoS --- //
 
         // Right arm [deg]
         // Joint 0 = -137.500
@@ -145,7 +300,7 @@ private:
         // Joint 9 = 70.0
         // Joint 10 = 70.0
 
-        // --- Home postures for Jarde --- //
+        // --- Park postures for Jarde --- //
 
         // Right arm [deg]
         // Joint 0 = -90

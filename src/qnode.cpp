@@ -1,10 +1,3 @@
-/**
- * @file /src/qnode.cpp
- *
- * @brief Ros communication central!
- *
- * @date February 2011
- **/
 
 /*****************************************************************************
 ** Includes
@@ -48,10 +41,6 @@
 
 
 
-/*****************************************************************************
-** Namespaces
-*****************************************************************************/
-
 namespace motion_manager {
 
 int h_detobj;
@@ -91,11 +80,7 @@ std::vector<bool> closed(3,false);
 /*****************************************************************************
 ** Implementation
 *****************************************************************************/
-/**
- * @brief QNode::QNode
- * @param argc
- * @param argv
- */
+
 QNode::QNode(int argc, char** argv ) :
 	init_argc(argc),
 	init_argv(argv)
@@ -109,39 +94,28 @@ QNode::QNode(int argc, char** argv ) :
     logging::add_common_attributes();
 
 }
-/**
- * @brief QNode::~QNode
- */
-QNode::~QNode() {
-    if(ros::isStarted()) {
-      ros::shutdown(); // explicitly needed since we use ros::start();
-      ros::waitForShutdown();
-    }
-	wait();
+
+QNode::~QNode()
+{
+    wait();
 }
-/**
- * @brief QNode::on_init
- * @return
- */
-bool QNode::on_init() {
+
+bool QNode::on_init()
+{
     ros::init(init_argc,init_argv,"motion_manager");
 	if ( ! ros::master::check() ) {
 		return false;
 	}
-    ros::start(); // explicitly needed since our nodehandle is going out of scope.
+    //ros::start(); // explicitly needed since our nodehandle is going out of scope.
     //ros::NodeHandle n;
 	// Add your ros communications here.
     //chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
     start();
 	return true;
 }
-/**
- * @brief QNode::on_init
- * @param master_url
- * @param host_url
- * @return
- */
-bool QNode::on_init(const std::string &master_url, const std::string &host_url) {
+
+bool QNode::on_init(const std::string &master_url, const std::string &host_url)
+{
 	std::map<std::string,std::string> remappings;
 	remappings["__master"] = master_url;
 	remappings["__hostname"] = host_url;
@@ -149,30 +123,29 @@ bool QNode::on_init(const std::string &master_url, const std::string &host_url) 
 	if ( ! ros::master::check() ) {
 		return false;
 	}
-    ros::start(); // explicitly needed since our nodehandle is going out of scope.
+    //ros::start(); // explicitly needed since our nodehandle is going out of scope.
     //ros::NodeHandle n;
 	// Add your ros communications here.
     //chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
     start();
 	return true;
 }
-/**
- * @brief QNode::on_end
- */
-void QNode::on_end(){
 
+void QNode::on_end()
+{
+
+    /*
     if(ros::isStarted()) {
-      ros::shutdown(); // explicitly needed since we use ros::start();
-      ros::waitForShutdown();
+      //ros::shutdown(); // explicitly needed since we use ros::start();
+      //ros::waitForShutdown();
     }
-    wait();
+    */
+    //wait();
 
 }
-/**
- * @brief QNode::loadScenario
- * @param path
- */
-bool  QNode::loadScenario(const std::string& path,int id){
+
+bool  QNode::loadScenario(const std::string& path,int id)
+{
 
     ros::NodeHandle n;
 
@@ -234,38 +207,28 @@ bool  QNode::loadScenario(const std::string& path,int id){
 
 
 }
-/**
- * @brief QNode::resetSimTime
- */
-void QNode::resetSimTime(){
+
+void QNode::resetSimTime()
+{
 
     this->TotalTime=0.0;
 }
-/**
- * @brief QNode::resetGlobals
- */
-void QNode::resetGlobals(){
+
+void QNode::resetGlobals()
+{
 
     for (int i =0; i < 3; ++i){
-
         closed.at(i)=false;
         needFullOpening.at(i)=0;
         firstPartLocked.at(i)=false;
-
     }
 
     obj_in_hand = false;
-
-
-
 }
 
-/**
- * @brief QNode::getElements
- * @param scene
- * @return
- */
-bool QNode::getElements(scenarioPtr scene){
+
+bool QNode::getElements(scenarioPtr scene)
+{
 
 
     ros::NodeHandle n;
@@ -378,7 +341,7 @@ bool QNode::getElements(scenarioPtr scene){
     humanoid_part left_upper_leg; // parameters of the left upper leg (Jarde)
     std::string l_upper_leg_str;
     std::vector<float> l_upper_leg_vec;
-*/
+    */
     // postures of the humanoid
     std::vector<float> rposture = std::vector<float>(HUMotion::JOINTS_ARM+HUMotion::JOINTS_HAND); // right
     std::vector<float> lposture = std::vector<float>(HUMotion::JOINTS_ARM+HUMotion::JOINTS_HAND); // left
@@ -1484,11 +1447,8 @@ bool QNode::getElements(scenarioPtr scene){
 
 
 
-/**
- * @brief QNode::BlueColumnCallback
- * @param data
- */
-void QNode::BlueColumnCallback(const geometry_msgs::PoseStamped &data){
+void QNode::BlueColumnCallback(const geometry_msgs::PoseStamped &data)
+{
 
     //BOOST_LOG_SEV(lg, info) << "blue_callback"  ;
 
@@ -1499,11 +1459,8 @@ void QNode::BlueColumnCallback(const geometry_msgs::PoseStamped &data){
 
 }
 
-/**
- * @brief QNode::GreenColumnCallback
- * @param data
- */
-void QNode::GreenColumnCallback(const geometry_msgs::PoseStamped &data){
+void QNode::GreenColumnCallback(const geometry_msgs::PoseStamped &data)
+{
 
     //BOOST_LOG_SEV(lg, info) << "green_callback"  ;
 
@@ -1514,11 +1471,9 @@ void QNode::GreenColumnCallback(const geometry_msgs::PoseStamped &data){
 
  }
 
-/**
- * @brief QNode::RedColumnCallback
- * @param data
- */
-void QNode::RedColumnCallback(const geometry_msgs::PoseStamped &data){
+
+void QNode::RedColumnCallback(const geometry_msgs::PoseStamped &data)
+{
 
     //BOOST_LOG_SEV(lg, info) << "red_callback"  ;
 
@@ -1529,11 +1484,9 @@ void QNode::RedColumnCallback(const geometry_msgs::PoseStamped &data){
 
 }
 
-/**
- * @brief QNode::MagentaColumnCallback
- * @param data
- */
-void QNode::MagentaColumnCallback(const geometry_msgs::PoseStamped &data){
+
+void QNode::MagentaColumnCallback(const geometry_msgs::PoseStamped &data)
+{
 
     //BOOST_LOG_SEV(lg, info) << "magenta_callback"  ;
 
@@ -1545,11 +1498,8 @@ void QNode::MagentaColumnCallback(const geometry_msgs::PoseStamped &data){
 }
 
 
-/**
- * @brief QNode::Nut1Callback
- * @param data
- */
-void QNode::Nut1Callback(const geometry_msgs::PoseStamped &data){
+void QNode::Nut1Callback(const geometry_msgs::PoseStamped &data)
+{
 
     //BOOST_LOG_SEV(lg, info) << "nut1_callback"  ;
 
@@ -1562,11 +1512,8 @@ void QNode::Nut1Callback(const geometry_msgs::PoseStamped &data){
 }
 
 
-/**
- * @brief QNode::Nut2Callback
- * @param data
- */
-void QNode::Nut2Callback(const geometry_msgs::PoseStamped &data){
+void QNode::Nut2Callback(const geometry_msgs::PoseStamped &data)
+{
 
     //BOOST_LOG_SEV(lg, info) << "nut2_callback"  ;
 
@@ -1577,11 +1524,9 @@ void QNode::Nut2Callback(const geometry_msgs::PoseStamped &data){
     this->updateObjectInfo(obj_id,name,data);
 }
 
-/**
- * @brief QNode::Wheel1Callback
- * @param data
- */
-void QNode::Wheel1Callback(const geometry_msgs::PoseStamped &data){
+
+void QNode::Wheel1Callback(const geometry_msgs::PoseStamped &data)
+{
 
     //BOOST_LOG_SEV(lg, info) << "wheel1_callback"  ;
 
@@ -1592,11 +1537,9 @@ void QNode::Wheel1Callback(const geometry_msgs::PoseStamped &data){
 
 }
 
-/**
- * @brief QNode::Wheel2Callback
- * @param data
- */
-void QNode::Wheel2Callback(const geometry_msgs::PoseStamped &data){
+
+void QNode::Wheel2Callback(const geometry_msgs::PoseStamped &data)
+{
 
     //BOOST_LOG_SEV(lg, info) << "wheel2_callback"  ;
 
@@ -1607,11 +1550,8 @@ void QNode::Wheel2Callback(const geometry_msgs::PoseStamped &data){
 
 }
 
-/**
- * @brief QNode::BaseCallback
- * @param data
- */
-void QNode::BaseCallback(const geometry_msgs::PoseStamped &data){
+void QNode::BaseCallback(const geometry_msgs::PoseStamped &data)
+{
 
     //BOOST_LOG_SEV(lg, info) << "base_callback"  ;
 
@@ -1621,11 +1561,9 @@ void QNode::BaseCallback(const geometry_msgs::PoseStamped &data){
     this->updateObjectInfo(obj_id,name,data);
 }
 
-/**
- * @brief QNode::TableCallback
- * @param data
- */
-void QNode::TableCallback(const geometry_msgs::PoseStamped &data){
+
+void QNode::TableCallback(const geometry_msgs::PoseStamped &data)
+{
 
     //BOOST_LOG_SEV(lg, info) << "table_callback"  ;
 
@@ -1636,13 +1574,9 @@ void QNode::TableCallback(const geometry_msgs::PoseStamped &data){
 
 }
 
-/**
- * @brief QNode::updateObjectInfo
- * @param obj_id
- * @param name
- * @param data
- */
-void QNode::updateObjectInfo(int obj_id, string name, const geometry_msgs::PoseStamped &data){
+
+void QNode::updateObjectInfo(int obj_id, string name, const geometry_msgs::PoseStamped &data)
+{
 
 
     std::vector<float> rpy;
@@ -1733,13 +1667,8 @@ void QNode::updateObjectInfo(int obj_id, string name, const geometry_msgs::PoseS
 
 }
 
-/**
- * @brief QNode::getRPY
- * @param Trans
- * @param rpy
- * @return
- */
-bool QNode::getRPY(Matrix4f Trans, std::vector<float> &rpy){
+bool QNode::getRPY(Matrix4f Trans, std::vector<float> &rpy)
+{
 
     rpy = std::vector<float>(3);
 
@@ -1767,116 +1696,6 @@ bool QNode::getRPY(Matrix4f Trans, std::vector<float> &rpy){
 }
 
 
-/*
-
-void QNode::infoScene(const std_msgs::StringConstPtr& msg){
-
-    //std::cout << "received = " << msg->data.c_str() << endl;
-    std::vector<objectPtr> objs;
-    this->curr_scene->getObjects(objs);
-    QString info = QString(msg->data.c_str());
-    QStringList objects_info = info.split("_%%_");
-
-    for(int i = 0; i < objects_info.size(); ++i){
-
-        QStringList object_info = objects_info.at(i).split("_::_");
-        QString obj_name = object_info.at(0);
-        QString obj_data = object_info.at(1);
-        int floatCount = obj_data.toStdString().size()/sizeof(float);
-        std::vector<float> myReceivedFloats;
-        for (int k=0;k<floatCount;++k)
-            myReceivedFloats.push_back(((float*)obj_data.toStdString().c_str())[k]);
-
-
-        for(int j=0; j < objs.size(); ++j){
-            objectPtr curr_obj = objs.at(j);
-            if(std::strcmp(obj_name.toStdString().c_str(),curr_obj->getName().c_str())==0){
-                if(myReceivedFloats.size()>=3){
-                    pos obj_pos;
-                    obj_pos.Xpos=myReceivedFloats.at(0)*1000;//[mm]
-                    obj_pos.Ypos=myReceivedFloats.at(1)*1000;//[mm]
-                    obj_pos.Zpos=myReceivedFloats.at(2)*1000;//[mm]
-                    curr_obj->setPos(obj_pos);
-                }
-                if(myReceivedFloats.size()>=6){
-                    orient obj_or;
-                    obj_or.roll=myReceivedFloats.at(3)*M_PI/180;//[rad]
-                    obj_or.pitch=myReceivedFloats.at(4)*M_PI/180;//[rad]
-                    obj_or.yaw=myReceivedFloats.at(5)*M_PI/180;//[rad]
-                    curr_obj->setOr(obj_or);
-                }
-                if(myReceivedFloats.size()>=9){
-                    dim obj_dim;
-                    obj_dim.Xsize=myReceivedFloats.at(6)*1000;//[mm]
-                    obj_dim.Ysize=myReceivedFloats.at(7)*1000;//[mm]
-                    obj_dim.Zsize=myReceivedFloats.at(8)*1000;//[mm]
-                    curr_obj->setSize(obj_dim);
-                }
-                if(myReceivedFloats.size()>=12){
-                    pos tar_right_pos;
-                    tar_right_pos.Xpos=myReceivedFloats.at(9)*1000;//[mm]
-                    tar_right_pos.Ypos=myReceivedFloats.at(10)*1000;//[mm]
-                    tar_right_pos.Zpos=myReceivedFloats.at(11)*1000;//[mm]
-                    curr_obj->getTargetRight()->setPos(tar_right_pos);
-                }
-                if(myReceivedFloats.size()>=15){
-                    orient tar_right_or;
-                    tar_right_or.roll=myReceivedFloats.at(12)*M_PI/180;//[rad]
-                    tar_right_or.pitch=myReceivedFloats.at(13)*M_PI/180;//[rad]
-                    tar_right_or.yaw=myReceivedFloats.at(14)*M_PI/180;//[rad]
-                    curr_obj->getTargetRight()->setOr(tar_right_or);
-                }
-                if(myReceivedFloats.size()>=18){
-                    pos tar_left_pos;
-                    tar_left_pos.Xpos=myReceivedFloats.at(15)*1000;//[mm]
-                    tar_left_pos.Ypos=myReceivedFloats.at(16)*1000;//[mm]
-                    tar_left_pos.Zpos=myReceivedFloats.at(17)*1000;//[mm]
-                    curr_obj->getTargetLeft()->setPos(tar_left_pos);
-                }
-                if(myReceivedFloats.size()>=21){
-                    orient tar_left_or;
-                    tar_left_or.roll=myReceivedFloats.at(18)*M_PI/180;//[rad]
-                    tar_left_or.pitch=myReceivedFloats.at(19)*M_PI/180;//[rad]
-                    tar_left_or.yaw=myReceivedFloats.at(20)*M_PI/180;//[rad]
-                    curr_obj->getTargetLeft()->setOr(tar_left_or);
-                }
-                if(myReceivedFloats.size()>=24){
-                    pos eng_pos;
-                    eng_pos.Xpos=myReceivedFloats.at(21)*1000;//[mm]
-                    eng_pos.Ypos=myReceivedFloats.at(22)*1000;//[mm]
-                    eng_pos.Zpos=myReceivedFloats.at(23)*1000;//[mm]
-                    curr_obj->getEngagePoint()->setPos(eng_pos);
-                }
-                if(myReceivedFloats.size()>=27){
-                    orient eng_or;
-                    eng_or.roll=myReceivedFloats.at(24)*M_PI/180;//[mm]
-                    eng_or.pitch=myReceivedFloats.at(25)*M_PI/180;//[mm]
-                    eng_or.yaw=myReceivedFloats.at(26)*M_PI/180;//[mm]
-                    curr_obj->getEngagePoint()->setOr(eng_or);
-                }
-
-                this->curr_scene->setObject(j,curr_obj);
-
-
-                //std::cout << obj_name.toStdString() << " ";
-
-            }
-
-        }
-
-        //std::cout << obj_name.toStdString() << " ";
-    }
-
-
-}
-
-*/
-
-
-/**
- * @brief QNode::infoCallback
- * @param info
- */
 void QNode::infoCallback(const vrep_common::VrepInfoConstPtr& info)
 {
 
@@ -1885,11 +1704,9 @@ void QNode::infoCallback(const vrep_common::VrepInfoConstPtr& info)
     simulationRunning=(info->simulatorState.data&1)!=0;
     //printf("simulation time: %f [sec]\n",simulationTime);
 }
-/**
- * @brief QNode::rightProxCallback
- * @param data
- */
-void QNode::rightProxCallback(const vrep_common::ProximitySensorData& data){
+
+void QNode::rightProxCallback(const vrep_common::ProximitySensorData& data)
+{
 
     //ros::NodeHandle node;
     //BOOST_LOG_SEV(lg, info) << "right_prox_callback"  ;
@@ -1957,11 +1774,9 @@ void QNode::rightProxCallback(const vrep_common::ProximitySensorData& data){
     }
 
 }
-/**
- * @brief QNode::leftProxCallback
- * @param data
- */
-void QNode::leftProxCallback(const vrep_common::ProximitySensorData& data){
+
+void QNode::leftProxCallback(const vrep_common::ProximitySensorData& data)
+{
 
     //BOOST_LOG_SEV(lg, info) << "left_prox_callback"  ;
 
@@ -1977,17 +1792,9 @@ void QNode::leftProxCallback(const vrep_common::ProximitySensorData& data){
 
 }
 
-/**
- * @brief QNode::execMovement
- * @param traj
- * @param vel
- * @param timeStep
- * @param tol_stop
- * @param mov
- * @param scene
- * @return
- */
-bool QNode::execMovement(MatrixXf& traj, MatrixXf& vel, float timeStep, float tol_stop, movementPtr mov, scenarioPtr scene){
+
+bool QNode::execMovement(MatrixXf& traj, MatrixXf& vel, float timeStep, float tol_stop, movementPtr mov, scenarioPtr scene)
+{
 
     this->curr_scene = scene;
     int scenarioID = scene->getID();
@@ -2317,18 +2124,9 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 
 }
 
-/**
- * @brief QNode::execTask
- * @param traj_task
- * @param vel_task
- * @param timeSteps
- * @param nSteps
- * @param tols_stop
- * @param task
- * @param scene
- * @return
- */
-bool QNode::execTask(MatrixXf& traj_task, MatrixXf &vel_task, std::vector<float> &timeSteps, std::vector<int> &nSteps, std::vector<float> &tols_stop,taskPtr task, scenarioPtr scene){
+
+bool QNode::execTask(MatrixXf& traj_task, MatrixXf &vel_task, std::vector<float> &timeSteps, std::vector<int> &nSteps, std::vector<float> &tols_stop,taskPtr task, scenarioPtr scene)
+{
 
     // TO DO:  integrate the trajectory that is the solution of the given problem with the movement object that is part of the problem
     ros::NodeHandle node;
@@ -2708,25 +2506,16 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 }
 
 
-
-
-/**
- * @brief QNode::interpolate
- * @param ya
- * @param yb
- * @param m
- * @return
- */
-float QNode::interpolate(float ya, float yb, float m){
+float QNode::interpolate(float ya, float yb, float m)
+{
 
     // linear interpolation
     return ya+(yb-ya)*m;
 
 }
-/**
- * @brief QNode::stopSim
- */
-void QNode::stopSim(){
+
+void QNode::stopSim()
+{
 
     ros::NodeHandle node;
 
@@ -2738,16 +2527,10 @@ void QNode::stopSim(){
 
 }
 
-/**
- * @brief QNode::checkVrepCallback
- * @param msg
- */
-void QNode::checkVrepCallback(const std_msgs::String::ConstPtr& msg){}
 
-/**
- * @brief QNode::checkVrep
- */
-bool QNode::checkVrep(){
+
+bool QNode::checkVrep()
+{
 
     FILE *fp;
     const int length=1000;
@@ -2768,7 +2551,6 @@ bool QNode::checkVrep(){
                 // V-REP is off-line
                 online=false;
             }else{
-
                 // V-REP is on-line
                 online=true;
             }
@@ -2777,7 +2559,6 @@ bool QNode::checkVrep(){
         cnt++;
 
     }
-
     return online;
 
 }
@@ -2785,28 +2566,21 @@ bool QNode::checkVrep(){
 
 
 
-void QNode::run() {
+void QNode::run()
+{
     //ros::Rate loop_rate(0.5);
     //ros::NodeHandle node;
 
+    while ( ros::ok() ) {} // infinite loop while ros is running
 
-
-    while ( ros::ok() ) {
-
-
-    }
-
-    ros::spinOnce(); // handls ROS messages
-    std::cout << "Ros shutdown, proceeding to close the gui." << std::endl;
-    Q_EMIT rosShutdown(); // used to signal the gui for a shutdown (useful to roslaunch)
+    ros::spinOnce(); // handles ROS messages
+    //std::cout << "Ros shutdown, proceeding to close the gui." << std::endl;
+    //Q_EMIT rosShutdown(); // used to signal the gui for a shutdown (useful to roslaunch)
 }
 
 
-/**
- * @brief QNode::JointsCallback
- * @param state
- */
-void QNode::JointsCallback(const sensor_msgs::JointState &state){
+void QNode::JointsCallback(const sensor_msgs::JointState &state)
+{
 
 std::vector<std::string> joints_names = state.name;
 std::vector<float> joints_pos(state.position.begin(),state.position.end());
@@ -2922,7 +2696,8 @@ if (this->curr_scene){
 }
 
 
-void QNode::log( const LogLevel &level, const std::string &msg) {
+void QNode::log( const LogLevel &level, const std::string &msg)
+{
 	logging_model.insertRows(logging_model.rowCount(),1);
 	std::stringstream logging_model_msg;
     //ros::Time::init();// bug fixed
@@ -2960,11 +2735,11 @@ void QNode::log( const LogLevel &level, const std::string &msg) {
 	}
 	QVariant new_row(QString(logging_model_msg.str().c_str()));
 	logging_model.setData(logging_model.index(logging_model.rowCount()-1),new_row);
-	Q_EMIT loggingUpdated(); // used to readjust the scrollbar
+    Q_EMIT loggingUpdated();
 }
 
-// Get current date/time, format is YYYY-MM-DD.HH:mm:ss
-const std::string QNode::currentDateTime() {
+const std::string QNode::currentDateTime()
+{
     time_t     now = time(0);
     struct tm  tstruct;
     char       buf[80];
@@ -2976,9 +2751,7 @@ const std::string QNode::currentDateTime() {
     return buf;
 }
 
-/**
- * @brief QNode::init
- */
+
 void QNode::init()
 {
 
@@ -2999,107 +2772,9 @@ void QNode::init()
 }
 
 
-/*
-bool QNode::updateScene(movementPtr mov, scenarioPtr scene){
 
-   int arm_code = mov->getArm();
-   int mov_type = mov->getType();
-
-
-   switch (mov_type) {
-
-   case 0: // reach-to-grasp
-
-       // we only need to update the posture of the arms
-
-       this->updateArmPosture(arm_code,scene->getHumanoid());
-
-       break;
-   case 1: // reaching
-
-       break;
-
-   case 2: // transport
-
-       break;
-
-   case 3: // engage
-
-       break;
-
-   case 4: // disengage
-
-       break;
-
-   case 5: // go home
-
-       break;
-   }
-
-
-}
-*/
-/*
-bool QNode::updateArmPosture(int arm_code, humanoidPtr hh){
-
-    bool succ;
-    string armstr;
-
-
-    switch (arm_code) {
-    case 0: // dual arm
-        // TODO
-        break;
-    case 1: // right arm
-        armstr = string ("sright_");
-
-        break;
-
-    case 2: // left arm
-        armstr = string ("sleft_");
-
-        break;
-    }
-
-    ros::NodeHandle n;
-    std::vector<float> posture = std::vector<float>(JOINTS_ARM+JOINTS_HAND);
-    add_client = n.serviceClient<vrep_common::simRosGetFloatSignal>("/vrep/simRosGetFloatSignal");
-    vrep_common::simRosGetFloatSignal srvf;
-
-    for (int i = 0; i <posture.size(); i++){
-        srvf.request.signalName = armstr+string("joint"+QString::number(i).toStdString());
-        add_client.call(srvf);
-        if (srvf.response.result == 1){
-             posture.at(i)= srvf.response.signalValue;
-
-        }else{succ = false;}
-    }
-
-    switch (arm_code) {
-    case 0: // dual arm
-        // TODO
-        break;
-    case 1: // right arm
-
-        hh->setRightPosture(posture);
-        break;
-
-    case 2: // left arm
-
-        hh->setLeftPosture(posture);
-        break;
-    }
-
-}
-
-*/
-
-/**
- * @brief getArmsHandles
- * @param humanoid
- * @return
- */
-bool getArmsHandles(int humanoid){
+bool getArmsHandles(int humanoid)
+{
 
     bool succ = true;
 
@@ -3619,12 +3294,9 @@ case 1: // Jarde
     return succ;
 }
 
-/**
- * @brief QNode::closeARoSHand
- * @param hand
- * @return
- */
-bool QNode::closeARoSHand(int hand){
+
+bool QNode::closeARoSHand(int hand)
+{
 
 
     int cnt = 0;
@@ -3812,11 +3484,9 @@ for (size_t i = 0; i < HAND_FINGERS; i++){
 
 }
 
-/**
- * @brief QNode::openARoSHand
- * @param hand
- */
-bool QNode::openARoSHand(int hand){
+
+bool QNode::openARoSHand(int hand)
+{
 
     int cnt = 0;
     MatrixXi hand_handles = MatrixXi::Constant(HUMotion::HAND_FINGERS,HUMotion::N_PHALANGE+1,1);
