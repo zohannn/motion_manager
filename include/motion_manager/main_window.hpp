@@ -13,6 +13,7 @@
 #include "roscommdialog.hpp"
 #include "vrepcommdialog.hpp"
 #include "toldialoghuml.hpp"
+#include "config.hpp"
 
 
 // *** HUML *** //

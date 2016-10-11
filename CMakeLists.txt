@@ -53,6 +53,15 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 # Settings
 ##############################################################################
 
+# ----------------- Path of the main directory -------------------------------- #
+set(MAIN_PATH /home/gianpaolo/catkin_ws/src/motion_manager)
+
+# configuration files
+configure_file (
+  "${PROJECT_SOURCE_DIR}/include/motion_manager/config.hpp.in"
+  "${PROJECT_SOURCE_DIR}/include/motion_manager/config.hpp"
+)
+
 ## Documentation
 # DOC=0. do not make the documentation
 # DOC=1, make the documentation

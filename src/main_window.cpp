@@ -271,7 +271,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              // Assembly scenario: the Toy vehicle with Jarde
              this->scenario_id = 1;
 
-             if (qnode.loadScenario(string("scenes/ToyVehicleTask_jarde.ttt"),this->scenario_id)){
+             if (qnode.loadScenario(MAIN_PATH+string("/scenarios/ToyVehicleTask_jarde.ttt"),this->scenario_id)){
                  qnode.log(QNode::Info,string("Assembly scenario: the Toy vehicle with Jarde HAS BEEN LOADED"));
                  ui.groupBox_getElements->setEnabled(true);
                  ui.groupBox_homePosture->setEnabled(true);
@@ -293,7 +293,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                  // Assembly scenario: the Toy vehicle with ARoS
                  this->scenario_id = 0;
 
-                 if (qnode.loadScenario(string("scenes/ToyVehicleTask_aros.ttt"),this->scenario_id)){
+                 if (qnode.loadScenario(MAIN_PATH+string("/scenarios/ToyVehicleTask_aros.ttt"),this->scenario_id)){
                      qnode.log(QNode::Info,string("Assembly scenario: the Toy vehicle with ARoS HAS BEEN LOADED"));
                      ui.groupBox_getElements->setEnabled(true);
                      ui.groupBox_homePosture->setEnabled(true);
@@ -848,7 +848,7 @@ void MainWindow::on_pushButton_load_task_clicked()
 
     QString filename = QFileDialog::getOpenFileName(this,
                                                     tr("Load the task trajectory"),
-                                                    QDir::currentPath()+"/Tasks",
+                                                    QString(MAIN_PATH)+"/Tasks",
                                                     "All Files (*.*);; Task Files (*.task)");
     QFile f( filename );
     if(f.open( QIODevice::ReadOnly )){
@@ -1135,7 +1135,7 @@ void MainWindow::on_pushButton_save_task_clicked()
 
     QString filename = QFileDialog::getSaveFileName(this,
                                                     tr("Save the task trajectory"),
-                                                    QDir::currentPath()+"/Tasks",
+                                                    QString(MAIN_PATH)+"/Tasks",
                                                     "All Files (*.*);;Task Files (*.task)");
     QFile f( filename );
     if(f.open( QIODevice::WriteOnly )){

@@ -182,7 +182,7 @@ void TolDialogHUML::on_pushButton_save_clicked()
 
    QString filename = QFileDialog::getSaveFileName(this,
                                                    tr("Save the file of tolerances"),
-                                                   QDir::currentPath()+"/Tols",
+                                                   QString(MAIN_PATH)+"/Tols",
                                                    "All Files (*.*);;Tol Files (*.tol)");
    QFile f( filename );
    if(f.open( QIODevice::WriteOnly )){
@@ -304,7 +304,7 @@ void TolDialogHUML::on_pushButton_load_clicked()
 
     QString filename = QFileDialog::getOpenFileName(this,
                                                     tr("Load the file of tolerances"),
-                                                    QDir::currentPath()+"/Tols",
+                                                    QString(MAIN_PATH)+"/Tols",
                                                     "All Files (*.*);; Tol Files (*.tol)");
     QFile f( filename );
     if(f.open( QIODevice::ReadOnly )){

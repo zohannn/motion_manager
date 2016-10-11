@@ -43,40 +43,6 @@
 
 namespace motion_manager {
 
-int h_detobj;
-//std::vector<float> r_traj = std::vector<float>(11);
-
-std::vector<int> right_handles; // right arm+hand joints handles
-std::vector<int> left_handles; // left arm+hand joints handles
-MatrixXi right_hand_handles = MatrixXi::Constant(HUMotion::HAND_FINGERS,HUMotion::N_PHALANGE+1,1); // right hand joints handles
-MatrixXi left_hand_handles = MatrixXi::Constant(HUMotion::HAND_FINGERS,HUMotion::N_PHALANGE+1,1); // left hand joints handles
-//matrix<int> right_hand_jarde_handles = identity_matrix<int>(5,4); // right hand joints handles
-//matrix<int> left_hand_jarde_handles = identity_matrix<int>(5,4); // left hand joints handles
-std::vector<float> right_2hand_pos(3,0.0f); // position of the right hand 2 phalanx
-std::vector<float> right_2hand_vel(3,0.0f); // velocity of the right hand 2 phalanx
-std::vector<float> right_2hand_force(3,0.0f); // forces of the right hand 2 phalanx
-std::vector<float> left_2hand_pos(3,0.0f); // position of the left hand 2 phalanx
-std::vector<float> left_2hand_vel(3,0.0f); // velocity of the left hand 2 phalanx
-std::vector<float> left_2hand_force(3,0.0f); // forces of the left hand 2 phalanx
-std::vector<int> right_firstPartTorqueSensorHandles; // right first part torque
-std::vector<int> left_firstPartTorqueSensorHandles; // left first part torque
-int right_sensor; // right hand proximity sensor
-int left_sensor; // left hand proximity sensor
-int right_attach; // right hand attach point
-int left_attach; // left hand attach point
-bool got_scene = false; // true if we got all the elements of the scenario
-bool obj_in_hand = false; // true if the object is in the hand
-
-// opena close the hand of ARoS
-int firstPartTorqueOvershootCountRequired = 1;
-float firstPartMaxTorque = 0.9f;
-float closingOpeningTorque = 1.0f;
-float closingVel = 60.0f * static_cast<float>(M_PI) / 180.0f;
-float openingVel = -120.0f * static_cast<float>(M_PI) / 180.0f;
-std::vector<bool> firstPartLocked(3, false);
-std::vector<int> needFullOpening(3, 0);
-std::vector<bool> closed(3,false);
-
 /*****************************************************************************
 ** Implementation
 *****************************************************************************/
@@ -87,6 +53,21 @@ QNode::QNode(int argc, char** argv ) :
     {
     nodeName = "motion_manager";
     TotalTime = 0.0;
+    right_hand_handles = MatrixXi::Constant(HUMotion::HAND_FINGERS,HUMotion::N_PHALANGE+1,1);
+    left_hand_handles = MatrixXi::Constant(HUMotion::HAND_FINGERS,HUMotion::N_PHALANGE+1,1);
+    right_2hand_pos.assign(3,0.0f);
+    right_2hand_vel.assign(3,0.0f);
+    right_2hand_force.assign(3,0.0f);
+    left_2hand_pos.assign(3,0.0f);
+    left_2hand_vel.assign(3,0.0f);
+    left_2hand_force.assign(3,0.0f);
+    got_scene = false;
+    obj_in_hand = false;
+#if HAND ==1
+    firstPartLocked.assign(3,false);
+    needFullOpening.assign(3,0);
+    closed.assign(3,false);
+#endif
 
 
     // logging
@@ -97,6 +78,9 @@ QNode::QNode(int argc, char** argv ) :
 
 QNode::~QNode()
 {
+    if(ros::isStarted()) {
+      ros::shutdown();
+    }
     wait();
 }
 
@@ -106,10 +90,7 @@ bool QNode::on_init()
 	if ( ! ros::master::check() ) {
 		return false;
 	}
-    //ros::start(); // explicitly needed since our nodehandle is going out of scope.
-    //ros::NodeHandle n;
-	// Add your ros communications here.
-    //chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
+    ros::start();
     start();
 	return true;
 }
@@ -123,10 +104,7 @@ bool QNode::on_init(const std::string &master_url, const std::string &host_url)
 	if ( ! ros::master::check() ) {
 		return false;
 	}
-    //ros::start(); // explicitly needed since our nodehandle is going out of scope.
-    //ros::NodeHandle n;
-	// Add your ros communications here.
-    //chatter_publisher = n.advertise<std_msgs::String>("chatter", 1000);
+    ros::start();
     start();
 	return true;
 }
@@ -134,13 +112,6 @@ bool QNode::on_init(const std::string &master_url, const std::string &host_url)
 void QNode::on_end()
 {
 
-    /*
-    if(ros::isStarted()) {
-      //ros::shutdown(); // explicitly needed since we use ros::start();
-      //ros::waitForShutdown();
-    }
-    */
-    //wait();
 
 }
 
@@ -1561,7 +1532,7 @@ void QNode::BaseCallback(const geometry_msgs::PoseStamped &data)
     this->updateObjectInfo(obj_id,name,data);
 }
 
-
+/*
 void QNode::TableCallback(const geometry_msgs::PoseStamped &data)
 {
 
@@ -1574,7 +1545,7 @@ void QNode::TableCallback(const geometry_msgs::PoseStamped &data)
 
 }
 
-
+*/
 void QNode::updateObjectInfo(int obj_id, string name, const geometry_msgs::PoseStamped &data)
 {
 
@@ -1894,7 +1865,7 @@ bool QNode::execMovement(MatrixXf& traj, MatrixXf& vel, float timeStep, float to
                     log(QNode::Error,string("Error in grasping the object "));
                 }
 #if HAND ==1
-                this->openARoSHand(arm_code);
+                this->openBarrettHand(arm_code);
 #endif
 
             //}
@@ -2073,7 +2044,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                 }
 
 #if HAND == 1
-                this->closeARoSHand(arm_code);
+                this->closeBarrettHand(arm_code);
 #endif
 
             }
@@ -2274,7 +2245,7 @@ bool QNode::execTask(MatrixXf& traj_task, MatrixXf &vel_task, std::vector<float>
                         log(QNode::Error,string("Error in grasping the object "));
                     }
 #if HAND==1
-                    this->openARoSHand(arm_code);
+                    this->openBarrettHand(arm_code);
 #endif
                 //}
                 ros::spinOnce(); // handle ROS messages
@@ -2447,7 +2418,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                         log(QNode::Error,string("Error in grasping the object "));
                     }
 #if HAND == 1
-                this->closeARoSHand(arm_code);
+                this->closeBarrettHand(arm_code);
 #endif
                 }
 
@@ -2773,7 +2744,7 @@ void QNode::init()
 
 
 
-bool getArmsHandles(int humanoid)
+bool QNode::getArmsHandles(int humanoid)
 {
 
     bool succ = true;
@@ -3294,8 +3265,9 @@ case 1: // Jarde
     return succ;
 }
 
+#if HAND == 1
 
-bool QNode::closeARoSHand(int hand)
+bool QNode::closeBarrettHand(int hand)
 {
 
 
@@ -3485,7 +3457,7 @@ for (size_t i = 0; i < HAND_FINGERS; i++){
 }
 
 
-bool QNode::openARoSHand(int hand)
+bool QNode::openBarrettHand(int hand)
 {
 
     int cnt = 0;
@@ -3673,5 +3645,6 @@ for (size_t i = 0; i < HAND_FINGERS; i++){
 
 }
 
+#endif
 
 }  // namespace motion_manager

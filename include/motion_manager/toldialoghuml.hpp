@@ -7,6 +7,7 @@
 #include<QMessageBox>
 #include <ui_toldialoghuml.h>
 #include <eigen3/Eigen/Dense>
+#include "config.hpp"
 
 namespace motion_manager{
 
