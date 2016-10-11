@@ -100,7 +100,7 @@ link_directories(
 # Binaries
 ##############################################################################
 add_executable(${PROJECT_NAME} ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 # ********** link external libraries ********
 # Human-like Upper-limbs Motion Library (HUML)
@@ -116,7 +116,6 @@ target_link_libraries(${PROJECT_NAME} libipoptamplinterface.a)
 target_link_libraries(${PROJECT_NAME} dl) # this has to be the last one
 target_link_libraries(${PROJECT_NAME} gfortran)# this has to be the last one
 
-target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
@@ -129,7 +128,6 @@ if(TEST)
     set(PROJECT_NAME_LIB ${PROJECT_NAME}_lib)
     add_library(${PROJECT_NAME_LIB} STATIC ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
     target_link_libraries(${PROJECT_NAME_LIB} ${QT_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-    ##set_target_properties(${PROJECT_NAME_LIB} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 
     # ********** link external libraries ********
@@ -146,8 +144,6 @@ if(TEST)
     target_link_libraries(${PROJECT_NAME_LIB} dl) # this has to be the last one
     target_link_libraries(${PROJECT_NAME_LIB} gfortran)# this has to be the last one
 
-    ##target_link_libraries(${PROJECT_NAME_LIB} ${Boost_LIBRARIES})
-
 
 
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
@@ -160,9 +156,7 @@ if(TEST)
     file(GLOB TEST_HPP_FILES ${PROJECT_SOURCE_DIR}/test/include/*.hpp)
     add_executable(${PROJECT_TEST_NAME} ${TEST_CPP_FILES} ${TEST_HPP_FILES})
     target_link_libraries(${PROJECT_TEST_NAME} boost_system ${GTEST_LIBRARIES} ${PROJECT_NAME_LIB})
-    ##target_link_libraries(${PROJECT_TEST_NAME} ${PROJECT_NAME_LIB})
     add_test (NAME Test_ros_comm_dlg COMMAND ${PROJECT_TEST_NAME})
-
 
 
 endif()
