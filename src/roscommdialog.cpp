@@ -147,7 +147,7 @@ void RosCommDialog::on_button_connect_clicked(bool check)
                 Q_EMIT rosConnected(bstatus);
             }
         } else {
-            if ( ! qnode->on_init(ui->line_edit_master->text().toStdString(),
+            if ( ! qnode->on_init_url(ui->line_edit_master->text().toStdString(),
                        ui->line_edit_host->text().toStdString()) ) {
                 showNoMasterMessage();
 

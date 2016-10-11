@@ -95,7 +95,7 @@ bool QNode::on_init()
 	return true;
 }
 
-bool QNode::on_init(const std::string &master_url, const std::string &host_url)
+bool QNode::on_init_url(const std::string &master_url, const std::string &host_url)
 {
 	std::map<std::string,std::string> remappings;
 	remappings["__master"] = master_url;

@@ -41,7 +41,7 @@
    <property name="title">
     <string>Geometric Dimensions of the arms and of the fingers</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_arm">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -125,7 +125,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_hand_1">
     <property name="geometry">
      <rect>
       <x>360</x>
@@ -172,7 +172,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_hand_2">
     <property name="geometry">
      <rect>
       <x>495</x>
@@ -219,7 +219,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_hand_3">
     <property name="geometry">
      <rect>
       <x>630</x>
@@ -266,7 +266,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_hand_radius">
     <property name="geometry">
      <rect>
       <x>200</x>
@@ -319,7 +319,7 @@
    <property name="title">
     <string>Joint Expense factors</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_lambda">
     <property name="geometry">
      <rect>
       <x>1</x>
@@ -506,7 +506,7 @@
    <property name="title">
     <string>Tolerances with the target [mm]</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_tol_target">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -539,7 +539,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_tol_tar_values">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -756,7 +756,7 @@
    <property name="title">
     <string>Tolerances for the final posture</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_tol_FP">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -805,7 +805,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget_max_vel">
    <property name="geometry">
     <rect>
      <x>240</x>
@@ -831,7 +831,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget_nsteps">
    <property name="geometry">
     <rect>
      <x>240</x>
@@ -857,7 +857,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget_approach">
    <property name="geometry">
     <rect>
      <x>240</x>
@@ -912,7 +912,7 @@
    <property name="title">
     <string>Tolerances with the obstacles [mm]</string>
    </property>
-   <widget class="QWidget" name="layoutWidget_6">
+   <widget class="QWidget" name="layoutWidget_size">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -945,7 +945,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget_7">
+   <widget class="QWidget" name="layoutWidget_tol_obs">
     <property name="geometry">
      <rect>
       <x>90</x>
@@ -1150,7 +1150,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget_save_load">
    <property name="geometry">
     <rect>
      <x>580</x>
@@ -1252,7 +1252,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QWidget" name="layoutWidget_eng_tol_pos">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -1279,7 +1279,7 @@
      </layout>
     </widget>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_dist">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -1305,7 +1305,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_eng_dir">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -1431,7 +1431,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget_tol_stop">
    <property name="geometry">
     <rect>
      <x>240</x>

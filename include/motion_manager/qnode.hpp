@@ -38,8 +38,6 @@
 
 namespace motion_manager {
 
-//bool getArmsHandles(int humanoid); // get the handles of both arms
-
 namespace logging = boost::log;
 namespace src = boost::log::sources;
 namespace sinks = boost::log::sinks;
@@ -81,7 +79,7 @@ public:
          * @param host_url
          * @return
          */
-        bool on_init(const string &master_url, const string &host_url);
+        bool on_init_url(const string &master_url, const string &host_url);
 
         /**
          * @brief This method runs ending operations

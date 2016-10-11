@@ -3,7 +3,8 @@
 ##############################################################################
 
 cmake_minimum_required(VERSION 2.8.0)
-project(motion_manager)
+set(PROJECT_NAME motion_manager)
+project(${PROJECT_NAME})
 
 ##############################################################################
 # Catkin
@@ -62,6 +63,12 @@ configure_file (
   "${PROJECT_SOURCE_DIR}/include/motion_manager/config.hpp"
 )
 
+
+## Tests
+# TEST=0. do not run the tests
+# TEST=1, run the tests
+set(TEST 1)
+
 ## Documentation
 # DOC=0. do not make the documentation
 # DOC=1, make the documentation
@@ -92,27 +99,73 @@ link_directories(
 ##############################################################################
 # Binaries
 ##############################################################################
-add_executable(motion_manager ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
-target_link_libraries(motion_manager ${QT_LIBRARIES} ${catkin_LIBRARIES})
+add_executable(${PROJECT_NAME} ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${catkin_LIBRARIES})
 
 # ********** link external libraries ********
 # Human-like Upper-limbs Motion Library (HUML)
-target_link_libraries(motion_manager HUML)
+target_link_libraries(${PROJECT_NAME} HUML)
 # -- IPOPT Solver
-target_link_libraries(motion_manager libipopt.a)
-target_link_libraries(motion_manager libcoinmumps.a)
-target_link_libraries(motion_manager libcoinlapack.a)
-target_link_libraries(motion_manager libcoinasl.a)
-target_link_libraries(motion_manager libcoinblas.a)
-target_link_libraries(motion_manager libcoinmetis.a)
-target_link_libraries(motion_manager libipoptamplinterface.a)
-target_link_libraries(motion_manager dl) # this has to be the last one
-target_link_libraries(motion_manager gfortran)# this has to be the last one
+target_link_libraries(${PROJECT_NAME} libipopt.a)
+target_link_libraries(${PROJECT_NAME} libcoinmumps.a)
+target_link_libraries(${PROJECT_NAME} libcoinlapack.a)
+target_link_libraries(${PROJECT_NAME} libcoinasl.a)
+target_link_libraries(${PROJECT_NAME} libcoinblas.a)
+target_link_libraries(${PROJECT_NAME} libcoinmetis.a)
+target_link_libraries(${PROJECT_NAME} libipoptamplinterface.a)
+target_link_libraries(${PROJECT_NAME} dl) # this has to be the last one
+target_link_libraries(${PROJECT_NAME} gfortran)# this has to be the last one
 
-target_link_libraries(motion_manager ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 
-install(TARGETS motion_manager RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
+
+##############################################################################
+# Testing
+##############################################################################
+if(TEST)
+
+    set(PROJECT_NAME_LIB ${PROJECT_NAME}_lib)
+    add_library(${PROJECT_NAME_LIB} STATIC ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
+    target_link_libraries(${PROJECT_NAME_LIB} ${QT_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+    ##set_target_properties(${PROJECT_NAME_LIB} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+
+    # ********** link external libraries ********
+    # Human-like Upper-limbs Motion Library (HUML)
+    target_link_libraries(${PROJECT_NAME_LIB} HUML)
+    # -- IPOPT Solver
+    target_link_libraries(${PROJECT_NAME_LIB} libipopt.a)
+    target_link_libraries(${PROJECT_NAME_LIB} libcoinmumps.a)
+    target_link_libraries(${PROJECT_NAME_LIB} libcoinlapack.a)
+    target_link_libraries(${PROJECT_NAME_LIB} libcoinasl.a)
+    target_link_libraries(${PROJECT_NAME_LIB} libcoinblas.a)
+    target_link_libraries(${PROJECT_NAME_LIB} libcoinmetis.a)
+    target_link_libraries(${PROJECT_NAME_LIB} libipoptamplinterface.a)
+    target_link_libraries(${PROJECT_NAME_LIB} dl) # this has to be the last one
+    target_link_libraries(${PROJECT_NAME_LIB} gfortran)# this has to be the last one
+
+    ##target_link_libraries(${PROJECT_NAME_LIB} ${Boost_LIBRARIES})
+
+
+
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    include_directories(${GTEST_INCLUDE_DIRS})
+    enable_testing ()
+
+    ## Test suite ros communication dialog
+    set(PROJECT_TEST_NAME ${PROJECT_NAME}_test_ros_comm_dlg)
+    file(GLOB TEST_CPP_FILES ${PROJECT_SOURCE_DIR}/test/src/ros_comm_dlg/*.cpp)
+    file(GLOB TEST_HPP_FILES ${PROJECT_SOURCE_DIR}/test/include/*.hpp)
+    add_executable(${PROJECT_TEST_NAME} ${TEST_CPP_FILES} ${TEST_HPP_FILES})
+    target_link_libraries(${PROJECT_TEST_NAME} boost_system ${GTEST_LIBRARIES} ${PROJECT_NAME_LIB})
+    ##target_link_libraries(${PROJECT_TEST_NAME} ${PROJECT_NAME_LIB})
+    add_test (NAME Test_ros_comm_dlg COMMAND ${PROJECT_TEST_NAME})
+
+
+
+endif()
 ##############################################################################
 # Documenting
 ##############################################################################
