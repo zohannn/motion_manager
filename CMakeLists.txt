@@ -72,7 +72,7 @@ set(TEST 1)
 ## Documentation
 # DOC=0. do not make the documentation
 # DOC=1, make the documentation
-set(DOC 1)
+set(DOC 0)
 
 ##############################################################################
 # External libraries
