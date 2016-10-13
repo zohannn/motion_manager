@@ -55,7 +55,7 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ##############################################################################
 
 # ----------------- Path of the main directory -------------------------------- #
-set(MAIN_PATH /home/gianpaolo/catkin_ws/src/motion_manager)
+set(MAIN_PATH ${PROJECT_SOURCE_DIR})
 
 # configuration files
 configure_file (
@@ -72,7 +72,7 @@ set(TEST 1)
 ## Documentation
 # DOC=0. do not make the documentation
 # DOC=1, make the documentation
-set(DOC 1)
+set(DOC 0)
 
 ##############################################################################
 # External libraries

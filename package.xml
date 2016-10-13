@@ -20,6 +20,7 @@
   <run_depend>qt_build</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>libqt4-dev</run_depend>
-	
- 
+<export>	
+		<rosdoc config="doxyconfig/rosdoc.yaml" />
+ </export>
 </package>
