@@ -19,6 +19,11 @@ public:
 
     /**
      * @brief RosCommDialog, a constructor
+     */
+    RosCommDialog();
+
+    /**
+     * @brief RosCommDialog, a constructor
      * @param q
      * @param parent
      */

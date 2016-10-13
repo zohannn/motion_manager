@@ -7,6 +7,12 @@ namespace motion_manager {
 
 using namespace Qt;
 
+RosCommDialog::RosCommDialog():
+    ui(new Ui::RosCommDialogDesign)
+{
+    ui->setupUi(this);
+}
+
 RosCommDialog::RosCommDialog(QNode *q, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::RosCommDialogDesign)

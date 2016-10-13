@@ -55,7 +55,7 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ##############################################################################
 
 # ----------------- Path of the main directory -------------------------------- #
-set(MAIN_PATH /home/gianpaolo/catkin_ws/src/motion_manager)
+set(MAIN_PATH ${PROJECT_SOURCE_DIR})
 
 # configuration files
 configure_file (
@@ -145,17 +145,16 @@ if(TEST)
     target_link_libraries(${PROJECT_NAME_LIB} gfortran)# this has to be the last one
 
 
-
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-    include_directories(${GTEST_INCLUDE_DIRS})
     enable_testing ()
 
     ## Test suite ros communication dialog
+    set(CMAKE_AUTOMOC ON)
     set(PROJECT_TEST_NAME ${PROJECT_NAME}_test_ros_comm_dlg)
     file(GLOB TEST_CPP_FILES ${PROJECT_SOURCE_DIR}/test/src/ros_comm_dlg/*.cpp)
     file(GLOB TEST_HPP_FILES ${PROJECT_SOURCE_DIR}/test/include/*.hpp)
     add_executable(${PROJECT_TEST_NAME} ${TEST_CPP_FILES} ${TEST_HPP_FILES})
-    target_link_libraries(${PROJECT_TEST_NAME} boost_system ${GTEST_LIBRARIES} ${PROJECT_NAME_LIB})
+    SET( TEST_LIBRARIES ${QT_QTTEST_LIBRARY} ${QT_LIBRARIES} )
+    target_link_libraries(${PROJECT_TEST_NAME} ${TEST_LIBRARIES} ${PROJECT_NAME_LIB})
     add_test (NAME Test_ros_comm_dlg COMMAND ${PROJECT_TEST_NAME})
 
 

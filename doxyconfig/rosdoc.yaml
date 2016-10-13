@@ -1,0 +1,8 @@
+- builder: doxygen
+  name: The motion_manager documentation
+  output_dir:  motion_manager_doc
+  file_patterns: '*.c *.cpp *.h *.hpp *.hh *.cc'
+  homepage: https://github.com/zohannn/motion_manager
+  description: The motion_manager package
+  license: MIT
+  maintainers: Gianpaolo Gulletta <gianpaologulletta@gmail.com>

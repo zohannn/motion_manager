@@ -1,7 +1,8 @@
 /**
- * Motion Planner
+ * The motion manager
  *
- * @author: Gianpaolo Gulletta d6468@dei.uminho.pt
+ * @author: Gianpaolo Gulletta
+ * @email: gianpaologulletta@gmail.com
  *
  * @file /src/main.cpp
  *
