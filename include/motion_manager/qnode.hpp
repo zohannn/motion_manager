@@ -93,6 +93,12 @@ public:
         bool checkVrep();
 
         /**
+         * @brief This method checks if RViz is online
+         * @return
+         */
+        bool checkRViz();
+
+        /**
          * @brief This method loads the scenario with index id
          * @param path
          * @param id
