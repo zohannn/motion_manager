@@ -12,6 +12,7 @@
 #include "qnode.hpp"
 #include "roscommdialog.hpp"
 #include "vrepcommdialog.hpp"
+#include "rvizcommdialog.hpp"
 #include "toldialoghuml.hpp"
 #include "config.hpp"
 
@@ -82,6 +83,11 @@ public Q_SLOTS:
          * @brief This method shows the V-REP communication dialog
          */
         void on_actionVrep_Communication_triggered();
+
+        /**
+         * @brief This method shows the RViz communication dialog
+         */
+        void on_actionRViz_Communication_triggered();
 
         /**
          * @brief This method loads the selected scenario
@@ -220,6 +226,13 @@ public Q_SLOTS:
         void updateVrepStatus(bool c);
 
         /**
+         * @brief This method updates the RViz status
+         * @param c
+         * c=true => "launched", c=false => "not launched"
+         */
+        void updateRVizStatus(bool c);
+
+        /**
          * @brief This method adds a new element to the widget
          * @param value
          */
@@ -258,6 +271,7 @@ private:
         QNode qnode; /**< ROS node handle */
         RosCommDialog *mrosCommdlg; /**< handle of the ROS communication dialog */
         VrepCommDialog *mvrepCommdlg; /**< handle of the V-REP communication dialog */
+        RVizCommDialog *mrvizCommdlg; /**< handle of the RViz communication dialog */
         TolDialogHUML *mTolHumldlg; /**< handle of the tuning dialog */
         int scenario_id; /**< id of the current scenario */
         humplannerPtr hum_planner; /**< human-like upper-limbs movement planner */

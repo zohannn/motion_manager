@@ -43,6 +43,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mvrepCommdlg = new VrepCommDialog(&qnode, this);
     mvrepCommdlg->setModal(true);
 
+    // create RViz Communication dialog
+    mrvizCommdlg = new RVizCommDialog(&qnode, this);
+    mrvizCommdlg->setModal(true);
+
     //create Tuning dialog
     mTolHumldlg = new TolDialogHUML(this);
     mTolHumldlg->setModal(true);
@@ -65,7 +69,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
     // V-REP connected signal
     QObject::connect(mvrepCommdlg, SIGNAL(vrepConnected(bool)), this, SLOT(updateVrepStatus(bool)));
-    //QObject::connect(mvrepCommdlg, SIGNAL(vrepConnected(bool)), this, SLOT(updateVrepStatus(bool)));
+
+    // RViz connectedsignal
+    QObject::connect(mrvizCommdlg, SIGNAL(rvizConnected(bool)), this, SLOT(updateRVizStatus(bool)));
+
 
     // new element in the scenario signal
     QObject::connect(&qnode, SIGNAL(newElement(string)),this,SLOT(addElement(string)));
@@ -149,11 +156,34 @@ void MainWindow::updateVrepStatus(bool c)
 
     if (c){
         ui.labelVrepComm->setText(QString("on-line"));
+        ui.actionRViz_Communication->setEnabled(true);
+        ui.labelStatusRViz->setEnabled(true);
+        ui.labelRVizComm->setEnabled(true);
+        //ui.tab_scenario->setEnabled(true);
+        //ui.groupBox_selectScenario->setEnabled(true);
+        //ui.listWidget_scenario->setCurrentRow(0);
+    }else{
+        ui.labelVrepComm->setText(QString("off-line"));
+        ui.actionRViz_Communication->setEnabled(false);
+        ui.labelStatusRViz->setEnabled(false);
+        ui.labelRVizComm->setEnabled(false);
+        //ui.tab_scenario->setEnabled(false);
+        //ui.groupBox_selectScenario->setEnabled(false);
+        //ui.listWidget_scenario->setCurrentRow(0);
+    }
+    //ui.pushButton_loadScenario->setEnabled(false);
+    //ui.groupBox_getElements->setEnabled(false);
+}
+
+void MainWindow::updateRVizStatus(bool c)
+{
+    if (c){
+        ui.labelRVizComm->setText(QString("on-line"));
         ui.tab_scenario->setEnabled(true);
         ui.groupBox_selectScenario->setEnabled(true);
         //ui.listWidget_scenario->setCurrentRow(0);
     }else{
-        ui.labelVrepComm->setText(QString("off-line"));
+        ui.labelRVizComm->setText(QString("off-line"));
         ui.tab_scenario->setEnabled(false);
         ui.groupBox_selectScenario->setEnabled(false);
         //ui.listWidget_scenario->setCurrentRow(0);
@@ -214,9 +244,16 @@ void MainWindow::on_actionRos_Communication_triggered()
 
 }
 
-void MainWindow::on_actionVrep_Communication_triggered(){
+void MainWindow::on_actionVrep_Communication_triggered()
+{
 
     mvrepCommdlg->show();
+}
+
+void MainWindow::on_actionRViz_Communication_triggered()
+{
+
+    mrvizCommdlg->show();
 }
 
 

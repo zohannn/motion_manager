@@ -2499,6 +2499,39 @@ void QNode::stopSim()
 }
 
 
+bool QNode::checkRViz()
+{
+
+    FILE *fp;
+    const int length=1000;
+    char result[length]; // line to read
+    std::string s2("unknown node");
+    bool online=false;
+
+    fp = popen("rosnode ping -c 1 /move_group", "r");
+
+    int cnt=0;
+    while (fgets(result, length, fp) != NULL){
+     //   printf("%s", result)
+        if (cnt==1){
+            // second line
+            std::string s1(result);
+
+            if (s1.find(s2) != std::string::npos){
+                // V-REP is off-line
+                online=false;
+            }else{
+                // V-REP is on-line
+                online=true;
+            }
+
+        }
+        cnt++;
+
+    }
+    return online;
+
+}
 
 bool QNode::checkVrep()
 {

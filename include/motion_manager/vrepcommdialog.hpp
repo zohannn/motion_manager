@@ -40,7 +40,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 
     /**
-     * @brief This method signals if vrep is on-line (c=true)
+     * @brief This method signals if V-REP is on-line (c=true)
      * @param c
      */
     void vrepConnected(bool c);
