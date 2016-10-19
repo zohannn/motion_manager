@@ -54,8 +54,8 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 # Settings
 ##############################################################################
 
-# ----------------- Path of the main directory -------------------------------- #
-set(MAIN_PATH ${PROJECT_SOURCE_DIR})
+set(MAIN_PATH ${PROJECT_SOURCE_DIR}) ## Path of the main directory
+set(PATH_SCENARIOS /home/gianpaolo/scenarios) ## Path of the scenarios
 
 # configuration files
 configure_file (

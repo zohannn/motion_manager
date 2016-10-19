@@ -308,7 +308,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              // Assembly scenario: the Toy vehicle with Jarde
              this->scenario_id = 1;
 
-             if (qnode.loadScenario(MAIN_PATH+string("/scenarios/ToyVehicleTask_jarde.ttt"),this->scenario_id)){
+             if (qnode.loadScenario(PATH_SCENARIOS+string("/vrep/ToyVehicleTask_jarde.ttt"),this->scenario_id)){
                  qnode.log(QNode::Info,string("Assembly scenario: the Toy vehicle with Jarde HAS BEEN LOADED"));
                  ui.groupBox_getElements->setEnabled(true);
                  ui.groupBox_homePosture->setEnabled(true);
@@ -330,7 +330,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                  // Assembly scenario: the Toy vehicle with ARoS
                  this->scenario_id = 0;
 
-                 if (qnode.loadScenario(MAIN_PATH+string("/scenarios/ToyVehicleTask_aros.ttt"),this->scenario_id)){
+                 if (qnode.loadScenario(PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt"),this->scenario_id)){
                      qnode.log(QNode::Info,string("Assembly scenario: the Toy vehicle with ARoS HAS BEEN LOADED"));
                      ui.groupBox_getElements->setEnabled(true);
                      ui.groupBox_homePosture->setEnabled(true);
