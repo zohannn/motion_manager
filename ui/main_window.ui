@@ -331,7 +331,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="title">
-       <string>The home posture [deg]</string>
+       <string>The park posture [deg]</string>
       </property>
       <widget class="QListWidget" name="listWidget_homePosture">
        <property name="geometry">
