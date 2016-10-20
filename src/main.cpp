@@ -2,7 +2,6 @@
  * The motion manager
  *
  * @author: Gianpaolo Gulletta
- * @email: gianpaologulletta@gmail.com
  *
  * @file /src/main.cpp
  *
