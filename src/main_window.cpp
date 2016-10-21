@@ -337,7 +337,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      //ui.pushButton_loadScenario->setEnabled(false);
                      string title = string("Assembly scenario: the Toy vehicle with ARoS");
                      this->hum_planner = humplannerPtr(new HUMPlanner(title, new Scenario(title,this->scenario_id+1), new Task()));
-
+                     this->h_planner = hplannerPtr(new HumanoidPlanner(PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene"),this->scenario_id+1));
                  }else{
 
                      qnode.log(QNode::Error,std::string("Assembly scenario: the Toy vehicle with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
@@ -1151,7 +1151,7 @@ void MainWindow::on_pushButton_load_task_clicked()
             ui.listWidget_sol_task->addItem(QString(this->vel_steps.at(i).c_str()));
         }
         float totalTime = 0;
-        for (int i = 0; i < this->timeSteps_task.size(); ++i){
+        for (size_t i = 0; i < this->timeSteps_task.size(); ++i){
             totalTime += this->timeSteps_task.at(i)*this->nSteps_task.at(i);
         }
         ui.label_totalTime_value_task->setText(QString::number(totalTime).toStdString().c_str());
@@ -1336,7 +1336,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
          ui.listWidget_sol_task->addItem(QString(this->vel_steps.at(i).c_str()));
      }
      float totalTime = 0;
-     for (int i = 0; i < this->timeSteps_task.size(); ++i){
+     for (size_t i = 0; i < this->timeSteps_task.size(); ++i){
          totalTime += this->timeSteps_task.at(i)*this->nSteps_task.at(i);
      }
      ui.label_totalTime_value_task->setText(QString::number(totalTime).toStdString().c_str());

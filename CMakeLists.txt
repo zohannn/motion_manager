@@ -6,13 +6,23 @@ cmake_minimum_required(VERSION 2.8.0)
 set(PROJECT_NAME motion_manager)
 project(${PROJECT_NAME})
 
+SET(CMAKE_CXX_FLAGS "-g -Wall -std=c++11")
+
 ##############################################################################
 # Catkin
 ##############################################################################
 
 # qt_build provides the qt cmake glue, roscpp the comms for a default talker
-find_package(catkin REQUIRED COMPONENTS qt_build roscpp)
+find_package(catkin REQUIRED COMPONENTS
+    qt_build
+    roscpp
+)
 include_directories(${catkin_INCLUDE_DIRS})
+
+find_package(aros_moveit_planner REQUIRED COMPONENTS
+    humanoid_planner
+)
+include_directories(${aros_moveit_planner_INCLUDE_DIRS})
 # Use this to define what the package will export (e.g. libs, headers).
 # Since the default here is to produce only a binary, we don't worry about
 # exporting anything. 
@@ -72,7 +82,7 @@ set(TEST 1)
 ## Documentation
 # DOC=0. do not make the documentation
 # DOC=1, make the documentation
-set(DOC 0)
+set(DOC 1)
 
 ##############################################################################
 # External libraries
@@ -105,6 +115,10 @@ target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${catkin_LIBRARIES} ${Boos
 # ********** link external libraries ********
 # Human-like Upper-limbs Motion Library (HUML)
 target_link_libraries(${PROJECT_NAME} HUML)
+
+# Humanoid moveit planner Library
+target_link_libraries(${PROJECT_NAME} humanoid_planner)
+
 # -- IPOPT Solver
 target_link_libraries(${PROJECT_NAME} libipopt.a)
 target_link_libraries(${PROJECT_NAME} libcoinmumps.a)
@@ -116,8 +130,6 @@ target_link_libraries(${PROJECT_NAME} libipoptamplinterface.a)
 target_link_libraries(${PROJECT_NAME} dl) # this has to be the last one
 target_link_libraries(${PROJECT_NAME} gfortran)# this has to be the last one
 
-
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 
 ##############################################################################
@@ -167,12 +179,20 @@ if(DOC)
     if(NOT DOXYGEN_FOUND)
         message(WARNING "Doxygen not found, unable to generate documentation")
     else()
-        add_custom_target(doc COMMAND ${DOXYGEN_EXECUTABLE} "doxyconfig/doxyfile.ini"
+        add_custom_target(doc_${PROJECT_NAME} COMMAND ${DOXYGEN_EXECUTABLE} "doxyconfig/doxyfile.ini"
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
             COMMENT "Building user's documentation into the doc directory ..."
         )
     endif()
 endif()
+##############################################################################
+# Installing
+##############################################################################
+install(TARGETS ${PROJECT_NAME}
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 
 
