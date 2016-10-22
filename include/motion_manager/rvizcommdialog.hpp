@@ -8,6 +8,10 @@
 
 namespace motion_manager{
 
+//! The RVizCommDialog class
+/**
+ * @brief This class defines the dialog of the RViz communication functionalities
+ */
 class RVizCommDialog : public QDialog
 {
     Q_OBJECT

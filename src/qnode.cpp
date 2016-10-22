@@ -616,7 +616,7 @@ bool QNode::getElements(scenarioPtr scene)
         // Joint 5 = -64
         // Joint 6 = 47.9
 
-        for (int i = 0; i <rposture.size(); i++){
+        for (size_t i = 0; i <rposture.size(); i++){
             srvf.request.signalName = string("sright_joint"+QString::number(i).toStdString());
             add_client.call(srvf);
             if (srvf.response.result == 1){
@@ -625,7 +625,7 @@ bool QNode::getElements(scenarioPtr scene)
         }
 
         // minimum right limits
-        for (int i = 0; i <min_rlimits.size(); i++){
+        for (size_t i = 0; i <min_rlimits.size(); i++){
             srvf.request.signalName = string("sright_joint"+QString::number(i).toStdString()+"_min");
             add_client.call(srvf);
             if (srvf.response.result == 1){
@@ -634,7 +634,7 @@ bool QNode::getElements(scenarioPtr scene)
         }
 
         // maximum right limits
-        for (int i = 0; i <max_rlimits.size(); i++){
+        for (size_t i = 0; i <max_rlimits.size(); i++){
             srvf.request.signalName = string("sright_joint"+QString::number(i).toStdString()+"_max");
             add_client.call(srvf);
             if (srvf.response.result == 1){
@@ -653,7 +653,7 @@ bool QNode::getElements(scenarioPtr scene)
         // Joint 5 = -64
         // Joint 6 = 132.03
 
-        for (int i = 0; i <lposture.size(); i++){
+        for (size_t i = 0; i <lposture.size(); i++){
             srvf.request.signalName = string("sleft_joint"+QString::number(i).toStdString());
             add_client.call(srvf);
             if (srvf.response.result == 1){
@@ -662,7 +662,7 @@ bool QNode::getElements(scenarioPtr scene)
         }
 
         // minimum left limits
-        for (int i = 0; i <min_llimits.size(); i++){
+        for (size_t i = 0; i <min_llimits.size(); i++){
             srvf.request.signalName = string("sleft_joint"+QString::number(i).toStdString()+"_min");
             add_client.call(srvf);
             if (srvf.response.result == 1){
@@ -671,7 +671,7 @@ bool QNode::getElements(scenarioPtr scene)
         }
 
         // maximum left limits
-        for (int i = 0; i <max_llimits.size(); i++){
+        for (size_t i = 0; i <max_llimits.size(); i++){
             srvf.request.signalName = string("sleft_joint"+QString::number(i).toStdString()+"_max");
             add_client.call(srvf);
             if (srvf.response.result == 1){
@@ -726,13 +726,13 @@ bool QNode::getElements(scenarioPtr scene)
             hptr->getLeftPosture(leftp);
 
             std::vector<string> rj = std::vector<string>(rightp.size());
-            for (int i=0; i<rightp.size(); i++ ){
+            for (size_t i=0; i<rightp.size(); i++ ){
                 rj.at(i) = string("right_joint "+ QString::number(i+1).toStdString()+ ": "+
                                        QString::number(rightp.at(i)*180/M_PI).toStdString());
                 Q_EMIT newJoint(rj.at(i));
             }
             std::vector<string> lj = std::vector<string>(leftp.size());
-            for (int i=0; i<leftp.size(); i++ ){
+            for (size_t i=0; i<leftp.size(); i++ ){
                 lj.at(i) = string("left_joint "+ QString::number(i+1).toStdString()+ ": "+
                                        QString::number(leftp.at(i)*180/M_PI).toStdString());
                 Q_EMIT newJoint(lj.at(i));
@@ -1235,7 +1235,7 @@ bool QNode::getElements(scenarioPtr scene)
         // Joint 9 = 70
         // Joint 10 = 70
 
-        for (int i = 0; i <rposture.size(); i++){
+        for (size_t i = 0; i <rposture.size(); i++){
             srvf.request.signalName = string("sright_joint"+QString::number(i).toStdString());
             add_client.call(srvf);
             if (srvf.response.result == 1){
@@ -1245,7 +1245,7 @@ bool QNode::getElements(scenarioPtr scene)
         }
 
         // minimum right limits
-        for (int i = 0; i <min_rlimits.size(); i++){
+        for (size_t i = 0; i <min_rlimits.size(); i++){
             srvf.request.signalName = string("sright_joint"+QString::number(i).toStdString()+"_min");
             add_client.call(srvf);
             if (srvf.response.result == 1){
@@ -1255,7 +1255,7 @@ bool QNode::getElements(scenarioPtr scene)
         }
 
         // maximum right limits
-        for (int i = 0; i <max_rlimits.size(); i++){
+        for (size_t i = 0; i <max_rlimits.size(); i++){
             srvf.request.signalName = string("sright_joint"+QString::number(i).toStdString()+"_max");
             add_client.call(srvf);
             if (srvf.response.result == 1){
@@ -1282,7 +1282,7 @@ bool QNode::getElements(scenarioPtr scene)
         // Joint 9 = 70
         // Joint 10 = 70
 
-        for (int i = 0; i <lposture.size(); i++){
+        for (size_t i = 0; i <lposture.size(); i++){
             srvf.request.signalName = string("sleft_joint"+QString::number(i).toStdString());
             add_client.call(srvf);
             if (srvf.response.result == 1){
@@ -1292,7 +1292,7 @@ bool QNode::getElements(scenarioPtr scene)
         }
 
         // minimum left limits
-        for (int i = 0; i <min_llimits.size(); i++){
+        for (size_t i = 0; i <min_llimits.size(); i++){
             srvf.request.signalName = string("sleft_joint"+QString::number(i).toStdString()+"_min");
             add_client.call(srvf);
             if (srvf.response.result == 1){
@@ -1302,7 +1302,7 @@ bool QNode::getElements(scenarioPtr scene)
         }
 
         // maximum left limits
-        for (int i = 0; i <max_llimits.size(); i++){
+        for (size_t i = 0; i <max_llimits.size(); i++){
             srvf.request.signalName = string("sleft_joint"+QString::number(i).toStdString()+"_max");
             add_client.call(srvf);
             if (srvf.response.result == 1){
@@ -2091,7 +2091,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 
     }
 
-
+return true;
 
 }
 
@@ -2620,8 +2620,8 @@ const char *l_2hand[]={"left_BarrettHand_jointC_0","left_BarrettHand_jointC_2","
 
 for (int i = 0; i < JOINTS_ARM+JOINTS_HAND; ++i){
 
-    int r_index = std::find(joints_names.begin(), joints_names.end(), r_names[i]) - joints_names.begin();
-    int l_index = std::find(joints_names.begin(), joints_names.end(), l_names[i]) - joints_names.begin();
+    size_t r_index = std::find(joints_names.begin(), joints_names.end(), r_names[i]) - joints_names.begin();
+    size_t l_index = std::find(joints_names.begin(), joints_names.end(), l_names[i]) - joints_names.begin();
     if (r_index >= joints_names.size() || l_index >= joints_names.size()){
         std::cout << "element not found in state.name\n";
     }else{
@@ -2646,8 +2646,8 @@ for (int i = 0; i < JOINTS_ARM+JOINTS_HAND; ++i){
 
 for(int i = 0; i < HAND_FINGERS; ++i){
 
-    int r_index = std::find(joints_names.begin(), joints_names.end(), r_2hand[i]) - joints_names.begin();
-    int l_index = std::find(joints_names.begin(), joints_names.end(), l_2hand[i]) - joints_names.begin();
+    size_t r_index = std::find(joints_names.begin(), joints_names.end(), r_2hand[i]) - joints_names.begin();
+    size_t l_index = std::find(joints_names.begin(), joints_names.end(), l_2hand[i]) - joints_names.begin();
     if (r_index >= joints_names.size() || l_index >= joints_names.size()){
         std::cout << "element not found in state.name\n";
     }else{
@@ -3674,7 +3674,7 @@ for (size_t i = 0; i < HAND_FINGERS; i++){
 }
 
 
-
+return true;
 
 }
 
