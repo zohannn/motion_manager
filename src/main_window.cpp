@@ -300,6 +300,9 @@ void MainWindow::on_pushButton_loadScenario_clicked()
          equal = scenario_text.compare(scenarios.at(i));
          if(equal==0){
 
+             string path_vrep_scene = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
+             string path_rviz_scene = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
+
              switch(i){
 
              case 0:
@@ -330,14 +333,14 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                  // Assembly scenario: the Toy vehicle with ARoS
                  this->scenario_id = 0;
 
-                 if (qnode.loadScenario(PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt"),this->scenario_id)){
+                 if (qnode.loadScenario(path_vrep_scene,this->scenario_id)){
                      qnode.log(QNode::Info,string("Assembly scenario: the Toy vehicle with ARoS HAS BEEN LOADED"));
                      ui.groupBox_getElements->setEnabled(true);
                      ui.groupBox_homePosture->setEnabled(true);
                      //ui.pushButton_loadScenario->setEnabled(false);
                      string title = string("Assembly scenario: the Toy vehicle with ARoS");
-                     this->hum_planner = humplannerPtr(new HUMPlanner(title, new Scenario(title,this->scenario_id+1), new Task()));
-                     this->h_planner = hplannerPtr(new HumanoidPlanner(PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene"),this->scenario_id+1));
+                     this->hum_planner = humplannerPtr(new HUMotion::HUMPlanner(title, new HUMotion::Scenario(title,this->scenario_id+1), new Task()));
+                     this->h_planner = hplannerPtr(new humanoid_planning::HumanoidPlanner(title,path_rviz_scene,this->scenario_id+1));
                  }else{
 
                      qnode.log(QNode::Error,std::string("Assembly scenario: the Toy vehicle with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
@@ -430,173 +433,183 @@ scenarioPtr scene = this->hum_planner->getScenario();
 
 void MainWindow::on_pushButton_addMov_clicked()
 {
-
     ui.pushButton_save_task->setEnabled(false);
+    int planner_id = ui.comboBox_planner->currentIndex();
 
-    int rows = ui.listWidget_movs->count();
-    //problemPtr prob = hum_planner->getProblem(row); //selected problem
-    bool add = true;
-    if (rows > 0){
-        problemPtr pre_prob = hum_planner->getProblem(rows-1); //previous problem
-        if(!pre_prob->getMovement()->getExecuted()){
-            int reply = QMessageBox::warning(this,tr("Warning"),
-                                 tr("<p>The previous movement has not been executed yet. Do you really want to add this movement?</p>"),QMessageBox::Yes,QMessageBox::No);
-           add = (reply == QMessageBox::Yes);
-        }
-    }
+    if (planner_id==0){
 
-    if(add){
+    // Human-like Upper-limbs Motion Planner
 
-        bool success = false;
-        int mov_id = ui.comboBox_mov->currentIndex();
-        //int plan_id = ui.comboBox_planner->currentIndex();
-        int aa;
-        if (ui.comboBox_Task->currentIndex()==0){
-            //single-arm
-            if(ui.radioButton_right->isChecked()){
-                aa=1; // right arm
-            }else{
-                aa=2; // left arm
+        int rows = ui.listWidget_movs->count();
+        bool add = true;
+        if (rows > 0){
+            problemPtr pre_prob = hum_planner->getProblem(rows-1); //previous problem
+            if(!pre_prob->getMovement()->getExecuted()){
+                int reply = QMessageBox::warning(this,tr("Warning"),
+                                     tr("<p>The previous movement has not been executed yet. Do you really want to add this movement?</p>"),QMessageBox::Yes,QMessageBox::No);
+               add = (reply == QMessageBox::Yes);
             }
-        }else{
-            //dual-arm
-            aa=0;
         }
 
-
-        // add the movement
-        scenarioPtr scene = this->hum_planner->getScenario();
-
-         if (ui.comboBox_objects->isEnabled() && ui.comboBox_objects_eng->isEnabled() && ui.groupBox_grip->isEnabled()){
-
-             // engage, disengage movements
-
-            //int obj_id = ui.comboBox_objects->currentIndex();
-            string obj_name = ui.comboBox_objects->currentText().toStdString();
-            //int obj_eng_id = ui.comboBox_objects_eng->currentIndex();
-            string obj_eng_name = ui.comboBox_objects_eng->currentText().toStdString();
-
-            //objectPtr obj = scene->getObject(obj_id);
-            objectPtr obj = scene->getObject(obj_name);
-            //objectPtr obj_eng = scene->getObject(obj_eng_id);
-            objectPtr obj_eng = scene->getObject(obj_eng_name);
-
-            if(obj!=NULL && obj_eng!=NULL){
-                int grip_id = ui.comboBox_grip->currentIndex();
-                bool prec = ui.radioButton_prec->isChecked();
-                //bool full = ui.radioButton_full->isChecked();
-                switch (aa){
-                case 0: // dual arm
-                    // TO DO
-                case 1: // right arm
-                     obj->setTargetRightEnabled(true);
-                     obj->setTargetLeftEnabled(false);
-                    break;
-                case 2: // left arm
-                    obj->setTargetLeftEnabled(true);
-                    obj->setTargetRightEnabled(false);
-                    break;
+        if(add){
+            bool success = false;
+            int mov_id = ui.comboBox_mov->currentIndex();
+            int arm_sel;
+            if (ui.comboBox_Task->currentIndex()==0){
+                //single-arm
+                if(ui.radioButton_right->isChecked()){
+                    arm_sel=1; // right arm
+                }else{
+                    arm_sel=2; // left arm
                 }
-                hum_planner->addProblem(movementPtr(new Movement(mov_id, aa, obj,obj_eng,grip_id,prec)));
-                success=true;
-
             }else{
-                qnode.log(QNode::Error,std::string("The movement requires two objects"));
+                //dual-arm
+                arm_sel=0;
             }
 
-         }else if(ui.comboBox_objects->isEnabled() && ui.groupBox_grip->isEnabled()){
 
-             if(std::strcmp(ui.comboBox_mov->currentText().toStdString().c_str(),"Go-home")!=0){
-                  // reach-to- grasp movement, transport movements
+            // add the movement
+            scenarioPtr scene = this->hum_planner->getScenario();
 
-                 //int obj_id = ui.comboBox_objects->currentIndex();
-                 string obj_name = ui.comboBox_objects->currentText().toStdString();
+             if (ui.comboBox_objects->isEnabled() && ui.comboBox_objects_eng->isEnabled() && ui.groupBox_grip->isEnabled()){
 
-                 //objectPtr obj = scene->getObject(obj_id);
-                 objectPtr obj = scene->getObject(obj_name);
+                 // engage, disengage movements
 
-                 if(obj!=NULL){
-                     int grip_id = ui.comboBox_grip->currentIndex();
-                     bool prec = ui.radioButton_prec->isChecked();
-                     //bool full = ui.radioButton_full->isChecked();
-                     switch (aa){
-                     case 0: // dual arm
-                         // TO DO
-                     case 1: // right arm
-                          obj->setTargetRightEnabled(true);
-                          obj->setTargetLeftEnabled(false);
-                         break;
-                     case 2: // left arm
-                         obj->setTargetLeftEnabled(true);
-                         obj->setTargetRightEnabled(false);
-                         break;
+                //int obj_id = ui.comboBox_objects->currentIndex();
+                string obj_name = ui.comboBox_objects->currentText().toStdString();
+                //int obj_eng_id = ui.comboBox_objects_eng->currentIndex();
+                string obj_eng_name = ui.comboBox_objects_eng->currentText().toStdString();
+
+                //objectPtr obj = scene->getObject(obj_id);
+                HUMotion::objectPtr obj = scene->getObject(obj_name);
+                //objectPtr obj_eng = scene->getObject(obj_eng_id);
+                HUMotion::objectPtr obj_eng = scene->getObject(obj_eng_name);
+
+                if(obj!=NULL && obj_eng!=NULL){
+                    int grip_id = ui.comboBox_grip->currentIndex();
+                    bool prec = ui.radioButton_prec->isChecked();
+                    //bool full = ui.radioButton_full->isChecked();
+                    switch (arm_sel){
+                    case 0: // dual arm
+                        // TO DO
+                    case 1: // right arm
+                         obj->setTargetRightEnabled(true);
+                         obj->setTargetLeftEnabled(false);
+                        break;
+                    case 2: // left arm
+                        obj->setTargetLeftEnabled(true);
+                        obj->setTargetRightEnabled(false);
+                        break;
+                    }
+                    hum_planner->addProblem(movementPtr(new Movement(mov_id, arm_sel, obj,obj_eng,grip_id,prec)));
+                    success=true;
+
+                }else{
+                    qnode.log(QNode::Error,std::string("The movement requires two objects"));
+                }
+
+             }else if(ui.comboBox_objects->isEnabled() && ui.groupBox_grip->isEnabled()){
+
+                 if(std::strcmp(ui.comboBox_mov->currentText().toStdString().c_str(),"Go-home")!=0){
+                      // reach-to- grasp movement, transport movements
+
+                     //int obj_id = ui.comboBox_objects->currentIndex();
+                     string obj_name = ui.comboBox_objects->currentText().toStdString();
+
+                     //objectPtr obj = scene->getObject(obj_id);
+                     objectPtr obj = scene->getObject(obj_name);
+
+                     if(obj!=NULL){
+                         int grip_id = ui.comboBox_grip->currentIndex();
+                         bool prec = ui.radioButton_prec->isChecked();
+                         //bool full = ui.radioButton_full->isChecked();
+                         switch (arm_sel){
+                         case 0: // dual arm
+                             // TO DO
+                         case 1: // right arm
+                              obj->setTargetRightEnabled(true);
+                              obj->setTargetLeftEnabled(false);
+                             break;
+                         case 2: // left arm
+                             obj->setTargetLeftEnabled(true);
+                             obj->setTargetRightEnabled(false);
+                             break;
+                         }
+                         hum_planner->addProblem(movementPtr(new Movement(mov_id, arm_sel, obj,grip_id,prec)));
+                         success=true;
+
+                     }else{
+                         qnode.log(QNode::Error,std::string("The movement requires an object"));
+
                      }
-                     hum_planner->addProblem(movementPtr(new Movement(mov_id, aa, obj,grip_id,prec)));
-                     success=true;
 
                  }else{
-                     qnode.log(QNode::Error,std::string("The movement requires an object"));
 
+                     // Go park movements
+                     //int obj_id = ui.comboBox_objects->currentIndex();
+                     string obj_name = ui.comboBox_objects->currentText().toStdString();
+                     //objectPtr obj = scene->getObject(obj_id);
+                     objectPtr obj = scene->getObject(obj_name);
+                     if(obj!=NULL){
+                         int grip_id = ui.comboBox_grip->currentIndex();
+                         bool prec = ui.radioButton_prec->isChecked();
+                         //bool full = ui.radioButton_full->isChecked();
+                         switch (arm_sel){
+                         case 0: // dual arm
+                             // TO DO
+                         case 1: // right arm
+                              obj->setTargetRightEnabled(true);
+                              obj->setTargetLeftEnabled(false);
+                             break;
+                         case 2: // left arm
+                             obj->setTargetLeftEnabled(true);
+                             obj->setTargetRightEnabled(false);
+                             break;
+                         }
+                         hum_planner->addProblem(movementPtr(new Movement(mov_id, arm_sel, obj,grip_id,prec)));
+                         success=true;
+
+                     }else{
+                        hum_planner->addProblem(movementPtr(new Movement(mov_id, arm_sel)));
+                        success=true;
+
+                     }
                  }
+
 
              }else{
 
-                 // go home movements
-                 //int obj_id = ui.comboBox_objects->currentIndex();
-                 string obj_name = ui.comboBox_objects->currentText().toStdString();
-                 //objectPtr obj = scene->getObject(obj_id);
-                 objectPtr obj = scene->getObject(obj_name);
-                 if(obj!=NULL){
-                     int grip_id = ui.comboBox_grip->currentIndex();
-                     bool prec = ui.radioButton_prec->isChecked();
-                     //bool full = ui.radioButton_full->isChecked();
-                     switch (aa){
-                     case 0: // dual arm
-                         // TO DO
-                     case 1: // right arm
-                          obj->setTargetRightEnabled(true);
-                          obj->setTargetLeftEnabled(false);
-                         break;
-                     case 2: // left arm
-                         obj->setTargetLeftEnabled(true);
-                         obj->setTargetRightEnabled(false);
-                         break;
-                     }
-                     hum_planner->addProblem(movementPtr(new Movement(mov_id, aa, obj,grip_id,prec)));
-                     success=true;
+                 // reaching movements
+                 hum_planner->addProblem(movementPtr(new Movement(mov_id, arm_sel)));
+                 success=true;
 
-                 }else{
-                    hum_planner->addProblem(movementPtr(new Movement(mov_id, aa)));
-                    success=true;
+             }
 
+             if(success){
+                 qnode.log(QNode::Info,std::string("The movement has been added to the current task"));
+                 ui.groupBox_task->setEnabled(true);
+                 ui.listWidget_movs->clear();
+                 for (int i = 0; i < hum_planner->getProblemNumber();i++ ){
+                    ui.listWidget_movs->addItem(QString(hum_planner->getProblemInfo(i).c_str()));
                  }
+                 ui.listWidget_movs->setCurrentRow(ui.listWidget_movs->count()-1);
+                 this->hum_planner->setScenario(scene); // update the scenario
              }
 
 
-         }else{
-
-             // reaching movements
-             hum_planner->addProblem(movementPtr(new Movement(mov_id, aa)));
-             success=true;
-
-         }
-
-         if(success){
-             qnode.log(QNode::Info,std::string("The movement has been added to the current task"));
-             ui.groupBox_task->setEnabled(true);
-             ui.listWidget_movs->clear();
-             for (int i = 0; i < hum_planner->getProblemNumber();i++ ){
-                ui.listWidget_movs->addItem(QString(hum_planner->getProblemInfo(i).c_str()));
-             }
-             ui.listWidget_movs->setCurrentRow(ui.listWidget_movs->count()-1);
-             this->hum_planner->setScenario(scene); // update the scenario
-         }
+        }
 
 
-    }
+    }else{
+
+        //Humanoid MoveIt! Planner
 
 
-}
+
+
+    } //if/else planner
+
+} // add movement
 
 
 void MainWindow::on_pushButton_plan_clicked()
@@ -608,7 +621,7 @@ void MainWindow::on_pushButton_plan_clicked()
         mTolHumldlg->setInfo(prob->getInfoLine());
         try{
 
-            Tols  tols;
+            HUMotion::Tols  tols;
             // --- Tolerances for the final posture selection ---- //
 
             // tolerances of the arm : radius in [mm]
@@ -1029,7 +1042,7 @@ void MainWindow::on_pushButton_load_task_clicked()
 
                 }else if(QString::compare(mov_type,QString("Disengage"),Qt::CaseInsensitive)==0){
                     mov_id=4;
-                }else if(QString::compare(mov_type,QString("Go home"),Qt::CaseInsensitive)==0){
+                }else if(QString::compare(mov_type,QString("Go park"),Qt::CaseInsensitive)==0){
                     mov_id=5;
                     //get the object
                     obj = this->hum_planner->getScenario()->getObject(obj_str.toStdString());
@@ -1438,7 +1451,7 @@ void MainWindow::on_comboBox_mov_currentIndexChanged(int i)
             ui.groupBox_grip->setEnabled(true);
             break;
         case 5:
-        // Go home
+        // Go park
             ui.comboBox_objects->setEnabled(true);
             ui.comboBox_objects_eng->setEnabled(false);
             ui.label_objects->setEnabled(true);
