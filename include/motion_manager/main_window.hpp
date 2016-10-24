@@ -16,10 +16,10 @@
 #include "toldialoghuml.hpp"
 #include "config.hpp"
 
-// *** Humanoid MoveIt! planner *** //
-#include <aros_moveit_planner/humanoid_planner.hpp>
+// *** Humanoid MoveIt! Planner *** //
+#include <aros_moveit_planner/humanoid_moveit_planner.hpp>
 // ******************************************* //
-// *** HUML *** //
+// *** Human-like Upper-limbs Motion Library (HUML) *** //
 #include <humplanner.hpp>
 // ************ //
 
@@ -31,7 +31,7 @@ using namespace std;
 //using namespace HUMotion;
 //using namespace humanoid_planning;
 typedef boost::shared_ptr<HUMotion::HUMPlanner> humplannerPtr; /**< shared pointer to a human-like motion planner */
-typedef boost::shared_ptr<humanoid_planning::HumanoidPlanner> hplannerPtr; /**< shared point to a humanoid moveit planner */
+typedef boost::shared_ptr<moveit_planning::HumanoidPlanner> moveit_plannerPtr; /**< shared point to a humanoid moveit planner */
 
 //! The MainWindow class
 /**
@@ -280,7 +280,7 @@ private:
         TolDialogHUML *mTolHumldlg; /**< handle of the tuning dialog */
         int scenario_id; /**< id of the current scenario */
         humplannerPtr hum_planner; /**< human-like upper-limbs movement planner */
-        hplannerPtr h_planner; /**< humanoid moveit planner */
+        moveit_plannerPtr h_planner; /**< humanoid moveit planner */
         float timeStep; /**< current time step of the trajectory */
         MatrixXf jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
         MatrixXf jointsPosition_mov; /**< trajectory of the joint position of the movement */

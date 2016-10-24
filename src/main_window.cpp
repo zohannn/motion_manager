@@ -300,8 +300,9 @@ void MainWindow::on_pushButton_loadScenario_clicked()
          equal = scenario_text.compare(scenarios.at(i));
          if(equal==0){
 
-             string path_vrep_scene = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
-             string path_rviz_scene = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
+             // Toy vehicle scenario
+             string path_vrep_toyscene = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
+             string path_rviz_toyscene = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
 
              switch(i){
 
@@ -311,7 +312,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              // Assembly scenario: the Toy vehicle with Jarde
              this->scenario_id = 1;
 
-             if (qnode.loadScenario(PATH_SCENARIOS+string("/vrep/ToyVehicleTask_jarde.ttt"),this->scenario_id)){
+             if (qnode.loadScenario(path_vrep_toyscene,this->scenario_id)){
                  qnode.log(QNode::Info,string("Assembly scenario: the Toy vehicle with Jarde HAS BEEN LOADED"));
                  ui.groupBox_getElements->setEnabled(true);
                  ui.groupBox_homePosture->setEnabled(true);
@@ -333,14 +334,14 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                  // Assembly scenario: the Toy vehicle with ARoS
                  this->scenario_id = 0;
 
-                 if (qnode.loadScenario(path_vrep_scene,this->scenario_id)){
+                 if (qnode.loadScenario(path_vrep_toyscene,this->scenario_id)){
                      qnode.log(QNode::Info,string("Assembly scenario: the Toy vehicle with ARoS HAS BEEN LOADED"));
                      ui.groupBox_getElements->setEnabled(true);
                      ui.groupBox_homePosture->setEnabled(true);
                      //ui.pushButton_loadScenario->setEnabled(false);
                      string title = string("Assembly scenario: the Toy vehicle with ARoS");
                      this->hum_planner = humplannerPtr(new HUMotion::HUMPlanner(title, new HUMotion::Scenario(title,this->scenario_id+1), new Task()));
-                     this->h_planner = hplannerPtr(new humanoid_planning::HumanoidPlanner(title,path_rviz_scene,this->scenario_id+1));
+                     this->h_planner = moveit_plannerPtr(new moveit_planning::HumanoidPlanner(title,new moveit_planning::Scenario(title,this->scenario_id+1),path_rviz_toyscene));
                  }else{
 
                      qnode.log(QNode::Error,std::string("Assembly scenario: the Toy vehicle with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
