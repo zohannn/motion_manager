@@ -28,8 +28,8 @@
 namespace motion_manager {
 
 using namespace std;
-using namespace HUMotion;
-using namespace humanoid_planning;
+//using namespace HUMotion;
+//using namespace humanoid_planning;
 typedef boost::shared_ptr<HUMotion::HUMPlanner> humplannerPtr; /**< shared pointer to a human-like motion planner */
 typedef boost::shared_ptr<humanoid_planning::HumanoidPlanner> hplannerPtr; /**< shared point to a humanoid moveit planner */
 
