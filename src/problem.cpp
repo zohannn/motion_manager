@@ -11,6 +11,12 @@ Problem::Problem():
     this->part_of_task=false;
     this->err_log=0;
 
+    this->h_planner.reset(new HUMotion::HUMPlanner(""));
+    int HUMotion::HUMPlanner::hand_fingers = HAND_FINGERS;
+    int HUMotion::HUMPlanner::joints_arm = JOINTS_ARM;
+    int HUMotion::HUMPlanner::joints_hand = JOINTS_HAND;
+    int HUMotion::HUMPlanner::n_phalange = N_PHALANGE;
+
 }
 
 Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
@@ -21,8 +27,16 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
     this->part_of_task=false;
     this->err_log=0;
 
+
     this->mov = movementPtr(mov);
     this->scene = scenarioPtr(scene);
+
+    this->h_planner.reset(new HUMotion::HUMPlanner(this->scene->getName()));
+    int HUMotion::HUMPlanner::hand_fingers = HAND_FINGERS;
+    int HUMotion::HUMPlanner::joints_arm = JOINTS_ARM;
+    int HUMotion::HUMPlanner::joints_hand = JOINTS_HAND;
+    int HUMotion::HUMPlanner::n_phalange = N_PHALANGE;
+
     this->planner_id=planner_id;
 
     switch(planner_id){
@@ -67,6 +81,8 @@ Problem::Problem(const Problem& s)
     this->targetAxis = s.targetAxis;
     this->mov = movementPtr(new Movement(*s.mov.get()));
     this->scene = scenarioPtr(new Scenario(*s.scene.get()));
+    this->h_planner = h_plannerPtr(new HUMotion::HUMPlanner(*s.h_planner.get()));
+
     this->planner_id=s.planner_id;
     this->planner_name=s.planner_name;
 }
