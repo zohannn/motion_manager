@@ -29,10 +29,9 @@
 #include <boost/log/sources/severity_logger.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 
-
-
-#include <humplanner.hpp>
-
+#include "config.hpp"
+#include "task.hpp"
+#include "scenario.hpp"
 
 
 
@@ -44,8 +43,10 @@ namespace sinks = boost::log::sinks;
 namespace keywords = boost::log::keywords;
 
 using namespace std;
-using namespace HUMotion;
 using namespace logging::trivial;
+
+typedef boost::shared_ptr<Scenario> scenarioPtr;/**< shared pointer to the current scenario */
+typedef boost::shared_ptr<Task> taskPtr; /**< shared pointer to the current task */
 
 //! The QNode class
 /**
@@ -130,7 +131,7 @@ public:
          * @param scene
          * @return
          */
-        bool execMovement(MatrixXf& traj, MatrixXf& vel, float timeStep, float tol_stop, movementPtr mov, scenarioPtr scene); // execute the movement
+        bool execMovement(MatrixXf& traj, MatrixXf& vel, double timeStep, double tol_stop, movementPtr mov, scenarioPtr scene);
 
         /**
          * @brief This method executes the movements in a task
@@ -143,8 +144,7 @@ public:
          * @param scene
          * @return
          */
-        bool execTask(MatrixXf& traj_task, MatrixXf& vel_task, std::vector<float>& timeSteps, std::vector<int>& nSteps, std::vector<float>& tols_stop, taskPtr task, scenarioPtr scene); // execute the task
-
+        bool execTask(MatrixXf& traj_task, MatrixXf& vel_task, vector<double>& timeSteps, vector<int>& nSteps, vector<double>& tols_stop, taskPtr task, scenarioPtr scene);
         /**
          * @brief This method sets to zero the time of simulation
          */
@@ -255,10 +255,10 @@ private:
         //ros::Subscriber subUpdateTable;
         QStringListModel logging_model; /**< list of loggings */
         bool simulationRunning; /**< true if the simulation in V-REP is running */
-        float simulationTime;/**< current time of the simulation */
-        float simulationTimeStep;/**< current time step of the simulation */
+        double simulationTime;/**< current time of the simulation */
+        double simulationTimeStep;/**< current time step of the simulation */
         string nodeName; /**< name of the ROS node */
-        float TotalTime; /**< total time of the movements */
+        double TotalTime; /**< total time of the movements */
         scenarioPtr curr_scene; /**< current scenario */
         movementPtr curr_mov; /**< current movement that is being executed */
         src::severity_logger< severity_level > lg; /**< logger */
@@ -273,12 +273,12 @@ private:
         std::vector<int> left_handles; /**< left arm and left hand joints handles */
         MatrixXi right_hand_handles; /**< matrix of the handles of the right hand joints */
         MatrixXi left_hand_handles; /**< matrix of the handles of the left hand joints */
-        std::vector<float> right_2hand_pos; /**< position of the right hand 2 phalanx */
-        std::vector<float> right_2hand_vel; /**< velocity of the right hand 2 phalanx */
-        std::vector<float> right_2hand_force; /**< forces of the right hand 2 phalanx */
-        std::vector<float> left_2hand_pos; /**< position of the left hand 2 phalanx */
-        std::vector<float> left_2hand_vel; /**< velocity of the left hand 2 phalanx */
-        std::vector<float> left_2hand_force; /**< forces of the left hand 2 phalanx */
+        std::vector<double> right_2hand_pos; /**< position of the right hand 2 phalanx */
+        std::vector<double> right_2hand_vel; /**< velocity of the right hand 2 phalanx */
+        std::vector<double> right_2hand_force; /**< forces of the right hand 2 phalanx */
+        std::vector<double> left_2hand_pos; /**< position of the left hand 2 phalanx */
+        std::vector<double> left_2hand_vel; /**< velocity of the left hand 2 phalanx */
+        std::vector<double> left_2hand_force; /**< forces of the left hand 2 phalanx */
 
 #if HAND ==1
         std::vector<bool> firstPartLocked;
@@ -383,7 +383,7 @@ private:
          * @param m
          * @return
          */
-        float interpolate(float ya, float yb, float m);
+        double interpolate(double ya, double yb, double m);
 
         /**
          * @brief This method initializate the logging
@@ -411,7 +411,7 @@ private:
          * @param rpy
          * @return
          */
-        bool getRPY(Matrix4f Trans, std::vector<float>& rpy);
+        bool getRPY(Matrix4f Trans, std::vector<double>& rpy);
 
         /**
          * @brief This method update the information of a generic object in V-REP

@@ -16,22 +16,22 @@
 #include "toldialoghuml.hpp"
 #include "config.hpp"
 
+
+
 // *** Humanoid MoveIt! Planner *** //
-#include <aros_moveit_planner/humanoid_moveit_planner.hpp>
+//#include <aros_moveit_planner/humanoid_moveit_planner.hpp>
 // ******************************************* //
 // *** Human-like Upper-limbs Motion Library (HUML) *** //
-#include <humplanner.hpp>
+//#include <humplanner.hpp>
 // ************ //
 
+
+using namespace std;
 
 /** This is the main namespace of the program */
 namespace motion_manager {
 
-using namespace std;
-//using namespace HUMotion;
-//using namespace humanoid_planning;
-typedef boost::shared_ptr<HUMotion::HUMPlanner> humplannerPtr; /**< shared pointer to a human-like motion planner */
-typedef boost::shared_ptr<moveit_planning::HumanoidPlanner> moveit_plannerPtr; /**< shared point to a humanoid moveit planner */
+
 
 //! The MainWindow class
 /**
@@ -279,19 +279,21 @@ private:
         RVizCommDialog *mrvizCommdlg; /**< handle of the RViz communication dialog */
         TolDialogHUML *mTolHumldlg; /**< handle of the tuning dialog */
         int scenario_id; /**< id of the current scenario */
-        humplannerPtr hum_planner; /**< human-like upper-limbs movement planner */
-        moveit_plannerPtr h_planner; /**< humanoid moveit planner */
-        float timeStep; /**< current time step of the trajectory */
+
+        double timeStep; /**< current time step of the trajectory */
         MatrixXf jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
         MatrixXf jointsPosition_mov; /**< trajectory of the joint position of the movement */
         MatrixXf jointsVelocity_task; /**< trajectory of the joint velocity of the task */
         MatrixXf jointsPosition_task; /**< trajectory of the joint position of the task */
-        std::vector<float> timeSteps_task; /**< vector of time steps of each movement in the task */
-        std::vector<int> nSteps_task; /**< vector of number of steps of each movement in the task */
-        std::vector<string> vel_steps; /**< steps of the trajectory for saving/loading file */
-        std::vector<float> tols_stop; /**< vector of the tolerances to stop each movement in the task */
-        movementPtr mov; /**< current movement */
+        vector<double> timeSteps_task; /**< vector of time steps of each movement in the task */
+        vector<int> nSteps_task; /**< vector of number of steps of each movement in the task */
+        vector<string> vel_steps; /**< steps of the trajectory for saving/loading file */
+        vector<double> tols_stop; /**< vector of the tolerances to stop each movement in the task */
+
+        movementPtr curr_mov; /**< current movement */
+        taskPtr curr_task;/**< current task */
         scenarioPtr init_scene; /**< initial scenario */
+        scenarioPtr curr_scene; /**< current scenario */
 
         // --- Park postures for ARoS --- //
 

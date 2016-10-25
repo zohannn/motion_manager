@@ -18,11 +18,10 @@
 /*****************************************************************************
 ** Namespaces
 *****************************************************************************/
-
-namespace motion_manager {
-
 using namespace Qt;
 using namespace std;
+
+namespace motion_manager {
 
 /*****************************************************************************
 ** Implementation [MainWindow]
@@ -300,9 +299,9 @@ void MainWindow::on_pushButton_loadScenario_clicked()
          equal = scenario_text.compare(scenarios.at(i));
          if(equal==0){
 
-             // Toy vehicle scenario
-             string path_vrep_toyscene = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
-             string path_rviz_toyscene = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
+             // Toy vehicle scenario with ARoS
+             string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
+             string path_rviz_toyscene_aros = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
 
              switch(i){
 
@@ -312,7 +311,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              // Assembly scenario: the Toy vehicle with Jarde
              this->scenario_id = 1;
 
-             if (qnode.loadScenario(path_vrep_toyscene,this->scenario_id)){
+             if (qnode.loadScenario(path_vrep_toyscene_aros,this->scenario_id)){
                  qnode.log(QNode::Info,string("Assembly scenario: the Toy vehicle with Jarde HAS BEEN LOADED"));
                  ui.groupBox_getElements->setEnabled(true);
                  ui.groupBox_homePosture->setEnabled(true);
@@ -334,14 +333,15 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                  // Assembly scenario: the Toy vehicle with ARoS
                  this->scenario_id = 0;
 
-                 if (qnode.loadScenario(path_vrep_toyscene,this->scenario_id)){
+                 if (qnode.loadScenario(path_vrep_toyscene_aros,this->scenario_id)){
                      qnode.log(QNode::Info,string("Assembly scenario: the Toy vehicle with ARoS HAS BEEN LOADED"));
                      ui.groupBox_getElements->setEnabled(true);
                      ui.groupBox_homePosture->setEnabled(true);
                      //ui.pushButton_loadScenario->setEnabled(false);
                      string title = string("Assembly scenario: the Toy vehicle with ARoS");
-                     this->hum_planner = humplannerPtr(new HUMotion::HUMPlanner(title, new HUMotion::Scenario(title,this->scenario_id+1), new Task()));
-                     this->h_planner = moveit_plannerPtr(new moveit_planning::HumanoidPlanner(title,new moveit_planning::Scenario(title,this->scenario_id+1),path_rviz_toyscene));
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+
                  }else{
 
                      qnode.log(QNode::Error,std::string("Assembly scenario: the Toy vehicle with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
@@ -398,14 +398,12 @@ void MainWindow::on_pushButton_plan_pressed()
 void MainWindow::on_pushButton_getElements_clicked()
 {
 
-scenarioPtr scene = this->hum_planner->getScenario();
 
     try{
-        if (qnode.getElements(scene)){
+        if (qnode.getElements(init_scene)){
 
-            this->hum_planner->setScenario(scene); //update the scenario
-            this->init_scene = scenarioPtr(new Scenario(*scene.get())); // set the initial scene
-
+            curr_scene = init_scene; //update the current scenario
+            curr_task = taskPtr(new Task());
             ui.pushButton_getElements->setEnabled(false);
             ui.tab_plan->setEnabled(true);
             ui.groupBox_specs->setEnabled(true);
@@ -437,20 +435,22 @@ void MainWindow::on_pushButton_addMov_clicked()
     ui.pushButton_save_task->setEnabled(false);
     int planner_id = ui.comboBox_planner->currentIndex();
 
-    if (planner_id==0){
+    //if (planner_id==0){
 
     // Human-like Upper-limbs Motion Planner
 
         int rows = ui.listWidget_movs->count();
         bool add = true;
+        /*
         if (rows > 0){
-            problemPtr pre_prob = hum_planner->getProblem(rows-1); //previous problem
+            h_problemPtr pre_prob = hum_planner->getProblem(rows-1); //previous problem
             if(!pre_prob->getMovement()->getExecuted()){
                 int reply = QMessageBox::warning(this,tr("Warning"),
                                      tr("<p>The previous movement has not been executed yet. Do you really want to add this movement?</p>"),QMessageBox::Yes,QMessageBox::No);
                add = (reply == QMessageBox::Yes);
             }
         }
+        */
 
         if(add){
             bool success = false;
@@ -470,21 +470,17 @@ void MainWindow::on_pushButton_addMov_clicked()
 
 
             // add the movement
-            scenarioPtr scene = this->hum_planner->getScenario();
+            //h_scenarioPtr scene = this->hum_planner->getScenario();
 
              if (ui.comboBox_objects->isEnabled() && ui.comboBox_objects_eng->isEnabled() && ui.groupBox_grip->isEnabled()){
 
                  // engage, disengage movements
 
-                //int obj_id = ui.comboBox_objects->currentIndex();
                 string obj_name = ui.comboBox_objects->currentText().toStdString();
-                //int obj_eng_id = ui.comboBox_objects_eng->currentIndex();
                 string obj_eng_name = ui.comboBox_objects_eng->currentText().toStdString();
 
-                //objectPtr obj = scene->getObject(obj_id);
-                HUMotion::objectPtr obj = scene->getObject(obj_name);
-                //objectPtr obj_eng = scene->getObject(obj_eng_id);
-                HUMotion::objectPtr obj_eng = scene->getObject(obj_eng_name);
+                objectPtr obj = scene->getObject(obj_name);
+                objectPtr obj_eng = scene->getObject(obj_eng_name);
 
                 if(obj!=NULL && obj_eng!=NULL){
                     int grip_id = ui.comboBox_grip->currentIndex();
@@ -502,7 +498,10 @@ void MainWindow::on_pushButton_addMov_clicked()
                         obj->setTargetRightEnabled(false);
                         break;
                     }
-                    hum_planner->addProblem(movementPtr(new Movement(mov_id, arm_sel, obj,obj_eng,grip_id,prec)));
+
+                    curr_task->addProblem(new Problem(planner_id,
+                                                      new Movement(mov_id, arm_sel, obj,obj_eng,grip_id,prec),
+                                                      new Scenario(this->curr_scene.get())));
                     success=true;
 
                 }else{
@@ -511,13 +510,10 @@ void MainWindow::on_pushButton_addMov_clicked()
 
              }else if(ui.comboBox_objects->isEnabled() && ui.groupBox_grip->isEnabled()){
 
-                 if(std::strcmp(ui.comboBox_mov->currentText().toStdString().c_str(),"Go-home")!=0){
+                 if(std::strcmp(ui.comboBox_mov->currentText().toStdString().c_str(),"Go-park")!=0){
                       // reach-to- grasp movement, transport movements
 
-                     //int obj_id = ui.comboBox_objects->currentIndex();
                      string obj_name = ui.comboBox_objects->currentText().toStdString();
-
-                     //objectPtr obj = scene->getObject(obj_id);
                      objectPtr obj = scene->getObject(obj_name);
 
                      if(obj!=NULL){
@@ -536,7 +532,9 @@ void MainWindow::on_pushButton_addMov_clicked()
                              obj->setTargetRightEnabled(false);
                              break;
                          }
-                         hum_planner->addProblem(movementPtr(new Movement(mov_id, arm_sel, obj,grip_id,prec)));
+                         curr_task->addProblem(new Problem(planner_id,
+                                                           new Movement(mov_id, arm_sel, obj,grip_id,prec),
+                                                           new Scenario(this->curr_scene.get())));
                          success=true;
 
                      }else{
@@ -547,9 +545,7 @@ void MainWindow::on_pushButton_addMov_clicked()
                  }else{
 
                      // Go park movements
-                     //int obj_id = ui.comboBox_objects->currentIndex();
                      string obj_name = ui.comboBox_objects->currentText().toStdString();
-                     //objectPtr obj = scene->getObject(obj_id);
                      objectPtr obj = scene->getObject(obj_name);
                      if(obj!=NULL){
                          int grip_id = ui.comboBox_grip->currentIndex();
@@ -567,11 +563,15 @@ void MainWindow::on_pushButton_addMov_clicked()
                              obj->setTargetRightEnabled(false);
                              break;
                          }
-                         hum_planner->addProblem(movementPtr(new Movement(mov_id, arm_sel, obj,grip_id,prec)));
+                         curr_task->addProblem(new Problem(planner_id,
+                                                           new Movement(mov_id, arm_sel, obj,grip_id,prec),
+                                                           new Scenario(this->curr_scene.get())));
                          success=true;
 
                      }else{
-                        hum_planner->addProblem(movementPtr(new Movement(mov_id, arm_sel)));
+                        curr_task->addProblem(new Problem(planner_id,
+                                                          new Movement(mov_id, arm_sel),
+                                                          new Scenario(this->curr_scene.get())));
                         success=true;
 
                      }
@@ -581,7 +581,9 @@ void MainWindow::on_pushButton_addMov_clicked()
              }else{
 
                  // reaching movements
-                 hum_planner->addProblem(movementPtr(new Movement(mov_id, arm_sel)));
+                 curr_task->addProblem(new Problem(planner_id,
+                                                   new Movement(mov_id, arm_sel),
+                                                   new Scenario(this->curr_scene.get())));
                  success=true;
 
              }
@@ -590,25 +592,25 @@ void MainWindow::on_pushButton_addMov_clicked()
                  qnode.log(QNode::Info,std::string("The movement has been added to the current task"));
                  ui.groupBox_task->setEnabled(true);
                  ui.listWidget_movs->clear();
-                 for (int i = 0; i < hum_planner->getProblemNumber();i++ ){
-                    ui.listWidget_movs->addItem(QString(hum_planner->getProblemInfo(i).c_str()));
+                 for (int i = 0; i < curr_task->getProblemNumber();i++ ){
+                    ui.listWidget_movs->addItem(QString(curr_task->getProblemInfo(i).c_str()));
                  }
                  ui.listWidget_movs->setCurrentRow(ui.listWidget_movs->count()-1);
-                 this->hum_planner->setScenario(scene); // update the scenario
+
              }
 
 
         }
 
 
-    }else{
+   // }else{
 
         //Humanoid MoveIt! Planner
 
 
 
 
-    } //if/else planner
+    //} //if/else planner
 
 } // add movement
 
@@ -617,12 +619,18 @@ void MainWindow::on_pushButton_plan_clicked()
 {
 
     ui.tabWidget_sol->setCurrentIndex(0);    
-    problemPtr prob = hum_planner->getProblem(ui.listWidget_movs->currentRow());
+    problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
+    int planner_id = prob->getPlannerID();
 
+    bool solved = false;
+
+    switch(planner_id){
+
+    case 0: // HUML
         mTolHumldlg->setInfo(prob->getInfoLine());
         try{
 
-            HUMotion::Tols  tols;
+            HUMotion::huml_tols  tols;
             // --- Tolerances for the final posture selection ---- //
 
             // tolerances of the arm : radius in [mm]
@@ -636,14 +644,14 @@ void MainWindow::on_pushButton_plan_clicked()
             //obstacle avoidance
             tols.obstacle_avoidance = mTolHumldlg->getObstacleAvoidance();
             // joint expense factors
-            std::vector<float> lambda;
+            vector<double> lambda;
             mTolHumldlg->getLambda(lambda);
-            for (int i = 0; i < JOINTS_ARM; ++i){
+            for (int i = 0; i < HUMotion::JOINTS_ARM; ++i){
                 tols.lambda_final.push_back(lambda.at(i));
             }
             // --- Tolerances for the bounce posture selection ---- //
 
-            for (int i=0; i < JOINTS_ARM + JOINTS_HAND; ++i){
+            for (int i=0; i < HUMotion::JOINTS_ARM + HUMotion::JOINTS_HAND; ++i){
                 tols.bounds.vel_0.push_back(0);
                 tols.bounds.vel_f.push_back(0);
                 tols.bounds.acc_0.push_back(0);
@@ -691,116 +699,118 @@ void MainWindow::on_pushButton_plan_clicked()
             // tol stop
             tols.tol_stop = mTolHumldlg->getTolStop();
 
-            bool solved = prob->solve(tols); // plan the movement
+            solved = prob->solve(tols); // plan the movement
 
-            if(solved){
+        break;
 
+    }
 
-                ui.pushButton_plan->setCheckable(false);
+    if(solved){
+        ui.pushButton_plan->setCheckable(false);
 
-                qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
-
-
-                MatrixXf traj;
-                prob->getTrajectory(traj);
+        qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
 
 
-                MatrixXf vel;
-                float timeStep = prob->getVelocity(vel);
-                std::vector<string> velStep = std::vector<string>(vel.rows());
-                for (int i=0; i<vel.rows();++i){
-                    velStep.at(i) = "Step="+QString::number(i).toStdString()+",";
-                    for (int j=0; j<vel.cols();++j){
-                        velStep.at(i) = velStep.at(i)+
-                                " Joint "+QString::number(j+1).toStdString()+"="+
-                                QString::number(traj(i,j)*180/M_PI).toStdString()+"|"+
-                                QString::number(vel(i,j)*180/M_PI).toStdString()+", ";
-                    }
-                    ui.listWidget_sol_mov->addItem(QString(velStep.at(i).c_str()));
-                }
+        MatrixXf traj;
+        prob->getTrajectory(traj);
 
 
-                ui.label_totalTime_value_mov->setText(QString::number(timeStep*tols.steps).toStdString().c_str());
-                ui.tabWidget_sol->setEnabled(true);
-
-                this->timeStep=timeStep;
-                this->jointsVelocity_mov = vel;
-                this->mov = prob->getMovement();
-
-                this->jointsPosition_mov = traj;
-
-            }else{
-
-                ui.listWidget_sol_mov->clear();
-                ui.pushButton_plan->setCheckable(false);
-
-                int err_log = prob->getErrLog();
-                std::string msg;
-
-                switch(err_log){
-
-                case 0:
-
-                    msg="unknown problem";
-                    break;
-
-                case 10:
-
-                    msg="the final posture problem of the reach-to-grasp movement has not been solved";
-                    break;
-
-                case 20:
-
-                    msg="the bounce posture problem of the reach-to-grasp movement has not been solved";
-                    break;
-
-                case 130:
-
-                    msg="the final posture problem of the sub-disengage movement has not been solved";
-                    break;
-
-                case 13:
-
-                    msg="the final posture problem of the engage movement has not been solved";
-                    break;
-
-                case 131:
-
-                    msg="the final posture problem of the sub-engage movement has not been solved";
-                    break;
-
-                case 23:
-
-                    msg="the bounce posture problem of the engage movement has not been solved";
-                    break;
-
-                case 25:
-
-                    msg="the bounce posture problem of the go-home movement has not been solved";
-                    break;
-
-                default:
-
-                    msg="unknown problem";
-                    break;
-
-                }
-
-                qnode.log(QNode::Error,std::string("The planning has failed: ")+msg);
-
-
+        MatrixXf vel;
+        double timeStep = prob->getVelocity(vel);
+        std::vector<string> velStep = std::vector<string>(vel.rows());
+        for (int i=0; i<vel.rows();++i){
+            velStep.at(i) = "Step="+QString::number(i).toStdString()+",";
+            for (int j=0; j<vel.cols();++j){
+                velStep.at(i) = velStep.at(i)+
+                        " Joint "+QString::number(j+1).toStdString()+"="+
+                        QString::number(traj(i,j)*180/M_PI).toStdString()+"|"+
+                        QString::number(vel(i,j)*180/M_PI).toStdString()+", ";
             }
+            ui.listWidget_sol_mov->addItem(QString(velStep.at(i).c_str()));
+        }
+
+
+        ui.label_totalTime_value_mov->setText(QString::number(timeStep*tols.steps).toStdString().c_str());
+        ui.tabWidget_sol->setEnabled(true);
+
+        this->timeStep=timeStep;
+        this->jointsVelocity_mov = vel;
+        this->curr_mov = prob->getMovement();
+
+        this->jointsPosition_mov = traj;
+
+    }else{
+
+        ui.listWidget_sol_mov->clear();
+        ui.pushButton_plan->setCheckable(false);
+
+        int err_log = prob->getErrLog();
+        std::string msg;
+
+        switch(err_log){
+        // TO DO!!!!!!!!!!!!!!!!!!!!!!!!
+        case 0:
+
+            msg="unknown problem";
+            break;
+
+        case 10:
+
+            msg="the final posture problem of the reach-to-grasp movement has not been solved";
+            break;
+
+        case 20:
+
+            msg="the bounce posture problem of the reach-to-grasp movement has not been solved";
+            break;
+
+        case 130:
+
+            msg="the final posture problem of the sub-disengage movement has not been solved";
+            break;
+
+        case 13:
+
+            msg="the final posture problem of the engage movement has not been solved";
+            break;
+
+        case 131:
+
+            msg="the final posture problem of the sub-engage movement has not been solved";
+            break;
+
+        case 23:
+
+            msg="the bounce posture problem of the engage movement has not been solved";
+            break;
+
+        case 25:
+
+            msg="the bounce posture problem of the go-home movement has not been solved";
+            break;
+
+        default:
+
+            msg="unknown problem";
+            break;
 
         }
-        catch (const std::string message){
 
-            qnode.log(QNode::Error,std::string("Plan failure: ")+message);
+        qnode.log(QNode::Error,std::string("The planning has failed: ")+msg);
 
-        }
-        catch(const std::exception exc){
 
-            qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());
-        }
+    }
+
+}
+catch (const std::string message){
+
+    qnode.log(QNode::Error,std::string("Plan failure: ")+message);
+
+}
+catch(const std::exception exc){
+
+    qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());
+}
 
 
 
@@ -820,12 +830,10 @@ void MainWindow::on_pushButton_execMov_clicked()
 
     MatrixXf vel = this->jointsVelocity_mov;
     MatrixXf traj = this->jointsPosition_mov;
-    float timeStep = this->timeStep;
-    float tol_stop = this->mTolHumldlg->getTolStop();
+    double timeStep = this->timeStep;
+    double tol_stop = this->mTolHumldlg->getTolStop();
 
-    qnode.execMovement(traj,vel,timeStep, tol_stop, this->mov, this->hum_planner->getScenario());
-    //qnode.execMovement(traj,timeStep, this->mov, this->hum_planner->getScenario());
-
+    qnode.execMovement(traj,vel,timeStep, tol_stop, this->curr_mov, this->curr_scene);
 
 }
 
@@ -856,11 +864,11 @@ void MainWindow::on_pushButton_execTask_clicked()
 
     MatrixXf traj = this->jointsPosition_task;
     MatrixXf vel = this->jointsVelocity_task;
-    std::vector<float> tSteps = this->timeSteps_task;
+    std::vector<double> tSteps = this->timeSteps_task;
     std::vector<int> nSteps = this->nSteps_task;
-    std::vector<float> stops = this->tols_stop;
+    std::vector<double> stops = this->tols_stop;
 
-    qnode.execTask(traj,vel,tSteps,nSteps,stops,this->hum_planner->getTask(),this->hum_planner->getScenario());
+    qnode.execTask(traj,vel,tSteps,nSteps,stops,this->curr_task,this->curr_scene);
 
 
 }
@@ -869,11 +877,12 @@ void MainWindow::on_pushButton_execTask_clicked()
 void MainWindow::on_pushButton_load_task_clicked()
 {
 
+    int plan_id; QString plan_type;
     int mov_id; QString mov_type;
     int arm_code; QString arm_type;
     int grip_id; QString grip_type;
-    QString obj_str; objectPtr obj;
-    QString obj_eng_str; objectPtr obj_eng;
+    QString obj_str; h_objectPtr obj;
+    QString obj_eng_str; h_objectPtr obj_eng;
     bool prec;
     int steps=0;
     int row=0;
@@ -895,7 +904,7 @@ void MainWindow::on_pushButton_load_task_clicked()
     ui.label_totalTime_value_task->clear();
     ui.label_totalTime_value_mov->clear();
     ui.listWidget_movs->clear();
-    this->hum_planner->clearProblems();
+    this->curr_task->clearProblems();
 
     QString filename = QFileDialog::getOpenFileName(this,
                                                     tr("Load the task trajectory"),
@@ -923,8 +932,8 @@ void MainWindow::on_pushButton_load_task_clicked()
                 QStringList fields = line.split(",");
                 for(int i=0; i< fields.size(); ++i){
                     QStringList fields1 = fields.at(i).split(":");
-                    if (QString::compare(fields1.at(0).simplified(),QString("Humanoid"),Qt::CaseInsensitive)==0){
-                       // do nothing
+                    if (QString::compare(fields1.at(0).simplified(),QString("Planner"),Qt::CaseInsensitive)==0){
+                       plan_type = fields1.at(1).simplified();
                     }else if (QString::compare(fields1.at(0).simplified(),QString("Movement"),Qt::CaseInsensitive)==0){
                         mov_type = fields1.at(1).simplified();
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Arm"),Qt::CaseInsensitive)==0){
@@ -937,6 +946,24 @@ void MainWindow::on_pushButton_load_task_clicked()
                         grip_type=fields1.at(1).simplified();
                     }
                 }
+
+                //get the planner id
+                if(QString::compare(plan_type,QString("HUML"),Qt::CaseInsensitive)==0){
+                    plan_id=0;
+                }else if(QString::compare(plan_type,QString("RRT"),Qt::CaseInsensitive)==0){
+                    plan_id=1;
+                }else if(QString::compare(plan_type,QString("RRTConnect"),Qt::CaseInsensitive)==0){
+                    plan_id=2;
+                }else if(QString::compare(plan_type,QString("RRTstar"),Qt::CaseInsensitive)==0){
+                    plan_id=3;
+                }else if(QString::compare(plan_type,QString("PRM"),Qt::CaseInsensitive)==0){
+                    plan_id=4;
+                }else if(QString::compare(plan_type,QString("PRMstar"),Qt::CaseInsensitive)==0){
+                    plan_id=5;
+                }else if(QString::compare(plan_type,QString("LBKPIECE"),Qt::CaseInsensitive)==0){
+                    plan_id=6;
+                }
+
 
                 // get the grip type
                 if(QString::compare(grip_type,QString("Precision Side thumb left"),Qt::CaseInsensitive)==0){
@@ -1004,12 +1031,11 @@ void MainWindow::on_pushButton_load_task_clicked()
                         break;
                     }
 
-                    problemPtr prob = problemPtr(new Problem(new Movement(mov_id, arm_code, obj,grip_id,prec),
-                                                             new Scenario(*(this->hum_planner->getScenario().get()))));
+                    problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec));
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
 
-                    this->hum_planner->addProblem(prob);
+                    this->curr_task->addProblem(prob);
 
                 }else if(QString::compare(mov_type,QString("Reaching"),Qt::CaseInsensitive)==0){
                     mov_id=1;
@@ -1018,9 +1044,9 @@ void MainWindow::on_pushButton_load_task_clicked()
                 }else if(QString::compare(mov_type,QString("Engage"),Qt::CaseInsensitive)==0){
                     mov_id=3;
                     //get the object
-                    obj = this->hum_planner->getScenario()->getObject(obj_str.toStdString());
+                    obj = this->curr_scene->getObject(obj_str.toStdString());
                     // get the object engaged
-                    obj_eng = this->hum_planner->getScenario()->getObject(obj_eng_str.toStdString());
+                    obj_eng = this->curr_scene->getObject(obj_eng_str.toStdString());
                     switch (arm_code){
                     case 0: // dual arm
                         // TO DO
@@ -1034,19 +1060,18 @@ void MainWindow::on_pushButton_load_task_clicked()
                         break;
                     }
 
-                    problemPtr prob = problemPtr(new Problem(new Movement(mov_id, arm_code, obj,obj_eng,grip_id,prec),
-                                                             new Scenario(*(this->hum_planner->getScenario().get()))));
+                    problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,grip_id,prec));
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
 
-                    this->hum_planner->addProblem(prob);
+                    this->curr_task->addProblem(prob);
 
                 }else if(QString::compare(mov_type,QString("Disengage"),Qt::CaseInsensitive)==0){
                     mov_id=4;
                 }else if(QString::compare(mov_type,QString("Go park"),Qt::CaseInsensitive)==0){
                     mov_id=5;
                     //get the object
-                    obj = this->hum_planner->getScenario()->getObject(obj_str.toStdString());
+                    obj = this->curr_scene->getObject(obj_str.toStdString());
                     switch (arm_code){
                     case 0: // dual arm
                         // TO DO
@@ -1060,12 +1085,11 @@ void MainWindow::on_pushButton_load_task_clicked()
                         break;
                     }
 
-                    problemPtr prob = problemPtr(new Problem(new Movement(mov_id, arm_code, obj,grip_id,prec),
-                                                             new Scenario(*(this->hum_planner->getScenario().get()))));
+                    problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec));
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
 
-                    this->hum_planner->addProblem(prob);
+                    this->curr_task->addProblem(prob);
 
                 }
 
@@ -1073,8 +1097,8 @@ void MainWindow::on_pushButton_load_task_clicked()
                 qnode.log(QNode::Info,std::string("The movement has been added to the current task"));
                 ui.groupBox_task->setEnabled(true);
                 ui.listWidget_movs->clear();
-                for (int i = 0; i < hum_planner->getProblemNumber();i++ ){
-                   ui.listWidget_movs->addItem(QString(hum_planner->getProblemInfo(i).c_str()));
+                for (int i = 0; i < this->curr_task->getProblemNumber();i++ ){
+                   ui.listWidget_movs->addItem(QString(this->curr_task->getProblemInfo(i).c_str()));
                 }
                 ui.listWidget_movs->setCurrentRow(0);
 
@@ -1230,7 +1254,7 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     this->jointsVelocity_mov.resize(0,0);
     this->jointsPosition_mov.resize(0,0);
 
-    this->hum_planner->setScenario(this->init_scene);
+    this->curr_scene = this->init_scene;
     qnode.resetSimTime();
     qnode.resetGlobals();
     qnode.log(QNode::Info,std::string("Tha scenario has been reset"));
@@ -1301,7 +1325,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
 
     ui.pushButton_save_task->setEnabled(true);
 
-    if(hum_planner->getProblem(ui.listWidget_movs->currentRow())->getSolved()){
+    if(curr_task->getProblem(ui.listWidget_movs->currentRow())->getSolved()){
 
      this->tols_stop.push_back(this->mTolHumldlg->getTolStop());
 
@@ -1357,7 +1381,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
      ui.tabWidget_sol->setCurrentIndex(1);
 
      // set part of the task
-     hum_planner->getProblem(ui.listWidget_movs->currentRow())->setPartOfTask(true);
+     curr_task->getProblem(ui.listWidget_movs->currentRow())->setPartOfTask(true);
 
     }
 
@@ -1381,7 +1405,7 @@ void MainWindow::on_pushButton_clear_task_clicked()
     ui.label_totalTime_value_task->clear();
     ui.label_totalTime_value_mov->clear();
     ui.listWidget_movs->clear();
-    this->hum_planner->clearProblems();
+    this->curr_task->clearProblems();
 
 }
 

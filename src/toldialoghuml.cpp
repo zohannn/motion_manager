@@ -46,7 +46,7 @@ float TolDialogHUML::getTolStop()
 }
 
 
-void TolDialogHUML::getTolsArm(std::vector<float> &tols)
+void TolDialogHUML::getTolsArm(vector<double> &tols)
 {
 
     tols.push_back(ui->lineEdit_shoulder_r->text().toFloat());

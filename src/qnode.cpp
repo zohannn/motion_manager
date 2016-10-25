@@ -53,8 +53,8 @@ QNode::QNode(int argc, char** argv ) :
     {
     nodeName = "motion_manager";
     TotalTime = 0.0;
-    right_hand_handles = MatrixXi::Constant(HUMotion::HAND_FINGERS,HUMotion::N_PHALANGE+1,1);
-    left_hand_handles = MatrixXi::Constant(HUMotion::HAND_FINGERS,HUMotion::N_PHALANGE+1,1);
+    right_hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
+    left_hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
     right_2hand_pos.assign(3,0.0f);
     right_2hand_vel.assign(3,0.0f);
     right_2hand_force.assign(3,0.0f);
@@ -219,26 +219,26 @@ bool QNode::getElements(scenarioPtr scene)
     std::string signEngage ="_engage";
     bool succ = true;
 
-    pos obj_pos; // position of the object
-    orient obj_or; // orientation of the object
-    dim obj_size; // size of the object
-    pos h_pos; // position of the humanoid
-    orient h_or; // orientation of the humanoid
-    dim h_size; // size of the humanoid
-    arm h_arm_specs; // specs of the arms
-    barrett_hand h_hand_specs; // specs of the barret hand
 
-    pos tarRight_pos;  // target right position
-    orient tarRight_or; // target right orientation
-    pos tarLeft_pos; // target left position
-    orient tarLeft_or; // target left orientation
-
+    pos obj_pos;// position of the object
+    orient obj_or;// orientation of the object
+    dim obj_size;// size of the object
+    pos tarRight_pos;// target right position
+    orient tarRight_or;// target right orientation
+    pos tarLeft_pos;// target left position
+    orient tarLeft_or;// target left orientation
     pos engage_pos; // engage point position
-    orient engage_or; // engage point orientation
+    orient engage_or;// engage point orientation
+
+    pos humanoid_pos; // position of the humanoid
+    orient humanoid_or; // orientation of the humanoid
+    dim humanoid_size; // size of the humanoid
+    arm humanoid_arm_specs; // specs of the arms
+    barrett_hand humanoid_hand_specs; // specs of the barret hand
 
     // **** object info **** //
     std::string obj_info_str;
-    std::vector<float> obj_info_vec;
+    std::vector<double> obj_info_vec;
 
 
     vrep_common::simRosGetIntegerSignal srvi;
@@ -289,7 +289,7 @@ bool QNode::getElements(scenarioPtr scene)
     // parameters of the human hand
     float max_human_Ap; //[m]
     human_hand jarde_hand;
-    jarde_hand.fingers = std::vector<human_finger>(4);
+    jarde_hand.fingers = std::vector<HUMotion::human_finger>(4);
     human_finger fing1 = jarde_hand.fingers.at(0);
     human_finger fing2 = jarde_hand.fingers.at(1);
     human_finger fing3 = jarde_hand.fingers.at(2);
@@ -314,17 +314,17 @@ bool QNode::getElements(scenarioPtr scene)
     std::vector<float> l_upper_leg_vec;
     */
     // postures of the humanoid
-    std::vector<float> rposture = std::vector<float>(HUMotion::JOINTS_ARM+HUMotion::JOINTS_HAND); // right
-    std::vector<float> lposture = std::vector<float>(HUMotion::JOINTS_ARM+HUMotion::JOINTS_HAND); // left
+    std::vector<float> rposture = std::vector<float>(JOINTS_ARM+JOINTS_HAND); // right
+    std::vector<float> lposture = std::vector<float>(JOINTS_ARM+JOINTS_HAND); // left
 
     // joint limits of the humanoid
-    std::vector<float> min_rlimits = std::vector<float>(HUMotion::JOINTS_ARM+HUMotion::JOINTS_HAND); // minimum right limits
-    std::vector<float> max_rlimits = std::vector<float>(HUMotion::JOINTS_ARM+HUMotion::JOINTS_HAND); // maximum right limits
-    std::vector<float> min_llimits = std::vector<float>(HUMotion::JOINTS_ARM+HUMotion::JOINTS_HAND); // minimum left limits
-    std::vector<float> max_llimits = std::vector<float>(HUMotion::JOINTS_ARM+HUMotion::JOINTS_HAND); // maximum left limits
+    std::vector<float> min_rlimits = std::vector<float>(JOINTS_ARM+JOINTS_HAND); // minimum right limits
+    std::vector<float> max_rlimits = std::vector<float>(JOINTS_ARM+JOINTS_HAND); // maximum right limits
+    std::vector<float> min_llimits = std::vector<float>(JOINTS_ARM+JOINTS_HAND); // minimum left limits
+    std::vector<float> max_llimits = std::vector<float>(JOINTS_ARM+JOINTS_HAND); // maximum left limits
 
 
-    int scenarioID  = scene->getID();
+    int scenarioID  = h_scene->getID();
     switch (scenarioID){
 
     case 0:
@@ -396,9 +396,9 @@ bool QNode::getElements(scenarioPtr scene)
                 tarRight_pos.Ypos = obj_info_vec.at(10)*1000;//[mm]
                 tarRight_pos.Zpos = obj_info_vec.at(11)*1000;//[mm]
                 // orientation of the target right
-                tarRight_or.roll = obj_info_vec.at(12)*M_PI/180;//[mm]
-                tarRight_or.pitch = obj_info_vec.at(13)*M_PI/180;//[mm]
-                tarRight_or.yaw = obj_info_vec.at(14)*M_PI/180;//[mm]
+                tarRight_or.roll = obj_info_vec.at(12)*M_PI/180;//[rad]
+                tarRight_or.pitch = obj_info_vec.at(13)*M_PI/180;//[rad]
+                tarRight_or.yaw = obj_info_vec.at(14)*M_PI/180;//[rad]
                 // position of the target left
                 tarLeft_pos.Xpos = obj_info_vec.at(15)*1000;//[mm]
                 tarLeft_pos.Ypos = obj_info_vec.at(16)*1000;//[mm]
@@ -422,6 +422,7 @@ bool QNode::getElements(scenarioPtr scene)
                                     new Target(signPrefix + signTarLeft,tarLeft_pos,tarLeft_or),
                                     new EngagePoint(signPrefix + signEngage, engage_pos, engage_or));
 
+
                 infoLine = ob->getInfoLine();
                 Q_EMIT newElement(infoLine);
                 Q_EMIT newObject(ob->getName());
@@ -436,6 +437,7 @@ bool QNode::getElements(scenarioPtr scene)
                 client_getHandle.call(srv_get_handle);
                 ob->setHandleBody(srv_get_handle.response.handle);
 
+                // add the object to the scenario
                 scene->addObject(ob);
 
                 cnt_obj++;
@@ -516,14 +518,14 @@ bool QNode::getElements(scenarioPtr scene)
         for (int k=0;k<floatCount;++k)
             DH_params_vec.push_back(((float*)DH_params_str.c_str())[k]);
 
-        h_arm_specs.arm_specs.alpha = std::vector<float>(7);
-        h_arm_specs.arm_specs.a = std::vector<float>(7);
-        h_arm_specs.arm_specs.d = std::vector<float>(7);
-        h_arm_specs.arm_specs.theta = std::vector<float>(7);
+        humanoid_arm_specs.arm_specs.alpha = std::vector<float>(7);
+        humanoid_arm_specs.arm_specs.a = std::vector<float>(7);
+        humanoid_arm_specs.arm_specs.d = std::vector<float>(7);
+        humanoid_arm_specs.arm_specs.theta = std::vector<float>(7);
         for(int i=0;i<7;++i){
-            h_arm_specs.arm_specs.alpha.at(i) = DH_params_vec.at(i)*M_PI/180; // [rad]
-            h_arm_specs.arm_specs.a.at(i) = DH_params_vec.at(i+7)*1000; // [mm]
-            h_arm_specs.arm_specs.d.at(i) = DH_params_vec.at(i+14)*1000; // [mm]
+            humanoid_arm_specs.arm_specs.alpha.at(i) = DH_params_vec.at(i)*M_PI/180; // [rad]
+            humanoid_arm_specs.arm_specs.a.at(i) = DH_params_vec.at(i+7)*1000; // [mm]
+            humanoid_arm_specs.arm_specs.d.at(i) = DH_params_vec.at(i+14)*1000; // [mm]
         }
 
 
@@ -683,27 +685,27 @@ bool QNode::getElements(scenarioPtr scene)
         if (succ){
 
             // create the new humanoid and add it to the scenario.
-            h_pos.Xpos = torso.Xpos;
-            h_pos.Ypos = torso.Ypos;
-            h_pos.Zpos = torso.Zpos;
-            h_or.roll =  torso.Roll;
-            h_or.pitch = torso.Pitch;
-            h_or.yaw = torso.Yaw;
-            h_size.Xsize = torso.Xsize;
-            h_size.Ysize = torso.Ysize;
-            h_size.Zsize = torso.Zsize;
+            humanoid_pos.Xpos = torso.Xpos;
+            humanoid_pos.Ypos = torso.Ypos;
+            humanoid_pos.Zpos = torso.Zpos;
+            humanoid_or.roll =  torso.Roll;
+            humanoid_or.pitch = torso.Pitch;
+            humanoid_or.yaw = torso.Yaw;
+            humanoid_size.Xsize = torso.Xsize;
+            humanoid_size.Ysize = torso.Ysize;
+            humanoid_size.Zsize = torso.Zsize;
 
-            h_hand_specs.maxAperture = maxAp;
-            h_hand_specs.Aw = Aw;
-            h_hand_specs.A1 = A1;
-            h_hand_specs.A2 = A2;
-            h_hand_specs.A3 = A3;
-            h_hand_specs.D3 = D3 ;
-            h_hand_specs.phi2 = phi2;
-            h_hand_specs.phi3 = phi3;
+            humanoid_hand_specs.maxAperture = maxAp;
+            humanoid_hand_specs.Aw = Aw;
+            humanoid_hand_specs.A1 = A1;
+            humanoid_hand_specs.A2 = A2;
+            humanoid_hand_specs.A3 = A3;
+            humanoid_hand_specs.D3 = D3 ;
+            humanoid_hand_specs.phi2 = phi2;
+            humanoid_hand_specs.phi3 = phi3;
 
 #if HAND==1
-            Humanoid *hptr = new Humanoid(Hname,h_pos,h_or,h_size,h_arm_specs, h_hand_specs,
+            Humanoid *hptr = new Humanoid(Hname,humanoid_pos,humanoid_or,humanoid_size,humanoid_arm_specs, humanoid_hand_specs,
                                           rposture, lposture,
                                           min_rlimits,max_rlimits,
                                           min_llimits,max_llimits);
@@ -959,14 +961,14 @@ bool QNode::getElements(scenarioPtr scene)
         for (int k=0;k<floatCount;++k)
             DH_params_vec.push_back(((float*)DH_params_str.c_str())[k]);
 
-        h_arm_specs.arm_specs.alpha = std::vector<float>(7);
-        h_arm_specs.arm_specs.a = std::vector<float>(7);
-        h_arm_specs.arm_specs.d = std::vector<float>(7);
-        h_arm_specs.arm_specs.theta = std::vector<float>(7);
+        humanoid_arm_specs.arm_specs.alpha = std::vector<float>(7);
+        humanoid_arm_specs.arm_specs.a = std::vector<float>(7);
+        humanoid_arm_specs.arm_specs.d = std::vector<float>(7);
+        humanoid_arm_specs.arm_specs.theta = std::vector<float>(7);
         for(int i=0;i<7;++i){
-            h_arm_specs.arm_specs.alpha.at(i) = DH_params_vec.at(i)*M_PI/180; // [rad]
-            h_arm_specs.arm_specs.a.at(i) = DH_params_vec.at(i+7)*1000; // [mm]
-            h_arm_specs.arm_specs.d.at(i) = DH_params_vec.at(i+14)*1000; // [mm]
+            humanoid_arm_specs.arm_specs.alpha.at(i) = DH_params_vec.at(i)*M_PI/180; // [rad]
+            humanoid_arm_specs.arm_specs.a.at(i) = DH_params_vec.at(i+7)*1000; // [mm]
+            humanoid_arm_specs.arm_specs.d.at(i) = DH_params_vec.at(i+14)*1000; // [mm]
         }
 
 #if HAND==0
@@ -1316,18 +1318,18 @@ bool QNode::getElements(scenarioPtr scene)
         if(succ){
 
             // create the new humanoid and add it to the scenario.
-            h_pos.Xpos = torso.Xpos;
-            h_pos.Ypos = torso.Ypos;
-            h_pos.Zpos = torso.Zpos;
-            h_or.roll =  torso.Roll;
-            h_or.pitch = torso.Pitch;
-            h_or.yaw = torso.Yaw;
-            h_size.Xsize = torso.Xsize;
-            h_size.Ysize = torso.Ysize;
-            h_size.Zsize = torso.Zsize;
+            humanoid_pos.Xpos = torso.Xpos;
+            humanoid_pos.Ypos = torso.Ypos;
+            humanoid_pos.Zpos = torso.Zpos;
+            humanoid_or.roll =  torso.Roll;
+            humanoid_or.pitch = torso.Pitch;
+            humanoid_or.yaw = torso.Yaw;
+            humanoid_size.Xsize = torso.Xsize;
+            humanoid_size.Ysize = torso.Ysize;
+            humanoid_size.Zsize = torso.Zsize;
 
 #if HAND==0
-            Humanoid *hptr = new Humanoid(Hname,h_pos,h_or,h_size,h_arm_specs, jarde_hand,
+            Humanoid *hptr = new Humanoid(Hname,humanoid_pos,humanoid_or,humanoid_size,humanoid_arm_specs, jarde_hand,
                                           rposture, lposture,
                                           min_rlimits,max_rlimits,
                                           min_llimits,max_llimits);
@@ -1638,10 +1640,10 @@ void QNode::updateObjectInfo(int obj_id, string name, const geometry_msgs::PoseS
 
 }
 
-bool QNode::getRPY(Matrix4f Trans, std::vector<float> &rpy)
+bool QNode::getRPY(Matrix4f Trans, std::vector<double> &rpy)
 {
 
-    rpy = std::vector<float>(3);
+    rpy = std::vector<double>(3);
 
 
     if((abs(Trans(0,0)) < 1e-5) && (abs(Trans(1,0)) < 1e-5)){
@@ -1655,8 +1657,8 @@ bool QNode::getRPY(Matrix4f Trans, std::vector<float> &rpy)
     }else{
 
         rpy.at(0) = atan2(Trans(1,0),Trans(0,0)); // [rad]
-        float sp = sin(rpy.at(0));
-        float cp = cos(rpy.at(0));
+        double sp = sin(rpy.at(0));
+        double cp = cos(rpy.at(0));
         rpy.at(1) = atan2(-Trans(2,0), cp*Trans(0,0)+sp*Trans(1,0)); // [rad]
         rpy.at(2) = atan2(sp*Trans(0,2)-cp*Trans(1,2),cp*Trans(1,1)-sp*Trans(0,1)); // [rad]
 
@@ -1701,7 +1703,7 @@ void QNode::rightProxCallback(const vrep_common::ProximitySensorData& data)
 
             case 0: // reach-to-grasp
 
-                h_obj= this->curr_mov->getObject()->getHandleBody(); // visible handle of the object we want to grasp
+                h_obj= this->h_curr_mov->getObject()->getHandleBody(); // visible handle of the object we want to grasp
                 h_detobj = data.detectedObject.data; // handle of the object currently detected
 
                 //BOOST_LOG_SEV(lg, info) << "h_obj = " << h_obj ;
@@ -1784,7 +1786,7 @@ bool QNode::execMovement(MatrixXf& traj, MatrixXf& vel, float timeStep, float to
 
 
     std::vector<int> handles;
-    MatrixXi hand_handles = MatrixXi::Constant(HUMotion::HAND_FINGERS,HUMotion::N_PHALANGE+1,1);
+    MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
     int h_attach; // handle of the attachment point of the hand
     switch (arm_code) {
     case 0: // dual arm
@@ -1933,7 +1935,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                     //BOOST_LOG_SEV(lg, info) << "tx_prev = " << tx_prev;
 
                     float m = (tx-ta)/(tb-ta);
-                    std::vector<float> r_post;
+                    std::vector<double> r_post;
                     this->curr_scene->getHumanoid()->getRightPosture(r_post);
 
 
@@ -2116,7 +2118,7 @@ bool QNode::execTask(MatrixXf& traj_task, MatrixXf &vel_task, std::vector<float>
     MatrixXf vel;
     MatrixXf traj;
     std::vector<int> handles;
-    MatrixXi hand_handles = MatrixXi::Constant(HUMotion::HAND_FINGERS,HUMotion::N_PHALANGE+1,1);
+    MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
     int h_attach; // handle of the attachment point of the hand
     bool f_reached;
 
@@ -2477,7 +2479,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 }
 
 
-float QNode::interpolate(float ya, float yb, float m)
+float QNode::interpolate(double ya, double yb, double m)
 {
 
     // linear interpolation
@@ -2970,7 +2972,7 @@ bool QNode::getArmsHandles(int humanoid)
 
     case 0: // ARoS
 
-        for (int k = 0; k < HUMotion::HAND_FINGERS; ++k){
+        for (int k = 0; k < HAND_FINGERS; ++k){
 
             if (k!=1){
 
@@ -3077,7 +3079,7 @@ bool QNode::getArmsHandles(int humanoid)
 
     case 1: // Jarde
 
-        for (int k = 0; k < HUMotion::HAND_FINGERS; ++k){
+        for (int k = 0; k < HAND_FINGERS; ++k){
 
             if (k==2){// Thumb
 
@@ -3373,7 +3375,7 @@ while (ros::ok() && simulationRunning && (!closed[0] || !closed[1] || !closed[2]
 
 
 
-        for (size_t i = 0; i < HAND_FINGERS; i++)
+        for (size_t i = 0; i < HUMotion::HAND_FINGERS; i++)
         {
 
             if (firstPartLocked.at(i)){
@@ -3388,7 +3390,7 @@ while (ros::ok() && simulationRunning && (!closed[0] || !closed[1] || !closed[2]
                 client_setIntParam.call(srv_setObjInt);
 
                 srv_setTarVel.request.handle = hand_handles(i,2);
-                srv_setTarVel.request.targetVelocity = closingVel/3.0f;
+                srv_setTarVel.request.targetVelocity = HUMotion::closingVel/3.0f;
                 client_setTarVel.call(srv_setTarVel);
                 //srv_setTarVel.response.results;
                 //simSetJointTargetVelocity(handHandles[i][2], closingVel / 3.0f);
@@ -3403,12 +3405,12 @@ while (ros::ok() && simulationRunning && (!closed[0] || !closed[1] || !closed[2]
                 //int res = simJointGetForce(handfirstpartTorqueHandles[i], &t);
                 t = hand_forces.at(i+1);
 
-                if (abs(t) > firstPartMaxTorque)
+                if (abs(t) > HUMotion::firstPartMaxTorque)
                     firstPartTorqueOvershootCount[i] ++;
                 else
                     firstPartTorqueOvershootCount[i] = 0;
 
-                if (firstPartTorqueOvershootCount[i] >= firstPartTorqueOvershootCountRequired)
+                if (firstPartTorqueOvershootCount[i] >= HUMotion::firstPartTorqueOvershootCountRequired)
                 {
                     needFullOpening[i] = 1;
                     firstPartLocked[i] = true;
@@ -3422,7 +3424,7 @@ while (ros::ok() && simulationRunning && (!closed[0] || !closed[1] || !closed[2]
                     client_setIntParam.call(srv_setObjInt);
                     // set the force
                     srv_setForce.request.handle = hand_handles(i,1);
-                    srv_setForce.request.forceOrTorque = closingOpeningTorque*100.0f;
+                    srv_setForce.request.forceOrTorque = HUMotion::closingOpeningTorque*100.0f;
                     client_setForce.call(srv_setForce);
                     // set the target position
                     srv_setTarPos.request.handle = hand_handles(i,1);
@@ -3437,7 +3439,7 @@ while (ros::ok() && simulationRunning && (!closed[0] || !closed[1] || !closed[2]
                     client_setIntParam.call(srv_setObjInt);
 
                     srv_setTarVel.request.handle = hand_handles(i,2);
-                    srv_setTarVel.request.targetVelocity = closingVel / 3.0f;
+                    srv_setTarVel.request.targetVelocity = HUMotion::closingVel / 3.0f;
                     client_setTarVel.call(srv_setTarVel);
 
                 }
@@ -3450,7 +3452,7 @@ while (ros::ok() && simulationRunning && (!closed[0] || !closed[1] || !closed[2]
                     client_setIntParam.call(srv_setObjInt);
 
                     srv_setTarVel.request.handle = hand_handles(i,1);
-                    srv_setTarVel.request.targetVelocity = closingVel;
+                    srv_setTarVel.request.targetVelocity = HUMotion::closingVel;
                     client_setTarVel.call(srv_setTarVel);
 
                     //second joint position is 1/3 of the first  
@@ -3494,7 +3496,7 @@ bool QNode::openBarrettHand(int hand)
 {
 
     int cnt = 0;
-    MatrixXi hand_handles = MatrixXi::Constant(HUMotion::HAND_FINGERS,HUMotion::N_PHALANGE+1,1);
+    MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
     ros::NodeHandle node;
     std::vector<float> hand_forces;
     std::vector<float> hand_posture;
@@ -3527,8 +3529,8 @@ while (ros::ok() && simulationRunning && (closed[0] || closed[1] || closed[2]) &
 
         hand_handles = right_hand_handles;
         hand2_pos = right_2hand_pos;
-        this->curr_scene->getHumanoid()->getRightHandForces(hand_forces);
-        this->curr_scene->getHumanoid()->getRightHandPosture(hand_posture);
+        this->h_curr_scene->getHumanoid()->getRightHandForces(hand_forces);
+        this->h_curr_scene->getHumanoid()->getRightHandPosture(hand_posture);
 
         break;
 
@@ -3536,8 +3538,8 @@ while (ros::ok() && simulationRunning && (closed[0] || closed[1] || closed[2]) &
 
         hand_handles = left_hand_handles;
         hand2_pos = left_2hand_pos;
-        this->curr_scene->getHumanoid()->getLeftHandForces(hand_forces);
-        this->curr_scene->getHumanoid()->getLeftHandPosture(hand_posture);
+        this->h_curr_scene->getHumanoid()->getLeftHandForces(hand_forces);
+        this->h_curr_scene->getHumanoid()->getLeftHandPosture(hand_posture);
 
         break;
     }

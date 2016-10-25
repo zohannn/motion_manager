@@ -48,7 +48,7 @@ rosbuild_prepare_qt4(QtCore QtGui QApplication) # Add the appropriate components
 
 file(GLOB QT_FORMS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ui/*.ui)
 file(GLOB QT_RESOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} resources/*.qrc)
-file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS include/motion_manager/*.hpp)
+file(GLOB_RECURSE QT_MOC RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS include/${PROJECT_NAME}/*.hpp)
 
 QT4_ADD_RESOURCES(QT_RESOURCES_CPP ${QT_RESOURCES})
 QT4_WRAP_UI(QT_FORMS_HPP ${QT_FORMS})
@@ -64,13 +64,34 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 # Settings
 ##############################################################################
 
+## Humanoid parts configuration
+# 1 means that the part is present and it is taken into account for the generation of the trajectories,
+# 0 otherwise.
+# The torso and the arms are the only parts assumed for any humanoid robot. In other words, the anthropomorphiism of the system is assumed.
+# The characteristics of the torso will be those ones of the humanoid.
+# However the following parts may be taken into account when they are present
+# set (HEAD 0)
+# set (NECK 0)
+# set (PELVIS 1)
+# set (RIGHT_UPPER_LEG 1)
+# set (RIGHT_LOWER_LEG 0)
+# set (RIGHT_FOOT 0)
+# set (LEFT_UPPER_LEG 1)
+# set (LEFT_LOWER_LEG 0)
+# set (LEFT_FOOT 0)
+
+## Hand configuration
+# HAND=0. Human hand
+# HAND=1, Barrett hand
+set (HAND 1)
+
 set(MAIN_PATH ${PROJECT_SOURCE_DIR}) ## Path of the main directory
 set(PATH_SCENARIOS /home/gianpaolo/scenarios) ## Path of the scenarios
 
 # configuration files
 configure_file (
-  "${PROJECT_SOURCE_DIR}/include/motion_manager/config.hpp.in"
-  "${PROJECT_SOURCE_DIR}/include/motion_manager/config.hpp"
+  "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/config.hpp.in"
+  "${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/config.hpp"
 )
 
 

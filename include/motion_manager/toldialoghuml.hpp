@@ -51,7 +51,7 @@ public:
      * @brief This method gets the tolerances of the arm
      * @param tols
      */
-    void getTolsArm(std::vector<float>& tols);
+    void getTolsArm(vector<double>& tols);
 
     /**
      * @brief This method gets the tolerances of the hand
