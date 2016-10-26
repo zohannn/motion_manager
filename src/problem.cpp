@@ -11,11 +11,11 @@ Problem::Problem():
     this->part_of_task=false;
     this->err_log=0;
 
-    this->h_planner.reset(new HUMotion::HUMPlanner(""));
     int HUMotion::HUMPlanner::hand_fingers = HAND_FINGERS;
     int HUMotion::HUMPlanner::joints_arm = JOINTS_ARM;
     int HUMotion::HUMPlanner::joints_hand = JOINTS_HAND;
     int HUMotion::HUMPlanner::n_phalange = N_PHALANGE;
+    //this->h_planner.reset(new HUMotion::HUMPlanner(""));
 
 }
 
@@ -27,22 +27,15 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
     this->part_of_task=false;
     this->err_log=0;
 
-
     this->mov = movementPtr(mov);
     this->scene = scenarioPtr(scene);
-
-    this->h_planner.reset(new HUMotion::HUMPlanner(this->scene->getName()));
-    int HUMotion::HUMPlanner::hand_fingers = HAND_FINGERS;
-    int HUMotion::HUMPlanner::joints_arm = JOINTS_ARM;
-    int HUMotion::HUMPlanner::joints_hand = JOINTS_HAND;
-    int HUMotion::HUMPlanner::n_phalange = N_PHALANGE;
-
     this->planner_id=planner_id;
 
+    bool huml = false;
     switch(planner_id){
-
     case 0:
         this->planner_name = "HUML";
+        huml = true;
         break;
     case 1:
         this->planner_name = "RRT";
@@ -62,8 +55,115 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
     case 6:
         this->planner_name = "LBKPIECE";
         break;
+    }
+    if (huml){
+        // --- Human-like movement planner settings --- //
+        int HUMotion::HUMPlanner::hand_fingers = HAND_FINGERS;
+        int HUMotion::HUMPlanner::joints_arm = JOINTS_ARM;
+        int HUMotion::HUMPlanner::joints_hand = JOINTS_HAND;
+        int HUMotion::HUMPlanner::n_phalange = N_PHALANGE;
+        this->h_planner.reset(new HUMotion::HUMPlanner(this->scene->getName()));
+        // set the current obstacles and targets of the scenario
+        vector<objectPtr> scene_objects;
+        if(this->scene->getObjects(scene_objects)){
+            HUMotion::objectPtr huml_obj; // object of the planner
+            objectPtr obj;
+            for(size_t i=0; i < scene_objects.size(); ++i){
+                obj = scene_objects.at(i);
+                std::vector position = {obj->getPos().Xpos,obj->getPos().Ypos,obj->getPos().Zpos};
+                std::vector orientation = {obj->getOr.roll,obj->getOr.pitch,obj->getOr.yaw};
+                std::vector dimension = {obj->getSize().Xsize,obj->getSize().Ysize,obj->getSize().Zsize};
+                huml_obj.reset(new HUMotion::Object(obj->getName()));
+                huml_obj->setParams(position,orientation,dimension);
+                if(!obj->isTargetRightEnabled() && !obj->isTargetLeftEnabled()){
+                    this->h_planner->addObstacle(huml_obj); // the object is an obstacle for the planner
+                }else{
+                    this->h_planner->setObjTarget(huml_obj); // the object has a target for the planner
+                }
+            }
+        }else{
+            // the scene is empty of objects
+        }
+
+        // set the humanoid
+        Matrix4f mat_right_arm; Matrix4f mat_right_hand; vector<double> min_rlimits; vector<double> max_rlimits;
+        Matrix4f mat_left_arm; Matrix4f mat_left_hand; vector<double> min_llimits; vector<double> max_llimits;
+        this->scene->getHumanoid()->getMatRight(mat_right_arm);
+        this->scene->getHumanoid()->getMatRightHand(mat_right_hand);
+        this->scene->getHumanoid()->getMatLeft(mat_left_arm);
+        this->scene->getHumanoid()->getMatLeftHand(mat_left_hand);
+        this->scene->getHumanoid()->getRightMinLimits(min_rlimits);
+        this->scene->getHumanoid()->getRightMaxLimits(max_rlimits);
+        this->scene->getHumanoid()->getLeftMinLimits(min_llimits);
+        this->scene->getHumanoid()->getLeftMaxLimits(max_llimits);
+        h_planner->setMatRightArm(mat_right_arm);
+        h_planner->setMatRightHand(mat_right_hand);
+        h_planner->setRightMaxLimits(max_rlimits);
+        h_planner->setRightMinLimits(min_rlimits);
+        h_planner->setMatLeftArm(mat_left_arm);
+        h_planner->setMatLeftHand(mat_left_hand);
+        h_planner->setLeftMaxLimits(max_llimits);
+        h_planner->setLeftMinLimits(min_llimits);
+
+        dim torso_dim = this->scene->getHumanoid()->getSize();
+        std::vector<double> tsize = {torso_dim.Xsize,torso_dim.Ysize,torso_dim.Zsize};
+        h_planner->setTorsoSize(tsize);
+
+        DHparams rDH = this->scene->getHumanoid()->getDH_rightArm();
+        DHparams lDH = this->scene->getHumanoid()->getDH_leftArm();
+        HUMotion::DHparameters right_arm_DH;
+        HUMotion::DHparameters left_arm_DH;
+        right_arm_DH.a = rDH.a; right_arm_DH.alpha = rDH.alpha; right_arm_DH.d = rDH.d; right_arm_DH.theta = rDH.theta;
+        left_arm_DH.a = lDH.a; left_arm_DH.alpha = lDH.alpha; left_arm_DH.d = lDH.d; left_arm_DH.theta = lDH.theta;
+        h_planner->setDH_rightArm(right_arm_DH);
+        h_planner->setDH_leftArm(left_arm_DH);
+
+#if HAND==0
+        human_hand hhand = this->scene->getHumanoid()->getHumanHand();
+        HUMotion::HumanHand huml_hhand;
+        huml_hhand.maxAperture = hhand.maxAperture;
+        huml_hhand.thumb.uTx = hhand.thumb.uTx;
+        huml_hhand.thumb.uTy = hhand.thumb.uTy;
+        huml_hhand.thumb.uTz = hhand.thumb.uTz;
+        huml_hhand.thumb.thumb_specs.a = hhand.thumb.thumb_specs.a;
+        huml_hhand.thumb.thumb_specs.alpha = hhand.thumb.thumb_specs.alpha;
+        huml_hhand.thumb.thumb_specs.d = hhand.thumb.thumb_specs.d;
+        huml_hhand.thumb.thumb_specs.theta = hhand.thumb.thumb_specs.theta;
+        vector<HUMotion::HumanFinger> huml_fings = huml_hhand.fingers;
+        vector<human_finger> fings = hhand.fingers;
+        for(size_t i=0; i<fings.size();++i){
+            human_finger fing = fings.at(i);
+            HUMotion::HumanFinger huml_fing = huml_fings.at(i);
+            huml_fing.ux = fing.ux; huml_fing.uy = fing.uy; huml_fing.uz = fing.uz;
+            huml_fing.finger_specs.a = fing.finger_specs.a;
+            huml_fing.finger_specs.alpha = fing.finger_specs.alpha;
+            huml_fing.finger_specs.d = fing.finger_specs.d;
+            huml_fing.finger_specs.theta = fing.finger_specs.theta;
+            huml_fings.at(i) = huml_fing;
+        }
+        huml_hhand.fingers = huml_fings;
+#elif HAND==1
+        barrett_hand b_hand = this->scene->getHumanoid()->getBarrettHand();
+        std::vector<double> rk; this->scene->getHumanoid()->getRK(rk);
+        std::vector<double> jk; this->scene->getHumanoid()->getRK(jk);
+        HUMotion::BarrettHand huml_bhand;
+        huml_bhand.A1 = b_hand.A1;
+        huml_bhand.A2 = b_hand.A2;
+        huml_bhand.A3 = b_hand.A3;
+        huml_bhand.Aw = b_hand.Aw;
+        huml_bhand.D3 = b_hand.D3;
+        huml_bhand.maxAperture = b_hand.maxAperture;
+        huml_bhand.phi2 = b_hand.phi2;
+        huml_bhand.phi3 = b_hand.phi3;
+        huml_bhand.rk = rk;
+        huml_bhand.jk = jk;
+        h_planner->setBarrettHand(huml_bhand);
+#endif
+
+    }else{
 
     }
+
 }
 
 Problem::Problem(const Problem& s)
@@ -742,9 +842,10 @@ bool Problem::invKinHand(float d_obj,int hand_id,std::vector<float>& sols)
 
 }
 
-bool Problem::solve(HUMotion::huml_tols probTols)
+bool Problem::solve(HUMotion::huml_tols tols)
 {
-    this->h_tols = probTols;
+
+    this->h_tols = tols;
     int arm_code =  this->mov->getArm();
 
     switch (this->mov->getType()){

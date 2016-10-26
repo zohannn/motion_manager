@@ -78,8 +78,9 @@ public:
     /**
      * @brief This method get the list of the objects in the scenario
      * @param objs
+     * @return
      */
-    void getObjects(vector<objectPtr>& objs);
+    bool getObjects(vector<objectPtr>& objs);
 
     /**
      * @brief This method adds a new object to the scenario

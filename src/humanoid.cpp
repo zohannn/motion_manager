@@ -651,19 +651,23 @@ dim Humanoid::getSize()
 void Humanoid::getRK(vector<double> &rkk)
 {
 
+    rkk = this->rk;
+    /*
     for (std::size_t i=0; i < this->rk.size(); ++i){
         rkk.push_back(this->rk.at(i));
     }
+    */
 
 }
 
 void Humanoid::getJK(vector<double> &jkk){
 
+    jkk = jk;
+    /*
     for(std::size_t i=0; i <this->jk.size(); ++i){
-
         jkk.push_back(this->jk.at(i));
-
     }
+    */
 
 }
 
@@ -962,6 +966,18 @@ string Humanoid::getInfoLine()
             //LlSTR + str(boost::format("%d") % this->m_arm_specs.arm_specs.d.at(4)) + MILLIMETERS + SEP+
             //LhSTR + str(boost::format("%d") % this->m_arm_specs.arm_specs.d.at(6)) + MILLIMETERS;
 
+}
+
+DHparams Humanoid::getDH_rightArm()
+{
+    this->computeRightArmDHparams();
+    return this->m_DH_rightArm;
+}
+
+DHparams Humanoid::getDH_leftArm()
+{
+    this->computeLeftArmDHparams();
+    return this->m_DH_leftArm;
 }
 
 

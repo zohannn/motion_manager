@@ -661,6 +661,18 @@ public:
      */
     string getInfoLine();
 
+    /**
+     * @brief getDH_rightArm
+     * @return
+     */
+    DHparams getDH_rightArm();
+
+    /**
+     * @brief getDH_leftArm
+     * @return
+     */
+    DHparams getDH_leftArm();
+
 //#if HEAD==1
   //  humanoid_part getHead();
 //#endif

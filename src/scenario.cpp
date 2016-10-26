@@ -68,10 +68,16 @@ humanoidPtr Scenario::getHumanoid()
     return hPtr;
 }
 
-void Scenario::getObjects(vector<objectPtr> &objs)
+bool Scenario::getObjects(vector<objectPtr> &objs)
 {
 
-    objs=this->objs_list;
+    if(!this->objs_list.empty()){
+        objs = std::vector<objectPtr>(this->objs_list.size());
+        std::copy(this->objs_list.begin(),this->objs_list.end(),objs.begin());
+        return true;
+    }else{
+        return false;
+    }
 
 }
 
@@ -79,7 +85,7 @@ void Scenario::getObjects(vector<objectPtr> &objs)
 void Scenario::addObject(Object* ob)
 {
 
-    this->objs_list.push_back(objectPtr(ob));
+    this->objs_list.push_back(objectPtr(new Object(*ob->get())));
 }
 
 objectPtr Scenario::getObject(int pos)

@@ -91,10 +91,10 @@ public:
 
     /**
      * @brief This method solves the problem given the tolerances and the parameters of the planner HUML
-     * @param probTols
+     * @param tols
      * @return
      */
-    bool solve(HUMotion::huml_tols probTols);
+    bool solve(HUMotion::huml_tols tols);
 
     /**
      * @brief This method gets the information of the problem
