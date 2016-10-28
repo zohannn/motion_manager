@@ -94,7 +94,7 @@ public:
      * @param tols
      * @return
      */
-    bool solve(HUMotion::huml_params tols);
+    bool solve(HUMotion::huml_params& params);
 
     /**
      * @brief This method gets the information of the problem
@@ -180,7 +180,7 @@ private:
     std::vector<double> leftFinalPosture_diseng; /**< final posture of the left arm+hand for disengaging movements*/
     std::vector<double> leftFinalPosture_eng; /**< final posture of the left arm+hand for engaging movements*/
     MatrixXd optimalTraj; /**< human-like optimized trajectory */
-    HUMotion::huml_params h_tols; /**< tolerances and parameters of the optimization problem */
+    HUMotion::huml_params h_params; /**< parameters of the optimization problem */
     movementPtr mov; /**< movement to be planned */
     scenarioPtr scene; /**< current scene */
     int targetAxis; /**< approaching direction towards the target: 0 = none , 1 = x axis , 2 = y axis, 3 = z axis*/

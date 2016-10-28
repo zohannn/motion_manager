@@ -72,8 +72,6 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
                 huml_obj->setParams(position,orientation,dimension);
                 if(!obj->isTargetRightEnabled() && !obj->isTargetLeftEnabled()){
                     this->h_planner->addObstacle(huml_obj); // the object is an obstacle for the planner
-                //}else{
-                    //this->h_planner->setObjTarget(huml_obj); // the object has a target for the planner
                 }
             }
         }else{
@@ -112,6 +110,7 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
         left_arm_DH.a = lDH.a; left_arm_DH.alpha = lDH.alpha; left_arm_DH.d = lDH.d; left_arm_DH.theta = lDH.theta;
         h_planner->setDH_rightArm(right_arm_DH);
         h_planner->setDH_leftArm(left_arm_DH);
+
 
 #if HAND==0
         human_hand hhand = this->scene->getHumanoid()->getHumanHand();
@@ -844,12 +843,67 @@ movementPtr Problem::getMovement()
     return this->mov;
 }
 
-bool Problem::solve(HUMotion::huml_params tols)
+bool Problem::solve(HUMotion::huml_params &params)
 {
 
-    this->h_tols = tols;
+    this->solved = false;
+    this->h_params = params;
     int arm_code =  this->mov->getArm();
-    int mov_type = this->mov->getType();
+    //int mov_type = this->mov->getType();
+    try{ // compute the final posture of the fingers according to the object involved in the movement
+        this->finalPostureFingers(arm_code);
+    }catch(const string message){throw message;}
+#if HAND==0
+    // Human Hand
+    int hand_code = 0;
+#elif HAND == 1
+    // Barrett Hand
+    int hand_code = 1;
+#endif
+    std::vector<double> shPos;
+    double dHO;
+    std::vector<double> finalHand;
+    objectPtr obj = this->mov->getObject();
+    targetPtr tar;
+    switch(arm_code){
+    case 0: // both arms
+        break;
+    case 1://right arm
+        this->scene->getHumanoid()->getRightShoulderPos(shPos);
+        dHO=this->dHOr;
+        finalHand = this->rightFinalHand;
+        tar = obj->getTargetRight();
+        break;
+    case 2:// left arm
+        this->scene->getHumanoid()->getLeftShoulderPos(shPos);
+        dHO=this->dHOl;
+        finalHand = this->leftFinalHand;
+        tar = obj->getTargetLeft();
+        break;
+    }
+    // shoulder position (center of the reacheble workspace )
+    this->h_planner->setShpos(shPos);
+
+    HUMotion::objectPtr huml_obj; std::vector<double> target;
+    target = {tar->getPos().Xpos, tar->getPos().Ypos, tar->getPos().Zpos,tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
+    std::vector<double> position = {obj->getPos().Xpos,obj->getPos().Ypos,obj->getPos().Zpos};
+    std::vector<double> orientation = {obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
+    std::vector<double> dimension = {obj->getSize().Xsize,obj->getSize().Ysize,obj->getSize().Zsize};
+    huml_obj.reset(new HUMotion::Object(obj->getName()));
+    huml_obj->setParams(position,orientation,dimension);
+
+    // movement settings
+    params.mov_specs.arm_code = arm_code;
+    params.mov_specs.hand_code = hand_code;
+    params.mov_specs.griptype = this->mov->getGrip();
+    params.mov_specs.mov_infoline = this->mov->getInfoLine();
+    params.mov_specs.dHO = dHO;
+    params.mov_specs.finalHand = finalHand;
+    params.mov_specs.target = target;
+    params.mov_specs.obj = huml_obj;
+
+
+
 
 
     return this->solved;
