@@ -48,7 +48,7 @@ namespace motion_manager{
 #if HAND==0
     // Human hand
     const double THETA8_HOME = 0.0; /**< constant of the joint 8 (spread of the hand) in [rad] */
-    const double THETA8_FINAL = -M_PI/2; /**< constant of the joint 8 (spread of the hand) in [rad] */
+    const double THETA8_FINAL = -double(M_PI)/2; /**< constant of the joint 8 (spread of the hand) in [rad] */
     const double TOL_GRIP = 5.0; /**< tolerance on the grip in [mm] */
 #elif HAND==1
     // Barrett hand

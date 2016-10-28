@@ -57,28 +57,28 @@ public:
      * @brief This method gets the tolerances of the hand
      * @param tols
      */
-    void getTolsHand(MatrixXf& tols);
+    void getTolsHand(MatrixXd& tols);
 
 
-    //void getTolsTable(std::vector<float>& tols);
+    //void getTolsTable(std::vector<double>& tols);
 
     /**
      * @brief This method gets the weights of the objective function
      * @param lambda
      */
-    void getLambda(std::vector<float>& lambda);
+    void getLambda(std::vector<double>& lambda);
 
     /**
      * @brief This method gets the tolerances of the obstacles
      * @param tols
      */
-    void getTolsObstacles(MatrixXf& tols);
+    void getTolsObstacles(MatrixXd& tols);
 
     /**
      * @brief This method gets the tolerances of the target
      * @param tols
      */
-    void getTolsTarget(MatrixXf& tols);
+    void getTolsTarget(MatrixXd& tols);
 
     /**
      * @brief This method gets the number of steps in a movement
@@ -90,7 +90,7 @@ public:
      * @brief This method gets the maximum angula velocity allowed for each joint
      * @return
      */
-    float getWMax();
+    double getWMax();
 
     /**
      * @brief This method gets the approaching axis in reach-to-grasp movements
@@ -102,19 +102,19 @@ public:
      * @brief This method gets the tolerances in positioning the end-effector
      * @return
      */
-    float getTolTarPos();
+    double getTolTarPos();
 
     /**
      * @brief This method gets the tolerances in orienting the end-effector
      * @return
      */
-    float getTolTarOr();
+    double getTolTarOr();
 
     /**
      * @brief This method gets the tolerance to stop the execution the movement
      * @return
      */
-    float getTolStop();
+    double getTolStop();
 
     /**
      * @brief This method gets the parameters for engaging movements
@@ -122,14 +122,14 @@ public:
      * @param dir
      * @param tols
      */
-    void getEngageParams(float& dist, int& dir, std::vector<float>& tols);
+    void getEngageParams(double& dist, int& dir, std::vector<double>& tols);
 
     /**
      * @brief This method gets the parameters for disengaging movements
      * @param dist
      * @param dir
      */
-    void getDisengageParams(float& dist, int& dir);
+    void getDisengageParams(double& dist, int& dir);
 
     /**
      * @brief This method gets the target avoidance flag

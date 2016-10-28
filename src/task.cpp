@@ -24,11 +24,11 @@ Task::~Task()
 void Task::addProblem(Problem* s)
 {
 
-    this->prolem_list.push_back(problemPtr(s));
+    this->prolem_list.push_back(problemPtr(new Problem(*s)));
 
 }
 
-string Task::getProbInfo(int pos)
+string Task::getProblemInfo(int pos)
 {
 
     vector<problemPtr>::iterator ii = this->prolem_list.begin();
@@ -50,6 +50,7 @@ problemPtr Task::getProblem(int pos)
 
     return (*ii);
 }
+
 
 void Task::clearProblems()
 {

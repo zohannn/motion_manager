@@ -281,10 +281,10 @@ private:
         int scenario_id; /**< id of the current scenario */
 
         double timeStep; /**< current time step of the trajectory */
-        MatrixXf jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
-        MatrixXf jointsPosition_mov; /**< trajectory of the joint position of the movement */
-        MatrixXf jointsVelocity_task; /**< trajectory of the joint velocity of the task */
-        MatrixXf jointsPosition_task; /**< trajectory of the joint position of the task */
+        MatrixXd jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
+        MatrixXd jointsPosition_mov; /**< trajectory of the joint position of the movement */
+        MatrixXd jointsVelocity_task; /**< trajectory of the joint velocity of the task */
+        MatrixXd jointsPosition_task; /**< trajectory of the joint position of the task */
         vector<double> timeSteps_task; /**< vector of time steps of each movement in the task */
         vector<int> nSteps_task; /**< vector of number of steps of each movement in the task */
         vector<string> vel_steps; /**< steps of the trajectory for saving/loading file */

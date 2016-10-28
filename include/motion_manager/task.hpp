@@ -37,7 +37,7 @@ public:
      * @param pos
      * @return
      */
-    string getProbInfo(int pos);
+    string getProblemInfo(int pos);
 
     /**
      * @brief This method gets the problem at the index pos.
@@ -57,6 +57,7 @@ public:
      * @param s
      */
     void addProblem(Problem* s);
+
 
     /**
      * @brief This method deletes all the problems of the task

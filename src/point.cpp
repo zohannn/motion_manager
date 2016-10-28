@@ -85,20 +85,20 @@ void Point::getZt(vector<double> &zt)
     this->getRotAxis(zt,2);
 }
 
-float Point::getNorm()
+double Point::getNorm()
 {
 
     return sqrt(pow((this->m_pos.Xpos),2)+pow((this->m_pos.Ypos),2)+pow((this->m_pos.Zpos),2));
 }
 
 
-void Point::RPY_matrix(Matrix3f &Rot)
+void Point::RPY_matrix(Matrix3d &Rot)
 {
-    Rot = Matrix3f::Zero();
+    Rot = Matrix3d::Zero();
 
-    float roll = this->m_or.roll; // around z
-    float pitch = this->m_or.pitch; // around y
-    float yaw = this->m_or.yaw; // around x
+    double roll = this->m_or.roll; // around z
+    double pitch = this->m_or.pitch; // around y
+    double yaw = this->m_or.yaw; // around x
 
     // Rot = Rot_z * Rot_y * Rot_x
 
@@ -108,12 +108,12 @@ void Point::RPY_matrix(Matrix3f &Rot)
 
 }
 
-void Point::Trans_matrix(Matrix4f& Trans)
+void Point::Trans_matrix(Matrix4d& Trans)
 {
 
-    Trans = Matrix4f::Zero();
+    Trans = Matrix4d::Zero();
 
-    Matrix3f Rot;
+    Matrix3d Rot;
     this->RPY_matrix(Rot);
 
     Trans(0,0) = Rot(0,0); Trans(0,1) = Rot(0,1); Trans(0,2) = Rot(0,2); Trans(0,3) = this->m_pos.Xpos;
@@ -126,9 +126,9 @@ void Point::Trans_matrix(Matrix4f& Trans)
 
 void Point::getRotAxis(vector<double>& xt, int id){
 
-    Matrix3f Rot;
+    Matrix3d Rot;
     this->RPY_matrix(Rot);
-    Vector3f v = Rot.col(id);
+    Vector3d v = Rot.col(id);
 
     // get the components of the axis
     xt.push_back(v(0)); // x

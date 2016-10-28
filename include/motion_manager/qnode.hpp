@@ -131,7 +131,7 @@ public:
          * @param scene
          * @return
          */
-        bool execMovement(MatrixXf& traj, MatrixXf& vel, double timeStep, double tol_stop, movementPtr mov, scenarioPtr scene);
+        bool execMovement(MatrixXd& traj, MatrixXd& vel, double timeStep, double tol_stop, movementPtr mov, scenarioPtr scene);
 
         /**
          * @brief This method executes the movements in a task
@@ -144,7 +144,7 @@ public:
          * @param scene
          * @return
          */
-        bool execTask(MatrixXf& traj_task, MatrixXf& vel_task, vector<double>& timeSteps, vector<int>& nSteps, vector<double>& tols_stop, taskPtr task, scenarioPtr scene);
+        bool execTask(MatrixXd& traj_task, MatrixXd& vel_task, vector<double>& timeSteps, vector<int>& nSteps, vector<double>& tols_stop, taskPtr task, scenarioPtr scene);
         /**
          * @brief This method sets to zero the time of simulation
          */
@@ -411,7 +411,7 @@ private:
          * @param rpy
          * @return
          */
-        bool getRPY(Matrix4f Trans, std::vector<double>& rpy);
+        bool getRPY(Matrix4d Trans, std::vector<double>& rpy);
 
         /**
          * @brief This method update the information of a generic object in V-REP

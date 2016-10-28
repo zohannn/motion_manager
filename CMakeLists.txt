@@ -98,12 +98,12 @@ configure_file (
 ## Tests
 # TEST=0. do not run the tests
 # TEST=1, run the tests
-set(TEST 1)
+set(TEST 0)
 
 ## Documentation
 # DOC=0. do not make the documentation
 # DOC=1, make the documentation
-set(DOC 1)
+set(DOC 0)
 
 ##############################################################################
 # External libraries

@@ -18,106 +18,106 @@ TolDialogHUML::~TolDialogHUML()
 }
 
 
-void TolDialogHUML::getEngageParams(float& dist, int& dir, std::vector<float> &tols)
+void TolDialogHUML::getEngageParams(double& dist, int& dir, std::vector<double> &tols)
 {
 
-    dist = ui->lineEdit_eng_dist->text().toFloat();
+    dist = ui->lineEdit_eng_dist->text().toDouble();
     dir = ui->comboBox_eng_dir->currentIndex();
-    tols = std::vector<float>(3);
-    tols.at(0) = ui->lineEdit_eng_x->text().toFloat();
-    tols.at(1) = ui->lineEdit_eng_y->text().toFloat();
-    tols.at(2) = ui->lineEdit_eng_z->text().toFloat();
+    tols = std::vector<double>(3);
+    tols.at(0) = ui->lineEdit_eng_x->text().toDouble();
+    tols.at(1) = ui->lineEdit_eng_y->text().toDouble();
+    tols.at(2) = ui->lineEdit_eng_z->text().toDouble();
 
 }
 
 
-void TolDialogHUML::getDisengageParams(float &dist, int &dir)
+void TolDialogHUML::getDisengageParams(double &dist, int &dir)
 {
 
-    dist = ui->lineEdit_diseng_dist->text().toFloat();
+    dist = ui->lineEdit_diseng_dist->text().toDouble();
     dir = ui->comboBox_diseng_dir->currentIndex();
 
 }
 
-float TolDialogHUML::getTolStop()
+double TolDialogHUML::getTolStop()
 {
 
-    return ui->lineEdit_tol_stop->text().toFloat();
+    return ui->lineEdit_tol_stop->text().toDouble();
 }
 
 
 void TolDialogHUML::getTolsArm(vector<double> &tols)
 {
 
-    tols.push_back(ui->lineEdit_shoulder_r->text().toFloat());
-    tols.push_back(ui->lineEdit_elbow_r->text().toFloat());
-    tols.push_back(ui->lineEdit_wrist_r->text().toFloat());
-    tols.push_back(ui->lineEdit_hand_r->text().toFloat());
+    tols.push_back(ui->lineEdit_shoulder_r->text().toDouble());
+    tols.push_back(ui->lineEdit_elbow_r->text().toDouble());
+    tols.push_back(ui->lineEdit_wrist_r->text().toDouble());
+    tols.push_back(ui->lineEdit_hand_r->text().toDouble());
 }
 
 
-void TolDialogHUML::getTolsHand(MatrixXf &tols)
+void TolDialogHUML::getTolsHand(MatrixXd &tols)
 {
 
-   tols = MatrixXf::Constant(4,3,1);
+   tols = MatrixXd::Constant(4,3,1);
 
-    tols(0,0) = ui->lineEdit_hand_1_1->text().toFloat(); tols(0,1) = ui->lineEdit_hand_1_2->text().toFloat(); tols(0,2) = ui->lineEdit_hand_1_3->text().toFloat();
-    tols(1,0) = ui->lineEdit_hand_2_1->text().toFloat(); tols(1,1) = ui->lineEdit_hand_2_2->text().toFloat(); tols(1,2) = ui->lineEdit_hand_2_3->text().toFloat();
-    tols(2,0) = ui->lineEdit_hand_3_1->text().toFloat(); tols(2,1) = ui->lineEdit_hand_3_2->text().toFloat(); tols(2,2) = ui->lineEdit_hand_3_3->text().toFloat();
-    tols(3,0) = ui->lineEdit_hand_tip_1->text().toFloat(); tols(3,1) = ui->lineEdit_hand_tip_2->text().toFloat(); tols(3,2) = ui->lineEdit_hand_tip_3->text().toFloat();
+    tols(0,0) = ui->lineEdit_hand_1_1->text().toDouble(); tols(0,1) = ui->lineEdit_hand_1_2->text().toDouble(); tols(0,2) = ui->lineEdit_hand_1_3->text().toDouble();
+    tols(1,0) = ui->lineEdit_hand_2_1->text().toDouble(); tols(1,1) = ui->lineEdit_hand_2_2->text().toDouble(); tols(1,2) = ui->lineEdit_hand_2_3->text().toDouble();
+    tols(2,0) = ui->lineEdit_hand_3_1->text().toDouble(); tols(2,1) = ui->lineEdit_hand_3_2->text().toDouble(); tols(2,2) = ui->lineEdit_hand_3_3->text().toDouble();
+    tols(3,0) = ui->lineEdit_hand_tip_1->text().toDouble(); tols(3,1) = ui->lineEdit_hand_tip_2->text().toDouble(); tols(3,2) = ui->lineEdit_hand_tip_3->text().toDouble();
 }
 
 /*
 
-void TolDialogHUML::getTolsTable(std::vector<float> &tols)
+void TolDialogHUML::getTolsTable(std::vector<double> &tols)
 {
 
 
-    tols.push_back(ui->lineEdit_table_1->text().toFloat());
-    tols.push_back(ui->lineEdit_table_2->text().toFloat());
-    tols.push_back(ui->lineEdit_table_3->text().toFloat());
+    tols.push_back(ui->lineEdit_table_1->text().toDouble());
+    tols.push_back(ui->lineEdit_table_2->text().toDouble());
+    tols.push_back(ui->lineEdit_table_3->text().toDouble());
 
 }
 */
 
-void TolDialogHUML::getLambda(std::vector<float> &lambda)
+void TolDialogHUML::getLambda(std::vector<double> &lambda)
 {
 
-   lambda.push_back(ui->lineEdit_lambda_1->text().toFloat());
-   lambda.push_back(ui->lineEdit_lambda_2->text().toFloat());
-   lambda.push_back(ui->lineEdit_lambda_3->text().toFloat());
-   lambda.push_back(ui->lineEdit_lambda_4->text().toFloat());
-   lambda.push_back(ui->lineEdit_lambda_5->text().toFloat());
-   lambda.push_back(ui->lineEdit_lambda_6->text().toFloat());
-   lambda.push_back(ui->lineEdit_lambda_7->text().toFloat());
-   lambda.push_back(ui->lineEdit_lambda_8->text().toFloat());
-   lambda.push_back(ui->lineEdit_lambda_9->text().toFloat());
-   lambda.push_back(ui->lineEdit_lambda_10->text().toFloat());
-   lambda.push_back(ui->lineEdit_lambda_11->text().toFloat());
+   lambda.push_back(ui->lineEdit_lambda_1->text().toDouble());
+   lambda.push_back(ui->lineEdit_lambda_2->text().toDouble());
+   lambda.push_back(ui->lineEdit_lambda_3->text().toDouble());
+   lambda.push_back(ui->lineEdit_lambda_4->text().toDouble());
+   lambda.push_back(ui->lineEdit_lambda_5->text().toDouble());
+   lambda.push_back(ui->lineEdit_lambda_6->text().toDouble());
+   lambda.push_back(ui->lineEdit_lambda_7->text().toDouble());
+   lambda.push_back(ui->lineEdit_lambda_8->text().toDouble());
+   lambda.push_back(ui->lineEdit_lambda_9->text().toDouble());
+   lambda.push_back(ui->lineEdit_lambda_10->text().toDouble());
+   lambda.push_back(ui->lineEdit_lambda_11->text().toDouble());
 
 }
 
 
-void TolDialogHUML::getTolsObstacles(MatrixXf &tols)
+void TolDialogHUML::getTolsObstacles(MatrixXd &tols)
 {
 
-    tols = MatrixXf::Constant(3,6,1);
+    tols = MatrixXd::Constant(3,6,1);
 
-    tols(0,0)=ui->lineEdit_obs_xx_1->text().toFloat(); tols(0,1)=ui->lineEdit_obs_yy_1->text().toFloat(); tols(0,2)=ui->lineEdit_obs_zz_1->text().toFloat(); tols(0,3)=ui->lineEdit_obs_xy_1->text().toFloat(); tols(0,4)=ui->lineEdit_obs_xz_1->text().toFloat(); tols(0,5)=ui->lineEdit_obs_yz_1->text().toFloat();
-    tols(1,0)=ui->lineEdit_obs_xx_2->text().toFloat(); tols(1,1)=ui->lineEdit_obs_yy_2->text().toFloat(); tols(1,2)=ui->lineEdit_obs_zz_2->text().toFloat(); tols(1,3)=ui->lineEdit_obs_xy_2->text().toFloat(); tols(1,4)=ui->lineEdit_obs_xz_2->text().toFloat(); tols(1,5)=ui->lineEdit_obs_yz_2->text().toFloat();
-    tols(2,0)=ui->lineEdit_obs_xx_3->text().toFloat(); tols(2,1)=ui->lineEdit_obs_yy_3->text().toFloat(); tols(2,2)=ui->lineEdit_obs_zz_3->text().toFloat(); tols(2,3)=ui->lineEdit_obs_xy_3->text().toFloat(); tols(2,4)=ui->lineEdit_obs_xz_3->text().toFloat(); tols(2,5)=ui->lineEdit_obs_yz_3->text().toFloat();
+    tols(0,0)=ui->lineEdit_obs_xx_1->text().toDouble(); tols(0,1)=ui->lineEdit_obs_yy_1->text().toDouble(); tols(0,2)=ui->lineEdit_obs_zz_1->text().toDouble(); tols(0,3)=ui->lineEdit_obs_xy_1->text().toDouble(); tols(0,4)=ui->lineEdit_obs_xz_1->text().toDouble(); tols(0,5)=ui->lineEdit_obs_yz_1->text().toDouble();
+    tols(1,0)=ui->lineEdit_obs_xx_2->text().toDouble(); tols(1,1)=ui->lineEdit_obs_yy_2->text().toDouble(); tols(1,2)=ui->lineEdit_obs_zz_2->text().toDouble(); tols(1,3)=ui->lineEdit_obs_xy_2->text().toDouble(); tols(1,4)=ui->lineEdit_obs_xz_2->text().toDouble(); tols(1,5)=ui->lineEdit_obs_yz_2->text().toDouble();
+    tols(2,0)=ui->lineEdit_obs_xx_3->text().toDouble(); tols(2,1)=ui->lineEdit_obs_yy_3->text().toDouble(); tols(2,2)=ui->lineEdit_obs_zz_3->text().toDouble(); tols(2,3)=ui->lineEdit_obs_xy_3->text().toDouble(); tols(2,4)=ui->lineEdit_obs_xz_3->text().toDouble(); tols(2,5)=ui->lineEdit_obs_yz_3->text().toDouble();
 
 }
 
 
-void TolDialogHUML::getTolsTarget(MatrixXf &tols)
+void TolDialogHUML::getTolsTarget(MatrixXd &tols)
 {
 
-    tols = MatrixXf::Constant(3,6,1);
+    tols = MatrixXd::Constant(3,6,1);
 
-    tols(0,0)=ui->lineEdit_tar_xx_1->text().toFloat(); tols(0,1)=ui->lineEdit_tar_yy_1->text().toFloat(); tols(0,2)=ui->lineEdit_tar_zz_1->text().toFloat(); tols(0,3)=ui->lineEdit_tar_xy_1->text().toFloat(); tols(0,4)=ui->lineEdit_tar_xz_1->text().toFloat(); tols(0,5)=ui->lineEdit_tar_yz_1->text().toFloat();
-    tols(1,0)=ui->lineEdit_tar_xx_2->text().toFloat(); tols(1,1)=ui->lineEdit_tar_yy_2->text().toFloat(); tols(1,2)=ui->lineEdit_tar_zz_2->text().toFloat(); tols(1,3)=ui->lineEdit_tar_xy_2->text().toFloat(); tols(1,4)=ui->lineEdit_tar_xz_2->text().toFloat(); tols(1,5)=ui->lineEdit_tar_yz_2->text().toFloat();
-    tols(2,0)=ui->lineEdit_tar_xx_3->text().toFloat(); tols(2,1)=ui->lineEdit_tar_yy_3->text().toFloat(); tols(2,2)=ui->lineEdit_tar_zz_3->text().toFloat(); tols(2,3)=ui->lineEdit_tar_xy_3->text().toFloat(); tols(2,4)=ui->lineEdit_tar_xz_3->text().toFloat(); tols(2,5)=ui->lineEdit_tar_yz_3->text().toFloat();
+    tols(0,0)=ui->lineEdit_tar_xx_1->text().toDouble(); tols(0,1)=ui->lineEdit_tar_yy_1->text().toDouble(); tols(0,2)=ui->lineEdit_tar_zz_1->text().toDouble(); tols(0,3)=ui->lineEdit_tar_xy_1->text().toDouble(); tols(0,4)=ui->lineEdit_tar_xz_1->text().toDouble(); tols(0,5)=ui->lineEdit_tar_yz_1->text().toDouble();
+    tols(1,0)=ui->lineEdit_tar_xx_2->text().toDouble(); tols(1,1)=ui->lineEdit_tar_yy_2->text().toDouble(); tols(1,2)=ui->lineEdit_tar_zz_2->text().toDouble(); tols(1,3)=ui->lineEdit_tar_xy_2->text().toDouble(); tols(1,4)=ui->lineEdit_tar_xz_2->text().toDouble(); tols(1,5)=ui->lineEdit_tar_yz_2->text().toDouble();
+    tols(2,0)=ui->lineEdit_tar_xx_3->text().toDouble(); tols(2,1)=ui->lineEdit_tar_yy_3->text().toDouble(); tols(2,2)=ui->lineEdit_tar_zz_3->text().toDouble(); tols(2,3)=ui->lineEdit_tar_xy_3->text().toDouble(); tols(2,4)=ui->lineEdit_tar_xz_3->text().toDouble(); tols(2,5)=ui->lineEdit_tar_yz_3->text().toDouble();
 
 
 }
@@ -130,10 +130,10 @@ int TolDialogHUML::getSteps()
 }
 
 
-float TolDialogHUML::getWMax()
+double TolDialogHUML::getWMax()
 {
 
-    return ui->lineEdit_w_max->text().toFloat();
+    return ui->lineEdit_w_max->text().toDouble();
 }
 
 
@@ -144,17 +144,17 @@ int TolDialogHUML::getApproachAxis()
 }
 
 
-float TolDialogHUML::getTolTarPos()
+double TolDialogHUML::getTolTarPos()
 {
 
-    return ui->lineEdit_tar_pos->text().toFloat();
+    return ui->lineEdit_tar_pos->text().toDouble();
 }
 
 
-float TolDialogHUML::getTolTarOr()
+double TolDialogHUML::getTolTarOr()
 {
 
-    return ui->lineEdit_tar_or->text().toFloat();
+    return ui->lineEdit_tar_or->text().toDouble();
 }
 
 void TolDialogHUML::setInfo(string info)

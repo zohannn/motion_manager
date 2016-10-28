@@ -479,8 +479,8 @@ void MainWindow::on_pushButton_addMov_clicked()
                 string obj_name = ui.comboBox_objects->currentText().toStdString();
                 string obj_eng_name = ui.comboBox_objects_eng->currentText().toStdString();
 
-                objectPtr obj = scene->getObject(obj_name);
-                objectPtr obj_eng = scene->getObject(obj_eng_name);
+                objectPtr obj = curr_scene->getObject(obj_name);
+                objectPtr obj_eng = curr_scene->getObject(obj_eng_name);
 
                 if(obj!=NULL && obj_eng!=NULL){
                     int grip_id = ui.comboBox_grip->currentIndex();
@@ -499,9 +499,7 @@ void MainWindow::on_pushButton_addMov_clicked()
                         break;
                     }
 
-                    curr_task->addProblem(new Problem(planner_id,
-                                                      new Movement(mov_id, arm_sel, obj,obj_eng,grip_id,prec),
-                                                      new Scenario(this->curr_scene.get())));
+                    curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                     success=true;
 
                 }else{
@@ -514,7 +512,7 @@ void MainWindow::on_pushButton_addMov_clicked()
                       // reach-to- grasp movement, transport movements
 
                      string obj_name = ui.comboBox_objects->currentText().toStdString();
-                     objectPtr obj = scene->getObject(obj_name);
+                     objectPtr obj = curr_scene->getObject(obj_name);
 
                      if(obj!=NULL){
                          int grip_id = ui.comboBox_grip->currentIndex();
@@ -532,9 +530,7 @@ void MainWindow::on_pushButton_addMov_clicked()
                              obj->setTargetRightEnabled(false);
                              break;
                          }
-                         curr_task->addProblem(new Problem(planner_id,
-                                                           new Movement(mov_id, arm_sel, obj,grip_id,prec),
-                                                           new Scenario(this->curr_scene.get())));
+                         curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                          success=true;
 
                      }else{
@@ -546,7 +542,7 @@ void MainWindow::on_pushButton_addMov_clicked()
 
                      // Go park movements
                      string obj_name = ui.comboBox_objects->currentText().toStdString();
-                     objectPtr obj = scene->getObject(obj_name);
+                     objectPtr obj = curr_scene->getObject(obj_name);
                      if(obj!=NULL){
                          int grip_id = ui.comboBox_grip->currentIndex();
                          bool prec = ui.radioButton_prec->isChecked();
@@ -563,15 +559,11 @@ void MainWindow::on_pushButton_addMov_clicked()
                              obj->setTargetRightEnabled(false);
                              break;
                          }
-                         curr_task->addProblem(new Problem(planner_id,
-                                                           new Movement(mov_id, arm_sel, obj,grip_id,prec),
-                                                           new Scenario(this->curr_scene.get())));
+                         curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                          success=true;
 
                      }else{
-                        curr_task->addProblem(new Problem(planner_id,
-                                                          new Movement(mov_id, arm_sel),
-                                                          new Scenario(this->curr_scene.get())));
+                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel),new Scenario(*(this->curr_scene.get()))));
                         success=true;
 
                      }
@@ -581,9 +573,7 @@ void MainWindow::on_pushButton_addMov_clicked()
              }else{
 
                  // reaching movements
-                 curr_task->addProblem(new Problem(planner_id,
-                                                   new Movement(mov_id, arm_sel),
-                                                   new Scenario(this->curr_scene.get())));
+                 curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel),new Scenario(*(this->curr_scene.get()))));
                  success=true;
 
              }
@@ -628,9 +618,9 @@ void MainWindow::on_pushButton_plan_clicked()
 
     case 0: // HUML
         mTolHumldlg->setInfo(prob->getInfoLine());
+        HUMotion::huml_params  tols;
         try{
 
-            HUMotion::huml_tols  tols;
             // --- Tolerances for the final posture selection ---- //
 
             // tolerances of the arm : radius in [mm]
@@ -646,12 +636,12 @@ void MainWindow::on_pushButton_plan_clicked()
             // joint expense factors
             vector<double> lambda;
             mTolHumldlg->getLambda(lambda);
-            for (int i = 0; i < HUMotion::JOINTS_ARM; ++i){
+            for (int i = 0; i < JOINTS_ARM; ++i){
                 tols.lambda_final.push_back(lambda.at(i));
             }
             // --- Tolerances for the bounce posture selection ---- //
 
-            for (int i=0; i < HUMotion::JOINTS_ARM + HUMotion::JOINTS_HAND; ++i){
+            for (int i=0; i < JOINTS_ARM + JOINTS_ARM; ++i){
                 tols.bounds.vel_0.push_back(0);
                 tols.bounds.vel_f.push_back(0);
                 tols.bounds.acc_0.push_back(0);
@@ -661,19 +651,19 @@ void MainWindow::on_pushButton_plan_clicked()
             }
 
             // tolerances for the obstacles
-            tols.final_tolsObstacles = MatrixXf::Constant(3,6,1) ;
+            tols.final_tolsObstacles = MatrixXd::Constant(3,6,1) ;
             mTolHumldlg->getTolsObstacles(tols.final_tolsObstacles);
 
-            tols.singleArm_tolsObstacles.push_back(MatrixXf::Constant(3,6,1));
-            tols.singleArm_tolsObstacles.push_back(MatrixXf::Constant(3,6,1));
+            tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1));
+            tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1));
 
             mTolHumldlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(0));
             mTolHumldlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(1));
 
             // tolerances for the target
-            tols.singleArm_tolsTarget.push_back(MatrixXf::Constant(3,6,1));
-            tols.singleArm_tolsTarget.push_back(MatrixXf::Constant(3,6,1));
-            tols.singleArm_tolsTarget.push_back(MatrixXf::Constant(3,6,1));
+            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
 
             mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
             mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
@@ -688,22 +678,24 @@ void MainWindow::on_pushButton_plan_clicked()
             tols.tolTarOr = mTolHumldlg->getTolTarOr();
 
             // set the approaching target axis
-            prob->setApproachingTargetAxis(mTolHumldlg->getApproachAxis());
+            //prob->setApproachingTargetAxis(mTolHumldlg->getApproachAxis());
 
             //engaging parametrs
-            mTolHumldlg->getEngageParams(tols.eng_dist,tols.eng_dir,tols.eng_tols);
+            //mTolHumldlg->getEngageParams(tols.eng_dist,tols.eng_dir,tols.eng_tols);
 
             //disengaging parameters
-            mTolHumldlg->getDisengageParams(tols.diseng_dist,tols.diseng_dir);
+            //mTolHumldlg->getDisengageParams(tols.diseng_dist,tols.diseng_dir);
 
             // tol stop
-            tols.tol_stop = mTolHumldlg->getTolStop();
+            //tols.tol_stop = mTolHumldlg->getTolStop();
 
             solved = prob->solve(tols); // plan the movement
 
         break;
 
-    }
+    }catch(...){}
+
+        /*
 
     if(solved){
         ui.pushButton_plan->setCheckable(false);
@@ -711,12 +703,12 @@ void MainWindow::on_pushButton_plan_clicked()
         qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
 
 
-        MatrixXf traj;
-        prob->getTrajectory(traj);
+        MatrixXd traj;
+        //prob->getTrajectory(traj);
 
 
-        MatrixXf vel;
-        double timeStep = prob->getVelocity(vel);
+        MatrixXd vel;
+        //double timeStep = prob->getVelocity(vel);
         std::vector<string> velStep = std::vector<string>(vel.rows());
         for (int i=0; i<vel.rows();++i){
             velStep.at(i) = "Step="+QString::number(i).toStdString()+",";
@@ -800,8 +792,14 @@ void MainWindow::on_pushButton_plan_clicked()
 
 
     }
+    */
 
 }
+
+
+}
+
+    /*
 catch (const std::string message){
 
     qnode.log(QNode::Error,std::string("Plan failure: ")+message);
@@ -815,6 +813,7 @@ catch(const std::exception exc){
 
 
 }
+*/
 
 
 void MainWindow::on_pushButton_execMov_pressed()
@@ -828,8 +827,8 @@ void MainWindow::on_pushButton_execMov_pressed()
 void MainWindow::on_pushButton_execMov_clicked()
 {
 
-    MatrixXf vel = this->jointsVelocity_mov;
-    MatrixXf traj = this->jointsPosition_mov;
+    MatrixXd vel = this->jointsVelocity_mov;
+    MatrixXd traj = this->jointsPosition_mov;
     double timeStep = this->timeStep;
     double tol_stop = this->mTolHumldlg->getTolStop();
 
@@ -862,8 +861,8 @@ void MainWindow::on_pushButton_execTask_pressed(){
 void MainWindow::on_pushButton_execTask_clicked()
 {
 
-    MatrixXf traj = this->jointsPosition_task;
-    MatrixXf vel = this->jointsVelocity_task;
+    MatrixXd traj = this->jointsPosition_task;
+    MatrixXd vel = this->jointsVelocity_task;
     std::vector<double> tSteps = this->timeSteps_task;
     std::vector<int> nSteps = this->nSteps_task;
     std::vector<double> stops = this->tols_stop;
@@ -881,13 +880,13 @@ void MainWindow::on_pushButton_load_task_clicked()
     int mov_id; QString mov_type;
     int arm_code; QString arm_type;
     int grip_id; QString grip_type;
-    QString obj_str; h_objectPtr obj;
-    QString obj_eng_str; h_objectPtr obj_eng;
+    QString obj_str; objectPtr obj;
+    QString obj_eng_str; objectPtr obj_eng;
     bool prec;
     int steps=0;
     int row=0;
-    MatrixXf vel;
-    MatrixXf poss;
+    MatrixXd vel;
+    MatrixXd poss;
 
     //clear
     this->jointsVelocity_task.resize(0,0);
@@ -1017,7 +1016,7 @@ void MainWindow::on_pushButton_load_task_clicked()
                 if(QString::compare(mov_type,QString("Reach-to-grasp"),Qt::CaseInsensitive)==0){
                     mov_id=0;
                     //get the object
-                    obj = this->hum_planner->getScenario()->getObject(obj_str.toStdString());
+                    obj = this->curr_scene->getObject(obj_str.toStdString());
                     switch (arm_code){
                     case 0: // dual arm
                         // TO DO
@@ -1031,11 +1030,11 @@ void MainWindow::on_pushButton_load_task_clicked()
                         break;
                     }
 
-                    problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec));
+                    problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
 
-                    this->curr_task->addProblem(prob);
+                    this->curr_task->addProblem(prob.get());
 
                 }else if(QString::compare(mov_type,QString("Reaching"),Qt::CaseInsensitive)==0){
                     mov_id=1;
@@ -1060,11 +1059,11 @@ void MainWindow::on_pushButton_load_task_clicked()
                         break;
                     }
 
-                    problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,grip_id,prec));
+                    problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
 
-                    this->curr_task->addProblem(prob);
+                    this->curr_task->addProblem(prob.get());
 
                 }else if(QString::compare(mov_type,QString("Disengage"),Qt::CaseInsensitive)==0){
                     mov_id=4;
@@ -1085,11 +1084,11 @@ void MainWindow::on_pushButton_load_task_clicked()
                         break;
                     }
 
-                    problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec));
+                    problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
 
-                    this->curr_task->addProblem(prob);
+                    this->curr_task->addProblem(prob.get());
 
                 }
 
@@ -1107,9 +1106,9 @@ void MainWindow::on_pushButton_load_task_clicked()
 
                 QStringList fields = line.split("=");
                 if(QString::compare(fields.at(0).simplified(),QString("time step"),Qt::CaseInsensitive)==0){
-                    this->timeSteps_task.push_back(fields.at(1).toFloat());
+                    this->timeSteps_task.push_back(fields.at(1).toDouble());
                 }else if(QString::compare(fields.at(0).simplified(),QString("tol stop"),Qt::CaseInsensitive)==0){
-                    this->tols_stop.push_back(fields.at(1).toFloat());
+                    this->tols_stop.push_back(fields.at(1).toDouble());
                 }
             }else{
                 poss.conservativeResize(poss.rows()+1,JOINTS_ARM+JOINTS_HAND);
@@ -1122,48 +1121,48 @@ void MainWindow::on_pushButton_load_task_clicked()
                         steps=fields1.at(1).toInt()-prev_steps;
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 1"),Qt::CaseInsensitive)==0){
                         QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,0)=fields2.at(0).toFloat()*M_PI/180;
-                        vel(row,0)=fields2.at(1).toFloat()*M_PI/180;
+                        poss(row,0)=fields2.at(0).toDouble()*M_PI/180;
+                        vel(row,0)=fields2.at(1).toDouble()*M_PI/180;
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 2"),Qt::CaseInsensitive)==0){
                         QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,1)=fields2.at(0).toFloat()*M_PI/180;
-                        vel(row,1)=fields2.at(1).toFloat()*M_PI/180;
+                        poss(row,1)=fields2.at(0).toDouble()*M_PI/180;
+                        vel(row,1)=fields2.at(1).toDouble()*M_PI/180;
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 3"),Qt::CaseInsensitive)==0){
                         QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,2)=fields2.at(0).toFloat()*M_PI/180;
-                        vel(row,2)=fields2.at(1).toFloat()*M_PI/180;
+                        poss(row,2)=fields2.at(0).toDouble()*M_PI/180;
+                        vel(row,2)=fields2.at(1).toDouble()*M_PI/180;
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 4"),Qt::CaseInsensitive)==0){
                         QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,3)=fields2.at(0).toFloat()*M_PI/180;
-                        vel(row,3)=fields2.at(1).toFloat()*M_PI/180;
+                        poss(row,3)=fields2.at(0).toDouble()*M_PI/180;
+                        vel(row,3)=fields2.at(1).toDouble()*M_PI/180;
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 5"),Qt::CaseInsensitive)==0){
                         QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,4)=fields2.at(0).toFloat()*M_PI/180;
-                        vel(row,4)=fields2.at(1).toFloat()*M_PI/180;
+                        poss(row,4)=fields2.at(0).toDouble()*M_PI/180;
+                        vel(row,4)=fields2.at(1).toDouble()*M_PI/180;
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 6"),Qt::CaseInsensitive)==0){
                         QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,5)=fields2.at(0).toFloat()*M_PI/180;
-                        vel(row,5)=fields2.at(1).toFloat()*M_PI/180;
+                        poss(row,5)=fields2.at(0).toDouble()*M_PI/180;
+                        vel(row,5)=fields2.at(1).toDouble()*M_PI/180;
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 7"),Qt::CaseInsensitive)==0){
                         QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,6)=fields2.at(0).toFloat()*M_PI/180;
-                        vel(row,6)=fields2.at(1).toFloat()*M_PI/180;
+                        poss(row,6)=fields2.at(0).toDouble()*M_PI/180;
+                        vel(row,6)=fields2.at(1).toDouble()*M_PI/180;
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 8"),Qt::CaseInsensitive)==0){
                         QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,7)=fields2.at(0).toFloat()*M_PI/180;
-                        vel(row,7)=fields2.at(1).toFloat()*M_PI/180;
+                        poss(row,7)=fields2.at(0).toDouble()*M_PI/180;
+                        vel(row,7)=fields2.at(1).toDouble()*M_PI/180;
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 9"),Qt::CaseInsensitive)==0){
                         QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,8)=fields2.at(0).toFloat()*M_PI/180;
-                        vel(row,8)=fields2.at(1).toFloat()*M_PI/180;
+                        poss(row,8)=fields2.at(0).toDouble()*M_PI/180;
+                        vel(row,8)=fields2.at(1).toDouble()*M_PI/180;
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 10"),Qt::CaseInsensitive)==0){
                         QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,9)=fields2.at(0).toFloat()*M_PI/180;
-                        vel(row,9)=fields2.at(1).toFloat()*M_PI/180;
+                        poss(row,9)=fields2.at(0).toDouble()*M_PI/180;
+                        vel(row,9)=fields2.at(1).toDouble()*M_PI/180;
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 11"),Qt::CaseInsensitive)==0){
                         QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,10)=fields2.at(0).toFloat()*M_PI/180;
-                        vel(row,10)=fields2.at(1).toFloat()*M_PI/180;
+                        poss(row,10)=fields2.at(0).toDouble()*M_PI/180;
+                        vel(row,10)=fields2.at(1).toDouble()*M_PI/180;
                     }
                 }
                 row++;
@@ -1188,7 +1187,7 @@ void MainWindow::on_pushButton_load_task_clicked()
             }
             ui.listWidget_sol_task->addItem(QString(this->vel_steps.at(i).c_str()));
         }
-        float totalTime = 0;
+        double totalTime = 0;
         for (size_t i = 0; i < this->timeSteps_task.size(); ++i){
             totalTime += this->timeSteps_task.at(i)*this->nSteps_task.at(i);
         }
@@ -1214,9 +1213,9 @@ void MainWindow::on_pushButton_save_task_clicked()
                                                     "All Files (*.*);;Task Files (*.task)");
     QFile f( filename );
     if(f.open( QIODevice::WriteOnly )){
-        std::vector<float> timeSteps = this->timeSteps_task;
+        std::vector<double> timeSteps = this->timeSteps_task;
         std::vector<int> steps = this->nSteps_task;
-        std::vector<float> tols_stop = this->tols_stop;
+        std::vector<double> tols_stop = this->tols_stop;
 
         QTextStream stream( &f );
         int prev_steps=0;
@@ -1329,11 +1328,11 @@ void MainWindow::on_pushButton_append_mov_clicked()
 
      this->tols_stop.push_back(this->mTolHumldlg->getTolStop());
 
-     MatrixXf vel_mov = this->jointsVelocity_mov;
-     MatrixXf vel_task = this->jointsVelocity_task;
+     MatrixXd vel_mov = this->jointsVelocity_mov;
+     MatrixXd vel_task = this->jointsVelocity_task;
 
-     MatrixXf pos_mov = this->jointsPosition_mov;
-     MatrixXf pos_task = this->jointsPosition_task;
+     MatrixXd pos_mov = this->jointsPosition_mov;
+     MatrixXd pos_task = this->jointsPosition_task;
 
      this->timeSteps_task.push_back(this->timeStep);
      this->nSteps_task.push_back(vel_mov.rows()-1);
@@ -1359,8 +1358,8 @@ void MainWindow::on_pushButton_append_mov_clicked()
      }
 
      ui.listWidget_sol_task->clear();
-     MatrixXf poss = this->jointsPosition_task;
-     MatrixXf vel = this->jointsVelocity_task;
+     MatrixXd poss = this->jointsPosition_task;
+     MatrixXd vel = this->jointsVelocity_task;
      this->vel_steps = std::vector<string>(vel.rows());
      for (int i=0; i<vel.rows();++i){
          this->vel_steps.at(i) ="Step="+QString::number(i).toStdString()+",";
@@ -1373,7 +1372,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
          }
          ui.listWidget_sol_task->addItem(QString(this->vel_steps.at(i).c_str()));
      }
-     float totalTime = 0;
+     double totalTime = 0;
      for (size_t i = 0; i < this->timeSteps_task.size(); ++i){
          totalTime += this->timeSteps_task.at(i)*this->nSteps_task.at(i);
      }

@@ -173,7 +173,7 @@ public:
      * @brief This method gets the radius of the object as the maximum radius on the XY plane
      * @return
      */
-    float getRadius();
+    double getRadius();
 
     /**
      * @brief This method gets information about the object
@@ -200,26 +200,26 @@ private:
      * @brief This method gets the transformation matrix of the target of the right arm
      * @param mat
      */
-    void getTar_right_matrix(Matrix4f& mat);
+    void getTar_right_matrix(Matrix4d& mat);
 
     /**
      * @brief This method gets the transformation matrix of the target of the left arm
      * @param mat
      */
-    void getTar_left_matrix(Matrix4f& mat);
+    void getTar_left_matrix(Matrix4d& mat);
 
     /**
      * @brief This method gets the transformation matrix of the engage point
      * @param mat
      */
-    void getEngage_matrix(Matrix4f& mat);
+    void getEngage_matrix(Matrix4d& mat);
 
     /**
      * @brief Get the orientation in Roll-Pitch-Yaw from the transformation matrix
      * @param Trans
      * @param rpy
      */
-    void getRPY(Matrix4f Trans, vector<double>& rpy);
+    void getRPY(Matrix4d Trans, vector<double>& rpy);
 
 
 

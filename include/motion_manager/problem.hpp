@@ -94,7 +94,7 @@ public:
      * @param tols
      * @return
      */
-    bool solve(HUMotion::huml_tols tols);
+    bool solve(HUMotion::huml_params tols);
 
     /**
      * @brief This method gets the information of the problem
@@ -107,14 +107,14 @@ public:
      * @param traj
      * @return
      */
-    double getTrajectory(MatrixXf& traj);
+    double getTrajectory(MatrixXd& traj);
 
     /**
      * @brief This method gets the velocity of the trajectory planned
      * @param vel
      * @return
      */
-    double getVelocity(MatrixXf& vel);
+    double getVelocity(MatrixXd& vel);
 
     /**
      * @brief This method gets the movement that is related to the problem
@@ -167,20 +167,20 @@ private:
      */
     int err_log;
     bool part_of_task; /**< true if the problem is part of a task */
-    float dHOr; /**< distance between the right hand and the center of the object that is being manipulated */
-    float dHOl; /**< distance between the left hand and the center of the object that is being manipulated */
-    float dFF; /**< distance between the fingertip F3 and the fingertips F1 and F2 */
-    float dFH; /**< distance between the fingers and the palm of the hand */
-    std::vector<float> rightFinalPosture; /**< final posture of the right arm+hand */
-    std::vector<float> rightFinalHand; /**< final posture of the right hand */
-    std::vector<float> leftFinalPosture; /**< final posture of the left arm+hand */
-    std::vector<float> leftFinalHand; /**< final posture of the left hand */
-    std::vector<float> rightFinalPosture_diseng; /**< final posture of the right arm+hand for disengaging movements*/
-    std::vector<float> rightFinalPosture_eng; /**< final posture of the right arm+hand for engaging movements*/
-    std::vector<float> leftFinalPosture_diseng; /**< final posture of the left arm+hand for disengaging movements*/
-    std::vector<float> leftFinalPosture_eng; /**< final posture of the left arm+hand for engaging movements*/
-    MatrixXf optimalTraj; /**< human-like optimized trajectory */
-    HUMotion::huml_tols h_tols; /**< tolerances and parameters of the optimization problem */
+    double dHOr; /**< distance between the right hand and the center of the object that is being manipulated */
+    double dHOl; /**< distance between the left hand and the center of the object that is being manipulated */
+    double dFF; /**< distance between the fingertip F3 and the fingertips F1 and F2 */
+    double dFH; /**< distance between the fingers and the palm of the hand */
+    std::vector<double> rightFinalPosture; /**< final posture of the right arm+hand */
+    std::vector<double> rightFinalHand; /**< final posture of the right hand */
+    std::vector<double> leftFinalPosture; /**< final posture of the left arm+hand */
+    std::vector<double> leftFinalHand; /**< final posture of the left hand */
+    std::vector<double> rightFinalPosture_diseng; /**< final posture of the right arm+hand for disengaging movements*/
+    std::vector<double> rightFinalPosture_eng; /**< final posture of the right arm+hand for engaging movements*/
+    std::vector<double> leftFinalPosture_diseng; /**< final posture of the left arm+hand for disengaging movements*/
+    std::vector<double> leftFinalPosture_eng; /**< final posture of the left arm+hand for engaging movements*/
+    MatrixXd optimalTraj; /**< human-like optimized trajectory */
+    HUMotion::huml_params h_tols; /**< tolerances and parameters of the optimization problem */
     movementPtr mov; /**< movement to be planned */
     scenarioPtr scene; /**< current scene */
     int targetAxis; /**< approaching direction towards the target: 0 = none , 1 = x axis , 2 = y axis, 3 = z axis*/
@@ -208,7 +208,7 @@ private:
      * @param sols: solution
      * @return
      */
-    bool invKinHand(float d_obj,int hand_id,std::vector<float>& sols);
+    bool invKinHand(double d_obj,int hand_id,std::vector<double>& sols);
 
 };
 

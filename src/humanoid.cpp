@@ -32,10 +32,10 @@ Humanoid::Humanoid(string name, pos ppos, orient oor, dim ssize, arm aspecs, hum
     this->leftForces = vector<double>(JOINTS_ARM+JOINTS_HAND);
 
 
-    this->mat_right = Matrix4f::Constant(1);
-    this->mat_left = Matrix4f::Constant(1);
-    this->mat_r_hand = Matrix4f::Constant(1);
-    this->mat_l_hand = Matrix4f::Constant(1);
+    this->mat_right = Matrix4d::Constant(1);
+    this->mat_left = Matrix4d::Constant(1);
+    this->mat_r_hand = Matrix4d::Constant(1);
+    this->mat_l_hand = Matrix4d::Constant(1);
 
 
 
@@ -74,10 +74,10 @@ Humanoid::Humanoid(string name, pos ppos, orient oor, dim ssize, arm aspecs, hum
     this->rightForces = vector<double>(JOINTS_ARM+JOINTS_HAND);
     this->leftForces = vector<double>(JOINTS_ARM+JOINTS_HAND);
 
-    this->mat_right = Matrix4f::Constant(1);
-    this->mat_left = Matrix4f::Constant(1);
-    this->mat_r_hand = Matrix4f::Constant(1);
-    this->mat_l_hand = Matrix4f::Constant(1);
+    this->mat_right = Matrix4d::Constant(1);
+    this->mat_left = Matrix4d::Constant(1);
+    this->mat_r_hand = Matrix4d::Constant(1);
+    this->mat_l_hand = Matrix4d::Constant(1);
 
 
 }
@@ -122,10 +122,10 @@ Humanoid::Humanoid(string name, pos ppos, orient oor, dim ssize, arm aspecs, hum
     this->rightForces = vector<double>(JOINTS_ARM+JOINTS_HAND);
     this->leftForces = vector<double>(JOINTS_ARM+JOINTS_HAND);
 
-    this->mat_right = Matrix4f::Constant(1);
-    this->mat_left = Matrix4f::Constant(1);
-    this->mat_r_hand = Matrix4f::Constant(1);
-    this->mat_l_hand = Matrix4f::Constant(1);
+    this->mat_right = Matrix4d::Constant(1);
+    this->mat_left = Matrix4d::Constant(1);
+    this->mat_r_hand = Matrix4d::Constant(1);
+    this->mat_l_hand = Matrix4d::Constant(1);
 
 }
 
@@ -165,10 +165,10 @@ Humanoid::Humanoid(string name, pos ppos, orient oor, dim ssize, arm aspecs, bar
         this->rightForces = vector<double>(JOINTS_ARM+JOINTS_HAND);
         this->leftForces = vector<double>(JOINTS_ARM+JOINTS_HAND);
 
-    this->mat_right = Matrix4f::Identity(4,4);
-    this->mat_left = Matrix4f::Identity(4,4);
-    this->mat_r_hand = Matrix4f::Identity(4,4);
-    this->mat_l_hand = Matrix4f::Identity(4,4);
+    this->mat_right = Matrix4d::Identity(4,4);
+    this->mat_left = Matrix4d::Identity(4,4);
+    this->mat_r_hand = Matrix4d::Identity(4,4);
+    this->mat_l_hand = Matrix4d::Identity(4,4);
 
 }
 
@@ -212,10 +212,10 @@ Humanoid::Humanoid(string name, pos ppos, orient oor, dim ssize, arm aspecs, bar
         this->rightForces = vector<double>(JOINTS_ARM+JOINTS_HAND);
         this->leftForces = vector<double>(JOINTS_ARM+JOINTS_HAND);
 
-        this->mat_right = Matrix4f::Identity(4,4);
-        this->mat_left = Matrix4f::Identity(4,4);
-        this->mat_r_hand = Matrix4f::Identity(4,4);
-        this->mat_l_hand = Matrix4f::Identity(4,4);
+        this->mat_right = Matrix4d::Identity(4,4);
+        this->mat_left = Matrix4d::Identity(4,4);
+        this->mat_r_hand = Matrix4d::Identity(4,4);
+        this->mat_l_hand = Matrix4d::Identity(4,4);
 
 }
 
@@ -269,10 +269,10 @@ Humanoid::Humanoid(string name, pos ppos, orient oor, dim ssize, arm aspecs, bar
     this->rightForces = vector<double>(JOINTS_ARM+JOINTS_HAND);
     this->leftForces = vector<double>(JOINTS_ARM+JOINTS_HAND);
 
-    this->mat_right = Matrix4f::Identity(4,4);
-    this->mat_left = Matrix4f::Identity(4,4);
-    this->mat_r_hand = Matrix4f::Identity(4,4);
-    this->mat_l_hand = Matrix4f::Identity(4,4);
+    this->mat_right = Matrix4d::Identity(4,4);
+    this->mat_left = Matrix4d::Identity(4,4);
+    this->mat_r_hand = Matrix4d::Identity(4,4);
+    this->mat_l_hand = Matrix4d::Identity(4,4);
 
 
 }
@@ -502,7 +502,7 @@ void Humanoid::setLeftForces(vector<double> &l)
 
 }
 
-void Humanoid::setMatRight(Matrix4f &m)
+void Humanoid::setMatRight(Matrix4d &m)
 {
 
     for (unsigned i = 0; i < m.rows(); ++ i){
@@ -513,7 +513,7 @@ void Humanoid::setMatRight(Matrix4f &m)
 
 }
 
-void Humanoid::setMatLeft(Matrix4f &m)
+void Humanoid::setMatLeft(Matrix4d &m)
 {
 
 
@@ -525,7 +525,7 @@ void Humanoid::setMatLeft(Matrix4f &m)
 }
 
 
-void Humanoid::setMatRightHand(Matrix4f &m)
+void Humanoid::setMatRightHand(Matrix4d &m)
 {
 
     for (unsigned i = 0; i < m.rows(); ++ i){
@@ -536,7 +536,7 @@ void Humanoid::setMatRightHand(Matrix4f &m)
 }
 
 
-void Humanoid::setMatLeftHand(Matrix4f &m)
+void Humanoid::setMatLeftHand(Matrix4d &m)
 {
 
     for (unsigned i = 0; i < m.rows(); ++ i){
@@ -648,7 +648,7 @@ dim Humanoid::getSize()
 
 #if HAND ==1
 
-void Humanoid::getRK(vector<double> &rkk)
+void Humanoid::getRK(vector<int> &rkk)
 {
 
     rkk = this->rk;
@@ -660,7 +660,7 @@ void Humanoid::getRK(vector<double> &rkk)
 
 }
 
-void Humanoid::getJK(vector<double> &jkk){
+void Humanoid::getJK(vector<int> &jkk){
 
     jkk = jk;
     /*
@@ -905,7 +905,7 @@ void Humanoid::getLeftHandForces(vector<double> &p)
      std::copy(this->leftForces.begin()+JOINTS_ARM,this->leftForces.end(),p.begin());
 }
 
-void Humanoid::getMatRight(Matrix4f &m)
+void Humanoid::getMatRight(Matrix4d &m)
 {
 
 
@@ -916,7 +916,7 @@ void Humanoid::getMatRight(Matrix4f &m)
     }
 }
 
-void Humanoid::getMatLeft(Matrix4f &m)
+void Humanoid::getMatLeft(Matrix4d &m)
 {
 
     for (unsigned i = 0; i < m.rows(); ++ i){
@@ -926,7 +926,7 @@ void Humanoid::getMatLeft(Matrix4f &m)
     }
 }
 
-void Humanoid::getMatRightHand(Matrix4f &m)
+void Humanoid::getMatRightHand(Matrix4d &m)
 {
 
 
@@ -937,7 +937,7 @@ void Humanoid::getMatRightHand(Matrix4f &m)
     }
 }
 
-void Humanoid::getMatLeftHand(Matrix4f &m)
+void Humanoid::getMatLeftHand(Matrix4d &m)
 {
 
     for (unsigned i = 0; i < m.rows(); ++ i){
@@ -1002,7 +1002,7 @@ double Humanoid::getRightShoulderNorm()
 }
 
 
-void Humanoid::getRightShoulderOr(Matrix3f &orr)
+void Humanoid::getRightShoulderOr(Matrix3d &orr)
 {
 
     // direct kinematics of the right arm
@@ -1034,7 +1034,7 @@ double Humanoid::getRightElbowNorm()
 }
 
 
-void Humanoid::getRightElbowOr(Matrix3f &orr)
+void Humanoid::getRightElbowOr(Matrix3d &orr)
 {
 
     // direct kinematics of the right arm
@@ -1064,7 +1064,7 @@ double Humanoid::getRightWristNorm()
 }
 
 
-void Humanoid::getRightWristOr(Matrix3f &orr)
+void Humanoid::getRightWristOr(Matrix3d &orr)
 {
 
     // direct kinematics of the right arm
@@ -1093,7 +1093,7 @@ double Humanoid::getRightHandNorm()
 }
 
 
-void Humanoid::getRightHandOr(Matrix3f &orr)
+void Humanoid::getRightHandOr(Matrix3d &orr)
 {
 
     // direct kinematics of the right arm
@@ -1123,7 +1123,7 @@ double Humanoid::getLeftShoulderNorm()
 }
 
 
-void Humanoid::getLeftShoulderOr(Matrix3f &orr)
+void Humanoid::getLeftShoulderOr(Matrix3d &orr)
 {
 
     // direct kinematics of the left arm
@@ -1154,7 +1154,7 @@ double Humanoid::getLeftElbowNorm()
 }
 
 
-void Humanoid::getLeftElbowOr(Matrix3f &orr)
+void Humanoid::getLeftElbowOr(Matrix3d &orr)
 {
 
     // direct kinematics of the left arm
@@ -1184,7 +1184,7 @@ double Humanoid::getLeftWristNorm()
 }
 
 
-void Humanoid::getLeftWristOr(Matrix3f &orr)
+void Humanoid::getLeftWristOr(Matrix3d &orr)
 {
 
     // direct kinematics of the left arm
@@ -1214,7 +1214,7 @@ double Humanoid::getLeftHandNorm()
 }
 
 
-void Humanoid::getLeftHandOr(Matrix3f &orr)
+void Humanoid::getLeftHandOr(Matrix3d &orr)
 {
 
     // direct kinematics of the left arm
@@ -1702,21 +1702,21 @@ void Humanoid::directKinematicsSingleArm(int arm)
 {
 
     vector<double> posture;
-    Matrix4f T;
-    Matrix4f T_aux;
-    Matrix4f mat_world;
-    Matrix4f mat_hand;
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
     DHparams m_DH_arm;
     vector<DHparams> m_DH_hand;
 
     vector<double> shoulderPos = vector<double>(3);
-    Matrix3f shoulderOr;
+    Matrix3d shoulderOr;
     vector<double> elbowPos = vector<double>(3);
-    Matrix3f elbowOr;
+    Matrix3d elbowOr;
     vector<double> wristPos = vector<double>(3);
-    Matrix3f wristOr;
+    Matrix3d wristOr;
     vector<double> handPos = vector<double>(3);
-    Matrix3f handOr;
+    Matrix3d handOr;
 
     switch (arm) {
 
@@ -1752,7 +1752,7 @@ void Humanoid::directKinematicsSingleArm(int arm)
         this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), m_DH_arm.theta.at(i),T_aux);
 
         T = T * T_aux;
-        Vector3f v;
+        Vector3d v;
 
         if (i==0){
             // get the shoulder
@@ -1877,7 +1877,7 @@ void Humanoid::directKinematicsSingleArm(int arm)
     this->rightFingers.resize(HAND_FINGERS,12);
     this->leftFingers.resize(HAND_FINGERS,12);
 
-    Matrix4f T_H_0_pos;
+    Matrix4d T_H_0_pos;
     vector<double> fing_pos;
 
     for (int i=0; i< HAND_FINGERS; ++i){
@@ -1902,9 +1902,9 @@ void Humanoid::directKinematicsSingleArm(int arm)
 
 }
 
-void Humanoid::transfMatrix(double alpha, double a, double d, double theta, Matrix4f &T)
+void Humanoid::transfMatrix(double alpha, double a, double d, double theta, Matrix4d &T)
 {
-    T = Matrix4f::Zero();
+    T = Matrix4d::Zero();
 
     T(0,0) = cos(theta);            T(0,1) = -sin(theta);            T(0,2) = 0.0;         T(0,3) = a;
     T(1,0) = sin(theta)*cos(alpha); T(1,1) = -cos(theta)*cos(alpha); T(1,2) = -sin(alpha); T(1,3) = -sin(alpha)*d;
@@ -1916,14 +1916,14 @@ void Humanoid::transfMatrix(double alpha, double a, double d, double theta, Matr
 }
 
 
-void Humanoid::directKinematicsFinger(DHparams& p, Matrix4f& T_ext, Matrix4f& T_H_0_pos, int id_fing, MatrixXf& Fingers)
+void Humanoid::directKinematicsFinger(DHparams& p, Matrix4d& T_ext, Matrix4d& T_H_0_pos, int id_fing, MatrixXd& Fingers)
 {
 
 
 
-     Matrix4f T;
+     Matrix4d T;
      vector<double> pos = vector<double>(3);
-     Matrix4f T_aux;
+     Matrix4d T_aux;
 
      for(int i =0; i<T_aux.rows();++i){
          for(int j=0; j<T_aux.cols();++j){

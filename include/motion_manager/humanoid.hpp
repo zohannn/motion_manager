@@ -238,25 +238,25 @@ public:
      * @brief This method sets the attribute mat_right
      * @param m
      */
-    void setMatRight(Matrix4f& m);
+    void setMatRight(Matrix4d& m);
 
     /**
      * @brief This method sets the attribute mat_left
      * @param m
      */
-    void setMatLeft(Matrix4f& m);
+    void setMatLeft(Matrix4d& m);
 
     /**
      * @brief This method sets the attribute mat_r_hand
      * @param m
      */
-    void setMatRightHand(Matrix4f& m);
+    void setMatRightHand(Matrix4d& m);
 
     /**
      * @brief This method sets the attribute mat_l_hand
      * @param m
      */
-    void setMatLeftHand(Matrix4f& m);
+    void setMatLeftHand(Matrix4d& m);
 
     // humanoid parts
 //#if HEAD==1
@@ -334,13 +334,13 @@ public:
      * @brief This method gets the r parameters of the hand of the humanoid
      * @param rk
      */
-    void getRK(vector<double>& rk);
+    void getRK(vector<int>& rk);
 
     /**
      * @brief This method gets the j parameters of the hand of the humanoid
      * @param jk
      */
-    void getJK(vector<double>& jk);
+    void getJK(vector<int>& jk);
 #endif
 
     /**
@@ -491,25 +491,25 @@ public:
      * @brief This method gets the attribute mat_right
      * @param m
      */
-    void getMatRight(Matrix4f& m);
+    void getMatRight(Matrix4d& m);
 
     /**
      * @brief This method gets the attribute mat_left
      * @param m
      */
-    void getMatLeft(Matrix4f& m);
+    void getMatLeft(Matrix4d& m);
 
     /**
      * @brief This method gets the attribute mat_r_hand
      * @param m
      */
-    void getMatRightHand(Matrix4f& m);
+    void getMatRightHand(Matrix4d& m);
 
     /**
      * @brief This method gets the attribute mat_l_hand
      * @param m
      */
-    void getMatLeftHand(Matrix4f& m);
+    void getMatLeftHand(Matrix4d& m);
 
 
     /**
@@ -528,7 +528,7 @@ public:
      * @brief This method gets the orientation of the right shoulder
      * @param orr
      */
-    void getRightShoulderOr(Matrix3f& orr);
+    void getRightShoulderOr(Matrix3d& orr);
 
     /**
      * @brief This method gets the position of the right elbow
@@ -546,7 +546,7 @@ public:
      * @brief This method gets the orientation of the right elbow
      * @param orr
      */
-    void getRightElbowOr(Matrix3f& orr);
+    void getRightElbowOr(Matrix3d& orr);
 
     /**
      * @brief This method gets the position of the right wrist
@@ -564,7 +564,7 @@ public:
      * @brief This method gets the orientation of the right wrist
      * @param orr
      */
-    void getRightWristOr(Matrix3f& orr);
+    void getRightWristOr(Matrix3d& orr);
 
     /**
      * @brief This method gets the position of the right hand
@@ -582,7 +582,7 @@ public:
      * @brief This method gets the orientation of the right hand
      * @param orr
      */
-    void getRightHandOr(Matrix3f& orr);
+    void getRightHandOr(Matrix3d& orr);
 
     /**
      * @brief This method gets the position of the left shoulder
@@ -600,7 +600,7 @@ public:
      * @brief This method gets the orientation of the left shoulder
      * @param orr
      */
-    void getLeftShoulderOr(Matrix3f& orr);
+    void getLeftShoulderOr(Matrix3d& orr);
 
     /**
      * @brief This method gets the position of the left elbow
@@ -618,7 +618,7 @@ public:
      * @brief This method gets the orientation of the left elbow
      * @param orr
      */
-    void getLeftElbowOr(Matrix3f& orr);
+    void getLeftElbowOr(Matrix3d& orr);
 
     /**
      * @brief This method gets the position of the left wrist
@@ -635,7 +635,7 @@ public:
      * @brief This method gets the orientation of the left wrist
      * @param orr
      */
-    void getLeftWristOr(Matrix3f& orr);
+    void getLeftWristOr(Matrix3d& orr);
 
     /**
      * @brief This method gets the position of the left hand
@@ -653,7 +653,7 @@ public:
      * @brief This method gets the orientation of the left hand
      * @param orr
      */
-    void getLeftHandOr(Matrix3f& orr);
+    void getLeftHandOr(Matrix3d& orr);
 
     /**
      * @brief This method gets information about the humanoid
@@ -740,8 +740,8 @@ private:
     human_hand m_human_hand_specs; /**< specifications of the hand */
 #elif HAND==1
     barrett_hand m_barrett_hand_specs; /**< specifications of the hand */
-    vector<double> rk; /**< r parameters of the barrett hand */
-    vector<double> jk; /**< j parameters of the barrett hand */
+    vector<int> rk; /**< r parameters of the barrett hand */
+    vector<int> jk; /**< j parameters of the barrett hand */
 #endif
 
     DHparams m_DH_rightArm; /**< current D-H parameters of the right arm */
@@ -751,10 +751,10 @@ private:
     vector<DHparams> m_DH_leftHand; /**< current D-H parameters of the fingers on the left hand */
     vector< vector<double> > left_fing_pos; /**< current positions of the phalanges of the fingers on the left hand */
 
-    Matrix4f mat_right; /**< transformation matrix from the fixed world frame and the reference frame of the right arm (positions are in [mm]) */
-    Matrix4f mat_left; /**< transformation matrix from the fixed world frame and the reference frame of the left arm (positions are in [mm]) */
-    Matrix4f mat_r_hand; /**< trabsformation matrix from the last joint of the right arm and the palm of the right hand (positions are in [mm]) */
-    Matrix4f mat_l_hand; /**< trabsformation matrix from the last joint of the left arm and the palm of the left hand (positions are in [mm]) */
+    Matrix4d mat_right; /**< transformation matrix from the fixed world frame and the reference frame of the right arm (positions are in [mm]) */
+    Matrix4d mat_left; /**< transformation matrix from the fixed world frame and the reference frame of the left arm (positions are in [mm]) */
+    Matrix4d mat_r_hand; /**< trabsformation matrix from the last joint of the right arm and the palm of the right hand (positions are in [mm]) */
+    Matrix4d mat_l_hand; /**< trabsformation matrix from the last joint of the left arm and the palm of the left hand (positions are in [mm]) */
 
     // joints [rad]: 7 joints + 4 joints for each arm (total: 22 joints)
     vector<double> rightPosture; /**< right arm+hand current posture */
@@ -781,13 +781,13 @@ private:
     vector<double> rightHandPos; /**< position of the right hand */
 
     // orientations on the right arm
-    Matrix3f rightShoulderOr; /**< orientation of the right shoulder */
-    Matrix3f rightElbowOr; /**< orientation of the right elbow */
-    Matrix3f rightWristOr; /**< orientation of the right wrist */
-    Matrix3f rightHandOr; /**< orientation of the right hand */
+    Matrix3d rightShoulderOr; /**< orientation of the right shoulder */
+    Matrix3d rightElbowOr; /**< orientation of the right elbow */
+    Matrix3d rightWristOr; /**< orientation of the right wrist */
+    Matrix3d rightHandOr; /**< orientation of the right hand */
 
     // positions on the right hand
-    MatrixXf rightFingers; /**< positions of the phalanges of the fingers on the right hand */
+    MatrixXd rightFingers; /**< positions of the phalanges of the fingers on the right hand */
 
     // positions on the left arm
     vector<double> leftShoulderPos; /**< position of the left shoulder */
@@ -796,13 +796,13 @@ private:
     vector<double> leftHandPos; /**< position of the left hand */
 
     // orientations on the left arm
-    Matrix3f leftShoulderOr; /**< orientation of the left shoulder */
-    Matrix3f leftElbowOr; /**< orientation of the left elbow */
-    Matrix3f leftWristOr; /**< orientation of the left wrist */
-    Matrix3f leftHandOr; /**< orientation of the left hand */
+    Matrix3d leftShoulderOr; /**< orientation of the left shoulder */
+    Matrix3d leftElbowOr; /**< orientation of the left elbow */
+    Matrix3d leftWristOr; /**< orientation of the left wrist */
+    Matrix3d leftHandOr; /**< orientation of the left hand */
 
     //positions on the left hand
-    MatrixXf leftFingers; /**< positions of the phalanges of the fingers on the left hand */
+    MatrixXd leftFingers; /**< positions of the phalanges of the fingers on the left hand */
 
 
     /**
@@ -844,7 +844,7 @@ private:
      * @param id_fing
      * @param Fingers
      */
-    void directKinematicsFinger(DHparams& p,Matrix4f& T_ext,Matrix4f& T_H_0_pos,int id_fing, MatrixXf& Fingers);
+    void directKinematicsFinger(DHparams& p,Matrix4d& T_ext,Matrix4d& T_H_0_pos,int id_fing, MatrixXd& Fingers);
 
     /**
      * @brief This method computes the transformation matrix from the D-H parameters
@@ -859,7 +859,7 @@ private:
      * @param theta
      * @param T
      */
-    void transfMatrix(double alpha, double a, double d, double theta, Matrix4f& T);
+    void transfMatrix(double alpha, double a, double d, double theta, Matrix4d& T);
 
 };
 

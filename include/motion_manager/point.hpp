@@ -3,10 +3,10 @@
 
 #include "common.hpp"
 
-namespace motion_manager{
-
 using namespace std;
 using namespace Eigen;
+
+namespace motion_manager{
 
 
 //! The Point class
@@ -108,13 +108,13 @@ public:
      * @brief This method gets the orientation matrix of the point.
      * @param Rot
      */
-    void RPY_matrix(Matrix3f& Rot);
+    void RPY_matrix(Matrix3d& Rot);
 
     /**
      * @brief Get the transformation matrix from the position and the orientation in Roll-Pitch-Yaw
      * @param Trans
      */
-    void Trans_matrix(Matrix4f& Trans);
+    void Trans_matrix(Matrix4d& Trans);
 
 protected:
 

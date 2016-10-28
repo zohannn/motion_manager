@@ -108,21 +108,21 @@ void Object::setPos(pos& ppos, bool update_features)
         double x;
         double y;
         double z;
-        Matrix4f trans_tar_right;
-        Matrix4f trans_tar_left;
-        Matrix4f trans_engage;
+        Matrix4d trans_tar_right;
+        Matrix4d trans_tar_left;
+        Matrix4d trans_engage;
 
-        Matrix4f trans_obj;
-        Matrix4f inv_trans_obj;
+        Matrix4d trans_obj;
+        Matrix4d inv_trans_obj;
 
-        Matrix4f trans_obj_tar_right;
-        Matrix4f trans_obj_tar_left;
-        Matrix4f trans_obj_engage;
+        Matrix4d trans_obj_tar_right;
+        Matrix4d trans_obj_tar_left;
+        Matrix4d trans_obj_engage;
 
         x = this->m_pos.Xpos;
         y = this->m_pos.Ypos;
         z = this->m_pos.Zpos;
-        Matrix3f Rot;
+        Matrix3d Rot;
         this->RPY_matrix(Rot);
 
         trans_obj(0,0) = Rot(0,0); trans_obj(0,1) = Rot(0,1); trans_obj(0,2) = Rot(0,2); trans_obj(0,3) = x;
@@ -180,16 +180,16 @@ void Object::setOr(orient& oor, bool update_features)
 
     if (update_features){
 
-        Matrix4f trans_tar_right;
-        Matrix4f trans_tar_left;
-        Matrix4f trans_engage;
+        Matrix4d trans_tar_right;
+        Matrix4d trans_tar_left;
+        Matrix4d trans_engage;
 
-        Matrix4f trans_obj;
-        Matrix4f inv_trans_obj;
+        Matrix4d trans_obj;
+        Matrix4d inv_trans_obj;
 
-        Matrix4f trans_obj_tar_right;
-        Matrix4f trans_obj_tar_left;
-        Matrix4f trans_obj_engage;
+        Matrix4d trans_obj_tar_right;
+        Matrix4d trans_obj_tar_left;
+        Matrix4d trans_obj_engage;
 
         this->Trans_matrix(trans_obj);
         this->getTar_right_matrix(trans_tar_right);
@@ -380,13 +380,13 @@ string Object::getInfoLine()
 }
 
 
-void Object::getTar_right_matrix(Matrix4f& mat)
+void Object::getTar_right_matrix(Matrix4d& mat)
 {
     this->p_targetRight->Trans_matrix(mat);
 }
 
 
-void Object::getTar_left_matrix(Matrix4f &mat)
+void Object::getTar_left_matrix(Matrix4d &mat)
 {
 
     this->p_targetLeft->Trans_matrix(mat);
@@ -394,7 +394,7 @@ void Object::getTar_left_matrix(Matrix4f &mat)
 }
 
 
-void Object::getEngage_matrix(Matrix4f &mat)
+void Object::getEngage_matrix(Matrix4d &mat)
 {
 
     this->p_engage->Trans_matrix(mat);
@@ -402,7 +402,7 @@ void Object::getEngage_matrix(Matrix4f &mat)
 
 
 
-void Object::getRPY(Matrix4f Trans, vector<double>& rpy)
+void Object::getRPY(Matrix4d Trans, vector<double>& rpy)
 {
 
     rpy = std::vector<double>(3);

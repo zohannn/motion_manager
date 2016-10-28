@@ -252,44 +252,44 @@ bool QNode::getElements(scenarioPtr scene)
     std::string Hname;
 
     int floatCount;
-    std::vector<float> DH_params_vec;
+    std::vector<double> DH_params_vec;
     string DH_params_str;
 
     // matrices from world to right and left references
     std::string mat_arms_str;
     std::string mat_right_arm_str;
     std::string mat_left_arm_str;
-    std::vector<float> mat_arms_vec;
-    std::vector<float> mat_right_arm_vec;
-    std::vector<float> mat_left_arm_vec;
-    Matrix4f mat_right;
-    Matrix4f mat_left;
+    std::vector<double> mat_arms_vec;
+    std::vector<double> mat_right_arm_vec;
+    std::vector<double> mat_left_arm_vec;
+    Matrix4d mat_right;
+    Matrix4d mat_left;
     // matrices from the last joint of the arm to the palm of the hand
     std::string r_mat_hand_str;
     std::string l_mat_hand_str;
-    std::vector<float> r_mat_hand_vec;
-    std::vector<float> l_mat_hand_vec;
-    Matrix4f mat_r_hand;
-    Matrix4f mat_l_hand;
+    std::vector<double> r_mat_hand_vec;
+    std::vector<double> l_mat_hand_vec;
+    Matrix4d mat_r_hand;
+    Matrix4d mat_l_hand;
 
     int rows;
 
     const string NOBJECTS = string("n_objects");
 
     // parameters of the barrett hand
-    float maxAp; //[m]
-    float Aw; // [m]
-    float A1; // [m]
-    float A2; // [m]
-    float A3; // [m]
-    float D3; // [m]
-    float phi2; // [rad]
-    float phi3; // [rad]
+    double maxAp; //[m]
+    double Aw; // [m]
+    double A1; // [m]
+    double A2; // [m]
+    double A3; // [m]
+    double D3; // [m]
+    double phi2; // [rad]
+    double phi3; // [rad]
 
     // parameters of the human hand
-    float max_human_Ap; //[m]
+    double max_human_Ap; //[m]
     human_hand jarde_hand;
-    jarde_hand.fingers = std::vector<HUMotion::human_finger>(4);
+    jarde_hand.fingers = std::vector<human_finger>(4);
     human_finger fing1 = jarde_hand.fingers.at(0);
     human_finger fing2 = jarde_hand.fingers.at(1);
     human_finger fing3 = jarde_hand.fingers.at(2);
@@ -299,32 +299,32 @@ bool QNode::getElements(scenarioPtr scene)
     // torso
     humanoid_part torso;  // parameters of the torso (ARoS and Jarde)
     std::string torso_str;
-    std::vector<float> torso_vec;
+    std::vector<double> torso_vec;
     /*
     // pelvis
     humanoid_part pelvis; // parameters of the pelvis (Jarde)
     std::string pelvis_str;
-    std::vector<float> pelvis_vec;
+    std::vector<double> pelvis_vec;
     //right_upper_leg
     humanoid_part right_upper_leg; // parameters of the right upper leg (Jarde)
     std::string r_upper_leg_str;
-    std::vector<float> r_upper_leg_vec;
+    std::vector<double> r_upper_leg_vec;
     humanoid_part left_upper_leg; // parameters of the left upper leg (Jarde)
     std::string l_upper_leg_str;
-    std::vector<float> l_upper_leg_vec;
+    std::vector<double> l_upper_leg_vec;
     */
     // postures of the humanoid
-    std::vector<float> rposture = std::vector<float>(JOINTS_ARM+JOINTS_HAND); // right
-    std::vector<float> lposture = std::vector<float>(JOINTS_ARM+JOINTS_HAND); // left
+    std::vector<double> rposture = std::vector<double>(JOINTS_ARM+JOINTS_HAND); // right
+    std::vector<double> lposture = std::vector<double>(JOINTS_ARM+JOINTS_HAND); // left
 
     // joint limits of the humanoid
-    std::vector<float> min_rlimits = std::vector<float>(JOINTS_ARM+JOINTS_HAND); // minimum right limits
-    std::vector<float> max_rlimits = std::vector<float>(JOINTS_ARM+JOINTS_HAND); // maximum right limits
-    std::vector<float> min_llimits = std::vector<float>(JOINTS_ARM+JOINTS_HAND); // minimum left limits
-    std::vector<float> max_llimits = std::vector<float>(JOINTS_ARM+JOINTS_HAND); // maximum left limits
+    std::vector<double> min_rlimits = std::vector<double>(JOINTS_ARM+JOINTS_HAND); // minimum right limits
+    std::vector<double> max_rlimits = std::vector<double>(JOINTS_ARM+JOINTS_HAND); // maximum right limits
+    std::vector<double> min_llimits = std::vector<double>(JOINTS_ARM+JOINTS_HAND); // minimum left limits
+    std::vector<double> max_llimits = std::vector<double>(JOINTS_ARM+JOINTS_HAND); // maximum left limits
 
 
-    int scenarioID  = h_scene->getID();
+    int scenarioID  = scene->getID();
     switch (scenarioID){
 
     case 0:
@@ -377,16 +377,16 @@ bool QNode::getElements(scenarioPtr scene)
                 floatCount = obj_info_str.size()/sizeof(float);
                 if(!obj_info_vec.empty()){obj_info_vec.clear();}
                 for (int k=0;k<floatCount;++k)
-                    obj_info_vec.push_back(((float*)obj_info_str.c_str())[k]);
+                    obj_info_vec.push_back(static_cast<double>(((float*)obj_info_str.c_str())[k]));
 
                 // position of the object
                 obj_pos.Xpos = obj_info_vec.at(0)*1000; //[mm]
                 obj_pos.Ypos = obj_info_vec.at(1)*1000; //[mm]
                 obj_pos.Zpos = obj_info_vec.at(2)*1000; //[mm]
                 // orientation of the object
-                obj_or.roll = obj_info_vec.at(3)*M_PI/180; //[rad]
-                obj_or.pitch = obj_info_vec.at(4)*M_PI/180; //[rad]
-                obj_or.yaw = obj_info_vec.at(5)*M_PI/180;//[rad]
+                obj_or.roll = obj_info_vec.at(3)*static_cast<double>(M_PI)/180; //[rad]
+                obj_or.pitch = obj_info_vec.at(4)*static_cast<double>(M_PI)/180; //[rad]
+                obj_or.yaw = obj_info_vec.at(5)*static_cast<double>(M_PI)/180;//[rad]
                 // size of the object
                 obj_size.Xsize = obj_info_vec.at(6)*1000; //[mm]
                 obj_size.Ysize = obj_info_vec.at(7)*1000; //[mm]
@@ -396,25 +396,25 @@ bool QNode::getElements(scenarioPtr scene)
                 tarRight_pos.Ypos = obj_info_vec.at(10)*1000;//[mm]
                 tarRight_pos.Zpos = obj_info_vec.at(11)*1000;//[mm]
                 // orientation of the target right
-                tarRight_or.roll = obj_info_vec.at(12)*M_PI/180;//[rad]
-                tarRight_or.pitch = obj_info_vec.at(13)*M_PI/180;//[rad]
-                tarRight_or.yaw = obj_info_vec.at(14)*M_PI/180;//[rad]
+                tarRight_or.roll = obj_info_vec.at(12)*static_cast<double>(M_PI)/180;//[rad]
+                tarRight_or.pitch = obj_info_vec.at(13)*static_cast<double>(M_PI)/180;//[rad]
+                tarRight_or.yaw = obj_info_vec.at(14)*static_cast<double>(M_PI)/180;//[rad]
                 // position of the target left
                 tarLeft_pos.Xpos = obj_info_vec.at(15)*1000;//[mm]
                 tarLeft_pos.Ypos = obj_info_vec.at(16)*1000;//[mm]
                 tarLeft_pos.Zpos = obj_info_vec.at(17)*1000;//[mm]
                 // orientation of the target left
-                tarLeft_or.roll = obj_info_vec.at(18)*M_PI/180;//[rad]
-                tarLeft_or.pitch = obj_info_vec.at(19)*M_PI/180;//[rad]
-                tarLeft_or.yaw = obj_info_vec.at(20)*M_PI/180;//[rad]
+                tarLeft_or.roll = obj_info_vec.at(18)*static_cast<double>(M_PI)/180;//[rad]
+                tarLeft_or.pitch = obj_info_vec.at(19)*static_cast<double>(M_PI)/180;//[rad]
+                tarLeft_or.yaw = obj_info_vec.at(20)*static_cast<double>(M_PI)/180;//[rad]
                 // position of the engage point
                 engage_pos.Xpos = obj_info_vec.at(21)*1000;//[mm]
                 engage_pos.Ypos = obj_info_vec.at(22)*1000;//[mm]
                 engage_pos.Zpos = obj_info_vec.at(23)*1000;//[mm]
                 // orientation of the engage point
-                engage_or.roll = obj_info_vec.at(24)*M_PI/180;//[rad]
-                engage_or.pitch = obj_info_vec.at(25)*M_PI/180;//[rad]
-                engage_or.yaw = obj_info_vec.at(26)*M_PI/180;//[rad]
+                engage_or.roll = obj_info_vec.at(24)*static_cast<double>(M_PI)/180;//[rad]
+                engage_or.pitch = obj_info_vec.at(25)*static_cast<double>(M_PI)/180;//[rad]
+                engage_or.yaw = obj_info_vec.at(26)*static_cast<double>(M_PI)/180;//[rad]
 
 
                 Object* ob = new Object(signPrefix,obj_pos,obj_or,obj_size,
@@ -472,7 +472,7 @@ bool QNode::getElements(scenarioPtr scene)
         if(!mat_right_arm_vec.empty()){mat_right_arm_vec.clear();}
         floatCount = mat_right_arm_str.size()/sizeof(float);
         for (int k=0;k<floatCount;++k)
-            mat_right_arm_vec.push_back(((float*)mat_right_arm_str.c_str())[k]);
+            mat_right_arm_vec.push_back(static_cast<double>(((float*)mat_right_arm_str.c_str())[k]));
         // left arm
         srvs.request.signalName = string("mat_left_arm");
         add_client.call(srvs);
@@ -482,7 +482,7 @@ bool QNode::getElements(scenarioPtr scene)
         if(!mat_left_arm_vec.empty()){mat_left_arm_vec.clear();}
         floatCount = mat_left_arm_str.size()/sizeof(float);
         for (int k=0;k<floatCount;++k)
-            mat_left_arm_vec.push_back(((float*)mat_left_arm_str.c_str())[k]);
+            mat_left_arm_vec.push_back(static_cast<double>(((float*)mat_left_arm_str.c_str())[k]));
 
         rows=0;
         for(int i=0;i<3;++i){
@@ -516,14 +516,14 @@ bool QNode::getElements(scenarioPtr scene)
         floatCount = DH_params_str.size()/sizeof(float);
         if (!DH_params_vec.empty()){DH_params_vec.clear();}
         for (int k=0;k<floatCount;++k)
-            DH_params_vec.push_back(((float*)DH_params_str.c_str())[k]);
+            DH_params_vec.push_back(static_cast<double>(((float*)DH_params_str.c_str())[k]));
 
-        humanoid_arm_specs.arm_specs.alpha = std::vector<float>(7);
-        humanoid_arm_specs.arm_specs.a = std::vector<float>(7);
-        humanoid_arm_specs.arm_specs.d = std::vector<float>(7);
-        humanoid_arm_specs.arm_specs.theta = std::vector<float>(7);
+        humanoid_arm_specs.arm_specs.alpha = std::vector<double>(7);
+        humanoid_arm_specs.arm_specs.a = std::vector<double>(7);
+        humanoid_arm_specs.arm_specs.d = std::vector<double>(7);
+        humanoid_arm_specs.arm_specs.theta = std::vector<double>(7);
         for(int i=0;i<7;++i){
-            humanoid_arm_specs.arm_specs.alpha.at(i) = DH_params_vec.at(i)*M_PI/180; // [rad]
+            humanoid_arm_specs.arm_specs.alpha.at(i) = DH_params_vec.at(i)*static_cast<double>(M_PI)/180; // [rad]
             humanoid_arm_specs.arm_specs.a.at(i) = DH_params_vec.at(i+7)*1000; // [mm]
             humanoid_arm_specs.arm_specs.d.at(i) = DH_params_vec.at(i+14)*1000; // [mm]
         }
@@ -593,14 +593,14 @@ bool QNode::getElements(scenarioPtr scene)
         floatCount = torso_str.size()/sizeof(float);
         if (!torso_vec.empty()){torso_vec.clear();}
         for (int k=0;k<floatCount;++k)
-            torso_vec.push_back(((float*)torso_str.c_str())[k]);
+            torso_vec.push_back(static_cast<double>(((float*)torso_str.c_str())[k]));
 
         torso.Xpos = torso_vec.at(0)*1000;//[mm]
         torso.Ypos = torso_vec.at(1)*1000;//[mm]
         torso.Zpos = torso_vec.at(2)*1000;//[mm]
-        torso.Roll = torso_vec.at(3)*M_PI/180; //[rad]
-        torso.Pitch = torso_vec.at(4)*M_PI/180; //[rad]
-        torso.Yaw = torso_vec.at(5)*M_PI/180; //[rad]
+        torso.Roll = torso_vec.at(3)*static_cast<double>(M_PI)/180; //[rad]
+        torso.Pitch = torso_vec.at(4)*static_cast<double>(M_PI)/180; //[rad]
+        torso.Yaw = torso_vec.at(5)*static_cast<double>(M_PI)/180; //[rad]
         torso.Xsize = torso_vec.at(6)*1000;//[mm]
         torso.Ysize = torso_vec.at(7)*1000;//[mm]
         torso.Zsize = torso_vec.at(8)*1000;//[mm]
@@ -721,8 +721,8 @@ bool QNode::getElements(scenarioPtr scene)
             Q_EMIT newElement(infoLine);
 
             // get the postures
-            std::vector<float> rightp;
-            std::vector<float> leftp;
+            std::vector<double> rightp;
+            std::vector<double> leftp;
 
             hptr->getRightPosture(rightp);
             hptr->getLeftPosture(leftp);
@@ -730,13 +730,13 @@ bool QNode::getElements(scenarioPtr scene)
             std::vector<string> rj = std::vector<string>(rightp.size());
             for (size_t i=0; i<rightp.size(); i++ ){
                 rj.at(i) = string("right_joint "+ QString::number(i+1).toStdString()+ ": "+
-                                       QString::number(rightp.at(i)*180/M_PI).toStdString());
+                                       QString::number(rightp.at(i)*180/static_cast<double>(M_PI)).toStdString());
                 Q_EMIT newJoint(rj.at(i));
             }
             std::vector<string> lj = std::vector<string>(leftp.size());
             for (size_t i=0; i<leftp.size(); i++ ){
                 lj.at(i) = string("left_joint "+ QString::number(i+1).toStdString()+ ": "+
-                                       QString::number(leftp.at(i)*180/M_PI).toStdString());
+                                       QString::number(leftp.at(i)*180/static_cast<double>(M_PI)).toStdString());
                 Q_EMIT newJoint(lj.at(i));
             }
 
@@ -796,16 +796,16 @@ bool QNode::getElements(scenarioPtr scene)
                 floatCount = obj_info_str.size()/sizeof(float);
                 if(!obj_info_vec.empty()){obj_info_vec.clear();}
                 for (int k=0;k<floatCount;++k)
-                    obj_info_vec.push_back(((float*)obj_info_str.c_str())[k]);
+                    obj_info_vec.push_back(static_cast<double>(((float*)obj_info_str.c_str())[k]));
 
                 // position of the object
                 obj_pos.Xpos = obj_info_vec.at(0)*1000; //[mm]
                 obj_pos.Ypos = obj_info_vec.at(1)*1000; //[mm]
                 obj_pos.Zpos = obj_info_vec.at(2)*1000; //[mm]
                 // orientation of the object
-                obj_or.roll = obj_info_vec.at(3)*M_PI/180; //[rad]
-                obj_or.pitch = obj_info_vec.at(4)*M_PI/180; //[rad]
-                obj_or.yaw = obj_info_vec.at(5)*M_PI/180;//[rad]
+                obj_or.roll = obj_info_vec.at(3)*static_cast<double>(M_PI)/180; //[rad]
+                obj_or.pitch = obj_info_vec.at(4)*static_cast<double>(M_PI)/180; //[rad]
+                obj_or.yaw = obj_info_vec.at(5)*static_cast<double>(M_PI)/180;//[rad]
                 // size of the object
                 obj_size.Xsize = obj_info_vec.at(6)*1000; //[mm]
                 obj_size.Ysize = obj_info_vec.at(7)*1000; //[mm]
@@ -815,25 +815,25 @@ bool QNode::getElements(scenarioPtr scene)
                 tarRight_pos.Ypos = obj_info_vec.at(10)*1000;//[mm]
                 tarRight_pos.Zpos = obj_info_vec.at(11)*1000;//[mm]
                 // orientation of the target right
-                tarRight_or.roll = obj_info_vec.at(12)*M_PI/180;//[mm]
-                tarRight_or.pitch = obj_info_vec.at(13)*M_PI/180;//[mm]
-                tarRight_or.yaw = obj_info_vec.at(14)*M_PI/180;//[mm]
+                tarRight_or.roll = obj_info_vec.at(12)*static_cast<double>(M_PI)/180;//[mm]
+                tarRight_or.pitch = obj_info_vec.at(13)*static_cast<double>(M_PI)/180;//[mm]
+                tarRight_or.yaw = obj_info_vec.at(14)*static_cast<double>(M_PI)/180;//[mm]
                 // position of the target left
                 tarLeft_pos.Xpos = obj_info_vec.at(15)*1000;//[mm]
                 tarLeft_pos.Ypos = obj_info_vec.at(16)*1000;//[mm]
                 tarLeft_pos.Zpos = obj_info_vec.at(17)*1000;//[mm]
                 // orientation of the target left
-                tarLeft_or.roll = obj_info_vec.at(18)*M_PI/180;//[rad]
-                tarLeft_or.pitch = obj_info_vec.at(19)*M_PI/180;//[rad]
-                tarLeft_or.yaw = obj_info_vec.at(20)*M_PI/180;//[rad]
+                tarLeft_or.roll = obj_info_vec.at(18)*static_cast<double>(M_PI)/180;//[rad]
+                tarLeft_or.pitch = obj_info_vec.at(19)*static_cast<double>(M_PI)/180;//[rad]
+                tarLeft_or.yaw = obj_info_vec.at(20)*static_cast<double>(M_PI)/180;//[rad]
                 // position of the engage point
                 engage_pos.Xpos = obj_info_vec.at(21)*1000;//[mm]
                 engage_pos.Ypos = obj_info_vec.at(22)*1000;//[mm]
                 engage_pos.Zpos = obj_info_vec.at(23)*1000;//[mm]
                 // orientation of the engage point
-                engage_or.roll = obj_info_vec.at(24)*M_PI/180;//[rad]
-                engage_or.pitch = obj_info_vec.at(25)*M_PI/180;//[rad]
-                engage_or.yaw = obj_info_vec.at(26)*M_PI/180;//[rad]
+                engage_or.roll = obj_info_vec.at(24)*static_cast<double>(M_PI)/180;//[rad]
+                engage_or.pitch = obj_info_vec.at(25)*static_cast<double>(M_PI)/180;//[rad]
+                engage_or.yaw = obj_info_vec.at(26)*static_cast<double>(M_PI)/180;//[rad]
 
 
                 Object* ob = new Object(signPrefix,obj_pos,obj_or,obj_size,
@@ -893,7 +893,7 @@ bool QNode::getElements(scenarioPtr scene)
         if(!mat_arms_vec.empty()){mat_arms_vec.clear();}
         floatCount = mat_arms_str.size()/sizeof(float);
         for (int k=0;k<floatCount;++k)
-            mat_arms_vec.push_back(((float*)mat_arms_str.c_str())[k]);
+            mat_arms_vec.push_back(static_cast<double>(((float*)mat_arms_str.c_str())[k]));
 
         // from the last joint of the arm to the palm of the hand
         // right hand
@@ -906,7 +906,7 @@ bool QNode::getElements(scenarioPtr scene)
         if(!r_mat_hand_vec.empty()){r_mat_hand_vec.clear();}
         floatCount = r_mat_hand_str.size()/sizeof(float);
         for (int k=0;k<floatCount;++k)
-            r_mat_hand_vec.push_back(((float*)r_mat_hand_str.c_str())[k]);
+            r_mat_hand_vec.push_back(static_cast<double>(((float*)r_mat_hand_str.c_str())[k]));
         // left hand
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
         srvs.request.signalName = string("l_mat_hand");
@@ -917,7 +917,7 @@ bool QNode::getElements(scenarioPtr scene)
         if(!l_mat_hand_vec.empty()){l_mat_hand_vec.clear();}
         floatCount = l_mat_hand_str.size()/sizeof(float);
         for (int k=0;k<floatCount;++k)
-            l_mat_hand_vec.push_back(((float*)l_mat_hand_str.c_str())[k]);
+            l_mat_hand_vec.push_back(static_cast<double>(((float*)l_mat_hand_str.c_str())[k]));
 
         rows=0;
         for(int i=0;i<4;++i){
@@ -959,14 +959,14 @@ bool QNode::getElements(scenarioPtr scene)
         floatCount = DH_params_str.size()/sizeof(float);
         if (!DH_params_vec.empty()){DH_params_vec.clear();}
         for (int k=0;k<floatCount;++k)
-            DH_params_vec.push_back(((float*)DH_params_str.c_str())[k]);
+            DH_params_vec.push_back(static_cast<double>(((float*)DH_params_str.c_str())[k]));
 
-        humanoid_arm_specs.arm_specs.alpha = std::vector<float>(7);
-        humanoid_arm_specs.arm_specs.a = std::vector<float>(7);
-        humanoid_arm_specs.arm_specs.d = std::vector<float>(7);
-        humanoid_arm_specs.arm_specs.theta = std::vector<float>(7);
+        humanoid_arm_specs.arm_specs.alpha = std::vector<double>(7);
+        humanoid_arm_specs.arm_specs.a = std::vector<double>(7);
+        humanoid_arm_specs.arm_specs.d = std::vector<double>(7);
+        humanoid_arm_specs.arm_specs.theta = std::vector<double>(7);
         for(int i=0;i<7;++i){
-            humanoid_arm_specs.arm_specs.alpha.at(i) = DH_params_vec.at(i)*M_PI/180; // [rad]
+            humanoid_arm_specs.arm_specs.alpha.at(i) = DH_params_vec.at(i)*static_cast<double>(M_PI)/180; // [rad]
             humanoid_arm_specs.arm_specs.a.at(i) = DH_params_vec.at(i+7)*1000; // [mm]
             humanoid_arm_specs.arm_specs.d.at(i) = DH_params_vec.at(i+14)*1000; // [mm]
         }
@@ -991,21 +991,21 @@ bool QNode::getElements(scenarioPtr scene)
         floatCount = DH_params_str.size()/sizeof(float);
         if (!DH_params_vec.empty()){DH_params_vec.clear();}
         for (int k=0;k<floatCount;++k)
-            DH_params_vec.push_back(((float*)DH_params_str.c_str())[k]);
+            DH_params_vec.push_back(static_cast<double>(((float*)DH_params_str.c_str())[k]));
 
         fing1 = jarde_hand.fingers.at(0);
         fing1.ux = DH_params_vec.at(0)*1000; // [mm]
         fing1.uy = DH_params_vec.at(1)*1000; // [mm]
         fing1.uz = DH_params_vec.at(2)*1000; // [mm]
-        fing1.finger_specs.alpha = std::vector<float>(4);
-        fing1.finger_specs.a = std::vector<float>(4);
-        fing1.finger_specs.d = std::vector<float>(4);
-        fing1.finger_specs.theta = std::vector<float>(4);
+        fing1.finger_specs.alpha = std::vector<double>(4);
+        fing1.finger_specs.a = std::vector<double>(4);
+        fing1.finger_specs.d = std::vector<double>(4);
+        fing1.finger_specs.theta = std::vector<double>(4);
         for(int i=0;i<4;++i){
-            fing1.finger_specs.alpha.at(i) = DH_params_vec.at(i+3)*M_PI/180; // [rad]
+            fing1.finger_specs.alpha.at(i) = DH_params_vec.at(i+3)*static_cast<double>(M_PI)/180; // [rad]
             fing1.finger_specs.a.at(i) = DH_params_vec.at(i+7)*1000; // [mm]
             fing1.finger_specs.d.at(i) = DH_params_vec.at(i+11)*1000; // [mm]
-            fing1.finger_specs.theta.at(i) = DH_params_vec.at(i+15)*M_PI/180; // [rad]
+            fing1.finger_specs.theta.at(i) = DH_params_vec.at(i+15)*static_cast<double>(M_PI)/180; // [rad]
         }
         jarde_hand.fingers.at(0) = fing1;
 
@@ -1019,21 +1019,21 @@ bool QNode::getElements(scenarioPtr scene)
         floatCount = DH_params_str.size()/sizeof(float);
         if (!DH_params_vec.empty()){DH_params_vec.clear();}
         for (int k=0;k<floatCount;++k)
-            DH_params_vec.push_back(((float*)DH_params_str.c_str())[k]);
+            DH_params_vec.push_back(static_cast<double>(((float*)DH_params_str.c_str())[k]));
 
         fing2 = jarde_hand.fingers.at(1);
         fing2.ux = DH_params_vec.at(0)*1000; // [mm]
         fing2.uy = DH_params_vec.at(1)*1000; // [mm]
         fing2.uz = DH_params_vec.at(2)*1000; // [mm]
-        fing2.finger_specs.alpha = std::vector<float>(4);
-        fing2.finger_specs.a = std::vector<float>(4);
-        fing2.finger_specs.d = std::vector<float>(4);
-        fing2.finger_specs.theta = std::vector<float>(4);
+        fing2.finger_specs.alpha = std::vector<double>(4);
+        fing2.finger_specs.a = std::vector<double>(4);
+        fing2.finger_specs.d = std::vector<double>(4);
+        fing2.finger_specs.theta = std::vector<double>(4);
         for(int i=0;i<4;++i){
-            fing2.finger_specs.alpha.at(i) = DH_params_vec.at(i+3)*M_PI/180; // [rad]
+            fing2.finger_specs.alpha.at(i) = DH_params_vec.at(i+3)*static_cast<double>(M_PI)/180; // [rad]
             fing2.finger_specs.a.at(i) = DH_params_vec.at(i+7)*1000; // [mm]
             fing2.finger_specs.d.at(i) = DH_params_vec.at(i+11)*1000; // [mm]
-            fing2.finger_specs.theta.at(i) = DH_params_vec.at(i+15)*M_PI/180; // [rad]
+            fing2.finger_specs.theta.at(i) = DH_params_vec.at(i+15)*static_cast<double>(M_PI)/180; // [rad]
         }
         jarde_hand.fingers.at(1) = fing2;
 
@@ -1048,21 +1048,21 @@ bool QNode::getElements(scenarioPtr scene)
         floatCount = DH_params_str.size()/sizeof(float);
         if (!DH_params_vec.empty()){DH_params_vec.clear();}
         for (int k=0;k<floatCount;++k)
-            DH_params_vec.push_back(((float*)DH_params_str.c_str())[k]);
+            DH_params_vec.push_back(static_cast<double>(((float*)DH_params_str.c_str())[k]));
 
         fing3 = jarde_hand.fingers.at(2);
         fing3.ux = DH_params_vec.at(0)*1000; // [mm]
         fing3.uy = DH_params_vec.at(1)*1000; // [mm]
         fing3.uz = DH_params_vec.at(2)*1000; // [mm]
-        fing3.finger_specs.alpha = std::vector<float>(4);
-        fing3.finger_specs.a = std::vector<float>(4);
-        fing3.finger_specs.d = std::vector<float>(4);
-        fing3.finger_specs.theta = std::vector<float>(4);
+        fing3.finger_specs.alpha = std::vector<double>(4);
+        fing3.finger_specs.a = std::vector<double>(4);
+        fing3.finger_specs.d = std::vector<double>(4);
+        fing3.finger_specs.theta = std::vector<double>(4);
         for(int i=0;i<4;++i){
-            fing3.finger_specs.alpha.at(i) = DH_params_vec.at(i+3)*M_PI/180; // [rad]
+            fing3.finger_specs.alpha.at(i) = DH_params_vec.at(i+3)*static_cast<double>(M_PI)/180; // [rad]
             fing3.finger_specs.a.at(i) = DH_params_vec.at(i+7)*1000; // [mm]
             fing3.finger_specs.d.at(i) = DH_params_vec.at(i+11)*1000; // [mm]
-            fing3.finger_specs.theta.at(i) = DH_params_vec.at(i+15)*M_PI/180; // [rad]
+            fing3.finger_specs.theta.at(i) = DH_params_vec.at(i+15)*static_cast<double>(M_PI)/180; // [rad]
         }
         jarde_hand.fingers.at(2) = fing3;
 
@@ -1077,21 +1077,21 @@ bool QNode::getElements(scenarioPtr scene)
         floatCount = DH_params_str.size()/sizeof(float);
         if (!DH_params_vec.empty()){DH_params_vec.clear();}
         for (int k=0;k<floatCount;++k)
-            DH_params_vec.push_back(((float*)DH_params_str.c_str())[k]);
+            DH_params_vec.push_back(static_cast<double>(((float*)DH_params_str.c_str())[k]));
 
         fing4 = jarde_hand.fingers.at(3);
         fing4.ux = DH_params_vec.at(0)*1000; // [mm]
         fing4.uy = DH_params_vec.at(1)*1000; // [mm]
         fing4.uz = DH_params_vec.at(2)*1000; // [mm]
-        fing4.finger_specs.alpha = std::vector<float>(4);
-        fing4.finger_specs.a = std::vector<float>(4);
-        fing4.finger_specs.d = std::vector<float>(4);
-        fing4.finger_specs.theta = std::vector<float>(4);
+        fing4.finger_specs.alpha = std::vector<double>(4);
+        fing4.finger_specs.a = std::vector<double>(4);
+        fing4.finger_specs.d = std::vector<double>(4);
+        fing4.finger_specs.theta = std::vector<double>(4);
         for(int i=0;i<4;++i){
-            fing4.finger_specs.alpha.at(i) = DH_params_vec.at(i+3)*M_PI/180; // [rad]
+            fing4.finger_specs.alpha.at(i) = DH_params_vec.at(i+3)*static_cast<double>(M_PI)/180; // [rad]
             fing4.finger_specs.a.at(i) = DH_params_vec.at(i+7)*1000; // [mm]
             fing4.finger_specs.d.at(i) = DH_params_vec.at(i+11)*1000; // [mm]
-            fing4.finger_specs.theta.at(i) = DH_params_vec.at(i+15)*M_PI/180; // [rad]
+            fing4.finger_specs.theta.at(i) = DH_params_vec.at(i+15)*static_cast<double>(M_PI)/180; // [rad]
         }
         jarde_hand.fingers.at(3) = fing4;
 
@@ -1105,21 +1105,21 @@ bool QNode::getElements(scenarioPtr scene)
         floatCount = DH_params_str.size()/sizeof(float);
         if (!DH_params_vec.empty()){DH_params_vec.clear();}
         for (int k=0;k<floatCount;++k)
-            DH_params_vec.push_back(((float*)DH_params_str.c_str())[k]);
+            DH_params_vec.push_back(static_cast<double>(((float*)DH_params_str.c_str())[k]));
 
         thumb = jarde_hand.thumb;
         thumb.uTx = DH_params_vec.at(0)*1000; // [mm]
         thumb.uTy = DH_params_vec.at(1)*1000; // [mm]
         thumb.uTz = DH_params_vec.at(2)*1000; // [mm]
-        thumb.thumb_specs.alpha = std::vector<float>(5);
-        thumb.thumb_specs.a = std::vector<float>(5);
-        thumb.thumb_specs.d = std::vector<float>(5);
-        thumb.thumb_specs.theta = std::vector<float>(5);
+        thumb.thumb_specs.alpha = std::vector<double>(5);
+        thumb.thumb_specs.a = std::vector<double>(5);
+        thumb.thumb_specs.d = std::vector<double>(5);
+        thumb.thumb_specs.theta = std::vector<double>(5);
         for(int i=0;i<5;++i){
-            thumb.thumb_specs.alpha.at(i) = DH_params_vec.at(i+3)*M_PI/180; // [rad]
+            thumb.thumb_specs.alpha.at(i) = DH_params_vec.at(i+3)*static_cast<double>(M_PI)/180; // [rad]
             thumb.thumb_specs.a.at(i) = DH_params_vec.at(i+8)*1000; // [mm]
             thumb.thumb_specs.d.at(i) = DH_params_vec.at(i+13)*1000; // [mm]
-            thumb.thumb_specs.theta.at(i) = DH_params_vec.at(i+18)*M_PI/180; // [rad]
+            thumb.thumb_specs.theta.at(i) = DH_params_vec.at(i+18)*static_cast<double>(M_PI)/180; // [rad]
         }
         jarde_hand.thumb = thumb;
 
@@ -1135,14 +1135,14 @@ bool QNode::getElements(scenarioPtr scene)
         floatCount = torso_str.size()/sizeof(float);
         if (!torso_vec.empty()){torso_vec.clear();}
         for (int k=0;k<floatCount;++k)
-            torso_vec.push_back(((float*)torso_str.c_str())[k]);
+            torso_vec.push_back(static_cast<double>(((float*)torso_str.c_str())[k]));
 
         torso.Xpos = torso_vec.at(0)*1000;//[mm]
         torso.Ypos = torso_vec.at(1)*1000;//[mm]
         torso.Zpos = torso_vec.at(2)*1000;//[mm]
-        torso.Roll = torso_vec.at(3)*M_PI/180; //[rad]
-        torso.Pitch = torso_vec.at(4)*M_PI/180; //[rad]
-        torso.Yaw = torso_vec.at(5)*M_PI/180; //[rad]
+        torso.Roll = torso_vec.at(3)*static_cast<double>(M_PI)/180; //[rad]
+        torso.Pitch = torso_vec.at(4)*static_cast<double>(M_PI)/180; //[rad]
+        torso.Yaw = torso_vec.at(5)*static_cast<double>(M_PI)/180; //[rad]
         torso.Xsize = torso_vec.at(6)*1000;//[mm]
         torso.Ysize = torso_vec.at(7)*1000;//[mm]
         torso.Zsize = torso_vec.at(8)*1000;//[mm]
@@ -1158,14 +1158,14 @@ bool QNode::getElements(scenarioPtr scene)
         floatCount = pelvis_str.size()/sizeof(float);
         if (!pelvis_vec.empty()){pelvis_vec.clear();}
         for (int k=0;k<floatCount;++k)
-            pelvis_vec.push_back(((float*)pelvis_str.c_str())[k]);
+            pelvis_vec.push_back(static_cast<double>(((float*)pelvis_str.c_str())[k]));
 
         pelvis.Xpos = pelvis_vec.at(0)*1000;//[mm]
         pelvis.Ypos = pelvis_vec.at(1)*1000;//[mm]
         pelvis.Zpos = pelvis_vec.at(2)*1000;//[mm]
-        pelvis.Roll = pelvis_vec.at(3)*M_PI/180; //[rad]
-        pelvis.Pitch = pelvis_vec.at(4)*M_PI/180; //[rad]
-        pelvis.Yaw = pelvis_vec.at(5)*M_PI/180; //[rad]
+        pelvis.Roll = pelvis_vec.at(3)*static_cast<double>(M_PI)/180; //[rad]
+        pelvis.Pitch = pelvis_vec.at(4)*static_cast<double>(M_PI)/180; //[rad]
+        pelvis.Yaw = pelvis_vec.at(5)*static_cast<double>(M_PI)/180; //[rad]
         pelvis.Xsize = pelvis_vec.at(6)*1000;//[mm]
         pelvis.Ysize = pelvis_vec.at(7)*1000;//[mm]
         pelvis.Zsize = pelvis_vec.at(8)*1000;//[mm]
@@ -1182,14 +1182,14 @@ bool QNode::getElements(scenarioPtr scene)
         floatCount = r_upper_leg_str.size()/sizeof(float);
         if (!r_upper_leg_vec.empty()){r_upper_leg_vec.clear();}
         for (int k=0;k<floatCount;++k)
-            r_upper_leg_vec.push_back(((float*)r_upper_leg_str.c_str())[k]);
+            r_upper_leg_vec.push_back(static_cast<double>(((float*)r_upper_leg_str.c_str())[k]));
 
         right_upper_leg.Xpos = r_upper_leg_vec.at(0)*1000;//[mm]
         right_upper_leg.Ypos = r_upper_leg_vec.at(1)*1000;//[mm]
         right_upper_leg.Zpos = r_upper_leg_vec.at(2)*1000;//[mm]
-        right_upper_leg.Roll = r_upper_leg_vec.at(3)*M_PI/180; //[rad]
-        right_upper_leg.Pitch = r_upper_leg_vec.at(4)*M_PI/180; //[rad]
-        right_upper_leg.Yaw = r_upper_leg_vec.at(5)*M_PI/180; //[rad]
+        right_upper_leg.Roll = r_upper_leg_vec.at(3)*static_cast<double>(M_PI)/180; //[rad]
+        right_upper_leg.Pitch = r_upper_leg_vec.at(4)*static_cast<double>(M_PI)/180; //[rad]
+        right_upper_leg.Yaw = r_upper_leg_vec.at(5)*static_cast<double>(M_PI)/180; //[rad]
         right_upper_leg.Xsize = r_upper_leg_vec.at(6)*1000;//[mm]
         right_upper_leg.Ysize = r_upper_leg_vec.at(7)*1000;//[mm]
         right_upper_leg.Zsize = r_upper_leg_vec.at(8)*1000;//[mm]
@@ -1206,14 +1206,14 @@ bool QNode::getElements(scenarioPtr scene)
         floatCount = l_upper_leg_str.size()/sizeof(float);
         if (!l_upper_leg_vec.empty()){l_upper_leg_vec.clear();}
         for (int k=0;k<floatCount;++k)
-            l_upper_leg_vec.push_back(((float*)l_upper_leg_str.c_str())[k]);
+            l_upper_leg_vec.push_back(static_cast<double>(((float*)l_upper_leg_str.c_str())[k]));
 
         left_upper_leg.Xpos = l_upper_leg_vec.at(0)*1000;//[mm]
         left_upper_leg.Ypos = l_upper_leg_vec.at(1)*1000;//[mm]
         left_upper_leg.Zpos = l_upper_leg_vec.at(2)*1000;//[mm]
-        left_upper_leg.Roll = l_upper_leg_vec.at(3)*M_PI/180; //[rad]
-        left_upper_leg.Pitch = l_upper_leg_vec.at(4)*M_PI/180; //[rad]
-        left_upper_leg.Yaw = l_upper_leg_vec.at(5)*M_PI/180; //[rad]
+        left_upper_leg.Roll = l_upper_leg_vec.at(3)*static_cast<double>(M_PI)/180; //[rad]
+        left_upper_leg.Pitch = l_upper_leg_vec.at(4)*static_cast<double>(M_PI)/180; //[rad]
+        left_upper_leg.Yaw = l_upper_leg_vec.at(5)*static_cast<double>(M_PI)/180; //[rad]
         left_upper_leg.Xsize = l_upper_leg_vec.at(6)*1000;//[mm]
         left_upper_leg.Ysize = l_upper_leg_vec.at(7)*1000;//[mm]
         left_upper_leg.Zsize = l_upper_leg_vec.at(8)*1000;//[mm]
@@ -1350,8 +1350,8 @@ bool QNode::getElements(scenarioPtr scene)
             Q_EMIT newElement(infoLine);
 
             // get the postures
-            std::vector<float> rightp;
-            std::vector<float> leftp;
+            std::vector<double> rightp;
+            std::vector<double> leftp;
 
             hptr->getRightPosture(rightp);
             hptr->getLeftPosture(leftp);
@@ -1359,13 +1359,13 @@ bool QNode::getElements(scenarioPtr scene)
             std::vector<string> rj = std::vector<string>(rightp.size());
             for (int i=0; i<rightp.size(); i++ ){
                 rj.at(i) = string("right_joint "+ QString::number(i+1).toStdString()+ ": "+
-                                       QString::number(rightp.at(i)*180/M_PI).toStdString());
+                                       QString::number(rightp.at(i)*180/static_cast<double>(M_PI)).toStdString());
                 Q_EMIT newJoint(rj.at(i));
             }
             std::vector<string> lj = std::vector<string>(leftp.size());
             for (int i=0; i<leftp.size(); i++ ){
                 lj.at(i) = string("left_joint "+ QString::number(i+1).toStdString()+ ": "+
-                                       QString::number(leftp.at(i)*180/M_PI).toStdString());
+                                       QString::number(leftp.at(i)*180/static_cast<double>(M_PI)).toStdString());
                 Q_EMIT newJoint(lj.at(i));
             }
 
@@ -1552,7 +1552,7 @@ void QNode::updateObjectInfo(int obj_id, string name, const geometry_msgs::PoseS
 {
 
 
-    std::vector<float> rpy;
+    std::vector<double> rpy;
     objectPtr obj = this->curr_scene->getObject(name);
 
     // position
@@ -1566,17 +1566,17 @@ void QNode::updateObjectInfo(int obj_id, string name, const geometry_msgs::PoseS
     // orientation
     orient orr;
     // get the quaternion
-    float epx = data.pose.orientation.x;
-    float epy = data.pose.orientation.y;
-    float epz = data.pose.orientation.z;
-    float w = data.pose.orientation.w;
+    double epx = data.pose.orientation.x;
+    double epy = data.pose.orientation.y;
+    double epz = data.pose.orientation.z;
+    double w = data.pose.orientation.w;
 
-    Matrix3f Rot;
+    Matrix3d Rot;
     Rot(0,0) = 2*(pow(w,2)+pow(epx,2))-1; Rot(0,1) = 2*(epx*epy-w*epz);         Rot(0,2) = 2*(epx*epz+w*epy);
     Rot(1,0) = 2*(epx*epy+w*epz);         Rot(1,1) = 2*(pow(w,2)+pow(epy,2))-1; Rot(1,2) = 2*(epy*epz-w*epx);
     Rot(2,0) = 2*(epx*epz-w*epy);         Rot(2,1) = 2*(epy*epz+w*epx);         Rot(2,2) = 2*(pow(w,2)+pow(epz,2))-1;
 
-    Matrix4f trans_obj;
+    Matrix4d trans_obj;
     trans_obj(0,0) = Rot(0,0); trans_obj(0,1) = Rot(0,1); trans_obj(0,2) = Rot(0,2); trans_obj(0,3) = poss.Xpos;
     trans_obj(1,0) = Rot(1,0); trans_obj(1,1) = Rot(1,1); trans_obj(1,2) = Rot(1,2); trans_obj(1,3) = poss.Ypos;
     trans_obj(2,0) = Rot(2,0); trans_obj(2,1) = Rot(2,1); trans_obj(2,2) = Rot(2,2); trans_obj(2,3) = poss.Zpos;
@@ -1640,7 +1640,7 @@ void QNode::updateObjectInfo(int obj_id, string name, const geometry_msgs::PoseS
 
 }
 
-bool QNode::getRPY(Matrix4f Trans, std::vector<double> &rpy)
+bool QNode::getRPY(Matrix4d Trans, std::vector<double> &rpy)
 {
 
     rpy = std::vector<double>(3);
@@ -1703,7 +1703,7 @@ void QNode::rightProxCallback(const vrep_common::ProximitySensorData& data)
 
             case 0: // reach-to-grasp
 
-                h_obj= this->h_curr_mov->getObject()->getHandleBody(); // visible handle of the object we want to grasp
+                h_obj= this->curr_mov->getObject()->getHandleBody(); // visible handle of the object we want to grasp
                 h_detobj = data.detectedObject.data; // handle of the object currently detected
 
                 //BOOST_LOG_SEV(lg, info) << "h_obj = " << h_obj ;
@@ -1766,21 +1766,21 @@ void QNode::leftProxCallback(const vrep_common::ProximitySensorData& data)
 }
 
 
-bool QNode::execMovement(MatrixXf& traj, MatrixXf& vel, float timeStep, float tol_stop, movementPtr mov, scenarioPtr scene)
+bool QNode::execMovement(MatrixXd& traj, MatrixXd& vel, double timeStep, double tol_stop, movementPtr mov, scenarioPtr scene)
 {
 
     this->curr_scene = scene;
     int scenarioID = scene->getID();
     this->curr_mov = mov;
-    VectorXf f_posture = traj.row(traj.rows()-1); // the final posture
+    VectorXd f_posture = traj.row(traj.rows()-1); // the final posture
     bool f_reached=false;
-    float tol_stop_rad = tol_stop*M_PI/180;
+    double tol_stop_rad = tol_stop*static_cast<double>(M_PI)/180;
 
     ros::NodeHandle node;
-    float ta;
-    float tb;
-    float tx;
-    float pre_time= 0.0;
+    double ta;
+    double tb;
+    double tx;
+    double pre_time= 0.0;
     int arm_code = mov->getArm();
     int mov_type = mov->getType();
 
@@ -1832,7 +1832,7 @@ bool QNode::execMovement(MatrixXf& traj, MatrixXf& vel, float timeStep, float to
 
     case 0: // reach-to-grasp
 
-        //tol_stop = 3*M_PI/180;
+        //tol_stop = 3*static_cast<double>(M_PI)/180;
 
         break;
     case 1: // reaching
@@ -1843,7 +1843,7 @@ bool QNode::execMovement(MatrixXf& traj, MatrixXf& vel, float timeStep, float to
 
     case 3: // engage
 
-         //tol_stop = 1.6*M_PI/180;
+         //tol_stop = 1.6*static_cast<double>(M_PI)/180;
 
         break;
 
@@ -1851,7 +1851,7 @@ bool QNode::execMovement(MatrixXf& traj, MatrixXf& vel, float timeStep, float to
         break;
 
     case 5: // go home
-        //tol_stop = 1.7*M_PI/180;
+        //tol_stop = 1.7*static_cast<double>(M_PI)/180;
         //ros::spinOnce();// handle ROS messages
 
         if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
@@ -1898,11 +1898,11 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
         for (int i = 1; i< vel.rows(); ++i){
             //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
 
-            VectorXf ya = vel.row(i-1);
-            VectorXf yb = vel.row(i);
+            VectorXd ya = vel.row(i-1);
+            VectorXd yb = vel.row(i);
 
-            VectorXf yat = traj.row(i-1);
-            VectorXf ybt = traj.row(i);
+            VectorXd yat = traj.row(i-1);
+            VectorXd ybt = traj.row(i);
 
             ta = (i-1)*timeStep+ TotalTime;
             tb = ta + timeStep;
@@ -1911,8 +1911,8 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
             //BOOST_LOG_SEV(lg, info) << "tb = " << tb << "\n";
             bool interval = true;
 
-            float tx_prev;
-            float yxt_prev;
+            double tx_prev;
+            double yxt_prev;
 
             ros::spinOnce(); // get the simulationRunning value
             while (ros::ok() && simulationRunning && interval)
@@ -1934,13 +1934,13 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                     //BOOST_LOG_SEV(lg, info) << "tx = " << tx ;
                     //BOOST_LOG_SEV(lg, info) << "tx_prev = " << tx_prev;
 
-                    float m = (tx-ta)/(tb-ta);
+                    double m = (tx-ta)/(tb-ta);
                     std::vector<double> r_post;
                     this->curr_scene->getHumanoid()->getRightPosture(r_post);
 
 
-                    float yx;
-                    float yxt;
+                    double yx;
+                    double yxt;
                      if(sqrt(pow((f_posture(0)-r_post.at(0)),2)+
                            pow((f_posture(1)-r_post.at(1)),2)+
                            pow((f_posture(2)-r_post.at(2)),2)+
@@ -1986,14 +1986,14 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                             // the fingers are being addressed
                             data_hand.handles.data.push_back(hand_handles(k+3-vel.cols(),2));
                             data_hand.setModes.data.push_back(1); // set the target position
-                            data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<float>(M_PI) / 180.0f);
+                            data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
 
                         }
 #endif
 
-                      //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/M_PI << ", ya = " << ya(k)*180/M_PI << ", yb = "<< yb(k)*180/M_PI;
-                      //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/M_PI << ",  traj joint " << k << " = " << yxt *180/M_PI <<
-                                                  //", error " << k << "=" << (r_post.at(k)-yxt)*180/M_PI;
+                      //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", ya = " << ya(k)*180/static_cast<double>(M_PI) << ", yb = "<< yb(k)*180/static_cast<double>(M_PI);
+                      //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
+                                                  //", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
 
                     }
 
@@ -2098,25 +2098,25 @@ return true;
 }
 
 
-bool QNode::execTask(MatrixXf& traj_task, MatrixXf &vel_task, std::vector<float> &timeSteps, std::vector<int> &nSteps, std::vector<float> &tols_stop,taskPtr task, scenarioPtr scene)
+bool QNode::execTask(MatrixXd& traj_task, MatrixXd &vel_task, std::vector<double> &timeSteps, std::vector<int> &nSteps, std::vector<double> &tols_stop,taskPtr task, scenarioPtr scene)
 {
 
     // TO DO:  integrate the trajectory that is the solution of the given problem with the movement object that is part of the problem
     ros::NodeHandle node;
-    float ta;
-    float tb;
-    float tx;
+    double ta;
+    double tb;
+    double tx;
     int arm_code;
     int mov_type;
-    float timeStep;
+    double timeStep;
     int steps;
-    float tol_stop_rad;
+    double tol_stop_rad;
     int steps_prev=0;
-    float timeTot = 0.0;
+    double timeTot = 0.0;
     this->curr_scene = scene;
     int scenarioID = scene->getID();
-    MatrixXf vel;
-    MatrixXf traj;
+    MatrixXd vel;
+    MatrixXd traj;
     std::vector<int> handles;
     MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
     int h_attach; // handle of the attachment point of the hand
@@ -2138,9 +2138,9 @@ bool QNode::execTask(MatrixXf& traj_task, MatrixXf &vel_task, std::vector<float>
         this->curr_mov = mov;
         timeStep = timeSteps.at(i);
         steps = nSteps.at(i);
-        tol_stop_rad = tols_stop.at(i)*M_PI/180;
+        tol_stop_rad = tols_stop.at(i)*static_cast<double>(M_PI)/180;
 
-        VectorXf f_posture = traj_task.row(steps+steps_prev); // the final posture of the movement
+        VectorXd f_posture = traj_task.row(steps+steps_prev); // the final posture of the movement
 
         //BOOST_LOG_SEV(lg, info) << "Step_prev = " << steps_prev;
 
@@ -2206,13 +2206,13 @@ bool QNode::execTask(MatrixXf& traj_task, MatrixXf &vel_task, std::vector<float>
         // ----- pre-movement operations -------- //
 
 
-        float pre_time=0.0;
+        double pre_time=0.0;
 
         switch (mov_type) {
 
         case 0: // reach-to-grasp
 
-            //tol_stop = 1.7*M_PI/180;
+            //tol_stop = 1.7*static_cast<double>(M_PI)/180;
 
             break;
         case 1: // reaching
@@ -2223,7 +2223,7 @@ bool QNode::execTask(MatrixXf& traj_task, MatrixXf &vel_task, std::vector<float>
 
         case 3: // engage
 
-            //tol_stop = 1.5*M_PI/180;
+            //tol_stop = 1.5*static_cast<double>(M_PI)/180;
 
             break;
 
@@ -2233,7 +2233,7 @@ bool QNode::execTask(MatrixXf& traj_task, MatrixXf &vel_task, std::vector<float>
         case 5: // go home
             //ros::spinOnce(); // handle ROS messages
 
-            //tol_stop = 1.7*M_PI/180;
+            //tol_stop = 1.7*static_cast<double>(M_PI)/180;
             if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
                 add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
                 vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
@@ -2279,10 +2279,10 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 
                 //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
 
-                VectorXf ya = vel.row(i-1);
-                VectorXf yb = vel.row(i);
-                VectorXf yat = traj.row(i-1);
-                VectorXf ybt = traj.row(i);
+                VectorXd ya = vel.row(i-1);
+                VectorXd yb = vel.row(i);
+                VectorXd yat = traj.row(i-1);
+                VectorXd ybt = traj.row(i);
 
                 ta = (i-1)*timeStep+timeTot;
                 tb = ta + timeStep;
@@ -2292,8 +2292,8 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 
                 bool interval = true;
 
-                float tx_prev;
-                float yxt_prev;
+                double tx_prev;
+                double yxt_prev;
 
                 ros::spinOnce(); // get the simulationRunning value
                 while (ros::ok() && simulationRunning && interval)
@@ -2315,11 +2315,11 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                         //BOOST_LOG_SEV(lg, info) << "tx = " << tx ;
                         //BOOST_LOG_SEV(lg, info) << "tx_prev = " << tx_prev;
 
-                        float m = (tx-ta)/(tb-ta);
-                        std::vector<float> r_post;
+                        double m = (tx-ta)/(tb-ta);
+                        std::vector<double> r_post;
                         this->curr_scene->getHumanoid()->getRightPosture(r_post);
-                        float yx;
-                        float yxt;
+                        double yx;
+                        double yxt;
                         if(sqrt(pow((f_posture(0)-r_post.at(0)),2)+
                                pow((f_posture(1)-r_post.at(1)),2)+
                                pow((f_posture(2)-r_post.at(2)),2)+
@@ -2361,16 +2361,16 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                                 break;
                             }
 
-                            //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/M_PI << ", ya = " << ya(k)*180/M_PI << ", yb = "<< yb(k)*180/M_PI;
-                            //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/M_PI << ",  traj joint " << k << " = " << yxt *180/M_PI <<
-                                                       //", error " << k << "=" << (r_post.at(k)-yxt)*180/M_PI;
+                            //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", ya = " << ya(k)*180/static_cast<double>(M_PI) << ", yb = "<< yb(k)*180/static_cast<double>(M_PI);
+                            //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
+                                                       //", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
 #if HAND==1
 
                             if((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) ){
                                 // the fingers are being addressed
                                 data_hand.handles.data.push_back(hand_handles(k+3-vel.cols(),2));
                                 data_hand.setModes.data.push_back(1); // set the target position
-                                data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<float>(M_PI) / 180.0f);
+                                data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
 
                             }
 #endif
@@ -2479,7 +2479,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 }
 
 
-float QNode::interpolate(double ya, double yb, double m)
+double QNode::interpolate(double ya, double yb, double m)
 {
 
     // linear interpolation
@@ -2589,16 +2589,16 @@ void QNode::JointsCallback(const sensor_msgs::JointState &state)
 {
 
 std::vector<std::string> joints_names = state.name;
-std::vector<float> joints_pos(state.position.begin(),state.position.end());
-std::vector<float> joints_vel(state.velocity.begin(),state.velocity.end());
-std::vector<float> joints_force(state.effort.begin(),state.effort.end());
+std::vector<double> joints_pos(state.position.begin(),state.position.end());
+std::vector<double> joints_vel(state.velocity.begin(),state.velocity.end());
+std::vector<double> joints_force(state.effort.begin(),state.effort.end());
 
-std::vector<float> right_posture;
-std::vector<float> right_vel;
-std::vector<float> right_forces;
-std::vector<float> left_posture;
-std::vector<float> left_vel;
-std::vector<float> left_forces;
+std::vector<double> right_posture;
+std::vector<double> right_vel;
+std::vector<double> right_forces;
+std::vector<double> left_posture;
+std::vector<double> left_vel;
+std::vector<double> left_forces;
 
 
 //BOOST_LOG_SEV(lg, info) << "joints_callback";
@@ -2629,10 +2629,10 @@ for (int i = 0; i < JOINTS_ARM+JOINTS_HAND; ++i){
     }else{
 
         /*
-        std::cout << "real joint 0: " << joints_pos.at(0)*180/M_PI << "real joint 1: " << joints_pos.at(1)*180/M_PI  << "real joint 2: " << joints_pos.at(2)*180/M_PI << "real joint 3: " << joints_pos.at(3)*180/M_PI
-                  << "real joint 4: " << joints_pos.at(4)*180/M_PI << "real joint 5: " << joints_pos.at(5)*180/M_PI << "real joint 6: " << joints_pos.at(6)*180/M_PI << '\n';
-        std::cout << "traj joint 0: " << r_traj.at(0)*180/M_PI << "traj joint 1: " << r_traj.at(1)*180/M_PI  << "traj joint 2: " << r_traj.at(2)*180/M_PI << "traj joint 3: " << r_traj.at(3)*180/M_PI
-                  << "traj joint 4: " << r_traj.at(4)*180/M_PI << "traj joint 5: " << r_traj.at(5)*180/M_PI << "traj joint 6: " << r_traj.at(6)*180/M_PI << '\n';
+        std::cout << "real joint 0: " << joints_pos.at(0)*180/static_cast<double>(M_PI) << "real joint 1: " << joints_pos.at(1)*180/static_cast<double>(M_PI)  << "real joint 2: " << joints_pos.at(2)*180/static_cast<double>(M_PI) << "real joint 3: " << joints_pos.at(3)*180/static_cast<double>(M_PI)
+                  << "real joint 4: " << joints_pos.at(4)*180/static_cast<double>(M_PI) << "real joint 5: " << joints_pos.at(5)*180/static_cast<double>(M_PI) << "real joint 6: " << joints_pos.at(6)*180/static_cast<double>(M_PI) << '\n';
+        std::cout << "traj joint 0: " << r_traj.at(0)*180/static_cast<double>(M_PI) << "traj joint 1: " << r_traj.at(1)*180/static_cast<double>(M_PI)  << "traj joint 2: " << r_traj.at(2)*180/static_cast<double>(M_PI) << "traj joint 3: " << r_traj.at(3)*180/static_cast<double>(M_PI)
+                  << "traj joint 4: " << r_traj.at(4)*180/static_cast<double>(M_PI) << "traj joint 5: " << r_traj.at(5)*180/static_cast<double>(M_PI) << "traj joint 6: " << r_traj.at(6)*180/static_cast<double>(M_PI) << '\n';
                   */
 
         right_posture.push_back(joints_pos.at(r_index));
@@ -2791,7 +2791,7 @@ bool QNode::getArmsHandles(int humanoid)
     add_client = node.serviceClient<vrep_common::simRosGetObjectHandle>("/vrep/simRosGetObjectHandle");
     vrep_common::simRosGetObjectHandle srvgetHandle;
 
-    for (int k = 0; k < HUMotion::JOINTS_ARM + HUMotion::JOINTS_HAND; ++k){
+    for (int k = 0; k < JOINTS_ARM + JOINTS_HAND; ++k){
 
         if (k < 7){
             srvgetHandle.request.objectName = string("right_joint")+QString::number(k).toStdString();
@@ -3316,10 +3316,10 @@ bool QNode::closeBarrettHand(int hand)
     needFullOpening.at(1)=0;
     needFullOpening.at(2)=0;
 
-    MatrixXi hand_handles = MatrixXi::Constant(HUMotion::HAND_FINGERS,HUMotion::N_PHALANGE+1,1);
+    MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
     ros::NodeHandle node;
-    std::vector<float> hand_forces;
-    std::vector<float> hand_posture;
+    std::vector<double> hand_forces;
+    std::vector<double> hand_posture;
 
     // set the target position
     ros::ServiceClient client_setTarPos = node.serviceClient<vrep_common::simRosSetJointTargetPosition>("/vrep/simRosSetJointTargetPosition");
@@ -3375,7 +3375,7 @@ while (ros::ok() && simulationRunning && (!closed[0] || !closed[1] || !closed[2]
 
 
 
-        for (size_t i = 0; i < HUMotion::HAND_FINGERS; i++)
+        for (size_t i = 0; i < HAND_FINGERS; i++)
         {
 
             if (firstPartLocked.at(i)){
@@ -3390,7 +3390,7 @@ while (ros::ok() && simulationRunning && (!closed[0] || !closed[1] || !closed[2]
                 client_setIntParam.call(srv_setObjInt);
 
                 srv_setTarVel.request.handle = hand_handles(i,2);
-                srv_setTarVel.request.targetVelocity = HUMotion::closingVel/3.0f;
+                srv_setTarVel.request.targetVelocity = closingVel/3.0f;
                 client_setTarVel.call(srv_setTarVel);
                 //srv_setTarVel.response.results;
                 //simSetJointTargetVelocity(handHandles[i][2], closingVel / 3.0f);
@@ -3400,17 +3400,17 @@ while (ros::ok() && simulationRunning && (!closed[0] || !closed[1] || !closed[2]
 
             }else if (!firstPartLocked.at(i)){
 
-                float t = 0.0f;
+                double t = 0.0f;
 
                 //int res = simJointGetForce(handfirstpartTorqueHandles[i], &t);
                 t = hand_forces.at(i+1);
 
-                if (abs(t) > HUMotion::firstPartMaxTorque)
+                if (abs(t) > firstPartMaxTorque)
                     firstPartTorqueOvershootCount[i] ++;
                 else
                     firstPartTorqueOvershootCount[i] = 0;
 
-                if (firstPartTorqueOvershootCount[i] >= HUMotion::firstPartTorqueOvershootCountRequired)
+                if (firstPartTorqueOvershootCount[i] >= firstPartTorqueOvershootCountRequired)
                 {
                     needFullOpening[i] = 1;
                     firstPartLocked[i] = true;
@@ -3424,7 +3424,7 @@ while (ros::ok() && simulationRunning && (!closed[0] || !closed[1] || !closed[2]
                     client_setIntParam.call(srv_setObjInt);
                     // set the force
                     srv_setForce.request.handle = hand_handles(i,1);
-                    srv_setForce.request.forceOrTorque = HUMotion::closingOpeningTorque*100.0f;
+                    srv_setForce.request.forceOrTorque = closingOpeningTorque*100.0f;
                     client_setForce.call(srv_setForce);
                     // set the target position
                     srv_setTarPos.request.handle = hand_handles(i,1);
@@ -3439,7 +3439,7 @@ while (ros::ok() && simulationRunning && (!closed[0] || !closed[1] || !closed[2]
                     client_setIntParam.call(srv_setObjInt);
 
                     srv_setTarVel.request.handle = hand_handles(i,2);
-                    srv_setTarVel.request.targetVelocity = HUMotion::closingVel / 3.0f;
+                    srv_setTarVel.request.targetVelocity = closingVel / 3.0f;
                     client_setTarVel.call(srv_setTarVel);
 
                 }
@@ -3452,12 +3452,12 @@ while (ros::ok() && simulationRunning && (!closed[0] || !closed[1] || !closed[2]
                     client_setIntParam.call(srv_setObjInt);
 
                     srv_setTarVel.request.handle = hand_handles(i,1);
-                    srv_setTarVel.request.targetVelocity = HUMotion::closingVel;
+                    srv_setTarVel.request.targetVelocity = closingVel;
                     client_setTarVel.call(srv_setTarVel);
 
                     //second joint position is 1/3 of the first  
                     srv_setTarPos.request.handle = hand_handles(i,2);
-                    srv_setTarPos.request.targetPosition = 45.0f*static_cast<float>(M_PI) / 180.0f + hand_posture.at(i+1) / 3.0f;
+                    srv_setTarPos.request.targetPosition = 45.0f*static_cast<double>(M_PI) / 180.0f + hand_posture.at(i+1) / 3.0f;
                     client_setTarPos.call(srv_setTarPos);
 
                 }
@@ -3498,9 +3498,9 @@ bool QNode::openBarrettHand(int hand)
     int cnt = 0;
     MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
     ros::NodeHandle node;
-    std::vector<float> hand_forces;
-    std::vector<float> hand_posture;
-    std::vector<float> hand2_pos;
+    std::vector<double> hand_forces;
+    std::vector<double> hand_posture;
+    std::vector<double> hand2_pos;
 
     // set the target position
     ros::ServiceClient client_setTarPos = node.serviceClient<vrep_common::simRosSetJointTargetPosition>("/vrep/simRosSetJointTargetPosition");
@@ -3529,8 +3529,8 @@ while (ros::ok() && simulationRunning && (closed[0] || closed[1] || closed[2]) &
 
         hand_handles = right_hand_handles;
         hand2_pos = right_2hand_pos;
-        this->h_curr_scene->getHumanoid()->getRightHandForces(hand_forces);
-        this->h_curr_scene->getHumanoid()->getRightHandPosture(hand_posture);
+        this->curr_scene->getHumanoid()->getRightHandForces(hand_forces);
+        this->curr_scene->getHumanoid()->getRightHandPosture(hand_posture);
 
         break;
 
@@ -3538,8 +3538,8 @@ while (ros::ok() && simulationRunning && (closed[0] || closed[1] || closed[2]) &
 
         hand_handles = left_hand_handles;
         hand2_pos = left_2hand_pos;
-        this->h_curr_scene->getHumanoid()->getLeftHandForces(hand_forces);
-        this->h_curr_scene->getHumanoid()->getLeftHandPosture(hand_posture);
+        this->curr_scene->getHumanoid()->getLeftHandForces(hand_forces);
+        this->curr_scene->getHumanoid()->getLeftHandPosture(hand_posture);
 
         break;
     }
@@ -3567,7 +3567,7 @@ while (ros::ok() && simulationRunning && (closed[0] || closed[1] || closed[2]) &
 
         if (firstPartLocked[i]){
 
-            if(hand2_pos.at(i) < 45.5*M_PI / 180.0){
+            if(hand2_pos.at(i) < 45.5*static_cast<double>(M_PI) / 180.0){
                 // unlock the first part
                 // set the velocity control
                 srv_setObjInt.request.handle = hand_handles(i,1);
@@ -3591,7 +3591,7 @@ while (ros::ok() && simulationRunning && (closed[0] || closed[1] || closed[2]) &
 
                 // full opening is needed
 
-                if (hand2_pos.at(i) < 45.5f*static_cast<float>(M_PI) / 180.0f && hand_posture.at(i+1) < 0.5f*static_cast<float>(M_PI) / 180.0f){
+                if (hand2_pos.at(i) < 45.5f*static_cast<double>(M_PI) / 180.0f && hand_posture.at(i+1) < 0.5f*static_cast<double>(M_PI) / 180.0f){
 
                     needFullOpening[i] = 0;
                     // second joint in position control
@@ -3603,7 +3603,7 @@ while (ros::ok() && simulationRunning && (closed[0] || closed[1] || closed[2]) &
 
                     // set the target position
                     srv_setTarPos.request.handle = hand_handles(i,2);
-                    srv_setTarPos.request.targetPosition = 45.0f*static_cast<float>(M_PI) / 180.0f + hand_posture.at(i+1)/3.0f ;
+                    srv_setTarPos.request.targetPosition = 45.0f*static_cast<double>(M_PI) / 180.0f + hand_posture.at(i+1)/3.0f ;
                     client_setTarPos.call(srv_setTarPos);
 
                     //BOOST_LOG_SEV(lg, info) << " Full opening needed: " << i;
@@ -3627,12 +3627,12 @@ while (ros::ok() && simulationRunning && (closed[0] || closed[1] || closed[2]) &
 
                 //second joint position is 1/3 of the first
                 srv_setTarPos.request.handle = hand_handles(i,2);
-                srv_setTarPos.request.targetPosition = 45.0f*static_cast<float>(M_PI) / 180.0f + hand_posture.at(i+1)/3.0f ;
+                srv_setTarPos.request.targetPosition = 45.0f*static_cast<double>(M_PI) / 180.0f + hand_posture.at(i+1)/3.0f ;
                 client_setTarPos.call(srv_setTarPos);
 
                 //BOOST_LOG_SEV(lg, info) << "hand posture " << i << hand_posture.at(i+1) <<" Full opening NOT needed ";
 
-                if ( hand_posture.at(i+1) <= 5.0f*static_cast<float>(M_PI) / 180.0f){
+                if ( hand_posture.at(i+1) <= 5.0f*static_cast<double>(M_PI) / 180.0f){
 
                     closed[i]=false;
 

@@ -85,7 +85,7 @@ bool Scenario::getObjects(vector<objectPtr> &objs)
 void Scenario::addObject(Object* ob)
 {
 
-    this->objs_list.push_back(objectPtr(new Object(*ob->get())));
+    this->objs_list.push_back(objectPtr(new Object(*ob)));
 }
 
 objectPtr Scenario::getObject(int pos)
