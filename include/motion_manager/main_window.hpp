@@ -18,14 +18,6 @@
 
 
 
-// *** Humanoid MoveIt! Planner *** //
-//#include <aros_moveit_planner/humanoid_moveit_planner.hpp>
-// ******************************************* //
-// *** Human-like Upper-limbs Motion Library (HUML) *** //
-//#include <humplanner.hpp>
-// ************ //
-
-
 using namespace std;
 
 /** This is the main namespace of the program */

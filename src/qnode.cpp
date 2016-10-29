@@ -188,11 +188,13 @@ void QNode::resetSimTime()
 void QNode::resetGlobals()
 {
 
+#if HAND == 1
     for (int i =0; i < 3; ++i){
         closed.at(i)=false;
         needFullOpening.at(i)=0;
         firstPartLocked.at(i)=false;
     }
+#endif
 
     obj_in_hand = false;
 }

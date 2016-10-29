@@ -6,6 +6,17 @@ Problem::Problem():
     mov(nullptr),scene(nullptr)
 {
 
+    this->rightFinalPosture = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->rightFinalPosture_diseng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->rightFinalPosture_eng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->leftFinalPosture = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->leftFinalPosture_diseng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->leftFinalPosture_eng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->rightFinalHand = std::vector<double>(JOINTS_HAND);
+    this->leftFinalHand = std::vector<double>(JOINTS_HAND);
+    //this->rightBouncePosture = std::vector<double>(JOINTS_ARM);
+    //this->leftBouncePosture = std::vector<double>(JOINTS_ARM);
+
     this->targetAxis = 0;
     this->solved=false;
     this->part_of_task=false;
@@ -16,6 +27,16 @@ Problem::Problem():
 
 Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
 {
+    this->rightFinalPosture = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->rightFinalPosture_diseng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->rightFinalPosture_eng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->leftFinalPosture = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->leftFinalPosture_diseng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->leftFinalPosture_eng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->rightFinalHand = std::vector<double>(JOINTS_HAND);
+    this->leftFinalHand = std::vector<double>(JOINTS_HAND);
+    //this->rightBouncePosture = std::vector<double>(JOINTS_ARM);
+    //this->leftBouncePosture = std::vector<double>(JOINTS_ARM);
 
     this->targetAxis = 0;
     this->solved=false;
@@ -163,6 +184,16 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
 Problem::Problem(const Problem& s)
 {
 
+    this->rightFinalPosture = s.rightFinalPosture;
+    this->rightFinalPosture_diseng = s.rightFinalPosture_diseng;
+    this->rightFinalPosture_eng = s.rightFinalPosture_eng;
+    this->rightFinalHand = s.rightFinalHand;
+    this->leftFinalPosture = s.leftFinalPosture;
+    this->leftFinalPosture_eng = s.leftFinalPosture_eng;
+    this->leftFinalPosture_diseng = s.leftFinalPosture_diseng;
+    this->leftFinalHand = s.leftFinalHand;
+    //this->rightBouncePosture = s.rightBouncePosture;
+    //this->leftBouncePosture = s.leftBouncePosture;
 
     this->dFF = s.dFF;
     this->dFH = s.dFH;
@@ -863,6 +894,7 @@ bool Problem::solve(HUMotion::huml_params &params)
     std::vector<double> shPos;
     double dHO;
     std::vector<double> finalHand;
+    std::vector<double> initPosture;
     objectPtr obj = this->mov->getObject();
     targetPtr tar;
     switch(arm_code){
@@ -870,12 +902,14 @@ bool Problem::solve(HUMotion::huml_params &params)
         break;
     case 1://right arm
         this->scene->getHumanoid()->getRightShoulderPos(shPos);
+        this->scene->getHumanoid()->getRightPosture(initPosture);
         dHO=this->dHOr;
         finalHand = this->rightFinalHand;
         tar = obj->getTargetRight();
         break;
     case 2:// left arm
         this->scene->getHumanoid()->getLeftShoulderPos(shPos);
+        this->scene->getHumanoid()->getLeftPosture(initPosture);
         dHO=this->dHOl;
         finalHand = this->leftFinalHand;
         tar = obj->getTargetLeft();
@@ -901,6 +935,8 @@ bool Problem::solve(HUMotion::huml_params &params)
     params.mov_specs.finalHand = finalHand;
     params.mov_specs.target = target;
     params.mov_specs.obj = huml_obj;
+
+    HUMotion::planning_result res =  this->h_planner->plan_pick(params,initPosture);
 
 
 

@@ -60,8 +60,6 @@ public:
     void getTolsHand(MatrixXd& tols);
 
 
-    //void getTolsTable(std::vector<double>& tols);
-
     /**
      * @brief This method gets the weights of the objective function
      * @param lambda
@@ -92,11 +90,6 @@ public:
      */
     double getWMax();
 
-    /**
-     * @brief This method gets the approaching axis in reach-to-grasp movements
-     * @return
-     */
-    int getApproachAxis();
 
     /**
      * @brief This method gets the tolerances in positioning the end-effector
@@ -116,20 +109,6 @@ public:
      */
     double getTolStop();
 
-    /**
-     * @brief This method gets the parameters for engaging movements
-     * @param dist
-     * @param dir
-     * @param tols
-     */
-    void getEngageParams(double& dist, int& dir, std::vector<double>& tols);
-
-    /**
-     * @brief This method gets the parameters for disengaging movements
-     * @param dist
-     * @param dir
-     */
-    void getDisengageParams(double& dist, int& dir);
 
     /**
      * @brief This method gets the target avoidance flag
@@ -144,10 +123,85 @@ public:
     bool getObstacleAvoidance();
 
     /**
+     * @brief getApproach
+     * @return
+     */
+    bool getApproach();
+
+    /**
+     * @brief getRetreat
+     * @return
+     */
+    bool getRetreat();
+
+    /**
+     * @brief getInitVel
+     * @param init_vel
+     */
+    void getInitVel(std::vector<double>& init_vel);
+
+    /**
+     * @brief getFinalVel
+     * @param final_vel
+     */
+    void getFinalVel(std::vector<double>& final_vel);
+
+    /**
+     * @brief getInitAcc
+     * @param init_acc
+     */
+    void getInitAcc(std::vector<double>& init_acc);
+
+    /**
+     * @brief getFinalAcc
+     * @param final_acc
+     */
+    void getFinalAcc(std::vector<double>& final_acc);
+
+    /**
+     * @brief getPreGraspApproach
+     * @param pre_grasp
+     */
+    void getPreGraspApproach(std::vector<double>& pre_grasp);
+
+    /**
+     * @brief getPostGraspRetreat
+     * @param post_grasp
+     */
+    void getPostGraspRetreat(std::vector<double>& post_grasp);
+
+    /**
+     * @brief getPrePlaceApproach
+     * @param pre_place
+     */
+    void getPrePlaceApproach(std::vector<double>& pre_place);
+
+    /**
+     * @brief getPostPlaceRetreat
+     * @param post_place
+     */
+    void getPostPlaceRetreat(std::vector<double>& post_place);
+
+    /**
      * @brief This method sets the information about the tuning of the planner
      * @param info
      */
     void setInfo(string info);
+
+public Q_SLOTS:
+
+    /**
+     * @brief checkApproach
+     * @param state
+     */
+    void checkApproach(int state);
+
+    /**
+     * @brief checkRetreat
+     * @param state
+     */
+    void checkRetreat(int state);
+
 
 
 private:

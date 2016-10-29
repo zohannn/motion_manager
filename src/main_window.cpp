@@ -263,7 +263,14 @@ void MainWindow::on_actionRViz_Communication_triggered()
 void MainWindow::on_pushButton_tuning_clicked()
 {
 
-    mTolHumldlg->show();
+    problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
+    int planner_id = prob->getPlannerID();
+    switch(planner_id){
+    case 0: // HUML
+            mTolHumldlg->show();
+        break;
+    }
+
 }
 
 
@@ -303,6 +310,10 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
              string path_rviz_toyscene_aros = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
 
+             // Toy vehicle scenario with Jarde
+             string path_vrep_toyscene_jarde = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_jarde.ttt");
+             string path_rviz_toyscene_jarde = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
+
              switch(i){
 
              case 0:
@@ -311,13 +322,14 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              // Assembly scenario: the Toy vehicle with Jarde
              this->scenario_id = 1;
 
-             if (qnode.loadScenario(path_vrep_toyscene_aros,this->scenario_id)){
+             if (qnode.loadScenario(path_vrep_toyscene_jarde,this->scenario_id)){
                  qnode.log(QNode::Info,string("Assembly scenario: the Toy vehicle with Jarde HAS BEEN LOADED"));
                  ui.groupBox_getElements->setEnabled(true);
                  ui.groupBox_homePosture->setEnabled(true);
                  //ui.pushButton_loadScenario->setEnabled(false);
                  string title = string("Assembly scenario: the Toy vehicle with Jarde");
-                 this->hum_planner = humplannerPtr(new HUMPlanner(title, new Scenario(title,this->scenario_id+1), new Task()));
+                 init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                 curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
 
              }else{
 
@@ -613,87 +625,52 @@ void MainWindow::on_pushButton_plan_clicked()
     int planner_id = prob->getPlannerID();
 
     bool solved = false;
-
+ try{
     switch(planner_id){
 
     case 0: // HUML
         mTolHumldlg->setInfo(prob->getInfoLine());
         HUMotion::huml_params  tols;
-        try{
+        // --- Tolerances for the final posture selection ---- //
+        tols.tolTarPos = mTolHumldlg->getTolTarPos(); // target position tolerances
+        tols.tolTarOr = mTolHumldlg->getTolTarOr(); // target orientation tolerances
+        mTolHumldlg->getTolsArm(tols.tolsArm);// tolerances of the arm : radius in [mm]
+        mTolHumldlg->getTolsHand(tols.tolsHand);// tolerances of the hand: radius in [mm]
+        tols.target_avoidance = mTolHumldlg->getTargetAvoidance();// target avoidance
+        tols.obstacle_avoidance = mTolHumldlg->getObstacleAvoidance(); //obstacle avoidance
+        mTolHumldlg->getLambda(tols.lambda_final); // joint expense factors
+        mTolHumldlg->getLambda(tols.lambda_bounce); // joint expense factors
+        // --- Tolerances for the bounce posture selection ---- //
+        tols.w_max.push_back(mTolHumldlg->getWMax()); // max joint velocity
+        mTolHumldlg->getInitVel(tols.bounds.vel_0); // initial velocity
+        mTolHumldlg->getFinalVel(tols.bounds.vel_f); // final velocity
+        mTolHumldlg->getInitAcc(tols.bounds.acc_0); // initial acceleration
+        mTolHumldlg->getFinalAcc(tols.bounds.acc_f); // final acceleration
+        // tolerances for the obstacles
+        mTolHumldlg->getTolsObstacles(tols.final_tolsObstacles); // final posture tols
+        tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
+        tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1));
+        mTolHumldlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(0));
+        mTolHumldlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(1));
+        // tolerances for the target
+        tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
+        tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+        tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+        mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
+        mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
+        mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
+        tols.steps = mTolHumldlg->getSteps();// number of steps
+        // pick / place settings
+        tols.mov_specs.approach = mTolHumldlg->getApproach();
+        tols.mov_specs.retreat = mTolHumldlg->getRetreat();
+        mTolHumldlg->getPreGraspApproach(tols.mov_specs.pre_grasp_approach); // pick approach
+        mTolHumldlg->getPostGraspRetreat(tols.mov_specs.post_grasp_retreat); // pick retreat
+        mTolHumldlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
+        mTolHumldlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
 
-            // --- Tolerances for the final posture selection ---- //
-
-            // tolerances of the arm : radius in [mm]
-            mTolHumldlg->getTolsArm(tols.tolsArm);
-            // tolerances of the hand: radius in [mm]
-            mTolHumldlg->getTolsHand(tols.tolsHand);
-            // tolerances with the table
-            //mTolHumldlg->getTolsTable(tols.tols_table);
-            // target avoidance
-            tols.target_avoidance = mTolHumldlg->getTargetAvoidance();
-            //obstacle avoidance
-            tols.obstacle_avoidance = mTolHumldlg->getObstacleAvoidance();
-            // joint expense factors
-            vector<double> lambda;
-            mTolHumldlg->getLambda(lambda);
-            for (int i = 0; i < JOINTS_ARM; ++i){
-                tols.lambda_final.push_back(lambda.at(i));
-            }
-            // --- Tolerances for the bounce posture selection ---- //
-
-            for (int i=0; i < JOINTS_ARM + JOINTS_ARM; ++i){
-                tols.bounds.vel_0.push_back(0);
-                tols.bounds.vel_f.push_back(0);
-                tols.bounds.acc_0.push_back(0);
-                tols.bounds.acc_f.push_back(0);
-                tols.lambda_bounce.push_back(lambda.at(i));
-                tols.w_max.push_back(mTolHumldlg->getWMax()); // [deg/sec]
-            }
-
-            // tolerances for the obstacles
-            tols.final_tolsObstacles = MatrixXd::Constant(3,6,1) ;
-            mTolHumldlg->getTolsObstacles(tols.final_tolsObstacles);
-
-            tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1));
-            tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1));
-
-            mTolHumldlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(0));
-            mTolHumldlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(1));
-
-            // tolerances for the target
-            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
-            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
-            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
-
-            mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
-            mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
-            mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
-
-
-            // number of steps
-            tols.steps = mTolHumldlg->getSteps();
-
-            // tol Tar pos and tol tar or
-            tols.tolTarPos = mTolHumldlg->getTolTarPos();
-            tols.tolTarOr = mTolHumldlg->getTolTarOr();
-
-            // set the approaching target axis
-            //prob->setApproachingTargetAxis(mTolHumldlg->getApproachAxis());
-
-            //engaging parametrs
-            //mTolHumldlg->getEngageParams(tols.eng_dist,tols.eng_dir,tols.eng_tols);
-
-            //disengaging parameters
-            //mTolHumldlg->getDisengageParams(tols.diseng_dist,tols.diseng_dir);
-
-            // tol stop
-            //tols.tol_stop = mTolHumldlg->getTolStop();
-
-            solved = prob->solve(tols); // plan the movement
+        solved = prob->solve(tols); // plan the movement
 
         break;
-
-    }catch(...){}
 
         /*
 
@@ -793,27 +770,15 @@ void MainWindow::on_pushButton_plan_clicked()
 
     }
     */
+            } // switch planner
 
-}
-
-
-}
-
-    /*
-catch (const std::string message){
-
-    qnode.log(QNode::Error,std::string("Plan failure: ")+message);
-
-}
-catch(const std::exception exc){
-
-    qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());
-}
-
+    }catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
+    }catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
 
 
 }
-*/
+
+
 
 
 void MainWindow::on_pushButton_execMov_pressed()

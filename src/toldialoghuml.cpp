@@ -10,6 +10,17 @@ TolDialogHUML::TolDialogHUML(QWidget *parent) :
     ui(new Ui::TolDialogHUML)
 {
     ui->setupUi(this);
+
+     QObject::connect(ui->checkBox_approach, SIGNAL(stateChanged(int)), this, SLOT(checkApproach(int)));
+
+    if(ui->checkBox_approach->isChecked()){
+        ui->groupBox_pre_grasp->setEnabled(false);
+        ui->groupBox_pre_place->setEnabled(false);
+    }
+    if(ui->checkBox_retreat->isChecked()){
+        ui->groupBox_post_grasp->setEnabled(false);
+        ui->groupBox_post_place->setEnabled(false);
+    }
 }
 
 TolDialogHUML::~TolDialogHUML()
@@ -18,26 +29,6 @@ TolDialogHUML::~TolDialogHUML()
 }
 
 
-void TolDialogHUML::getEngageParams(double& dist, int& dir, std::vector<double> &tols)
-{
-
-    dist = ui->lineEdit_eng_dist->text().toDouble();
-    dir = ui->comboBox_eng_dir->currentIndex();
-    tols = std::vector<double>(3);
-    tols.at(0) = ui->lineEdit_eng_x->text().toDouble();
-    tols.at(1) = ui->lineEdit_eng_y->text().toDouble();
-    tols.at(2) = ui->lineEdit_eng_z->text().toDouble();
-
-}
-
-
-void TolDialogHUML::getDisengageParams(double &dist, int &dir)
-{
-
-    dist = ui->lineEdit_diseng_dist->text().toDouble();
-    dir = ui->comboBox_diseng_dir->currentIndex();
-
-}
 
 double TolDialogHUML::getTolStop()
 {
@@ -48,7 +39,7 @@ double TolDialogHUML::getTolStop()
 
 void TolDialogHUML::getTolsArm(vector<double> &tols)
 {
-
+    tols.clear();
     tols.push_back(ui->lineEdit_shoulder_r->text().toDouble());
     tols.push_back(ui->lineEdit_elbow_r->text().toDouble());
     tols.push_back(ui->lineEdit_wrist_r->text().toDouble());
@@ -67,22 +58,12 @@ void TolDialogHUML::getTolsHand(MatrixXd &tols)
     tols(3,0) = ui->lineEdit_hand_tip_1->text().toDouble(); tols(3,1) = ui->lineEdit_hand_tip_2->text().toDouble(); tols(3,2) = ui->lineEdit_hand_tip_3->text().toDouble();
 }
 
-/*
 
-void TolDialogHUML::getTolsTable(std::vector<double> &tols)
-{
-
-
-    tols.push_back(ui->lineEdit_table_1->text().toDouble());
-    tols.push_back(ui->lineEdit_table_2->text().toDouble());
-    tols.push_back(ui->lineEdit_table_3->text().toDouble());
-
-}
-*/
 
 void TolDialogHUML::getLambda(std::vector<double> &lambda)
 {
 
+   lambda.clear();
    lambda.push_back(ui->lineEdit_lambda_1->text().toDouble());
    lambda.push_back(ui->lineEdit_lambda_2->text().toDouble());
    lambda.push_back(ui->lineEdit_lambda_3->text().toDouble());
@@ -137,11 +118,6 @@ double TolDialogHUML::getWMax()
 }
 
 
-int TolDialogHUML::getApproachAxis()
-{
-
-    return ui->comboBox_approach_axis->currentIndex();
-}
 
 
 double TolDialogHUML::getTolTarPos()
@@ -175,6 +151,118 @@ bool TolDialogHUML::getObstacleAvoidance()
     return !ui->checkBox_ob_av->isChecked();
 }
 
+bool TolDialogHUML::getApproach()
+{
+    return !ui->checkBox_approach->isChecked();
+}
+
+bool TolDialogHUML::getRetreat()
+{
+    return !ui->checkBox_retreat->isChecked();
+}
+
+void TolDialogHUML::getInitVel(std::vector<double> &init_vel)
+{
+    init_vel.clear();
+    init_vel.push_back(ui->lineEdit_init_vel_1->text().toDouble());
+    init_vel.push_back(ui->lineEdit_init_vel_2->text().toDouble());
+    init_vel.push_back(ui->lineEdit_init_vel_3->text().toDouble());
+    init_vel.push_back(ui->lineEdit_init_vel_4->text().toDouble());
+    init_vel.push_back(ui->lineEdit_init_vel_5->text().toDouble());
+    init_vel.push_back(ui->lineEdit_init_vel_6->text().toDouble());
+    init_vel.push_back(ui->lineEdit_init_vel_7->text().toDouble());
+    init_vel.push_back(ui->lineEdit_init_vel_8->text().toDouble());
+    init_vel.push_back(ui->lineEdit_init_vel_9->text().toDouble());
+    init_vel.push_back(ui->lineEdit_init_vel_10->text().toDouble());
+    init_vel.push_back(ui->lineEdit_init_vel_11->text().toDouble());
+}
+
+void TolDialogHUML::getFinalVel(std::vector<double> &final_vel)
+{
+    final_vel.clear();
+    final_vel.push_back(ui->lineEdit_final_vel_1->text().toDouble());
+    final_vel.push_back(ui->lineEdit_final_vel_2->text().toDouble());
+    final_vel.push_back(ui->lineEdit_final_vel_3->text().toDouble());
+    final_vel.push_back(ui->lineEdit_final_vel_4->text().toDouble());
+    final_vel.push_back(ui->lineEdit_final_vel_5->text().toDouble());
+    final_vel.push_back(ui->lineEdit_final_vel_6->text().toDouble());
+    final_vel.push_back(ui->lineEdit_final_vel_7->text().toDouble());
+    final_vel.push_back(ui->lineEdit_final_vel_8->text().toDouble());
+    final_vel.push_back(ui->lineEdit_final_vel_9->text().toDouble());
+    final_vel.push_back(ui->lineEdit_final_vel_10->text().toDouble());
+    final_vel.push_back(ui->lineEdit_final_vel_11->text().toDouble());
+}
+
+void TolDialogHUML::getInitAcc(std::vector<double> &init_acc)
+{
+    init_acc.clear();
+    init_acc.push_back(ui->lineEdit_init_acc_1->text().toDouble());
+    init_acc.push_back(ui->lineEdit_init_acc_2->text().toDouble());
+    init_acc.push_back(ui->lineEdit_init_acc_3->text().toDouble());
+    init_acc.push_back(ui->lineEdit_init_acc_4->text().toDouble());
+    init_acc.push_back(ui->lineEdit_init_acc_5->text().toDouble());
+    init_acc.push_back(ui->lineEdit_init_acc_6->text().toDouble());
+    init_acc.push_back(ui->lineEdit_init_acc_7->text().toDouble());
+    init_acc.push_back(ui->lineEdit_init_acc_8->text().toDouble());
+    init_acc.push_back(ui->lineEdit_init_acc_9->text().toDouble());
+    init_acc.push_back(ui->lineEdit_init_acc_10->text().toDouble());
+    init_acc.push_back(ui->lineEdit_init_acc_11->text().toDouble());
+}
+
+void TolDialogHUML::getFinalAcc(std::vector<double> &final_acc)
+{
+    final_acc.clear();
+    final_acc.push_back(ui->lineEdit_final_acc_1->text().toDouble());
+    final_acc.push_back(ui->lineEdit_final_acc_2->text().toDouble());
+    final_acc.push_back(ui->lineEdit_final_acc_3->text().toDouble());
+    final_acc.push_back(ui->lineEdit_final_acc_4->text().toDouble());
+    final_acc.push_back(ui->lineEdit_final_acc_5->text().toDouble());
+    final_acc.push_back(ui->lineEdit_final_acc_6->text().toDouble());
+    final_acc.push_back(ui->lineEdit_final_acc_7->text().toDouble());
+    final_acc.push_back(ui->lineEdit_final_acc_8->text().toDouble());
+    final_acc.push_back(ui->lineEdit_final_acc_9->text().toDouble());
+    final_acc.push_back(ui->lineEdit_final_acc_10->text().toDouble());
+    final_acc.push_back(ui->lineEdit_final_acc_11->text().toDouble());
+}
+
+void TolDialogHUML::getPreGraspApproach(std::vector<double> &pre_grasp)
+{
+    pre_grasp.clear();
+    pre_grasp.push_back(ui->lineEdit_pre_grasp_x->text().toDouble());
+    pre_grasp.push_back(ui->lineEdit_pre_grasp_y->text().toDouble());
+    pre_grasp.push_back(ui->lineEdit_pre_grasp_z->text().toDouble());
+    pre_grasp.push_back(ui->lineEdit_pre_grasp_dist->text().toDouble());
+}
+
+void TolDialogHUML::getPostGraspRetreat(std::vector<double> &post_grasp)
+{
+    post_grasp.clear();
+    post_grasp.push_back(ui->lineEdit_post_grasp_x->text().toDouble());
+    post_grasp.push_back(ui->lineEdit_post_grasp_y->text().toDouble());
+    post_grasp.push_back(ui->lineEdit_post_grasp_z->text().toDouble());
+    post_grasp.push_back(ui->lineEdit_post_grasp_dist->text().toDouble());
+}
+
+void TolDialogHUML::getPrePlaceApproach(std::vector<double> &pre_place)
+{
+    pre_place.clear();
+    pre_place.push_back(ui->lineEdit_pre_place_x->text().toDouble());
+    pre_place.push_back(ui->lineEdit_pre_place_y->text().toDouble());
+    pre_place.push_back(ui->lineEdit_pre_place_z->text().toDouble());
+    pre_place.push_back(ui->lineEdit_pre_place_dist->text().toDouble());
+
+}
+
+void TolDialogHUML::getPostPlaceRetreat(std::vector<double> &post_place)
+{
+    post_place.clear();
+    post_place.push_back(ui->lineEdit_post_place_x->text().toDouble());
+    post_place.push_back(ui->lineEdit_post_place_y->text().toDouble());
+    post_place.push_back(ui->lineEdit_post_place_z->text().toDouble());
+    post_place.push_back(ui->lineEdit_post_place_dist->text().toDouble());
+}
+
+
 // Q_SLOTS
 
 void TolDialogHUML::on_pushButton_save_clicked()
@@ -207,10 +295,6 @@ void TolDialogHUML::on_pushButton_save_clicked()
        stream << "Hand_tip_1=" << ui->lineEdit_hand_tip_1->text().toStdString().c_str() << endl;
        stream << "Hand_tip_2=" << ui->lineEdit_hand_tip_2->text().toStdString().c_str() << endl;
        stream << "Hand_tip_3=" << ui->lineEdit_hand_tip_3->text().toStdString().c_str() << endl;
-       stream << "# Tolerance with the table [mm]" << endl;
-       //stream << "against_wrist="<< ui->lineEdit_table_1->text().toStdString().c_str() << endl;
-       //stream << "against_hand="<< ui->lineEdit_table_2->text().toStdString().c_str() << endl;
-       //stream << "against_fingers="<< ui->lineEdit_table_3->text().toStdString().c_str() << endl;
        stream << "# Joint Expanse factors" << endl;
        stream << "lambda_1=" << ui->lineEdit_lambda_1->text().toStdString().c_str() << endl;
        stream << "lambda_2=" << ui->lineEdit_lambda_2->text().toStdString().c_str() << endl;
@@ -223,6 +307,54 @@ void TolDialogHUML::on_pushButton_save_clicked()
        stream << "lambda_9=" << ui->lineEdit_lambda_9->text().toStdString().c_str() << endl;
        stream << "lambda_10=" << ui->lineEdit_lambda_10->text().toStdString().c_str() << endl;
        stream << "lambda_11=" << ui->lineEdit_lambda_11->text().toStdString().c_str() << endl;
+       stream << "# Initial Velocity " << endl;
+       stream << "init_vel_1=" << ui->lineEdit_init_vel_1->text().toStdString().c_str() << endl;
+       stream << "init_vel_2=" << ui->lineEdit_init_vel_2->text().toStdString().c_str() << endl;
+       stream << "init_vel_3=" << ui->lineEdit_init_vel_3->text().toStdString().c_str() << endl;
+       stream << "init_vel_4=" << ui->lineEdit_init_vel_4->text().toStdString().c_str() << endl;
+       stream << "init_vel_5=" << ui->lineEdit_init_vel_5->text().toStdString().c_str() << endl;
+       stream << "init_vel_6=" << ui->lineEdit_init_vel_6->text().toStdString().c_str() << endl;
+       stream << "init_vel_7=" << ui->lineEdit_init_vel_7->text().toStdString().c_str() << endl;
+       stream << "init_vel_8=" << ui->lineEdit_init_vel_8->text().toStdString().c_str() << endl;
+       stream << "init_vel_9=" << ui->lineEdit_init_vel_9->text().toStdString().c_str() << endl;
+       stream << "init_vel_10=" << ui->lineEdit_init_vel_10->text().toStdString().c_str() << endl;
+       stream << "init_vel_11=" << ui->lineEdit_init_vel_11->text().toStdString().c_str() << endl;
+       stream << "# Final Velocity " << endl;
+       stream << "final_vel_1=" << ui->lineEdit_final_vel_1->text().toStdString().c_str() << endl;
+       stream << "final_vel_2=" << ui->lineEdit_final_vel_2->text().toStdString().c_str() << endl;
+       stream << "final_vel_3=" << ui->lineEdit_final_vel_3->text().toStdString().c_str() << endl;
+       stream << "final_vel_4=" << ui->lineEdit_final_vel_4->text().toStdString().c_str() << endl;
+       stream << "final_vel_5=" << ui->lineEdit_final_vel_5->text().toStdString().c_str() << endl;
+       stream << "final_vel_6=" << ui->lineEdit_final_vel_6->text().toStdString().c_str() << endl;
+       stream << "final_vel_7=" << ui->lineEdit_final_vel_7->text().toStdString().c_str() << endl;
+       stream << "final_vel_8=" << ui->lineEdit_final_vel_8->text().toStdString().c_str() << endl;
+       stream << "final_vel_9=" << ui->lineEdit_final_vel_9->text().toStdString().c_str() << endl;
+       stream << "final_vel_10=" << ui->lineEdit_final_vel_10->text().toStdString().c_str() << endl;
+       stream << "final_vel_11=" << ui->lineEdit_final_vel_11->text().toStdString().c_str() << endl;
+       stream << "# Initial Acceleration " << endl;
+       stream << "init_acc_1=" << ui->lineEdit_init_acc_1->text().toStdString().c_str() << endl;
+       stream << "init_acc_2=" << ui->lineEdit_init_acc_2->text().toStdString().c_str() << endl;
+       stream << "init_acc_3=" << ui->lineEdit_init_acc_3->text().toStdString().c_str() << endl;
+       stream << "init_acc_4=" << ui->lineEdit_init_acc_4->text().toStdString().c_str() << endl;
+       stream << "init_acc_5=" << ui->lineEdit_init_acc_5->text().toStdString().c_str() << endl;
+       stream << "init_acc_6=" << ui->lineEdit_init_acc_6->text().toStdString().c_str() << endl;
+       stream << "init_acc_7=" << ui->lineEdit_init_acc_7->text().toStdString().c_str() << endl;
+       stream << "init_acc_8=" << ui->lineEdit_init_acc_8->text().toStdString().c_str() << endl;
+       stream << "init_acc_9=" << ui->lineEdit_init_acc_9->text().toStdString().c_str() << endl;
+       stream << "init_acc_10=" << ui->lineEdit_init_acc_10->text().toStdString().c_str() << endl;
+       stream << "init_acc_11=" << ui->lineEdit_init_acc_11->text().toStdString().c_str() << endl;
+       stream << "# Final Acceleration " << endl;
+       stream << "final_acc_1=" << ui->lineEdit_final_acc_1->text().toStdString().c_str() << endl;
+       stream << "final_acc_2=" << ui->lineEdit_final_acc_2->text().toStdString().c_str() << endl;
+       stream << "final_acc_3=" << ui->lineEdit_final_acc_3->text().toStdString().c_str() << endl;
+       stream << "final_acc_4=" << ui->lineEdit_final_acc_4->text().toStdString().c_str() << endl;
+       stream << "final_acc_5=" << ui->lineEdit_final_acc_5->text().toStdString().c_str() << endl;
+       stream << "final_acc_6=" << ui->lineEdit_final_acc_6->text().toStdString().c_str() << endl;
+       stream << "final_acc_7=" << ui->lineEdit_final_acc_7->text().toStdString().c_str() << endl;
+       stream << "final_acc_8=" << ui->lineEdit_final_acc_8->text().toStdString().c_str() << endl;
+       stream << "final_acc_9=" << ui->lineEdit_final_acc_9->text().toStdString().c_str() << endl;
+       stream << "final_acc_10=" << ui->lineEdit_final_acc_10->text().toStdString().c_str() << endl;
+       stream << "final_acc_11=" << ui->lineEdit_final_acc_11->text().toStdString().c_str() << endl;
        stream << "# Tolerances with the target [mm]" << endl;
        stream << "tar_xx_1=" << ui->lineEdit_tar_xx_1->text().toStdString().c_str()<< endl;
        stream << "tar_xx_2=" << ui->lineEdit_tar_xx_2->text().toStdString().c_str()<< endl;
@@ -264,30 +396,33 @@ void TolDialogHUML::on_pushButton_save_clicked()
        stream << "# Tolerances for the final posture" << endl;
        stream << "tar_pos=" << ui->lineEdit_tar_pos->text().toStdString().c_str()<< endl;
        stream << "tar_or="<< ui->lineEdit_tar_or->text().toStdString().c_str() << endl;
-       stream << "# Engaging parameters [mm]" << endl;
-       stream << "eng_dist=" << ui->lineEdit_eng_dist->text().toStdString().c_str()<< endl;
-       stream << "eng_dir=" << ui->comboBox_eng_dir->currentIndex()<< endl;
-       stream << "eng_x=" << ui->lineEdit_eng_x->text().toStdString().c_str()<< endl;
-       stream << "eng_y=" << ui->lineEdit_eng_y->text().toStdString().c_str()<< endl;
-       stream << "eng_z=" << ui->lineEdit_eng_z->text().toStdString().c_str()<< endl;
-       stream << "# Disengaging parameters [mm]" << endl;
-       stream << "diseng_dist=" << ui->lineEdit_diseng_dist->text().toStdString().c_str()<< endl;
-       stream << "diseng_dir=" << ui->comboBox_diseng_dir->currentIndex()<< endl;
+       stream << "# Pick settings" << endl;
+       stream << "pre_grasp_x="<< ui->lineEdit_pre_grasp_x->text().toStdString().c_str() << endl;
+       stream << "pre_grasp_y="<< ui->lineEdit_pre_grasp_y->text().toStdString().c_str() << endl;
+       stream << "pre_grasp_z="<< ui->lineEdit_pre_grasp_z->text().toStdString().c_str() << endl;
+       stream << "pre_grasp_dist="<< ui->lineEdit_pre_grasp_dist->text().toStdString().c_str() << endl;
+       stream << "post_grasp_x="<< ui->lineEdit_post_grasp_x->text().toStdString().c_str() << endl;
+       stream << "post_grasp_y="<< ui->lineEdit_post_grasp_y->text().toStdString().c_str() << endl;
+       stream << "post_grasp_z="<< ui->lineEdit_post_grasp_z->text().toStdString().c_str() << endl;
+       stream << "post_grasp_dist="<< ui->lineEdit_post_grasp_dist->text().toStdString().c_str() << endl;
+       stream << "# Place settings" << endl;
+       stream << "pre_place_x="<< ui->lineEdit_pre_place_x->text().toStdString().c_str() << endl;
+       stream << "pre_place_y="<< ui->lineEdit_pre_place_y->text().toStdString().c_str() << endl;
+       stream << "pre_place_z="<< ui->lineEdit_pre_place_z->text().toStdString().c_str() << endl;
+       stream << "pre_place_dist="<< ui->lineEdit_pre_place_dist->text().toStdString().c_str() << endl;
+       stream << "post_place_x="<< ui->lineEdit_post_place_x->text().toStdString().c_str() << endl;
+       stream << "post_place_y="<< ui->lineEdit_post_place_y->text().toStdString().c_str() << endl;
+       stream << "post_place_z="<< ui->lineEdit_post_place_z->text().toStdString().c_str() << endl;
+       stream << "post_place_dist="<< ui->lineEdit_post_place_dist->text().toStdString().c_str() << endl;
+       stream << "# Move settings" << endl;
        stream << "# Others" << endl;
        stream << "max_velocity="<< ui->lineEdit_w_max->text().toStdString().c_str() <<endl;
        stream << "steps=" << ui->lineEdit_steps->text().toStdString().c_str()<< endl;
-       stream << "tar_axis=" << ui->comboBox_approach_axis->currentIndex()<< endl;
        stream << "tol_stop=" << ui->lineEdit_tol_stop->text().toStdString().c_str()<< endl;
-       if (ui->checkBox_tar_av->isChecked()){
-           stream << "tar_av=false"<< endl;
-       }else{
-           stream << "tar_av=true"<< endl;
-       }
-       if (ui->checkBox_ob_av->isChecked()){
-           stream << "ob_av=false"<< endl;
-       }else{
-           stream << "ob_av=true"<< endl;
-       }
+       if (ui->checkBox_tar_av->isChecked()){ stream << "tar_av=false"<< endl;}else{stream << "tar_av=true"<< endl;}
+       if (ui->checkBox_ob_av->isChecked()){stream << "ob_av=false"<< endl;}else{stream << "ob_av=true"<< endl;}
+       if(ui->checkBox_approach->isChecked()){stream << "approach=false"<<endl;}else{stream << "approach=true"<<endl;}
+       if(ui->checkBox_retreat->isChecked()){stream << "retreat=false"<<endl;}else{stream << "retreat=true"<<endl;}
        //stream << "# END" << endl;
 
 
@@ -355,12 +490,6 @@ void TolDialogHUML::on_pushButton_load_clicked()
                     ui->lineEdit_hand_tip_2->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Hand_tip_3"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_hand_tip_3->setText(fields.at(1));
-                //}else if(QString::compare(fields.at(0),QString("against_wrist"),Qt::CaseInsensitive)==0){
-                    //ui->lineEdit_table_1->setText(fields.at(1));
-                //}else if(QString::compare(fields.at(0),QString("against_hand"),Qt::CaseInsensitive)==0){
-                    //ui->lineEdit_table_2->setText(fields.at(1));
-                //}else if(QString::compare(fields.at(0),QString("against_fingers"),Qt::CaseInsensitive)==0){
-                    //ui->lineEdit_table_3->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("lambda_1"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_lambda_1->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("lambda_2"),Qt::CaseInsensitive)==0){
@@ -383,6 +512,94 @@ void TolDialogHUML::on_pushButton_load_clicked()
                     ui->lineEdit_lambda_10->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("lambda_11"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_lambda_11->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_vel_1"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_vel_1->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_vel_2"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_vel_2->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_vel_3"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_vel_3->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_vel_4"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_vel_4->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_vel_5"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_vel_5->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_vel_6"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_vel_6->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_vel_7"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_vel_7->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_vel_8"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_vel_8->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_vel_9"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_vel_9->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_vel_10"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_vel_10->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_vel_11"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_vel_11->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_vel_1"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_vel_1->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_vel_2"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_vel_2->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_vel_3"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_vel_3->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_vel_4"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_vel_4->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_vel_5"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_vel_5->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_vel_6"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_vel_6->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_vel_7"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_vel_7->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_vel_8"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_vel_8->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_vel_9"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_vel_9->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_vel_10"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_vel_10->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_vel_11"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_vel_11->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_acc_1"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_acc_1->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_acc_2"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_acc_2->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_acc_3"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_acc_3->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_acc_4"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_acc_4->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_acc_5"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_acc_5->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_acc_6"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_acc_6->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_acc_7"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_acc_7->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_acc_8"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_acc_8->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_acc_9"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_acc_9->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_acc_10"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_acc_10->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("init_acc_11"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_init_acc_11->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_acc_1"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_acc_1->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_acc_2"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_acc_2->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_acc_3"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_acc_3->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_acc_4"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_acc_4->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_acc_5"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_acc_5->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_acc_6"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_acc_6->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_acc_7"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_acc_7->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_acc_8"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_acc_8->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_acc_9"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_acc_9->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_acc_10"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_acc_10->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_acc_11"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_acc_11->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("tar_xx_1"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_tar_xx_1->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("tar_xx_2"),Qt::CaseInsensitive)==0){
@@ -459,26 +676,42 @@ void TolDialogHUML::on_pushButton_load_clicked()
                     ui->lineEdit_tar_pos->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("tar_or"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_tar_or->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("eng_dist"),Qt::CaseInsensitive)==0){
-                    ui->lineEdit_eng_dist->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("eng_dir"),Qt::CaseInsensitive)==0){
-                    ui->comboBox_eng_dir->setCurrentIndex(fields.at(1).toInt());
-                }else if(QString::compare(fields.at(0),QString("eng_x"),Qt::CaseInsensitive)==0){
-                    ui->lineEdit_eng_x->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("eng_y"),Qt::CaseInsensitive)==0){
-                    ui->lineEdit_eng_y->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("eng_z"),Qt::CaseInsensitive)==0){
-                    ui->lineEdit_eng_z->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("diseng_dist"),Qt::CaseInsensitive)==0){
-                    ui->lineEdit_diseng_dist->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("diseng_dir"),Qt::CaseInsensitive)==0){
-                    ui->comboBox_diseng_dir->setCurrentIndex(fields.at(1).toInt());
+                }else if(QString::compare(fields.at(0),QString("pre_grasp_x"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_pre_grasp_x->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("pre_grasp_y"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_pre_grasp_y->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("pre_grasp_z"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_pre_grasp_z->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("pre_grasp_dist"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_pre_grasp_dist->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("post_grasp_x"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_post_grasp_x->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("post_grasp_y"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_post_grasp_y->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("post_grasp_z"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_post_grasp_z->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("post_grasp_dist"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_post_grasp_dist->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("pre_place_x"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_pre_place_x->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("pre_place_y"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_pre_place_y->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("pre_place_z"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_pre_place_z->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("pre_place_dist"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_pre_place_dist->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("post_place_x"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_post_place_x->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("post_place_y"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_post_place_y->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("post_place_z"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_post_place_z->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("post_place_dist"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_post_place_dist->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("max_velocity"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_w_max->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("steps"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_steps->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("tar_axis"),Qt::CaseInsensitive)==0){
-                    ui->comboBox_approach_axis->setCurrentIndex(fields.at(1).toInt());
                 }else if(QString::compare(fields.at(0),QString("tol_stop"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_tol_stop->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("tar_av"),Qt::CaseInsensitive)==0){
@@ -493,6 +726,18 @@ void TolDialogHUML::on_pushButton_load_clicked()
                     }else{
                         ui->checkBox_ob_av->setChecked(false);
                     }
+                }else if(QString::compare(fields.at(0),QString("approach"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_approach->setChecked(true);
+                    }else{
+                        ui->checkBox_approach->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("retreat"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_retreat->setChecked(true);
+                    }else{
+                        ui->checkBox_retreat->setChecked(false);
+                    }
                 }
 
             }
@@ -503,6 +748,32 @@ void TolDialogHUML::on_pushButton_load_clicked()
 
     }
 
+}
+
+void TolDialogHUML::checkApproach(int state)
+{
+    if(state==0){
+        // unchecked
+        ui->groupBox_pre_grasp->setEnabled(true);
+        ui->groupBox_pre_place->setEnabled(true);
+    }else{
+        //checked
+        ui->groupBox_pre_grasp->setEnabled(false);
+        ui->groupBox_pre_place->setEnabled(false);
+    }
+}
+
+void TolDialogHUML::checkRetreat(int state)
+{
+    if(state==0){
+        // unchecked
+        ui->groupBox_post_grasp->setEnabled(true);
+        ui->groupBox_post_place->setEnabled(true);
+    }else{
+        //checked
+        ui->groupBox_post_grasp->setEnabled(false);
+        ui->groupBox_post_place->setEnabled(false);
+    }
 }
 
 
