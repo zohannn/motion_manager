@@ -231,10 +231,10 @@ tar_or=0.001
 pre_grasp_x=0
 
 pre_grasp_y=1
+
 pre_grasp_z=0
 
-pre_grasp_dist=0
-
+pre_grasp_dist=10
 post_grasp_x=0
 
 post_grasp_y=0
