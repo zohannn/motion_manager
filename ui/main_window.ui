@@ -796,18 +796,8 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="title">
-         <string>The planned Movement: [deg]|[deg/sec]</string>
+         <string>The planned Movement: [deg]|[deg/s]|[deg/s^2]</string>
         </property>
-        <widget class="QListWidget" name="listWidget_sol_mov">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>21</y>
-           <width>621</width>
-           <height>181</height>
-          </rect>
-         </property>
-        </widget>
         <widget class="QWidget" name="layoutWidget_time_mov">
          <property name="geometry">
           <rect>
@@ -866,6 +856,16 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
          </layout>
+        </widget>
+        <widget class="QTableWidget" name="tableWidget_sol_mov">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>21</y>
+           <width>631</width>
+           <height>181</height>
+          </rect>
+         </property>
         </widget>
        </widget>
       </widget>

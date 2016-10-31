@@ -401,7 +401,7 @@ void MainWindow::on_pushButton_plan_pressed()
 
     qnode.log(QNode::Info,string("planning the selected movement. . ."));
     ui.pushButton_plan->setCheckable(true);
-    ui.listWidget_sol_mov->clear();
+    ui.tableWidget_sol_mov->clear();//ui.listWidget_sol_mov->clear();
     ui.label_totalTime_value_mov->clear();
 }
 
@@ -623,14 +623,15 @@ void MainWindow::on_pushButton_plan_clicked()
     ui.tabWidget_sol->setCurrentIndex(0);    
     problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
     int planner_id = prob->getPlannerID();
+    double tol_stop; // stop tolerance on the joints when executing the movements
+    HUMotion::planning_result h_results; HUMotion::huml_params  tols;
 
-    bool solved = false;
+    //bool solved = false;
  try{
     switch(planner_id){
 
     case 0: // HUML
         mTolHumldlg->setInfo(prob->getInfoLine());
-        HUMotion::huml_params  tols;
         // --- Tolerances for the final posture selection ---- //
         tols.tolTarPos = mTolHumldlg->getTolTarPos(); // target position tolerances
         tols.tolTarOr = mTolHumldlg->getTolTarOr(); // target orientation tolerances
@@ -641,11 +642,13 @@ void MainWindow::on_pushButton_plan_clicked()
         mTolHumldlg->getLambda(tols.lambda_final); // joint expense factors
         mTolHumldlg->getLambda(tols.lambda_bounce); // joint expense factors
         // --- Tolerances for the bounce posture selection ---- //
-        tols.w_max.push_back(mTolHumldlg->getWMax()); // max joint velocity
+        tols.w_max = std::vector<double>(tols.lambda_final.size(),mTolHumldlg->getWMax()); // max joint velocity
         mTolHumldlg->getInitVel(tols.bounds.vel_0); // initial velocity
         mTolHumldlg->getFinalVel(tols.bounds.vel_f); // final velocity
         mTolHumldlg->getInitAcc(tols.bounds.acc_0); // initial acceleration
         mTolHumldlg->getFinalAcc(tols.bounds.acc_f); // final acceleration
+        mTolHumldlg->getVelApproach(tols.vel_approach); // velocity approach
+        mTolHumldlg->getAccApproach(tols.acc_approach); // acceleration approach
         // tolerances for the obstacles
         mTolHumldlg->getTolsObstacles(tols.final_tolsObstacles); // final posture tols
         tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
@@ -660,6 +663,7 @@ void MainWindow::on_pushButton_plan_clicked()
         mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
         mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
         tols.steps = mTolHumldlg->getSteps();// number of steps
+        tols.totalTime = 1.0; // 1 = plan the 100% of the movement
         // pick / place settings
         tols.mov_specs.approach = mTolHumldlg->getApproach();
         tols.mov_specs.retreat = mTolHumldlg->getRetreat();
@@ -668,112 +672,72 @@ void MainWindow::on_pushButton_plan_clicked()
         mTolHumldlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
         mTolHumldlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
 
-        solved = prob->solve(tols); // plan the movement
+        tol_stop = mTolHumldlg->getTolStop(); // stop tolerance on the joints when executing the movements
+
+        h_results = prob->solve(tols); // plan the movement
+
+        ui.pushButton_plan->setCheckable(false);
+        if(h_results.status==0){
+            qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
+            this->curr_mov = prob->getMovement();
+            this->timeSteps_mov = h_results.time_steps;
+            this->jointsPosition_mov = h_results.trajectory_stages;
+            this->jointsVelocity_mov = h_results.velocity_stages;
+            this->jointsAcceleration_mov = h_results.acceleration_stages;
+        }else{
+            ui.tableWidget_sol_mov->clear();//ui.listWidget_sol_mov->clear();
+            qnode.log(QNode::Error,std::string("The planning has failed: ")+h_results.status_msg);
+        }
 
         break;
 
-        /*
-
-    if(solved){
-        ui.pushButton_plan->setCheckable(false);
-
-        qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
+    case 1: // another planner
+        break;
 
 
-        MatrixXd traj;
-        //prob->getTrajectory(traj);
+    } // switch planner
 
-
-        MatrixXd vel;
-        //double timeStep = prob->getVelocity(vel);
-        std::vector<string> velStep = std::vector<string>(vel.rows());
-        for (int i=0; i<vel.rows();++i){
-            velStep.at(i) = "Step="+QString::number(i).toStdString()+",";
-            for (int j=0; j<vel.cols();++j){
-                velStep.at(i) = velStep.at(i)+
-                        " Joint "+QString::number(j+1).toStdString()+"="+
-                        QString::number(traj(i,j)*180/M_PI).toStdString()+"|"+
-                        QString::number(vel(i,j)*180/M_PI).toStdString()+", ";
-            }
-            ui.listWidget_sol_mov->addItem(QString(velStep.at(i).c_str()));
-        }
-
-
-        ui.label_totalTime_value_mov->setText(QString::number(timeStep*tols.steps).toStdString().c_str());
-        ui.tabWidget_sol->setEnabled(true);
-
-        this->timeStep=timeStep;
-        this->jointsVelocity_mov = vel;
-        this->curr_mov = prob->getMovement();
-
-        this->jointsPosition_mov = traj;
-
-    }else{
-
-        ui.listWidget_sol_mov->clear();
-        ui.pushButton_plan->setCheckable(false);
-
-        int err_log = prob->getErrLog();
-        std::string msg;
-
-        switch(err_log){
-        // TO DO!!!!!!!!!!!!!!!!!!!!!!!!
-        case 0:
-
-            msg="unknown problem";
-            break;
-
-        case 10:
-
-            msg="the final posture problem of the reach-to-grasp movement has not been solved";
-            break;
-
-        case 20:
-
-            msg="the bounce posture problem of the reach-to-grasp movement has not been solved";
-            break;
-
-        case 130:
-
-            msg="the final posture problem of the sub-disengage movement has not been solved";
-            break;
-
-        case 13:
-
-            msg="the final posture problem of the engage movement has not been solved";
-            break;
-
-        case 131:
-
-            msg="the final posture problem of the sub-engage movement has not been solved";
-            break;
-
-        case 23:
-
-            msg="the bounce posture problem of the engage movement has not been solved";
-            break;
-
-        case 25:
-
-            msg="the bounce posture problem of the go-home movement has not been solved";
-            break;
-
-        default:
-
-            msg="unknown problem";
-            break;
-
-        }
-
-        qnode.log(QNode::Error,std::string("The planning has failed: ")+msg);
-
-
+QStringList h_headers; bool h_head=false; QStringList v_headers;
+double mov_duration = 0;
+std::vector<std::vector<QString>> mov_steps;
+for (size_t k=0; k< this->jointsPosition_mov.size();++k){
+    MatrixXd jointPosition_stage = this->jointsPosition_mov.at(k);
+    MatrixXd jointVelocity_stage = this->jointsVelocity_mov.at(k);
+    MatrixXd jointAcceleration_stage = this->jointsAcceleration_mov.at(k);
+    mov_duration += this->timeSteps_mov.at(k)*(jointPosition_stage.rows()-1);
+    this->tols_stop.push_back(tol_stop);
+    std::vector<QString> stage_step;
+    for(int i =0; i< jointPosition_stage.rows(); ++i){
+        stage_step.clear();
+        v_headers.push_back(QString("Step ")+QString::number(i));
+        for (int j=0; j<jointPosition_stage.cols();++j){
+            stage_step.push_back(
+                    QString::number(jointPosition_stage(i,j)*180/M_PI)+"|"+
+                    QString::number(jointVelocity_stage(i,j)*180/M_PI)+"|"+
+                    QString::number(jointAcceleration_stage(i,j)*180/M_PI));
+            if(!h_head){h_headers.push_back(QString("Joint ")+QString::number(j+1));}
+        } // columns
+        h_head = true;
+        mov_steps.push_back(stage_step);
+    }// rows
+}// movements
+// show the results
+ui.tableWidget_sol_mov->setColumnCount(h_headers.size());
+ui.tableWidget_sol_mov->setHorizontalHeaderLabels(h_headers);
+ui.tableWidget_sol_mov->setRowCount(v_headers.size());
+ui.tableWidget_sol_mov->setVerticalHeaderLabels(v_headers);
+for(int i =0; i < v_headers.size(); ++i){
+    std::vector<QString> row = mov_steps.at(i);
+    for(int j=0; j < h_headers.size(); ++j){
+        QString item = row.at(j);
+       ui.tableWidget_sol_mov->setItem(i,j,new QTableWidgetItem(item));
     }
-    */
-            } // switch planner
+}
+ui.label_totalTime_value_mov->setText(QString::number(mov_duration).toStdString().c_str());
+ui.tabWidget_sol->setEnabled(true);
 
-    }catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
-    }catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
+}catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
+}catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
 
 
 }
@@ -792,12 +756,12 @@ void MainWindow::on_pushButton_execMov_pressed()
 void MainWindow::on_pushButton_execMov_clicked()
 {
 
-    MatrixXd vel = this->jointsVelocity_mov;
-    MatrixXd traj = this->jointsPosition_mov;
-    double timeStep = this->timeStep;
-    double tol_stop = this->mTolHumldlg->getTolStop();
+    //MatrixXd vel = this->jointsVelocity_mov;
+    //MatrixXd traj = this->jointsPosition_mov;
+    //double timeStep = this->timeStep;
+    //double tol_stop = this->mTolHumldlg->getTolStop();
 
-    qnode.execMovement(traj,vel,timeStep, tol_stop, this->curr_mov, this->curr_scene);
+   // qnode.execMovement(traj,vel,timeStep, tol_stop, this->curr_mov, this->curr_scene);
 
 }
 
@@ -826,13 +790,13 @@ void MainWindow::on_pushButton_execTask_pressed(){
 void MainWindow::on_pushButton_execTask_clicked()
 {
 
-    MatrixXd traj = this->jointsPosition_task;
-    MatrixXd vel = this->jointsVelocity_task;
-    std::vector<double> tSteps = this->timeSteps_task;
-    std::vector<int> nSteps = this->nSteps_task;
-    std::vector<double> stops = this->tols_stop;
+    //MatrixXd traj = this->jointsPosition_task;
+    //MatrixXd vel = this->jointsVelocity_task;
+    //std::vector<double> tSteps = this->timeSteps_task;
+    //std::vector<int> nSteps = this->nSteps_task;
+    //std::vector<double> stops = this->tols_stop;
 
-    qnode.execTask(traj,vel,tSteps,nSteps,stops,this->curr_task,this->curr_scene);
+    //qnode.execTask(traj,vel,tSteps,nSteps,stops,this->curr_task,this->curr_scene);
 
 
 }
@@ -856,15 +820,15 @@ void MainWindow::on_pushButton_load_task_clicked()
     //clear
     this->jointsVelocity_task.resize(0,0);
     this->jointsPosition_task.resize(0,0);
-    this->jointsVelocity_mov.resize(0,0);
-    this->jointsPosition_mov.resize(0,0);
-    this->timeStep=0.0;
+    //this->jointsVelocity_mov.resize(0,0);
+    //this->jointsPosition_mov.resize(0,0);
+    //this->timeStep=0.0;
     this->timeSteps_task.clear();
     this->nSteps_task.clear();
     this->tols_stop.clear();
 
     ui.listWidget_sol_task->clear();
-    ui.listWidget_sol_mov->clear();
+    ui.tableWidget_sol_mov->clear();//ui.listWidget_sol_mov->clear();
     ui.label_totalTime_value_task->clear();
     ui.label_totalTime_value_mov->clear();
     ui.listWidget_movs->clear();
@@ -1212,11 +1176,11 @@ void MainWindow::on_pushButton_scene_reset_clicked()
 {
 
     // reset the movements
-    ui.listWidget_sol_mov->clear();
+    ui.tableWidget_sol_mov->clear();//ui.listWidget_sol_mov->clear();
     //ui.listWidget_movs->clear();
     ui.label_totalTime_value_mov->clear();
-    this->jointsVelocity_mov.resize(0,0);
-    this->jointsPosition_mov.resize(0,0);
+    //this->jointsVelocity_mov.resize(0,0);
+    //this->jointsPosition_mov.resize(0,0);
 
     this->curr_scene = this->init_scene;
     qnode.resetSimTime();
@@ -1284,27 +1248,28 @@ void MainWindow::on_pushButton_scene_reset_clicked()
 
 }
 
+
 void MainWindow::on_pushButton_append_mov_clicked()
 {
-
+/*
     ui.pushButton_save_task->setEnabled(true);
 
     if(curr_task->getProblem(ui.listWidget_movs->currentRow())->getSolved()){
 
      this->tols_stop.push_back(this->mTolHumldlg->getTolStop());
 
-     MatrixXd vel_mov = this->jointsVelocity_mov;
+     //MatrixXd vel_mov = this->jointsVelocity_mov;
      MatrixXd vel_task = this->jointsVelocity_task;
 
-     MatrixXd pos_mov = this->jointsPosition_mov;
+     //MatrixXd pos_mov = this->jointsPosition_mov;
      MatrixXd pos_task = this->jointsPosition_task;
 
-     this->timeSteps_task.push_back(this->timeStep);
-     this->nSteps_task.push_back(vel_mov.rows()-1);
+     //this->timeSteps_task.push_back(this->timeStep);
+     //this->nSteps_task.push_back(vel_mov.rows()-1);
 
      if (vel_task.rows()==0){
          this->jointsVelocity_task = vel_mov;
-         this->jointsPosition_task = pos_mov;
+        // this->jointsPosition_task = pos_mov;
      }else{
         int vel_rows = vel_task.rows();
         int pos_rows = pos_task.rows();
@@ -1349,23 +1314,24 @@ void MainWindow::on_pushButton_append_mov_clicked()
 
     }
 
-
+*/
 
 }
+
 
 void MainWindow::on_pushButton_clear_task_clicked()
 {
 
     this->jointsVelocity_task.resize(0,0);
     this->jointsPosition_task.resize(0,0);
-    this->jointsVelocity_mov.resize(0,0);
-    this->jointsPosition_mov.resize(0,0);
-    this->timeStep=0.0;
+    //this->jointsVelocity_mov.resize(0,0);
+    //this->jointsPosition_mov.resize(0,0);
+    //this->timeStep=0.0;
     this->timeSteps_task.clear();
     this->nSteps_task.clear();
 
     ui.listWidget_sol_task->clear();
-    ui.listWidget_sol_mov->clear();
+    ui.tableWidget_sol_mov->clear();//ui.listWidget_sol_mov->clear();
     ui.label_totalTime_value_task->clear();
     ui.label_totalTime_value_mov->clear();
     ui.listWidget_movs->clear();

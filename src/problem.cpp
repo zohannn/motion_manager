@@ -874,7 +874,7 @@ movementPtr Problem::getMovement()
     return this->mov;
 }
 
-bool Problem::solve(HUMotion::huml_params &params)
+HUMotion::planning_result Problem::solve(HUMotion::huml_params &params)
 {
 
     this->solved = false;
@@ -938,11 +938,7 @@ bool Problem::solve(HUMotion::huml_params &params)
 
     HUMotion::planning_result res =  this->h_planner->plan_pick(params,initPosture);
 
-
-
-
-
-    return this->solved;
+    return res;
 }
 
 

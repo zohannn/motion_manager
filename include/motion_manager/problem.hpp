@@ -94,7 +94,7 @@ public:
      * @param tols
      * @return
      */
-    bool solve(HUMotion::huml_params& params);
+    HUMotion::planning_result solve(HUMotion::huml_params& params);
 
     /**
      * @brief This method gets the information of the problem

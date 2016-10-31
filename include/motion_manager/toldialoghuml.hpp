@@ -159,6 +159,18 @@ public:
     void getFinalAcc(std::vector<double>& final_acc);
 
     /**
+     * @brief getVelApproach
+     * @param vel_approach
+     */
+    void getVelApproach(std::vector<double>& vel_approach);
+
+    /**
+     * @brief getAccApproach
+     * @param acc_approach
+     */
+    void getAccApproach(std::vector<double>& acc_approach);
+
+    /**
      * @brief getPreGraspApproach
      * @param pre_grasp
      */

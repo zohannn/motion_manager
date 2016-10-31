@@ -272,9 +272,10 @@ private:
         TolDialogHUML *mTolHumldlg; /**< handle of the tuning dialog */
         int scenario_id; /**< id of the current scenario */
 
-        double timeStep; /**< current time step of the trajectory */
-        MatrixXd jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
-        MatrixXd jointsPosition_mov; /**< trajectory of the joint position of the movement */
+        vector<double> timeSteps_mov; /**< current time steps of the movement */
+        vector< MatrixXd > jointsAcceleration_mov; /**< trajectory of the joint acceleration of the movement */
+        vector< MatrixXd > jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
+        vector< MatrixXd > jointsPosition_mov; /**< trajectory of the joint position of the movement */
         MatrixXd jointsVelocity_task; /**< trajectory of the joint velocity of the task */
         MatrixXd jointsPosition_task; /**< trajectory of the joint position of the task */
         vector<double> timeSteps_task; /**< vector of time steps of each movement in the task */

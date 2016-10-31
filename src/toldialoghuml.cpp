@@ -16,6 +16,8 @@ TolDialogHUML::TolDialogHUML(QWidget *parent) :
     if(ui->checkBox_approach->isChecked()){
         ui->groupBox_pre_grasp->setEnabled(false);
         ui->groupBox_pre_place->setEnabled(false);
+        ui->groupBox_vel_approach->setEnabled(false);
+        ui->groupBox_acc_approach->setEnabled(false);
     }
     if(ui->checkBox_retreat->isChecked()){
         ui->groupBox_post_grasp->setEnabled(false);
@@ -225,6 +227,38 @@ void TolDialogHUML::getFinalAcc(std::vector<double> &final_acc)
     final_acc.push_back(ui->lineEdit_final_acc_11->text().toDouble());
 }
 
+void TolDialogHUML::getVelApproach(std::vector<double> &vel_approach)
+{
+    vel_approach.clear();
+    vel_approach.push_back(ui->lineEdit_vel_approach_1->text().toDouble());
+    vel_approach.push_back(ui->lineEdit_vel_approach_2->text().toDouble());
+    vel_approach.push_back(ui->lineEdit_vel_approach_3->text().toDouble());
+    vel_approach.push_back(ui->lineEdit_vel_approach_4->text().toDouble());
+    vel_approach.push_back(ui->lineEdit_vel_approach_5->text().toDouble());
+    vel_approach.push_back(ui->lineEdit_vel_approach_6->text().toDouble());
+    vel_approach.push_back(ui->lineEdit_vel_approach_7->text().toDouble());
+    vel_approach.push_back(ui->lineEdit_vel_approach_8->text().toDouble());
+    vel_approach.push_back(ui->lineEdit_vel_approach_9->text().toDouble());
+    vel_approach.push_back(ui->lineEdit_vel_approach_10->text().toDouble());
+    vel_approach.push_back(ui->lineEdit_vel_approach_11->text().toDouble());
+}
+
+void TolDialogHUML::getAccApproach(std::vector<double> &acc_approach)
+{
+    acc_approach.clear();
+    acc_approach.push_back(ui->lineEdit_acc_approach_1->text().toDouble());
+    acc_approach.push_back(ui->lineEdit_acc_approach_2->text().toDouble());
+    acc_approach.push_back(ui->lineEdit_acc_approach_3->text().toDouble());
+    acc_approach.push_back(ui->lineEdit_acc_approach_4->text().toDouble());
+    acc_approach.push_back(ui->lineEdit_acc_approach_5->text().toDouble());
+    acc_approach.push_back(ui->lineEdit_acc_approach_6->text().toDouble());
+    acc_approach.push_back(ui->lineEdit_acc_approach_7->text().toDouble());
+    acc_approach.push_back(ui->lineEdit_acc_approach_8->text().toDouble());
+    acc_approach.push_back(ui->lineEdit_acc_approach_9->text().toDouble());
+    acc_approach.push_back(ui->lineEdit_acc_approach_10->text().toDouble());
+    acc_approach.push_back(ui->lineEdit_acc_approach_11->text().toDouble());
+}
+
 void TolDialogHUML::getPreGraspApproach(std::vector<double> &pre_grasp)
 {
     pre_grasp.clear();
@@ -355,6 +389,30 @@ void TolDialogHUML::on_pushButton_save_clicked()
        stream << "final_acc_9=" << ui->lineEdit_final_acc_9->text().toStdString().c_str() << endl;
        stream << "final_acc_10=" << ui->lineEdit_final_acc_10->text().toStdString().c_str() << endl;
        stream << "final_acc_11=" << ui->lineEdit_final_acc_11->text().toStdString().c_str() << endl;
+       stream << "# Velocity Approach" << endl;
+       stream << "vel_approach_1=" << ui->lineEdit_vel_approach_1->text().toStdString().c_str() << endl;
+       stream << "vel_approach_2=" << ui->lineEdit_vel_approach_2->text().toStdString().c_str() << endl;
+       stream << "vel_approach_3=" << ui->lineEdit_vel_approach_3->text().toStdString().c_str() << endl;
+       stream << "vel_approach_4=" << ui->lineEdit_vel_approach_4->text().toStdString().c_str() << endl;
+       stream << "vel_approach_5=" << ui->lineEdit_vel_approach_5->text().toStdString().c_str() << endl;
+       stream << "vel_approach_6=" << ui->lineEdit_vel_approach_6->text().toStdString().c_str() << endl;
+       stream << "vel_approach_7=" << ui->lineEdit_vel_approach_7->text().toStdString().c_str() << endl;
+       stream << "vel_approach_8=" << ui->lineEdit_vel_approach_8->text().toStdString().c_str() << endl;
+       stream << "vel_approach_9=" << ui->lineEdit_vel_approach_9->text().toStdString().c_str() << endl;
+       stream << "vel_approach_10=" << ui->lineEdit_vel_approach_10->text().toStdString().c_str() << endl;
+       stream << "vel_approach_11=" << ui->lineEdit_vel_approach_11->text().toStdString().c_str() << endl;
+       stream << "# Acceleration Approach" << endl;
+       stream << "acc_approach_1=" << ui->lineEdit_acc_approach_1->text().toStdString().c_str() << endl;
+       stream << "acc_approach_2=" << ui->lineEdit_acc_approach_2->text().toStdString().c_str() << endl;
+       stream << "acc_approach_3=" << ui->lineEdit_acc_approach_3->text().toStdString().c_str() << endl;
+       stream << "acc_approach_4=" << ui->lineEdit_acc_approach_4->text().toStdString().c_str() << endl;
+       stream << "acc_approach_5=" << ui->lineEdit_acc_approach_5->text().toStdString().c_str() << endl;
+       stream << "acc_approach_6=" << ui->lineEdit_acc_approach_6->text().toStdString().c_str() << endl;
+       stream << "acc_approach_7=" << ui->lineEdit_acc_approach_7->text().toStdString().c_str() << endl;
+       stream << "acc_approach_8=" << ui->lineEdit_acc_approach_8->text().toStdString().c_str() << endl;
+       stream << "acc_approach_9=" << ui->lineEdit_acc_approach_9->text().toStdString().c_str() << endl;
+       stream << "acc_approach_10=" << ui->lineEdit_acc_approach_10->text().toStdString().c_str() << endl;
+       stream << "acc_approach_11=" << ui->lineEdit_acc_approach_11->text().toStdString().c_str() << endl;
        stream << "# Tolerances with the target [mm]" << endl;
        stream << "tar_xx_1=" << ui->lineEdit_tar_xx_1->text().toStdString().c_str()<< endl;
        stream << "tar_xx_2=" << ui->lineEdit_tar_xx_2->text().toStdString().c_str()<< endl;
@@ -600,6 +658,50 @@ void TolDialogHUML::on_pushButton_load_clicked()
                     ui->lineEdit_final_acc_10->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("final_acc_11"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_final_acc_11->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("vel_approach_1"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_vel_approach_1->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("vel_approach_2"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_vel_approach_2->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("vel_approach_3"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_vel_approach_3->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("vel_approach_4"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_vel_approach_4->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("vel_approach_5"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_vel_approach_5->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("vel_approach_6"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_vel_approach_6->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("vel_approach_7"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_vel_approach_7->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("vel_approach_8"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_vel_approach_8->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("vel_approach_9"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_vel_approach_9->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("vel_approach_10"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_vel_approach_10->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("vel_approach_11"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_vel_approach_11->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("acc_approach_1"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_acc_approach_1->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("acc_approach_2"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_acc_approach_2->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("acc_approach_3"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_acc_approach_3->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("acc_approach_4"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_acc_approach_4->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("acc_approach_5"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_acc_approach_5->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("acc_approach_6"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_acc_approach_6->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("acc_approach_7"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_acc_approach_7->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("acc_approach_8"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_acc_approach_8->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("acc_approach_9"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_acc_approach_9->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("acc_approach_10"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_acc_approach_10->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("acc_approach_11"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_acc_approach_11->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("tar_xx_1"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_tar_xx_1->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("tar_xx_2"),Qt::CaseInsensitive)==0){
@@ -756,10 +858,14 @@ void TolDialogHUML::checkApproach(int state)
         // unchecked
         ui->groupBox_pre_grasp->setEnabled(true);
         ui->groupBox_pre_place->setEnabled(true);
+        ui->groupBox_vel_approach->setEnabled(true);
+        ui->groupBox_acc_approach->setEnabled(true);
     }else{
         //checked
         ui->groupBox_pre_grasp->setEnabled(false);
         ui->groupBox_pre_place->setEnabled(false);
+        ui->groupBox_vel_approach->setEnabled(false);
+        ui->groupBox_acc_approach->setEnabled(false);
     }
 }
 

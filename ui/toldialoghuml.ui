@@ -1178,7 +1178,7 @@
       <rect>
        <x>30</x>
        <y>20</y>
-       <width>131</width>
+       <width>141</width>
        <height>341</height>
       </rect>
      </property>
@@ -1360,12 +1360,12 @@
       </layout>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_init_vel_3">
+    <widget class="QGroupBox" name="groupBox_init_acc">
      <property name="geometry">
       <rect>
-       <x>380</x>
+       <x>410</x>
        <y>20</y>
-       <width>191</width>
+       <width>201</width>
        <height>341</height>
       </rect>
      </property>
@@ -1547,12 +1547,12 @@
       </layout>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_init_vel_2">
+    <widget class="QGroupBox" name="groupBox_final_vel">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>220</x>
        <y>20</y>
-       <width>131</width>
+       <width>141</width>
        <height>341</height>
       </rect>
      </property>
@@ -1734,12 +1734,12 @@
       </layout>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_init_vel_4">
+    <widget class="QGroupBox" name="groupBox_final_acc">
      <property name="geometry">
       <rect>
-       <x>610</x>
+       <x>680</x>
        <y>20</y>
-       <width>191</width>
+       <width>201</width>
        <height>341</height>
       </rect>
      </property>
@@ -2186,6 +2186,380 @@
       </widget>
      </widget>
     </widget>
+    <widget class="QGroupBox" name="groupBox_vel_approach">
+     <property name="geometry">
+      <rect>
+       <x>530</x>
+       <y>20</y>
+       <width>141</width>
+       <height>341</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Final velocity [rad/s]</string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_6">
+      <property name="geometry">
+       <rect>
+        <x>2</x>
+        <y>22</y>
+        <width>121</width>
+        <height>317</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_23">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_27">
+         <item>
+          <widget class="QLabel" name="label_94">
+           <property name="text">
+            <string>Joint 1</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_95">
+           <property name="text">
+            <string>Joint 2</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_96">
+           <property name="text">
+            <string>Joint 3</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_109">
+           <property name="text">
+            <string>Joint 4</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_110">
+           <property name="text">
+            <string>Joint 5</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_111">
+           <property name="text">
+            <string>Joint 6</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_112">
+           <property name="text">
+            <string>Joint 7</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_113">
+           <property name="text">
+            <string>Joint 8</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_114">
+           <property name="text">
+            <string>Joint 9</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_115">
+           <property name="text">
+            <string>Joint 10</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_116">
+           <property name="text">
+            <string>Joint 11</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_28">
+         <item>
+          <widget class="QLineEdit" name="lineEdit_vel_approach_1">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_vel_approach_2">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_vel_approach_3">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_vel_approach_4">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_vel_approach_5">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_vel_approach_6">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_vel_approach_7">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_vel_approach_8">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_vel_approach_9">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_vel_approach_10">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_vel_approach_11">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_acc_approach">
+     <property name="geometry">
+      <rect>
+       <x>720</x>
+       <y>20</y>
+       <width>201</width>
+       <height>341</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Final acceleration  [rad/s^2]</string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_7">
+      <property name="geometry">
+       <rect>
+        <x>2</x>
+        <y>22</y>
+        <width>181</width>
+        <height>317</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_24">
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_29">
+         <item>
+          <widget class="QLabel" name="label_117">
+           <property name="text">
+            <string>Joint 1</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_118">
+           <property name="text">
+            <string>Joint 2</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_119">
+           <property name="text">
+            <string>Joint 3</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_120">
+           <property name="text">
+            <string>Joint 4</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_121">
+           <property name="text">
+            <string>Joint 5</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_122">
+           <property name="text">
+            <string>Joint 6</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_123">
+           <property name="text">
+            <string>Joint 7</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_124">
+           <property name="text">
+            <string>Joint 8</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_125">
+           <property name="text">
+            <string>Joint 9</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_126">
+           <property name="text">
+            <string>Joint 10</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_127">
+           <property name="text">
+            <string>Joint 11</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_30">
+         <item>
+          <widget class="QLineEdit" name="lineEdit_acc_approach_1">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_acc_approach_2">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_acc_approach_3">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_acc_approach_4">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_acc_approach_5">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_acc_approach_6">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_acc_approach_7">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_acc_approach_8">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_acc_approach_9">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_acc_approach_10">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_acc_approach_11">
+           <property name="text">
+            <string>0.0</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_huml_place">
     <attribute name="title">
@@ -2194,7 +2568,7 @@
     <widget class="QGroupBox" name="groupBox_post_place">
      <property name="geometry">
       <rect>
-       <x>270</x>
+       <x>330</x>
        <y>20</y>
        <width>221</width>
        <height>181</height>

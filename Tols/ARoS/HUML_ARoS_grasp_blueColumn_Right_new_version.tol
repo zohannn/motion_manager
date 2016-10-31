@@ -148,6 +148,52 @@ final_acc_10=0.0
 
 final_acc_11=0.0
 
+# Velocity Approach
+vel_approach_1=0.0
+
+vel_approach_2=0.0
+
+vel_approach_3=0.0
+
+vel_approach_4=0.0
+
+vel_approach_5=0.0
+
+vel_approach_6=0.0
+
+vel_approach_7=0.0
+
+vel_approach_8=0.0
+
+vel_approach_9=0.0
+
+vel_approach_10=0.0
+
+vel_approach_11=0.0
+
+# Acceleration Approach
+acc_approach_1=0.0
+
+acc_approach_2=0.0
+
+acc_approach_3=0.0
+
+acc_approach_4=0.0
+
+acc_approach_5=0.0
+
+acc_approach_6=0.0
+
+acc_approach_7=0.0
+
+acc_approach_8=0.0
+
+acc_approach_9=0.0
+
+acc_approach_10=0.0
+
+acc_approach_11=0.0
+
 # Tolerances with the target [mm]
 tar_xx_1=50
 
@@ -234,7 +280,7 @@ pre_grasp_y=1
 
 pre_grasp_z=0
 
-pre_grasp_dist=10
+pre_grasp_dist=15
 post_grasp_x=0
 
 post_grasp_y=0
