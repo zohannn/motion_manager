@@ -712,9 +712,9 @@ for (size_t k=0; k< this->jointsPosition_mov.size();++k){
         v_headers.push_back(QString("Step ")+QString::number(i));
         for (int j=0; j<jointPosition_stage.cols();++j){
             stage_step.push_back(
-                    QString::number(jointPosition_stage(i,j)*180/M_PI)+"|"+
-                    QString::number(jointVelocity_stage(i,j)*180/M_PI)+"|"+
-                    QString::number(jointAcceleration_stage(i,j)*180/M_PI));
+                    QString::number(jointPosition_stage(i,j)*180/M_PI,'g',3)+"|"+
+                    QString::number(jointVelocity_stage(i,j)*180/M_PI,'g',3)+"|"+
+                    QString::number(jointAcceleration_stage(i,j)*180/M_PI,'g',3));
             if(!h_head){h_headers.push_back(QString("Joint ")+QString::number(j+1));}
         } // columns
         h_head = true;
