@@ -626,7 +626,7 @@ void MainWindow::on_pushButton_plan_clicked()
     double tol_stop; // stop tolerance on the joints when executing the movements
     HUMotion::planning_result h_results; HUMotion::huml_params  tols;
 
-    //bool solved = false;
+    bool solved = false;
  try{
     switch(planner_id){
 
@@ -684,6 +684,7 @@ void MainWindow::on_pushButton_plan_clicked()
             this->jointsPosition_mov = h_results.trajectory_stages;
             this->jointsVelocity_mov = h_results.velocity_stages;
             this->jointsAcceleration_mov = h_results.acceleration_stages;
+            solved=true;
         }else{
             ui.tableWidget_sol_mov->clear();//ui.listWidget_sol_mov->clear();
             qnode.log(QNode::Error,std::string("The planning has failed: ")+h_results.status_msg);
@@ -697,44 +698,46 @@ void MainWindow::on_pushButton_plan_clicked()
 
     } // switch planners
 
-QStringList h_headers; bool h_head=false; QStringList v_headers;
-double mov_duration = 0;
-std::vector<std::vector<QString>> mov_steps;
-for (size_t k=0; k< this->jointsPosition_mov.size();++k){
-    MatrixXd jointPosition_stage = this->jointsPosition_mov.at(k);
-    MatrixXd jointVelocity_stage = this->jointsVelocity_mov.at(k);
-    MatrixXd jointAcceleration_stage = this->jointsAcceleration_mov.at(k);
-    mov_duration += this->timeSteps_mov.at(k)*(jointPosition_stage.rows()-1);
-    this->tols_stop_mov.push_back(tol_stop);
-    std::vector<QString> stage_step;
-    for(int i =0; i< jointPosition_stage.rows(); ++i){
-        stage_step.clear();
-        v_headers.push_back(QString("Step ")+QString::number(i));
-        for (int j=0; j<jointPosition_stage.cols();++j){
-            stage_step.push_back(
-                    QString::number(jointPosition_stage(i,j)*180/M_PI,'g',3)+"|"+
-                    QString::number(jointVelocity_stage(i,j)*180/M_PI,'g',3)+"|"+
-                    QString::number(jointAcceleration_stage(i,j)*180/M_PI,'g',3));
-            if(!h_head){h_headers.push_back(QString("Joint ")+QString::number(j+1));}
-        } // columns
-        h_head = true;
-        mov_steps.push_back(stage_step);
-    }// rows
-}// movements
-// show the results
-ui.tableWidget_sol_mov->setColumnCount(h_headers.size());
-ui.tableWidget_sol_mov->setHorizontalHeaderLabels(h_headers);
-ui.tableWidget_sol_mov->setRowCount(v_headers.size());
-ui.tableWidget_sol_mov->setVerticalHeaderLabels(v_headers);
-for(int i =0; i < v_headers.size(); ++i){
-    std::vector<QString> row = mov_steps.at(i);
-    for(int j=0; j < h_headers.size(); ++j){
-        QString item = row.at(j);
-       ui.tableWidget_sol_mov->setItem(i,j,new QTableWidgetItem(item));
+if(solved){
+    QStringList h_headers; bool h_head=false; QStringList v_headers;
+    double mov_duration = 0;
+    std::vector<std::vector<QString>> mov_steps;
+    for (size_t k=0; k< this->jointsPosition_mov.size();++k){
+        MatrixXd jointPosition_stage = this->jointsPosition_mov.at(k);
+        MatrixXd jointVelocity_stage = this->jointsVelocity_mov.at(k);
+        MatrixXd jointAcceleration_stage = this->jointsAcceleration_mov.at(k);
+        mov_duration += this->timeSteps_mov.at(k)*(jointPosition_stage.rows()-1);
+        this->tols_stop_mov.push_back(tol_stop);
+        std::vector<QString> stage_step;
+        for(int i =0; i< jointPosition_stage.rows(); ++i){
+            stage_step.clear();
+            v_headers.push_back(QString("Step ")+QString::number(i));
+            for (int j=0; j<jointPosition_stage.cols();++j){
+                stage_step.push_back(
+                        QString::number(jointPosition_stage(i,j)*180/M_PI,'g',3)+"|"+
+                        QString::number(jointVelocity_stage(i,j)*180/M_PI,'g',3)+"|"+
+                        QString::number(jointAcceleration_stage(i,j)*180/M_PI,'g',3));
+                if(!h_head){h_headers.push_back(QString("Joint ")+QString::number(j+1));}
+            } // columns
+            h_head = true;
+            mov_steps.push_back(stage_step);
+        }// rows
+    }// movements
+    // show the results
+    ui.tableWidget_sol_mov->setColumnCount(h_headers.size());
+    ui.tableWidget_sol_mov->setHorizontalHeaderLabels(h_headers);
+    ui.tableWidget_sol_mov->setRowCount(v_headers.size());
+    ui.tableWidget_sol_mov->setVerticalHeaderLabels(v_headers);
+    for(int i =0; i < v_headers.size(); ++i){
+        std::vector<QString> row = mov_steps.at(i);
+        for(int j=0; j < h_headers.size(); ++j){
+            QString item = row.at(j);
+           ui.tableWidget_sol_mov->setItem(i,j,new QTableWidgetItem(item));
+        }
     }
+    ui.label_totalTime_value_mov->setText(QString::number(mov_duration).toStdString().c_str());
+    ui.tabWidget_sol->setEnabled(true);
 }
-ui.label_totalTime_value_mov->setText(QString::number(mov_duration).toStdString().c_str());
-ui.tabWidget_sol->setEnabled(true);
 
 }catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
 }catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
@@ -770,7 +773,6 @@ void MainWindow::on_pushButton_stop_mov_clicked()
 
 void MainWindow::on_pushButton_stop_task_clicked()
 {
-
     qnode.stopSim();
     qnode.resetSimTime();
     qnode.resetGlobals();
@@ -794,7 +796,7 @@ void MainWindow::on_pushButton_execTask_clicked()
 
 void MainWindow::on_pushButton_load_task_clicked()
 {
-    /*
+
 
     int plan_id; QString plan_type;
     int mov_id; QString mov_type;
@@ -803,10 +805,10 @@ void MainWindow::on_pushButton_load_task_clicked()
     QString obj_str; objectPtr obj;
     QString obj_eng_str; objectPtr obj_eng;
     bool prec;
-    int steps=0;
     int row=0;
-    MatrixXd vel;
-    MatrixXd poss;
+    MatrixXd pos_stage;
+    MatrixXd vel_stage;
+    MatrixXd acc_stage;
 
     //clear
     this->jointsAcceleration_task.clear();
@@ -835,22 +837,46 @@ void MainWindow::on_pushButton_load_task_clicked()
 
         QTextStream stream( &f );
         QString line;
-        //int prev_steps=0;
 
+        vector<MatrixXd> t_mov;
+        vector<MatrixXd> w_mov;
+        vector<MatrixXd> a_mov;
+        vector<double> timesteps_mov;
+        vector<double> tols_stop_mov;
 
         while(!stream.atEnd()){
             line = f.readLine();
             if(line.at(0)==QChar('#')){
 
-                if(steps!=0){
-                    this->nSteps_task.push_back(steps);
-                    prev_steps+=steps+1;
-                    steps=0;
+                // the previous stage has finished
+                if(pos_stage.rows()!=0){
+                    t_mov.push_back(pos_stage);
+                    w_mov.push_back(vel_stage);
+                    a_mov.push_back(acc_stage);
                 }
-
+                // the previous movement hs finished
+                if(!t_mov.empty()){
+                    this->jointsPosition_task.push_back(t_mov);
+                    this->jointsVelocity_task.push_back(w_mov);
+                    this->jointsAcceleration_task.push_back(a_mov);
+                    this->timeSteps_task.push_back(timesteps_mov);
+                    this->tols_stop_task.push_back(tols_stop_mov);
+                }
+                // new movement in the task
+                t_mov.clear();
+                w_mov.clear();
+                a_mov.clear();
+                timesteps_mov.clear();
+                tols_stop_mov.clear();
+                // new stage in the movement
+                pos_stage.resize(0,0);
+                vel_stage.resize(0,0);
+                acc_stage.resize(0,0);
 
                 if((line.at(1)==QChar('E')) && (line.at(2)==QChar('N')) && (line.at(3)==QChar('D'))){break;}
+
                 QStringList fields = line.split(",");
+                QString tmp = fields.at(0); tmp.remove(QChar('#')); fields[0]=tmp;
                 for(int i=0; i< fields.size(); ++i){
                     QStringList fields1 = fields.at(i).split(":");
                     if (QString::compare(fields1.at(0).simplified(),QString("Planner"),Qt::CaseInsensitive)==0){
@@ -1019,104 +1045,104 @@ void MainWindow::on_pushButton_load_task_clicked()
                 ui.listWidget_movs->setCurrentRow(0);
 
 
+            }else if(line.at(0)==QChar('M')){
+                // the previous stage has finished
+                if(pos_stage.rows()!=0){
+                    t_mov.push_back(pos_stage);
+                    w_mov.push_back(vel_stage);
+                    a_mov.push_back(acc_stage);
+                }
+                // new stage in the movement
+                pos_stage.resize(0,0);
+                vel_stage.resize(0,0);
+                acc_stage.resize(0,0);
+                row=0;
             }else if(line.at(0)==QChar('t')){
 
                 QStringList fields = line.split("=");
                 if(QString::compare(fields.at(0).simplified(),QString("time step"),Qt::CaseInsensitive)==0){
-                    this->timeSteps_task.push_back(fields.at(1).toDouble());
+                    timesteps_mov.push_back(fields.at(1).toDouble());
                 }else if(QString::compare(fields.at(0).simplified(),QString("tol stop"),Qt::CaseInsensitive)==0){
-                    this->tols_stop.push_back(fields.at(1).toDouble());
+                    tols_stop_mov.push_back(fields.at(1).toDouble());
                 }
             }else{
-                poss.conservativeResize(poss.rows()+1,JOINTS_ARM+JOINTS_HAND);
-                vel.conservativeResize(vel.rows()+1,JOINTS_ARM+JOINTS_HAND);
+                pos_stage.conservativeResize(pos_stage.rows()+1,JOINTS_ARM+JOINTS_HAND);
+                vel_stage.conservativeResize(vel_stage.rows()+1,JOINTS_ARM+JOINTS_HAND);
+                acc_stage.conservativeResize(acc_stage.rows()+1,JOINTS_ARM+JOINTS_HAND);
 
                 QStringList fields = line.split(",");                               
                 for(int i=0; i <fields.size();++i){
                     QStringList fields1 = fields.at(i).split("=");
-                    if(QString::compare(fields1.at(0).simplified(),QString("Step"),Qt::CaseInsensitive)==0){
-                        steps=fields1.at(1).toInt()-prev_steps;
-                    }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 1"),Qt::CaseInsensitive)==0){
-                        QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,0)=fields2.at(0).toDouble()*M_PI/180;
-                        vel(row,0)=fields2.at(1).toDouble()*M_PI/180;
-                    }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 2"),Qt::CaseInsensitive)==0){
-                        QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,1)=fields2.at(0).toDouble()*M_PI/180;
-                        vel(row,1)=fields2.at(1).toDouble()*M_PI/180;
-                    }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 3"),Qt::CaseInsensitive)==0){
-                        QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,2)=fields2.at(0).toDouble()*M_PI/180;
-                        vel(row,2)=fields2.at(1).toDouble()*M_PI/180;
-                    }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 4"),Qt::CaseInsensitive)==0){
-                        QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,3)=fields2.at(0).toDouble()*M_PI/180;
-                        vel(row,3)=fields2.at(1).toDouble()*M_PI/180;
-                    }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 5"),Qt::CaseInsensitive)==0){
-                        QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,4)=fields2.at(0).toDouble()*M_PI/180;
-                        vel(row,4)=fields2.at(1).toDouble()*M_PI/180;
-                    }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 6"),Qt::CaseInsensitive)==0){
-                        QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,5)=fields2.at(0).toDouble()*M_PI/180;
-                        vel(row,5)=fields2.at(1).toDouble()*M_PI/180;
-                    }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 7"),Qt::CaseInsensitive)==0){
-                        QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,6)=fields2.at(0).toDouble()*M_PI/180;
-                        vel(row,6)=fields2.at(1).toDouble()*M_PI/180;
-                    }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 8"),Qt::CaseInsensitive)==0){
-                        QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,7)=fields2.at(0).toDouble()*M_PI/180;
-                        vel(row,7)=fields2.at(1).toDouble()*M_PI/180;
-                    }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 9"),Qt::CaseInsensitive)==0){
-                        QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,8)=fields2.at(0).toDouble()*M_PI/180;
-                        vel(row,8)=fields2.at(1).toDouble()*M_PI/180;
-                    }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 10"),Qt::CaseInsensitive)==0){
-                        QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,9)=fields2.at(0).toDouble()*M_PI/180;
-                        vel(row,9)=fields2.at(1).toDouble()*M_PI/180;
-                    }else if(QString::compare(fields1.at(0).simplified(),QString("Joint 11"),Qt::CaseInsensitive)==0){
-                        QStringList fields2 = fields1.at(1).split("|");
-                        poss(row,10)=fields2.at(0).toDouble()*M_PI/180;
-                        vel(row,10)=fields2.at(1).toDouble()*M_PI/180;
+                    for(int k=0; k < JOINTS_ARM+JOINTS_HAND; ++k){
+                        if(QString::compare(fields1.at(0).simplified(),QString("Joint ")+QString::number(k+1),Qt::CaseInsensitive)==0){
+                            QStringList fields2 = fields1.at(1).split("|");
+                            pos_stage(row,k) = fields2.at(0).toDouble()*M_PI/180;
+                            vel_stage(row,k) = fields2.at(1).toDouble()*M_PI/180;
+                            acc_stage(row,k) = fields2.at(2).toDouble()*M_PI/180;
+                        }else if(QString::compare(fields1.at(0).simplified(),QString("step"),Qt::CaseInsensitive)==0){break;}
                     }
-                }
+                } // for loop columns
                 row++;
             }
 
-        } // while loop
-
-        this->jointsPosition_task=poss;
-        this->jointsVelocity_task=vel;
+        } // while loop rows
 
         qnode.log(QNode::Info,std::string("The task has been loaded"));
 
-        this->vel_steps = std::vector<string>(vel.rows());
-        for (int i=0; i<vel.rows();++i){
-            this->vel_steps.at(i) ="Step="+QString::number(i).toStdString()+",";
-            for (int j=0; j<vel.cols();++j){
+        QStringList h_headers; bool h_head=false; QStringList v_headers;
+        std::vector<std::vector<QString>> task_steps;
+        vector<MatrixXd> pos_mov; vector<MatrixXd> vel_mov; vector<MatrixXd> acc_mov; vector<double> tstep_mov;
+        double task_duration = 0.0; double mov_duration = 0.0;
+        for(size_t h=0; h< this->jointsPosition_task.size();++h){
+            pos_mov = this->jointsPosition_task.at(h);
+            vel_mov = this->jointsVelocity_task.at(h);
+            acc_mov = this->jointsAcceleration_task.at(h);
+            tstep_mov = this->timeSteps_task.at(h);
+            mov_duration = 0;
+            for (size_t k=0; k< pos_mov.size();++k){
+                MatrixXd jointPosition_stage = pos_mov.at(k);
+                MatrixXd jointVelocity_stage = vel_mov.at(k);
+                MatrixXd jointAcceleration_stage = acc_mov.at(k);
+                mov_duration += tstep_mov.at(k)*(jointPosition_stage.rows()-1);
+                std::vector<QString> stage_step;
+                for(int i =0; i< jointPosition_stage.rows(); ++i){
+                    stage_step.clear();
+                    v_headers.push_back(QString("Step ")+QString::number(i));
+                    for (int j=0; j<jointPosition_stage.cols();++j){
+                        stage_step.push_back(
+                                QString::number(jointPosition_stage(i,j)*180/M_PI,'g',3)+"|"+
+                                QString::number(jointVelocity_stage(i,j)*180/M_PI,'g',3)+"|"+
+                                QString::number(jointAcceleration_stage(i,j)*180/M_PI,'g',3));
+                        if(!h_head){h_headers.push_back(QString("Joint ")+QString::number(j+1));}
+                    } // stage columns
+                    h_head = true;
+                    task_steps.push_back(stage_step);
+                }// stage rows
+            }// movements
+            task_duration +=mov_duration;
+        }//task
 
-                this->vel_steps.at(i) = this->vel_steps.at(i)+
-                        " Joint "+QString::number(j+1).toStdString()+"="+
-                        QString::number(poss(i,j)*180/M_PI).toStdString()+"|"+
-                        QString::number(vel(i,j)*180/M_PI).toStdString()+", ";
+        ui.tableWidget_sol_task->setColumnCount(h_headers.size());
+        ui.tableWidget_sol_task->setHorizontalHeaderLabels(h_headers);
+        ui.tableWidget_sol_task->setRowCount(v_headers.size());
+        ui.tableWidget_sol_task->setVerticalHeaderLabels(v_headers);
+        for(int i =0; i < v_headers.size(); ++i){
+            std::vector<QString> row = task_steps.at(i);
+            for(int j=0; j < h_headers.size(); ++j){
+                QString item = row.at(j);
+               ui.tableWidget_sol_task->setItem(i,j,new QTableWidgetItem(item));
             }
-            ui.listWidget_sol_task->addItem(QString(this->vel_steps.at(i).c_str()));
         }
-        double totalTime = 0;
-        for (size_t i = 0; i < this->timeSteps_task.size(); ++i){
-            totalTime += this->timeSteps_task.at(i)*this->nSteps_task.at(i);
-        }
-        ui.label_totalTime_value_task->setText(QString::number(totalTime).toStdString().c_str());
-
+        ui.label_totalTime_value_task->setText(QString::number(task_duration).toStdString().c_str());
         ui.tabWidget_sol->setEnabled(true);
         ui.tabWidget_sol->setCurrentIndex(1);
 
 
     }
     f.close();
-*/
+
+
+
 
 }
 
@@ -1141,7 +1167,7 @@ void MainWindow::on_pushButton_save_task_clicked()
             vector< double > tols_stop_mov = this->tols_stop_task.at(i);
 
             for(size_t j=0;j < traj_mov.size(); ++j){
-                stream << "# Stage: "<< QString::number(j+1).toStdString().c_str()<< endl;
+                stream << "Movement stage: "<< QString::number(j+1).toStdString().c_str()<< endl;
                 MatrixXd traj = traj_mov.at(j);
                 MatrixXd vel = vel_mov.at(j);
                 MatrixXd acc = acc_mov.at(j);

@@ -57,7 +57,11 @@
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="lineEdit_tol_stop"/>
+     <widget class="QLineEdit" name="lineEdit_tol_stop">
+      <property name="text">
+       <string>1.0</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
