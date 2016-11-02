@@ -938,6 +938,8 @@ HUMotion::planning_result Problem::solve(HUMotion::huml_params &params)
 
     HUMotion::planning_result res =  this->h_planner->plan_pick(params,initPosture);
 
+    if(res.status==0){this->solved=true;}
+
     return res;
 }
 

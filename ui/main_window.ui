@@ -780,7 +780,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_mov">
        <attribute name="title">
@@ -878,27 +878,17 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>0</x>
           <y>10</y>
-          <width>551</width>
+          <width>641</width>
           <height>241</height>
          </rect>
         </property>
         <property name="title">
-         <string>The complete task: [deg]|[deg/sec]</string>
+         <string>The complete task: [deg]|[deg/s]|[deg/s^2]</string>
         </property>
-        <widget class="QListWidget" name="listWidget_sol_task">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>21</y>
-           <width>531</width>
-           <height>181</height>
-          </rect>
-         </property>
-        </widget>
         <widget class="QWidget" name="layoutWidget_time_task">
          <property name="geometry">
           <rect>
-           <x>370</x>
+           <x>470</x>
            <y>0</y>
            <width>166</width>
            <height>17</height>
@@ -960,6 +950,16 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
          </layout>
+        </widget>
+        <widget class="QTableWidget" name="tableWidget_sol_task">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>20</y>
+           <width>631</width>
+           <height>181</height>
+          </rect>
+         </property>
         </widget>
        </widget>
       </widget>

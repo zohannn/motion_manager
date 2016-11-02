@@ -1768,24 +1768,19 @@ void QNode::leftProxCallback(const vrep_common::ProximitySensorData& data)
 }
 
 
-bool QNode::execMovement(MatrixXd& traj, MatrixXd& vel, double timeStep, double tol_stop, movementPtr mov, scenarioPtr scene)
+bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>& vel_mov, std::vector<double> timesteps, std::vector<double> tols_stop, movementPtr mov, scenarioPtr scene)
 {
 
     this->curr_scene = scene;
     int scenarioID = scene->getID();
-    this->curr_mov = mov;
-    VectorXd f_posture = traj.row(traj.rows()-1); // the final posture
-    bool f_reached=false;
-    double tol_stop_rad = tol_stop*static_cast<double>(M_PI)/180;
+    this->curr_mov = mov; int mov_type = mov->getType();  int arm_code = mov->getArm();
+    bool approach;
 
     ros::NodeHandle node;
     double ta;
     double tb;
     double tx;
     double pre_time= 0.0;
-    int arm_code = mov->getArm();
-    int mov_type = mov->getType();
-
 
     std::vector<int> handles;
     MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
@@ -1820,16 +1815,250 @@ bool QNode::execMovement(MatrixXd& traj, MatrixXd& vel, double timeStep, double 
     srv_enableSubscriber_hand.request.topicName="/"+nodeName+"/set_pos_hand"; // the topic name
     srv_enableSubscriber_hand.request.queueSize=1; // the subscriber queue size (on V-REP side)
     srv_enableSubscriber_hand.request.streamCmd=simros_strmcmd_set_joint_state; // the subscriber type
-
 #endif
+    VectorXd f_posture; // the final posture
+    bool f_reached;
+    double tol_stop_rad;
+    double timeStep;
+    double timeTot = 0.0;
 
     // start the simulation
     add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
     vrep_common::simRosStartSimulation srvstart;
     add_client.call(srvstart);
+    ros::spinOnce(); // first handle ROS messages
+
+    // for loop stages
+    for (size_t k=0; k< traj_mov.size();++k){
+
+        switch (mov_type){
+        case 0: // reach-to-grasp
+            if(k==1){approach=true;}else{approach=false;}
+            break;
+        case 1: // reaching
+            approach=false;
+            break;
+        case 2:// transport
+            if(k==1){approach=true;}else{approach=false;}
+            break;
+        case 3: // engage
+            if(k==1){approach=true;}else{approach=false;}
+            break;
+        case 4:// disengage
+            if(k==1){approach=true;}else{approach=false;}
+            break;
+        case 5: // go-park
+            approach = false;
+            break;
+        }
+
+        MatrixXd traj = traj_mov.at(k);
+        MatrixXd vel = vel_mov.at(k);
+        tol_stop_rad = tols_stop.at(k)*static_cast<double>(M_PI)/180;;
+        timeStep = timesteps.at(k);
+
+        f_posture = traj.row(traj.rows()-1);
+        f_reached=false;
+
+        ros::spinOnce(); // handle ROS messages
+        pre_time = simulationTime - timeTot; // update the total time of the movement
+        //BOOST_LOG_SEV(lg, info) << "timeTot = " << timeTot ;
+        //BOOST_LOG_SEV(lg, info) << "pre_time = " << pre_time ;
+
+
+
+#if HAND==0
+if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.response.subscriberID!=-1)){
+
+#elif HAND==1
+    if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.response.subscriberID!=-1) &&
+         client_enableSubscriber_hand.call(srv_enableSubscriber_hand) && (srv_enableSubscriber_hand.response.subscriberID!=-1)){
+        // ok, the service call was ok, and the subscriber was succesfully started on V-REP side
+        // V-REP is now listening to the desired values
+        ros::Publisher pub_hand=node.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_pos_hand",1);
+#endif
+
+        // 5. Let's prepare a publisher of those values:
+        ros::Publisher pub=node.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
+
+        for (int i = 1; i< vel.rows(); ++i){
+            //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
+            VectorXd ya = vel.row(i-1);
+            VectorXd yb = vel.row(i);
+            VectorXd yat = traj.row(i-1);
+            VectorXd ybt = traj.row(i);
+            ta = (i-1)*timeStep+ timeTot;
+            tb = ta + timeStep;
+            //BOOST_LOG_SEV(lg, info) << "ta = " << ta;
+            //BOOST_LOG_SEV(lg, info) << "tb = " << tb << "\n";
+            bool interval = true;
+            double tx_prev;
+            double yxt_prev;
+            ros::spinOnce(); // get the simulationRunning value
+            while (ros::ok() && simulationRunning && interval)
+            {// ros is running, simulation is running
+
+                vrep_common::JointSetStateData dataTraj;
+#if HAND==1
+                vrep_common::JointSetStateData data_hand;
+#endif
+
+                tx = simulationTime -pre_time;
+                //BOOST_LOG_SEV(lg, info) << "simulationTime = " << simulationTime ;
+                if (tx >= tb){
+                    // go to the next interval
+                    interval = false;
+                }else{
+                    //BOOST_LOG_SEV(lg, info) << "tx = " << tx ;
+                    //BOOST_LOG_SEV(lg, info) << "tx_prev = " << tx_prev;
+
+                    double m = (tx-ta)/(tb-ta);
+                    std::vector<double> r_post;
+                    this->curr_scene->getHumanoid()->getRightPosture(r_post);
+                    double yx;
+                    double yxt;
+                     if(sqrt(pow((f_posture(0)-r_post.at(0)),2)+
+                           pow((f_posture(1)-r_post.at(1)),2)+
+                           pow((f_posture(2)-r_post.at(2)),2)+
+                           pow((f_posture(3)-r_post.at(3)),2)+
+                           pow((f_posture(4)-r_post.at(4)),2)+
+                           pow((f_posture(5)-r_post.at(5)),2)+
+                           pow((f_posture(6)-r_post.at(6)),2)) < tol_stop_rad){
+                        f_reached=true;
+                        //std::cout << "final posture reached" << std::endl;
+                        break;
+                    }else{f_reached=false;}
+
+                    for (int k = 0; k< vel.cols(); ++k){
+                        if(f_reached){
+                            yx=0;
+                            yxt=yxt_prev;
+                        }else{
+                            yx = interpolate(ya(k),yb(k),m);
+                            yxt = interpolate(yat(k),ybt(k),m);
+                            yxt_prev=yxt;
+                        }
+                        dataTraj.handles.data.push_back(handles.at(k));
+                        switch(scenarioID){
+                        case 0: //error
+                            // TO DO
+                            break;
+                        case 1: // Toy vehicle scenario with AROS
+                            if((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4) ){
+                                dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                            }else{
+                                dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                            }
+                            dataTraj.values.data.push_back(yxt);
+                            break;
+                        case 2: // Toy vehicle scenario with Jarde
+                            dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                            dataTraj.values.data.push_back(yxt);
+                            break;
+                        }
+#if HAND ==1
+                        if((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) ){
+                            // the fingers are being addressed
+                            data_hand.handles.data.push_back(hand_handles(k+3-vel.cols(),2));
+                            data_hand.setModes.data.push_back(1); // set the target position
+                            data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
+
+                        }
+#endif
+
+                      //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", ya = " << ya(k)*180/static_cast<double>(M_PI) << ", yb = "<< yb(k)*180/static_cast<double>(M_PI);
+                      //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
+                                                  //", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
+
+                    }
+                    //BOOST_LOG_SEV(lg, info) << "\n";
+
+
+                    pub.publish(dataTraj);
+#if HAND ==1
+                    pub_hand.publish(data_hand);
+#endif
+
+                    interval = true;
+                    tx_prev = tx;
+                }
+
+                // handle ROS messages:
+                ros::spinOnce();
+
+
+            } // while
+
+            if(f_reached){
+                log(QNode::Info,string("Final Posture reached."));
+                break;}
+
+        }// for loop steps
+
+        // ----- post-movement operations -------- //
+        add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+        vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+        switch (mov_type) {
+        case 0: // reach-to grasp
+            // grasp the object
+            if(obj_in_hand){
+                if(approach){
+                    //srvset_parent.request.handle = h_detobj;
+                    srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                    srvset_parent.request.parentHandle = h_attach;
+                    srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                    add_client.call(srvset_parent);
+                    if (srvset_parent.response.result != 1){
+                        log(QNode::Error,string("Error in grasping the object "));
+                    }
+
+
+#if HAND == 1
+                    this->closeBarrettHand(arm_code);
+#endif
+                }
+
+            }
+            break;
+        case 1: // reaching
+            break;
+        case 2: // transport
+            break;
+        case 3: // engage
+            break;
+        case 4: // disengage
+            break;
+        case 5: // go home
+            break;
+        }
+    } // if subscriber
+    // handle ROS messages:
+    ros::spinOnce();
+    timeTot = simulationTime; // update the total time of the movement
+
+} // for loop stages
+
+// pause the simulation
+add_client = node.serviceClient<vrep_common::simRosPauseSimulation>("/vrep/simRosPauseSimulation");
+vrep_common::simRosPauseSimulation srvpause;
+add_client.call(srvpause);
+
+// handle ROS messages:
+ros::spinOnce();
+
+TotalTime = simulationTime; // update the total time of the movement
+
+log(QNode::Info,string("Movement completed"));
+mov->setExecuted(true);
+
+
+return true;
+
+
+
 
     // ----- pre-movement operations -------- //
-
+/*
     switch (mov_type) {
 
     case 0: // reach-to-grasp
@@ -1877,233 +2106,19 @@ bool QNode::execMovement(MatrixXd& traj, MatrixXd& vel, double timeStep, double 
             pre_time=simulationTime-TotalTime; //time took to open the hand
         }
 
+
+
         break;
     }
 
-
-//BOOST_LOG_SEV(lg, info) << "TotalTime = " << TotalTime;
-
-#if HAND==0
-if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.response.subscriberID!=-1)){
-
-#elif HAND==1
-    if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.response.subscriberID!=-1) &&
-         client_enableSubscriber_hand.call(srv_enableSubscriber_hand) && (srv_enableSubscriber_hand.response.subscriberID!=-1)){
-        // ok, the service call was ok, and the subscriber was succesfully started on V-REP side
-        // V-REP is now listening to the desired values
-        ros::Publisher pub_hand=node.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_pos_hand",1);
-#endif
-
-        // 5. Let's prepare a publisher of those values:
-        ros::Publisher pub=node.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
-
-        for (int i = 1; i< vel.rows(); ++i){
-            //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
-
-            VectorXd ya = vel.row(i-1);
-            VectorXd yb = vel.row(i);
-
-            VectorXd yat = traj.row(i-1);
-            VectorXd ybt = traj.row(i);
-
-            ta = (i-1)*timeStep+ TotalTime;
-            tb = ta + timeStep;
-
-            //BOOST_LOG_SEV(lg, info) << "ta = " << ta;
-            //BOOST_LOG_SEV(lg, info) << "tb = " << tb << "\n";
-            bool interval = true;
-
-            double tx_prev;
-            double yxt_prev;
-
-            ros::spinOnce(); // get the simulationRunning value
-            while (ros::ok() && simulationRunning && interval)
-            {// ros is running, simulation is running
-
-                vrep_common::JointSetStateData dataTraj;
-#if HAND==1
-                vrep_common::JointSetStateData data_hand;
-#endif
-
-                tx = simulationTime -pre_time;
-
-                //BOOST_LOG_SEV(lg, info) << "simulationTime = " << simulationTime ;
-                if (tx >= tb){
-                    // go to the next interval
-                    interval = false;
-
-                }else{
-                    //BOOST_LOG_SEV(lg, info) << "tx = " << tx ;
-                    //BOOST_LOG_SEV(lg, info) << "tx_prev = " << tx_prev;
-
-                    double m = (tx-ta)/(tb-ta);
-                    std::vector<double> r_post;
-                    this->curr_scene->getHumanoid()->getRightPosture(r_post);
-
-
-                    double yx;
-                    double yxt;
-                     if(sqrt(pow((f_posture(0)-r_post.at(0)),2)+
-                           pow((f_posture(1)-r_post.at(1)),2)+
-                           pow((f_posture(2)-r_post.at(2)),2)+
-                           pow((f_posture(3)-r_post.at(3)),2)+
-                           pow((f_posture(4)-r_post.at(4)),2)+
-                           pow((f_posture(5)-r_post.at(5)),2)+
-                           pow((f_posture(6)-r_post.at(6)),2)) < tol_stop_rad){
-                        f_reached=true;
-                        //std::cout << "final posture reached" << std::endl;
-                        break;
-                    }else{f_reached=false;}
-
-                    for (int k = 0; k< vel.cols(); ++k){
-
-                        if(f_reached){
-                            yx=0;
-                            yxt=yxt_prev;
-                        }else{
-                            yx = interpolate(ya(k),yb(k),m);
-                            yxt = interpolate(yat(k),ybt(k),m);
-                            yxt_prev=yxt;
-                        }
-
-                        dataTraj.handles.data.push_back(handles.at(k));
-                        switch(scenarioID){
-                        case 0: //error
-                            break;
-                        case 1: // Toy vehicle scenario with AROS
-                            if((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4) ){
-                                dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
-                            }else{
-                                dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
-                            }
-                            dataTraj.values.data.push_back(yxt);
-                            break;
-                        case 2: // Toy vehicle scenario with Jarde
-                            dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
-                            dataTraj.values.data.push_back(yxt);
-                            break;
-                        }
-#if HAND ==1
-                        if((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) ){
-                            // the fingers are being addressed
-                            data_hand.handles.data.push_back(hand_handles(k+3-vel.cols(),2));
-                            data_hand.setModes.data.push_back(1); // set the target position
-                            data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
-
-                        }
-#endif
-
-                      //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", ya = " << ya(k)*180/static_cast<double>(M_PI) << ", yb = "<< yb(k)*180/static_cast<double>(M_PI);
-                      //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
-                                                  //", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
-
-                    }
-
-                    //BOOST_LOG_SEV(lg, info) << "\n";
-
-
-                    pub.publish(dataTraj);
-#if HAND ==1
-                    pub_hand.publish(data_hand);
-#endif
-
-                    interval = true;
-                    tx_prev = tx;
-                }
-
-                // handle ROS messages:
-                ros::spinOnce();
-
-
-            } // while
-
-            if(f_reached){
-                log(QNode::Info,string("Final Posture reached."));
-                break;}
-
-        }// for loop steps
-
-        // update the info of the postures and objects in the scenario
-        //this->updateScene(mov,scene);
-
-        // ----- post-movement operations -------- //
-        add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
-        vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
-
-        switch (mov_type) {
-
-        case 0: // reach-to grasp
-
-            // grasp the object
-
-            if(obj_in_hand){
-
-                //srvset_parent.request.handle = h_detobj;
-                srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
-                srvset_parent.request.parentHandle = h_attach;
-                srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
-                add_client.call(srvset_parent);
-                if (srvset_parent.response.result != 1){
-                    log(QNode::Error,string("Error in grasping the object "));
-                }
-
-#if HAND == 1
-                this->closeBarrettHand(arm_code);
-#endif
-
-            }
-
-
-            break;
-
-        case 1: // reaching
-
-            break;
-
-        case 2: // transport
-
-            break;
-
-        case 3: // engage
-
-            break;
-
-        case 4: // disengage
-
-            break;
-
-        case 5: // go home
-
-            break;
-
-
-        }
-
-        // pause the simulation
-        add_client = node.serviceClient<vrep_common::simRosPauseSimulation>("/vrep/simRosPauseSimulation");
-        vrep_common::simRosPauseSimulation srvpause;
-        add_client.call(srvpause);
-
-        // handle ROS messages:
-        ros::spinOnce();
-
-        TotalTime = simulationTime; // update the total time of the movement
-
-        log(QNode::Info,string("Movement completed"));
-        mov->setExecuted(true);
-
-
-    }
-
-return true;
+    */
 
 }
 
 
-bool QNode::execTask(MatrixXd& traj_task, MatrixXd &vel_task, std::vector<double> &timeSteps, std::vector<int> &nSteps, std::vector<double> &tols_stop,taskPtr task, scenarioPtr scene)
-{
 
-    // TO DO:  integrate the trajectory that is the solution of the given problem with the movement object that is part of the problem
+bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<double>>& timesteps_task, vector<vector<double>>& tols_stop_task, taskPtr task, scenarioPtr scene)
+{
     ros::NodeHandle node;
     double ta;
     double tb;
@@ -2111,41 +2126,311 @@ bool QNode::execTask(MatrixXd& traj_task, MatrixXd &vel_task, std::vector<double
     int arm_code;
     int mov_type;
     double timeStep;
-    int steps;
     double tol_stop_rad;
-    int steps_prev=0;
     double timeTot = 0.0;
     this->curr_scene = scene;
     int scenarioID = scene->getID();
-    MatrixXd vel;
-    MatrixXd traj;
     std::vector<int> handles;
     MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
     int h_attach; // handle of the attachment point of the hand
     bool f_reached;
+    VectorXd f_posture; // the final posture of the movement
+    bool approach;
+    double pre_time;
 
 
     //BOOST_LOG_SEV(lg, info) << "TotalTime = " << TotalTime;
 
+
+
+    // set joints position or velocity (it depends on the scenario)
+    ros::ServiceClient client_enableSubscriber=node.serviceClient<vrep_common::simRosEnableSubscriber>("/vrep/simRosEnableSubscriber");
+    vrep_common::simRosEnableSubscriber srv_enableSubscriber;
+    srv_enableSubscriber.request.topicName="/"+nodeName+"/set_joints"; // the topic name
+    srv_enableSubscriber.request.queueSize=1; // the subscriber queue size (on V-REP side)
+    srv_enableSubscriber.request.streamCmd=simros_strmcmd_set_joint_state; // the subscriber type
+
+#if HAND==1
+
+    // set joints position (it is used to set the target postion of the 2nd phalanx of the fingers)
+    ros::ServiceClient client_enableSubscriber_hand=node.serviceClient<vrep_common::simRosEnableSubscriber>("/vrep/simRosEnableSubscriber");
+    vrep_common::simRosEnableSubscriber srv_enableSubscriber_hand;
+    srv_enableSubscriber_hand.request.topicName="/"+nodeName+"/set_pos_hand"; // the topic name
+    srv_enableSubscriber_hand.request.queueSize=1; // the subscriber queue size (on V-REP side)
+    srv_enableSubscriber_hand.request.streamCmd=simros_strmcmd_set_joint_state; // the subscriber type
+
+#endif
+
+
+    //for loop movements
     for(int i=0; i < task->getProblemNumber(); ++i){
-
       if(task->getProblem(i)->getPartOfTask() && task->getProblem(i)->getSolved()){
+          vector<MatrixXd> traj_mov = traj_task.at(i);
+          vector<MatrixXd> vel_mov = vel_task.at(i);
+          vector<double> timesteps_mov = timesteps_task.at(i);
+          vector<double> tols_stop_mov = tols_stop_task.at(i);
+          movementPtr mov = task->getProblem(i)->getMovement();
+          //BOOST_LOG_SEV(lg, info) << "Movement = " << mov->getInfoLine();
+          this->curr_mov = mov;
+          arm_code = mov->getArm();
+          mov_type = mov->getType();
+          switch (arm_code) {
+          case 0: // dual arm
+              // TODO
+              break;
+
+          case 1: //right arm
+              handles = right_handles;
+              hand_handles = right_hand_handles;
+              h_attach = right_attach;
+              break;
+
+          case 2: // left arm
+              handles = left_handles;
+              hand_handles = left_hand_handles;
+              h_attach = left_attach;
+              break;
+          }
+          // start the simulation
+          add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
+          vrep_common::simRosStartSimulation srvstart;
+          add_client.call(srvstart);
+          ros::spinOnce(); // first handle ROS messages
+
+          //for loop stages
+          for(size_t j=0; j <traj_mov.size();++j){
+              switch (mov_type){
+              case 0: // reach-to-grasp
+                  if(j==1){approach=true;}else{approach=false;}
+                  break;
+              case 1: // reaching
+                  approach=false;
+                  break;
+              case 2:// transport
+                  if(j==1){approach=true;}else{approach=false;}
+                  break;
+              case 3: // engage
+                  if(j==1){approach=true;}else{approach=false;}
+                  break;
+              case 4:// disengage
+                  if(j==1){approach=true;}else{approach=false;}
+                  break;
+              case 5: // go-park
+                  approach = false;
+                  break;
+              }
+
+              MatrixXd traj = traj_mov.at(j);
+              MatrixXd vel = vel_mov.at(j);
+              f_posture = traj.row(traj.rows()-1);
+              f_reached=false;
+              timeStep = timesteps_mov.at(j);
+              tol_stop_rad = tols_stop_mov.at(j)*static_cast<double>(M_PI)/180;
+
+              ros::spinOnce(); // handle ROS messages
+              pre_time = simulationTime - timeTot; // update the total time of the movement
+
+#if HAND==0
+        if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.response.subscriberID!=-1)){
+
+#elif HAND==1
+            if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.response.subscriberID!=-1) &&
+                 client_enableSubscriber_hand.call(srv_enableSubscriber_hand) && (srv_enableSubscriber_hand.response.subscriberID!=-1)){
+                // ok, the service call was ok, and the subscriber was succesfully started on V-REP side
+                // V-REP is now listening to the desired values
+                ros::Publisher pub_hand=node.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_pos_hand",1);
+#endif
+
+                    // 5. Let's prepare a publisher of those values:
+                    ros::Publisher pub=node.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
+                    for (int i = 1; i< vel.rows(); ++i){
+
+                        //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
+
+                        VectorXd ya = vel.row(i-1);
+                        VectorXd yb = vel.row(i);
+                        VectorXd yat = traj.row(i-1);
+                        VectorXd ybt = traj.row(i);
+
+                        ta = (i-1)*timeStep+timeTot;
+                        tb = ta + timeStep;
+
+                        //BOOST_LOG_SEV(lg, info) << "ta = " << ta;
+                        //BOOST_LOG_SEV(lg, info) << "tb = " << tb << "\n";
+
+                        bool interval = true;
+                        double tx_prev;
+                        double yxt_prev;
+                        ros::spinOnce(); // get the simulationRunning value
+                        while (ros::ok() && simulationRunning && interval)
+                        {// ros is running, simulation is running
+                            vrep_common::JointSetStateData dataTraj;
+#if HAND==1
+                            vrep_common::JointSetStateData data_hand;
+#endif
+
+                            tx = simulationTime - pre_time;
+
+                            //BOOST_LOG_SEV(lg, info) << "simulationTime = " << simulationTime ;
+
+                            if (tx >= tb){
+                                // go to the next interval
+                                interval = false;
+                            }else{
+
+                                //BOOST_LOG_SEV(lg, info) << "tx = " << tx ;
+                                //BOOST_LOG_SEV(lg, info) << "tx_prev = " << tx_prev;
+
+                                double m = (tx-ta)/(tb-ta);
+                                std::vector<double> r_post;
+                                this->curr_scene->getHumanoid()->getRightPosture(r_post);
+                                double yx;
+                                double yxt;
+                                if(sqrt(pow((f_posture(0)-r_post.at(0)),2)+
+                                       pow((f_posture(1)-r_post.at(1)),2)+
+                                       pow((f_posture(2)-r_post.at(2)),2)+
+                                       pow((f_posture(3)-r_post.at(3)),2)+
+                                       pow((f_posture(4)-r_post.at(4)),2)+
+                                       pow((f_posture(5)-r_post.at(5)),2)+
+                                       pow((f_posture(6)-r_post.at(6)),2)) < tol_stop_rad){
+                                    f_reached=true;
+                                    log(QNode::Info,string("Final posture reached, movement: ")+mov->getStrType());
+                                    //std::cout << "final posture reached, movement: " << mov->getStrType() << std::endl;
+                                    break;
+                                }else{f_reached=false;}
+                                for (int k = 0; k< vel.cols(); ++k){
+                                    if(f_reached){
+                                        yx=0;
+                                        yxt=yxt_prev;
+                                    }else{
+                                        yx = interpolate(ya(k),yb(k),m);
+                                        yxt = interpolate(yat(k),ybt(k),m);
+                                        yxt_prev=yxt;
+                                    }
+
+                                    dataTraj.handles.data.push_back(handles.at(k));
+                                    switch(scenarioID){
+                                    case 0: //error
+                                        break;
+                                    case 1: // Toy vehicle scenario with AROS
+                                        if((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4) ){
+                                            dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                        }else{
+                                            dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                        }
+                                        dataTraj.values.data.push_back(yxt);
+                                        break;
+                                    case 2: // Toy vehicle scenario with Jarde
+                                        dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                        dataTraj.values.data.push_back(yxt);
+                                        break;
+                                    }
+
+                                    //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", ya = " << ya(k)*180/static_cast<double>(M_PI) << ", yb = "<< yb(k)*180/static_cast<double>(M_PI);
+                                    //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
+                                                               //", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
+#if HAND==1
+
+                                    if((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) ){
+                                        // the fingers are being addressed
+                                        data_hand.handles.data.push_back(hand_handles(k+3-vel.cols(),2));
+                                        data_hand.setModes.data.push_back(1); // set the target position
+                                        data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
+
+                                    }
+#endif
+                                }
+
+                                //BOOST_LOG_SEV(lg, info) << "\n";
+
+                                pub.publish(dataTraj);
+
+#if HAND==1
+                                pub_hand.publish(data_hand);
+#endif
+
+                                interval = true;
+                                tx_prev = tx;
+                            }
+
+                            // handle ROS messages:
+                            ros::spinOnce();
+
+                        } // while
+
+                        if(f_reached){break;}
+
+                    } // for loop step
+
+                    // ---- post-movement operations ---- //
+
+                    // set the detected object child of the attach point
+                    add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                    vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+
+                    switch (mov_type) {
+                    case 0: // reach-to grasp
+                        // grasp the object
+                        if(obj_in_hand){
+                            if(approach){
+                                //srvset_parent.request.handle = h_detobj;
+                                srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                                srvset_parent.request.parentHandle = h_attach;
+                                srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                                add_client.call(srvset_parent);
+                                if (srvset_parent.response.result != 1){
+                                    log(QNode::Error,string("Error in grasping the object "));
+                                }
+#if HAND == 1
+                        this->closeBarrettHand(arm_code);
+#endif
+                            }
+                        }
+                        break;
+                    case 1: // reaching
+                        break;
+                    case 2: // transport
+                        break;
+                    case 3: // engage
+                        break;
+                    case 4: // disengage
+                        break;
+                    case 5: // go-park
+                        break;
+                    }
+
+                    // handle ROS messages:
+                    ros::spinOnce();
+                    timeTot = simulationTime; // update the total time of the movement
+
+                } // if
+
+          }//for loop stages
+          // movement complete
+          task->getProblem(i)->getMovement()->setExecuted(true);
+
+        } // if prob is part of the task
+        log(QNode::Info,string("Task completed"));
+
+      }// for problems loop
+
+      // pause the simulation
+      add_client = node.serviceClient<vrep_common::simRosPauseSimulation>("/vrep/simRosPauseSimulation");
+      vrep_common::simRosPauseSimulation srvpause;
+      add_client.call(srvpause);
+
+      // handle ROS messages:
+      ros::spinOnce();
+
+      TotalTime=simulationTime;
+
+      return true;
 
 
-        movementPtr mov = task->getProblem(i)->getMovement();
-        f_reached=false;
 
-        //BOOST_LOG_SEV(lg, info) << "Movement = " << mov->getInfoLine();
-
-        this->curr_mov = mov;
-        timeStep = timeSteps.at(i);
-        steps = nSteps.at(i);
-        tol_stop_rad = tols_stop.at(i)*static_cast<double>(M_PI)/180;
-
-        VectorXd f_posture = traj_task.row(steps+steps_prev); // the final posture of the movement
 
         //BOOST_LOG_SEV(lg, info) << "Step_prev = " << steps_prev;
-
+/*
         vel.resize(steps+1,vel_task.cols());
         for (int j = 0; j < vel.rows(); ++j){
             for(int k = 0; k < vel.cols();++k){
@@ -2160,50 +2445,10 @@ bool QNode::execTask(MatrixXd& traj_task, MatrixXd &vel_task, std::vector<double
             }
         }
         steps_prev +=steps+1;
+*/
 
-        arm_code = mov->getArm();
-        mov_type = mov->getType();
 
-        switch (arm_code) {
-        case 0: // dual arm
-            // TODO
-            break;
-
-        case 1: //right arm
-            handles = right_handles;
-            hand_handles = right_hand_handles;
-            h_attach = right_attach;
-            break;
-
-        case 2: // left arm
-            handles = left_handles;
-            hand_handles = left_hand_handles;
-            h_attach = left_attach;
-            break;
-        }
-
-        // set joints position or velocity (it depends on the scenario)
-        ros::ServiceClient client_enableSubscriber=node.serviceClient<vrep_common::simRosEnableSubscriber>("/vrep/simRosEnableSubscriber");
-        vrep_common::simRosEnableSubscriber srv_enableSubscriber;
-        srv_enableSubscriber.request.topicName="/"+nodeName+"/set_joints"; // the topic name
-        srv_enableSubscriber.request.queueSize=1; // the subscriber queue size (on V-REP side)
-        srv_enableSubscriber.request.streamCmd=simros_strmcmd_set_joint_state; // the subscriber type
-
-#if HAND==1
-
-        // set joints position (it is used to set the target postion of the 2nd phalanx of the fingers)
-        ros::ServiceClient client_enableSubscriber_hand=node.serviceClient<vrep_common::simRosEnableSubscriber>("/vrep/simRosEnableSubscriber");
-        vrep_common::simRosEnableSubscriber srv_enableSubscriber_hand;
-        srv_enableSubscriber_hand.request.topicName="/"+nodeName+"/set_pos_hand"; // the topic name
-        srv_enableSubscriber_hand.request.queueSize=1; // the subscriber queue size (on V-REP side)
-        srv_enableSubscriber_hand.request.streamCmd=simros_strmcmd_set_joint_state; // the subscriber type
-
-#endif
-
-        // start the simulation
-        add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
-        vrep_common::simRosStartSimulation srvstart;
-        add_client.call(srvstart);
+/*
 
         // ----- pre-movement operations -------- //
 
@@ -2261,220 +2506,9 @@ bool QNode::execTask(MatrixXd& traj_task, MatrixXd &vel_task, std::vector<double
 
 
 
+*/
 
 
-#if HAND==0
-if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.response.subscriberID!=-1)){
-
-#elif HAND==1
-    if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.response.subscriberID!=-1) &&
-         client_enableSubscriber_hand.call(srv_enableSubscriber_hand) && (srv_enableSubscriber_hand.response.subscriberID!=-1)){
-        // ok, the service call was ok, and the subscriber was succesfully started on V-REP side
-        // V-REP is now listening to the desired values
-        ros::Publisher pub_hand=node.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_pos_hand",1);
-#endif
-
-            // 5. Let's prepare a publisher of those values:
-            ros::Publisher pub=node.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
-
-            for (int i = 1; i< vel.rows(); ++i){
-
-                //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
-
-                VectorXd ya = vel.row(i-1);
-                VectorXd yb = vel.row(i);
-                VectorXd yat = traj.row(i-1);
-                VectorXd ybt = traj.row(i);
-
-                ta = (i-1)*timeStep+timeTot;
-                tb = ta + timeStep;
-
-                //BOOST_LOG_SEV(lg, info) << "ta = " << ta;
-                //BOOST_LOG_SEV(lg, info) << "tb = " << tb << "\n";
-
-                bool interval = true;
-
-                double tx_prev;
-                double yxt_prev;
-
-                ros::spinOnce(); // get the simulationRunning value
-                while (ros::ok() && simulationRunning && interval)
-                {// ros is running, simulation is running
-                    vrep_common::JointSetStateData dataTraj;
-#if HAND==1
-                    vrep_common::JointSetStateData data_hand;
-#endif
-
-                    tx = simulationTime - pre_time;
-
-                    //BOOST_LOG_SEV(lg, info) << "simulationTime = " << simulationTime ;
-
-                    if (tx >= tb){
-                        // go to the next interval
-                        interval = false;
-                    }else{
-
-                        //BOOST_LOG_SEV(lg, info) << "tx = " << tx ;
-                        //BOOST_LOG_SEV(lg, info) << "tx_prev = " << tx_prev;
-
-                        double m = (tx-ta)/(tb-ta);
-                        std::vector<double> r_post;
-                        this->curr_scene->getHumanoid()->getRightPosture(r_post);
-                        double yx;
-                        double yxt;
-                        if(sqrt(pow((f_posture(0)-r_post.at(0)),2)+
-                               pow((f_posture(1)-r_post.at(1)),2)+
-                               pow((f_posture(2)-r_post.at(2)),2)+
-                               pow((f_posture(3)-r_post.at(3)),2)+
-                               pow((f_posture(4)-r_post.at(4)),2)+
-                               pow((f_posture(5)-r_post.at(5)),2)+
-                               pow((f_posture(6)-r_post.at(6)),2)) < tol_stop_rad){
-                            f_reached=true;
-                            log(QNode::Info,string("Final posture reached, movement: ")+mov->getStrType());
-                            //std::cout << "final posture reached, movement: " << mov->getStrType() << std::endl;
-                            break;
-                        }else{f_reached=false;}
-
-                        for (int k = 0; k< vel.cols(); ++k){
-                            if(f_reached){
-                                yx=0;
-                                yxt=yxt_prev;
-                            }else{
-                                yx = interpolate(ya(k),yb(k),m);
-                                yxt = interpolate(yat(k),ybt(k),m);
-                                yxt_prev=yxt;
-                            }
-
-                            dataTraj.handles.data.push_back(handles.at(k));
-                            switch(scenarioID){
-                            case 0: //error
-                                break;
-                            case 1: // Toy vehicle scenario with AROS
-                                if((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4) ){
-                                    dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
-                                }else{
-                                    dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
-                                }
-                                dataTraj.values.data.push_back(yxt);
-                                break;
-                            case 2: // Toy vehicle scenario with Jarde
-                                dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
-                                dataTraj.values.data.push_back(yxt);
-                                break;
-                            }
-
-                            //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", ya = " << ya(k)*180/static_cast<double>(M_PI) << ", yb = "<< yb(k)*180/static_cast<double>(M_PI);
-                            //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
-                                                       //", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
-#if HAND==1
-
-                            if((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) ){
-                                // the fingers are being addressed
-                                data_hand.handles.data.push_back(hand_handles(k+3-vel.cols(),2));
-                                data_hand.setModes.data.push_back(1); // set the target position
-                                data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
-
-                            }
-#endif
-                        }
-
-                        //BOOST_LOG_SEV(lg, info) << "\n";
-
-                        pub.publish(dataTraj);
-
-#if HAND==1
-                        pub_hand.publish(data_hand);
-#endif
-
-                        interval = true;
-                        tx_prev = tx;
-                    }
-
-                    // handle ROS messages:
-                    ros::spinOnce();
-
-                } // while
-
-                if(f_reached){break;}
-
-            } // for loop step
-
-            // ---- post-movement operations ---- //
-
-            // set the detected object child of the attach point
-            add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
-            vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
-
-            switch (mov_type) {
-
-            case 0: // reach-to grasp
-
-                // grasp the object
-
-                if(obj_in_hand){
-
-                    //srvset_parent.request.handle = h_detobj;
-                    srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
-                    srvset_parent.request.parentHandle = h_attach;
-                    srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
-                    add_client.call(srvset_parent);
-                    if (srvset_parent.response.result != 1){
-                        log(QNode::Error,string("Error in grasping the object "));
-                    }
-#if HAND == 1
-                this->closeBarrettHand(arm_code);
-#endif
-                }
-
-
-                break;
-
-            case 1: // reaching
-
-                break;
-
-            case 2: // transport
-
-                break;
-
-            case 3: // engage
-
-                break;
-
-            case 4: // disengage
-
-                break;
-
-            case 5: // go home
-
-                break;
-
-
-            }
-
-            // handle ROS messages:
-            ros::spinOnce();
-            timeTot = simulationTime; // update the total time of the movement
-
-        } // if
-
-        // movement complete
-        task->getProblem(i)->getMovement()->setExecuted(true);
-
-      } // if prob is part of the task
-      log(QNode::Info,string("Task completed"));
-
-    }// for problems loop
-
-    // pause the simulation
-    add_client = node.serviceClient<vrep_common::simRosPauseSimulation>("/vrep/simRosPauseSimulation");
-    vrep_common::simRosPauseSimulation srvpause;
-    add_client.call(srvpause);
-
-    // handle ROS messages:
-    ros::spinOnce();
-
-    TotalTime=simulationTime;
 
 
 
@@ -3488,6 +3522,7 @@ for (size_t i = 0; i < HAND_FINGERS; i++){
     client_setIntParam.call(srv_setObjInt);
 }
 
+    log(QNode::Info,string("Hand closed."));
     return (closed[0] && closed[1] && closed[2]);
 
 
@@ -3677,7 +3712,7 @@ for (size_t i = 0; i < HAND_FINGERS; i++){
     client_setIntParam.call(srv_setObjInt);
 }
 
-
+log(QNode::Info,string("Hand opened."));
 return true;
 
 }

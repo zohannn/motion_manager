@@ -414,8 +414,8 @@ void MainWindow::on_pushButton_getElements_clicked()
     try{
         if (qnode.getElements(init_scene)){
 
-            curr_scene = init_scene; //update the current scenario
-            curr_task = taskPtr(new Task());
+            this->curr_scene = scenarioPtr(new Scenario(*(this->init_scene.get()))); //update the current scenario
+            this->curr_task = taskPtr(new Task());
             ui.pushButton_getElements->setEnabled(false);
             ui.tab_plan->setEnabled(true);
             ui.groupBox_specs->setEnabled(true);
@@ -451,7 +451,7 @@ void MainWindow::on_pushButton_addMov_clicked()
 
     // Human-like Upper-limbs Motion Planner
 
-        int rows = ui.listWidget_movs->count();
+        //int rows = ui.listWidget_movs->count();
         bool add = true;
         /*
         if (rows > 0){
@@ -695,7 +695,7 @@ void MainWindow::on_pushButton_plan_clicked()
         break;
 
 
-    } // switch planner
+    } // switch planners
 
 QStringList h_headers; bool h_head=false; QStringList v_headers;
 double mov_duration = 0;
@@ -705,7 +705,7 @@ for (size_t k=0; k< this->jointsPosition_mov.size();++k){
     MatrixXd jointVelocity_stage = this->jointsVelocity_mov.at(k);
     MatrixXd jointAcceleration_stage = this->jointsAcceleration_mov.at(k);
     mov_duration += this->timeSteps_mov.at(k)*(jointPosition_stage.rows()-1);
-    this->tols_stop.push_back(tol_stop);
+    this->tols_stop_mov.push_back(tol_stop);
     std::vector<QString> stage_step;
     for(int i =0; i< jointPosition_stage.rows(); ++i){
         stage_step.clear();
@@ -756,12 +756,7 @@ void MainWindow::on_pushButton_execMov_pressed()
 void MainWindow::on_pushButton_execMov_clicked()
 {
 
-    //MatrixXd vel = this->jointsVelocity_mov;
-    //MatrixXd traj = this->jointsPosition_mov;
-    //double timeStep = this->timeStep;
-    //double tol_stop = this->mTolHumldlg->getTolStop();
-
-   // qnode.execMovement(traj,vel,timeStep, tol_stop, this->curr_mov, this->curr_scene);
+     qnode.execMovement(this->jointsPosition_mov,this->jointsVelocity_mov,this->timeSteps_mov, this->tols_stop_mov, this->curr_mov, this->curr_scene);
 
 }
 
@@ -790,13 +785,8 @@ void MainWindow::on_pushButton_execTask_pressed(){
 void MainWindow::on_pushButton_execTask_clicked()
 {
 
-    //MatrixXd traj = this->jointsPosition_task;
-    //MatrixXd vel = this->jointsVelocity_task;
-    //std::vector<double> tSteps = this->timeSteps_task;
-    //std::vector<int> nSteps = this->nSteps_task;
-    //std::vector<double> stops = this->tols_stop;
 
-    //qnode.execTask(traj,vel,tSteps,nSteps,stops,this->curr_task,this->curr_scene);
+    qnode.execTask(this->jointsPosition_task,this->jointsVelocity_task,this->timeSteps_task, this->tols_stop_task, this->curr_task, this->curr_scene);
 
 
 }
@@ -804,6 +794,7 @@ void MainWindow::on_pushButton_execTask_clicked()
 
 void MainWindow::on_pushButton_load_task_clicked()
 {
+    /*
 
     int plan_id; QString plan_type;
     int mov_id; QString mov_type;
@@ -818,17 +809,18 @@ void MainWindow::on_pushButton_load_task_clicked()
     MatrixXd poss;
 
     //clear
-    this->jointsVelocity_task.resize(0,0);
-    this->jointsPosition_task.resize(0,0);
-    //this->jointsVelocity_mov.resize(0,0);
-    //this->jointsPosition_mov.resize(0,0);
-    //this->timeStep=0.0;
+    this->jointsAcceleration_task.clear();
+    this->jointsVelocity_task.clear();
+    this->jointsPosition_task.clear();
     this->timeSteps_task.clear();
-    this->nSteps_task.clear();
-    this->tols_stop.clear();
-
-    ui.listWidget_sol_task->clear();
-    ui.tableWidget_sol_mov->clear();//ui.listWidget_sol_mov->clear();
+    this->tols_stop_task.clear();
+    this->jointsPosition_mov.clear();
+    this->jointsVelocity_mov.clear();
+    this->jointsAcceleration_mov.clear();
+    this->timeSteps_mov.clear();
+    this->tols_stop_mov.clear();
+    ui.tableWidget_sol_task->clear();
+    ui.tableWidget_sol_mov->clear();
     ui.label_totalTime_value_task->clear();
     ui.label_totalTime_value_mov->clear();
     ui.listWidget_movs->clear();
@@ -843,11 +835,10 @@ void MainWindow::on_pushButton_load_task_clicked()
 
         QTextStream stream( &f );
         QString line;
-        int prev_steps=0;
+        //int prev_steps=0;
 
 
         while(!stream.atEnd()){
-
             line = f.readLine();
             if(line.at(0)==QChar('#')){
 
@@ -856,6 +847,8 @@ void MainWindow::on_pushButton_load_task_clicked()
                     prev_steps+=steps+1;
                     steps=0;
                 }
+
+
                 if((line.at(1)==QChar('E')) && (line.at(2)==QChar('N')) && (line.at(3)==QChar('D'))){break;}
                 QStringList fields = line.split(",");
                 for(int i=0; i< fields.size(); ++i){
@@ -891,7 +884,6 @@ void MainWindow::on_pushButton_load_task_clicked()
                 }else if(QString::compare(plan_type,QString("LBKPIECE"),Qt::CaseInsensitive)==0){
                     plan_id=6;
                 }
-
 
                 // get the grip type
                 if(QString::compare(grip_type,QString("Precision Side thumb left"),Qt::CaseInsensitive)==0){
@@ -962,7 +954,6 @@ void MainWindow::on_pushButton_load_task_clicked()
                     problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
-
                     this->curr_task->addProblem(prob.get());
 
                 }else if(QString::compare(mov_type,QString("Reaching"),Qt::CaseInsensitive)==0){
@@ -991,9 +982,7 @@ void MainWindow::on_pushButton_load_task_clicked()
                     problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
-
                     this->curr_task->addProblem(prob.get());
-
                 }else if(QString::compare(mov_type,QString("Disengage"),Qt::CaseInsensitive)==0){
                     mov_id=4;
                 }else if(QString::compare(mov_type,QString("Go park"),Qt::CaseInsensitive)==0){
@@ -1016,7 +1005,6 @@ void MainWindow::on_pushButton_load_task_clicked()
                     problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
-
                     this->curr_task->addProblem(prob.get());
 
                 }
@@ -1128,7 +1116,7 @@ void MainWindow::on_pushButton_load_task_clicked()
 
     }
     f.close();
-
+*/
 
 }
 
@@ -1136,33 +1124,44 @@ void MainWindow::on_pushButton_load_task_clicked()
 void MainWindow::on_pushButton_save_task_clicked()
 {
 
+
     QString filename = QFileDialog::getSaveFileName(this,
                                                     tr("Save the task trajectory"),
                                                     QString(MAIN_PATH)+"/Tasks",
                                                     "All Files (*.*);;Task Files (*.task)");
     QFile f( filename );
     if(f.open( QIODevice::WriteOnly )){
-        std::vector<double> timeSteps = this->timeSteps_task;
-        std::vector<int> steps = this->nSteps_task;
-        std::vector<double> tols_stop = this->tols_stop;
-
         QTextStream stream( &f );
-        int prev_steps=0;
         for(int i=0; i <ui.listWidget_movs->count(); ++i){
-
-            if(i!=0){prev_steps += steps.at(i-1)+1;}
-
             stream << "# " << ui.listWidget_movs->item(i)->text().toStdString().c_str()<< endl;
-            stream << "time step="<< QString::number(timeSteps.at(i)).toStdString().c_str()<< endl;
-            stream << "tol stop="<< QString::number(tols_stop.at(i)).toStdString().c_str()<< endl;
+            vector< MatrixXd > traj_mov = this->jointsPosition_task.at(i);
+            vector< MatrixXd > vel_mov = this->jointsVelocity_task.at(i);
+            vector< MatrixXd > acc_mov = this->jointsAcceleration_task.at(i);
+            vector< double > timesteps_mov = this->timeSteps_task.at(i);
+            vector< double > tols_stop_mov = this->tols_stop_task.at(i);
 
-            for(int j=0; j< steps.at(i)+1; ++j){
+            for(size_t j=0;j < traj_mov.size(); ++j){
+                stream << "# Stage: "<< QString::number(j+1).toStdString().c_str()<< endl;
+                MatrixXd traj = traj_mov.at(j);
+                MatrixXd vel = vel_mov.at(j);
+                MatrixXd acc = acc_mov.at(j);
+                double timestep = timesteps_mov.at(j);
+                double tol_stop = tols_stop_mov.at(j);
+                stream << "time step="<< QString::number(timestep).toStdString().c_str()<< endl;
+                stream << "tol stop="<< QString::number(tol_stop).toStdString().c_str()<< endl;
 
-                stream << ui.listWidget_sol_task->item(j+prev_steps)->text().toStdString().c_str()<< endl;
-
-
-            }
-        }
+                for(int r=0; r < traj.rows(); ++r){
+                    stream << "step="<< QString::number(r).toStdString().c_str()<<", ";
+                    for(int c=0; c < traj.cols(); ++c){
+                        stream << "Joint "<<QString::number(c+1).toStdString().c_str()<<"="<<
+                                  QString::number(traj(r,c)*180/M_PI,'g',3).toStdString().c_str()<<"|"<<
+                                  QString::number(vel(r,c)*180/M_PI,'g',3).toStdString().c_str()<<"|"<<
+                                  QString::number(acc(r,c)*180/M_PI,'g',3).toStdString().c_str();
+                        if(c==traj.cols()-1){stream << endl;}else{stream<<", ";}
+                    }// for loop columns
+                }// for loop rows
+            }// for loop movement
+        }// for loop task
         stream << "#END" <<endl;
 
     }
@@ -1176,13 +1175,16 @@ void MainWindow::on_pushButton_scene_reset_clicked()
 {
 
     // reset the movements
-    ui.tableWidget_sol_mov->clear();//ui.listWidget_sol_mov->clear();
+    ui.tableWidget_sol_mov->clear();
     //ui.listWidget_movs->clear();
     ui.label_totalTime_value_mov->clear();
-    //this->jointsVelocity_mov.resize(0,0);
-    //this->jointsPosition_mov.resize(0,0);
+    this->jointsAcceleration_mov.clear();
+    this->jointsVelocity_mov.clear();
+    this->jointsPosition_mov.clear();
+    this->timeSteps_mov.clear();
+    this->tols_stop_mov.clear();
 
-    this->curr_scene = this->init_scene;
+    this->curr_scene = scenarioPtr(new Scenario(*(this->init_scene.get())));
     qnode.resetSimTime();
     qnode.resetGlobals();
     qnode.log(QNode::Info,std::string("Tha scenario has been reset"));
@@ -1192,12 +1194,19 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     string title;
     string success;
     string failure;
+    // Toy vehicle scenario with ARoS
+    string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
+    string path_rviz_toyscene_aros = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
+
+    // Toy vehicle scenario with Jarde
+    string path_vrep_toyscene_jarde = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_jarde.ttt");
+    string path_rviz_toyscene_jarde = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
 
     switch(scene_id){
 
     case 0:
         // Assembly scenario: the Toy vehicle with ARoS
-        path = string("scenes/ToyVehicleTask_aros.ttt");
+        path = path_vrep_toyscene_aros;
         title = string("Assembly scenario: the Toy vehicle with ARoS");
         success = string("Assembly scenario: the Toy vehicle with ARoS HAS BEEN LOADED");
         failure = string("Assembly scenario: the Toy vehicle with ARoS HAS NOT BEEN LOADED");
@@ -1206,7 +1215,7 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     case 1:
         // Assembly scenario: the Toy vehicle with Avatar
 
-        path = string("scenes/ToyVehicleTask_jarde.ttt");
+        path = path_vrep_toyscene_jarde;
         title = string("Assembly scenario: the Toy vehicle with the Avatar");
         success = string("Assembly scenario: the Toy vehicle with the Avatar HAS BEEN LOADED");
         failure = string("Assembly scenario: the Toy vehicle with the Avatar HAS NOT BEEN LOADED");
@@ -1251,70 +1260,72 @@ void MainWindow::on_pushButton_scene_reset_clicked()
 
 void MainWindow::on_pushButton_append_mov_clicked()
 {
-/*
+
+    ui.tableWidget_sol_task->clear();
     ui.pushButton_save_task->setEnabled(true);
 
     if(curr_task->getProblem(ui.listWidget_movs->currentRow())->getSolved()){
 
-     this->tols_stop.push_back(this->mTolHumldlg->getTolStop());
+        this->jointsPosition_task.push_back(this->jointsPosition_mov);
+        this->jointsVelocity_task.push_back(this->jointsVelocity_mov);
+        this->jointsAcceleration_task.push_back(this->jointsAcceleration_mov);
+        this->timeSteps_task.push_back(this->timeSteps_mov);
+        this->tols_stop_task.push_back(this->tols_stop_mov);
 
-     //MatrixXd vel_mov = this->jointsVelocity_mov;
-     MatrixXd vel_task = this->jointsVelocity_task;
 
-     //MatrixXd pos_mov = this->jointsPosition_mov;
-     MatrixXd pos_task = this->jointsPosition_task;
+         QStringList h_headers; bool h_head=false; QStringList v_headers;
+         std::vector<std::vector<QString>> task_steps;
+         vector<MatrixXd> pos_mov; vector<MatrixXd> vel_mov; vector<MatrixXd> acc_mov; vector<double> tstep_mov;
+         double task_duration = 0.0; double mov_duration = 0.0;
+         for(size_t h=0; h< this->jointsPosition_task.size();++h){
+             pos_mov = this->jointsPosition_task.at(h);
+             vel_mov = this->jointsVelocity_task.at(h);
+             acc_mov = this->jointsAcceleration_task.at(h);
+             tstep_mov = this->timeSteps_task.at(h);
+             mov_duration = 0;
+             for (size_t k=0; k< this->jointsPosition_mov.size();++k){
+                 MatrixXd jointPosition_stage = pos_mov.at(k);
+                 MatrixXd jointVelocity_stage = vel_mov.at(k);
+                 MatrixXd jointAcceleration_stage = acc_mov.at(k);
+                 mov_duration += tstep_mov.at(k)*(jointPosition_stage.rows()-1);
+                 std::vector<QString> stage_step;
+                 for(int i =0; i< jointPosition_stage.rows(); ++i){
+                     stage_step.clear();
+                     v_headers.push_back(QString("Step ")+QString::number(i));
+                     for (int j=0; j<jointPosition_stage.cols();++j){
+                         stage_step.push_back(
+                                 QString::number(jointPosition_stage(i,j)*180/M_PI,'g',3)+"|"+
+                                 QString::number(jointVelocity_stage(i,j)*180/M_PI,'g',3)+"|"+
+                                 QString::number(jointAcceleration_stage(i,j)*180/M_PI,'g',3));
+                         if(!h_head){h_headers.push_back(QString("Joint ")+QString::number(j+1));}
+                     } // stage columns
+                     h_head = true;
+                     task_steps.push_back(stage_step);
+                 }// stage rows
+             }// movements
+             task_duration +=mov_duration;
+         }//task
 
-     //this->timeSteps_task.push_back(this->timeStep);
-     //this->nSteps_task.push_back(vel_mov.rows()-1);
-
-     if (vel_task.rows()==0){
-         this->jointsVelocity_task = vel_mov;
-        // this->jointsPosition_task = pos_mov;
-     }else{
-        int vel_rows = vel_task.rows();
-        int pos_rows = pos_task.rows();
-
-        vel_task.conservativeResize(vel_rows+vel_mov.rows(),vel_task.cols());
-        for(int i = 0; i < vel_mov.rows();++i){
-            vel_task.row(vel_rows+i) = vel_mov.row(i);
-        }
-        this->jointsVelocity_task = vel_task;
-
-        pos_task.conservativeResize(pos_rows+pos_mov.rows(),pos_task.cols());
-        for(int i = 0; i < pos_mov.rows();++i){
-            pos_task.row(pos_rows+i) = pos_mov.row(i);
-        }
-        this->jointsPosition_task = pos_task;
-     }
-
-     ui.listWidget_sol_task->clear();
-     MatrixXd poss = this->jointsPosition_task;
-     MatrixXd vel = this->jointsVelocity_task;
-     this->vel_steps = std::vector<string>(vel.rows());
-     for (int i=0; i<vel.rows();++i){
-         this->vel_steps.at(i) ="Step="+QString::number(i).toStdString()+",";
-         for (int j=0; j<vel.cols();++j){
-
-             this->vel_steps.at(i) = this->vel_steps.at(i)+
-                     " Joint "+QString::number(j+1).toStdString()+"="+
-                     QString::number(poss(i,j)*180/M_PI).toStdString()+"|"+
-                     QString::number(vel(i,j)*180/M_PI).toStdString()+", ";
+         ui.tableWidget_sol_task->setColumnCount(h_headers.size());
+         ui.tableWidget_sol_task->setHorizontalHeaderLabels(h_headers);
+         ui.tableWidget_sol_task->setRowCount(v_headers.size());
+         ui.tableWidget_sol_task->setVerticalHeaderLabels(v_headers);
+         for(int i =0; i < v_headers.size(); ++i){
+             std::vector<QString> row = task_steps.at(i);
+             for(int j=0; j < h_headers.size(); ++j){
+                 QString item = row.at(j);
+                ui.tableWidget_sol_task->setItem(i,j,new QTableWidgetItem(item));
+             }
          }
-         ui.listWidget_sol_task->addItem(QString(this->vel_steps.at(i).c_str()));
-     }
-     double totalTime = 0;
-     for (size_t i = 0; i < this->timeSteps_task.size(); ++i){
-         totalTime += this->timeSteps_task.at(i)*this->nSteps_task.at(i);
-     }
-     ui.label_totalTime_value_task->setText(QString::number(totalTime).toStdString().c_str());
-     ui.tabWidget_sol->setCurrentIndex(1);
+         ui.label_totalTime_value_task->setText(QString::number(task_duration).toStdString().c_str());
+         ui.tabWidget_sol->setCurrentIndex(1);
 
-     // set part of the task
-     curr_task->getProblem(ui.listWidget_movs->currentRow())->setPartOfTask(true);
+         // set part of the task
+         curr_task->getProblem(ui.listWidget_movs->currentRow())->setPartOfTask(true);
 
     }
 
-*/
+
 
 }
 
@@ -1322,20 +1333,24 @@ void MainWindow::on_pushButton_append_mov_clicked()
 void MainWindow::on_pushButton_clear_task_clicked()
 {
 
-    this->jointsVelocity_task.resize(0,0);
-    this->jointsPosition_task.resize(0,0);
-    //this->jointsVelocity_mov.resize(0,0);
-    //this->jointsPosition_mov.resize(0,0);
-    //this->timeStep=0.0;
+    this->jointsAcceleration_task.clear();
+    this->jointsVelocity_task.clear();
+    this->jointsPosition_task.clear();
+    this->jointsAcceleration_mov.clear();
+    this->jointsVelocity_mov.clear();
+    this->jointsPosition_mov.clear();
     this->timeSteps_task.clear();
-    this->nSteps_task.clear();
+    this->timeSteps_mov.clear();
+    this->tols_stop_task.clear();
+    this->tols_stop_mov.clear();
 
-    ui.listWidget_sol_task->clear();
-    ui.tableWidget_sol_mov->clear();//ui.listWidget_sol_mov->clear();
+    ui.tableWidget_sol_task->clear();
+    ui.tableWidget_sol_mov->clear();
     ui.label_totalTime_value_task->clear();
     ui.label_totalTime_value_mov->clear();
     ui.listWidget_movs->clear();
     this->curr_task->clearProblems();
+
 
 }
 

@@ -121,30 +121,31 @@ public:
          */
         bool getArmsHandles(int humanoid); // get the handles of both arms
 
+
         /**
-         * @brief This method executes a movement
-         * @param traj
-         * @param vel
-         * @param timeStep
-         * @param tol_stop
+         * @brief execMovement
+         * @param traj_mov
+         * @param vel_mov
+         * @param timesteps
+         * @param tols_stop
          * @param mov
          * @param scene
          * @return
          */
-        bool execMovement(MatrixXd& traj, MatrixXd& vel, double timeStep, double tol_stop, movementPtr mov, scenarioPtr scene);
+        bool execMovement(vector<MatrixXd>& traj_mov, vector<MatrixXd>& vel_mov, vector<double> timesteps, vector<double> tols_stop, movementPtr mov, scenarioPtr scene);
 
         /**
-         * @brief This method executes the movements in a task
+         * @brief execTask
          * @param traj_task
          * @param vel_task
-         * @param timeSteps
-         * @param nSteps
-         * @param tols_stop
+         * @param timesteps_task
+         * @param tols_stop_task
          * @param task
          * @param scene
          * @return
          */
-        bool execTask(MatrixXd& traj_task, MatrixXd& vel_task, vector<double>& timeSteps, vector<int>& nSteps, vector<double>& tols_stop, taskPtr task, scenarioPtr scene);
+        bool execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<double>>& timesteps_task, vector<vector<double>>& tols_stop_task, taskPtr task, scenarioPtr scene);
+
         /**
          * @brief This method sets to zero the time of simulation
          */

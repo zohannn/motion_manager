@@ -273,15 +273,18 @@ private:
         int scenario_id; /**< id of the current scenario */
 
         vector<double> timeSteps_mov; /**< current time steps of the movement */
+        vector<double> tols_stop_mov; /**< vector of the tolerances to stop each stage in the movement */
         vector< MatrixXd > jointsAcceleration_mov; /**< trajectory of the joint acceleration of the movement */
         vector< MatrixXd > jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
         vector< MatrixXd > jointsPosition_mov; /**< trajectory of the joint position of the movement */
-        MatrixXd jointsVelocity_task; /**< trajectory of the joint velocity of the task */
-        MatrixXd jointsPosition_task; /**< trajectory of the joint position of the task */
-        vector<double> timeSteps_task; /**< vector of time steps of each movement in the task */
-        vector<int> nSteps_task; /**< vector of number of steps of each movement in the task */
+        vector< vector< MatrixXd > > jointsAcceleration_task; /**< trajectory of the joint acceleration of the task */
+        vector< vector< MatrixXd > > jointsVelocity_task; /**< trajectory of the joint velocity of the task */
+        vector< vector< MatrixXd > > jointsPosition_task; /**< trajectory of the joint position of the task */
+        vector<vector<double>> timeSteps_task; /**< vector of time steps of each movement in the task */
+        vector<vector<double>> tols_stop_task; /**< vector of the tolerances to stop each movement in the task */
         vector<string> vel_steps; /**< steps of the trajectory for saving/loading file */
-        vector<double> tols_stop; /**< vector of the tolerances to stop each movement in the task */
+
+
 
         movementPtr curr_mov; /**< current movement */
         taskPtr curr_task;/**< current task */
