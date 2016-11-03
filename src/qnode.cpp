@@ -1860,11 +1860,6 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
         f_posture = traj.row(traj.rows()-1);
         f_reached=false;
 
-        ros::spinOnce(); // handle ROS messages
-        pre_time = simulationTime - timeTot; // update the total time of the movement
-        //BOOST_LOG_SEV(lg, info) << "timeTot = " << timeTot ;
-        //BOOST_LOG_SEV(lg, info) << "pre_time = " << pre_time ;
-
 
 
 #if HAND==0
@@ -1881,16 +1876,22 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
         // 5. Let's prepare a publisher of those values:
         ros::Publisher pub=node.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
 
+        ros::spinOnce(); // handle ROS messages
+        pre_time = simulationTime - timeTot; // update the total time of the movement
+        BOOST_LOG_SEV(lg, info) << "timeTot = " << timeTot ;
+        BOOST_LOG_SEV(lg, info) << "pre_time = " << pre_time ;
+
+
         for (int i = 1; i< vel.rows(); ++i){
-            //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
+            BOOST_LOG_SEV(lg, info) << "Interval = " << i;
             VectorXd ya = vel.row(i-1);
             VectorXd yb = vel.row(i);
             VectorXd yat = traj.row(i-1);
             VectorXd ybt = traj.row(i);
             ta = (i-1)*timeStep+ timeTot;
             tb = ta + timeStep;
-            //BOOST_LOG_SEV(lg, info) << "ta = " << ta;
-            //BOOST_LOG_SEV(lg, info) << "tb = " << tb << "\n";
+            BOOST_LOG_SEV(lg, info) << "ta = " << ta;
+            BOOST_LOG_SEV(lg, info) << "tb = " << tb << "\n";
             bool interval = true;
             double tx_prev;
             double yxt_prev;
@@ -1904,13 +1905,13 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 #endif
 
                 tx = simulationTime -pre_time;
-                //BOOST_LOG_SEV(lg, info) << "simulationTime = " << simulationTime ;
+                BOOST_LOG_SEV(lg, info) << "simulationTime = " << simulationTime ;
                 if (tx >= tb){
                     // go to the next interval
                     interval = false;
                 }else{
-                    //BOOST_LOG_SEV(lg, info) << "tx = " << tx ;
-                    //BOOST_LOG_SEV(lg, info) << "tx_prev = " << tx_prev;
+                    BOOST_LOG_SEV(lg, info) << "tx = " << tx ;
+                    BOOST_LOG_SEV(lg, info) << "tx_prev = " << tx_prev;
 
                     double m = (tx-ta)/(tb-ta);
                     std::vector<double> r_post;
@@ -1926,6 +1927,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                            pow((f_posture(6)-r_post.at(6)),2)) < tol_stop_rad){
                         f_reached=true;
                         //std::cout << "final posture reached" << std::endl;
+                        BOOST_LOG_SEV(lg, info) << "final posture reached" ;
                         break;
                     }else{f_reached=false;}
 
@@ -1966,12 +1968,12 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                         }
 #endif
 
-                      //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", ya = " << ya(k)*180/static_cast<double>(M_PI) << ", yb = "<< yb(k)*180/static_cast<double>(M_PI);
-                      //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
-                                                  //", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
+                      BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", ya = " << ya(k)*180/static_cast<double>(M_PI) << ", yb = "<< yb(k)*180/static_cast<double>(M_PI);
+                      BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
+                                                  ", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
 
                     }
-                    //BOOST_LOG_SEV(lg, info) << "\n";
+                    BOOST_LOG_SEV(lg, info) << "\n";
 
 
                     pub.publish(dataTraj);

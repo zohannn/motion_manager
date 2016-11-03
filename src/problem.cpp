@@ -35,8 +35,6 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
     this->leftFinalPosture_eng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
     this->rightFinalHand = std::vector<double>(JOINTS_HAND);
     this->leftFinalHand = std::vector<double>(JOINTS_HAND);
-    //this->rightBouncePosture = std::vector<double>(JOINTS_ARM);
-    //this->leftBouncePosture = std::vector<double>(JOINTS_ARM);
 
     this->targetAxis = 0;
     this->solved=false;
@@ -72,13 +70,17 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
         this->planner_name = "LBKPIECE";
         break;
     }
+    string scene_name = this->scene->getName();
+    int scene_id = this->scene->getID();
+
     if (huml){
         // --- Human-like movement planner settings --- //
         HUMotion::HUMPlanner::hand_fingers = HAND_FINGERS;
         HUMotion::HUMPlanner::joints_arm = JOINTS_ARM;
         HUMotion::HUMPlanner::joints_hand = JOINTS_HAND;
         HUMotion::HUMPlanner::n_phalange = N_PHALANGE;
-        this->h_planner.reset(new HUMotion::HUMPlanner(this->scene->getName()));
+        this->m_planner = nullptr;
+        this->h_planner.reset(new HUMotion::HUMPlanner(scene_name));
         // set the current obstacles and targets of the scenario
         vector<objectPtr> scene_objects;
         if(this->scene->getObjects(scene_objects)){
@@ -176,6 +178,23 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
 #endif
 
     }else{
+        // moveit planner
+#if HAND==0
+        // Toy vehicle scenario with Jarde
+        string path_rviz_toyscene = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
+#elif HAND==1
+        // Toy vehicle scenario with ARoS
+        string path_rviz_toyscene = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
+#endif
+        string path;
+        switch(scene_id){
+        case 1: // toy vehicle scenario
+            path = path_rviz_toyscene;
+            break;
+        }
+        this->h_planner = nullptr;
+        this->m_planner.reset(new moveit_planning::HumanoidPlanner(scene_name,path));
+
 
     }
 
@@ -192,8 +211,6 @@ Problem::Problem(const Problem& s)
     this->leftFinalPosture_eng = s.leftFinalPosture_eng;
     this->leftFinalPosture_diseng = s.leftFinalPosture_diseng;
     this->leftFinalHand = s.leftFinalHand;
-    //this->rightBouncePosture = s.rightBouncePosture;
-    //this->leftBouncePosture = s.leftBouncePosture;
 
     this->dFF = s.dFF;
     this->dFH = s.dFH;
@@ -206,7 +223,12 @@ Problem::Problem(const Problem& s)
     this->targetAxis = s.targetAxis;
     this->mov = movementPtr(new Movement(*s.mov.get()));
     this->scene = scenarioPtr(new Scenario(*s.scene.get()));
-    this->h_planner = h_plannerPtr(new HUMotion::HUMPlanner(*s.h_planner.get()));
+    if(m_planner!=nullptr){
+        this->m_planner = moveit_plannerPtr(new moveit_planning::HumanoidPlanner(*s.m_planner.get()));
+    }
+    if(h_planner!=nullptr){
+        this->h_planner = h_plannerPtr(new HUMotion::HUMPlanner(*s.h_planner.get()));
+    }
 
     this->planner_id=s.planner_id;
     this->planner_name=s.planner_name;

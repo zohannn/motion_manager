@@ -20,7 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
 include_directories(${catkin_INCLUDE_DIRS})
 
 find_package(aros_moveit_planner REQUIRED COMPONENTS
-    humanoid_planner
+  humanoid_planner
 )
 include_directories(${aros_moveit_planner_INCLUDE_DIRS})
 # Use this to define what the package will export (e.g. libs, headers).
@@ -136,9 +136,9 @@ target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${catkin_LIBRARIES} ${Boos
 # ********** link external libraries ********
 # Human-like Upper-limbs Motion Library (HUML)
 target_link_libraries(${PROJECT_NAME} HUML)
-
 # Humanoid moveit planner Library
 target_link_libraries(${PROJECT_NAME} humanoid_planner)
+
 
 # -- IPOPT Solver
 target_link_libraries(${PROJECT_NAME} libipopt.a)

@@ -308,11 +308,10 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 
              // Toy vehicle scenario with ARoS
              string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
-             string path_rviz_toyscene_aros = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
 
              // Toy vehicle scenario with Jarde
              string path_vrep_toyscene_jarde = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_jarde.ttt");
-             string path_rviz_toyscene_jarde = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
+
 
              switch(i){
 
@@ -448,7 +447,6 @@ void MainWindow::on_pushButton_addMov_clicked()
     int planner_id = ui.comboBox_planner->currentIndex();
 
     //if (planner_id==0){
-
     // Human-like Upper-limbs Motion Planner
 
         //int rows = ui.listWidget_movs->count();
@@ -605,7 +603,7 @@ void MainWindow::on_pushButton_addMov_clicked()
         }
 
 
-   // }else{
+    //}else{
 
         //Humanoid MoveIt! Planner
 

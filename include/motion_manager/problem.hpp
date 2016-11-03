@@ -5,7 +5,7 @@
 #include "scenario.hpp"
 
 // *** Humanoid MoveIt! Planner *** //
-//#include <aros_moveit_planner/humanoid_moveit_planner.hpp>
+#include <aros_moveit_planner/humanoid_moveit_planner.hpp>
 // ******************************************* //
 // *** Human-like Upper-limbs Motion Library (HUML) *** //
 #include <humplanner.hpp>
@@ -13,7 +13,7 @@
 
 
 namespace motion_manager {
-
+typedef boost::shared_ptr<moveit_planning::HumanoidPlanner> moveit_plannerPtr; /**< shared pointer to a moveit humanoid planner */
 typedef boost::shared_ptr<HUMotion::HUMPlanner> h_plannerPtr; /**< shared pointer to a human-like motion planner */
 
 typedef boost::shared_ptr<Scenario> scenarioPtr; /**< shared pointer to a scenario */
@@ -191,6 +191,7 @@ private:
     int planner_id; /**<  planner id of the selected planner */
     string planner_name; /**< name of the selected planner */
 
+    moveit_plannerPtr m_planner; /**< MoveIt! Libraries planner */
     h_plannerPtr h_planner; /**< Human-like Upper-limbs Motion Planner */
 
     /**
