@@ -308,10 +308,11 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 
              // Toy vehicle scenario with ARoS
              string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
+             string path_rviz_toyscene_aros = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
 
              // Toy vehicle scenario with Jarde
              string path_vrep_toyscene_jarde = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_jarde.ttt");
-
+             string path_rviz_toyscene_jarde = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
 
              switch(i){
 
@@ -352,6 +353,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      string title = string("Assembly scenario: the Toy vehicle with ARoS");
                      init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
                      curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     this->m_planner.reset(new moveit_planning::HumanoidPlanner(title,path_rviz_toyscene_aros));
 
                  }else{
 
@@ -508,8 +510,11 @@ void MainWindow::on_pushButton_addMov_clicked()
                         obj->setTargetRightEnabled(false);
                         break;
                     }
-
-                    curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                    if(planner_id==0){
+                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                    }else{
+                       curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                    }
                     success=true;
 
                 }else{
@@ -540,7 +545,11 @@ void MainWindow::on_pushButton_addMov_clicked()
                              obj->setTargetRightEnabled(false);
                              break;
                          }
-                         curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                         if(planner_id==0){
+                            curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                         }else{
+                            curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                         }
                          success=true;
 
                      }else{
@@ -569,11 +578,19 @@ void MainWindow::on_pushButton_addMov_clicked()
                              obj->setTargetRightEnabled(false);
                              break;
                          }
-                         curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                         if(planner_id==0){
+                            curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                         }else{
+                            curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                         }
                          success=true;
 
                      }else{
-                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel),new Scenario(*(this->curr_scene.get()))));
+                        if(planner_id==0){
+                            curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel),new Scenario(*(this->curr_scene.get()))));
+                        }else{
+                            curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                        }
                         success=true;
 
                      }

@@ -18,6 +18,7 @@
 
 
 
+
 using namespace std;
 
 /** This is the main namespace of the program */
@@ -284,7 +285,7 @@ private:
         vector<vector<double>> tols_stop_task; /**< vector of the tolerances to stop each movement in the task */
         vector<string> vel_steps; /**< steps of the trajectory for saving/loading file */
 
-
+        moveit_plannerPtr m_planner; /**< MoveIt! Libraries planner */
 
         movementPtr curr_mov; /**< current movement */
         taskPtr curr_task;/**< current task */

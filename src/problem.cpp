@@ -46,6 +46,9 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
     this->planner_id=planner_id;
 
     bool huml = false;
+
+    if (planner_id==0){huml = true;}
+    /*
     switch(planner_id){
     case 0:
         this->planner_name = "HUML";
@@ -70,8 +73,9 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
         this->planner_name = "LBKPIECE";
         break;
     }
+    */
     string scene_name = this->scene->getName();
-    int scene_id = this->scene->getID();
+    //int scene_id = this->scene->getID();
 
     if (huml){
         // --- Human-like movement planner settings --- //
@@ -177,26 +181,57 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
         h_planner->setBarrettHand(huml_bhand);
 #endif
 
-    }else{
-        // moveit planner
-#if HAND==0
-        // Toy vehicle scenario with Jarde
-        string path_rviz_toyscene = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
-#elif HAND==1
-        // Toy vehicle scenario with ARoS
-        string path_rviz_toyscene = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
-#endif
-        string path;
-        switch(scene_id){
-        case 1: // toy vehicle scenario
-            path = path_rviz_toyscene;
-            break;
-        }
-        this->h_planner = nullptr;
-        this->m_planner.reset(new moveit_planning::HumanoidPlanner(scene_name,path));
-
-
     }
+
+}
+
+Problem::Problem(int planner_id, Movement *mov, Scenario *scene, moveit_plannerPtr m_plannerPtr)
+{
+    this->rightFinalPosture = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->rightFinalPosture_diseng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->rightFinalPosture_eng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->leftFinalPosture = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->leftFinalPosture_diseng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->leftFinalPosture_eng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->rightFinalHand = std::vector<double>(JOINTS_HAND);
+    this->leftFinalHand = std::vector<double>(JOINTS_HAND);
+
+    this->targetAxis = 0;
+    this->solved=false;
+    this->part_of_task=false;
+    this->err_log=0;
+
+    this->mov = movementPtr(mov);
+    this->scene = scenarioPtr(scene);
+    this->planner_id=planner_id;
+
+    switch(planner_id){
+    case 0:
+        this->planner_name = "HUML";
+        break;
+    case 1:
+        this->planner_name = "RRT";
+        break;
+    case 2:
+        this->planner_name = "RRTConnect";
+        break;
+    case 3:
+        this->planner_name = "RRTstar";
+        break;
+    case 4:
+        this->planner_name = "PRM";
+        break;
+    case 5:
+        this->planner_name = "PRMstar";
+        break;
+    case 6:
+        this->planner_name = "LBKPIECE";
+        break;
+    }
+
+    this->m_planner=m_plannerPtr;
+    this->h_planner=nullptr;
+
 
 }
 

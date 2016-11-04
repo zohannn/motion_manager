@@ -40,6 +40,15 @@ public:
     Problem(int planner_id,Movement* mov,Scenario* scene);
 
     /**
+     * @brief Problem
+     * @param planner_id
+     * @param mov
+     * @param scene
+     * @param m_plannerPtr
+     */
+    Problem(int planner_id,Movement* mov,Scenario* scene, moveit_plannerPtr m_plannerPtr);
+
+    /**
      * @brief Problem, a copy constructor
      * @param s
      */
