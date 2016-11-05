@@ -34,6 +34,18 @@ public Q_SLOTS:
      */
     void on_pushButton_load_clicked();
 
+    /**
+     * @brief checkApproach
+     * @param state
+     */
+    void checkApproach(int state);
+
+    /**
+     * @brief checkRetreat
+     * @param state
+     */
+    void checkRetreat(int state);
+
 public:
 
     /**
@@ -200,19 +212,7 @@ public:
      */
     void setInfo(string info);
 
-public Q_SLOTS:
 
-    /**
-     * @brief checkApproach
-     * @param state
-     */
-    void checkApproach(int state);
-
-    /**
-     * @brief checkRetreat
-     * @param state
-     */
-    void checkRetreat(int state);
 
 
 

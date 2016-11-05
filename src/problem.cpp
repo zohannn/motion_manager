@@ -47,33 +47,8 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
 
     bool huml = false;
 
-    if (planner_id==0){huml = true;}
-    /*
-    switch(planner_id){
-    case 0:
-        this->planner_name = "HUML";
-        huml = true;
-        break;
-    case 1:
-        this->planner_name = "RRT";
-        break;
-    case 2:
-        this->planner_name = "RRTConnect";
-        break;
-    case 3:
-        this->planner_name = "RRTstar";
-        break;
-    case 4:
-        this->planner_name = "PRM";
-        break;
-    case 5:
-        this->planner_name = "PRMstar";
-        break;
-    case 6:
-        this->planner_name = "LBKPIECE";
-        break;
-    }
-    */
+    if (planner_id==0){huml = true;this->planner_name = "HUML";}
+
     string scene_name = this->scene->getName();
     //int scene_id = this->scene->getID();
 
@@ -224,9 +199,6 @@ Problem::Problem(int planner_id, Movement *mov, Scenario *scene, moveit_plannerP
     case 5:
         this->planner_name = "PRMstar";
         break;
-    case 6:
-        this->planner_name = "LBKPIECE";
-        break;
     }
 
     this->m_planner=m_plannerPtr;
@@ -258,10 +230,10 @@ Problem::Problem(const Problem& s)
     this->targetAxis = s.targetAxis;
     this->mov = movementPtr(new Movement(*s.mov.get()));
     this->scene = scenarioPtr(new Scenario(*s.scene.get()));
-    if(m_planner!=nullptr){
+    if(s.m_planner!=nullptr){
         this->m_planner = moveit_plannerPtr(new moveit_planning::HumanoidPlanner(*s.m_planner.get()));
     }
-    if(h_planner!=nullptr){
+    if(s.h_planner!=nullptr){
         this->h_planner = h_plannerPtr(new HUMotion::HUMPlanner(*s.h_planner.get()));
     }
 
@@ -298,9 +270,6 @@ void Problem::setPlannerID(int id)
         break;
     case 5:
         this->planner_name = "PRMstar";
-        break;
-    case 6:
-        this->planner_name = "LBKPIECE";
         break;
 
     }

@@ -1,0 +1,21 @@
+# Configuration settings
+config=RRTkConfigDefault
+# Pick settings
+pre_grasp_x=0
+pre_grasp_y=0
+pre_grasp_z=0
+pre_grasp_dist=0
+post_grasp_x=0
+post_grasp_y=0
+post_grasp_z=0
+post_grasp_dist=0
+# Place settings
+pre_place_x=0
+pre_place_y=0
+pre_place_z=0
+pre_place_dist=0
+post_place_x=0
+post_place_y=0
+post_place_z=0
+post_place_dist=0
+# Move settings

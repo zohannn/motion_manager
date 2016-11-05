@@ -15,6 +15,7 @@
 #include "rvizcommdialog.hpp"
 #include "toldialoghuml.hpp"
 #include "config.hpp"
+#include "rrtdialog.hpp"
 
 
 
@@ -270,7 +271,8 @@ private:
         RosCommDialog *mrosCommdlg; /**< handle of the ROS communication dialog */
         VrepCommDialog *mvrepCommdlg; /**< handle of the V-REP communication dialog */
         RVizCommDialog *mrvizCommdlg; /**< handle of the RViz communication dialog */
-        TolDialogHUML *mTolHumldlg; /**< handle of the tuning dialog */
+        TolDialogHUML *mTolHumldlg; /**< handle of the HUML tuning dialog */
+        RRTDialog *mRRTdlg; /**< handle of the RRT tuning dialog */
         int scenario_id; /**< id of the current scenario */
 
         vector<double> timeSteps_mov; /**< current time steps of the movement */

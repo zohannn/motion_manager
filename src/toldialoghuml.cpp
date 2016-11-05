@@ -12,16 +12,19 @@ TolDialogHUML::TolDialogHUML(QWidget *parent) :
     ui->setupUi(this);
 
      QObject::connect(ui->checkBox_approach, SIGNAL(stateChanged(int)), this, SLOT(checkApproach(int)));
+     QObject::connect(ui->checkBox_retreat, SIGNAL(stateChanged(int)), this, SLOT(checkRetreat(int)));
 
     if(ui->checkBox_approach->isChecked()){
         ui->groupBox_pre_grasp->setEnabled(false);
         ui->groupBox_pre_place->setEnabled(false);
         ui->groupBox_vel_approach->setEnabled(false);
         ui->groupBox_acc_approach->setEnabled(false);
+        ui->label_pick->setEnabled(false);
     }
     if(ui->checkBox_retreat->isChecked()){
         ui->groupBox_post_grasp->setEnabled(false);
         ui->groupBox_post_place->setEnabled(false);
+        ui->label_pick->setEnabled(false);
     }
 }
 
@@ -860,12 +863,14 @@ void TolDialogHUML::checkApproach(int state)
         ui->groupBox_pre_place->setEnabled(true);
         ui->groupBox_vel_approach->setEnabled(true);
         ui->groupBox_acc_approach->setEnabled(true);
+        ui->label_pick->setEnabled(true);
     }else{
         //checked
         ui->groupBox_pre_grasp->setEnabled(false);
         ui->groupBox_pre_place->setEnabled(false);
         ui->groupBox_vel_approach->setEnabled(false);
         ui->groupBox_acc_approach->setEnabled(false);
+        ui->label_pick->setEnabled(false);
     }
 }
 
@@ -875,10 +880,12 @@ void TolDialogHUML::checkRetreat(int state)
         // unchecked
         ui->groupBox_post_grasp->setEnabled(true);
         ui->groupBox_post_place->setEnabled(true);
+        ui->label_pick->setEnabled(true);
     }else{
         //checked
         ui->groupBox_post_grasp->setEnabled(false);
         ui->groupBox_post_place->setEnabled(false);
+        ui->label_pick->setEnabled(false);
     }
 }
 

@@ -46,9 +46,13 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mrvizCommdlg = new RVizCommDialog(&qnode, this);
     mrvizCommdlg->setModal(true);
 
-    //create Tuning dialog
+    //create HUML Tuning dialog
     mTolHumldlg = new TolDialogHUML(this);
     mTolHumldlg->setModal(true);
+
+    //create RRT Tuning dialog
+    mRRTdlg = new RRTDialog(this);
+    mRRTdlg->setModal(true);
 
 
     ReadSettings();
@@ -268,6 +272,11 @@ void MainWindow::on_pushButton_tuning_clicked()
     switch(planner_id){
     case 0: // HUML
             mTolHumldlg->show();
+        break;
+    case 1: // RRT
+        mRRTdlg->show();
+        break;
+    case 2:
         break;
     }
 
@@ -598,9 +607,12 @@ void MainWindow::on_pushButton_addMov_clicked()
 
 
              }else{
-
                  // reaching movements
-                 curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel),new Scenario(*(this->curr_scene.get()))));
+                 if(planner_id==0){
+                    curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel),new Scenario(*(this->curr_scene.get()))));
+                }else{
+                    curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                 }
                  success=true;
 
              }
