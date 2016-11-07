@@ -317,11 +317,11 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 
              // Toy vehicle scenario with ARoS
              string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
-             string path_rviz_toyscene_aros = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
+             //string path_rviz_toyscene_aros = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
 
              // Toy vehicle scenario with Jarde
              string path_vrep_toyscene_jarde = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_jarde.ttt");
-             string path_rviz_toyscene_jarde = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
+             //string path_rviz_toyscene_jarde = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
 
              switch(i){
 
@@ -362,7 +362,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      string title = string("Assembly scenario: the Toy vehicle with ARoS");
                      init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
                      curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
-                     this->m_planner.reset(new moveit_planning::HumanoidPlanner(title,path_rviz_toyscene_aros));
+                     this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 
                  }else{
 
@@ -431,6 +431,20 @@ void MainWindow::on_pushButton_getElements_clicked()
             ui.groupBox_specs->setEnabled(true);
             ui.groupBox_task->setEnabled(false);
             ui.tabWidget_sol->setEnabled(false);
+
+            // load the objects into RViz
+            std::vector<objectPtr> objs; this->curr_scene->getObjects(objs);
+            for(size_t i=0;i<objs.size();++i){
+                objectPtr obj = objs.at(i);
+                string name = obj->getName();
+                std::vector<double> pose;
+                pose = {obj->getPos().Xpos/1000,obj->getPos().Ypos/1000,obj->getPos().Zpos/1000,
+                       obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
+                if(strcmp(name.c_str(),"Table")==0){
+                    this->m_planner->addTable(name,pose);
+                }
+
+            }
             qnode.log(QNode::Info,string("The elements of the scenario are now available"));
 
         }else{
