@@ -103,7 +103,15 @@ public:
      * @param tols
      * @return
      */
-    HUMotion::planning_result solve(HUMotion::huml_params& params);
+    HUMotion::planning_result_ptr solve(HUMotion::huml_params& params);
+
+    /**
+     * @brief This method solves the problem given the tolerances and the parameters
+     * humanoid planner
+     * @param params
+     * @return
+     */
+    moveit_planning::PlanningResultPtr solve(moveit_planning::moveit_params& params);
 
     /**
      * @brief This method gets the information of the problem
@@ -189,7 +197,8 @@ private:
     std::vector<double> leftFinalPosture_diseng; /**< final posture of the left arm+hand for disengaging movements*/
     std::vector<double> leftFinalPosture_eng; /**< final posture of the left arm+hand for engaging movements*/
     MatrixXd optimalTraj; /**< human-like optimized trajectory */
-    HUMotion::huml_params h_params; /**< parameters of the optimization problem */
+    moveit_planning::moveit_params m_params; /**< parameters of the moveit Humanoid planner */
+    HUMotion::huml_params h_params; /**< parameters of the HUML planner */
     movementPtr mov; /**< movement to be planned */
     scenarioPtr scene; /**< current scene */
     int targetAxis; /**< approaching direction towards the target: 0 = none , 1 = x axis , 2 = y axis, 3 = z axis*/

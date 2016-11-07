@@ -313,7 +313,7 @@ void TolDialogHUML::on_pushButton_save_clicked()
    if(f.open( QIODevice::WriteOnly )){
 
        QTextStream stream( &f );
-       stream << "### Tolerances for the Human-like Upper-limbs Motion Library ###" << endl;
+       stream << "### Parameters of the Human-like Upper-limbs Motion Library ###" << endl;
        stream << "# "<< this->infoLine.c_str() << endl;
        stream << "# Geometric Dimensions of the arms and of the fingers" << endl;
        stream << "Shoulder_radius=" << ui->lineEdit_shoulder_r->text().toStdString().c_str() << endl;

@@ -69,10 +69,23 @@ public:
      */
     std::string getConfig();
 
+    /**
+     * @brief This method sets the information about the tuning of the planner
+     * @param info
+     */
+    void setInfo(std::string info);
+
+    /**
+     * @brief This method gets the tolerance to stop the execution the movement
+     * @return
+     */
+    double getTolStop();
+
 
 private:
     Ui::RRTDialog *ui; /**< handle of the user interface */
     std::string config; /**< current configuration */
+    std::string infoLine; /**< information about the tuning of the planner */
 };
 
 } // namespace motion_manager

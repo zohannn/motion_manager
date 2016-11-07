@@ -900,13 +900,13 @@ movementPtr Problem::getMovement()
     return this->mov;
 }
 
-HUMotion::planning_result Problem::solve(HUMotion::huml_params &params)
+HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
 {
 
     this->solved = false;
     this->h_params = params;
     int arm_code =  this->mov->getArm();
-    //int mov_type = this->mov->getType();
+    int mov_type = this->mov->getType();
     try{ // compute the final posture of the fingers according to the object involved in the movement
         this->finalPostureFingers(arm_code);
     }catch(const string message){throw message;}
@@ -962,11 +962,103 @@ HUMotion::planning_result Problem::solve(HUMotion::huml_params &params)
     params.mov_specs.target = target;
     params.mov_specs.obj = huml_obj;
 
-    HUMotion::planning_result res =  this->h_planner->plan_pick(params,initPosture);
+    HUMotion::planning_result_ptr res;
+    switch(mov_type){
+    case 0:// reach-to-grasp
+        res =  this->h_planner->plan_pick(params,initPosture);
+        break;
+    case 1:// reaching
+        break;
+    case 2://transport
+        break;
+    case 3://engage
+        break;
+    case 4:// disengage
+        break;
+    case 5:// go-park
+        break;
+    }
 
-    if(res.status==0){this->solved=true;}
+
+
+    if(res->status==0){this->solved=true;}
 
     return res;
+}
+
+
+moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params &params)
+{
+    this->solved = false;
+    this->m_params = params;
+    int arm_code =  this->mov->getArm();
+    int mov_type = this->mov->getType();
+    try{ // compute the final posture of the fingers according to the object involved in the movement
+        this->finalPostureFingers(arm_code);
+    }catch(const string message){throw message;}
+#if HAND==0
+    // Human Hand
+    int hand_code = 0;
+#elif HAND == 1
+    // Barrett Hand
+    int hand_code = 1;
+#endif
+    double dHO;
+    std::vector<double> finalHand;
+    std::vector<double> initPosture;
+    objectPtr obj = this->mov->getObject();
+    targetPtr tar;
+    switch(arm_code){
+    case 0: // both arms
+        break;
+    case 1://right arm
+        this->scene->getHumanoid()->getRightPosture(initPosture);
+        dHO=this->dHOr;
+        finalHand = this->rightFinalHand;
+        tar = obj->getTargetRight();
+        break;
+    case 2:// left arm
+        this->scene->getHumanoid()->getLeftPosture(initPosture);
+        dHO=this->dHOl;
+        finalHand = this->leftFinalHand;
+        tar = obj->getTargetLeft();
+        break;
+    }
+    std::vector<double> target;
+    target = {tar->getPos().Xpos/1000, tar->getPos().Ypos/1000, tar->getPos().Zpos/1000,
+              tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
+    // movement settings
+    params.arm_code = arm_code;
+    params.hand_code = hand_code;
+    params.griptype = this->mov->getGrip();
+    params.mov_infoline = this->mov->getInfoLine();
+    params.dHO = (dHO)/1000;
+    params.finalHand = finalHand;
+    params.target = target;
+    params.obj_name = this->mov->getObject()->getName();
+
+    moveit_planning::PlanningResultPtr res;
+    switch(mov_type){
+    case 0:// reach-to-grasp
+        res =  this->m_planner->pick(params);
+        break;
+    case 1:// reaching
+        break;
+    case 2://transport
+        break;
+    case 3://engage
+        break;
+    case 4:// disengage
+        break;
+    case 5:// go-park
+        break;
+    }
+
+    if(res->status==0){this->solved=true;}
+
+    return res;
+
+
 }
 
 

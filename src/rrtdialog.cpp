@@ -21,7 +21,7 @@ void RRTDialog::getPreGraspApproach(std::vector<double> &pre_grasp)
     pre_grasp.push_back(ui->lineEdit_pre_grasp_x->text().toDouble());
     pre_grasp.push_back(ui->lineEdit_pre_grasp_y->text().toDouble());
     pre_grasp.push_back(ui->lineEdit_pre_grasp_z->text().toDouble());
-    pre_grasp.push_back(ui->lineEdit_pre_grasp_dist->text().toDouble());
+    pre_grasp.push_back(ui->lineEdit_pre_grasp_dist->text().toDouble()/1000);
 }
 
 void RRTDialog::getPostGraspRetreat(std::vector<double> &post_grasp)
@@ -30,7 +30,7 @@ void RRTDialog::getPostGraspRetreat(std::vector<double> &post_grasp)
     post_grasp.push_back(ui->lineEdit_post_grasp_x->text().toDouble());
     post_grasp.push_back(ui->lineEdit_post_grasp_y->text().toDouble());
     post_grasp.push_back(ui->lineEdit_post_grasp_z->text().toDouble());
-    post_grasp.push_back(ui->lineEdit_post_grasp_dist->text().toDouble());
+    post_grasp.push_back(ui->lineEdit_post_grasp_dist->text().toDouble()/1000);
 }
 
 void RRTDialog::getPrePlaceApproach(std::vector<double> &pre_place)
@@ -39,7 +39,7 @@ void RRTDialog::getPrePlaceApproach(std::vector<double> &pre_place)
     pre_place.push_back(ui->lineEdit_pre_place_x->text().toDouble());
     pre_place.push_back(ui->lineEdit_pre_place_y->text().toDouble());
     pre_place.push_back(ui->lineEdit_pre_place_z->text().toDouble());
-    pre_place.push_back(ui->lineEdit_pre_place_dist->text().toDouble());
+    pre_place.push_back(ui->lineEdit_pre_place_dist->text().toDouble()/1000);
 }
 
 void RRTDialog::getPostPlaceRetreat(std::vector<double> &post_place)
@@ -48,7 +48,7 @@ void RRTDialog::getPostPlaceRetreat(std::vector<double> &post_place)
     post_place.push_back(ui->lineEdit_post_place_x->text().toDouble());
     post_place.push_back(ui->lineEdit_post_place_y->text().toDouble());
     post_place.push_back(ui->lineEdit_post_place_z->text().toDouble());
-    post_place.push_back(ui->lineEdit_post_place_dist->text().toDouble());
+    post_place.push_back(ui->lineEdit_post_place_dist->text().toDouble()/1000);
 }
 
 std::string RRTDialog::getConfig()
@@ -79,6 +79,8 @@ void RRTDialog::on_pushButton_save_clicked()
     QFile f( filename );
     if(f.open( QIODevice::WriteOnly )){
         QTextStream stream( &f );
+        stream << "### Parameters of the RRT planner in MoveIt! ###" << endl;
+        stream << "# "<< this->infoLine.c_str() << endl;
         stream << "# Configuration settings" << endl;
         stream << "config=" << this->config.c_str() << endl;
         stream << "# Pick settings" << endl;
@@ -100,6 +102,8 @@ void RRTDialog::on_pushButton_save_clicked()
         stream << "post_place_z="<< ui->lineEdit_post_place_z->text().toStdString().c_str() << endl;
         stream << "post_place_dist="<< ui->lineEdit_post_place_dist->text().toStdString().c_str() << endl;
         stream << "# Move settings" << endl;
+        stream << "# Others" << endl;
+        stream << "tol_stop=" << ui->lineEdit_tol_stop->text().toStdString().c_str()<< endl;
 
     }
 }
@@ -153,6 +157,8 @@ void RRTDialog::on_pushButton_load_clicked()
                     ui->lineEdit_post_place_z->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("post_place_dist"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_post_place_dist->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("tol_stop"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_tol_stop->setText(fields.at(1));
                 }
             }
 
@@ -167,6 +173,18 @@ void RRTDialog::on_pushButton_load_clicked()
         }
 
     }
+}
+
+void RRTDialog::setInfo(std::string info)
+{
+
+    this->infoLine = info;
+}
+
+double RRTDialog::getTolStop()
+{
+
+    return ui->lineEdit_tol_stop->text().toDouble();
 }
 
 

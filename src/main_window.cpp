@@ -651,7 +651,8 @@ void MainWindow::on_pushButton_plan_clicked()
     problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
     int planner_id = prob->getPlannerID();
     double tol_stop; // stop tolerance on the joints when executing the movements
-    HUMotion::planning_result h_results; HUMotion::huml_params  tols;
+    HUMotion::planning_result_ptr h_results; HUMotion::huml_params  tols;
+    moveit_planning::PlanningResultPtr m_results; moveit_planning::moveit_params m_params;
 
     bool solved = false;
  try{
@@ -704,22 +705,34 @@ void MainWindow::on_pushButton_plan_clicked()
         h_results = prob->solve(tols); // plan the movement
 
         ui.pushButton_plan->setCheckable(false);
-        if(h_results.status==0){
+        if(h_results->status==0){
             qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
             this->curr_mov = prob->getMovement();
-            this->timeSteps_mov = h_results.time_steps;
-            this->jointsPosition_mov = h_results.trajectory_stages;
-            this->jointsVelocity_mov = h_results.velocity_stages;
-            this->jointsAcceleration_mov = h_results.acceleration_stages;
+            this->timeSteps_mov = h_results->time_steps;
+            this->jointsPosition_mov = h_results->trajectory_stages;
+            this->jointsVelocity_mov = h_results->velocity_stages;
+            this->jointsAcceleration_mov = h_results->acceleration_stages;
             solved=true;
         }else{
             ui.tableWidget_sol_mov->clear();//ui.listWidget_sol_mov->clear();
-            qnode.log(QNode::Error,std::string("The planning has failed: ")+h_results.status_msg);
+            qnode.log(QNode::Error,std::string("The planning has failed: ")+h_results->status_msg);
         }
 
         break;
+    case 1: // RRT
+        mRRTdlg->setInfo(prob->getInfoLine());
+        // configuration
+        m_params.config = mRRTdlg->getConfig();
+        // pick/place settings
+        mRRTdlg->getPreGraspApproach(m_params.pre_grasp_approach); // pick approach
+        mRRTdlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
+        mRRTdlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
+        mRRTdlg->getPostPlaceRetreat(m_params.post_place_retreat); // place retreat
 
-    case 1: // another planner
+        tol_stop = mRRTdlg->getTolStop(); // stop tolerance on the joints when executing the movements
+
+        m_results = prob->solve(m_params); // plan the movement
+
         break;
 
 
