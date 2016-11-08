@@ -1032,7 +1032,7 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     params.hand_code = hand_code;
     params.griptype = this->mov->getGrip();
     params.mov_infoline = this->mov->getInfoLine();
-    params.dHO = (dHO)/1000;
+    params.dHO = dHO/1000;
     params.finalHand = finalHand;
     params.target = target;
     params.obj_name = this->mov->getObject()->getName();

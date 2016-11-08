@@ -749,7 +749,7 @@ void MainWindow::on_pushButton_plan_clicked()
 
         }else{
             ui.tableWidget_sol_mov->clear();
-            qnode.log(QNode::Error,std::string("The planning has failed: ")+h_results->status_msg);
+            qnode.log(QNode::Error,std::string("The planning has failed: ")+m_results->status_msg);
         }
 
         break;
