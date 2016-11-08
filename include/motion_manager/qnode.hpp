@@ -108,6 +108,12 @@ public:
         bool loadScenario(const string &path,int id);
 
         /**
+         * @brief loadRVizScenario
+         * @param objs
+         */
+        void loadRVizScenario(std::vector<objectPtr>& objs);
+
+        /**
          * @brief This method gets the elements of the scenario
          * @param scene
          * @return
@@ -250,10 +256,8 @@ private:
         ros::Subscriber subWheel1; /**< ROS sunscriber to the topic /vrep/Wheel1_pose (obj_id=6 in the toy vehicle scenario) */
         ros::Subscriber subWheel2; /**< ROS sunscriber to the topic /vrep/Wheel2_pose (obj_id=7 in the toy vehicle scenario) */
         ros::Subscriber subBase; /**< ROS sunscriber to the topic /vrep/Base_pose (obj_id=8 in the toy vehicle scenario) */
-        //ros::Subscriber subTable; /**< ROS sunscriber to the topic /vrep/Table_pose (obj_id=9 in the toy vehicle scenario) */
         // -----------------------------------------------------------------------------------------------------------------------------------
-        //ros::Subscriber subUpdateScene;
-        //ros::Subscriber subUpdateTable;
+        boost::shared_ptr<moveit::planning_interface::PlanningSceneInterface> planning_scene_interface_ptr;/**< scene interface */
         QStringListModel logging_model; /**< list of loggings */
         bool simulationRunning; /**< true if the simulation in V-REP is running */
         double simulationTime;/**< current time of the simulation */
@@ -413,6 +417,13 @@ private:
          * @return
          */
         bool getRPY(Matrix4d Trans, std::vector<double>& rpy);
+
+        /**
+         * @brief RPY_matrix
+         * @param rpy
+         * @param Rot
+         */
+        void RPY_matrix(std::vector<double>rpy, Matrix3d &Rot);
 
         /**
          * @brief This method update the information of a generic object in V-REP

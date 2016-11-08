@@ -63,6 +63,7 @@ QNode::QNode(int argc, char** argv ) :
     left_2hand_force.assign(3,0.0f);
     got_scene = false;
     obj_in_hand = false;
+
 #if HAND ==1
     firstPartLocked.assign(3,false);
     needFullOpening.assign(3,0);
@@ -169,13 +170,78 @@ bool  QNode::loadScenario(const std::string& path,int id)
             break;
 
         }
-
-
+        // planning scene of RViZ
+        planning_scene_interface_ptr.reset(new moveit::planning_interface::PlanningSceneInterface());
         return true;
     }else{
         return false;
     }
 
+
+}
+
+void QNode::loadRVizScenario(std::vector<objectPtr> &objs)
+{
+    vector<string> rem_object_ids;
+    vector<moveit_msgs::CollisionObject> add_collision_objects;
+
+    for(size_t i=0; i<objs.size();++i){
+        objectPtr obj = objs.at(i); string name = obj->getName();
+        string mesh_file;
+        if(strcmp(name.c_str(),"Table")==0){
+            mesh_file = "table/table.dae";
+        }else if((strcmp(name.c_str(),"BlueColumn")==0)||
+                 (strcmp(name.c_str(),"GreenColumn")==0)||
+                 (strcmp(name.c_str(),"RedColumn")==0)||
+                 (strcmp(name.c_str(),"MagentaColumn")==0)){
+            mesh_file = "column/column.dae";
+        }else if((strcmp(name.c_str(),"Nut1")==0)||
+                 (strcmp(name.c_str(),"Nut2")==0)){
+            mesh_file = "nut/nut.dae";
+        }else if((strcmp(name.c_str(),"Wheel1")==0)||
+                 (strcmp(name.c_str(),"Wheel2")==0)){
+            mesh_file = "wheel/wheel.dae";
+        }else if(strcmp(name.c_str(),"Base")==0){
+            mesh_file = "base/base.dae";
+        }
+        string mesh_path = string("package://models/meshes/")+mesh_file;
+
+        moveit_msgs::CollisionObject co;
+        co.header.stamp = ros::Time::now();
+        co.header.frame_id = FRAME_ID;
+        // remove
+        co.id = name;
+        co.operation = moveit_msgs::CollisionObject::REMOVE;
+        rem_object_ids.push_back(co.id);
+        // add
+        co.operation = moveit_msgs::CollisionObject::ADD;
+        shapes::Mesh* table_shape = shapes::createMeshFromResource(mesh_path.c_str());
+        shapes::ShapeMsg table_mesh_msg;
+        shapes::constructMsgFromShape(table_shape,table_mesh_msg);
+        shape_msgs::Mesh table_mesh = boost::get<shape_msgs::Mesh>(table_mesh_msg);
+        std::vector<double> rpy = {obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
+        Matrix3d Rot; this->RPY_matrix(rpy,Rot); Quaterniond q(Rot);
+        co.meshes.resize(1);
+        co.meshes[0] = table_mesh;
+        co.mesh_poses.resize(1);
+        co.mesh_poses[0].position.x = obj->getPos().Xpos/1000; // [m]
+        co.mesh_poses[0].position.y = obj->getPos().Ypos/1000; // [m]
+        co.mesh_poses[0].position.z = obj->getPos().Zpos/1000; // [m]
+        co.mesh_poses[0].orientation.w= q.w();
+        co.mesh_poses[0].orientation.x= q.x();
+        co.mesh_poses[0].orientation.y= q.y();
+        co.mesh_poses[0].orientation.z= q.z();
+        add_collision_objects.push_back(co);
+
+
+    }
+    // remove
+    planning_scene_interface_ptr->removeCollisionObjects(rem_object_ids);
+    // add
+    planning_scene_interface_ptr->addCollisionObjects(add_collision_objects);
+
+    /* Sleep so we have time to see the object in RViz */
+    ros::WallDuration(5.0).sleep();
 
 }
 
@@ -1668,6 +1734,24 @@ bool QNode::getRPY(Matrix4d Trans, std::vector<double> &rpy)
     }
 
 
+}
+
+void QNode::RPY_matrix(std::vector<double> rpy, Matrix3d &Rot)
+{
+    Rot = Matrix3d::Zero();
+
+    if(!rpy.empty()){
+        double roll = rpy.at(0); // around z
+        double pitch = rpy.at(1); // around y
+        double yaw = rpy.at(2); // around x
+
+        // Rot = Rot_z * Rot_y * Rot_x
+
+        Rot(0,0) = cos(roll)*cos(pitch);  Rot(0,1) = cos(roll)*sin(pitch)*sin(yaw)-sin(roll)*cos(yaw); Rot(0,2) = sin(roll)*sin(yaw)+cos(roll)*sin(pitch)*cos(yaw);
+        Rot(1,0) = sin(roll)*cos(pitch);  Rot(1,1) = cos(roll)*cos(yaw)+sin(roll)*sin(pitch)*sin(yaw); Rot(1,2) = sin(roll)*sin(pitch)*cos(yaw)-cos(roll)*sin(yaw);
+        Rot(2,0) = -sin(pitch);           Rot(2,1) = cos(pitch)*sin(yaw);                              Rot(2,2) = cos(pitch)*cos(yaw);
+
+    }
 }
 
 

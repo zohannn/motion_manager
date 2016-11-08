@@ -431,20 +431,9 @@ void MainWindow::on_pushButton_getElements_clicked()
             ui.groupBox_specs->setEnabled(true);
             ui.groupBox_task->setEnabled(false);
             ui.tabWidget_sol->setEnabled(false);
-
             // load the objects into RViz
             std::vector<objectPtr> objs; this->curr_scene->getObjects(objs);
-            for(size_t i=0;i<objs.size();++i){
-                objectPtr obj = objs.at(i);
-                string name = obj->getName();
-                std::vector<double> pose;
-                pose = {obj->getPos().Xpos/1000,obj->getPos().Ypos/1000,obj->getPos().Zpos/1000,
-                       obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
-                if(strcmp(name.c_str(),"Table")==0){
-                    this->m_planner->addTable(name,pose);
-                }
-
-            }
+            qnode.loadRVizScenario(objs);
             qnode.log(QNode::Info,string("The elements of the scenario are now available"));
 
         }else{
