@@ -1054,7 +1054,7 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         break;
     }
 
-    if(res->status==0){this->solved=true;}
+    if(res->status==1){this->solved=true;}
 
     return res;
 

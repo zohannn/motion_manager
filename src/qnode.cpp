@@ -35,7 +35,7 @@
 #include<vrep_common/simRosSetJointForce.h>
 #include<vrep_common/simRosSetJointPosition.h>
 
-
+#include <geometric_shapes/solid_primitive_dims.h>
 
 #include "../include/motion_manager/v_repConst.hpp"
 
@@ -204,6 +204,9 @@ void QNode::loadRVizScenario(std::vector<objectPtr> &objs)
         }else if(strcmp(name.c_str(),"Base")==0){
             mesh_file = "base/base.dae";
         }
+        std::vector<double> rpy = {obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
+        Matrix3d Rot; this->RPY_matrix(rpy,Rot); Quaterniond q(Rot);
+
         string mesh_path = string("package://models/meshes/")+mesh_file;
 
         moveit_msgs::CollisionObject co;
@@ -219,8 +222,6 @@ void QNode::loadRVizScenario(std::vector<objectPtr> &objs)
         shapes::ShapeMsg table_mesh_msg;
         shapes::constructMsgFromShape(table_shape,table_mesh_msg);
         shape_msgs::Mesh table_mesh = boost::get<shape_msgs::Mesh>(table_mesh_msg);
-        std::vector<double> rpy = {obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
-        Matrix3d Rot; this->RPY_matrix(rpy,Rot); Quaterniond q(Rot);
         co.meshes.resize(1);
         co.meshes[0] = table_mesh;
         co.mesh_poses.resize(1);
@@ -231,9 +232,7 @@ void QNode::loadRVizScenario(std::vector<objectPtr> &objs)
         co.mesh_poses[0].orientation.x= q.x();
         co.mesh_poses[0].orientation.y= q.y();
         co.mesh_poses[0].orientation.z= q.z();
-        add_collision_objects.push_back(co);
-
-
+            add_collision_objects.push_back(co);
     }
     // remove
     planning_scene_interface_ptr->removeCollisionObjects(rem_object_ids);
@@ -1473,7 +1472,7 @@ bool QNode::getElements(scenarioPtr scene)
 
     }// switch scenario
 
-
+    this->curr_scene = scene;
 
     // stop the simulation
     add_client = n.serviceClient<vrep_common::simRosStopSimulation>("/vrep/simRosStopSimulation");

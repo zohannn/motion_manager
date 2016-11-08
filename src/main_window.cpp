@@ -717,7 +717,7 @@ void MainWindow::on_pushButton_plan_clicked()
             this->jointsAcceleration_mov = h_results->acceleration_stages;
             solved=true;
         }else{
-            ui.tableWidget_sol_mov->clear();//ui.listWidget_sol_mov->clear();
+            ui.tableWidget_sol_mov->clear();
             qnode.log(QNode::Error,std::string("The planning has failed: ")+h_results->status_msg);
         }
 
@@ -735,6 +735,22 @@ void MainWindow::on_pushButton_plan_clicked()
         tol_stop = mRRTdlg->getTolStop(); // stop tolerance on the joints when executing the movements
 
         m_results = prob->solve(m_params); // plan the movement
+        ui.pushButton_plan->setCheckable(false);
+        if(m_results->status==1){
+            qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
+            this->curr_mov = prob->getMovement();
+            for(size_t i=0; i<m_results->trajectory_stages.size(); ++i){
+                moveit_msgs::RobotTrajectory rob_traj = m_results->trajectory_stages.at(i);
+                vector<trajectory_msgs::JointTrajectoryPoint> points = rob_traj.joint_trajectory.points;
+                double duration = points.at(0).time_from_start.toSec();
+            }
+
+             solved=true;
+
+        }else{
+            ui.tableWidget_sol_mov->clear();
+            qnode.log(QNode::Error,std::string("The planning has failed: ")+h_results->status_msg);
+        }
 
         break;
 
