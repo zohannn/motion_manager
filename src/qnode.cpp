@@ -1851,7 +1851,7 @@ void QNode::leftProxCallback(const vrep_common::ProximitySensorData& data)
 }
 
 
-bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>& vel_mov, std::vector<double> timesteps, std::vector<double> tols_stop, movementPtr mov, scenarioPtr scene)
+bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>& vel_mov, std::vector<std::vector<double>> timesteps, std::vector<double> tols_stop, movementPtr mov, scenarioPtr scene)
 {
 
     this->curr_scene = scene;
@@ -1902,7 +1902,7 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
     VectorXd f_posture; // the final posture
     bool f_reached;
     double tol_stop_rad;
-    double timeStep;
+    std::vector<double> timesteps_stage;
     double timeTot = 0.0;
 
     // start the simulation
@@ -1911,10 +1911,10 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
     add_client.call(srvstart);
     ros::spinOnce(); // first handle ROS messages
 
-    // for loop stages
-    for (size_t k=0; k< traj_mov.size();++k){
 
-        switch (mov_type){
+    for (size_t k=0; k< traj_mov.size();++k){  // for loop stages
+
+        switch (mov_type){// TO REVIEW!!!!
         case 0: // reach-to-grasp
             if(k==1){approach=true;}else{approach=false;}
             break;
@@ -1938,7 +1938,7 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
         MatrixXd traj = traj_mov.at(k);
         MatrixXd vel = vel_mov.at(k);
         tol_stop_rad = tols_stop.at(k)*static_cast<double>(M_PI)/180;;
-        timeStep = timesteps.at(k);
+        timesteps_stage = timesteps.at(k);
 
         f_posture = traj.row(traj.rows()-1);
         f_reached=false;
@@ -1971,8 +1971,8 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
             VectorXd yb = vel.row(i);
             VectorXd yat = traj.row(i-1);
             VectorXd ybt = traj.row(i);
-            ta = (i-1)*timeStep+ timeTot;
-            tb = ta + timeStep;
+            ta = (i-1)*timesteps_stage.at(i)+ timeTot;
+            tb = ta + timesteps_stage.at(i);
             BOOST_LOG_SEV(lg, info) << "ta = " << ta;
             BOOST_LOG_SEV(lg, info) << "tb = " << tb << "\n";
             bool interval = true;
@@ -2098,9 +2098,9 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                     }
 
 
-#if HAND == 1
-                    this->closeBarrettHand(arm_code);
-#endif
+//#if HAND == 1
+  //                  this->closeBarrettHand(arm_code);
+//#endif
                 }
 
             }
@@ -2466,9 +2466,9 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                                 if (srvset_parent.response.result != 1){
                                     log(QNode::Error,string("Error in grasping the object "));
                                 }
-#if HAND == 1
-                        this->closeBarrettHand(arm_code);
-#endif
+//#if HAND == 1
+  //                      this->closeBarrettHand(arm_code);
+//#endif
                             }
                         }
                         break;

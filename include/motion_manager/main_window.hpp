@@ -275,7 +275,7 @@ private:
         RRTDialog *mRRTdlg; /**< handle of the RRT tuning dialog */
         int scenario_id; /**< id of the current scenario */
 
-        vector<double> timeSteps_mov; /**< current time steps of the movement */
+        vector< vector<double> > timesteps_mov; /**< current time steps of the movement */
         vector<double> tols_stop_mov; /**< vector of the tolerances to stop each stage in the movement */
         vector< MatrixXd > jointsAcceleration_mov; /**< trajectory of the joint acceleration of the movement */
         vector< MatrixXd > jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */

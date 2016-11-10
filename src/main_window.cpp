@@ -711,10 +711,20 @@ void MainWindow::on_pushButton_plan_clicked()
         if(h_results->status==0){
             qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
             this->curr_mov = prob->getMovement();
-            this->timeSteps_mov = h_results->time_steps;
-            this->jointsPosition_mov = h_results->trajectory_stages;
-            this->jointsVelocity_mov = h_results->velocity_stages;
-            this->jointsAcceleration_mov = h_results->acceleration_stages;
+            this->timesteps_mov.clear();
+            this->jointsPosition_mov.clear(); this->jointsPosition_mov = h_results->trajectory_stages;
+            this->jointsVelocity_mov.clear(); this->jointsVelocity_mov = h_results->velocity_stages;
+            this->jointsAcceleration_mov.clear(); this->jointsAcceleration_mov = h_results->acceleration_stages;
+            std::vector<double> timesteps_stage_aux;
+            for(size_t i=0; i<h_results->trajectory_stages.size();++i){
+                timesteps_stage_aux.clear();
+                double t_stage = h_results->time_steps.at(i);
+                MatrixXd traj_stage = h_results->trajectory_stages.at(i);
+                for(int j=0;j<traj_stage.rows();++j){
+                    timesteps_stage_aux.push_back(t_stage);
+                }
+                this->timesteps_mov.push_back(timesteps_stage_aux);
+            }
             solved=true;
         }else{
             ui.tableWidget_sol_mov->clear();
@@ -739,13 +749,250 @@ void MainWindow::on_pushButton_plan_clicked()
         if(m_results->status==1){
             qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
             this->curr_mov = prob->getMovement();
-            for(size_t i=0; i<m_results->trajectory_stages.size(); ++i){
-                moveit_msgs::RobotTrajectory rob_traj = m_results->trajectory_stages.at(i);
-                vector<trajectory_msgs::JointTrajectoryPoint> points = rob_traj.joint_trajectory.points;
-                double duration = points.at(0).time_from_start.toSec();
+            std::vector<double> init_posture;
+            std::vector<double> init_velocities;
+            std::vector<double> init_accelerations(JOINTS_ARM+JOINTS_HAND,0.0);
+            int arm = m_params.arm_code;
+            switch(arm){
+            case 0: // both arms
+                //TO DO
+                break;
+            case 1: // right arm
+                this->curr_scene->getHumanoid()->getRightPosture(init_posture);
+                this->curr_scene->getHumanoid()->getRightVelocities(init_velocities);
+                break;
+            case 2: // left arm
+                this->curr_scene->getHumanoid()->getLeftPosture(init_posture);
+                this->curr_scene->getHumanoid()->getLeftVelocities(init_velocities);
+                break;
             }
+            MatrixXd jointsPosition_stage_plan; MatrixXd jointsVelocity_stage_plan; MatrixXd jointsAcceleration_stage_plan;
+            MatrixXd jointsPosition_stage_approach; MatrixXd jointsVelocity_stage_approach; MatrixXd jointsAcceleration_stage_approach;
+            MatrixXd jointsPosition_stage_retreat; MatrixXd jointsVelocity_stage_retreat; MatrixXd jointsAcceleration_stage_retreat;
+            std::vector<double> timesteps_stage_plan; std::vector<double> timesteps_stage_approach; std::vector<double> timesteps_stage_retreat;
 
-             solved=true;
+            double time_from_start = 0.0;
+            for(size_t i=0; i<m_results->trajectory_stages.size(); ++i){
+                std::string traj_descr = m_results->trajectory_descriptions.at(i);
+                moveit_msgs::RobotTrajectory rob_traj;
+                vector<trajectory_msgs::JointTrajectoryPoint> points;
+                std::vector<double> timesteps_stage_aux;
+                MatrixXd jointsPosition_stage_aux; MatrixXd jointsVelocity_stage_aux; MatrixXd jointsAcceleration_stage_aux;
+                if(strcmp(traj_descr.c_str(),"plan")==0){
+                    timesteps_stage_plan.clear(); timesteps_stage_aux.clear();
+                    rob_traj = m_results->trajectory_stages.at(i);
+                    points = rob_traj.joint_trajectory.points;
+                    jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    for(size_t j=0; j<points.size();++j){
+                        if(j==0){
+                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
+                        }else{
+                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                        }
+                        trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
+                        for(size_t k=0; k<traj_pnt.positions.size()+JOINTS_HAND;++k){
+                            if(k<traj_pnt.positions.size()){
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(k);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(k);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(k);
+                            }else{
+                                jointsPosition_stage_aux(j,k) = init_posture.at(k);
+                                jointsVelocity_stage_aux(j,k) = init_velocities.at(k);
+                                jointsAcceleration_stage_aux(j,k) = init_accelerations.at(k);
+                            }
+                        }
+                    }// points
+                    time_from_start += points.at(points.size()-1).time_from_start.toSec();
+                    timesteps_stage_plan = timesteps_stage_aux;
+                    jointsPosition_stage_plan = jointsPosition_stage_aux;
+                    jointsVelocity_stage_plan = jointsVelocity_stage_aux;
+                    jointsAcceleration_stage_plan = jointsAcceleration_stage_aux;
+                }else if(strcmp(traj_descr.c_str(),"pre_grasp")==0){
+                    timesteps_stage_aux.clear();
+                    rob_traj = m_results->trajectory_stages.at(i);
+                    points = rob_traj.joint_trajectory.points;
+                    jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    for(size_t j=0; j<points.size();++j){
+                        timesteps_stage_aux.push_back(0.0);
+                        trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
+                        for(size_t k=0; k<JOINTS_ARM+JOINTS_HAND;++k){
+                            if(k<JOINTS_ARM){
+                                jointsPosition_stage_aux(j,k) = jointsPosition_stage_plan(jointsPosition_stage_plan.rows()-1,k);
+                                jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_plan(jointsVelocity_stage_plan.rows()-1,k);
+                                jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_plan(jointsAcceleration_stage_plan.rows()-1,k);
+                            }else if(k==JOINTS_ARM){
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(0);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(0);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(0);
+                            }else if(k==JOINTS_ARM+1){
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(1);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(1);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(1);
+                            }else if(k==JOINTS_ARM+2){
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(4);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(4);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(4);
+                            }else if(k==JOINTS_ARM+3){
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(6);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(6);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(6);
+                            }
+                        }
+                    }// points
+                    timesteps_stage_plan.insert(timesteps_stage_plan.end(), timesteps_stage_aux.begin(), timesteps_stage_aux.end());
+                    MatrixXd tmp_pos(jointsPosition_stage_plan.rows()+jointsPosition_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
+                    tmp_pos << jointsPosition_stage_plan,
+                               jointsPosition_stage_aux;
+                    jointsPosition_stage_plan = tmp_pos;
+                    MatrixXd tmp_vel(jointsVelocity_stage_plan.rows()+jointsVelocity_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
+                    tmp_vel << jointsVelocity_stage_plan,
+                               jointsVelocity_stage_aux;
+                    jointsVelocity_stage_plan = tmp_vel;
+                    MatrixXd tmp_acc(jointsAcceleration_stage_plan.rows()+jointsAcceleration_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
+                    tmp_acc << jointsAcceleration_stage_plan,
+                               jointsAcceleration_stage_aux;
+                    jointsAcceleration_stage_plan = tmp_acc;
+                }else if(strcmp(traj_descr.c_str(),"approach")==0){
+                    timesteps_stage_approach.clear(); timesteps_stage_aux.clear();
+                    rob_traj = m_results->trajectory_stages.at(i);
+                    points = rob_traj.joint_trajectory.points;
+                    jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    for(size_t j=0; j<points.size();++j){
+                        if(j==0){
+                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
+                        }else{
+                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                        }
+                        trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
+                        for(size_t k=0; k<traj_pnt.positions.size()+JOINTS_HAND;++k){
+                            if(k<traj_pnt.positions.size()){
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(k);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(k);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(k);
+                            }else{
+                                jointsPosition_stage_aux(j,k) = jointsPosition_stage_plan(jointsPosition_stage_plan.rows()-1,k);
+                                jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_plan(jointsVelocity_stage_plan.rows()-1,k);
+                                jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_plan(jointsAcceleration_stage_plan.rows()-1,k);
+                            }
+                        }
+                    }// points
+                    time_from_start += points.at(points.size()-1).time_from_start.toSec();
+                    timesteps_stage_approach = timesteps_stage_aux;
+                    jointsPosition_stage_approach = jointsPosition_stage_aux;
+                    jointsVelocity_stage_approach = jointsVelocity_stage_aux;
+                    jointsAcceleration_stage_approach = jointsAcceleration_stage_aux;
+
+                }else if(strcmp(traj_descr.c_str(),"grasp")==0){
+                    timesteps_stage_aux.clear();
+                    rob_traj = m_results->trajectory_stages.at(i);
+                    points = rob_traj.joint_trajectory.points;
+                    jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    for(size_t j=0; j<points.size();++j){
+                        timesteps_stage_aux.push_back(0.0);
+                        trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
+                        for(size_t k=0; k<JOINTS_ARM+JOINTS_HAND;++k){
+                            if(k<JOINTS_ARM){
+                                jointsPosition_stage_aux(j,k) = jointsPosition_stage_plan(jointsPosition_stage_plan.rows()-1,k);
+                                jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_plan(jointsVelocity_stage_plan.rows()-1,k);
+                                jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_plan(jointsAcceleration_stage_plan.rows()-1,k);
+                            }else if(k==JOINTS_ARM){
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(0);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(0);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(0);
+                            }else if(k==JOINTS_ARM+1){
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(1);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(1);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(1);
+                            }else if(k==JOINTS_ARM+2){
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(4);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(4);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(4);
+                            }else if(k==JOINTS_ARM+3){
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(6);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(6);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(6);
+                            }
+                        }
+                    }// points
+                    timesteps_stage_approach.insert(timesteps_stage_approach.end(), timesteps_stage_aux.begin(), timesteps_stage_aux.end());
+                    MatrixXd tmp_pos(jointsPosition_stage_approach.rows()+jointsPosition_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
+                    tmp_pos << jointsPosition_stage_approach,
+                               jointsPosition_stage_aux;
+                    jointsPosition_stage_approach = tmp_pos;
+                    MatrixXd tmp_vel(jointsVelocity_stage_approach.rows()+jointsVelocity_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
+                    tmp_vel << jointsVelocity_stage_approach,
+                               jointsVelocity_stage_aux;
+                    jointsVelocity_stage_approach = tmp_vel;
+                    MatrixXd tmp_acc(jointsAcceleration_stage_approach.rows()+jointsAcceleration_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
+                    tmp_acc << jointsAcceleration_stage_approach,
+                               jointsAcceleration_stage_aux;
+                    jointsAcceleration_stage_approach = tmp_acc;
+                }else if(strcmp(traj_descr.c_str(),"retreat")==0){
+                    timesteps_stage_aux.clear(); timesteps_stage_retreat.clear();
+                    rob_traj = m_results->trajectory_stages.at(i);
+                    points = rob_traj.joint_trajectory.points;
+                    jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    for(size_t j=0; j<points.size();++j){
+                        if(j==0){
+                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
+                        }else{
+                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                        }
+                        trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
+                        for(size_t k=0; k<traj_pnt.positions.size()+JOINTS_HAND;++k){
+                            if(k<traj_pnt.positions.size()){
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(k);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(k);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(k);
+                            }else{
+                                jointsPosition_stage_aux(j,k) = jointsPosition_stage_approach(jointsPosition_stage_approach.rows()-1,k);
+                                jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_approach(jointsVelocity_stage_approach.rows()-1,k);
+                                jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_approach(jointsAcceleration_stage_approach.rows()-1,k);
+                            }
+                        }
+                    }// points
+                    time_from_start += points.at(points.size()-1).time_from_start.toSec();
+                    timesteps_stage_retreat = timesteps_stage_aux;
+                    jointsPosition_stage_retreat = jointsPosition_stage_aux;
+                    jointsVelocity_stage_retreat = jointsVelocity_stage_aux;
+                    jointsAcceleration_stage_retreat = jointsAcceleration_stage_aux;
+
+                }
+
+            } // for loop stages
+
+            //positions
+            this->jointsPosition_mov.clear();
+            this->jointsPosition_mov.push_back(jointsPosition_stage_plan);
+            this->jointsPosition_mov.push_back(jointsPosition_stage_approach);
+            this->jointsPosition_mov.push_back(jointsPosition_stage_retreat);
+            //velocities
+            this->jointsVelocity_mov.clear();
+            this->jointsVelocity_mov.push_back(jointsVelocity_stage_plan);
+            this->jointsVelocity_mov.push_back(jointsVelocity_stage_approach);
+            this->jointsVelocity_mov.push_back(jointsVelocity_stage_retreat);
+            //accelerations
+            this->jointsAcceleration_mov.clear();
+            this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_plan);
+            this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_approach);
+            this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_retreat);
+            //time steps
+            this->timesteps_mov.clear();
+            this->timesteps_mov.push_back(timesteps_stage_plan);
+            this->timesteps_mov.push_back(timesteps_stage_approach);
+            this->timesteps_mov.push_back(timesteps_stage_retreat);
+
+            solved=true;
 
         }else{
             ui.tableWidget_sol_mov->clear();
@@ -765,10 +1012,11 @@ if(solved){
         MatrixXd jointPosition_stage = this->jointsPosition_mov.at(k);
         MatrixXd jointVelocity_stage = this->jointsVelocity_mov.at(k);
         MatrixXd jointAcceleration_stage = this->jointsAcceleration_mov.at(k);
-        mov_duration += this->timeSteps_mov.at(k)*(jointPosition_stage.rows()-1);
+        std::vector<double> timestep_stage = this->timesteps_mov.at(k);
         this->tols_stop_mov.push_back(tol_stop);
         std::vector<QString> stage_step;
         for(int i =0; i< jointPosition_stage.rows(); ++i){
+            mov_duration += timestep_stage.at(i);
             stage_step.clear();
             v_headers.push_back(QString("Step ")+QString::number(i));
             for (int j=0; j<jointPosition_stage.cols();++j){
@@ -818,7 +1066,7 @@ void MainWindow::on_pushButton_execMov_pressed()
 void MainWindow::on_pushButton_execMov_clicked()
 {
 
-     qnode.execMovement(this->jointsPosition_mov,this->jointsVelocity_mov,this->timeSteps_mov, this->tols_stop_mov, this->curr_mov, this->curr_scene);
+     qnode.execMovement(this->jointsPosition_mov,this->jointsVelocity_mov,this->timesteps_mov, this->tols_stop_mov, this->curr_mov, this->curr_scene);
 
 }
 
@@ -878,7 +1126,7 @@ void MainWindow::on_pushButton_load_task_clicked()
     this->jointsPosition_mov.clear();
     this->jointsVelocity_mov.clear();
     this->jointsAcceleration_mov.clear();
-    this->timeSteps_mov.clear();
+    this->timesteps_mov.clear();
     this->tols_stop_mov.clear();
     ui.tableWidget_sol_task->clear();
     ui.tableWidget_sol_mov->clear();
@@ -1266,7 +1514,7 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     this->jointsAcceleration_mov.clear();
     this->jointsVelocity_mov.clear();
     this->jointsPosition_mov.clear();
-    this->timeSteps_mov.clear();
+    this->timesteps_mov.clear();
     this->tols_stop_mov.clear();
 
     this->curr_scene = scenarioPtr(new Scenario(*(this->init_scene.get())));
@@ -1354,7 +1602,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
         this->jointsPosition_task.push_back(this->jointsPosition_mov);
         this->jointsVelocity_task.push_back(this->jointsVelocity_mov);
         this->jointsAcceleration_task.push_back(this->jointsAcceleration_mov);
-        this->timeSteps_task.push_back(this->timeSteps_mov);
+        //this->timeSteps_task.push_back(this->timeSteps_mov);
         this->tols_stop_task.push_back(this->tols_stop_mov);
 
 
@@ -1425,7 +1673,7 @@ void MainWindow::on_pushButton_clear_task_clicked()
     this->jointsVelocity_mov.clear();
     this->jointsPosition_mov.clear();
     this->timeSteps_task.clear();
-    this->timeSteps_mov.clear();
+    this->timesteps_mov.clear();
     this->tols_stop_task.clear();
     this->tols_stop_mov.clear();
 

@@ -138,7 +138,7 @@ public:
          * @param scene
          * @return
          */
-        bool execMovement(vector<MatrixXd>& traj_mov, vector<MatrixXd>& vel_mov, vector<double> timesteps, vector<double> tols_stop, movementPtr mov, scenarioPtr scene);
+        bool execMovement(vector<MatrixXd>& traj_mov, vector<MatrixXd>& vel_mov, std::vector<std::vector<double> > timesteps, vector<double> tols_stop, movementPtr mov, scenarioPtr scene);
 
         /**
          * @brief execTask
