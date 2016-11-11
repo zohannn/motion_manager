@@ -75,11 +75,6 @@ public:
      */
     void setInfo(std::string info);
 
-    /**
-     * @brief This method gets the tolerance to stop the execution the movement
-     * @return
-     */
-    double getTolStop();
 
 
 private:

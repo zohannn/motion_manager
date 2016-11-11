@@ -1005,20 +1005,17 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
 #endif
     double dHO;
     std::vector<double> finalHand;
-    std::vector<double> initPosture;
     objectPtr obj = this->mov->getObject();
     targetPtr tar;
     switch(arm_code){
     case 0: // both arms
         break;
     case 1://right arm
-        this->scene->getHumanoid()->getRightPosture(initPosture);
         dHO=this->dHOr;
         finalHand = this->rightFinalHand;
         tar = obj->getTargetRight();
         break;
     case 2:// left arm
-        this->scene->getHumanoid()->getLeftPosture(initPosture);
         dHO=this->dHOl;
         finalHand = this->leftFinalHand;
         tar = obj->getTargetLeft();

@@ -1854,6 +1854,7 @@ void QNode::leftProxCallback(const vrep_common::ProximitySensorData& data)
 bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>& vel_mov, std::vector<std::vector<double>> timesteps, std::vector<double> tols_stop, movementPtr mov, scenarioPtr scene)
 {
 
+    bool hand_closed; closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
     this->curr_scene = scene;
     int scenarioID = scene->getID();
     this->curr_mov = mov; int mov_type = mov->getType();  int arm_code = mov->getArm();
@@ -1861,7 +1862,7 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
 
     ros::NodeHandle node;
     double ta;
-    double tb;
+    double tb = 0.0;
     double tx;
     double pre_time= 0.0;
 
@@ -1901,7 +1902,7 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
 #endif
     VectorXd f_posture; // the final posture
     bool f_reached;
-    double tol_stop_rad;
+    double tol_stop_stage;
     std::vector<double> timesteps_stage;
     double timeTot = 0.0;
 
@@ -1937,7 +1938,7 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
 
         MatrixXd traj = traj_mov.at(k);
         MatrixXd vel = vel_mov.at(k);
-        tol_stop_rad = tols_stop.at(k)*static_cast<double>(M_PI)/180;;
+        tol_stop_stage = tols_stop.at(k);
         timesteps_stage = timesteps.at(k);
 
         f_posture = traj.row(traj.rows()-1);
@@ -1961,24 +1962,27 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 
         ros::spinOnce(); // handle ROS messages
         pre_time = simulationTime - timeTot; // update the total time of the movement
-        BOOST_LOG_SEV(lg, info) << "timeTot = " << timeTot ;
-        BOOST_LOG_SEV(lg, info) << "pre_time = " << pre_time ;
+        //BOOST_LOG_SEV(lg, info) << "timeTot = " << timeTot ;
+        //BOOST_LOG_SEV(lg, info) << "pre_time = " << pre_time ;
 
-
-        for (int i = 1; i< vel.rows(); ++i){
-            BOOST_LOG_SEV(lg, info) << "Interval = " << i;
-            VectorXd ya = vel.row(i-1);
-            VectorXd yb = vel.row(i);
-            VectorXd yat = traj.row(i-1);
-            VectorXd ybt = traj.row(i);
-            ta = (i-1)*timesteps_stage.at(i)+ timeTot;
+        tb = timeTot-pre_time;
+        for (int i = 0; i< vel.rows()-1; ++i){
+            //BOOST_LOG_SEV(lg, info) << "Stage = " << k;
+            //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
+            VectorXd ya = vel.row(i);
+            VectorXd yb = vel.row(i+1);
+            VectorXd yat = traj.row(i);
+            VectorXd ybt = traj.row(i+1);
+            //BOOST_LOG_SEV(lg, info) << "timeTot = " << timeTot;
+            //BOOST_LOG_SEV(lg, info) << "timesteps_stage = " << timesteps_stage.at(i);
+            ta = tb;
             tb = ta + timesteps_stage.at(i);
-            BOOST_LOG_SEV(lg, info) << "ta = " << ta;
-            BOOST_LOG_SEV(lg, info) << "tb = " << tb << "\n";
+            //BOOST_LOG_SEV(lg, info) << "ta = " << ta;
+            //BOOST_LOG_SEV(lg, info) << "tb = " << tb << "\n";
             bool interval = true;
             double tx_prev;
             double yxt_prev;
-            ros::spinOnce(); // get the simulationRunning value
+            //ros::spinOnce(); // get the simulationRunning value
             while (ros::ok() && simulationRunning && interval)
             {// ros is running, simulation is running
 
@@ -1988,15 +1992,16 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 #endif
 
                 tx = simulationTime -pre_time;
-                BOOST_LOG_SEV(lg, info) << "simulationTime = " << simulationTime ;
-                if (tx >= tb){
+                //BOOST_LOG_SEV(lg, info) << "simulationTime = " << simulationTime ;
+                if (tx > tb){
                     // go to the next interval
                     interval = false;
                 }else{
-                    BOOST_LOG_SEV(lg, info) << "tx = " << tx ;
-                    BOOST_LOG_SEV(lg, info) << "tx_prev = " << tx_prev;
+                    //BOOST_LOG_SEV(lg, info) << "tx = " << tx ;
+                    //BOOST_LOG_SEV(lg, info) << "tx_prev = " << tx_prev;
 
-                    double m = (tx-ta)/(tb-ta);
+                    double m;
+                    if((tb-ta)==0){m=1;}else{m = (tx-ta)/(tb-ta);}
                     std::vector<double> r_post;
                     this->curr_scene->getHumanoid()->getRightPosture(r_post);
                     double yx;
@@ -2007,14 +2012,15 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                            pow((f_posture(3)-r_post.at(3)),2)+
                            pow((f_posture(4)-r_post.at(4)),2)+
                            pow((f_posture(5)-r_post.at(5)),2)+
-                           pow((f_posture(6)-r_post.at(6)),2)) < tol_stop_rad){
+                           pow((f_posture(6)-r_post.at(6)),2)) < tol_stop_stage){
                         f_reached=true;
-                        //std::cout << "final posture reached" << std::endl;
-                        BOOST_LOG_SEV(lg, info) << "final posture reached" ;
+                        std::cout << "final posture reached" << std::endl;
+                        //BOOST_LOG_SEV(lg, info) << "final posture reached" ;
                         break;
                     }else{f_reached=false;}
 
-                    for (int k = 0; k< vel.cols(); ++k){
+                    hand_closed = (closed[0] && closed[1] && closed[2]);
+                    for (int k = 0; k< vel.cols(); ++k){// for loop joints
                         if(f_reached){
                             yx=0;
                             yxt=yxt_prev;
@@ -2023,18 +2029,24 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                             yxt = interpolate(yat(k),ybt(k),m);
                             yxt_prev=yxt;
                         }
-                        dataTraj.handles.data.push_back(handles.at(k));
+                        if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4)) || // joints of the arm
+                                (((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed)){
+                            dataTraj.handles.data.push_back(handles.at(k));
+                        }
                         switch(scenarioID){
                         case 0: //error
                             // TO DO
                             break;
                         case 1: // Toy vehicle scenario with AROS
-                            if((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4) ){
+                            if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed){
                                 dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
-                            }else{
+                            }else if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4))){
                                 dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
                             }
-                            dataTraj.values.data.push_back(yxt);
+                            if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4)) || // joints of the arm
+                                    (((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed)){
+                                dataTraj.values.data.push_back(yxt);
+                            }
                             break;
                         case 2: // Toy vehicle scenario with Jarde
                             dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
@@ -2042,7 +2054,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                             break;
                         }
 #if HAND ==1
-                        if((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) ){
+                        if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3)) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
                             // the fingers are being addressed
                             data_hand.handles.data.push_back(hand_handles(k+3-vel.cols(),2));
                             data_hand.setModes.data.push_back(1); // set the target position
@@ -2051,12 +2063,12 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                         }
 #endif
 
-                      BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", ya = " << ya(k)*180/static_cast<double>(M_PI) << ", yb = "<< yb(k)*180/static_cast<double>(M_PI);
-                      BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
-                                                  ", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
+                      //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", yat = " << yat(k)*180/static_cast<double>(M_PI) << ", ybt = "<< ybt(k)*180/static_cast<double>(M_PI);
+                      //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
+                                                  //", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
 
                     }
-                    BOOST_LOG_SEV(lg, info) << "\n";
+                    //BOOST_LOG_SEV(lg, info) << "\n";
 
 
                     pub.publish(dataTraj);
@@ -2066,7 +2078,8 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 
                     interval = true;
                     tx_prev = tx;
-                }
+
+                } // if tx is inside the interval
 
                 // handle ROS messages:
                 ros::spinOnce();
@@ -2098,9 +2111,9 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                     }
 
 
-//#if HAND == 1
-  //                  this->closeBarrettHand(arm_code);
-//#endif
+#if HAND == 1
+                    this->closeBarrettHand(arm_code);
+#endif
                 }
 
             }

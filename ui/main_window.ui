@@ -217,7 +217,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -775,7 +775,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_mov">
        <attribute name="title">
@@ -861,6 +861,32 @@ p, li { white-space: pre-wrap; }
            <height>181</height>
           </rect>
          </property>
+        </widget>
+        <widget class="QWidget" name="layoutWidget_tol_stop">
+         <property name="geometry">
+          <rect>
+           <x>310</x>
+           <y>210</y>
+           <width>131</width>
+           <height>27</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_19">
+          <item>
+           <widget class="QLabel" name="label_34">
+            <property name="text">
+             <string>tol_stop</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_tol_stop_mov">
+            <property name="text">
+             <string>1e-10</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </widget>
       </widget>

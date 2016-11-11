@@ -116,13 +116,6 @@ public:
     double getTolTarOr();
 
     /**
-     * @brief This method gets the tolerance to stop the execution the movement
-     * @return
-     */
-    double getTolStop();
-
-
-    /**
      * @brief This method gets the target avoidance flag
      * @return
      */

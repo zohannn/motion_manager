@@ -39,32 +39,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_tol_stop">
-   <property name="geometry">
-    <rect>
-     <x>440</x>
-     <y>700</y>
-     <width>141</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_19">
-    <item>
-     <widget class="QLabel" name="label_34">
-      <property name="text">
-       <string>tol_stop [deg]</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="lineEdit_tol_stop">
-      <property name="text">
-       <string>1.0</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QGroupBox" name="groupBox_constraints">
    <property name="geometry">
     <rect>
@@ -2943,7 +2917,6 @@
   </widget>
   <zorder>layoutWidget</zorder>
   <zorder>layoutWidget_max_vel</zorder>
-  <zorder>layoutWidget_tol_stop</zorder>
   <zorder>groupBox_constraints</zorder>
   <zorder>tabWidget</zorder>
   <zorder>groupBox_constraints_2</zorder>

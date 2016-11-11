@@ -275,7 +275,7 @@ private:
         RRTDialog *mRRTdlg; /**< handle of the RRT tuning dialog */
         int scenario_id; /**< id of the current scenario */
 
-        vector< vector<double> > timesteps_mov; /**< current time steps of the movement */
+        vector< vector < double > > timesteps_mov; /**< current time steps of the movement */
         vector<double> tols_stop_mov; /**< vector of the tolerances to stop each stage in the movement */
         vector< MatrixXd > jointsAcceleration_mov; /**< trajectory of the joint acceleration of the movement */
         vector< MatrixXd > jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
@@ -283,11 +283,15 @@ private:
         vector< vector< MatrixXd > > jointsAcceleration_task; /**< trajectory of the joint acceleration of the task */
         vector< vector< MatrixXd > > jointsVelocity_task; /**< trajectory of the joint velocity of the task */
         vector< vector< MatrixXd > > jointsPosition_task; /**< trajectory of the joint position of the task */
-        vector<vector<double>> timeSteps_task; /**< vector of time steps of each movement in the task */
+        vector< vector< vector < double > > > timesteps_task; /**< vector of time steps of each movement in the task */
         vector<vector<double>> tols_stop_task; /**< vector of the tolerances to stop each movement in the task */
         vector<string> vel_steps; /**< steps of the trajectory for saving/loading file */
 
         moveit_plannerPtr m_planner; /**< MoveIt! Libraries planner */
+        bool moveit_mov; /**< true if the movement has been planned by the moveit planner, false otherwise */
+        HUMotion::planning_result_ptr h_results; /**< results of the HUML planner */
+        moveit_planning::PlanningResultPtr m_results; /**< results of the moveit planner */
+
 
         movementPtr curr_mov; /**< current movement */
         taskPtr curr_task;/**< current task */

@@ -103,7 +103,6 @@ void RRTDialog::on_pushButton_save_clicked()
         stream << "post_place_dist="<< ui->lineEdit_post_place_dist->text().toStdString().c_str() << endl;
         stream << "# Move settings" << endl;
         stream << "# Others" << endl;
-        stream << "tol_stop=" << ui->lineEdit_tol_stop->text().toStdString().c_str()<< endl;
 
     }
 }
@@ -157,8 +156,6 @@ void RRTDialog::on_pushButton_load_clicked()
                     ui->lineEdit_post_place_z->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("post_place_dist"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_post_place_dist->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("tol_stop"),Qt::CaseInsensitive)==0){
-                    ui->lineEdit_tol_stop->setText(fields.at(1));
                 }
             }
 
@@ -181,11 +178,6 @@ void RRTDialog::setInfo(std::string info)
     this->infoLine = info;
 }
 
-double RRTDialog::getTolStop()
-{
-
-    return ui->lineEdit_tol_stop->text().toDouble();
-}
 
 
 

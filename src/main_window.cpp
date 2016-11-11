@@ -654,8 +654,8 @@ void MainWindow::on_pushButton_plan_clicked()
     problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
     int planner_id = prob->getPlannerID();
     double tol_stop; // stop tolerance on the joints when executing the movements
-    HUMotion::planning_result_ptr h_results; HUMotion::huml_params  tols;
-    moveit_planning::PlanningResultPtr m_results; moveit_planning::moveit_params m_params;
+    HUMotion::huml_params  tols;
+    moveit_planning::moveit_params m_params;
 
     bool solved = false;
  try{
@@ -703,8 +703,6 @@ void MainWindow::on_pushButton_plan_clicked()
         mTolHumldlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
         mTolHumldlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
 
-        tol_stop = mTolHumldlg->getTolStop(); // stop tolerance on the joints when executing the movements
-
         h_results = prob->solve(tols); // plan the movement
 
         ui.pushButton_plan->setCheckable(false);
@@ -725,6 +723,7 @@ void MainWindow::on_pushButton_plan_clicked()
                 }
                 this->timesteps_mov.push_back(timesteps_stage_aux);
             }
+            this->moveit_mov = false;
             solved=true;
         }else{
             ui.tableWidget_sol_mov->clear();
@@ -742,34 +741,39 @@ void MainWindow::on_pushButton_plan_clicked()
         mRRTdlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
         mRRTdlg->getPostPlaceRetreat(m_params.post_place_retreat); // place retreat
 
-        tol_stop = mRRTdlg->getTolStop(); // stop tolerance on the joints when executing the movements
 
         m_results = prob->solve(m_params); // plan the movement
         ui.pushButton_plan->setCheckable(false);
         if(m_results->status==1){
             qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
             this->curr_mov = prob->getMovement();
-            std::vector<double> init_posture;
-            std::vector<double> init_velocities;
-            std::vector<double> init_accelerations(JOINTS_ARM+JOINTS_HAND,0.0);
-            int arm = m_params.arm_code;
-            switch(arm){
-            case 0: // both arms
-                //TO DO
-                break;
-            case 1: // right arm
-                this->curr_scene->getHumanoid()->getRightPosture(init_posture);
-                this->curr_scene->getHumanoid()->getRightVelocities(init_velocities);
-                break;
-            case 2: // left arm
-                this->curr_scene->getHumanoid()->getLeftPosture(init_posture);
-                this->curr_scene->getHumanoid()->getLeftVelocities(init_velocities);
-                break;
-            }
             MatrixXd jointsPosition_stage_plan; MatrixXd jointsVelocity_stage_plan; MatrixXd jointsAcceleration_stage_plan;
             MatrixXd jointsPosition_stage_approach; MatrixXd jointsVelocity_stage_approach; MatrixXd jointsAcceleration_stage_approach;
             MatrixXd jointsPosition_stage_retreat; MatrixXd jointsVelocity_stage_retreat; MatrixXd jointsAcceleration_stage_retreat;
             std::vector<double> timesteps_stage_plan; std::vector<double> timesteps_stage_approach; std::vector<double> timesteps_stage_retreat;
+
+            // get the initial posture of the fingers
+            std::vector<double> init_hand_pos;
+            std::vector<double> init_hand_vel;
+            std::vector<double> init_hand_acc;
+            moveit_msgs::RobotTrajectory rob_traj_pre = m_results->trajectory_stages.at(1);
+            vector<trajectory_msgs::JointTrajectoryPoint> points_pre = rob_traj_pre.joint_trajectory.points;
+            trajectory_msgs::JointTrajectoryPoint traj_pnt_pre = points_pre.at(0);
+            //positions
+            init_hand_pos.push_back(traj_pnt_pre.positions.at(0));
+            init_hand_pos.push_back(traj_pnt_pre.positions.at(1));
+            init_hand_pos.push_back(traj_pnt_pre.positions.at(4));
+            init_hand_pos.push_back(traj_pnt_pre.positions.at(6));
+            //velocities
+            init_hand_vel.push_back(traj_pnt_pre.velocities.at(0));
+            init_hand_vel.push_back(traj_pnt_pre.velocities.at(1));
+            init_hand_vel.push_back(traj_pnt_pre.velocities.at(4));
+            init_hand_vel.push_back(traj_pnt_pre.velocities.at(6));
+            //accelerations
+            init_hand_acc.push_back(traj_pnt_pre.accelerations.at(0));
+            init_hand_acc.push_back(traj_pnt_pre.accelerations.at(1));
+            init_hand_acc.push_back(traj_pnt_pre.accelerations.at(4));
+            init_hand_acc.push_back(traj_pnt_pre.accelerations.at(6));
 
             double time_from_start = 0.0;
             for(size_t i=0; i<m_results->trajectory_stages.size(); ++i){
@@ -798,9 +802,9 @@ void MainWindow::on_pushButton_plan_clicked()
                                 jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(k);
                                 jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(k);
                             }else{
-                                jointsPosition_stage_aux(j,k) = init_posture.at(k);
-                                jointsVelocity_stage_aux(j,k) = init_velocities.at(k);
-                                jointsAcceleration_stage_aux(j,k) = init_accelerations.at(k);
+                                jointsPosition_stage_aux(j,k) = init_hand_pos.at(k-JOINTS_ARM);
+                                jointsVelocity_stage_aux(j,k) = init_hand_vel.at(k-JOINTS_ARM);
+                                jointsAcceleration_stage_aux(j,k) = init_hand_acc.at(k-JOINTS_ARM);
                             }
                         }
                     }// points
@@ -900,9 +904,9 @@ void MainWindow::on_pushButton_plan_clicked()
                         trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
                         for(size_t k=0; k<JOINTS_ARM+JOINTS_HAND;++k){
                             if(k<JOINTS_ARM){
-                                jointsPosition_stage_aux(j,k) = jointsPosition_stage_plan(jointsPosition_stage_plan.rows()-1,k);
-                                jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_plan(jointsVelocity_stage_plan.rows()-1,k);
-                                jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_plan(jointsAcceleration_stage_plan.rows()-1,k);
+                                jointsPosition_stage_aux(j,k) = jointsPosition_stage_approach(jointsPosition_stage_approach.rows()-1,k);
+                                jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_approach(jointsVelocity_stage_approach.rows()-1,k);
+                                jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_approach(jointsAcceleration_stage_approach.rows()-1,k);
                             }else if(k==JOINTS_ARM){
                                 jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(0);
                                 jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(0);
@@ -992,6 +996,7 @@ void MainWindow::on_pushButton_plan_clicked()
             this->timesteps_mov.push_back(timesteps_stage_approach);
             this->timesteps_mov.push_back(timesteps_stage_retreat);
 
+            this->moveit_mov = true;
             solved=true;
 
         }else{
@@ -1013,7 +1018,6 @@ if(solved){
         MatrixXd jointVelocity_stage = this->jointsVelocity_mov.at(k);
         MatrixXd jointAcceleration_stage = this->jointsAcceleration_mov.at(k);
         std::vector<double> timestep_stage = this->timesteps_mov.at(k);
-        this->tols_stop_mov.push_back(tol_stop);
         std::vector<QString> stage_step;
         for(int i =0; i< jointPosition_stage.rows(); ++i){
             mov_duration += timestep_stage.at(i);
@@ -1066,7 +1070,15 @@ void MainWindow::on_pushButton_execMov_pressed()
 void MainWindow::on_pushButton_execMov_clicked()
 {
 
-     qnode.execMovement(this->jointsPosition_mov,this->jointsVelocity_mov,this->timesteps_mov, this->tols_stop_mov, this->curr_mov, this->curr_scene);
+    this->tols_stop_mov.clear();
+    double tol_stop = ui.lineEdit_tol_stop_mov->text().toDouble();
+    for (size_t k=0; k< this->jointsPosition_mov.size();++k){
+        this->tols_stop_mov.push_back(tol_stop);
+    }
+    if(this->moveit_mov)
+        this->m_planner->execute(m_results);
+
+    qnode.execMovement(this->jointsPosition_mov,this->jointsVelocity_mov,this->timesteps_mov, this->tols_stop_mov, this->curr_mov, this->curr_scene);
 
 }
 
@@ -1095,7 +1107,7 @@ void MainWindow::on_pushButton_execTask_clicked()
 {
 
 
-    qnode.execTask(this->jointsPosition_task,this->jointsVelocity_task,this->timeSteps_task, this->tols_stop_task, this->curr_task, this->curr_scene);
+    //qnode.execTask(this->jointsPosition_task,this->jointsVelocity_task,this->timeSteps_task, this->tols_stop_task, this->curr_task, this->curr_scene);
 
 
 }
@@ -1121,7 +1133,7 @@ void MainWindow::on_pushButton_load_task_clicked()
     this->jointsAcceleration_task.clear();
     this->jointsVelocity_task.clear();
     this->jointsPosition_task.clear();
-    this->timeSteps_task.clear();
+    //this->timeSteps_task.clear();
     this->tols_stop_task.clear();
     this->jointsPosition_mov.clear();
     this->jointsVelocity_mov.clear();
@@ -1166,7 +1178,7 @@ void MainWindow::on_pushButton_load_task_clicked()
                     this->jointsPosition_task.push_back(t_mov);
                     this->jointsVelocity_task.push_back(w_mov);
                     this->jointsAcceleration_task.push_back(a_mov);
-                    this->timeSteps_task.push_back(timesteps_mov);
+                    //this->timeSteps_task.push_back(timesteps_mov);
                     this->tols_stop_task.push_back(tols_stop_mov);
                 }
                 // new movement in the task
@@ -1404,7 +1416,7 @@ void MainWindow::on_pushButton_load_task_clicked()
             pos_mov = this->jointsPosition_task.at(h);
             vel_mov = this->jointsVelocity_task.at(h);
             acc_mov = this->jointsAcceleration_task.at(h);
-            tstep_mov = this->timeSteps_task.at(h);
+            //tstep_mov = this->timeSteps_task.at(h);
             mov_duration = 0;
             for (size_t k=0; k< pos_mov.size();++k){
                 MatrixXd jointPosition_stage = pos_mov.at(k);
@@ -1470,7 +1482,7 @@ void MainWindow::on_pushButton_save_task_clicked()
             vector< MatrixXd > traj_mov = this->jointsPosition_task.at(i);
             vector< MatrixXd > vel_mov = this->jointsVelocity_task.at(i);
             vector< MatrixXd > acc_mov = this->jointsAcceleration_task.at(i);
-            vector< double > timesteps_mov = this->timeSteps_task.at(i);
+            //vector< double > timesteps_mov = this->timeSteps_task.at(i);
             vector< double > tols_stop_mov = this->tols_stop_task.at(i);
 
             for(size_t j=0;j < traj_mov.size(); ++j){
@@ -1478,7 +1490,7 @@ void MainWindow::on_pushButton_save_task_clicked()
                 MatrixXd traj = traj_mov.at(j);
                 MatrixXd vel = vel_mov.at(j);
                 MatrixXd acc = acc_mov.at(j);
-                double timestep = timesteps_mov.at(j);
+                double timestep;// = timesteps_mov.at(j);
                 double tol_stop = tols_stop_mov.at(j);
                 stream << "time step="<< QString::number(timestep).toStdString().c_str()<< endl;
                 stream << "tol stop="<< QString::number(tol_stop).toStdString().c_str()<< endl;
@@ -1602,27 +1614,29 @@ void MainWindow::on_pushButton_append_mov_clicked()
         this->jointsPosition_task.push_back(this->jointsPosition_mov);
         this->jointsVelocity_task.push_back(this->jointsVelocity_mov);
         this->jointsAcceleration_task.push_back(this->jointsAcceleration_mov);
-        //this->timeSteps_task.push_back(this->timeSteps_mov);
+        this->timesteps_task.push_back(this->timesteps_mov);
         this->tols_stop_task.push_back(this->tols_stop_mov);
 
 
          QStringList h_headers; bool h_head=false; QStringList v_headers;
          std::vector<std::vector<QString>> task_steps;
-         vector<MatrixXd> pos_mov; vector<MatrixXd> vel_mov; vector<MatrixXd> acc_mov; vector<double> tstep_mov;
+         vector<MatrixXd> pos_mov; vector<MatrixXd> vel_mov; vector<MatrixXd> acc_mov; vector<vector<double>> tstep_mov;
          double task_duration = 0.0; double mov_duration = 0.0;
          for(size_t h=0; h< this->jointsPosition_task.size();++h){
              pos_mov = this->jointsPosition_task.at(h);
              vel_mov = this->jointsVelocity_task.at(h);
              acc_mov = this->jointsAcceleration_task.at(h);
-             tstep_mov = this->timeSteps_task.at(h);
+             tstep_mov = this->timesteps_task.at(h);
              mov_duration = 0;
              for (size_t k=0; k< this->jointsPosition_mov.size();++k){
                  MatrixXd jointPosition_stage = pos_mov.at(k);
                  MatrixXd jointVelocity_stage = vel_mov.at(k);
                  MatrixXd jointAcceleration_stage = acc_mov.at(k);
-                 mov_duration += tstep_mov.at(k)*(jointPosition_stage.rows()-1);
+                 vector<double> tstep_stage = tstep_mov.at(k);
+                 double stage_duration = 0;
                  std::vector<QString> stage_step;
                  for(int i =0; i< jointPosition_stage.rows(); ++i){
+                     stage_duration += tstep_stage.at(i);
                      stage_step.clear();
                      v_headers.push_back(QString("Step ")+QString::number(i));
                      for (int j=0; j<jointPosition_stage.cols();++j){
@@ -1635,6 +1649,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
                      h_head = true;
                      task_steps.push_back(stage_step);
                  }// stage rows
+                 mov_duration +=stage_duration;
              }// movements
              task_duration +=mov_duration;
          }//task
@@ -1672,7 +1687,7 @@ void MainWindow::on_pushButton_clear_task_clicked()
     this->jointsAcceleration_mov.clear();
     this->jointsVelocity_mov.clear();
     this->jointsPosition_mov.clear();
-    this->timeSteps_task.clear();
+    this->timesteps_task.clear();
     this->timesteps_mov.clear();
     this->tols_stop_task.clear();
     this->tols_stop_mov.clear();

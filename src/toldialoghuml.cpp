@@ -35,11 +35,6 @@ TolDialogHUML::~TolDialogHUML()
 
 
 
-double TolDialogHUML::getTolStop()
-{
-
-    return ui->lineEdit_tol_stop->text().toDouble();
-}
 
 
 void TolDialogHUML::getTolsArm(vector<double> &tols)
@@ -479,7 +474,6 @@ void TolDialogHUML::on_pushButton_save_clicked()
        stream << "# Others" << endl;
        stream << "max_velocity="<< ui->lineEdit_w_max->text().toStdString().c_str() <<endl;
        stream << "steps=" << ui->lineEdit_steps->text().toStdString().c_str()<< endl;
-       stream << "tol_stop=" << ui->lineEdit_tol_stop->text().toStdString().c_str()<< endl;
        if (ui->checkBox_tar_av->isChecked()){ stream << "tar_av=false"<< endl;}else{stream << "tar_av=true"<< endl;}
        if (ui->checkBox_ob_av->isChecked()){stream << "ob_av=false"<< endl;}else{stream << "ob_av=true"<< endl;}
        if(ui->checkBox_approach->isChecked()){stream << "approach=false"<<endl;}else{stream << "approach=true"<<endl;}
@@ -817,8 +811,6 @@ void TolDialogHUML::on_pushButton_load_clicked()
                     ui->lineEdit_w_max->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("steps"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_steps->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("tol_stop"),Qt::CaseInsensitive)==0){
-                    ui->lineEdit_tol_stop->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("tar_av"),Qt::CaseInsensitive)==0){
                     if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
                         ui->checkBox_tar_av->setChecked(true);
