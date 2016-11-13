@@ -149,6 +149,16 @@ public Q_SLOTS:
         void on_pushButton_execMov_clicked();
 
         /**
+         * @brief on_pushButton_execMov_moveit_clicked
+         */
+        void on_pushButton_execMov_moveit_clicked();
+
+        /**
+         * @brief on_pushButton_execMov_moveit_pressed
+         */
+        void on_pushButton_execMov_moveit_pressed();
+
+        /**
          * @brief This method executes the selected movement
          */
         void on_pushButton_execMov_pressed();

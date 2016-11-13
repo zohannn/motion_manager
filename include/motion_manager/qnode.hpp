@@ -150,7 +150,7 @@ public:
          * @param scene
          * @return
          */
-        bool execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<double>>& timesteps_task, vector<vector<double>>& tols_stop_task, taskPtr task, scenarioPtr scene);
+        bool execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double> > > &timesteps_task, vector<vector<double>>& tols_stop_task, taskPtr task, scenarioPtr scene);
 
         /**
          * @brief This method sets to zero the time of simulation
