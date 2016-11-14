@@ -923,6 +923,10 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
     std::vector<double> initPosture;
     objectPtr obj = this->mov->getObject();
     targetPtr tar;
+    // engaging info
+    objectPtr obj_eng = this->mov->getObjectEng();
+    engagePtr eng = obj->getEngagePoint();
+    engagePtr eng1 = obj_eng->getEngagePoint();
     switch(arm_code){
     case 0: // both arms
         break;
@@ -943,6 +947,30 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
     }
     // shoulder position (center of the reacheble workspace )
     this->h_planner->setShpos(shPos);
+    // compute the position of the engage point relative to the target frame
+    pos tar_pos = tar->getPos();
+    pos eng_pos = eng->getPos();
+    Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
+    Matrix3d Rot_tar_inv = Rot_tar.inverse();
+    Vector3d diff;
+    diff(0) = eng_pos.Xpos - tar_pos.Xpos;
+    diff(1) = eng_pos.Ypos - tar_pos.Ypos;
+    diff(2) = eng_pos.Zpos - tar_pos.Zpos;
+    Vector3d eng_to_tar; eng_to_tar = Rot_tar_inv * diff;
+    // compute the position of the target when the object will be engaged
+    pos eng1_pos = eng1->getPos(); // position of the engage point of the other object
+    pos new_tar;
+    new_tar.Xpos=eng1_pos.Xpos - eng_to_tar(0);
+    new_tar.Ypos=eng1_pos.Ypos - eng_to_tar(1);
+    new_tar.Zpos=eng1_pos.Zpos - eng_to_tar(2);
+    std::vector<double> place_location;
+    place_location.push_back(new_tar.Xpos);
+    place_location.push_back(new_tar.Ypos);
+    place_location.push_back(new_tar.Zpos);
+    place_location.push_back(eng1->getOr().roll);
+    place_location.push_back(eng1->getOr().pitch);
+    place_location.push_back(eng1->getOr().yaw);
+
 
     HUMotion::objectPtr huml_obj; std::vector<double> target;
     target = {tar->getPos().Xpos, tar->getPos().Ypos, tar->getPos().Zpos,tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
@@ -959,12 +987,12 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
     params.mov_specs.mov_infoline = this->mov->getInfoLine();
     params.mov_specs.dHO = dHO;
     params.mov_specs.finalHand = finalHand;
-    params.mov_specs.target = target;
     params.mov_specs.obj = huml_obj;
 
     HUMotion::planning_result_ptr res;
     switch(mov_type){
     case 0:// reach-to-grasp
+        params.mov_specs.target = target;
         res =  this->h_planner->plan_pick(params,initPosture);
         break;
     case 1:// reaching
@@ -972,6 +1000,8 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
     case 2://transport
         break;
     case 3://engage
+        params.mov_specs.target = place_location;
+        res = this->h_planner->plan_place(params,initPosture);
         break;
     case 4:// disengage
         break;

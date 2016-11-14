@@ -1311,7 +1311,12 @@ void MainWindow::on_pushButton_load_task_clicked()
                         break;
                     }
 
-                    problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                    problemPtr prob;
+                    if(plan_id==0){
+                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                    }else{
+                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                    }
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
                     this->curr_task->addProblem(prob.get());
@@ -1407,14 +1412,15 @@ void MainWindow::on_pushButton_load_task_clicked()
                 QStringList fields = line.split(",");                               
                 for(int i=0; i <fields.size();++i){
                     QStringList fields1 = fields.at(i).split("=");
+                    if(QString::compare(fields1.at(0).simplified(),QString("time step"),Qt::CaseInsensitive)==0){
+                        timesteps_stage.push_back(fields1.at(1).toDouble());
+                    }
                     for(int k=0; k < JOINTS_ARM+JOINTS_HAND; ++k){
                         if(QString::compare(fields1.at(0).simplified(),QString("Joint ")+QString::number(k+1),Qt::CaseInsensitive)==0){
                             QStringList fields2 = fields1.at(1).split("|");
                             pos_stage(row,k) = fields2.at(0).toDouble()*M_PI/180;
                             vel_stage(row,k) = fields2.at(1).toDouble()*M_PI/180;
                             acc_stage(row,k) = fields2.at(2).toDouble()*M_PI/180;
-                        }else if(QString::compare(fields1.at(0).simplified(),QString("time step"),Qt::CaseInsensitive)==0){
-                            timesteps_stage.push_back(fields1.at(1).toDouble());
                         }else if(QString::compare(fields1.at(0).simplified(),QString("step"),Qt::CaseInsensitive)==0){break;}
                     }
                 } // for loop columns
@@ -1468,7 +1474,7 @@ void MainWindow::on_pushButton_load_task_clicked()
         for(int i =0; i < v_headers.size(); ++i){
             std::vector<QString> row = task_steps.at(i);
             for(int j=0; j < h_headers.size(); ++j){
-                QString item = row.at(j);
+               QString item = row.at(j);
                ui.tableWidget_sol_task->setItem(i,j,new QTableWidgetItem(item));
             }
         }
