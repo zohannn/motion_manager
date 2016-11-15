@@ -27,11 +27,11 @@ Hand_3_2=20.0
 
 Hand_3_3=20.0
 
-Hand_tip_1=5.0
+Hand_tip_1=15.0
 
-Hand_tip_2=5.0
+Hand_tip_2=15.0
 
-Hand_tip_3=5.0
+Hand_tip_3=15.0
 
 # Joint Expanse factors
 lambda_1=1.0
@@ -195,41 +195,41 @@ acc_approach_10=0.0
 acc_approach_11=0.0
 
 # Tolerances with the target [mm]
-tar_xx_1=50
+tar_xx_1=20
 
-tar_xx_2=50
+tar_xx_2=20
 
-tar_xx_3=50
+tar_xx_3=20
 
-tar_yy_1=50
+tar_yy_1=5
 
-tar_yy_2=50
+tar_yy_2=5
 
-tar_yy_3=50
+tar_yy_3=5
 
-tar_zz_1=100
+tar_zz_1=5
 
-tar_zz_2=100
+tar_zz_2=5
 
-tar_zz_3=100
+tar_zz_3=5
 
-tar_xy_1=50
+tar_xy_1=5
 
-tar_xy_2=50
+tar_xy_2=5
 
-tar_xy_3=50
+tar_xy_3=5
 
-tar_xz_1=50
+tar_xz_1=5
 
-tar_xz_2=50
+tar_xz_2=5
 
-tar_xz_3=50
+tar_xz_3=5
 
-tar_yz_1=50
+tar_yz_1=5
 
-tar_yz_2=50
+tar_yz_2=5
 
-tar_yz_3=50
+tar_yz_3=5
 
 # Tolerances with the obstacles [mm]
 obs_xx_1=5.0
@@ -280,7 +280,7 @@ pre_grasp_y=1
 
 pre_grasp_z=0
 
-pre_grasp_dist=35
+pre_grasp_dist=150
 
 post_grasp_x=0
 
@@ -288,8 +288,7 @@ post_grasp_y=1
 
 post_grasp_z=0
 
-post_grasp_dist=40
-
+post_grasp_dist=100
 # Place settings
 pre_place_x=0
 

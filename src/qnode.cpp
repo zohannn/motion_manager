@@ -1854,11 +1854,19 @@ void QNode::leftProxCallback(const vrep_common::ProximitySensorData& data)
 bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>& vel_mov, std::vector<std::vector<double>> timesteps, std::vector<double> tols_stop, movementPtr mov, scenarioPtr scene)
 {
 
-    bool hand_closed; closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
     this->curr_scene = scene;
     int scenarioID = scene->getID();
     this->curr_mov = mov; int mov_type = mov->getType();  int arm_code = mov->getArm();
-    bool approach;
+    bool approach; bool retreat;
+    bool hand_closed;
+    switch (mov_type){
+    case 0: case 1: case 5: // reach-to-grasp, reaching, go-park
+        closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
+        break;
+    case 2: case 3: case 4: // transport, engage, disengage
+        closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
+        break;
+    }
 
     ros::NodeHandle node;
     double ta;
@@ -1927,6 +1935,10 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
             break;
         case 3: // engage
             if(k==1){approach=true;}else{approach=false;}
+            if(k==2){
+                retreat=true;
+                closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
+            }else{retreat=false;}
             break;
         case 4:// disengage
             if(k==1){approach=true;}else{approach=false;}
@@ -1965,7 +1977,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
         //BOOST_LOG_SEV(lg, info) << "timeTot = " << timeTot ;
         //BOOST_LOG_SEV(lg, info) << "pre_time = " << pre_time ;
 
-        tb = timeTot-pre_time;
+        tb = pre_time;
         for (int i = 0; i< vel.rows()-1; ++i){
             //BOOST_LOG_SEV(lg, info) << "Stage = " << k;
             //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
@@ -1991,7 +2003,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                 vrep_common::JointSetStateData data_hand;
 #endif
 
-                tx = simulationTime -pre_time;
+                tx = simulationTime - timeTot;
                 //BOOST_LOG_SEV(lg, info) << "simulationTime = " << simulationTime ;
                 if (tx > tb){
                     // go to the next interval
@@ -2014,7 +2026,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                            pow((f_posture(5)-r_post.at(5)),2)+
                            pow((f_posture(6)-r_post.at(6)),2)) < tol_stop_stage){
                         f_reached=true;
-                        std::cout << "final posture reached" << std::endl;
+                        //std::cout << "final posture reached" << std::endl;
                         //BOOST_LOG_SEV(lg, info) << "final posture reached" ;
                         break;
                     }else{f_reached=false;}
@@ -2109,13 +2121,10 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                     if (srvset_parent.response.result != 1){
                         log(QNode::Error,string("Error in grasping the object "));
                     }
-
-
 #if HAND == 1
                     this->closeBarrettHand(arm_code);
 #endif
                 }
-
             }
             break;
         case 1: // reaching
@@ -2123,6 +2132,25 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
         case 2: // transport
             break;
         case 3: // engage
+            if(approach){
+            //ros::spinOnce();// handle ROS messages
+            if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
+                add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                //if(obj_in_hand){
+                    srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                    srvset_parent.request.parentHandle = -1; // parentless object
+                    srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                    add_client.call(srvset_parent);
+                    if (srvset_parent.response.result != 1){
+                        log(QNode::Error,string("Error in releasing the object "));
+                    }
+                //}
+            }
+//#if HAND ==1
+  //              this->openBarrettHand(arm_code);
+//#endif
+            }
             break;
         case 4: // disengage
             break;
@@ -2344,7 +2372,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
 
                     // 5. Let's prepare a publisher of those values:
                     ros::Publisher pub=node.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
-                    tb = timeTot-pre_time;
+                    tb = pre_time;
                     for (int i = 1; i< vel.rows(); ++i){
 
                         //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
@@ -2371,7 +2399,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                             vrep_common::JointSetStateData data_hand;
 #endif
 
-                            tx = simulationTime - pre_time;
+                            tx = simulationTime - timeTot;
 
                             //BOOST_LOG_SEV(lg, info) << "simulationTime = " << simulationTime ;
 
