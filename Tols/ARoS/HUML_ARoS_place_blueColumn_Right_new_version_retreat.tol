@@ -34,8 +34,7 @@ Hand_tip_2=5
 Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=1.0
-
+lambda_1=0.01
 lambda_2=1.0
 
 lambda_3=1.0
@@ -298,6 +297,7 @@ pre_place_y=0
 pre_place_z=1
 
 pre_place_dist=80
+
 post_place_x=0
 
 post_place_y=1
