@@ -36,7 +36,7 @@ Hand_tip_3=5
 # Joint Expanse factors
 lambda_1=0.01
 
-lambda_2=0.1
+lambda_2=0.7
 lambda_3=1.0
 
 lambda_4=1.0
@@ -232,8 +232,11 @@ tar_yz_3=5
 
 # Tolerances with the obstacles [mm]
 obs_xx_1=50
+
 obs_xx_2=50
+
 obs_xx_3=50
+
 obs_yy_1=50
 
 obs_yy_2=50
@@ -293,16 +296,14 @@ pre_place_y=0
 
 pre_place_z=1
 
-pre_place_dist=90
-
+pre_place_dist=60
 post_place_x=0
 
 post_place_y=1
 
 post_place_z=0
 
-post_place_dist=150
-
+post_place_dist=140
 # Move settings
 # Others
 max_velocity=50

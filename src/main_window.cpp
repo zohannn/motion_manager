@@ -1250,7 +1250,6 @@ void MainWindow::on_pushButton_load_task_clicked()
                         obj->setTargetRightEnabled(false);
                         break;
                     }
-
                     problemPtr prob;
                     if(plan_id==0){
                         prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
@@ -1260,7 +1259,6 @@ void MainWindow::on_pushButton_load_task_clicked()
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
                     this->curr_task->addProblem(prob.get());
-
                 }else if(QString::compare(mov_type,QString("Reaching"),Qt::CaseInsensitive)==0){
                     mov_id=1;
                 }else if(QString::compare(mov_type,QString("Transport"),Qt::CaseInsensitive)==0){
@@ -1283,8 +1281,12 @@ void MainWindow::on_pushButton_load_task_clicked()
                         obj->setTargetRightEnabled(false);
                         break;
                     }
-
-                    problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                    problemPtr prob;
+                    if(plan_id==0){
+                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                    }else{
+                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                    }
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
                     this->curr_task->addProblem(prob.get());
@@ -1292,26 +1294,15 @@ void MainWindow::on_pushButton_load_task_clicked()
                     mov_id=4;
                 }else if(QString::compare(mov_type,QString("Go park"),Qt::CaseInsensitive)==0){
                     mov_id=5;
-                    //get the object
-                    obj = this->curr_scene->getObject(obj_str.toStdString());
-                    switch (arm_code){
-                    case 0: // dual arm
-                        // TO DO
-                    case 1: // right arm
-                         obj->setTargetRightEnabled(true);
-                         obj->setTargetLeftEnabled(false);
-                        break;
-                    case 2: // left arm
-                        obj->setTargetLeftEnabled(true);
-                        obj->setTargetRightEnabled(false);
-                        break;
+                    problemPtr prob;
+                    if(plan_id==0){
+                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get()))));
+                    }else{
+                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get())),this->m_planner));
                     }
-
-                    problemPtr prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
                     this->curr_task->addProblem(prob.get());
-
                 }
 
                 //logging

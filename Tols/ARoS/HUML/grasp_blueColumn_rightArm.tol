@@ -34,10 +34,8 @@ Hand_tip_2=15.0
 Hand_tip_3=15.0
 
 # Joint Expanse factors
-lambda_1=1.0
-
+lambda_1=0.1
 lambda_2=1.0
-
 lambda_3=1.0
 
 lambda_4=1.0
@@ -201,15 +199,12 @@ tar_xx_2=20
 
 tar_xx_3=20
 
-tar_yy_1=5
-tar_yy_2=5
-tar_yy_3=5
+tar_yy_1=50
+tar_yy_2=50
+tar_yy_3=50
 tar_zz_1=5
-
 tar_zz_2=5
-
 tar_zz_3=5
-
 tar_xy_1=5
 
 tar_xy_2=5

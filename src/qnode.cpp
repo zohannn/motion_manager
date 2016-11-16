@@ -1774,63 +1774,34 @@ void QNode::rightProxCallback(const vrep_common::ProximitySensorData& data)
     //vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
 
     if (this->curr_mov){
-
         int arm_code = this->curr_mov->getArm();
-
         if (arm_code == 1){
             //right arm
-
             int h_obj;
-
             int mov_type = this->curr_mov->getType();
-
             switch (mov_type) {
-
             case 0: // reach-to-grasp
-
                 h_obj= this->curr_mov->getObject()->getHandleBody(); // visible handle of the object we want to grasp
                 h_detobj = data.detectedObject.data; // handle of the object currently detected
-
                 //BOOST_LOG_SEV(lg, info) << "h_obj = " << h_obj ;
                 //BOOST_LOG_SEV(lg, info) << "\n " ;
                 //BOOST_LOG_SEV(lg, info) << "h_detobj = " << h_detobj ;
                 //BOOST_LOG_SEV(lg, info) << "\n " ;
                 obj_in_hand = (h_obj == h_detobj);
-
                 break;
-
             case 1: // reaching
-
                 break;
-
             case 2: // transport
-
                 break;
-
             case 3: // engage
-
                 break;
-
             case 4: // disengage
-
                 break;
-
-            case 5: // go home
-
-                h_obj= this->curr_mov->getObject()->getHandleBody(); // visible handle of the object we want to grasp
-                h_detobj = data.detectedObject.data; // handle of the object currently detected
-
-                obj_in_hand = (h_obj == h_detobj);
-
+            case 5: // go park
                 break;
             }
-
-
-
-
         }
     }
-
 }
 
 void QNode::leftProxCallback(const vrep_common::ProximitySensorData& data)
