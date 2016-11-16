@@ -762,6 +762,30 @@ void Humanoid::getRightHomePosture(vector<double>& p)
 
 }
 
+void Humanoid::getRightHandHomePosture(vector<double> &p)
+{
+   p = vector<double>(JOINTS_HAND);
+   std::copy(this->rightHomePosture.begin()+JOINTS_ARM,this->rightHomePosture.end(),p.begin());
+}
+
+void Humanoid::getRightArmHomePosture(vector<double> &p)
+{
+    p = vector<double>(JOINTS_ARM);
+    std::copy(this->rightHomePosture.begin(),this->rightHomePosture.end()-JOINTS_HAND,p.begin());
+}
+
+void Humanoid::getLeftHandHomePosture(vector<double> &p)
+{
+    p = vector<double>(JOINTS_HAND);
+    std::copy(this->leftHomePosture.begin()+JOINTS_ARM,this->leftHomePosture.end(),p.begin());
+}
+
+void Humanoid::getLeftArmHomePosture(vector<double> &p)
+{
+    p = vector<double>(JOINTS_ARM);
+    std::copy(this->leftHomePosture.begin(),this->leftHomePosture.end()-JOINTS_HAND,p.begin());
+}
+
 void Humanoid::getLeftHomePosture(vector<double>& p)
 {
 

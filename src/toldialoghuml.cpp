@@ -838,9 +838,9 @@ void TolDialogHUML::on_pushButton_load_clicked()
                     }
                 }else if(QString::compare(fields.at(0),QString("rand_init"),Qt::CaseInsensitive)==0){
                 if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
-                    ui->checkBox_retreat->setChecked(false);
+                    ui->checkBox_rand_init->setChecked(false);
                 }else{
-                    ui->checkBox_retreat->setChecked(true);
+                    ui->checkBox_rand_init->setChecked(true);
                 }
             }
 

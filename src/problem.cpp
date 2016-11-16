@@ -907,9 +907,6 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
     this->h_params = params;
     int arm_code =  this->mov->getArm();
     int mov_type = this->mov->getType();
-    try{ // compute the final posture of the fingers according to the object involved in the movement
-        this->finalPostureFingers(arm_code);
-    }catch(const string message){throw message;}
 #if HAND==0
     // Human Hand
     int hand_code = 0;
@@ -920,74 +917,99 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
     std::vector<double> shPos;
     double dHO;
     std::vector<double> finalHand;
+    std::vector<double> homePosture;
     std::vector<double> initPosture;
-    objectPtr obj = this->mov->getObject();
     targetPtr tar;
-    // engaging info
-    objectPtr obj_eng = this->mov->getObjectEng();
-    engagePtr eng = obj->getEngagePoint();
-    engagePtr eng1 = obj_eng->getEngagePoint();
+    objectPtr obj; engagePtr eng;
+    objectPtr obj_eng; engagePtr eng1;
+    if(mov_type!=1 && mov_type!=5){
+        try{ // compute the final posture of the fingers according to the object involved in the movement
+            this->finalPostureFingers(arm_code);
+        }catch(const string message){throw message;}
+        obj = this->mov->getObject();
+        // engaging info
+        obj_eng = this->mov->getObjectEng();
+        eng = obj->getEngagePoint();
+        eng1 = obj_eng->getEngagePoint();
+    }
+
     switch(arm_code){
     case 0: // both arms
         break;
     case 1://right arm
         this->scene->getHumanoid()->getRightShoulderPos(shPos);
         this->scene->getHumanoid()->getRightPosture(initPosture);
-        dHO=this->dHOr;
-        finalHand = this->rightFinalHand;
-        tar = obj->getTargetRight();
+        this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
+        if(mov_type==5){
+          this->scene->getHumanoid()->getRightHandHomePosture(finalHand);
+        }else{
+            dHO=this->dHOr;
+            tar = obj->getTargetRight();
+            finalHand = this->rightFinalHand;
+        }
         break;
     case 2:// left arm
         this->scene->getHumanoid()->getLeftShoulderPos(shPos);
         this->scene->getHumanoid()->getLeftPosture(initPosture);
-        dHO=this->dHOl;
-        finalHand = this->leftFinalHand;
-        tar = obj->getTargetLeft();
+        this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
+        if(mov_type==5){
+          this->scene->getHumanoid()->getLeftHandHomePosture(finalHand);
+        }else{
+            dHO=this->dHOl;
+            finalHand = this->leftFinalHand;
+            tar = obj->getTargetLeft();
+        }
         break;
     }
     // shoulder position (center of the reacheble workspace )
     this->h_planner->setShpos(shPos);
-    // compute the position of the engage point relative to the target frame
-    pos tar_pos = tar->getPos();
-    pos eng_pos = eng->getPos();
-    Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
-    Matrix3d Rot_tar_inv = Rot_tar.inverse();
-    Vector3d diff;
-    diff(0) = eng_pos.Xpos - tar_pos.Xpos;
-    diff(1) = eng_pos.Ypos - tar_pos.Ypos;
-    diff(2) = eng_pos.Zpos - tar_pos.Zpos;
-    Vector3d eng_to_tar; eng_to_tar = Rot_tar_inv * diff;
-    // compute the position of the target when the object will be engaged
-    pos eng1_pos = eng1->getPos(); // position of the engage point of the other object
-    pos new_tar;
-    new_tar.Xpos=eng1_pos.Xpos - eng_to_tar(0);
-    new_tar.Ypos=eng1_pos.Ypos - eng_to_tar(1);
-    new_tar.Zpos=eng1_pos.Zpos - eng_to_tar(2);
+    std::vector<double> target;
     std::vector<double> place_location;
-    place_location.push_back(new_tar.Xpos);
-    place_location.push_back(new_tar.Ypos);
-    place_location.push_back(new_tar.Zpos);
-    place_location.push_back(eng1->getOr().roll);
-    place_location.push_back(eng1->getOr().pitch);
-    place_location.push_back(eng1->getOr().yaw);
+    if(mov_type!=1 && mov_type!=5){
+        // compute the position of the engage point relative to the target frame
+        pos tar_pos = tar->getPos();
+        pos eng_pos = eng->getPos();
+        Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
+        Matrix3d Rot_tar_inv = Rot_tar.inverse();
+        Vector3d diff;
+        diff(0) = eng_pos.Xpos - tar_pos.Xpos;
+        diff(1) = eng_pos.Ypos - tar_pos.Ypos;
+        diff(2) = eng_pos.Zpos - tar_pos.Zpos;
+        Vector3d eng_to_tar; eng_to_tar = Rot_tar_inv * diff;
+        // compute the position of the target when the object will be engaged
+        pos eng1_pos = eng1->getPos(); // position of the engage point of the other object
+        pos new_tar;
+        new_tar.Xpos=eng1_pos.Xpos - eng_to_tar(0);
+        new_tar.Ypos=eng1_pos.Ypos - eng_to_tar(1);
+        new_tar.Zpos=eng1_pos.Zpos - eng_to_tar(2);
 
+        place_location.push_back(new_tar.Xpos);
+        place_location.push_back(new_tar.Ypos);
+        place_location.push_back(new_tar.Zpos);
+        place_location.push_back(eng1->getOr().roll);
+        place_location.push_back(eng1->getOr().pitch);
+        place_location.push_back(eng1->getOr().yaw);
 
-    HUMotion::objectPtr huml_obj; std::vector<double> target;
-    target = {tar->getPos().Xpos, tar->getPos().Ypos, tar->getPos().Zpos,tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
-    std::vector<double> position = {obj->getPos().Xpos,obj->getPos().Ypos,obj->getPos().Zpos};
-    std::vector<double> orientation = {obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
-    std::vector<double> dimension = {obj->getSize().Xsize,obj->getSize().Ysize,obj->getSize().Zsize};
-    huml_obj.reset(new HUMotion::Object(obj->getName()));
-    huml_obj->setParams(position,orientation,dimension);
+        HUMotion::objectPtr huml_obj;
+        target = {tar->getPos().Xpos, tar->getPos().Ypos, tar->getPos().Zpos,tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
+        std::vector<double> position = {obj->getPos().Xpos,obj->getPos().Ypos,obj->getPos().Zpos};
+        std::vector<double> orientation = {obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
+        std::vector<double> dimension = {obj->getSize().Xsize,obj->getSize().Ysize,obj->getSize().Zsize};
+        huml_obj.reset(new HUMotion::Object(obj->getName()));
+        huml_obj->setParams(position,orientation,dimension);
+
+        // movement settings
+        params.mov_specs.griptype = this->mov->getGrip();
+        params.mov_specs.dHO = dHO;
+        params.mov_specs.obj = huml_obj;
+
+    }
 
     // movement settings
     params.mov_specs.arm_code = arm_code;
     params.mov_specs.hand_code = hand_code;
-    params.mov_specs.griptype = this->mov->getGrip();
     params.mov_specs.mov_infoline = this->mov->getInfoLine();
-    params.mov_specs.dHO = dHO;
     params.mov_specs.finalHand = finalHand;
-    params.mov_specs.obj = huml_obj;
 
     HUMotion::planning_result_ptr res;
     switch(mov_type){
@@ -1006,10 +1028,9 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
     case 4:// disengage
         break;
     case 5:// go-park
+        res = this->h_planner->plan_move(params,initPosture,homePosture);
         break;
     }
-
-
 
     if(res->status==0){this->solved=true;}
 

@@ -460,14 +460,11 @@ void MainWindow::on_pushButton_addMov_clicked()
     ui.pushButton_save_task->setEnabled(false);
     int planner_id = ui.comboBox_planner->currentIndex();
 
-    //if (planner_id==0){
-    // Human-like Upper-limbs Motion Planner
-
-        //int rows = ui.listWidget_movs->count();
         bool add = true;
         /*
+        int rows = ui.listWidget_movs->count();
         if (rows > 0){
-            h_problemPtr pre_prob = hum_planner->getProblem(rows-1); //previous problem
+            this->curr_task->getProblem(rows-1); // previous problem
             if(!pre_prob->getMovement()->getExecuted()){
                 int reply = QMessageBox::warning(this,tr("Warning"),
                                      tr("<p>The previous movement has not been executed yet. Do you really want to add this movement?</p>"),QMessageBox::Yes,QMessageBox::No);
@@ -475,6 +472,7 @@ void MainWindow::on_pushButton_addMov_clicked()
             }
         }
         */
+
 
         if(add){
             bool success = false;
@@ -492,14 +490,8 @@ void MainWindow::on_pushButton_addMov_clicked()
                 arm_sel=0;
             }
 
-
-            // add the movement
-            //h_scenarioPtr scene = this->hum_planner->getScenario();
-
              if (ui.comboBox_objects->isEnabled() && ui.comboBox_objects_eng->isEnabled() && ui.groupBox_grip->isEnabled()){
-
                  // engage, disengage movements
-
                 string obj_name = ui.comboBox_objects->currentText().toStdString();
                 string obj_eng_name = ui.comboBox_objects_eng->currentText().toStdString();
 
@@ -534,83 +526,41 @@ void MainWindow::on_pushButton_addMov_clicked()
                 }
 
              }else if(ui.comboBox_objects->isEnabled() && ui.groupBox_grip->isEnabled()){
+                  // reach-to- grasp movement, transport movements
+                 string obj_name = ui.comboBox_objects->currentText().toStdString();
+                 objectPtr obj = curr_scene->getObject(obj_name);
 
-                 if(std::strcmp(ui.comboBox_mov->currentText().toStdString().c_str(),"Go-park")!=0){
-                      // reach-to- grasp movement, transport movements
-
-                     string obj_name = ui.comboBox_objects->currentText().toStdString();
-                     objectPtr obj = curr_scene->getObject(obj_name);
-
-                     if(obj!=NULL){
-                         int grip_id = ui.comboBox_grip->currentIndex();
-                         bool prec = ui.radioButton_prec->isChecked();
-                         //bool full = ui.radioButton_full->isChecked();
-                         switch (arm_sel){
-                         case 0: // dual arm
-                             // TO DO
-                         case 1: // right arm
-                              obj->setTargetRightEnabled(true);
-                              obj->setTargetLeftEnabled(false);
-                             break;
-                         case 2: // left arm
-                             obj->setTargetLeftEnabled(true);
-                             obj->setTargetRightEnabled(false);
-                             break;
-                         }
-                         if(planner_id==0){
-                            curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
-                         }else{
-                            curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
-                         }
-                         success=true;
-
-                     }else{
-                         qnode.log(QNode::Error,std::string("The movement requires an object"));
-
+                 if(obj!=NULL){
+                     int grip_id = ui.comboBox_grip->currentIndex();
+                     bool prec = ui.radioButton_prec->isChecked();
+                     //bool full = ui.radioButton_full->isChecked();
+                     switch (arm_sel){
+                     case 0: // dual arm
+                         // TO DO
+                     case 1: // right arm
+                          obj->setTargetRightEnabled(true);
+                          obj->setTargetLeftEnabled(false);
+                         break;
+                     case 2: // left arm
+                         obj->setTargetLeftEnabled(true);
+                         obj->setTargetRightEnabled(false);
+                         break;
                      }
-
-                 }else{
-
-                     // Go park movements
-                     string obj_name = ui.comboBox_objects->currentText().toStdString();
-                     objectPtr obj = curr_scene->getObject(obj_name);
-                     if(obj!=NULL){
-                         int grip_id = ui.comboBox_grip->currentIndex();
-                         bool prec = ui.radioButton_prec->isChecked();
-                         //bool full = ui.radioButton_full->isChecked();
-                         switch (arm_sel){
-                         case 0: // dual arm
-                             // TO DO
-                         case 1: // right arm
-                              obj->setTargetRightEnabled(true);
-                              obj->setTargetLeftEnabled(false);
-                             break;
-                         case 2: // left arm
-                             obj->setTargetLeftEnabled(true);
-                             obj->setTargetRightEnabled(false);
-                             break;
-                         }
-                         if(planner_id==0){
-                            curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
-                         }else{
-                            curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
-                         }
-                         success=true;
-
+                     if(planner_id==0){
+                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                      }else{
-                        if(planner_id==0){
-                            curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel),new Scenario(*(this->curr_scene.get()))));
-                        }else{
-                            curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel),new Scenario(*(this->curr_scene.get())),this->m_planner));
-                        }
-                        success=true;
-
+                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
                      }
-                 }
+                     success=true;
 
-
+                 }else{qnode.log(QNode::Error,std::string("The movement requires an object"));}
              }else{
-                 // reaching movements
+                 // go-park and reaching movements
+                 std::vector<objectPtr> objects; this->curr_scene->getObjects(objects);
+                 for(size_t i=0;i<objects.size();++i){
+                     this->curr_scene->getObject(i)->setTargetRightEnabled(false);
+                     this->curr_scene->getObject(i)->setTargetLeftEnabled(false);
+                 }
                  if(planner_id==0){
                     curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel),new Scenario(*(this->curr_scene.get()))));
                 }else{
@@ -633,17 +583,6 @@ void MainWindow::on_pushButton_addMov_clicked()
 
 
         }
-
-
-    //}else{
-
-        //Humanoid MoveIt! Planner
-
-
-
-
-    //} //if/else planner
-
 } // add movement
 
 
@@ -1649,19 +1588,19 @@ void MainWindow::on_pushButton_append_mov_clicked()
          QStringList h_headers; bool h_head=false; QStringList v_headers;
          std::vector<std::vector<QString>> task_steps;
          vector<MatrixXd> pos_mov; vector<MatrixXd> vel_mov; vector<MatrixXd> acc_mov; vector<vector<double>> tstep_mov;
-         double task_duration = 0.0; double mov_duration = 0.0;
+         double task_duration = 0.0; double mov_duration = 0.0; double stage_duration = 0.0;
          for(size_t h=0; h< this->jointsPosition_task.size();++h){
              pos_mov = this->jointsPosition_task.at(h);
              vel_mov = this->jointsVelocity_task.at(h);
              acc_mov = this->jointsAcceleration_task.at(h);
              tstep_mov = this->timesteps_task.at(h);
-             mov_duration = 0;
-             for (size_t k=0; k< this->jointsPosition_mov.size();++k){
+             mov_duration = 0.0;
+             for (size_t k=0; k< pos_mov.size();++k){
                  MatrixXd jointPosition_stage = pos_mov.at(k);
                  MatrixXd jointVelocity_stage = vel_mov.at(k);
                  MatrixXd jointAcceleration_stage = acc_mov.at(k);
                  vector<double> tstep_stage = tstep_mov.at(k);
-                 double stage_duration = 0;
+                 stage_duration = 0.0;
                  std::vector<QString> stage_step;
                  for(int i =0; i< jointPosition_stage.rows(); ++i){
                      stage_duration += tstep_stage.at(i);
@@ -1798,10 +1737,10 @@ void MainWindow::on_comboBox_mov_currentIndexChanged(int i)
             break;
         case 5:
         // Go park
-            ui.comboBox_objects->setEnabled(true);
+            ui.comboBox_objects->setEnabled(false);
             ui.comboBox_objects_eng->setEnabled(false);
-            ui.label_objects->setEnabled(true);
-            ui.groupBox_grip->setEnabled(true);
+            ui.label_objects->setEnabled(false);
+            ui.groupBox_grip->setEnabled(false);
             break;
 
     }

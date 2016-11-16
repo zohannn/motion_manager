@@ -386,10 +386,34 @@ public:
     void getRightHomePosture(vector<double>& p);
 
     /**
+     * @brief getRightHandHomePosture
+     * @param p
+     */
+    void getRightHandHomePosture(vector<double>& p);
+
+    /**
+     * @brief getRightArmHomePosture
+     * @param p
+     */
+    void getRightArmHomePosture(vector<double>& p);
+
+    /**
      * @brief This method gets the home posture of the left arm+hand
      * @param p
      */
     void getLeftHomePosture(vector<double>& p);
+
+    /**
+     * @brief getLeftHandHomePosture
+     * @param p
+     */
+    void getLeftHandHomePosture(vector<double>& p);
+
+    /**
+     * @brief getLeftArmHomePosture
+     * @param p
+     */
+    void getLeftArmHomePosture(vector<double>& p);
 
     /**
      * @brief This method gets the joint velocities of the right arm+hand

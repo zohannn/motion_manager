@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUML ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Grip Type: Full Side thumb left
+# Planner: HUML ,Movement: Engage, Arm: right, Object: BlueColumn, Object Engaged: Base, Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
@@ -36,8 +36,7 @@ Hand_tip_3=5
 # Joint Expanse factors
 lambda_1=0.01
 
-lambda_2=1.0
-
+lambda_2=0.1
 lambda_3=1.0
 
 lambda_4=1.0
@@ -232,23 +231,20 @@ tar_yz_2=5
 tar_yz_3=5
 
 # Tolerances with the obstacles [mm]
-obs_xx_1=5
+obs_xx_1=50
+obs_xx_2=50
+obs_xx_3=50
+obs_yy_1=50
 
-obs_xx_2=5
+obs_yy_2=50
 
-obs_xx_3=5
+obs_yy_3=50
 
-obs_yy_1=5
+obs_zz_1=50
 
-obs_yy_2=5
+obs_zz_2=50
 
-obs_yy_3=5
-
-obs_zz_1=5
-
-obs_zz_2=5
-
-obs_zz_3=5
+obs_zz_3=50
 
 obs_xy_1=5
 
@@ -297,7 +293,7 @@ pre_place_y=0
 
 pre_place_z=1
 
-pre_place_dist=80
+pre_place_dist=90
 
 post_place_x=0
 
@@ -305,7 +301,7 @@ post_place_y=1
 
 post_place_z=0
 
-post_place_dist=100
+post_place_dist=150
 
 # Move settings
 # Others
