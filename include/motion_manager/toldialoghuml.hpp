@@ -46,6 +46,7 @@ public Q_SLOTS:
      */
     void checkRetreat(int state);
 
+
 public:
 
     /**
@@ -205,6 +206,12 @@ public:
      */
     void setInfo(string info);
 
+    /**
+     * @brief getRandInit
+     * @return
+     */
+    bool getRandInit();
+
 
 
 
@@ -212,6 +219,7 @@ public:
 private:
     Ui::TolDialogHUML *ui; /**< handle of the user interface */
     string infoLine; /**< information about the tuning of the planner */
+    bool rand_init;
 };
 
 } // namespace motion_manager

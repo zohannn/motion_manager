@@ -701,6 +701,7 @@ void MainWindow::on_pushButton_plan_clicked()
         mTolHumldlg->getPostGraspRetreat(tols.mov_specs.post_grasp_retreat); // pick retreat
         mTolHumldlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
         mTolHumldlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
+        tols.mov_specs.rand_init = mTolHumldlg->getRandInit(); // random initialization for "plan" stages
 
         h_results = prob->solve(tols); // plan the movement
 

@@ -625,9 +625,9 @@
     <widget class="QGroupBox" name="groupBox_3">
      <property name="geometry">
       <rect>
-       <x>820</x>
+       <x>790</x>
        <y>10</y>
-       <width>131</width>
+       <width>161</width>
        <height>361</height>
       </rect>
      </property>
@@ -1062,9 +1062,9 @@
     <widget class="QGroupBox" name="groupBox_6">
      <property name="geometry">
       <rect>
-       <x>760</x>
+       <x>720</x>
        <y>430</y>
-       <width>191</width>
+       <width>231</width>
        <height>91</height>
       </rect>
      </property>
@@ -2835,7 +2835,7 @@
     <rect>
      <x>240</x>
      <y>600</y>
-     <width>191</width>
+     <width>241</width>
      <height>91</height>
     </rect>
    </property>
@@ -2915,11 +2915,28 @@
     </item>
    </layout>
   </widget>
+  <widget class="QCheckBox" name="checkBox_rand_init">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>700</y>
+     <width>169</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>random initialization</string>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
   <zorder>layoutWidget</zorder>
   <zorder>layoutWidget_max_vel</zorder>
   <zorder>groupBox_constraints</zorder>
   <zorder>tabWidget</zorder>
   <zorder>groupBox_constraints_2</zorder>
+  <zorder>checkBox_rand_init</zorder>
  </widget>
  <resources/>
  <connections>

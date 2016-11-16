@@ -478,6 +478,7 @@ void TolDialogHUML::on_pushButton_save_clicked()
        if (ui->checkBox_ob_av->isChecked()){stream << "ob_av=false"<< endl;}else{stream << "ob_av=true"<< endl;}
        if(ui->checkBox_approach->isChecked()){stream << "approach=false"<<endl;}else{stream << "approach=true"<<endl;}
        if(ui->checkBox_retreat->isChecked()){stream << "retreat=false"<<endl;}else{stream << "retreat=true"<<endl;}
+       if(ui->checkBox_rand_init->isChecked()){stream << "rand_init=true"<<endl;}else{stream << "rand_init=false"<<endl;}
        //stream << "# END" << endl;
 
 
@@ -835,7 +836,13 @@ void TolDialogHUML::on_pushButton_load_clicked()
                     }else{
                         ui->checkBox_retreat->setChecked(false);
                     }
+                }else if(QString::compare(fields.at(0),QString("rand_init"),Qt::CaseInsensitive)==0){
+                if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                    ui->checkBox_retreat->setChecked(false);
+                }else{
+                    ui->checkBox_retreat->setChecked(true);
                 }
+            }
 
             }
 
@@ -879,6 +886,12 @@ void TolDialogHUML::checkRetreat(int state)
         ui->groupBox_post_place->setEnabled(false);
         ui->label_pick->setEnabled(false);
     }
+}
+
+
+bool TolDialogHUML::getRandInit()
+{
+    return ui->checkBox_rand_init->isChecked();
 }
 
 
