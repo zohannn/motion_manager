@@ -2223,8 +2223,6 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
     double tx;
     int arm_code;
     int mov_type;
-    double timeStep;
-    double tol_stop_rad;
     double timeTot = 0.0;
     this->curr_scene = scene;
     int scenarioID = scene->getID();

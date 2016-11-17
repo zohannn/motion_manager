@@ -904,7 +904,6 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
 {
 
     this->solved = false;
-    this->h_params = params;
     int arm_code =  this->mov->getArm();
     int mov_type = this->mov->getType();
 #if HAND==0
@@ -1031,7 +1030,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
         res = this->h_planner->plan_move(params,initPosture,homePosture);
         break;
     }
-
+    this->h_params = params;
     if(res->status==0){this->solved=true;}
 
     return res;
@@ -1041,12 +1040,9 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
 moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params &params)
 {
     this->solved = false;
-    this->m_params = params;
     int arm_code =  this->mov->getArm();
     int mov_type = this->mov->getType();
-    try{ // compute the final posture of the fingers according to the object involved in the movement
-        this->finalPostureFingers(arm_code);
-    }catch(const string message){throw message;}
+    params.support_surface = "Table";
 #if HAND==0
     // Human Hand
     int hand_code = 0;
@@ -1056,38 +1052,91 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
 #endif
     double dHO;
     std::vector<double> finalHand;
-    objectPtr obj = this->mov->getObject();
+    std::vector<double> homePosture;
     targetPtr tar;
+    objectPtr obj; engagePtr eng;
+    objectPtr obj_eng; engagePtr eng1;
+    if(mov_type!=1 && mov_type!=5){
+        try{ // compute the final posture of the fingers according to the object involved in the movement
+            this->finalPostureFingers(arm_code);
+        }catch(const string message){throw message;}
+        obj = this->mov->getObject();
+        // engaging info
+        obj_eng = this->mov->getObjectEng();
+        eng = obj->getEngagePoint();
+        eng1 = obj_eng->getEngagePoint();
+    }
+
     switch(arm_code){
     case 0: // both arms
         break;
     case 1://right arm
-        dHO=this->dHOr;
-        finalHand = this->rightFinalHand;
-        tar = obj->getTargetRight();
+        this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
+        if(mov_type==5){
+            this->scene->getHumanoid()->getRightHandHomePosture(finalHand);
+        }else{
+            dHO=this->dHOr;
+            finalHand = this->rightFinalHand;
+            tar = obj->getTargetRight();
+        }
         break;
     case 2:// left arm
-        dHO=this->dHOl;
-        finalHand = this->leftFinalHand;
-        tar = obj->getTargetLeft();
+        this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
+        if(mov_type==5){
+            this->scene->getHumanoid()->getLeftHandHomePosture(finalHand);
+        }else{
+            dHO=this->dHOl;
+            finalHand = this->leftFinalHand;
+            tar = obj->getTargetLeft();
+        }
         break;
     }
     std::vector<double> target;
-    target = {tar->getPos().Xpos/1000, tar->getPos().Ypos/1000, tar->getPos().Zpos/1000,
-              tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
+    std::vector<double> place_location;
+    if(mov_type!=1 && mov_type!=5){
+        // compute the position of the engage point relative to the target frame
+        pos tar_pos = tar->getPos();
+        pos eng_pos = eng->getPos();
+        Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
+        Matrix3d Rot_tar_inv = Rot_tar.inverse();
+        Vector3d diff;
+        diff(0) = eng_pos.Xpos - tar_pos.Xpos;
+        diff(1) = eng_pos.Ypos - tar_pos.Ypos;
+        diff(2) = eng_pos.Zpos - tar_pos.Zpos;
+        Vector3d eng_to_tar; eng_to_tar = Rot_tar_inv * diff;
+        // compute the position of the target when the object will be engaged
+        pos eng1_pos = eng1->getPos(); // position of the engage point of the other object
+        pos new_tar;
+        new_tar.Xpos=eng1_pos.Xpos - eng_to_tar(0);
+        new_tar.Ypos=eng1_pos.Ypos - eng_to_tar(1);
+        new_tar.Zpos=eng1_pos.Zpos - eng_to_tar(2);
+
+        place_location.push_back(new_tar.Xpos/1000);
+        place_location.push_back(new_tar.Ypos/1000);
+        place_location.push_back(new_tar.Zpos/1000);
+        place_location.push_back(eng1->getOr().roll);
+        place_location.push_back(eng1->getOr().pitch);
+        place_location.push_back(eng1->getOr().yaw);
+
+        target = {tar->getPos().Xpos/1000, tar->getPos().Ypos/1000, tar->getPos().Zpos/1000,
+                  tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
+
+        // movement settings
+        params.dHO = dHO/1000;
+        params.griptype = this->mov->getGrip();
+        params.obj_name = this->mov->getObject()->getName();
+    }
+
     // movement settings
     params.arm_code = arm_code;
     params.hand_code = hand_code;
-    params.griptype = this->mov->getGrip();
     params.mov_infoline = this->mov->getInfoLine();
-    params.dHO = dHO/1000;
     params.finalHand = finalHand;
-    params.target = target;
-    params.obj_name = this->mov->getObject()->getName();
 
     moveit_planning::PlanningResultPtr res;
     switch(mov_type){
     case 0:// reach-to-grasp
+        params.target = target;
         res =  this->m_planner->pick(params);
         break;
     case 1:// reaching
@@ -1095,13 +1144,17 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     case 2://transport
         break;
     case 3://engage
+        params.support_surface = obj_eng->getName();
+        params.target = place_location;
+        res =  this->m_planner->place(params);
         break;
     case 4:// disengage
         break;
     case 5:// go-park
+        res = this->m_planner->move(params,homePosture);
         break;
     }
-
+    this->m_params = params;
     if(res->status==1){this->solved=true;}
 
     return res;

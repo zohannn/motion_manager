@@ -521,9 +521,7 @@ void MainWindow::on_pushButton_addMov_clicked()
                     }
                     success=true;
 
-                }else{
-                    qnode.log(QNode::Error,std::string("The movement requires two objects"));
-                }
+                }else{qnode.log(QNode::Error,std::string("The movement requires two objects"));}
 
              }else if(ui.comboBox_objects->isEnabled() && ui.groupBox_grip->isEnabled()){
                   // reach-to- grasp movement, transport movements
@@ -695,24 +693,35 @@ void MainWindow::on_pushButton_plan_clicked()
             std::vector<double> init_hand_pos;
             std::vector<double> init_hand_vel;
             std::vector<double> init_hand_acc;
-            moveit_msgs::RobotTrajectory rob_traj_pre = m_results->trajectory_stages.at(1);
-            vector<trajectory_msgs::JointTrajectoryPoint> points_pre = rob_traj_pre.joint_trajectory.points;
-            trajectory_msgs::JointTrajectoryPoint traj_pnt_pre = points_pre.at(0);
-            //positions
-            init_hand_pos.push_back(traj_pnt_pre.positions.at(0));
-            init_hand_pos.push_back(traj_pnt_pre.positions.at(1));
-            init_hand_pos.push_back(traj_pnt_pre.positions.at(4));
-            init_hand_pos.push_back(traj_pnt_pre.positions.at(6));
-            //velocities
-            init_hand_vel.push_back(traj_pnt_pre.velocities.at(0));
-            init_hand_vel.push_back(traj_pnt_pre.velocities.at(1));
-            init_hand_vel.push_back(traj_pnt_pre.velocities.at(4));
-            init_hand_vel.push_back(traj_pnt_pre.velocities.at(6));
-            //accelerations
-            init_hand_acc.push_back(traj_pnt_pre.accelerations.at(0));
-            init_hand_acc.push_back(traj_pnt_pre.accelerations.at(1));
-            init_hand_acc.push_back(traj_pnt_pre.accelerations.at(4));
-            init_hand_acc.push_back(traj_pnt_pre.accelerations.at(6));
+            moveit_msgs::RobotTrajectory rob_traj_pre;
+            vector<trajectory_msgs::JointTrajectoryPoint> points_pre;
+            trajectory_msgs::JointTrajectoryPoint traj_pnt_pre;
+            // positions of the fingers in the Barrett Hand
+            int fing_base = 0; int fing_1 = 1; int fing_2 = 4; int fing_3 = 6;
+            bool move;
+            if(m_results->trajectory_stages.size()>1){
+                 // pick and place movements
+                move=false;
+                rob_traj_pre = m_results->trajectory_stages.at(1);
+                points_pre = rob_traj_pre.joint_trajectory.points;
+                traj_pnt_pre = points_pre.at(0);
+                //positions
+                init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_base));
+                init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_1));
+                init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_2));
+                init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_3));
+                //velocities
+                init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_base));
+                init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_1));
+                init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_2));
+                init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_3));
+                //accelerations
+                init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_base));
+                init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_1));
+                init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_2));
+                init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_3));
+            }else{move=true;}
+
 
             double time_from_start = 0.0;
             for(size_t i=0; i<m_results->trajectory_stages.size(); ++i){
@@ -768,21 +777,21 @@ void MainWindow::on_pushButton_plan_clicked()
                                 jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_plan(jointsVelocity_stage_plan.rows()-1,k);
                                 jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_plan(jointsAcceleration_stage_plan.rows()-1,k);
                             }else if(k==JOINTS_ARM){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(0);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(0);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(0);
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_base);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_base);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_base);
                             }else if(k==JOINTS_ARM+1){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(1);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(1);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(1);
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_1);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_1);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_1);
                             }else if(k==JOINTS_ARM+2){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(4);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(4);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(4);
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_2);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_2);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_2);
                             }else if(k==JOINTS_ARM+3){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(6);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(6);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(6);
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_3);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_3);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_3);
                             }
                         }
                     }// points
@@ -847,21 +856,21 @@ void MainWindow::on_pushButton_plan_clicked()
                                 jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_approach(jointsVelocity_stage_approach.rows()-1,k);
                                 jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_approach(jointsAcceleration_stage_approach.rows()-1,k);
                             }else if(k==JOINTS_ARM){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(0);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(0);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(0);
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_base);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_base);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_base);
                             }else if(k==JOINTS_ARM+1){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(1);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(1);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(1);
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_1);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_1);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_1);
                             }else if(k==JOINTS_ARM+2){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(4);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(4);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(4);
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_2);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_2);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_2);
                             }else if(k==JOINTS_ARM+3){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(6);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(6);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(6);
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_3);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_3);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_3);
                             }
                         }
                     }// points
@@ -910,30 +919,89 @@ void MainWindow::on_pushButton_plan_clicked()
                     jointsVelocity_stage_retreat = jointsVelocity_stage_aux;
                     jointsAcceleration_stage_retreat = jointsAcceleration_stage_aux;
 
+                }else if(strcmp(traj_descr.c_str(),"target")==0){
+                    timesteps_stage_plan.clear(); timesteps_stage_aux.clear();
+                    rob_traj = m_results->trajectory_stages.at(i);
+                    points = rob_traj.joint_trajectory.points;
+                    jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                    for(size_t j=0; j<points.size();++j){
+                        if(j==0){
+                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
+                        }else{
+                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                        }
+                        trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
+                        for(size_t k=0; k<traj_pnt.positions.size();++k){
+                            if(k<JOINTS_ARM){
+                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(k);
+                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(k);
+                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(k);
+                            }else if(k==JOINTS_ARM+fing_base){
+                                jointsPosition_stage_aux(j,JOINTS_ARM) = traj_pnt.positions.at(k);
+                                jointsVelocity_stage_aux(j,JOINTS_ARM) = traj_pnt.velocities.at(k);
+                                jointsAcceleration_stage_aux(j,JOINTS_ARM) = traj_pnt.accelerations.at(k);
+                            }else if(k==JOINTS_ARM+fing_1){
+                                jointsPosition_stage_aux(j,JOINTS_ARM+1) = traj_pnt.positions.at(k);
+                                jointsVelocity_stage_aux(j,JOINTS_ARM+1) = traj_pnt.velocities.at(k);
+                                jointsAcceleration_stage_aux(j,JOINTS_ARM+1) = traj_pnt.accelerations.at(k);
+                            }else if(k==JOINTS_ARM+fing_2){
+                                jointsPosition_stage_aux(j,JOINTS_ARM+2) = traj_pnt.positions.at(k);
+                                jointsVelocity_stage_aux(j,JOINTS_ARM+2) = traj_pnt.velocities.at(k);
+                                jointsAcceleration_stage_aux(j,JOINTS_ARM+2) = traj_pnt.accelerations.at(k);
+                            }else if(k==JOINTS_ARM+fing_3){
+                                jointsPosition_stage_aux(j,JOINTS_ARM+3) = traj_pnt.positions.at(k);
+                                jointsVelocity_stage_aux(j,JOINTS_ARM+3) = traj_pnt.velocities.at(k);
+                                jointsAcceleration_stage_aux(j,JOINTS_ARM+3) = traj_pnt.accelerations.at(k);
+                            }
+                        }
+                    }// points
+                    time_from_start += points.at(points.size()-1).time_from_start.toSec();
+                    timesteps_stage_plan = timesteps_stage_aux;
+                    jointsPosition_stage_plan = jointsPosition_stage_aux;
+                    jointsVelocity_stage_plan = jointsVelocity_stage_aux;
+                    jointsAcceleration_stage_plan = jointsAcceleration_stage_aux;
+
                 }
 
             } // for loop stages
+            if(move){
+                //positions
+                this->jointsPosition_mov.clear();
+                this->jointsPosition_mov.push_back(jointsPosition_stage_plan);
+                //velocities
+                this->jointsVelocity_mov.clear();
+                this->jointsVelocity_mov.push_back(jointsVelocity_stage_plan);
+                //accelerations
+                this->jointsAcceleration_mov.clear();
+                this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_plan);
+                //time steps
+                this->timesteps_mov.clear();
+                this->timesteps_mov.push_back(timesteps_stage_plan);
+            }else{
+                //positions
+                this->jointsPosition_mov.clear();
+                this->jointsPosition_mov.push_back(jointsPosition_stage_plan);
+                this->jointsPosition_mov.push_back(jointsPosition_stage_approach);
+                this->jointsPosition_mov.push_back(jointsPosition_stage_retreat);
+                //velocities
+                this->jointsVelocity_mov.clear();
+                this->jointsVelocity_mov.push_back(jointsVelocity_stage_plan);
+                this->jointsVelocity_mov.push_back(jointsVelocity_stage_approach);
+                this->jointsVelocity_mov.push_back(jointsVelocity_stage_retreat);
+                //accelerations
+                this->jointsAcceleration_mov.clear();
+                this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_plan);
+                this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_approach);
+                this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_retreat);
+                //time steps
+                this->timesteps_mov.clear();
+                this->timesteps_mov.push_back(timesteps_stage_plan);
+                this->timesteps_mov.push_back(timesteps_stage_approach);
+                this->timesteps_mov.push_back(timesteps_stage_retreat);
+            }
 
-            //positions
-            this->jointsPosition_mov.clear();
-            this->jointsPosition_mov.push_back(jointsPosition_stage_plan);
-            this->jointsPosition_mov.push_back(jointsPosition_stage_approach);
-            this->jointsPosition_mov.push_back(jointsPosition_stage_retreat);
-            //velocities
-            this->jointsVelocity_mov.clear();
-            this->jointsVelocity_mov.push_back(jointsVelocity_stage_plan);
-            this->jointsVelocity_mov.push_back(jointsVelocity_stage_approach);
-            this->jointsVelocity_mov.push_back(jointsVelocity_stage_retreat);
-            //accelerations
-            this->jointsAcceleration_mov.clear();
-            this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_plan);
-            this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_approach);
-            this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_retreat);
-            //time steps
-            this->timesteps_mov.clear();
-            this->timesteps_mov.push_back(timesteps_stage_plan);
-            this->timesteps_mov.push_back(timesteps_stage_approach);
-            this->timesteps_mov.push_back(timesteps_stage_retreat);
 
             this->moveit_mov = true;
             solved=true;
@@ -1486,6 +1554,7 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     this->jointsPosition_mov.clear();
     this->timesteps_mov.clear();
     this->tols_stop_mov.clear();
+    this->m_planner.reset(new moveit_planning::HumanoidPlanner(this->init_scene->getName()));
 
     this->curr_scene = scenarioPtr(new Scenario(*(this->init_scene.get())));
     qnode.resetSimTime();
@@ -1548,6 +1617,8 @@ void MainWindow::on_pushButton_scene_reset_clicked()
         qnode.log(QNode::Info,success);
         ui.groupBox_getElements->setEnabled(true);
         ui.groupBox_homePosture->setEnabled(true);
+        std::vector<objectPtr> objs; this->curr_scene->getObjects(objs);
+        qnode.loadRVizScenario(objs);
 
     }else{
 
