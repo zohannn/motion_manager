@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RRTDialog</class>
- <widget class="QDialog" name="RRTDialog">
+ <class>PRMDialog</class>
+ <widget class="QDialog" name="PRMDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -35,7 +35,7 @@
        <x>10</x>
        <y>20</y>
        <width>371</width>
-       <height>121</height>
+       <height>131</height>
       </rect>
      </property>
      <property name="title">
@@ -44,15 +44,15 @@
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>21</x>
-        <y>31</y>
-        <width>342</width>
+        <x>23</x>
+        <y>33</y>
+        <width>333</width>
         <height>83</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="QRadioButton" name="radioButton_default">
            <property name="text">
@@ -66,7 +66,7 @@
          <item>
           <widget class="QLabel" name="label">
            <property name="text">
-            <string>range = 0.0 goal_bias = 0.05</string>
+            <string>max_nearest_neighbors: 10</string>
            </property>
           </widget>
          </item>
@@ -84,14 +84,14 @@
          <item>
           <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>range = 0.05 goal_bias = 0.1</string>
+            <string>max_nearest_neighbors: 20</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="QRadioButton" name="radioButton_2">
            <property name="text">
@@ -102,7 +102,7 @@
          <item>
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>range = 0.1 goal_bias = 0.01</string>
+            <string>max_nearest_neighbors: 5</string>
            </property>
           </widget>
          </item>
@@ -734,7 +734,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>RRTDialog</receiver>
+   <receiver>PRMDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -750,7 +750,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>RRTDialog</receiver>
+   <receiver>PRMDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -54,6 +54,22 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mRRTdlg = new RRTDialog(this);
     mRRTdlg->setModal(true);
 
+    //create RRT Connect Tuning dialog
+    mRRTConnectdlg = new RRTConnectDialog(this);
+    mRRTConnectdlg->setModal(true);
+
+    //create RRT star Tuning dialog
+    mRRTstardlg = new RRTstarDialog(this);
+    mRRTstardlg->setModal(true);
+
+    //create PRM Tuning dialog
+    mPRMdlg = new PRMDialog(this);
+    mPRMdlg->setModal(true);
+
+    //create PRM star Tuning dialog
+    mPRMstardlg = new PRMstarDialog(this);
+    mPRMstardlg->setModal(true);
+
 
     ReadSettings();
     setWindowIcon(QIcon(":/images/motion_managerIcon.png"));
@@ -271,12 +287,22 @@ void MainWindow::on_pushButton_tuning_clicked()
     int planner_id = prob->getPlannerID();
     switch(planner_id){
     case 0: // HUML
-            mTolHumldlg->show();
+        mTolHumldlg->show();
         break;
     case 1: // RRT
         mRRTdlg->show();
         break;
-    case 2:
+    case 2: //RRTConnect
+        mRRTConnectdlg->show();
+        break;
+    case 3: //RRTstar
+        mRRTstardlg->show();
+        break;
+    case 4: //PRM
+        mPRMdlg->show();
+        break;
+    case 5: // PRMstar
+        mPRMstardlg->show();
         break;
     }
 
@@ -592,12 +618,14 @@ void MainWindow::on_pushButton_plan_clicked()
     int planner_id = prob->getPlannerID();
     HUMotion::huml_params  tols;
     moveit_planning::moveit_params m_params;
+    bool moveit_plan = false;
 
     bool solved = false;
  try{
     switch(planner_id){
 
     case 0: // HUML
+        moveit_plan = false;
         mTolHumldlg->setInfo(prob->getInfoLine());
         // --- Tolerances for the final posture selection ---- //
         tols.tolTarPos = mTolHumldlg->getTolTarPos(); // target position tolerances
@@ -669,6 +697,7 @@ void MainWindow::on_pushButton_plan_clicked()
 
         break;
     case 1: // RRT
+        moveit_plan = true;
         mRRTdlg->setInfo(prob->getInfoLine());
         // configuration
         m_params.config = mRRTdlg->getConfig();
@@ -677,10 +706,77 @@ void MainWindow::on_pushButton_plan_clicked()
         mRRTdlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
         mRRTdlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
         mRRTdlg->getPostPlaceRetreat(m_params.post_place_retreat); // place retreat
-
-
         m_results = prob->solve(m_params); // plan the movement
         ui.pushButton_plan->setCheckable(false);
+
+        break;
+
+    case 2: // RRT Connect
+        moveit_plan = true;
+        mRRTConnectdlg->setInfo(prob->getInfoLine());
+        // configuration
+        m_params.config = mRRTConnectdlg->getConfig();
+        // pick/place settings
+        mRRTConnectdlg->getPreGraspApproach(m_params.pre_grasp_approach); // pick approach
+        mRRTConnectdlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
+        mRRTConnectdlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
+        mRRTConnectdlg->getPostPlaceRetreat(m_params.post_place_retreat); // place retreat
+        m_results = prob->solve(m_params); // plan the movement
+        ui.pushButton_plan->setCheckable(false);
+
+        break;
+
+    case 3: // RRT star
+        moveit_plan = true;
+        mRRTstardlg->setInfo(prob->getInfoLine());
+        // configuration
+        m_params.config = mRRTstardlg->getConfig();
+        // pick/place settings
+        mRRTstardlg->getPreGraspApproach(m_params.pre_grasp_approach); // pick approach
+        mRRTstardlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
+        mRRTstardlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
+        mRRTstardlg->getPostPlaceRetreat(m_params.post_place_retreat); // place retreat
+        m_results = prob->solve(m_params); // plan the movement
+        ui.pushButton_plan->setCheckable(false);
+
+        break;
+
+    case 4: // PRM
+        moveit_plan = true;
+        mPRMdlg->setInfo(prob->getInfoLine());
+        // configuration
+        m_params.config = mPRMdlg->getConfig();
+        // pick/place settings
+        mPRMdlg->getPreGraspApproach(m_params.pre_grasp_approach); // pick approach
+        mPRMdlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
+        mPRMdlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
+        mPRMdlg->getPostPlaceRetreat(m_params.post_place_retreat); // place retreat
+        m_results = prob->solve(m_params); // plan the movement
+        ui.pushButton_plan->setCheckable(false);
+
+        break;
+
+    case 5: // PRM star
+        moveit_plan = true;
+        mPRMstardlg->setInfo(prob->getInfoLine());
+        // configuration
+        m_params.config = mRRTdlg->getConfig();
+        // pick/place settings
+        mPRMstardlg->getPreGraspApproach(m_params.pre_grasp_approach); // pick approach
+        mPRMstardlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
+        mPRMstardlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
+        mPRMstardlg->getPostPlaceRetreat(m_params.post_place_retreat); // place retreat
+        m_results = prob->solve(m_params); // plan the movement
+        ui.pushButton_plan->setCheckable(false);
+
+        break;
+
+    } // switch planners
+
+}catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
+}catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
+
+    if(moveit_plan){
         if(m_results->status==1){
             qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
             this->curr_mov = prob->getMovement();
@@ -1001,8 +1097,6 @@ void MainWindow::on_pushButton_plan_clicked()
                 this->timesteps_mov.push_back(timesteps_stage_approach);
                 this->timesteps_mov.push_back(timesteps_stage_retreat);
             }
-
-
             this->moveit_mov = true;
             solved=true;
 
@@ -1010,11 +1104,7 @@ void MainWindow::on_pushButton_plan_clicked()
             ui.tableWidget_sol_mov->clear();
             qnode.log(QNode::Error,std::string("The planning has failed: ")+m_results->status_msg);
         }
-
-        break;
-
-
-    } // switch planners
+    }
 
 if(solved){
     QStringList h_headers; bool h_head=false; QStringList v_headers;
@@ -1068,8 +1158,6 @@ if(solved){
     }
 }
 
-}catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
-}catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
 
 
 }

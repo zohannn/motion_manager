@@ -1,17 +1,17 @@
-#ifndef RRTDIALOG_HPP
-#define RRTDIALOG_HPP
+#ifndef RRTCONNECTDIALOG_HPP
+#define RRTCONNECTDIALOG_HPP
 
 #include <QDialog>
 #include <QFileDialog>
 #include <QFile>
 #include <QTextStream>
 #include <cstring>
-#include <ui_rrtdialog.h>
+#include <ui_rrtconnectdialog.h>
 #include "config.hpp"
 
 namespace motion_manager {
 
-class RRTDialog : public QDialog
+class RRTConnectDialog : public QDialog
 {
     Q_OBJECT
 
@@ -29,15 +29,15 @@ public Q_SLOTS:
 
 public:
     /**
-     * @brief RRTDialog, a constructor
+     * @brief RRTConnectDialog, a constructor
      * @param parent
      */
-    explicit RRTDialog(QWidget *parent = 0);
+    explicit RRTConnectDialog(QWidget *parent = 0);
 
     /**
-     * @brief ~RRTDialog, a destructor
+     * @brief ~RRTConnectDialog, a destructor
      */
-    ~RRTDialog();
+    ~RRTConnectDialog();
 
     /**
      * @brief getPreGraspApproach
@@ -78,10 +78,10 @@ public:
 
 
 private:
-    Ui::RRTDialog *ui; /**< handle of the user interface */
+    Ui::RRTConnectDialog *ui; /**< handle of the user interface */
     std::string config; /**< current configuration */
     std::string infoLine; /**< information about the tuning of the planner */
 };
 
 } // namespace motion_manager
-#endif // RRTDIALOG_HPP
+#endif // RRTCONNECTDIALOG_HPP

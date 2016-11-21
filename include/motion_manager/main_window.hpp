@@ -16,9 +16,10 @@
 #include "toldialoghuml.hpp"
 #include "config.hpp"
 #include "rrtdialog.hpp"
-
-
-
+#include "rrtconnectdialog.hpp"
+#include "rrtstardialog.hpp"
+#include "prmdialog.hpp"
+#include "prmstardialog.hpp"
 
 using namespace std;
 
@@ -56,7 +57,7 @@ public:
         void ReadSettings();
 
         /**
-         * @brief This method saves qt program settings when closing
+         * @brief This method saves qt program settings when closing the main_window
          */
         void WriteSettings();
 
@@ -283,6 +284,10 @@ private:
         RVizCommDialog *mrvizCommdlg; /**< handle of the RViz communication dialog */
         TolDialogHUML *mTolHumldlg; /**< handle of the HUML tuning dialog */
         RRTDialog *mRRTdlg; /**< handle of the RRT tuning dialog */
+        RRTConnectDialog *mRRTConnectdlg; /**< handle of the RRT Connect tuning dialog */
+        RRTstarDialog *mRRTstardlg; /**< handle of the RRT star tuning dialog */
+        PRMDialog *mPRMdlg; /**< handle of the PRM tuning dialog */
+        PRMstarDialog *mPRMstardlg; /**< handle of the PRM star tuning dlg */
         int scenario_id; /**< id of the current scenario */
 
         vector< vector < double > > timesteps_mov; /**< current time steps of the movement */

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RRTDialog</class>
- <widget class="QDialog" name="RRTDialog">
+ <class>PRMstarDialog</class>
+ <widget class="QDialog" name="PRMstarDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -34,8 +34,8 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>371</width>
-       <height>121</height>
+       <width>541</width>
+       <height>161</height>
       </rect>
      </property>
      <property name="title">
@@ -44,10 +44,10 @@
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>21</x>
-        <y>31</y>
-        <width>342</width>
-        <height>83</height>
+        <x>20</x>
+        <y>32</y>
+        <width>512</width>
+        <height>112</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -66,7 +66,7 @@
          <item>
           <widget class="QLabel" name="label">
            <property name="text">
-            <string>range = 0.0 goal_bias = 0.05</string>
+            <string>optimization_objective: PathLengthOptimizationObjective</string>
            </property>
           </widget>
          </item>
@@ -84,7 +84,7 @@
          <item>
           <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>range = 0.05 goal_bias = 0.1</string>
+            <string>optimization_objective: MaximizeMinClearanceObjective</string>
            </property>
           </widget>
          </item>
@@ -102,7 +102,25 @@
          <item>
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>range = 0.1 goal_bias = 0.01</string>
+            <string>optimization_objective: StateCostIntegralObjective</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QRadioButton" name="radioButton_3">
+           <property name="text">
+            <string>Configuration 3</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>optimization_objective: MinimaxObjective</string>
            </property>
           </widget>
          </item>
@@ -734,7 +752,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>RRTDialog</receiver>
+   <receiver>PRMstarDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -750,7 +768,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>RRTDialog</receiver>
+   <receiver>PRMstarDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
