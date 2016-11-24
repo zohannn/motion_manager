@@ -122,6 +122,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 #elif HAND == 1
 
     ui.listWidget_scenario->addItem(QString("Assembly scenario: Toy vehicle with ARoS"));
+    ui.listWidget_scenario->addItem(QString("Empty scenario: empty scenario with ARoS"));
     //ui.listWidget_scenario->addItem(QString("Assistive scenario: beverages with ARoS"));
     //ui.listWidget_scenario->addItem(QString("Organizing scenario: shelfs and objects with ARoS"));
 
@@ -315,8 +316,9 @@ void MainWindow::on_pushButton_loadScenario_clicked()
     // scenarios
     QVector<QString> scenarios;
         //0 --> Toy vehicle scenario
-        //1 --> Beverages scenario
-        //2 --> shelfs and objects scenario
+        //1 --> Empty scenario
+        //2 --> Beverages scenario
+        //3 --> shelfs and objects scenario
 #if HAND == 0
 
     scenarios.push_back(QString("Assembly scenario: Toy vehicle with Jarde"));
@@ -326,32 +328,28 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 #elif HAND == 1
 
     scenarios.push_back(QString("Assembly scenario: Toy vehicle with ARoS"));
+    scenarios.push_back(QString("Empty scenario: empty scenario with ARoS"));
     //scenarios.push_back(QString("Assistive scenario: beverages with ARoS"));
     //scenarios.push_back(QString("Organizing scenario: shelfs and objects with ARoS"));
 
 #endif
 
     //this->scenario_id = ui.listWidget_scenario->currentRow();
-
     QString scenario_text = ui.listWidget_scenario->currentItem()->text();
-
     int equal;
     for(int i=0; i<scenarios.size();++i){
-
          equal = scenario_text.compare(scenarios.at(i));
          if(equal==0){
-
+             // Empty scenario with ARoS
+             string path_vrep_emptyscene_aros = PATH_SCENARIOS+string("/vrep/empty_aros.ttt");
              // Toy vehicle scenario with ARoS
              string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
              //string path_rviz_toyscene_aros = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
-
              // Toy vehicle scenario with Jarde
              string path_vrep_toyscene_jarde = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_jarde.ttt");
              //string path_rviz_toyscene_jarde = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
-
              switch(i){
-
-             case 0:
+             case 0: // Assembly scenario
 
 #if HAND == 0
              // Assembly scenario: the Toy vehicle with Jarde
@@ -391,7 +389,6 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 
                  }else{
-
                      qnode.log(QNode::Error,std::string("Assembly scenario: the Toy vehicle with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
@@ -401,17 +398,36 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 
 #endif
 
-             case 1:
-                 // Assistive scenario: beverages
+             case 1:// Empty scenario
+#if HAND==0
 
-                 //TO DO
+#elif HAND==1
+                 // Empty scenario with ARoS
+                 this->scenario_id = 2;
+                 if (qnode.loadScenario(path_vrep_emptyscene_aros,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Empty scenario: empty scenario with ARoS HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Empty scenario: empty with ARoS");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 
+                 }else{
+                     qnode.log(QNode::Error,std::string("Empty scenario: empty scenario with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+
+#endif
                  break;
-
-             case 2:
-                 // Organizing scenario: shelfs ad objects
+             case 2:// Assistive scenario: beverages
                  //TO DO
-
+                 break;
+             case 3: // Organizing scenario: shelfs ad objects
+                 //TO DO
                  break;
 
              }
@@ -1938,18 +1954,23 @@ void MainWindow::onListScenarioItemClicked(QListWidgetItem *item)
         if (ui.listWidget_scenario->item(i)== item) {
             switch(i){
 
-            case(0):
+            case 0:
                 // Assembly scenario: the Toy vehicle with ARoS
                 ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
                                                          "ARoS has to assemble a toy vehicle on a table in front of him"));
                 break;
+            case 1:
+                //Empty scenario: empty with ARoS
+                ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
+                                                         "ARoS moves in a empty workspace"));
+                break;
 
-            case(1):
+            case 2:
                 //Assistive scenario: beverages with ARoS
 
                 break;
 
-            case(2):
+            case 3:
                 //Organizing scenario: shelfs and objects with ARoS
 
                 break;
