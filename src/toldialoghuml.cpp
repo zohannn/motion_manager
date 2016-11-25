@@ -13,6 +13,7 @@ TolDialogHUML::TolDialogHUML(QWidget *parent) :
 
      QObject::connect(ui->checkBox_approach, SIGNAL(stateChanged(int)), this, SLOT(checkApproach(int)));
      QObject::connect(ui->checkBox_retreat, SIGNAL(stateChanged(int)), this, SLOT(checkRetreat(int)));
+     QObject::connect(ui->checkBox_sel_final_posture, SIGNAL(stateChanged(int)), this, SLOT(checkFinalPosture(int)));
 
     if(ui->checkBox_approach->isChecked()){
         ui->groupBox_pre_grasp->setEnabled(false);
@@ -294,6 +295,38 @@ void TolDialogHUML::getPostPlaceRetreat(std::vector<double> &post_place)
     post_place.push_back(ui->lineEdit_post_place_dist->text().toDouble());
 }
 
+void TolDialogHUML::getTargetMove(std::vector<double> &target)
+{
+    target.clear();
+    target.push_back(ui->lineEdit_target_x->text().toDouble());
+    target.push_back(ui->lineEdit_target_y->text().toDouble());
+    target.push_back(ui->lineEdit_target_z->text().toDouble());
+    target.push_back(ui->lineEdit_target_roll->text().toDouble());
+    target.push_back(ui->lineEdit_target_pitch->text().toDouble());
+    target.push_back(ui->lineEdit_target_yaw->text().toDouble());
+}
+
+void TolDialogHUML::getFinalArm(std::vector<double> &finalArm)
+{
+    finalArm.clear();
+    finalArm.push_back(ui->lineEdit_final_arm_1->text().toDouble());
+    finalArm.push_back(ui->lineEdit_final_arm_2->text().toDouble());
+    finalArm.push_back(ui->lineEdit_final_arm_3->text().toDouble());
+    finalArm.push_back(ui->lineEdit_final_arm_4->text().toDouble());
+    finalArm.push_back(ui->lineEdit_final_arm_5->text().toDouble());
+    finalArm.push_back(ui->lineEdit_final_arm_6->text().toDouble());
+    finalArm.push_back(ui->lineEdit_final_arm_7->text().toDouble());
+}
+
+void TolDialogHUML::getFinalHand(std::vector<double> &finalHand)
+{
+    finalHand.clear();
+    finalHand.push_back(ui->lineEdit_final_hand_1->text().toDouble());
+    finalHand.push_back(ui->lineEdit_final_hand_2->text().toDouble());
+    finalHand.push_back(ui->lineEdit_final_hand_3->text().toDouble());
+    finalHand.push_back(ui->lineEdit_final_hand_4->text().toDouble());
+}
+
 
 // Q_SLOTS
 
@@ -471,6 +504,24 @@ void TolDialogHUML::on_pushButton_save_clicked()
        stream << "post_place_z="<< ui->lineEdit_post_place_z->text().toStdString().c_str() << endl;
        stream << "post_place_dist="<< ui->lineEdit_post_place_dist->text().toStdString().c_str() << endl;
        stream << "# Move settings" << endl;
+       stream << "target_x=" << ui->lineEdit_target_x->text().toStdString().c_str() << endl;
+       stream << "target_y=" << ui->lineEdit_target_y->text().toStdString().c_str() << endl;
+       stream << "target_z=" << ui->lineEdit_target_z->text().toStdString().c_str() << endl;
+       stream << "target_roll=" << ui->lineEdit_target_roll->text().toStdString().c_str() << endl;
+       stream << "target_pitch=" << ui->lineEdit_target_pitch->text().toStdString().c_str() << endl;
+       stream << "target_yaw=" << ui->lineEdit_target_yaw->text().toStdString().c_str() << endl;
+       stream << "final_arm_1=" << ui->lineEdit_final_arm_1->text().toStdString().c_str() << endl;
+       stream << "final_arm_2=" << ui->lineEdit_final_arm_2->text().toStdString().c_str() << endl;
+       stream << "final_arm_3=" << ui->lineEdit_final_arm_3->text().toStdString().c_str() << endl;
+       stream << "final_arm_4=" << ui->lineEdit_final_arm_4->text().toStdString().c_str() << endl;
+       stream << "final_arm_5=" << ui->lineEdit_final_arm_5->text().toStdString().c_str() << endl;
+       stream << "final_arm_6=" << ui->lineEdit_final_arm_6->text().toStdString().c_str() << endl;
+       stream << "final_arm_7=" << ui->lineEdit_final_arm_7->text().toStdString().c_str() << endl;
+       stream << "final_hand_1=" << ui->lineEdit_final_hand_1->text().toStdString().c_str() << endl;
+       stream << "final_hand_2=" << ui->lineEdit_final_hand_2->text().toStdString().c_str() << endl;
+       stream << "final_hand_3=" << ui->lineEdit_final_hand_3->text().toStdString().c_str() << endl;
+       stream << "final_hand_4=" << ui->lineEdit_final_hand_4->text().toStdString().c_str() << endl;
+       if (ui->checkBox_sel_final_posture->isChecked()){ stream << "sel_final=true"<< endl;}else{stream << "sel_final=false"<< endl;}
        stream << "# Others" << endl;
        stream << "max_velocity="<< ui->lineEdit_w_max->text().toStdString().c_str() <<endl;
        stream << "steps=" << ui->lineEdit_steps->text().toStdString().c_str()<< endl;
@@ -808,6 +859,46 @@ void TolDialogHUML::on_pushButton_load_clicked()
                     ui->lineEdit_post_place_z->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("post_place_dist"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_post_place_dist->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("target_x"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_target_x->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("target_y"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_target_y->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("target_z"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_target_z->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("target_roll"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_target_roll->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("target_pitch"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_target_pitch->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("target_yaw"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_target_yaw->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_arm_1"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_arm_1->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_arm_2"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_arm_2->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_arm_3"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_arm_3->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_arm_4"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_arm_4->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_arm_5"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_arm_5->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_arm_6"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_arm_6->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_arm_7"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_arm_7->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_hand_1"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_hand_1->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_hand_2"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_hand_2->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_hand_3"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_hand_3->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("final_hand_4"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_final_hand_4->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("sel_final"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_sel_final_posture->setChecked(false);
+                    }else{
+                        ui->checkBox_sel_final_posture->setChecked(true);
+                    }
                 }else if(QString::compare(fields.at(0),QString("max_velocity"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_w_max->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("steps"),Qt::CaseInsensitive)==0){
@@ -888,10 +979,28 @@ void TolDialogHUML::checkRetreat(int state)
     }
 }
 
+void TolDialogHUML::checkFinalPosture(int state)
+{
+    if(state==0){
+        // unchecked
+        ui->groupBox_target->setEnabled(true);
+        ui->groupBox_final_arm->setEnabled(false);
+    }else{
+        //checked
+        ui->groupBox_target->setEnabled(false);
+        ui->groupBox_final_arm->setEnabled(true);
+    }
+}
+
 
 bool TolDialogHUML::getRandInit()
 {
     return ui->checkBox_rand_init->isChecked();
+}
+
+bool TolDialogHUML::get_use_final_posture()
+{
+    return ui->checkBox_sel_final_posture->isChecked();
 }
 
 

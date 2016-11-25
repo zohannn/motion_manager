@@ -99,6 +99,15 @@ public:
     void setPartOfTask(bool p);
 
     /**
+     * @brief setMoveSettings
+     * @param tar
+     * @param final_hand
+     * @param final_arm
+     * @param use_posture
+     */
+    void setMoveSettings(std::vector<double> &tar, std::vector<double> &final_hand, std::vector<double> &final_arm, bool use_posture);
+
+    /**
      * @brief This method solves the problem given the tolerances and the parameters of the planner HUML
      * @param tols
      * @return
@@ -208,6 +217,12 @@ private:
 
     int planner_id; /**<  planner id of the selected planner */
     string planner_name; /**< name of the selected planner */
+
+    // move movements settings
+    std::vector<double> move_final_hand;/**< goal hand posture in move movements */
+    std::vector<double> move_final_arm;/**< goal arm posture in move movements */
+    std::vector<double> move_target;/**< goal target pose of the end-effector in move movements */
+    bool use_posture;/**< true to use the move_final_arm, false to use move_target in move movements */
 
     moveit_plannerPtr m_planner; /**< MoveIt! Libraries planner */
     h_plannerPtr h_planner; /**< Human-like Upper-limbs Motion Planner */

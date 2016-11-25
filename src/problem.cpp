@@ -328,6 +328,14 @@ void Problem::setPartOfTask(bool p)
     this->part_of_task=p;
 }
 
+void Problem::setMoveSettings(std::vector<double> &tar, std::vector<double> &final_hand, std::vector<double> &final_arm, bool use_posture)
+{
+    this->move_target=tar;
+    this->move_final_hand=final_hand;
+    this->move_final_arm=final_arm;
+    this->use_posture=use_posture;
+}
+
 bool Problem::finalPostureFingers(int hand_id)
 {
 
@@ -941,6 +949,8 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
         this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
         if(mov_type==5){
           this->scene->getHumanoid()->getRightHandHomePosture(finalHand);
+        }else if(mov_type==1){
+            finalHand=this->move_final_hand;
         }else{
             dHO=this->dHOr;
             tar = obj->getTargetRight();
@@ -953,6 +963,8 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
         this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
         if(mov_type==5){
           this->scene->getHumanoid()->getLeftHandHomePosture(finalHand);
+        }else if(mov_type==1){
+            finalHand=this->move_final_hand;
         }else{
             dHO=this->dHOl;
             finalHand = this->leftFinalHand;
@@ -1017,6 +1029,12 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
         res =  this->h_planner->plan_pick(params,initPosture);
         break;
     case 1:// reaching
+        if(this->use_posture){
+          res = this->h_planner->plan_move(params,initPosture,this->move_final_arm);
+        }else{
+         params.mov_specs.target=this->move_target;
+         res = this->h_planner->plan_move(params,initPosture);
+        }
         break;
     case 2://transport
         break;

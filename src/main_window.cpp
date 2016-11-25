@@ -633,6 +633,10 @@ void MainWindow::on_pushButton_plan_clicked()
     problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
     int planner_id = prob->getPlannerID();
     HUMotion::huml_params  tols;
+    std::vector<double> move_target;
+    std::vector<double> move_final_hand;
+    std::vector<double> move_final_arm;
+    bool use_final;
     moveit_planning::moveit_params m_params;
     bool moveit_plan = false;
 
@@ -683,6 +687,12 @@ void MainWindow::on_pushButton_plan_clicked()
         mTolHumldlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
         mTolHumldlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
         tols.mov_specs.rand_init = mTolHumldlg->getRandInit(); // random initialization for "plan" stages
+        // move settings
+        mTolHumldlg->getTargetMove(move_target);
+        mTolHumldlg->getFinalHand(move_final_hand);
+        mTolHumldlg->getFinalArm(move_final_arm);
+        use_final = mTolHumldlg->get_use_final_posture();
+        prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
 
         h_results = prob->solve(tols); // plan the movement
 

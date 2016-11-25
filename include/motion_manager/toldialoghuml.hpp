@@ -46,6 +46,12 @@ public Q_SLOTS:
      */
     void checkRetreat(int state);
 
+    /**
+     * @brief checkFinalPosture
+     * @param state
+     */
+    void checkFinalPosture(int state);
+
 
 public:
 
@@ -211,6 +217,30 @@ public:
      * @return
      */
     bool getRandInit();
+
+    /**
+     * @brief getTargetMove
+     * @param target
+     */
+    void getTargetMove(std::vector<double> &target);
+
+    /**
+     * @brief getFinalHand
+     * @param finalHand
+     */
+    void getFinalHand(std::vector<double> &finalHand);
+
+    /**
+     * @brief getFinalArm
+     * @param finalArm
+     */
+    void getFinalArm(std::vector<double> &finalArm);
+
+    /**
+     * @brief get_use_final_posture
+     * @return
+     */
+    bool get_use_final_posture();
 
 
 
