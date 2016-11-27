@@ -693,6 +693,8 @@ void MainWindow::on_pushButton_plan_clicked()
         mTolHumldlg->getFinalArm(move_final_arm);
         use_final = mTolHumldlg->get_use_final_posture();
         prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
+        tols.mov_specs.use_move_plane = mTolHumldlg->get_add_plane();
+        mTolHumldlg->getPlaneParameters(tols.mov_specs.plane_params);
 
         h_results = prob->solve(tols); // plan the movement
 

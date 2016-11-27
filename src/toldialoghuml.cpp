@@ -14,6 +14,7 @@ TolDialogHUML::TolDialogHUML(QWidget *parent) :
      QObject::connect(ui->checkBox_approach, SIGNAL(stateChanged(int)), this, SLOT(checkApproach(int)));
      QObject::connect(ui->checkBox_retreat, SIGNAL(stateChanged(int)), this, SLOT(checkRetreat(int)));
      QObject::connect(ui->checkBox_sel_final_posture, SIGNAL(stateChanged(int)), this, SLOT(checkFinalPosture(int)));
+     QObject::connect(ui->checkBox_add_plane, SIGNAL(stateChanged(int)), this, SLOT(checkAddPlane(int)));
 
     if(ui->checkBox_approach->isChecked()){
         ui->groupBox_pre_grasp->setEnabled(false);
@@ -328,6 +329,64 @@ void TolDialogHUML::getFinalHand(std::vector<double> &finalHand)
 }
 
 
+void TolDialogHUML::getPlaneParameters(std::vector<double> &params)
+{
+    params.clear(); double a,b,c,d;
+    std::vector<double> point1;
+    std::vector<double> point2;
+    std::vector<double> point3;
+
+    point1.push_back(ui->lineEdit_point_1_x->text().toDouble());
+    point1.push_back(ui->lineEdit_point_1_y->text().toDouble());
+    point1.push_back(ui->lineEdit_point_1_z->text().toDouble());
+
+    point2.push_back(ui->lineEdit_point_2_x->text().toDouble());
+    point2.push_back(ui->lineEdit_point_2_y->text().toDouble());
+    point2.push_back(ui->lineEdit_point_2_z->text().toDouble());
+
+    point3.push_back(ui->lineEdit_point_3_x->text().toDouble());
+    point3.push_back(ui->lineEdit_point_3_y->text().toDouble());
+    point3.push_back(ui->lineEdit_point_3_z->text().toDouble());
+
+
+    Matrix3d D; double det;
+    D << point1.at(0),point1.at(1),point1.at(2),
+        point2.at(0),point2.at(1),point2.at(2),
+        point3.at(0),point3.at(1),point3.at(2);
+
+    det = D.determinant();
+
+    if(det!=0){
+        d=1;
+
+        Matrix3d A;
+        A << 1,point1.at(1),point1.at(2),
+            1,point2.at(1),point2.at(2),
+            1,point3.at(1),point3.at(2);
+        a = (-d*A.determinant())/det;
+
+        Matrix3d B;
+        B << point1.at(0),1,point1.at(2),
+            point2.at(0),1,point2.at(2),
+            point3.at(0),1,point3.at(2);
+        b = (-d*B.determinant())/det;
+
+        Matrix3d C;
+        C << point1.at(0),point1.at(1),1,
+            point2.at(0),point2.at(1),1,
+            point3.at(0),point3.at(1),1;
+        c = (-d*C.determinant())/det;
+
+        params.push_back(a);
+        params.push_back(b);
+        params.push_back(c);
+        params.push_back(d);
+    }
+
+
+
+}
+
 // Q_SLOTS
 
 void TolDialogHUML::on_pushButton_save_clicked()
@@ -522,6 +581,16 @@ void TolDialogHUML::on_pushButton_save_clicked()
        stream << "final_hand_3=" << ui->lineEdit_final_hand_3->text().toStdString().c_str() << endl;
        stream << "final_hand_4=" << ui->lineEdit_final_hand_4->text().toStdString().c_str() << endl;
        if (ui->checkBox_sel_final_posture->isChecked()){ stream << "sel_final=true"<< endl;}else{stream << "sel_final=false"<< endl;}
+       stream << "plane_point1_x=" << ui->lineEdit_point_1_x->text().toStdString().c_str() << endl;
+       stream << "plane_point1_y=" << ui->lineEdit_point_1_y->text().toStdString().c_str() << endl;
+       stream << "plane_point1_z=" << ui->lineEdit_point_1_z->text().toStdString().c_str() << endl;
+       stream << "plane_point2_x=" << ui->lineEdit_point_2_x->text().toStdString().c_str() << endl;
+       stream << "plane_point2_y=" << ui->lineEdit_point_2_y->text().toStdString().c_str() << endl;
+       stream << "plane_point2_z=" << ui->lineEdit_point_2_z->text().toStdString().c_str() << endl;
+       stream << "plane_point3_x=" << ui->lineEdit_point_3_x->text().toStdString().c_str() << endl;
+       stream << "plane_point3_y=" << ui->lineEdit_point_3_y->text().toStdString().c_str() << endl;
+       stream << "plane_point3_z=" << ui->lineEdit_point_3_z->text().toStdString().c_str() << endl;
+       if (ui->checkBox_add_plane->isChecked()){ stream << "add_plane=true"<< endl;}else{stream << "add_plane=false"<< endl;}
        stream << "# Others" << endl;
        stream << "max_velocity="<< ui->lineEdit_w_max->text().toStdString().c_str() <<endl;
        stream << "steps=" << ui->lineEdit_steps->text().toStdString().c_str()<< endl;
@@ -898,6 +967,30 @@ void TolDialogHUML::on_pushButton_load_clicked()
                         ui->checkBox_sel_final_posture->setChecked(false);
                     }else{
                         ui->checkBox_sel_final_posture->setChecked(true);
+                    }                    
+                }else if(QString::compare(fields.at(0),QString("plane_point1_x"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_point_1_x->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("plane_point1_y"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_point_1_y->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("plane_point1_z"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_point_1_z->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("plane_point2_x"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_point_2_x->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("plane_point2_y"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_point_2_y->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("plane_point2_z"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_point_2_z->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("plane_point3_x"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_point_3_x->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("plane_point3_y"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_point_3_y->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("plane_point3_z"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_point_3_z->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("add_plane"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_add_plane->setChecked(false);
+                    }else{
+                        ui->checkBox_add_plane->setChecked(true);
                     }
                 }else if(QString::compare(fields.at(0),QString("max_velocity"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_w_max->setText(fields.at(1));
@@ -992,6 +1085,17 @@ void TolDialogHUML::checkFinalPosture(int state)
     }
 }
 
+void TolDialogHUML::checkAddPlane(int state)
+{
+    if(state==0){
+        //unchecked
+        ui->groupBox_plane->setEnabled(false);
+    }else{
+        //checked
+        ui->groupBox_plane->setEnabled(true);
+    }
+}
+
 
 bool TolDialogHUML::getRandInit()
 {
@@ -1001,6 +1105,11 @@ bool TolDialogHUML::getRandInit()
 bool TolDialogHUML::get_use_final_posture()
 {
     return ui->checkBox_sel_final_posture->isChecked();
+}
+
+bool TolDialogHUML::get_add_plane()
+{
+    return ui->checkBox_add_plane->isChecked();
 }
 
 

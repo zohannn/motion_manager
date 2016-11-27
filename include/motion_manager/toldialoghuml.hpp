@@ -52,6 +52,12 @@ public Q_SLOTS:
      */
     void checkFinalPosture(int state);
 
+    /**
+     * @brief checkAddPlane
+     * @param state
+     */
+    void checkAddPlane(int state);
+
 
 public:
 
@@ -241,6 +247,20 @@ public:
      * @return
      */
     bool get_use_final_posture();
+
+    /**
+     * @brief get_add_plane
+     * @return
+     */
+    bool get_add_plane();
+
+    /**
+     * @brief getPlaneParameters
+     * a*x+b*y+c*z+d=0
+     * @param params
+     * a=params(0), b=params(1), c=params(2), d=params(3)
+     */
+    void getPlaneParameters(std::vector<double> &params);
 
 
 
