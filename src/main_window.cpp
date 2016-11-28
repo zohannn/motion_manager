@@ -762,6 +762,15 @@ void MainWindow::on_pushButton_plan_clicked()
         mRRTConnectdlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
         mRRTConnectdlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
         mRRTConnectdlg->getPostPlaceRetreat(m_params.post_place_retreat); // place retreat
+        // move settings
+        mRRTConnectdlg->getTargetMove(move_target);
+        mRRTConnectdlg->getFinalHand(move_final_hand);
+        mRRTConnectdlg->getFinalArm(move_final_arm);
+        use_final = mRRTConnectdlg->get_use_final_posture();
+        prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
+        m_params.use_move_plane = mRRTConnectdlg->get_add_plane();
+        mRRTConnectdlg->getPlaneParameters(m_params.plane_params,m_params.plane_point1,m_params.plane_point2,m_params.plane_point3);
+
         m_results = prob->solve(m_params); // plan the movement
         ui.pushButton_plan->setCheckable(false);
 
@@ -777,6 +786,15 @@ void MainWindow::on_pushButton_plan_clicked()
         mRRTstardlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
         mRRTstardlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
         mRRTstardlg->getPostPlaceRetreat(m_params.post_place_retreat); // place retreat
+        // move settings
+        mRRTstardlg->getTargetMove(move_target);
+        mRRTstardlg->getFinalHand(move_final_hand);
+        mRRTstardlg->getFinalArm(move_final_arm);
+        use_final = mRRTstardlg->get_use_final_posture();
+        prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
+        m_params.use_move_plane = mRRTstardlg->get_add_plane();
+        mRRTstardlg->getPlaneParameters(m_params.plane_params,m_params.plane_point1,m_params.plane_point2,m_params.plane_point3);
+
         m_results = prob->solve(m_params); // plan the movement
         ui.pushButton_plan->setCheckable(false);
 
@@ -792,6 +810,15 @@ void MainWindow::on_pushButton_plan_clicked()
         mPRMdlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
         mPRMdlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
         mPRMdlg->getPostPlaceRetreat(m_params.post_place_retreat); // place retreat
+        // move settings
+        mPRMdlg->getTargetMove(move_target);
+        mPRMdlg->getFinalHand(move_final_hand);
+        mPRMdlg->getFinalArm(move_final_arm);
+        use_final = mPRMdlg->get_use_final_posture();
+        prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
+        m_params.use_move_plane = mPRMdlg->get_add_plane();
+        mPRMdlg->getPlaneParameters(m_params.plane_params,m_params.plane_point1,m_params.plane_point2,m_params.plane_point3);
+
         m_results = prob->solve(m_params); // plan the movement
         ui.pushButton_plan->setCheckable(false);
 
@@ -807,6 +834,15 @@ void MainWindow::on_pushButton_plan_clicked()
         mPRMstardlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
         mPRMstardlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
         mPRMstardlg->getPostPlaceRetreat(m_params.post_place_retreat); // place retreat
+        // move settings
+        mPRMstardlg->getTargetMove(move_target);
+        mPRMstardlg->getFinalHand(move_final_hand);
+        mPRMstardlg->getFinalArm(move_final_arm);
+        use_final = mPRMstardlg->get_use_final_posture();
+        prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
+        m_params.use_move_plane = mPRMstardlg->get_add_plane();
+        mPRMstardlg->getPlaneParameters(m_params.plane_params,m_params.plane_point1,m_params.plane_point2,m_params.plane_point3);
+
         m_results = prob->solve(m_params); // plan the movement
         ui.pushButton_plan->setCheckable(false);
 

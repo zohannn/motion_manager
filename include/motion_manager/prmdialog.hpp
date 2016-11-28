@@ -7,9 +7,13 @@
 #include <QTextStream>
 #include <cstring>
 #include <ui_prmdialog.h>
+#include <eigen3/Eigen/Dense>
 #include "config.hpp"
 
 namespace motion_manager {
+
+using namespace std;
+using namespace Eigen;
 
 class PRMDialog : public QDialog
 {
@@ -26,6 +30,18 @@ public Q_SLOTS:
      * @brief This method loads the tuning parameters from a file
      */
     void on_pushButton_load_clicked();
+
+    /**
+     * @brief checkFinalPosture
+     * @param state
+     */
+    void checkFinalPosture(int state);
+
+    /**
+     * @brief checkAddPlane
+     * @param state
+     */
+    void checkAddPlane(int state);
 
 public:
     /**
@@ -75,7 +91,46 @@ public:
      */
     void setInfo(std::string info);
 
+    /**
+     * @brief getTargetMove
+     * @param target
+     */
+    void getTargetMove(std::vector<double> &target);
 
+    /**
+     * @brief getFinalHand
+     * @param finalHand
+     */
+    void getFinalHand(std::vector<double> &finalHand);
+
+    /**
+     * @brief getFinalArm
+     * @param finalArm
+     */
+    void getFinalArm(std::vector<double> &finalArm);
+
+    /**
+     * @brief get_use_final_posture
+     * @return
+     */
+    bool get_use_final_posture();
+
+    /**
+     * @brief get_add_plane
+     * @return
+     */
+    bool get_add_plane();
+
+    /**
+     * @brief getPlaneParameters
+     * a*x+b*y+c*z+d=0
+     * @param params
+     * @param point1
+     * @param point2
+     * @param point3
+     * a=params(0), b=params(1), c=params(2), d=params(3)
+     */
+    void getPlaneParameters(std::vector<double> &params, std::vector<double> &point1, std::vector<double> &point2, std::vector<double> &point3);
 
 private:
     Ui::PRMDialog *ui; /**< handle of the user interface */

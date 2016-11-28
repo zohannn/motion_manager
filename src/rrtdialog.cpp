@@ -158,9 +158,6 @@ void RRTDialog::getPlaneParameters(std::vector<double> &params,
         params.push_back(c);
         params.push_back(d);
     }
-
-
-
 }
 
 // Q_SLOTS
