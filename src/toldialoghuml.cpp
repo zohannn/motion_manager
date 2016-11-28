@@ -357,25 +357,25 @@ void TolDialogHUML::getPlaneParameters(std::vector<double> &params)
     det = D.determinant();
 
     if(det!=0){
-        d=1;
+        d=1000;
 
         Matrix3d A;
         A << 1,point1.at(1),point1.at(2),
             1,point2.at(1),point2.at(2),
             1,point3.at(1),point3.at(2);
-        a = (-d*A.determinant())/det;
+        a = (-d/det)*A.determinant();
 
         Matrix3d B;
         B << point1.at(0),1,point1.at(2),
             point2.at(0),1,point2.at(2),
             point3.at(0),1,point3.at(2);
-        b = (-d*B.determinant())/det;
+        b = (-d/det)*B.determinant();
 
         Matrix3d C;
         C << point1.at(0),point1.at(1),1,
             point2.at(0),point2.at(1),1,
             point3.at(0),point3.at(1),1;
-        c = (-d*C.determinant())/det;
+        c = (-d/det)*C.determinant();
 
         params.push_back(a);
         params.push_back(b);
@@ -590,7 +590,7 @@ void TolDialogHUML::on_pushButton_save_clicked()
        stream << "plane_point3_x=" << ui->lineEdit_point_3_x->text().toStdString().c_str() << endl;
        stream << "plane_point3_y=" << ui->lineEdit_point_3_y->text().toStdString().c_str() << endl;
        stream << "plane_point3_z=" << ui->lineEdit_point_3_z->text().toStdString().c_str() << endl;
-       if (ui->checkBox_add_plane->isChecked()){ stream << "add_plane=true"<< endl;}else{stream << "add_plane=false"<< endl;}
+       if (ui->checkBox_add_plane->isChecked()){ stream << "add_plane=true"<< endl;}else{stream << "add_plane=false"<< endl;}       
        stream << "# Others" << endl;
        stream << "max_velocity="<< ui->lineEdit_w_max->text().toStdString().c_str() <<endl;
        stream << "steps=" << ui->lineEdit_steps->text().toStdString().c_str()<< endl;

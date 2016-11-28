@@ -1049,7 +1049,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
         break;
     }
     this->h_params = params;
-    if(res->status==0){this->solved=true;}
+    if(res!=nullptr){if(res->status==0){this->solved=true;}}
 
     return res;
 }
@@ -1092,6 +1092,8 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
         if(mov_type==5){
             this->scene->getHumanoid()->getRightHandHomePosture(finalHand);
+        }else if(mov_type==1){
+            finalHand=this->move_final_hand;
         }else{
             dHO=this->dHOr;
             finalHand = this->rightFinalHand;
@@ -1102,6 +1104,8 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
         if(mov_type==5){
             this->scene->getHumanoid()->getLeftHandHomePosture(finalHand);
+        }else if(mov_type==1){
+            finalHand=this->move_final_hand;
         }else{
             dHO=this->dHOl;
             finalHand = this->leftFinalHand;
@@ -1158,6 +1162,12 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         res =  this->m_planner->pick(params);
         break;
     case 1:// reaching
+        if(this->use_posture){
+          res = this->m_planner->move(params,this->move_final_arm);
+        }else{
+          params.target=this->move_target;
+          res = this->m_planner->move(params);
+        }
         break;
     case 2://transport
         break;
@@ -1173,7 +1183,7 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         break;
     }
     this->m_params = params;
-    if(res->status==1){this->solved=true;}
+    if(res!=nullptr){if(res->status==1){this->solved=true;}}
 
     return res;
 

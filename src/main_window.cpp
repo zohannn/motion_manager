@@ -699,30 +699,34 @@ void MainWindow::on_pushButton_plan_clicked()
         h_results = prob->solve(tols); // plan the movement
 
         ui.pushButton_plan->setCheckable(false);
-        if(h_results->status==0){
-            qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
-            this->curr_mov = prob->getMovement();
-            this->timesteps_mov.clear();
-            this->jointsPosition_mov.clear(); this->jointsPosition_mov = h_results->trajectory_stages;
-            this->jointsVelocity_mov.clear(); this->jointsVelocity_mov = h_results->velocity_stages;
-            this->jointsAcceleration_mov.clear(); this->jointsAcceleration_mov = h_results->acceleration_stages;
-            std::vector<double> timesteps_stage_aux;
-            for(size_t i=0; i<h_results->trajectory_stages.size();++i){
-                timesteps_stage_aux.clear();
-                double t_stage = h_results->time_steps.at(i);
-                MatrixXd traj_stage = h_results->trajectory_stages.at(i);
-                for(int j=0;j<traj_stage.rows();++j){
-                    timesteps_stage_aux.push_back(t_stage);
+        if(h_results!=nullptr){
+            if(h_results->status==0){
+                qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
+                this->curr_mov = prob->getMovement();
+                this->timesteps_mov.clear();
+                this->jointsPosition_mov.clear(); this->jointsPosition_mov = h_results->trajectory_stages;
+                this->jointsVelocity_mov.clear(); this->jointsVelocity_mov = h_results->velocity_stages;
+                this->jointsAcceleration_mov.clear(); this->jointsAcceleration_mov = h_results->acceleration_stages;
+                std::vector<double> timesteps_stage_aux;
+                for(size_t i=0; i<h_results->trajectory_stages.size();++i){
+                    timesteps_stage_aux.clear();
+                    double t_stage = h_results->time_steps.at(i);
+                    MatrixXd traj_stage = h_results->trajectory_stages.at(i);
+                    for(int j=0;j<traj_stage.rows();++j){
+                        timesteps_stage_aux.push_back(t_stage);
+                    }
+                    this->timesteps_mov.push_back(timesteps_stage_aux);
                 }
-                this->timesteps_mov.push_back(timesteps_stage_aux);
+                this->moveit_mov = false;
+                solved=true;
+            }else{
+                ui.tableWidget_sol_mov->clear();
+                qnode.log(QNode::Error,std::string("The planning has failed: ")+h_results->status_msg);
             }
-            this->moveit_mov = false;
-            solved=true;
         }else{
             ui.tableWidget_sol_mov->clear();
-            qnode.log(QNode::Error,std::string("The planning has failed: ")+h_results->status_msg);
+            qnode.log(QNode::Error,std::string("The planning has failed: unknown status"));
         }
-
         break;
     case 1: // RRT
         moveit_plan = true;
@@ -734,6 +738,15 @@ void MainWindow::on_pushButton_plan_clicked()
         mRRTdlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
         mRRTdlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
         mRRTdlg->getPostPlaceRetreat(m_params.post_place_retreat); // place retreat
+        // move settings
+        mRRTdlg->getTargetMove(move_target);
+        mRRTdlg->getFinalHand(move_final_hand);
+        mRRTdlg->getFinalArm(move_final_arm);
+        use_final = mRRTdlg->get_use_final_posture();
+        prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
+        m_params.use_move_plane = mRRTdlg->get_add_plane();
+        mRRTdlg->getPlaneParameters(m_params.plane_params,m_params.plane_point1,m_params.plane_point2,m_params.plane_point3);
+
         m_results = prob->solve(m_params); // plan the movement
         ui.pushButton_plan->setCheckable(false);
 
@@ -804,7 +817,7 @@ void MainWindow::on_pushButton_plan_clicked()
 }catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
 }catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
 
-    if(moveit_plan){
+    if(moveit_plan && m_results!=nullptr){
         if(m_results->status==1){
             qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
             this->curr_mov = prob->getMovement();
@@ -1132,6 +1145,9 @@ void MainWindow::on_pushButton_plan_clicked()
             ui.tableWidget_sol_mov->clear();
             qnode.log(QNode::Error,std::string("The planning has failed: ")+m_results->status_msg);
         }
+    }else{
+        ui.tableWidget_sol_mov->clear();
+        qnode.log(QNode::Error,std::string("The planning has failed: unknown status"));
     }
 
 if(solved){
