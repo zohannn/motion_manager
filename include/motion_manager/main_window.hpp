@@ -1,10 +1,11 @@
 #ifndef motion_manager_MAIN_WINDOW_H
 #define motion_manager_MAIN_WINDOW_H
 
+
 /*****************************************************************************
 ** Includes
 *****************************************************************************/
-
+#include <qcustomplot.h>
 #include <QtGui/QMainWindow>
 #include <QtGui/QListWidgetItem>
 #include <boost/smart_ptr.hpp>

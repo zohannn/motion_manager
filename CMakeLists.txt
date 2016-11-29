@@ -23,6 +23,9 @@ find_package(aros_moveit_planner REQUIRED COMPONENTS
   humanoid_planner
 )
 include_directories(${aros_moveit_planner_INCLUDE_DIRS})
+
+
+
 # Use this to define what the package will export (e.g. libs, headers).
 # Since the default here is to produce only a binary, we don't worry about
 # exporting anything. 
@@ -127,6 +130,15 @@ link_directories(
     ${IPOPT_HOME}/${CMAKE_BUILD_TYPE}/lib
 )
 
+# -- QCustomPlot
+add_definitions(-DQCUSTOMPLOT_USE_LIBRARY)
+set(QCUSTOMPLOT_HOME /home/gianpaolo/qcustomplot)
+include_directories(
+    ${QCUSTOMPLOT_HOME}/${CMAKE_BUILD_TYPE}/include
+)
+link_directories(
+    ${QCUSTOMPLOT_HOME}/${CMAKE_BUILD_TYPE}/lib
+)
 ##############################################################################
 # Binaries
 ##############################################################################
@@ -150,6 +162,14 @@ target_link_libraries(${PROJECT_NAME} libcoinmetis.a)
 target_link_libraries(${PROJECT_NAME} libipoptamplinterface.a)
 target_link_libraries(${PROJECT_NAME} dl) # this has to be the last one
 target_link_libraries(${PROJECT_NAME} gfortran)# this has to be the last one
+
+# -- QCustomPlot
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_link_libraries(${PROJECT_NAME} qcustomplotd)
+else()
+    target_link_libraries(${PROJECT_NAME} qcustomplot)
+endif()
+
 
 
 
