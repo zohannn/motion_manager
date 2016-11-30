@@ -15,6 +15,7 @@
 #include "../include/motion_manager/main_window.hpp"
 
 
+
 /*****************************************************************************
 ** Namespaces
 *****************************************************************************/
@@ -69,6 +70,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     //create PRM star Tuning dialog
     mPRMstardlg = new PRMstarDialog(this);
     mPRMstardlg->setModal(true);
+
+    //create the Results Joints dialog
+    mResultsJointsdlg = new ResultsJointsDialog(this);
+    mResultsJointsdlg->setModal(false);
 
 
     ReadSettings();
@@ -137,14 +142,11 @@ MainWindow::~MainWindow()
 {
 
 
-
 }
 
 /*****************************************************************************
 ** Implementation [Slots]
 *****************************************************************************/
-
-
 
 
 void MainWindow::updateLoggingView()
@@ -470,6 +472,7 @@ void MainWindow::on_pushButton_getElements_clicked()
             this->curr_task = taskPtr(new Task());
             ui.pushButton_getElements->setEnabled(false);
             ui.tab_plan->setEnabled(true);
+            ui.tab_results->setEnabled(true);
             ui.groupBox_specs->setEnabled(true);
             ui.groupBox_task->setEnabled(false);
             ui.tabWidget_sol->setEnabled(false);
@@ -853,342 +856,344 @@ void MainWindow::on_pushButton_plan_clicked()
 }catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
 }catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
 
-    if(moveit_plan && m_results!=nullptr){
-        if(m_results->status==1){
-            qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
-            this->curr_mov = prob->getMovement();
-            MatrixXd jointsPosition_stage_plan; MatrixXd jointsVelocity_stage_plan; MatrixXd jointsAcceleration_stage_plan;
-            MatrixXd jointsPosition_stage_approach; MatrixXd jointsVelocity_stage_approach; MatrixXd jointsAcceleration_stage_approach;
-            MatrixXd jointsPosition_stage_retreat; MatrixXd jointsVelocity_stage_retreat; MatrixXd jointsAcceleration_stage_retreat;
-            std::vector<double> timesteps_stage_plan; std::vector<double> timesteps_stage_approach; std::vector<double> timesteps_stage_retreat;
+    if(moveit_plan){
+        if(m_results!=nullptr){
+            if(m_results->status==1){
+                qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
+                this->curr_mov = prob->getMovement();
+                MatrixXd jointsPosition_stage_plan; MatrixXd jointsVelocity_stage_plan; MatrixXd jointsAcceleration_stage_plan;
+                MatrixXd jointsPosition_stage_approach; MatrixXd jointsVelocity_stage_approach; MatrixXd jointsAcceleration_stage_approach;
+                MatrixXd jointsPosition_stage_retreat; MatrixXd jointsVelocity_stage_retreat; MatrixXd jointsAcceleration_stage_retreat;
+                std::vector<double> timesteps_stage_plan; std::vector<double> timesteps_stage_approach; std::vector<double> timesteps_stage_retreat;
 
-            // get the initial posture of the fingers
-            std::vector<double> init_hand_pos;
-            std::vector<double> init_hand_vel;
-            std::vector<double> init_hand_acc;
-            moveit_msgs::RobotTrajectory rob_traj_pre;
-            vector<trajectory_msgs::JointTrajectoryPoint> points_pre;
-            trajectory_msgs::JointTrajectoryPoint traj_pnt_pre;
-            // positions of the fingers in the Barrett Hand
-            int fing_base = 0; int fing_1 = 1; int fing_2 = 4; int fing_3 = 6;
-            bool move;
-            if(m_results->trajectory_stages.size()>1){
-                 // pick and place movements
-                move=false;
-                rob_traj_pre = m_results->trajectory_stages.at(1);
-                points_pre = rob_traj_pre.joint_trajectory.points;
-                traj_pnt_pre = points_pre.at(0);
-                //positions
-                init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_base));
-                init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_1));
-                init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_2));
-                init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_3));
-                //velocities
-                init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_base));
-                init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_1));
-                init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_2));
-                init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_3));
-                //accelerations
-                init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_base));
-                init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_1));
-                init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_2));
-                init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_3));
-            }else{move=true;}
+                // get the initial posture of the fingers
+                std::vector<double> init_hand_pos;
+                std::vector<double> init_hand_vel;
+                std::vector<double> init_hand_acc;
+                moveit_msgs::RobotTrajectory rob_traj_pre;
+                vector<trajectory_msgs::JointTrajectoryPoint> points_pre;
+                trajectory_msgs::JointTrajectoryPoint traj_pnt_pre;
+                // positions of the fingers in the Barrett Hand
+                int fing_base = 0; int fing_1 = 1; int fing_2 = 4; int fing_3 = 6;
+                bool move;
+                if(m_results->trajectory_stages.size()>1){
+                     // pick and place movements
+                    move=false;
+                    rob_traj_pre = m_results->trajectory_stages.at(1);
+                    points_pre = rob_traj_pre.joint_trajectory.points;
+                    traj_pnt_pre = points_pre.at(0);
+                    //positions
+                    init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_base));
+                    init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_1));
+                    init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_2));
+                    init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_3));
+                    //velocities
+                    init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_base));
+                    init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_1));
+                    init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_2));
+                    init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_3));
+                    //accelerations
+                    init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_base));
+                    init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_1));
+                    init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_2));
+                    init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_3));
+                }else{move=true;}
 
 
-            double time_from_start = 0.0;
-            for(size_t i=0; i<m_results->trajectory_stages.size(); ++i){
-                std::string traj_descr = m_results->trajectory_descriptions.at(i);
-                moveit_msgs::RobotTrajectory rob_traj;
-                vector<trajectory_msgs::JointTrajectoryPoint> points;
-                std::vector<double> timesteps_stage_aux;
-                MatrixXd jointsPosition_stage_aux; MatrixXd jointsVelocity_stage_aux; MatrixXd jointsAcceleration_stage_aux;
-                if(strcmp(traj_descr.c_str(),"plan")==0){
-                    timesteps_stage_plan.clear(); timesteps_stage_aux.clear();
-                    rob_traj = m_results->trajectory_stages.at(i);
-                    points = rob_traj.joint_trajectory.points;
-                    jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    for(size_t j=0; j<points.size();++j){
-                        if(j==0){
-                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
-                        }else{
-                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
-                        }
-                        trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
-                        for(size_t k=0; k<traj_pnt.positions.size()+JOINTS_HAND;++k){
-                            if(k<traj_pnt.positions.size()){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(k);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(k);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(k);
+                double time_from_start = 0.0;
+                for(size_t i=0; i<m_results->trajectory_stages.size(); ++i){
+                    std::string traj_descr = m_results->trajectory_descriptions.at(i);
+                    moveit_msgs::RobotTrajectory rob_traj;
+                    vector<trajectory_msgs::JointTrajectoryPoint> points;
+                    std::vector<double> timesteps_stage_aux;
+                    MatrixXd jointsPosition_stage_aux; MatrixXd jointsVelocity_stage_aux; MatrixXd jointsAcceleration_stage_aux;
+                    if(strcmp(traj_descr.c_str(),"plan")==0){
+                        timesteps_stage_plan.clear(); timesteps_stage_aux.clear();
+                        rob_traj = m_results->trajectory_stages.at(i);
+                        points = rob_traj.joint_trajectory.points;
+                        jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        for(size_t j=0; j<points.size();++j){
+                            if(j==0){
+                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
                             }else{
-                                jointsPosition_stage_aux(j,k) = init_hand_pos.at(k-JOINTS_ARM);
-                                jointsVelocity_stage_aux(j,k) = init_hand_vel.at(k-JOINTS_ARM);
-                                jointsAcceleration_stage_aux(j,k) = init_hand_acc.at(k-JOINTS_ARM);
+                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
                             }
-                        }
-                    }// points
-                    time_from_start += points.at(points.size()-1).time_from_start.toSec();
-                    timesteps_stage_plan = timesteps_stage_aux;
-                    jointsPosition_stage_plan = jointsPosition_stage_aux;
-                    jointsVelocity_stage_plan = jointsVelocity_stage_aux;
-                    jointsAcceleration_stage_plan = jointsAcceleration_stage_aux;
-                }else if(strcmp(traj_descr.c_str(),"pre_grasp")==0){
-                    timesteps_stage_aux.clear();
-                    rob_traj = m_results->trajectory_stages.at(i);
-                    points = rob_traj.joint_trajectory.points;
-                    jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    for(size_t j=0; j<points.size();++j){
-                        timesteps_stage_aux.push_back(0.0);
-                        trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
-                        for(size_t k=0; k<JOINTS_ARM+JOINTS_HAND;++k){
-                            if(k<JOINTS_ARM){
-                                jointsPosition_stage_aux(j,k) = jointsPosition_stage_plan(jointsPosition_stage_plan.rows()-1,k);
-                                jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_plan(jointsVelocity_stage_plan.rows()-1,k);
-                                jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_plan(jointsAcceleration_stage_plan.rows()-1,k);
-                            }else if(k==JOINTS_ARM){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_base);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_base);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_base);
-                            }else if(k==JOINTS_ARM+1){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_1);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_1);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_1);
-                            }else if(k==JOINTS_ARM+2){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_2);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_2);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_2);
-                            }else if(k==JOINTS_ARM+3){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_3);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_3);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_3);
+                            trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
+                            for(size_t k=0; k<traj_pnt.positions.size()+JOINTS_HAND;++k){
+                                if(k<traj_pnt.positions.size()){
+                                    jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(k);
+                                    jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(k);
+                                    jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(k);
+                                }else{
+                                    jointsPosition_stage_aux(j,k) = init_hand_pos.at(k-JOINTS_ARM);
+                                    jointsVelocity_stage_aux(j,k) = init_hand_vel.at(k-JOINTS_ARM);
+                                    jointsAcceleration_stage_aux(j,k) = init_hand_acc.at(k-JOINTS_ARM);
+                                }
                             }
-                        }
-                    }// points
-                    timesteps_stage_plan.insert(timesteps_stage_plan.end(), timesteps_stage_aux.begin(), timesteps_stage_aux.end());
-                    MatrixXd tmp_pos(jointsPosition_stage_plan.rows()+jointsPosition_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
-                    tmp_pos << jointsPosition_stage_plan,
-                               jointsPosition_stage_aux;
-                    jointsPosition_stage_plan = tmp_pos;
-                    MatrixXd tmp_vel(jointsVelocity_stage_plan.rows()+jointsVelocity_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
-                    tmp_vel << jointsVelocity_stage_plan,
-                               jointsVelocity_stage_aux;
-                    jointsVelocity_stage_plan = tmp_vel;
-                    MatrixXd tmp_acc(jointsAcceleration_stage_plan.rows()+jointsAcceleration_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
-                    tmp_acc << jointsAcceleration_stage_plan,
-                               jointsAcceleration_stage_aux;
-                    jointsAcceleration_stage_plan = tmp_acc;
-                }else if(strcmp(traj_descr.c_str(),"approach")==0){
-                    timesteps_stage_approach.clear(); timesteps_stage_aux.clear();
-                    rob_traj = m_results->trajectory_stages.at(i);
-                    points = rob_traj.joint_trajectory.points;
-                    jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    for(size_t j=0; j<points.size();++j){
-                        if(j==0){
-                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
-                        }else{
-                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
-                        }
-                        trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
-                        for(size_t k=0; k<traj_pnt.positions.size()+JOINTS_HAND;++k){
-                            if(k<traj_pnt.positions.size()){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(k);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(k);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(k);
+                        }// points
+                        time_from_start += points.at(points.size()-1).time_from_start.toSec();
+                        timesteps_stage_plan = timesteps_stage_aux;
+                        jointsPosition_stage_plan = jointsPosition_stage_aux;
+                        jointsVelocity_stage_plan = jointsVelocity_stage_aux;
+                        jointsAcceleration_stage_plan = jointsAcceleration_stage_aux;
+                    }else if(strcmp(traj_descr.c_str(),"pre_grasp")==0){
+                        timesteps_stage_aux.clear();
+                        rob_traj = m_results->trajectory_stages.at(i);
+                        points = rob_traj.joint_trajectory.points;
+                        jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        for(size_t j=0; j<points.size();++j){
+                            timesteps_stage_aux.push_back(0.0);
+                            trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
+                            for(size_t k=0; k<JOINTS_ARM+JOINTS_HAND;++k){
+                                if(k<JOINTS_ARM){
+                                    jointsPosition_stage_aux(j,k) = jointsPosition_stage_plan(jointsPosition_stage_plan.rows()-1,k);
+                                    jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_plan(jointsVelocity_stage_plan.rows()-1,k);
+                                    jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_plan(jointsAcceleration_stage_plan.rows()-1,k);
+                                }else if(k==JOINTS_ARM){
+                                    jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_base);
+                                    jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_base);
+                                    jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_base);
+                                }else if(k==JOINTS_ARM+1){
+                                    jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_1);
+                                    jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_1);
+                                    jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_1);
+                                }else if(k==JOINTS_ARM+2){
+                                    jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_2);
+                                    jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_2);
+                                    jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_2);
+                                }else if(k==JOINTS_ARM+3){
+                                    jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_3);
+                                    jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_3);
+                                    jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_3);
+                                }
+                            }
+                        }// points
+                        timesteps_stage_plan.insert(timesteps_stage_plan.end(), timesteps_stage_aux.begin(), timesteps_stage_aux.end());
+                        MatrixXd tmp_pos(jointsPosition_stage_plan.rows()+jointsPosition_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
+                        tmp_pos << jointsPosition_stage_plan,
+                                   jointsPosition_stage_aux;
+                        jointsPosition_stage_plan = tmp_pos;
+                        MatrixXd tmp_vel(jointsVelocity_stage_plan.rows()+jointsVelocity_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
+                        tmp_vel << jointsVelocity_stage_plan,
+                                   jointsVelocity_stage_aux;
+                        jointsVelocity_stage_plan = tmp_vel;
+                        MatrixXd tmp_acc(jointsAcceleration_stage_plan.rows()+jointsAcceleration_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
+                        tmp_acc << jointsAcceleration_stage_plan,
+                                   jointsAcceleration_stage_aux;
+                        jointsAcceleration_stage_plan = tmp_acc;
+                    }else if(strcmp(traj_descr.c_str(),"approach")==0){
+                        timesteps_stage_approach.clear(); timesteps_stage_aux.clear();
+                        rob_traj = m_results->trajectory_stages.at(i);
+                        points = rob_traj.joint_trajectory.points;
+                        jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        for(size_t j=0; j<points.size();++j){
+                            if(j==0){
+                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
                             }else{
-                                jointsPosition_stage_aux(j,k) = jointsPosition_stage_plan(jointsPosition_stage_plan.rows()-1,k);
-                                jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_plan(jointsVelocity_stage_plan.rows()-1,k);
-                                jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_plan(jointsAcceleration_stage_plan.rows()-1,k);
+                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
                             }
-                        }
-                    }// points
-                    time_from_start += points.at(points.size()-1).time_from_start.toSec();
-                    timesteps_stage_approach = timesteps_stage_aux;
-                    jointsPosition_stage_approach = jointsPosition_stage_aux;
-                    jointsVelocity_stage_approach = jointsVelocity_stage_aux;
-                    jointsAcceleration_stage_approach = jointsAcceleration_stage_aux;
+                            trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
+                            for(size_t k=0; k<traj_pnt.positions.size()+JOINTS_HAND;++k){
+                                if(k<traj_pnt.positions.size()){
+                                    jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(k);
+                                    jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(k);
+                                    jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(k);
+                                }else{
+                                    jointsPosition_stage_aux(j,k) = jointsPosition_stage_plan(jointsPosition_stage_plan.rows()-1,k);
+                                    jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_plan(jointsVelocity_stage_plan.rows()-1,k);
+                                    jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_plan(jointsAcceleration_stage_plan.rows()-1,k);
+                                }
+                            }
+                        }// points
+                        time_from_start += points.at(points.size()-1).time_from_start.toSec();
+                        timesteps_stage_approach = timesteps_stage_aux;
+                        jointsPosition_stage_approach = jointsPosition_stage_aux;
+                        jointsVelocity_stage_approach = jointsVelocity_stage_aux;
+                        jointsAcceleration_stage_approach = jointsAcceleration_stage_aux;
 
-                }else if(strcmp(traj_descr.c_str(),"grasp")==0){
-                    timesteps_stage_aux.clear();
-                    rob_traj = m_results->trajectory_stages.at(i);
-                    points = rob_traj.joint_trajectory.points;
-                    jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    for(size_t j=0; j<points.size();++j){
-                        timesteps_stage_aux.push_back(0.0);
-                        trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
-                        for(size_t k=0; k<JOINTS_ARM+JOINTS_HAND;++k){
-                            if(k<JOINTS_ARM){
-                                jointsPosition_stage_aux(j,k) = jointsPosition_stage_approach(jointsPosition_stage_approach.rows()-1,k);
-                                jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_approach(jointsVelocity_stage_approach.rows()-1,k);
-                                jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_approach(jointsAcceleration_stage_approach.rows()-1,k);
-                            }else if(k==JOINTS_ARM){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_base);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_base);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_base);
-                            }else if(k==JOINTS_ARM+1){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_1);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_1);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_1);
-                            }else if(k==JOINTS_ARM+2){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_2);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_2);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_2);
-                            }else if(k==JOINTS_ARM+3){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_3);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_3);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_3);
+                    }else if(strcmp(traj_descr.c_str(),"grasp")==0){
+                        timesteps_stage_aux.clear();
+                        rob_traj = m_results->trajectory_stages.at(i);
+                        points = rob_traj.joint_trajectory.points;
+                        jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        for(size_t j=0; j<points.size();++j){
+                            timesteps_stage_aux.push_back(0.0);
+                            trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
+                            for(size_t k=0; k<JOINTS_ARM+JOINTS_HAND;++k){
+                                if(k<JOINTS_ARM){
+                                    jointsPosition_stage_aux(j,k) = jointsPosition_stage_approach(jointsPosition_stage_approach.rows()-1,k);
+                                    jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_approach(jointsVelocity_stage_approach.rows()-1,k);
+                                    jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_approach(jointsAcceleration_stage_approach.rows()-1,k);
+                                }else if(k==JOINTS_ARM){
+                                    jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_base);
+                                    jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_base);
+                                    jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_base);
+                                }else if(k==JOINTS_ARM+1){
+                                    jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_1);
+                                    jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_1);
+                                    jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_1);
+                                }else if(k==JOINTS_ARM+2){
+                                    jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_2);
+                                    jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_2);
+                                    jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_2);
+                                }else if(k==JOINTS_ARM+3){
+                                    jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(fing_3);
+                                    jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(fing_3);
+                                    jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(fing_3);
+                                }
                             }
-                        }
-                    }// points
-                    timesteps_stage_approach.insert(timesteps_stage_approach.end(), timesteps_stage_aux.begin(), timesteps_stage_aux.end());
-                    MatrixXd tmp_pos(jointsPosition_stage_approach.rows()+jointsPosition_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
-                    tmp_pos << jointsPosition_stage_approach,
-                               jointsPosition_stage_aux;
-                    jointsPosition_stage_approach = tmp_pos;
-                    MatrixXd tmp_vel(jointsVelocity_stage_approach.rows()+jointsVelocity_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
-                    tmp_vel << jointsVelocity_stage_approach,
-                               jointsVelocity_stage_aux;
-                    jointsVelocity_stage_approach = tmp_vel;
-                    MatrixXd tmp_acc(jointsAcceleration_stage_approach.rows()+jointsAcceleration_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
-                    tmp_acc << jointsAcceleration_stage_approach,
-                               jointsAcceleration_stage_aux;
-                    jointsAcceleration_stage_approach = tmp_acc;
-                }else if(strcmp(traj_descr.c_str(),"retreat")==0){
-                    timesteps_stage_aux.clear(); timesteps_stage_retreat.clear();
-                    rob_traj = m_results->trajectory_stages.at(i);
-                    points = rob_traj.joint_trajectory.points;
-                    jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    for(size_t j=0; j<points.size();++j){
-                        if(j==0){
-                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
-                        }else{
-                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
-                        }
-                        trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
-                        for(size_t k=0; k<traj_pnt.positions.size()+JOINTS_HAND;++k){
-                            if(k<traj_pnt.positions.size()){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(k);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(k);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(k);
+                        }// points
+                        timesteps_stage_approach.insert(timesteps_stage_approach.end(), timesteps_stage_aux.begin(), timesteps_stage_aux.end());
+                        MatrixXd tmp_pos(jointsPosition_stage_approach.rows()+jointsPosition_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
+                        tmp_pos << jointsPosition_stage_approach,
+                                   jointsPosition_stage_aux;
+                        jointsPosition_stage_approach = tmp_pos;
+                        MatrixXd tmp_vel(jointsVelocity_stage_approach.rows()+jointsVelocity_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
+                        tmp_vel << jointsVelocity_stage_approach,
+                                   jointsVelocity_stage_aux;
+                        jointsVelocity_stage_approach = tmp_vel;
+                        MatrixXd tmp_acc(jointsAcceleration_stage_approach.rows()+jointsAcceleration_stage_aux.rows(),JOINTS_ARM+JOINTS_HAND);
+                        tmp_acc << jointsAcceleration_stage_approach,
+                                   jointsAcceleration_stage_aux;
+                        jointsAcceleration_stage_approach = tmp_acc;
+                    }else if(strcmp(traj_descr.c_str(),"retreat")==0){
+                        timesteps_stage_aux.clear(); timesteps_stage_retreat.clear();
+                        rob_traj = m_results->trajectory_stages.at(i);
+                        points = rob_traj.joint_trajectory.points;
+                        jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        for(size_t j=0; j<points.size();++j){
+                            if(j==0){
+                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
                             }else{
-                                jointsPosition_stage_aux(j,k) = jointsPosition_stage_approach(jointsPosition_stage_approach.rows()-1,k);
-                                jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_approach(jointsVelocity_stage_approach.rows()-1,k);
-                                jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_approach(jointsAcceleration_stage_approach.rows()-1,k);
+                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
                             }
-                        }
-                    }// points
-                    time_from_start += points.at(points.size()-1).time_from_start.toSec();
-                    timesteps_stage_retreat = timesteps_stage_aux;
-                    jointsPosition_stage_retreat = jointsPosition_stage_aux;
-                    jointsVelocity_stage_retreat = jointsVelocity_stage_aux;
-                    jointsAcceleration_stage_retreat = jointsAcceleration_stage_aux;
-
-                }else if(strcmp(traj_descr.c_str(),"target")==0){
-                    timesteps_stage_plan.clear(); timesteps_stage_aux.clear();
-                    rob_traj = m_results->trajectory_stages.at(i);
-                    points = rob_traj.joint_trajectory.points;
-                    jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
-                    for(size_t j=0; j<points.size();++j){
-                        if(j==0){
-                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
-                        }else{
-                            timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
-                        }
-                        trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
-                        for(size_t k=0; k<traj_pnt.positions.size();++k){
-                            if(k<JOINTS_ARM){
-                                jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(k);
-                                jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(k);
-                                jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(k);
-                            }else if(k==JOINTS_ARM+fing_base){
-                                jointsPosition_stage_aux(j,JOINTS_ARM) = traj_pnt.positions.at(k);
-                                jointsVelocity_stage_aux(j,JOINTS_ARM) = traj_pnt.velocities.at(k);
-                                jointsAcceleration_stage_aux(j,JOINTS_ARM) = traj_pnt.accelerations.at(k);
-                            }else if(k==JOINTS_ARM+fing_1){
-                                jointsPosition_stage_aux(j,JOINTS_ARM+1) = traj_pnt.positions.at(k);
-                                jointsVelocity_stage_aux(j,JOINTS_ARM+1) = traj_pnt.velocities.at(k);
-                                jointsAcceleration_stage_aux(j,JOINTS_ARM+1) = traj_pnt.accelerations.at(k);
-                            }else if(k==JOINTS_ARM+fing_2){
-                                jointsPosition_stage_aux(j,JOINTS_ARM+2) = traj_pnt.positions.at(k);
-                                jointsVelocity_stage_aux(j,JOINTS_ARM+2) = traj_pnt.velocities.at(k);
-                                jointsAcceleration_stage_aux(j,JOINTS_ARM+2) = traj_pnt.accelerations.at(k);
-                            }else if(k==JOINTS_ARM+fing_3){
-                                jointsPosition_stage_aux(j,JOINTS_ARM+3) = traj_pnt.positions.at(k);
-                                jointsVelocity_stage_aux(j,JOINTS_ARM+3) = traj_pnt.velocities.at(k);
-                                jointsAcceleration_stage_aux(j,JOINTS_ARM+3) = traj_pnt.accelerations.at(k);
+                            trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
+                            for(size_t k=0; k<traj_pnt.positions.size()+JOINTS_HAND;++k){
+                                if(k<traj_pnt.positions.size()){
+                                    jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(k);
+                                    jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(k);
+                                    jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(k);
+                                }else{
+                                    jointsPosition_stage_aux(j,k) = jointsPosition_stage_approach(jointsPosition_stage_approach.rows()-1,k);
+                                    jointsVelocity_stage_aux(j,k) = jointsVelocity_stage_approach(jointsVelocity_stage_approach.rows()-1,k);
+                                    jointsAcceleration_stage_aux(j,k) = jointsAcceleration_stage_approach(jointsAcceleration_stage_approach.rows()-1,k);
+                                }
                             }
-                        }
-                    }// points
-                    time_from_start += points.at(points.size()-1).time_from_start.toSec();
-                    timesteps_stage_plan = timesteps_stage_aux;
-                    jointsPosition_stage_plan = jointsPosition_stage_aux;
-                    jointsVelocity_stage_plan = jointsVelocity_stage_aux;
-                    jointsAcceleration_stage_plan = jointsAcceleration_stage_aux;
+                        }// points
+                        time_from_start += points.at(points.size()-1).time_from_start.toSec();
+                        timesteps_stage_retreat = timesteps_stage_aux;
+                        jointsPosition_stage_retreat = jointsPosition_stage_aux;
+                        jointsVelocity_stage_retreat = jointsVelocity_stage_aux;
+                        jointsAcceleration_stage_retreat = jointsAcceleration_stage_aux;
 
+                    }else if(strcmp(traj_descr.c_str(),"target")==0){
+                        timesteps_stage_plan.clear(); timesteps_stage_aux.clear();
+                        rob_traj = m_results->trajectory_stages.at(i);
+                        points = rob_traj.joint_trajectory.points;
+                        jointsPosition_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
+                        for(size_t j=0; j<points.size();++j){
+                            if(j==0){
+                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
+                            }else{
+                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                            }
+                            trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
+                            for(size_t k=0; k<traj_pnt.positions.size();++k){
+                                if(k<JOINTS_ARM){
+                                    jointsPosition_stage_aux(j,k) = traj_pnt.positions.at(k);
+                                    jointsVelocity_stage_aux(j,k) = traj_pnt.velocities.at(k);
+                                    jointsAcceleration_stage_aux(j,k) = traj_pnt.accelerations.at(k);
+                                }else if(k==JOINTS_ARM+fing_base){
+                                    jointsPosition_stage_aux(j,JOINTS_ARM) = traj_pnt.positions.at(k);
+                                    jointsVelocity_stage_aux(j,JOINTS_ARM) = traj_pnt.velocities.at(k);
+                                    jointsAcceleration_stage_aux(j,JOINTS_ARM) = traj_pnt.accelerations.at(k);
+                                }else if(k==JOINTS_ARM+fing_1){
+                                    jointsPosition_stage_aux(j,JOINTS_ARM+1) = traj_pnt.positions.at(k);
+                                    jointsVelocity_stage_aux(j,JOINTS_ARM+1) = traj_pnt.velocities.at(k);
+                                    jointsAcceleration_stage_aux(j,JOINTS_ARM+1) = traj_pnt.accelerations.at(k);
+                                }else if(k==JOINTS_ARM+fing_2){
+                                    jointsPosition_stage_aux(j,JOINTS_ARM+2) = traj_pnt.positions.at(k);
+                                    jointsVelocity_stage_aux(j,JOINTS_ARM+2) = traj_pnt.velocities.at(k);
+                                    jointsAcceleration_stage_aux(j,JOINTS_ARM+2) = traj_pnt.accelerations.at(k);
+                                }else if(k==JOINTS_ARM+fing_3){
+                                    jointsPosition_stage_aux(j,JOINTS_ARM+3) = traj_pnt.positions.at(k);
+                                    jointsVelocity_stage_aux(j,JOINTS_ARM+3) = traj_pnt.velocities.at(k);
+                                    jointsAcceleration_stage_aux(j,JOINTS_ARM+3) = traj_pnt.accelerations.at(k);
+                                }
+                            }
+                        }// points
+                        time_from_start += points.at(points.size()-1).time_from_start.toSec();
+                        timesteps_stage_plan = timesteps_stage_aux;
+                        jointsPosition_stage_plan = jointsPosition_stage_aux;
+                        jointsVelocity_stage_plan = jointsVelocity_stage_aux;
+                        jointsAcceleration_stage_plan = jointsAcceleration_stage_aux;
+
+                    }
+
+                } // for loop stages
+                if(move){
+                    //positions
+                    this->jointsPosition_mov.clear();
+                    this->jointsPosition_mov.push_back(jointsPosition_stage_plan);
+                    //velocities
+                    this->jointsVelocity_mov.clear();
+                    this->jointsVelocity_mov.push_back(jointsVelocity_stage_plan);
+                    //accelerations
+                    this->jointsAcceleration_mov.clear();
+                    this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_plan);
+                    //time steps
+                    this->timesteps_mov.clear();
+                    this->timesteps_mov.push_back(timesteps_stage_plan);
+                }else{
+                    //positions
+                    this->jointsPosition_mov.clear();
+                    this->jointsPosition_mov.push_back(jointsPosition_stage_plan);
+                    this->jointsPosition_mov.push_back(jointsPosition_stage_approach);
+                    this->jointsPosition_mov.push_back(jointsPosition_stage_retreat);
+                    //velocities
+                    this->jointsVelocity_mov.clear();
+                    this->jointsVelocity_mov.push_back(jointsVelocity_stage_plan);
+                    this->jointsVelocity_mov.push_back(jointsVelocity_stage_approach);
+                    this->jointsVelocity_mov.push_back(jointsVelocity_stage_retreat);
+                    //accelerations
+                    this->jointsAcceleration_mov.clear();
+                    this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_plan);
+                    this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_approach);
+                    this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_retreat);
+                    //time steps
+                    this->timesteps_mov.clear();
+                    this->timesteps_mov.push_back(timesteps_stage_plan);
+                    this->timesteps_mov.push_back(timesteps_stage_approach);
+                    this->timesteps_mov.push_back(timesteps_stage_retreat);
                 }
+                this->moveit_mov = true;
+                solved=true;
 
-            } // for loop stages
-            if(move){
-                //positions
-                this->jointsPosition_mov.clear();
-                this->jointsPosition_mov.push_back(jointsPosition_stage_plan);
-                //velocities
-                this->jointsVelocity_mov.clear();
-                this->jointsVelocity_mov.push_back(jointsVelocity_stage_plan);
-                //accelerations
-                this->jointsAcceleration_mov.clear();
-                this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_plan);
-                //time steps
-                this->timesteps_mov.clear();
-                this->timesteps_mov.push_back(timesteps_stage_plan);
             }else{
-                //positions
-                this->jointsPosition_mov.clear();
-                this->jointsPosition_mov.push_back(jointsPosition_stage_plan);
-                this->jointsPosition_mov.push_back(jointsPosition_stage_approach);
-                this->jointsPosition_mov.push_back(jointsPosition_stage_retreat);
-                //velocities
-                this->jointsVelocity_mov.clear();
-                this->jointsVelocity_mov.push_back(jointsVelocity_stage_plan);
-                this->jointsVelocity_mov.push_back(jointsVelocity_stage_approach);
-                this->jointsVelocity_mov.push_back(jointsVelocity_stage_retreat);
-                //accelerations
-                this->jointsAcceleration_mov.clear();
-                this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_plan);
-                this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_approach);
-                this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_retreat);
-                //time steps
-                this->timesteps_mov.clear();
-                this->timesteps_mov.push_back(timesteps_stage_plan);
-                this->timesteps_mov.push_back(timesteps_stage_approach);
-                this->timesteps_mov.push_back(timesteps_stage_retreat);
+                ui.tableWidget_sol_mov->clear();
+                qnode.log(QNode::Error,std::string("The planning has failed: ")+m_results->status_msg);
             }
-            this->moveit_mov = true;
-            solved=true;
-
         }else{
             ui.tableWidget_sol_mov->clear();
-            qnode.log(QNode::Error,std::string("The planning has failed: ")+m_results->status_msg);
+            qnode.log(QNode::Error,std::string("The planning has failed: unknown status"));
         }
-    }else{
-        ui.tableWidget_sol_mov->clear();
-        qnode.log(QNode::Error,std::string("The planning has failed: unknown status"));
     }
 
 if(solved){
     QStringList h_headers; bool h_head=false; QStringList v_headers;
-    double mov_duration = 0;
+    double mov_duration = 0.0;
     std::vector<std::vector<QString>> mov_steps;
     for (size_t k=0; k< this->jointsPosition_mov.size();++k){
         MatrixXd jointPosition_stage = this->jointsPosition_mov.at(k);
@@ -1196,8 +1201,9 @@ if(solved){
         MatrixXd jointAcceleration_stage = this->jointsAcceleration_mov.at(k);
         std::vector<double> timestep_stage = this->timesteps_mov.at(k);
         std::vector<QString> stage_step;
-        for(int i =0; i< jointPosition_stage.rows(); ++i){
-            mov_duration += timestep_stage.at(i);
+        double stage_duration = 0.0;
+        for(int i = 0; i< jointPosition_stage.rows(); ++i){
+            stage_duration += timestep_stage.at(i);
             stage_step.clear();
             v_headers.push_back(QString("Step ")+QString::number(i));
             for (int j=0; j<jointPosition_stage.cols();++j){
@@ -1210,6 +1216,7 @@ if(solved){
             h_head = true;
             mov_steps.push_back(stage_step);
         }// rows
+        mov_duration += stage_duration;
     }// movements
     // show the results
     ui.tableWidget_sol_mov->setColumnCount(h_headers.size());
@@ -1236,6 +1243,8 @@ if(solved){
     for (size_t k=0; k< this->jointsPosition_mov.size();++k){
         this->tols_stop_mov.push_back(tol_stop);
     }
+
+    this->mResultsJointsdlg->setupPlots(this->jointsPosition_mov,this->jointsVelocity_mov,this->jointsAcceleration_mov,this->timesteps_mov);
 }
 
 
@@ -2046,6 +2055,195 @@ void MainWindow::onListScenarioItemClicked(QListWidgetItem *item)
     }
 #endif
 
+}
+
+void MainWindow::on_pushButton_plot_clicked()
+{
+    this->setupPlot(ui.customPlot);
+    ui.customPlot->replot();
+}
+
+void MainWindow::setupPlot(QCustomPlot *customPlot)
+{
+
+    /*
+  // generate some data:
+  QVector<double> x(101), y(101); // initialize with entries 0..100
+  for (int i=0; i<101; ++i)
+  {
+    x[i] = i/50.0 - 1; // x goes from -1 to 1
+    y[i] = x[i]*x[i];  // let's plot a quadratic function
+  }
+  // create graph and assign data to it:
+  customPlot->addGraph();
+  customPlot->graph(0)->setData(x, y);
+  // give the axes some labels:
+  customPlot->xAxis->setLabel("x");
+  customPlot->yAxis->setLabel("y");
+  // set axes ranges, so we see all data:
+  customPlot->xAxis->setRange(-1, 1);
+  customPlot->yAxis->setRange(0, 1);
+  */
+  /*
+    // add two new graphs and set their look:
+    customPlot->addGraph();
+    customPlot->graph(0)->setPen(QPen(Qt::blue)); // line color blue for first graph
+    customPlot->graph(0)->setBrush(QBrush(QColor(0, 0, 255, 20))); // first graph will be filled with translucent blue
+    customPlot->addGraph();
+    customPlot->graph(1)->setPen(QPen(Qt::red)); // line color red for second graph
+    // generate some points of data (y0 for first, y1 for second graph):
+    QVector<double> x(251), y0(251), y1(251);
+    for (int i=0; i<251; ++i)
+    {
+      x[i] = i;
+      y0[i] = qExp(-i/150.0)*qCos(i/10.0); // exponentially decaying cosine
+      y1[i] = qExp(-i/150.0);              // exponential envelope
+    }
+    // configure right and top axis to show ticks but no labels:
+    // (see QCPAxisRect::setupFullAxesBox for a quicker method to do this)
+    customPlot->xAxis2->setVisible(true);
+    customPlot->xAxis2->setTickLabels(false);
+    customPlot->yAxis2->setVisible(true);
+    customPlot->yAxis2->setTickLabels(false);
+    // make left and bottom axes always transfer their ranges to right and top axes:
+    connect(customPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), customPlot->xAxis2, SLOT(setRange(QCPRange)));
+    connect(customPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), customPlot->yAxis2, SLOT(setRange(QCPRange)));
+    // pass data points to graphs:
+    customPlot->graph(0)->setData(x, y0);
+    customPlot->graph(1)->setData(x, y1);
+    // let the ranges scale themselves so graph 0 fits perfectly in the visible area:
+    customPlot->graph(0)->rescaleAxes();
+    // same thing for graph 1, but only enlarge ranges (in case graph 1 is smaller than graph 0):
+    customPlot->graph(1)->rescaleAxes(true);
+    // Note: we could have also just called customPlot->rescaleAxes(); instead
+    // Allow user to drag axis ranges with mouse, zoom with mouse wheel and select graphs by clicking:
+    customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    */
+
+    customPlot->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+    customPlot->legend->setVisible(true);
+    QFont legendFont = font();  // start out with MainWindow's font..
+    legendFont.setPointSize(9); // and make a bit smaller for legend
+    customPlot->legend->setFont(legendFont);
+    customPlot->legend->setBrush(QBrush(QColor(255,255,255,230)));
+    // by default, the legend is in the inset layout of the main axis rect. So this is how we access it to change legend placement:
+    customPlot->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignRight);
+
+    // setup for graph 0: key axis left, value axis bottom
+    // will contain left maxwell-like function
+    customPlot->addGraph(customPlot->yAxis, customPlot->xAxis);
+    customPlot->graph(0)->setPen(QPen(QColor(255, 100, 0)));
+    //customPlot->graph(0)->setBrush(QBrush(QPixmap("./balboa.jpg"))); // fill with texture of specified image
+    customPlot->graph(0)->setLineStyle(QCPGraph::lsLine);
+    customPlot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssDisc, 5));
+    customPlot->graph(0)->setName("Left maxwell function");
+
+    // setup for graph 1: key axis bottom, value axis left (those are the default axes)
+    // will contain bottom maxwell-like function with error bars
+    customPlot->addGraph();
+    customPlot->graph(1)->setPen(QPen(Qt::red));
+    //customPlot->graph(1)->setBrush(QBrush(QPixmap("./balboa.jpg"))); // same fill as we used for graph 0
+    customPlot->graph(1)->setLineStyle(QCPGraph::lsStepCenter);
+    customPlot->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, Qt::red, Qt::white, 7));
+    customPlot->graph(1)->setName("Bottom maxwell function");
+    //QCPErrorBars *errorBars = new QCPErrorBars(customPlot->xAxis, customPlot->yAxis);
+    //errorBars->removeFromLegend();
+    //errorBars->setDataPlottable(customPlot->graph(1));
+
+    // setup for graph 2: key axis top, value axis right
+    // will contain high frequency sine with low frequency beating:
+    customPlot->addGraph(customPlot->xAxis2, customPlot->yAxis2);
+    customPlot->graph(2)->setPen(QPen(Qt::blue));
+    customPlot->graph(2)->setName("High frequency sine");
+
+    // setup for graph 3: same axes as graph 2
+    // will contain low frequency beating envelope of graph 2
+    customPlot->addGraph(customPlot->xAxis2, customPlot->yAxis2);
+    QPen blueDotPen;
+    blueDotPen.setColor(QColor(30, 40, 255, 150));
+    blueDotPen.setStyle(Qt::DotLine);
+    blueDotPen.setWidthF(4);
+    customPlot->graph(3)->setPen(blueDotPen);
+    customPlot->graph(3)->setName("Sine envelope");
+
+    // setup for graph 4: key axis right, value axis top
+    // will contain parabolically distributed data points with some random perturbance
+    customPlot->addGraph(customPlot->yAxis2, customPlot->xAxis2);
+    customPlot->graph(4)->setPen(QColor(50, 50, 50, 255));
+    customPlot->graph(4)->setLineStyle(QCPGraph::lsNone);
+    customPlot->graph(4)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
+    customPlot->graph(4)->setName("Some random data around\na quadratic function");
+
+    // generate data, just playing with numbers, not much to learn here:
+    QVector<double> x0(25), y0(25);
+    QVector<double> x1(15), y1(15), y1err(15);
+    QVector<double> x2(250), y2(250);
+    QVector<double> x3(250), y3(250);
+    QVector<double> x4(250), y4(250);
+    for (int i=0; i<25; ++i) // data for graph 0
+    {
+      x0[i] = 3*i/25.0;
+      y0[i] = qExp(-x0[i]*x0[i]*0.8)*(x0[i]*x0[i]+x0[i]);
+    }
+    for (int i=0; i<15; ++i) // data for graph 1
+    {
+      x1[i] = 3*i/15.0;;
+      y1[i] = qExp(-x1[i]*x1[i])*(x1[i]*x1[i])*2.6;
+      y1err[i] = y1[i]*0.25;
+    }
+    for (int i=0; i<250; ++i) // data for graphs 2, 3 and 4
+    {
+      x2[i] = i/250.0*3*M_PI;
+      x3[i] = x2[i];
+      x4[i] = i/250.0*100-50;
+      y2[i] = qSin(x2[i]*12)*qCos(x2[i])*10;
+      y3[i] = qCos(x3[i])*10;
+      y4[i] = 0.01*x4[i]*x4[i] + 1.5*(rand()/(double)RAND_MAX-0.5) + 1.5*M_PI;
+    }
+
+    // pass data points to graphs:
+    customPlot->graph(0)->setData(x0, y0);
+    customPlot->graph(1)->setData(x1, y1);
+    //errorBars->setData(y1err);
+    customPlot->graph(2)->setData(x2, y2);
+    customPlot->graph(3)->setData(x3, y3);
+    customPlot->graph(4)->setData(x4, y4);
+    // activate top and right axes, which are invisible by default:
+    customPlot->xAxis2->setVisible(true);
+    customPlot->yAxis2->setVisible(true);
+    // set ranges appropriate to show data:
+    customPlot->xAxis->setRange(0, 2.7);
+    customPlot->yAxis->setRange(0, 2.6);
+    customPlot->xAxis2->setRange(0, 3.0*M_PI);
+    customPlot->yAxis2->setRange(-70, 35);
+    // set pi ticks on top axis:
+    //customPlot->xAxis2->setTicker(QSharedPointer<QCPAxisTickerPi>(new QCPAxisTickerPi));
+    // add title layout element:
+    customPlot->plotLayout()->insertRow(0);
+    customPlot->plotLayout()->addElement(0,0, new QCPPlotTitle(customPlot,"Way too many graphs in one plot"));
+    //customPlot->plotLayout()->addElement(0, 0, new QCPTextElement(customPlot, "Way too many graphs in one plot", QFont("sans", 12, QFont::Bold)));
+    // set labels:
+    customPlot->xAxis->setLabel("Bottom axis with outward ticks");
+    customPlot->yAxis->setLabel("Left axis label");
+    customPlot->xAxis2->setLabel("Top axis label");
+    customPlot->yAxis2->setLabel("Right axis label");
+    // make ticks on bottom axis go outward:
+    customPlot->xAxis->setTickLength(0, 5);
+    customPlot->xAxis->setSubTickLength(0, 3);
+    // make ticks on right axis go inward and outward:
+    customPlot->yAxis2->setTickLength(3, 3);
+    customPlot->yAxis2->setSubTickLength(1, 1);
+
+}
+
+void MainWindow::on_pushButton_save_plot_clicked()
+{
+    ui.customPlot->savePdf("prova1.pdf",true,0,0,QString(),QString("prova1"));
+}
+
+void MainWindow::on_pushButton_joints_results_clicked()
+{
+    this->mResultsJointsdlg->show();
 }
 
 

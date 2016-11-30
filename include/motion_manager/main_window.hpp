@@ -6,6 +6,7 @@
 ** Includes
 *****************************************************************************/
 #include <qcustomplot.h>
+#include <qcpdocumentobject.h>
 #include <QtGui/QMainWindow>
 #include <QtGui/QListWidgetItem>
 #include <boost/smart_ptr.hpp>
@@ -21,6 +22,7 @@
 #include "rrtstardialog.hpp"
 #include "prmdialog.hpp"
 #include "prmstardialog.hpp"
+#include "results_plan_joints_dialog.hpp"
 
 using namespace std;
 
@@ -67,6 +69,8 @@ public:
          * @param event
          */
         void closeEvent(QCloseEvent *event);
+
+        void setupPlot(QCustomPlot *customPlot);
 
 public Q_SLOTS:
 
@@ -275,6 +279,21 @@ public Q_SLOTS:
          */
         void onListScenarioItemClicked(QListWidgetItem* item);
 
+        /**
+         * @brief on_pushButton_plot_clicked
+         */
+        void on_pushButton_plot_clicked();
+
+        /**
+         * @brief on_pushButton_save_plot_clicked
+         */
+        void on_pushButton_save_plot_clicked();
+
+        /**
+         * @brief on_pushButton_joints_results_clicked
+         */
+        void on_pushButton_joints_results_clicked();
+
 
 
 private:
@@ -289,6 +308,7 @@ private:
         RRTstarDialog *mRRTstardlg; /**< handle of the RRT star tuning dialog */
         PRMDialog *mPRMdlg; /**< handle of the PRM tuning dialog */
         PRMstarDialog *mPRMstardlg; /**< handle of the PRM star tuning dlg */
+        ResultsJointsDialog *mResultsJointsdlg;/**< handle of the results joints dlg*/
         int scenario_id; /**< id of the current scenario */
 
         vector< vector < double > > timesteps_mov; /**< current time steps of the movement */

@@ -89,7 +89,7 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 set (HAND 1)
 
 set(MAIN_PATH ${PROJECT_SOURCE_DIR}) ## Path of the main directory
-set(PATH_SCENARIOS /home/gianpaolo/scenarios) ## Path of the scenarios
+set(PATH_SCENARIOS /home/$ENV{USER}/scenarios) ## Path of the scenarios
 
 # configuration files
 configure_file (
@@ -113,7 +113,7 @@ set(DOC 0)
 ##############################################################################
 
 # ----- Human-like Upper-limbs Motion Library (HUML) -------- #
-set(HUML_HOME /home/gianpaolo/HUML)
+set(HUML_HOME /home/$ENV{USER}/HUML)
 include_directories(${HUML_HOME}/include)
 add_library(HUML STATIC IMPORTED)
 set_property(TARGET HUML PROPERTY IMPORTED_LOCATION ${HUML_HOME}/${CMAKE_BUILD_TYPE}/libHUML.a)
@@ -132,12 +132,21 @@ link_directories(
 
 # -- QCustomPlot
 add_definitions(-DQCUSTOMPLOT_USE_LIBRARY)
-set(QCUSTOMPLOT_HOME /home/gianpaolo/qcustomplot)
+set(QCUSTOMPLOT_HOME /home/$ENV{USER}/qcustomplot)
 include_directories(
     ${QCUSTOMPLOT_HOME}/${CMAKE_BUILD_TYPE}/include
 )
 link_directories(
     ${QCUSTOMPLOT_HOME}/${CMAKE_BUILD_TYPE}/lib
+)
+
+# -- QCPDocumentObject
+set(QCPDOCUMENTOBJECT_HOME /home/$ENV{USER}/qcpdocumentobject)
+include_directories(
+    ${QCPDOCUMENTOBJECT_HOME}/${CMAKE_BUILD_TYPE}/include
+)
+link_directories(
+    ${QCPDOCUMENTOBJECT_HOME}/${CMAKE_BUILD_TYPE}/lib
 )
 ##############################################################################
 # Binaries
@@ -163,11 +172,11 @@ target_link_libraries(${PROJECT_NAME} libipoptamplinterface.a)
 target_link_libraries(${PROJECT_NAME} dl) # this has to be the last one
 target_link_libraries(${PROJECT_NAME} gfortran)# this has to be the last one
 
-# -- QCustomPlot
+# -- QCustomPlot and QCPDocumentObject
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_link_libraries(${PROJECT_NAME} qcustomplotd)
+    target_link_libraries(${PROJECT_NAME} qcustomplotd qcpdocumentobjectd)
 else()
-    target_link_libraries(${PROJECT_NAME} qcustomplot)
+    target_link_libraries(${PROJECT_NAME} qcustomplot qcpdocumentobject)
 endif()
 
 
@@ -196,7 +205,12 @@ if(TEST)
     target_link_libraries(${PROJECT_NAME_LIB} libipoptamplinterface.a)
     target_link_libraries(${PROJECT_NAME_LIB} dl) # this has to be the last one
     target_link_libraries(${PROJECT_NAME_LIB} gfortran)# this has to be the last one
-
+    # -- QCustomPlot and QCPDocumentObject
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_link_libraries(${PROJECT_NAME} qcustomplotd qcpdocumentobjectd)
+    else()
+        target_link_libraries(${PROJECT_NAME} qcustomplot qcpdocumentobject)
+    endif()
 
     enable_testing ()
 

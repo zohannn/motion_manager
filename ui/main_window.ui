@@ -1009,6 +1009,9 @@ p, li { white-space: pre-wrap; }
      </widget>
     </widget>
     <widget class="QWidget" name="tab_results">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <attribute name="title">
       <string>Results</string>
      </attribute>
@@ -1028,14 +1031,53 @@ p, li { white-space: pre-wrap; }
        <attribute name="title">
         <string>Planning</string>
        </attribute>
-       <widget class="QCustomPlot" name="widget" native="true">
+       <widget class="QCustomPlot" name="customPlot" native="true">
         <property name="geometry">
          <rect>
-          <x>180</x>
-          <y>100</y>
+          <x>470</x>
+          <y>60</y>
           <width>471</width>
-          <height>211</height>
+          <height>311</height>
          </rect>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton_plot">
+        <property name="geometry">
+         <rect>
+          <x>750</x>
+          <y>400</y>
+          <width>80</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Plot</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton_save_plot">
+        <property name="geometry">
+         <rect>
+          <x>850</x>
+          <y>400</y>
+          <width>80</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Save</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton_joints_results">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>410</y>
+          <width>161</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>show results of the joints</string>
         </property>
        </widget>
       </widget>
