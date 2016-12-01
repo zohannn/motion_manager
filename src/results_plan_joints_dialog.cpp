@@ -18,7 +18,7 @@ ResultsJointsDialog::~ResultsJointsDialog()
 void ResultsJointsDialog::setupPlots(vector<MatrixXd> &pos, vector<MatrixXd> &vel, vector<MatrixXd> &acc, vector<vector<double> > &timesteps)
 {
     const double radtodeg = 180.0/static_cast<double>(M_PI);
-    double tstep_final = 0.0;
+
     vector<double> time;
     QVector<double> pos_joint1, vel_joint1, acc_joint1;
     QVector<double> pos_joint2, vel_joint2, acc_joint2;
@@ -40,18 +40,14 @@ void ResultsJointsDialog::setupPlots(vector<MatrixXd> &pos, vector<MatrixXd> &ve
         double time_init;
         if(time.empty()){
             time_init=0.0;
-            tstep_final=0.0;
         }else{
             time_init=time.at(time.size()-1);
         }
         vector<double> time_stage(tsteps_stage.size());
+        time_stage.at(0) = time_init;
 
         for(int k=0;k<pos_stage.rows();++k){
-            if(k==0){
-                time_stage.at(0) = time_init + tstep_final;
-            }else{
-                time_stage.at(k) = time_stage.at(k-1) + tsteps_stage.at(k-1);
-            }
+            if(k>0){time_stage.at(k) = time_stage.at(k-1) + tsteps_stage.at(k-1);}
             for(int j=0;j<pos_stage.cols();++j){
                 switch(j){
                 case 0:// joint 1
@@ -112,12 +108,13 @@ void ResultsJointsDialog::setupPlots(vector<MatrixXd> &pos, vector<MatrixXd> &ve
                 }
             }
         }
-        tstep_final = tsteps_stage.at(tsteps_stage.size()-1);
         time.reserve(time_stage.size());
         std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time));
     }
     QVector<double> qtime = QVector<double>::fromStdVector(time);
     // joint 1
+    //if(ui->plot_joint_1->graphCount()>0){ui->plot_joint_1->clearGraphs();};
+    //if(ui->plot_joint_1->plotLayout()->rowCount()>0){ui->plot_joint_1->plotLayout()->clear();}
     ui->plot_joint_1->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
     ui->plot_joint_1->legend->setVisible(false);
     QFont legendFont = font();  // start out with MainWindow's font..

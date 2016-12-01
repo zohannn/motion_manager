@@ -1203,7 +1203,7 @@ if(solved){
         std::vector<QString> stage_step;
         double stage_duration = 0.0;
         for(int i = 0; i< jointPosition_stage.rows(); ++i){
-            stage_duration += timestep_stage.at(i);
+            if(i>0){stage_duration += timestep_stage.at(i);}
             stage_step.clear();
             v_headers.push_back(QString("Step ")+QString::number(i));
             for (int j=0; j<jointPosition_stage.cols();++j){
@@ -1842,7 +1842,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
                  stage_duration = 0.0;
                  std::vector<QString> stage_step;
                  for(int i =0; i< jointPosition_stage.rows(); ++i){
-                     stage_duration += tstep_stage.at(i);
+                     if(i>0){stage_duration += tstep_stage.at(i);}
                      stage_step.clear();
                      v_headers.push_back(QString("Step ")+QString::number(i));
                      for (int j=0; j<jointPosition_stage.cols();++j){
