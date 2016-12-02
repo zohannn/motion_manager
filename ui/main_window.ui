@@ -1031,42 +1031,6 @@ p, li { white-space: pre-wrap; }
        <attribute name="title">
         <string>Planning</string>
        </attribute>
-       <widget class="QCustomPlot" name="customPlot" native="true">
-        <property name="geometry">
-         <rect>
-          <x>470</x>
-          <y>60</y>
-          <width>471</width>
-          <height>311</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton_plot">
-        <property name="geometry">
-         <rect>
-          <x>750</x>
-          <y>400</y>
-          <width>80</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Plot</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton_save_plot">
-        <property name="geometry">
-         <rect>
-          <x>850</x>
-          <y>400</y>
-          <width>80</width>
-          <height>23</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Save</string>
-        </property>
-       </widget>
        <widget class="QPushButton" name="pushButton_joints_results">
         <property name="geometry">
          <rect>
@@ -1246,14 +1210,6 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QCustomPlot</class>
-   <extends>QWidget</extends>
-   <header>qcustomplot.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections>
   <connection>

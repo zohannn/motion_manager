@@ -6,6 +6,9 @@
 #include <QFile>
 #include <QTextStream>
 #include <cstring>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <ui_results_plan_joints_dialog.h>
 #include <eigen3/Eigen/Dense>
 #include "config.hpp"
@@ -22,9 +25,9 @@ class ResultsJointsDialog : public QDialog
 public Q_SLOTS:
 
     /**
-     * @brief This method saves the tuning parameters to a file
+     * @brief on_pushButton_save_joints_plots_clicked
      */
-    void on_pushButton_save_clicked();
+    void on_pushButton_save_joints_plots_clicked();
 
 public:
     /**
@@ -50,6 +53,17 @@ public:
 
 private:
     Ui::ResultsJointsDialog *ui; /**< handle of the user interface */
+
+    /**
+     * @brief plotJoint
+     * @param plot
+     * @param title
+     * @param time
+     * @param pos
+     * @param vel
+     * @param acc
+     */
+    void plotJoint(QCustomPlot* plot, QString title, QVector<double>& time, QVector<double>& pos, QVector<double>& vel, QVector<double>& acc);
 };
 
 } // namespace motion_manager

@@ -70,7 +70,6 @@ public:
          */
         void closeEvent(QCloseEvent *event);
 
-        void setupPlot(QCustomPlot *customPlot);
 
 public Q_SLOTS:
 
@@ -278,16 +277,6 @@ public Q_SLOTS:
          * @param item
          */
         void onListScenarioItemClicked(QListWidgetItem* item);
-
-        /**
-         * @brief on_pushButton_plot_clicked
-         */
-        void on_pushButton_plot_clicked();
-
-        /**
-         * @brief on_pushButton_save_plot_clicked
-         */
-        void on_pushButton_save_plot_clicked();
 
         /**
          * @brief on_pushButton_joints_results_clicked
