@@ -1192,6 +1192,7 @@ void MainWindow::on_pushButton_plan_clicked()
     }
 
 if(solved){
+    uint tot_steps=0;
     QStringList h_headers; bool h_head=false; QStringList v_headers;
     double mov_duration = 0.0;
     std::vector<std::vector<QString>> mov_steps;
@@ -1203,6 +1204,7 @@ if(solved){
         std::vector<QString> stage_step;
         double stage_duration = 0.0;
         for(int i = 0; i< jointPosition_stage.rows(); ++i){
+            tot_steps++;
             if(i>0){stage_duration += timestep_stage.at(i);}
             stage_step.clear();
             v_headers.push_back(QString("Step ")+QString::number(i));
@@ -1244,6 +1246,21 @@ if(solved){
         this->tols_stop_mov.push_back(tol_stop);
     }
 
+    // compute the hand values
+    this->handPosition_mov.resize(tot_steps);
+    int step = 0;
+    int arm_code = prob->getMovement()->getArm();
+    for (size_t k=0; k< this->jointsPosition_mov.size();++k){
+        MatrixXd pos_stage = this->jointsPosition_mov.at(k);
+        for(int i=0;i<pos_stage.rows();++i){
+            VectorXd row = pos_stage.block<1,JOINTS_ARM>(i,0);
+            vector<double> posture; posture.resize(row.size());
+            VectorXd::Map(&posture[0], row.size()) = row;
+            this->curr_scene->getHumanoid()->getHandPos(arm_code,this->handPosition_mov.at(step),posture);
+            step++;
+        }
+    }
+    // plot the joints values
     this->mResultsJointsdlg->setupPlots(this->jointsPosition_mov,this->jointsVelocity_mov,this->jointsAcceleration_mov,this->timesteps_mov);
 }
 

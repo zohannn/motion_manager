@@ -312,6 +312,11 @@ private:
         vector<vector<double>> tols_stop_task; /**< vector of the tolerances to stop each movement in the task */
         vector<string> vel_steps; /**< steps of the trajectory for saving/loading file */
 
+        vector<vector<double>> handPosition_mov; /**< hand position during the movement. 0=x,1=y,2=z */
+        vector<vector<double>> handOrientation_mov; /**< hand orientation during the movement. */
+        vector<vector<double>> handLinearVelocity_mov; /**< hand linear velocity during the movement */
+        vector<vector<double>> handAngularVelocity_mov;/**< hand angular velocity during the movement */
+
         moveit_plannerPtr m_planner; /**< MoveIt! Libraries planner */
         bool moveit_mov; /**< true if the movement has been planned by the moveit planner, false otherwise */
         HUMotion::planning_result_ptr h_results; /**< results of the HUML planner */

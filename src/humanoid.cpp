@@ -1106,6 +1106,8 @@ void Humanoid::getRightHandPos(vector<double> &pos)
     pos = rightHandPos;
 }
 
+
+
 double Humanoid::getRightHandNorm()
 {
 
@@ -1245,6 +1247,92 @@ void Humanoid::getLeftHandOr(Matrix3d &orr)
     directKinematicsSingleArm(2);
 
     orr = leftHandOr;
+}
+
+
+void Humanoid::getHandPos(int arm, vector<double> &pos, vector<double> &posture)
+{
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    vector<double> shoulderPos = vector<double>(3);
+    Matrix3d shoulderOr;
+    vector<double> elbowPos = vector<double>(3);
+    Matrix3d elbowOr;
+    vector<double> wristPos = vector<double>(3);
+    Matrix3d wristOr;
+    vector<double> handPos = vector<double>(3);
+    Matrix3d handOr;
+
+    switch (arm) {
+    case 1: // right arm
+        this->getRightArmPosture(posture);
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        this->getLeftArmPosture(posture);
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), m_DH_arm.theta.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d v;
+        if (i==0){
+            // get the shoulder
+            shoulderOr = T.block(0,0,3,3);
+            v = T.block(0,3,3,1);
+            shoulderPos[0] = v[0];
+            shoulderPos[1] = v[1];
+            shoulderPos[2] = v[2];
+        }else if (i==2){
+            // get the elbow
+            elbowOr = T.block(0,0,3,3);
+            v = T.block(0,3,3,1);
+            elbowPos[0] = v[0];
+            elbowPos[1] = v[1];
+            elbowPos[2] = v[2];
+        }else if (i==4){
+            // get the wrist
+            wristOr = T.block(0,0,3,3);
+            v = T.block(0,3,3,1);
+            wristPos[0] = v[0];
+            wristPos[1] = v[1];
+            wristPos[2] = v[2];
+        } else if (i==6){
+            //get the hand
+            T = T * mat_hand;
+            handOr = T.block(0,0,3,3);
+            v = T.block(0,3,3,1);
+            handPos[0] = v[0];
+            handPos[1] = v[1];
+            handPos[2] = v[2];
+        }
+
+    }
+
+    pos.clear();
+    pos.push_back(handPos[0]);
+    pos.push_back(handPos[1]);
+    pos.push_back(handPos[2]);
+
 }
 
 //#if HEAD==1

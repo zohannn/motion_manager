@@ -680,6 +680,14 @@ public:
     void getLeftHandOr(Matrix3d& orr);
 
     /**
+     * @brief getHandPos
+     * @param arm
+     * @param pos
+     * @param posture
+     */
+    void getHandPos(int arm, vector<double>& pos, vector<double>& posture);
+
+    /**
      * @brief This method gets information about the humanoid
      * @return
      */
