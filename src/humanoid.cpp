@@ -1270,7 +1270,6 @@ void Humanoid::getHandPos(int arm, vector<double> &pos, vector<double> &posture)
 
     switch (arm) {
     case 1: // right arm
-        this->getRightArmPosture(posture);
         mat_world = this->mat_right;
         mat_hand = this->mat_r_hand;
         this->computeRightArmDHparams();
@@ -1279,7 +1278,6 @@ void Humanoid::getHandPos(int arm, vector<double> &pos, vector<double> &posture)
         m_DH_hand = this->m_DH_rightHand;
         break;
     case 2: //left arm
-        this->getLeftArmPosture(posture);
         mat_world = this->mat_left;
         mat_hand = this->mat_l_hand;
         this->computeLeftArmDHparams();
@@ -1292,7 +1290,7 @@ void Humanoid::getHandPos(int arm, vector<double> &pos, vector<double> &posture)
     T = mat_world;
 
     for (size_t i = 0; i < posture.size(); ++i){
-        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), m_DH_arm.theta.at(i),T_aux);
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
         T = T * T_aux;
         Vector3d v;
         if (i==0){

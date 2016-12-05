@@ -7,6 +7,7 @@
 *****************************************************************************/
 #include <qcustomplot.h>
 #include <qcpdocumentobject.h>
+#include <pca.hpp>
 #include <QtGui/QMainWindow>
 #include <QtGui/QListWidgetItem>
 #include <boost/smart_ptr.hpp>
@@ -69,6 +70,21 @@ public:
          * @param event
          */
         void closeEvent(QCloseEvent *event);
+
+        /* Returns the amount of milliseconds elapsed since the UNIX epoch. Works on both
+         * windows and linux.
+
+          Thanks to stackoverflow.com: http://stackoverflow.com/questions/1861294/how-to-calculate-execution-time-of-a-code-snippet-in-c
+          */
+        long long GetTimeMs64();
+
+        /**
+         * @brief doPCA
+         * @param data
+         * @param data_red
+         * @return -1 in case of error, 0 normal functionality, 1 dimensionality reduction according kaiser criterion
+         */
+        int doPCA(vector<vector<double>>& data, vector<vector<double> > &data_red);
 
 
 public Q_SLOTS:

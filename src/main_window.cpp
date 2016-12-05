@@ -1228,7 +1228,7 @@ if(solved){
     for(int i =0; i < v_headers.size(); ++i){
         std::vector<QString> row = mov_steps.at(i);
         for(int j=0; j < h_headers.size(); ++j){
-            QString item = row.at(j);
+           QString item = row.at(j);
            ui.tableWidget_sol_mov->setItem(i,j,new QTableWidgetItem(item));
         }
     }
@@ -1260,6 +1260,9 @@ if(solved){
             step++;
         }
     }
+    // PCA of the hand position
+    vector<vector<double>> handPosition_mov_red;
+    int pca_hand = this->doPCA(this->handPosition_mov,handPosition_mov_red);
     // plot the joints values
     this->mResultsJointsdlg->setupPlots(this->jointsPosition_mov,this->jointsVelocity_mov,this->jointsAcceleration_mov,this->timesteps_mov);
 }
@@ -2122,6 +2125,160 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
 	WriteSettings();
 	QMainWindow::closeEvent(event);
+}
+
+long long MainWindow::GetTimeMs64() {
+#ifdef WIN32
+ /* Windows */
+ FILETIME ft;
+ LARGE_INTEGER li;
+ /* Get the amount of 100 nano seconds intervals elapsed since January 1, 1601 (UTC) and copy it
+  * to a LARGE_INTEGER structure. */
+ GetSystemTimeAsFileTime(&ft);
+ li.LowPart = ft.dwLowDateTime;
+ li.HighPart = ft.dwHighDateTime;
+ unsigned long long ret = li.QuadPart;
+ ret -= 116444736000000000LL; /* Convert from file time to UNIX epoch time. */
+ ret /= 10000; /* From 100 nano seconds (10^-7) to 1 millisecond (10^-3) intervals */
+ return ret;
+#else
+ /* Linux */
+ struct timeval tv;
+ gettimeofday(&tv, NULL);
+ uint64_t ret = tv.tv_usec;
+ /* Convert from micro seconds (10^-6) to milliseconds (10^-3) */
+ ret /= 1000;
+ /* Adds the seconds (10^0) after converting them to milliseconds (10^-3) */
+ ret += (tv.tv_sec * 1000);
+ return ret;
+#endif
+}
+
+int MainWindow::doPCA(vector<vector<double> > &data, vector<vector<double> > &data_red)
+{
+    MatrixXd mat(data.size(),data.at(0).size());
+    for (size_t i = 0; i < data.size(); ++i) {
+        vector<double> row = data.at(i);
+      for (size_t j = 0; j < row.size(); ++j) {
+          mat(i,j)=row.at(j);
+      }
+    }
+    // Principal component analisys
+    Pca *pca = new Pca();
+    int init_result = pca->Calculate(mat,true,true,true);
+    if (0 != init_result) {
+      qnode.log(QNode::Error,"There is an error during PCA calculation!");
+      return -1;
+    }
+    vector<double> sd = pca->sd(),
+                  prop_of_var = pca->prop_of_var(),
+                  cum_prop = pca->cum_prop(),
+                  scores = pca->scores();
+    vector<unsigned int> el_cols = pca->eliminated_columns();
+    double         kaiser = pca->kaiser(),
+                  thresh95 = pca->thresh95();
+    unsigned int
+                  ncols = pca->ncols(),
+                  nrows = pca->nrows();
+    string method = pca->method();
+    delete pca;
+
+    // Save the result to text file
+    struct stat st = {0};
+    if (stat("results", &st) == -1) {
+        mkdir("results", 0700);
+    }
+    if (stat("results/planning", &st) == -1) {
+        mkdir("results/planning", 0700);
+    }
+    if (stat("results/planning/pca", &st) == -1) {
+        mkdir("results/planning/pca", 0700);
+    }
+    QString path("results/planning/pca/");
+    QString fname = path+QString("pca_out.txt");
+
+    ofstream outfile(fname.toStdString());
+    if (!outfile) {
+      cerr << "Can't create output file!" << endl;
+      return -1;
+    }
+    outfile << "Initial matrix: " << endl;
+    for (unsigned int i = 0; i < mat.rows(); ++i) {
+      for (unsigned int j = 0; j < mat.cols(); ++j) {
+        outfile << setw(7) << mat(i,j) << " ";
+      }
+      outfile << endl;
+    }
+    if (0 != el_cols.size()) {
+      outfile << "\nNumbers of eliminated columns (0 based):\n";
+      copy(el_cols.begin(), el_cols.end(), std::ostream_iterator<unsigned int>(outfile, " "));
+      outfile << "\n\nMatrix after the eliminating: " << endl;
+      for (unsigned int i = 0; i < mat.rows(); ++i) {
+        for (unsigned int j = 0; j < mat.cols(); ++j) {
+          if ( std::find(el_cols.begin(), el_cols.end(), j) == el_cols.end() ) {
+            outfile << setw(7) << mat(i,j) << " ";
+          }
+        }
+        outfile << endl;
+      }
+    }
+    outfile << "\n\n" << method << " method was used\n";
+    outfile << "\n\nStandard deviation:\n";
+    copy(sd.begin(), sd.end(), std::ostream_iterator<float>(outfile, " "));
+    outfile << "\n\nProportion of variance:\n";
+    copy(prop_of_var.begin(), prop_of_var.end(), std::ostream_iterator<float>(outfile, " "));
+    outfile << "\n\nCumulative proportion:\n";
+    copy(cum_prop.begin(), cum_prop.end(), std::ostream_iterator<float>(outfile, " "));
+    outfile << "\n\nKaiser criterion: " << kaiser;
+    outfile << "\n\n95% threshold criterion: " << thresh95 << endl;
+
+    outfile << "\n\nRotated data: " << endl;
+    unsigned int row_lim = nrows,
+                 col_lim = ncols;
+    if (scores.size() != nrows * ncols) {
+      row_lim = (nrows < ncols)? nrows : ncols,
+      col_lim = (ncols < nrows)? ncols : nrows;
+    }
+    for (unsigned int i = 0; i < row_lim; ++i) {
+      for (unsigned int j = 0; j < col_lim; ++j) {
+        outfile << setw(13) << scores[j + col_lim*i];
+      }
+      outfile << endl;
+    }
+
+    if(kaiser>1){
+        // export data reduced in dimentionality
+        data_red.clear();
+        data_red.resize(data.size());
+        data_red.at(0).resize(kaiser);
+
+        for (size_t i = 0; i < data.size(); ++i) {
+          vector<double> data_row = data.at(i);
+          vector<double> data_red_row;
+          for (size_t j = 0; j < data_row.size(); ++j) {
+              if(sd.at(j)>=1.0){
+                  data_red_row.push_back(data_row.at(j));
+              }
+          }
+          data_red.at(i) = data_red_row;
+        }
+
+        outfile << "\n\nMatrix reduced according to the kaiser criterion: " << endl;
+        for (size_t i = 0; i < data_red.size(); ++i) {
+          vector<double> data_red_row = data_red.at(i);
+          for (size_t j = 0; j < data_red_row.size(); ++j) {
+              outfile << setw(7) << data_red_row.at(j) << " ";
+          }
+          outfile << endl;
+        }
+        outfile.close();
+        return 1;
+    }
+    outfile.close();
+
+
+
+    return 0;
 }
 
 

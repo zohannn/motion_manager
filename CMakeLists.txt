@@ -148,6 +148,16 @@ include_directories(
 link_directories(
     ${QCPDOCUMENTOBJECT_HOME}/${CMAKE_BUILD_TYPE}/lib
 )
+
+# -- EigenPCA
+set(EIGENPCA_HOME /home/$ENV{USER}/EigenPCA)
+include_directories(
+    ${EIGENPCA_HOME}/${CMAKE_BUILD_TYPE}/include
+)
+link_directories(
+    ${EIGENPCA_HOME}/${CMAKE_BUILD_TYPE}/lib
+)
+
 ##############################################################################
 # Binaries
 ##############################################################################
@@ -179,8 +189,8 @@ else()
     target_link_libraries(${PROJECT_NAME} qcustomplot qcpdocumentobject)
 endif()
 
-
-
+# -- EigenPCA
+target_link_libraries(${PROJECT_NAME} EigenPCA)
 
 ##############################################################################
 # Testing
@@ -211,6 +221,8 @@ if(TEST)
     else()
         target_link_libraries(${PROJECT_NAME} qcustomplot qcpdocumentobject)
     endif()
+    # -- EigenPCA
+    target_link_libraries(${PROJECT_NAME} libEigenPCA)
 
     enable_testing ()
 
