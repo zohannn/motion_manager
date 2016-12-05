@@ -1263,6 +1263,56 @@ if(solved){
     // PCA of the hand position
     vector<vector<double>> handPosition_mov_red;
     int pca_hand = this->doPCA(this->handPosition_mov,handPosition_mov_red);
+    if (pca_hand!=-1){
+        // PCA successful
+        if((!handPosition_mov_red.empty())&&(handPosition_mov_red.at(0).size()==2)){
+            // dimensionality of the hand position reduced to 2 (movement on a plane)
+            QVector<double> pos_u; QVector<double> pos_v;
+            for(size_t i=0;i<handPosition_mov_red.size();++i){
+                vector<double> row = handPosition_mov_red.at(i);
+                pos_u.push_back(row.at(0));
+                pos_v.push_back(row.at(1));
+            }
+
+            ui.plot_hand_pos->plotLayout()->clear();
+            ui.plot_hand_pos->clearGraphs();
+            ui.plot_hand_pos->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+            QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_hand_pos);
+            wideAxisRect->setupFullAxesBox(true);
+            QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_hand_pos);
+            wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+            // move newly created axes on "axes" layer and grids on "grid" layer:
+            for (QCPAxisRect *rect : ui.plot_hand_pos->axisRects())
+            {
+              for (QCPAxis *axis : rect->axes())
+              {
+                axis->setLayer("axes");
+                axis->grid()->setLayer("grid");
+              }
+            }
+            QString title("Hand position");
+            ui.plot_hand_pos->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_hand_pos,title));
+            ui.plot_hand_pos->plotLayout()->addElement(1, 0, wideAxisRect);
+
+            ui.plot_hand_pos->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+            ui.plot_hand_pos->graph(0)->setPen(QPen(Qt::blue));
+            ui.plot_hand_pos->graph(0)->setName(title);
+            ui.plot_hand_pos->graph(0)->valueAxis()->setLabel("u [mm]");
+            ui.plot_hand_pos->graph(0)->keyAxis()->setLabel("v [mm]");
+            ui.plot_hand_pos->graph(0)->setData(pos_v, pos_u);
+            ui.plot_hand_pos->graph(0)->valueAxis()->setRange(*std::min_element(pos_u.begin(), pos_u.end()),
+                                                              *std::max_element(pos_u.begin(), pos_u.end()));
+            ui.plot_hand_pos->graph(0)->rescaleAxes();
+
+            ui.plot_hand_pos->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+
+            ui.plot_hand_pos->replot();
+
+        }else{
+            ui.plot_hand_pos->plotLayout()->clear();
+            ui.plot_hand_pos->clearGraphs();
+        }
+    }
     // plot the joints values
     this->mResultsJointsdlg->setupPlots(this->jointsPosition_mov,this->jointsVelocity_mov,this->jointsAcceleration_mov,this->timesteps_mov);
 }
@@ -2246,34 +2296,32 @@ int MainWindow::doPCA(vector<vector<double> > &data, vector<vector<double> > &da
       outfile << endl;
     }
 
-    if(kaiser>1){
-        // export data reduced in dimentionality
-        data_red.clear();
-        data_red.resize(data.size());
-        data_red.at(0).resize(kaiser);
+    // export data reduced in dimentionality
+    data_red.clear();
+    data_red.resize(data.size());
+    data_red.at(0).resize(kaiser);
 
-        for (size_t i = 0; i < data.size(); ++i) {
-          vector<double> data_row = data.at(i);
-          vector<double> data_red_row;
-          for (size_t j = 0; j < data_row.size(); ++j) {
-              if(sd.at(j)>=1.0){
-                  data_red_row.push_back(data_row.at(j));
-              }
+    for (size_t i = 0; i < data.size(); ++i) {
+      vector<double> data_row = data.at(i);
+      vector<double> data_red_row;
+      for (size_t j = 0; j < data_row.size(); ++j) {
+          if(sd.at(j)>=1.0){
+              data_red_row.push_back(data_row.at(j));
           }
-          data_red.at(i) = data_red_row;
-        }
-
-        outfile << "\n\nMatrix reduced according to the kaiser criterion: " << endl;
-        for (size_t i = 0; i < data_red.size(); ++i) {
-          vector<double> data_red_row = data_red.at(i);
-          for (size_t j = 0; j < data_red_row.size(); ++j) {
-              outfile << setw(7) << data_red_row.at(j) << " ";
-          }
-          outfile << endl;
-        }
-        outfile.close();
-        return 1;
+      }
+      data_red.at(i) = data_red_row;
     }
+
+    outfile << "\n\nMatrix reduced according to the kaiser criterion: " << endl;
+    for (size_t i = 0; i < data_red.size(); ++i) {
+      vector<double> data_red_row = data_red.at(i);
+      for (size_t j = 0; j < data_red_row.size(); ++j) {
+          outfile << setw(7) << data_red_row.at(j) << " ";
+      }
+      outfile << endl;
+    }
+
+
     outfile.close();
 
 

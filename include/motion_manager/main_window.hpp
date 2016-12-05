@@ -82,7 +82,7 @@ public:
          * @brief doPCA
          * @param data
          * @param data_red
-         * @return -1 in case of error, 0 normal functionality, 1 dimensionality reduction according kaiser criterion
+         * @return -1 in case of error, 0 otherwise
          */
         int doPCA(vector<vector<double>>& data, vector<vector<double> > &data_red);
 
