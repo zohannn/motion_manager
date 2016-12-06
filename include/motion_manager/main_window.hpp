@@ -86,6 +86,14 @@ public:
          */
         int doPCA(vector<vector<double>>& data, vector<vector<double> > &data_red);
 
+        /**
+         * @brief getDerivative
+         * @param function
+         * @param step_values
+         * @param derFunction
+         */
+        void getDerivative(QVector<double> &function, QVector<double> &step_values, QVector<double> &derFunction);
+
 
 public Q_SLOTS:
 
@@ -332,6 +340,7 @@ private:
         vector<vector<double>> handOrientation_mov; /**< hand orientation during the movement. */
         vector<vector<double>> handLinearVelocity_mov; /**< hand linear velocity during the movement */
         vector<vector<double>> handAngularVelocity_mov;/**< hand angular velocity during the movement */
+        vector<double> handVelocityNorm_mov; /**< hand velocity norm during the movement */
 
         moveit_plannerPtr m_planner; /**< MoveIt! Libraries planner */
         bool moveit_mov; /**< true if the movement has been planned by the moveit planner, false otherwise */

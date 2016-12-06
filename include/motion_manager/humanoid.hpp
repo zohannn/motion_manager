@@ -609,6 +609,19 @@ public:
     void getRightHandOr(Matrix3d& orr);
 
     /**
+     * @brief getRightHandVel
+     * @param vel
+     */
+    void getRightHandVel(vector<double>& vel);
+
+    /**
+     * @brief getRightHandVelNorm
+     * @return
+     */
+    double getRightHandVelNorm();
+
+
+    /**
      * @brief This method gets the position of the left shoulder
      * @param pos
      */
@@ -680,12 +693,43 @@ public:
     void getLeftHandOr(Matrix3d& orr);
 
     /**
+     * @brief getLeftHandVel
+     * @param vel
+     */
+    void getLeftHandVel(vector<double>& vel);
+
+    /**
+     * @brief getLeftHandVelNorm
+     * @return
+     */
+    double getLeftHandVelNorm();
+
+
+    /**
      * @brief getHandPos
      * @param arm
      * @param pos
      * @param posture
      */
     void getHandPos(int arm, vector<double>& pos, vector<double>& posture);
+
+    /**
+     * @brief getHandVel
+     * @param arm
+     * @param vel
+     * @param posture
+     * @param velocities
+     */
+    void getHandVel(int arm, vector<double>& vel, vector<double>& posture,vector<double>& velocities);
+
+    /**
+     * @brief getHandVelNorm
+     * @param arm
+     * @param posture
+     * @param velocities
+     * @return
+     */
+    double getHandVelNorm(int arm, vector<double>& posture,vector<double>& velocities);
 
     /**
      * @brief This method gets information about the humanoid
@@ -860,8 +904,18 @@ private:
     /**
      * @brief This method computes the direct kinematic of the arm
      * @param arm
+     * @param posture
      */
-    void directKinematicsSingleArm(int arm);
+    void directKinematicsSingleArm(int arm,std::vector<double>& posture);
+
+    /**
+     * @brief directDiffKinematicsSingleArm
+     * @param arm
+     * @param posture
+     * @param velocities
+     * @param hand_vel
+     */
+    void directDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> velocities, VectorXd &hand_vel);
 
     /**
      * @brief This method computes the direct kinematic of both arms

@@ -308,10 +308,8 @@ post_place_z=0
 post_place_dist=0
 
 # Move settings
-target_x=-400
-
-target_y=700
-
+target_x=-300
+target_y=500
 target_z=1000
 
 target_roll=0.79
@@ -345,13 +343,12 @@ final_hand_4=1.22
 sel_final=false
 plane_point1_x=-400
 
-plane_point1_y=500
-
+plane_point1_y=0
 plane_point1_z=1000
 
 plane_point2_x=-100
-plane_point2_y=700
 
+plane_point2_y=500
 plane_point2_z=1000
 
 plane_point3_x=-200

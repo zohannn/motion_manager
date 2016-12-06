@@ -1009,7 +1009,9 @@ void Humanoid::getRightShoulderPos(vector<double> &pos)
 {
 
     // direct kinematics of the right arm
-    directKinematicsSingleArm(1);
+    std::vector<double> posture;
+    this->getRightArmPosture(posture);
+    directKinematicsSingleArm(1,posture);
 
     pos = rightShoulderPos;
 }
@@ -1030,7 +1032,9 @@ void Humanoid::getRightShoulderOr(Matrix3d &orr)
 {
 
     // direct kinematics of the right arm
-    directKinematicsSingleArm(1);
+    std::vector<double> posture;
+    this->getRightArmPosture(posture);
+    directKinematicsSingleArm(1,posture);
 
     orr=rightShoulderOr;
 
@@ -1040,7 +1044,9 @@ void Humanoid::getRightElbowPos(vector<double> &pos)
 {
 
     // direct kinematics of the right arm
-    directKinematicsSingleArm(1);
+    std::vector<double> posture;
+    this->getRightArmPosture(posture);
+    directKinematicsSingleArm(1,posture);
 
     pos = rightElbowPos;
 }
@@ -1062,7 +1068,9 @@ void Humanoid::getRightElbowOr(Matrix3d &orr)
 {
 
     // direct kinematics of the right arm
-    directKinematicsSingleArm(1);
+    std::vector<double> posture;
+    this->getRightArmPosture(posture);
+    directKinematicsSingleArm(1,posture);
 
     orr = rightElbowOr;
 }
@@ -1072,7 +1080,9 @@ void Humanoid::getRightWristPos(vector<double> &pos)
 {
 
     // direct kinematics of the right arm
-    directKinematicsSingleArm(1);
+    std::vector<double> posture;
+    this->getRightArmPosture(posture);
+    directKinematicsSingleArm(1,posture);
 
     pos = rightWristPos;
 }
@@ -1092,7 +1102,9 @@ void Humanoid::getRightWristOr(Matrix3d &orr)
 {
 
     // direct kinematics of the right arm
-    directKinematicsSingleArm(1);
+    std::vector<double> posture;
+    this->getRightArmPosture(posture);
+    directKinematicsSingleArm(1,posture);
 
     orr = rightWristOr;
 }
@@ -1101,7 +1113,9 @@ void Humanoid::getRightHandPos(vector<double> &pos)
 {
 
     // direct kinematics of the right arm
-    directKinematicsSingleArm(1);
+    std::vector<double> posture;
+    this->getRightArmPosture(posture);
+    directKinematicsSingleArm(1,posture);
 
     pos = rightHandPos;
 }
@@ -1123,16 +1137,39 @@ void Humanoid::getRightHandOr(Matrix3d &orr)
 {
 
     // direct kinematics of the right arm
-    directKinematicsSingleArm(1);
+    std::vector<double> posture;
+    this->getRightArmPosture(posture);
+    directKinematicsSingleArm(1,posture);
 
     orr = rightHandOr;
+}
+
+void Humanoid::getRightHandVel(vector<double> &vel)
+{
+    std::vector<double> posture; std::vector<double> velocities;
+    this->getRightArmPosture(posture); this->getRightArmVelocities(velocities);
+    VectorXd hand_vel;
+    directDiffKinematicsSingleArm(1,posture,velocities,hand_vel);
+    vel.resize(hand_vel.size());
+    VectorXd::Map(&vel[0], hand_vel.size()) = hand_vel;
+}
+
+double Humanoid::getRightHandVelNorm()
+{
+    std::vector<double> hand_vel;
+
+    this->getRightHandVel(hand_vel);
+
+    return sqrt(pow(hand_vel.at(0),2)+pow(hand_vel.at(1),2)+pow(hand_vel.at(2),2));
 }
 
 void Humanoid::getLeftShoulderPos(vector<double> &pos)
 {
 
     // direct kinematics of the left arm
-    directKinematicsSingleArm(2);
+    std::vector<double> posture;
+    this->getLeftArmPosture(posture);
+    directKinematicsSingleArm(2,posture);
 
     pos = leftShoulderPos;
 }
@@ -1153,7 +1190,9 @@ void Humanoid::getLeftShoulderOr(Matrix3d &orr)
 {
 
     // direct kinematics of the left arm
-    directKinematicsSingleArm(2);
+    std::vector<double> posture;
+    this->getLeftArmPosture(posture);
+    directKinematicsSingleArm(2,posture);
 
     orr = leftShoulderOr;
 }
@@ -1163,7 +1202,9 @@ void Humanoid::getLeftElbowPos(vector<double> &pos)
 {
 
     // direct kinematics of the left arm
-    directKinematicsSingleArm(2);
+    std::vector<double> posture;
+    this->getLeftArmPosture(posture);
+    directKinematicsSingleArm(2,posture);
 
     pos = leftElbowPos;
 
@@ -1184,7 +1225,9 @@ void Humanoid::getLeftElbowOr(Matrix3d &orr)
 {
 
     // direct kinematics of the left arm
-    directKinematicsSingleArm(2);
+    std::vector<double> posture;
+    this->getLeftArmPosture(posture);
+    directKinematicsSingleArm(2,posture);
 
     orr = leftElbowOr;
 }
@@ -1194,7 +1237,9 @@ void Humanoid::getLeftWristPos(vector<double> &pos)
 {
 
     // direct kinematics of the left arm
-    directKinematicsSingleArm(2);
+    std::vector<double> posture;
+    this->getLeftArmPosture(posture);
+    directKinematicsSingleArm(2,posture);
 
     pos = leftWristPos;
 }
@@ -1214,7 +1259,9 @@ void Humanoid::getLeftWristOr(Matrix3d &orr)
 {
 
     // direct kinematics of the left arm
-    directKinematicsSingleArm(2);
+    std::vector<double> posture;
+    this->getLeftArmPosture(posture);
+    directKinematicsSingleArm(2,posture);
 
     orr = leftWristOr;
 }
@@ -1224,7 +1271,9 @@ void Humanoid::getLeftHandPos(vector<double> &pos)
 {
 
     // direct kinematics of the left arm
-    directKinematicsSingleArm(2);
+    std::vector<double> posture;
+    this->getLeftArmPosture(posture);
+    directKinematicsSingleArm(2,posture);
 
     pos = leftHandPos;
 }
@@ -1236,6 +1285,8 @@ double Humanoid::getLeftHandNorm()
 
     this->getLeftHandPos(pos);
 
+    pos = leftHandPos;
+
     return sqrt(pow(pos.at(0),2)+pow(pos.at(1),2)+pow(pos.at(2),2));
 }
 
@@ -1244,9 +1295,30 @@ void Humanoid::getLeftHandOr(Matrix3d &orr)
 {
 
     // direct kinematics of the left arm
-    directKinematicsSingleArm(2);
+    std::vector<double> posture;
+    this->getLeftArmPosture(posture);
+    directKinematicsSingleArm(2,posture);
 
     orr = leftHandOr;
+}
+
+void Humanoid::getLeftHandVel(vector<double> &vel)
+{
+    std::vector<double> posture; std::vector<double> velocities;
+    this->getLeftArmPosture(posture); this->getLeftArmVelocities(velocities);
+    VectorXd hand_vel;
+    directDiffKinematicsSingleArm(2,posture,velocities,hand_vel);
+    vel.resize(hand_vel.size());
+    VectorXd::Map(&vel[0], hand_vel.size()) = hand_vel;
+}
+
+double Humanoid::getLeftHandVelNorm()
+{
+    std::vector<double> hand_vel;
+
+    this->getLeftHandVel(hand_vel);
+
+    return sqrt(pow(hand_vel.at(0),2)+pow(hand_vel.at(1),2)+pow(hand_vel.at(2),2));
 }
 
 
@@ -1333,6 +1405,23 @@ void Humanoid::getHandPos(int arm, vector<double> &pos, vector<double> &posture)
 
 }
 
+void Humanoid::getHandVel(int arm, vector<double> &vel, vector<double> &posture, vector<double> &velocities)
+{
+    VectorXd hand_vel;
+    directDiffKinematicsSingleArm(arm,posture,velocities,hand_vel);
+    vel.resize(hand_vel.size());
+    VectorXd::Map(&vel[0], hand_vel.size()) = hand_vel;
+}
+
+double Humanoid::getHandVelNorm(int arm, vector<double> &posture, vector<double> &velocities)
+{
+    std::vector<double> hand_vel;
+
+    this->getHandVel(arm,hand_vel,posture,velocities);
+
+    return sqrt(pow(hand_vel.at(0),2)+pow(hand_vel.at(1),2)+pow(hand_vel.at(2),2));
+}
+
 //#if HEAD==1
 
 //humanoid_part Humanoid::getHead(){
@@ -1408,8 +1497,14 @@ void Humanoid::directKinematicsDualArm()
 {
 
 
-    directKinematicsSingleArm(1);// right arm
-    directKinematicsSingleArm(2);// left arm
+    // direct kinematics of the right arm
+    std::vector<double> rposture;
+    this->getRightArmPosture(rposture);
+    directKinematicsSingleArm(1,rposture);
+    // direct kinematics of the left arm
+    std::vector<double> lposture;
+    this->getLeftArmPosture(lposture);
+    directKinematicsSingleArm(2,lposture);
 
 }
 
@@ -1808,10 +1903,10 @@ void Humanoid::computeLeftHandDHparams()
 }
 
 
-void Humanoid::directKinematicsSingleArm(int arm)
+void Humanoid::directKinematicsSingleArm(int arm, std::vector<double>& posture)
 {
 
-    vector<double> posture;
+
     Matrix4d T;
     Matrix4d T_aux;
     Matrix4d mat_world;
@@ -1829,37 +1924,29 @@ void Humanoid::directKinematicsSingleArm(int arm)
     Matrix3d handOr;
 
     switch (arm) {
-
-    case 1: // right arm
-
-        this->getRightArmPosture(posture);
+    case 1: // right arm        
         mat_world = this->mat_right;
         mat_hand = this->mat_r_hand;
         this->computeRightArmDHparams();
         this->computeRightHandDHparams();
         m_DH_arm = this->m_DH_rightArm;
         m_DH_hand = this->m_DH_rightHand;
-
         break;
-
     case 2: //left arm
-
-        this->getLeftArmPosture(posture);
         mat_world = this->mat_left;
         mat_hand = this->mat_l_hand;
         this->computeLeftArmDHparams();
         this->computeLeftHandDHparams();
         m_DH_arm = this->m_DH_leftArm;
         m_DH_hand = this->m_DH_leftHand;
-
         break;
     }
 
     T = mat_world;
 
-    for (int i = 0; i < JOINTS_ARM; ++i){
+    for (int i = 0; i < posture.size(); ++i){
 
-        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), m_DH_arm.theta.at(i),T_aux);
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
 
         T = T * T_aux;
         Vector3d v;
@@ -1874,21 +1961,14 @@ void Humanoid::directKinematicsSingleArm(int arm)
             shoulderPos[2] = v[2];
 
             switch (arm){
-
             case 1: // right arm
-
                 this->rightShoulderPos = shoulderPos;
                 this->rightShoulderOr = shoulderOr;
-
                 break;
-
             case 2: // left arm
-
                 this->leftShoulderPos = shoulderPos;
                 this->leftShoulderOr = shoulderOr;
-
                 break;
-
             }
 
         }else if (i==2){
@@ -1902,21 +1982,14 @@ void Humanoid::directKinematicsSingleArm(int arm)
             elbowPos[2] = v[2];
 
             switch(arm){
-
             case 1: // right arm
-
                 this->rightElbowPos = elbowPos;
                 this->rightElbowOr = elbowOr;
-
                 break;
-
             case 2: // left arm
-
                 this->leftElbowPos = elbowPos;
                 this->leftElbowOr = elbowOr;
-
                 break;
-
             }
 
         }else if (i==4){
@@ -1930,21 +2003,14 @@ void Humanoid::directKinematicsSingleArm(int arm)
             wristPos[2] = v[2];
 
             switch(arm){
-
             case 1: // right arm
-
                 this->rightWristPos = wristPos;
                 this->rightWristOr = wristOr;
-
                 break;
-
             case 2: // left arm
-
                 this->leftWristPos = wristPos;
                 this->leftWristOr = wristOr;
-
                 break;
-
             }
 
 
@@ -1960,21 +2026,14 @@ void Humanoid::directKinematicsSingleArm(int arm)
             handPos[2] = v[2];
 
             switch(arm){
-
             case 1: // right arm
-
                 this->rightHandPos = handPos;
                 this->rightHandOr = handOr;
-
                 break;
-
             case 2: // left arm
-
                 this->leftHandPos = handPos;
                 this->leftHandOr = handOr;
-
                 break;
-
             }
 
 
@@ -2009,6 +2068,124 @@ void Humanoid::directKinematicsSingleArm(int arm)
             break;
         }
     }
+
+}
+
+void Humanoid::directDiffKinematicsSingleArm(int arm,vector<double> posture, vector<double> velocities, VectorXd& hand_vel)
+{
+    VectorXd joint_velocities;
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    MatrixXd JacobianArm(6,JOINTS_ARM);
+
+    Vector3d pos0;
+    Vector3d z0;
+    Vector3d pos1;
+    Vector3d z1;
+    Vector3d pos2;
+    Vector3d z2;
+    Vector3d pos3;
+    Vector3d z3;
+    Vector3d pos4;
+    Vector3d z4;
+    Vector3d pos5;
+    Vector3d z5;
+    Vector3d pos6;
+    Vector3d z6;
+
+    vector<double> handPos; Vector3d pos_hand;
+    this->getHandPos(arm,handPos,posture);
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+    pos_hand << handPos.at(0), handPos.at(1), handPos.at(2);
+    joint_velocities.resize(velocities.size());
+
+    for (int i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d diff;
+        Vector3d cross;
+        Vector3d zi;
+        switch(i){
+        case 0:
+            z0 = T.block(0,2,3,1);
+            pos0 = T.block(0,3,3,1);
+            diff = pos_hand - pos0;
+            cross = z0.cross(diff);
+            zi=z0;
+            break;
+        case 1:
+            z1 = T.block(0,2,3,1);
+            pos1 = T.block(0,3,3,1);
+            diff = pos_hand - pos1;
+            cross = z1.cross(diff);
+            zi=z1;
+            break;
+        case 2:
+            z2 = T.block(0,2,3,1);
+            pos2 = T.block(0,3,3,1);
+            diff = pos_hand - pos2;
+            cross = z2.cross(diff);
+            zi=z2;
+            break;
+        case 3:
+            z3 = T.block(0,2,3,1);
+            pos3 = T.block(0,3,3,1);
+            diff = pos_hand - pos3;
+            cross = z3.cross(diff);
+            zi=z3;
+            break;
+        case 4:
+            z4 = T.block(0,2,3,1);
+            pos4 = T.block(0,3,3,1);
+            diff = pos_hand - pos4;
+            cross = z4.cross(diff);
+            zi=z4;
+            break;
+        case 5:
+            z5 = T.block(0,2,3,1);
+            pos5 = T.block(0,3,3,1);
+            diff = pos_hand - pos5;
+            cross = z5.cross(diff);
+            zi=z5;
+            break;
+        case 6:
+            z6 = T.block(0,2,3,1);
+            pos6 = T.block(0,3,3,1);
+            diff = pos_hand - pos6;
+            cross = z6.cross(diff);
+            zi=z6;
+            break;
+        }
+        VectorXd column(6); column << cross, zi;
+        JacobianArm.col(i) = column;
+        joint_velocities(i) = velocities.at(i);
+    }
+    hand_vel = JacobianArm*joint_velocities;
 
 }
 
