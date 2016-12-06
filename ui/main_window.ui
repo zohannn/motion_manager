@@ -1047,8 +1047,8 @@ p, li { white-space: pre-wrap; }
        <widget class="QCustomPlot" name="plot_hand_pos" native="true">
         <property name="geometry">
          <rect>
-          <x>20</x>
-          <y>10</y>
+          <x>370</x>
+          <y>20</y>
           <width>321</width>
           <height>231</height>
          </rect>
@@ -1057,9 +1057,9 @@ p, li { white-space: pre-wrap; }
        <widget class="QCustomPlot" name="plot_hand_vel" native="true">
         <property name="geometry">
          <rect>
-          <x>360</x>
-          <y>10</y>
-          <width>311</width>
+          <x>10</x>
+          <y>20</y>
+          <width>331</width>
           <height>231</height>
          </rect>
         </property>
@@ -1067,8 +1067,8 @@ p, li { white-space: pre-wrap; }
        <widget class="QCustomPlot" name="plot_power_law" native="true">
         <property name="geometry">
          <rect>
-          <x>690</x>
-          <y>10</y>
+          <x>720</x>
+          <y>20</y>
           <width>341</width>
           <height>231</height>
          </rect>
