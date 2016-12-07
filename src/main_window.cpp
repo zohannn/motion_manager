@@ -1328,8 +1328,8 @@ if(solved){
             ui.plot_hand_pos->graph(0)->valueAxis()->setLabel("u [mm]");
             ui.plot_hand_pos->graph(0)->keyAxis()->setLabel("v [mm]");
             ui.plot_hand_pos->graph(0)->setData(pos_v, pos_u);
-            ui.plot_hand_pos->graph(0)->valueAxis()->setRange(*std::min_element(pos_u.begin(), pos_u.end()),
-                                                              *std::max_element(pos_u.begin(), pos_u.end()));
+            //ui.plot_hand_pos->graph(0)->valueAxis()->setRange(*std::min_element(pos_u.begin(), pos_u.end()),
+                                                              //*std::max_element(pos_u.begin(), pos_u.end()));
             ui.plot_hand_pos->graph(0)->rescaleAxes();
             ui.plot_hand_pos->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
             ui.plot_hand_pos->replot();
@@ -1348,10 +1348,22 @@ if(solved){
             QVector<double> R;// curvature radius
             QVector<double> lnR; QVector<double> lnHand_vel;
             for(size_t i=0; i<pos_u.size();++i){
-                R.push_back((pow(pow(der_pos_u_1.at(i),2)+pow(der_pos_v_1.at(i),2),(3/2)))/(abs(der_pos_u_1.at(i)*der_pos_v_2.at(i)-der_pos_v_1.at(i)*der_pos_u_2.at(i))));
+                R.push_back((pow(pow(der_pos_u_1.at(i),2)+pow(der_pos_v_1.at(i),2),(3/2)))/
+                            (abs(der_pos_u_1.at(i)*der_pos_v_2.at(i)-der_pos_v_1.at(i)*der_pos_u_2.at(i))));
                 C.push_back(1/R.at(i));
-                lnR.push_back(log(R.at(i)));
-                lnHand_vel.push_back(log(qhand_vel.at(i)));
+                if((R.at(i)>=1) || (R.at(i)<=-1)){
+                   lnR.push_back(log(R.at(i)));
+                   lnHand_vel.push_back(log(qhand_vel.at(i)));
+                }
+            }
+            // fit R^2
+            double q,m,r;
+            this->linreg(lnR,lnHand_vel,&q,&m,&r);
+            std::cout << " m = " << m << " q = " << q << " R^2 = " << r << endl;
+            QVector<double> lnHand_vel_fit; QVector<double> best_line; double m_best = 1/3;
+            for(size_t i=0; i<lnR.size();++i){
+                lnHand_vel_fit.push_back(m*lnR.at(i)+q);
+                best_line.push_back(m_best*lnR.at(i));
             }
 
             // plot power law
@@ -1377,13 +1389,36 @@ if(solved){
 
             ui.plot_power_law->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
             ui.plot_power_law->graph(0)->setPen(QPen(Qt::black));
+            ui.plot_power_law->graph(0)->setLineStyle(QCPGraph::lsNone);
+            ui.plot_power_law->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross, 4));
             ui.plot_power_law->graph(0)->setName(title);
             ui.plot_power_law->graph(0)->valueAxis()->setLabel("ln(v(t))");
             ui.plot_power_law->graph(0)->keyAxis()->setLabel("ln(R(t))");
             ui.plot_power_law->graph(0)->setData(lnR, lnHand_vel);
-            ui.plot_power_law->graph(0)->valueAxis()->setRange(*std::min_element(lnHand_vel.begin(), lnHand_vel.end()),
-                                                              *std::max_element(lnHand_vel.begin(), lnHand_vel.end()));
+            //ui.plot_power_law->graph(0)->valueAxis()->setRange(*std::min_element(lnHand_vel.begin(), lnHand_vel.end()),
+                                                             // *std::max_element(lnHand_vel.begin(), lnHand_vel.end()));
             ui.plot_power_law->graph(0)->rescaleAxes();
+
+            ui.plot_power_law->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+            ui.plot_power_law->graph(1)->setPen(QPen(Qt::red));
+            //ui.plot_power_law->graph(0)->setName(title);
+            //ui.plot_power_law->graph(0)->valueAxis()->setLabel("ln(v(t))");
+            //ui.plot_power_law->graph(0)->keyAxis()->setLabel("ln(R(t))");
+            ui.plot_power_law->graph(1)->setData(lnR, lnHand_vel_fit);
+            //ui.plot_power_law->graph(0)->valueAxis()->setRange(*std::min_element(lnHand_vel.begin(), lnHand_vel.end()),
+                                                             // *std::max_element(lnHand_vel.begin(), lnHand_vel.end()));
+            ui.plot_power_law->graph(1)->rescaleAxes();
+
+            ui.plot_power_law->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+            ui.plot_power_law->graph(2)->setPen(QPen(Qt::darkYellow));
+            //ui.plot_power_law->graph(0)->setName(title);
+            //ui.plot_power_law->graph(0)->valueAxis()->setLabel("ln(v(t))");
+            //ui.plot_power_law->graph(0)->keyAxis()->setLabel("ln(R(t))");
+            ui.plot_power_law->graph(2)->setData(lnR, best_line);
+            //ui.plot_power_law->graph(0)->valueAxis()->setRange(*std::min_element(lnHand_vel.begin(), lnHand_vel.end()),
+                                                             // *std::max_element(lnHand_vel.begin(), lnHand_vel.end()));
+            ui.plot_power_law->graph(2)->rescaleAxes();
+
             ui.plot_power_law->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
             ui.plot_power_law->replot();
 
@@ -2524,6 +2559,63 @@ void MainWindow::getDerivative(QVector<double> &function, QVector<double> &step_
        step_value = step_values.at(tnsample);
        derFunction.push_back(((  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h))/step_value);
 
+}
+
+int MainWindow::linreg(const QVector<double> &x, const QVector<double> &y, double *b, double *m, double *r)
+{
+    double mm,bb,rr;
+
+    double   sumx = 0.0;                        /* sum of x                      */
+    double   sumx2 = 0.0;                       /* sum of x^2                   */
+    double   sumxy = 0.0;                       /* sum of x * y                  */
+    double   sumy = 0.0;                        /* sum of y                      */
+    //double   sumy2 = 0.0;                       /* sum of y^2                   */
+
+    int n = x.size();
+
+   for (int i=0; i<n ;++i)
+    {
+      sumx  += x.at(i);
+      sumx2 += pow((x.at(i)),2);
+      sumxy += x.at(i) * y.at(i);
+      sumy  += y.at(i);
+      //sumy2 += pow(y.at(i),2);
+    }
+
+   double   meanx = sumx/n;                        /* mean of x                      */
+   double   meanx2 = sumx2/n;                       /* mean of x^2                   */
+   double   meanxy = sumxy/n;                       /* mean of x * y                  */
+   double   meany = sumy/n;                        /* mean of y                      */
+   //double   meany2 = sumy2/n;                       /* mean of y^2                   */
+
+   double denom = (pow(meanx,2) - meanx2);
+   if (denom == 0) {
+       // can't solve the problem.
+       *m = 0;
+       *b = 0;
+       *r = 0;
+       return 1;
+   }
+
+   mm = ((meanx*meany) - meanxy) / denom;
+   bb = meany - mm*meanx;
+
+   /* compute correlation coeff     */
+   double se_y = 0.0; /* squared error in y or total variation in y */
+   double se_line = 0.0; /* squared error of the fitted line */
+   for(int i=0; i<n; ++i)
+   {
+       se_y += pow((y.at(i) - meany),2);
+       se_line += pow((y.at(i)-(mm*x.at(i)+bb)),2);
+   }
+   rr = 1 - (se_line/se_y);
+
+   // results
+   *m = mm;
+   *b = bb;
+   *r = rr;
+
+   return 0;
 }
 
 

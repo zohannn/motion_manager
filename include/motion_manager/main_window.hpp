@@ -94,6 +94,17 @@ public:
          */
         void getDerivative(QVector<double> &function, QVector<double> &step_values, QVector<double> &derFunction);
 
+        /**
+         * @brief linreg
+         * @param x array of data
+         * @param y array of data
+         * @param b output intercept
+         * @param m output slope
+         * @param r output correlation coefficient (can be NULL if you don't want it)
+         * @return
+         */
+         int linreg(const QVector<double> &x, const QVector<double> &y, double* b, double* m, double* r);
+
 
 public Q_SLOTS:
 
