@@ -75,6 +75,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mResultsJointsdlg = new ResultsJointsDialog(this);
     mResultsJointsdlg->setModal(false);
 
+    // create the Power Law dialog
+    mPowerLawdlg = new PowerLawDialog(this);
+    mPowerLawdlg->setModal(false);
+
 
     ReadSettings();
     setWindowIcon(QIcon(":/images/motion_managerIcon.png"));
@@ -1197,7 +1201,7 @@ if(solved){
     uint tot_steps=0;
     QStringList h_headers; bool h_head=false; QStringList v_headers;
     double mov_duration = 0.0;
-    vector<double> time;     QVector<double> tot_timesteps_mov;
+    vector<double> time;
     std::vector<std::vector<QString>> mov_steps;
     for (size_t k=0; k< this->jointsPosition_mov.size();++k){
         MatrixXd jointPosition_stage = this->jointsPosition_mov.at(k);
@@ -1216,7 +1220,6 @@ if(solved){
         double stage_duration = 0.0;
         for(int i = 0; i< jointPosition_stage.rows(); ++i){
             tot_steps++;
-            tot_timesteps_mov.push_back(timestep_stage.at(i));
             if(i>0){
                 stage_duration += timestep_stage.at(i);
                 time_stage.at(i) = time_stage.at(i-1) + timestep_stage.at(i-1);
@@ -1237,7 +1240,7 @@ if(solved){
         time.reserve(time_stage.size());
         std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time));
     }// movements
-    QVector<double> qtime = QVector<double>::fromStdVector(time);
+    this->qtime_mov = QVector<double>::fromStdVector(time);
 
     // show the results
     ui.tableWidget_sol_mov->setColumnCount(h_headers.size());
@@ -1287,297 +1290,7 @@ if(solved){
         }
     }
 
-    QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_mov);
-
-
-
-    // PCA of the hand position
-    vector<vector<double>> handPosition_mov_red;
-    int pca_hand = this->doPCA(this->handPosition_mov,handPosition_mov_red);
-    if (pca_hand!=-1){
-        // PCA successful
-        if((!handPosition_mov_red.empty())&&(handPosition_mov_red.at(0).size()==2)){
-            // dimensionality of the hand position reduced to 2 (movement on a plane)
-            QVector<double> pos_u; QVector<double> pos_v;
-            for(size_t i=0;i<handPosition_mov_red.size();++i){
-                vector<double> row = handPosition_mov_red.at(i);
-                pos_u.push_back(row.at(0));
-                pos_v.push_back(row.at(1));
-            }
-            /*
-            // ecc ellipse
-            double ecc = 0.85;  double pos_u_0 = -400;
-            double v_max = *std::max_element(pos_v.begin(), pos_v.end());
-            double v_min = *std::min_element(pos_v.begin(), pos_v.end());
-            double pos_v_0 = (v_max -v_min)/2;
-            double ar = v_max - pos_v_0; double br=ar*sqrt(1-pow(ecc,2));
-            for(size_t i=0; i<pos_v.size();++i){
-                pos_u.push_back(pos_u_0+br*sqrt(1-pow(((pos_v.at(i)-pos_v_0)/ar),2)));
-            }
-            */
-
-            // plot hand position
-            ui.plot_hand_pos->plotLayout()->clear();
-            ui.plot_hand_pos->clearGraphs();
-            ui.plot_hand_pos->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
-            QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_hand_pos);
-            wideAxisRect->setupFullAxesBox(true);
-            QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_hand_pos);
-            wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
-            // move newly created axes on "axes" layer and grids on "grid" layer:
-            for (QCPAxisRect *rect : ui.plot_hand_pos->axisRects())
-            {
-              for (QCPAxis *axis : rect->axes())
-              {
-                axis->setLayer("axes");
-                axis->grid()->setLayer("grid");
-              }
-            }
-            QString title("Hand position");
-            ui.plot_hand_pos->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_hand_pos,title));
-            ui.plot_hand_pos->plotLayout()->addElement(1, 0, wideAxisRect);
-
-            ui.plot_hand_pos->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-            ui.plot_hand_pos->graph(0)->setPen(QPen(Qt::blue));
-            ui.plot_hand_pos->graph(0)->setName(title);
-            ui.plot_hand_pos->graph(0)->valueAxis()->setLabel("u [mm]");
-            ui.plot_hand_pos->graph(0)->keyAxis()->setLabel("v [mm]");
-            ui.plot_hand_pos->graph(0)->setData(pos_v, pos_u);
-            //ui.plot_hand_pos->graph(0)->valueAxis()->setRange(*std::min_element(pos_u.begin(), pos_u.end()),
-                                                              //*std::max_element(pos_u.begin(), pos_u.end()));
-            ui.plot_hand_pos->graph(0)->rescaleAxes();
-            ui.plot_hand_pos->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-            ui.plot_hand_pos->replot();
-
-            // --- Curvature radius --- //
-            // first derivatives
-            QVector<double> der_pos_u_1; QVector<double> der_pos_v_1;
-            this->getDerivative(pos_u,tot_timesteps_mov,der_pos_u_1);
-            this->getDerivative(pos_v,tot_timesteps_mov,der_pos_v_1);
-            // second derivatives
-            QVector<double> der_pos_u_2; QVector<double> der_pos_v_2;
-            this->getDerivative(der_pos_u_1,tot_timesteps_mov,der_pos_u_2);
-            this->getDerivative(der_pos_v_1,tot_timesteps_mov,der_pos_v_2);
-
-            QVector<double> C;// curvature
-            QVector<double> lnC;
-            QVector<double> R;// curvature radius
-            QVector<double> lnR; //QVector<double> lnHand_vel;
-            double eexp = ((double)3)/2; double num; double den;
-            for(size_t i=0; i<pos_u.size();++i){
-                num = pow(pow(der_pos_u_1.at(i),2)+pow(der_pos_v_1.at(i),2),eexp);
-                den = abs((der_pos_u_1.at(i)*der_pos_v_2.at(i))-(der_pos_v_1.at(i)*der_pos_u_2.at(i)));
-                R.push_back(((double)num)/den); // [mm]
-                C.push_back(((double)1)/R.at(i)); // [mm^-1]
-                //if(((R.at(i)>1) || (R.at(i)<-1)) && ((C.at(i)<1) || (C.at(i)>-1))){
-                if(C.at(i)<1){
-                   lnR.push_back(log(R.at(i)));
-                   lnC.push_back(log(C.at(i)));
-                }
-                   //lnHand_vel.push_back(log(qhand_vel.at(i)));
-                //}
-            }
-
-            // tangential velocity
-            QVector<double> theta; QVector<double> der_theta; QVector<double> ln_theta; QVector<double> vel_tan; QVector<double> ln_vel_tan;
-            for(size_t i=0; i< pos_u.size(); ++i){
-                theta.push_back(std::atan2(pos_v.at(i),pos_u.at(i)));
-            }
-            this->getDerivative(theta,tot_timesteps_mov,der_theta);
-            for(size_t i=0; i<der_theta.size();++i){
-                ln_theta.push_back(abs(der_theta.at(i)));
-                vel_tan.push_back(R.at(i)*der_theta.at(i));
-                ln_vel_tan.push_back(abs(vel_tan.at(i)));
-            }
-
-            // plot the curvature
-            ui.plot_curvature->plotLayout()->clear();
-            ui.plot_curvature->clearGraphs();
-            ui.plot_curvature->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
-            wideAxisRect = new QCPAxisRect(ui.plot_curvature);
-            wideAxisRect->setupFullAxesBox(true);
-            marginGroup = new QCPMarginGroup(ui.plot_curvature);
-            wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
-            // move newly created axes on "axes" layer and grids on "grid" layer:
-            for (QCPAxisRect *rect : ui.plot_curvature->axisRects())
-            {
-              for (QCPAxis *axis : rect->axes())
-              {
-                axis->setLayer("axes");
-                axis->grid()->setLayer("grid");
-              }
-            }
-            title = "Curvature ";
-            ui.plot_curvature->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_curvature,title));
-            ui.plot_curvature->plotLayout()->addElement(1, 0, wideAxisRect);
-
-            ui.plot_curvature->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-            ui.plot_curvature->graph(0)->setPen(QPen(Qt::blue));
-            ui.plot_curvature->graph(0)->setName(title);
-            ui.plot_curvature->graph(0)->valueAxis()->setLabel("curvature [cm^-1]");
-            ui.plot_curvature->graph(0)->keyAxis()->setLabel("time [s]");
-            ui.plot_curvature->graph(0)->setData(qtime, C);
-            //ui.plot_curvature->graph(0)->valueAxis()->setRange(*std::min_element(C.begin(), C.end()),
-              //                                                 *std::max_element(C.begin(), C.end()));
-            ui.plot_curvature->graph(0)->rescaleAxes();
-
-
-            ui.plot_curvature->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-            ui.plot_curvature->replot();
-
-            // plot the tangential velocity
-            ui.plot_vel_tan->plotLayout()->clear();
-            ui.plot_vel_tan->clearGraphs();
-            ui.plot_vel_tan->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
-            wideAxisRect = new QCPAxisRect(ui.plot_vel_tan);
-            wideAxisRect->setupFullAxesBox(true);
-            marginGroup = new QCPMarginGroup(ui.plot_vel_tan);
-            wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
-            // move newly created axes on "axes" layer and grids on "grid" layer:
-            for (QCPAxisRect *rect : ui.plot_vel_tan->axisRects())
-            {
-              for (QCPAxis *axis : rect->axes())
-              {
-                axis->setLayer("axes");
-                axis->grid()->setLayer("grid");
-              }
-            }
-            title = "Angular velocity";
-            ui.plot_vel_tan->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_vel_tan,title));
-            ui.plot_vel_tan->plotLayout()->addElement(1, 0, wideAxisRect);
-
-            ui.plot_vel_tan->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-            ui.plot_vel_tan->graph(0)->setPen(QPen(Qt::blue));
-            ui.plot_vel_tan->graph(0)->setName(title);
-            ui.plot_vel_tan->graph(0)->valueAxis()->setLabel(" [rad/s]");
-            ui.plot_vel_tan->graph(0)->keyAxis()->setLabel("time [s]");
-            ui.plot_vel_tan->graph(0)->setData(qtime, der_theta);
-
-            ui.plot_curvature->graph(0)->valueAxis()->setRange(*std::min_element(vel_tan.begin(), vel_tan.end()),
-                                                               *std::max_element(vel_tan.begin(), vel_tan.end()));
-            ui.plot_vel_tan->graph(0)->rescaleAxes();
-
-
-            ui.plot_vel_tan->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-            ui.plot_vel_tan->replot();
-
-            // R-squared regression
-            double q,m,r;
-            this->linreg(lnC,ln_theta,&q,&m,&r);
-            std::cout << " m = " << m << " q = " << q << " R^2 = " << r << endl;
-            QVector<double> ln_vel_fit; QVector<double> best_line; double m_best = ((double)2)/3;
-            for(size_t i=0; i < lnC.size(); ++i){
-                ln_vel_fit.push_back(m*lnC.at(i)+q);
-                best_line.push_back(m_best*lnC.at(i)+q);
-            }
-
-            // plot power law
-            ui.plot_power_law->plotLayout()->clear();
-            ui.plot_power_law->clearGraphs();
-            ui.plot_power_law->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
-            wideAxisRect = new QCPAxisRect(ui.plot_power_law);
-            wideAxisRect->setupFullAxesBox(true);
-            marginGroup = new QCPMarginGroup(ui.plot_power_law);
-            wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
-            // move newly created axes on "axes" layer and grids on "grid" layer:
-            for (QCPAxisRect *rect : ui.plot_power_law->axisRects())
-            {
-              for (QCPAxis *axis : rect->axes())
-              {
-                axis->setLayer("axes");
-                axis->grid()->setLayer("grid");
-              }
-            }
-            title = "Angular Velocity / Curvature ";
-            ui.plot_power_law->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_power_law,title));
-            ui.plot_power_law->plotLayout()->addElement(1, 0, wideAxisRect);
-
-            ui.plot_power_law->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-            ui.plot_power_law->graph(0)->setPen(QPen(Qt::black));
-            ui.plot_power_law->graph(0)->setLineStyle(QCPGraph::lsNone);
-            ui.plot_power_law->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross, 4));
-            ui.plot_power_law->graph(0)->setName(title);
-            ui.plot_power_law->graph(0)->valueAxis()->setLabel("ln(A) [rad/s]");
-            ui.plot_power_law->graph(0)->keyAxis()->setLabel("ln(C) [cm^-1]");
-            //ui.plot_power_law->graph(0)->setData(lnR, ln_vel_tan);
-            ui.plot_power_law->graph(0)->setData(lnC, ln_theta);
-            //ui.plot_power_law->graph(0)->valueAxis()->setRange(*std::min_element(lnHand_vel.begin(), lnHand_vel.end()),
-                                                              // *std::max_element(lnHand_vel.begin(), lnHand_vel.end()));
-            ui.plot_power_law->graph(0)->rescaleAxes();
-
-
-            ui.plot_power_law->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-            ui.plot_power_law->graph(1)->setPen(QPen(Qt::red));
-            //ui.plot_power_law->graph(0)->setName(title);
-            //ui.plot_power_law->graph(0)->valueAxis()->setLabel("ln(v(t))");
-            //ui.plot_power_law->graph(0)->keyAxis()->setLabel("ln(R(t))");
-            ui.plot_power_law->graph(1)->setData(lnC, ln_vel_fit);
-            //ui.plot_power_law->graph(0)->valueAxis()->setRange(*std::min_element(lnHand_vel.begin(), lnHand_vel.end()),
-                                                             // *std::max_element(lnHand_vel.begin(), lnHand_vel.end()));
-            ui.plot_power_law->graph(1)->rescaleAxes();
-
-            ui.plot_power_law->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-            ui.plot_power_law->graph(2)->setPen(QPen(Qt::blue));
-            //ui.plot_power_law->graph(0)->setName(title);
-            //ui.plot_power_law->graph(0)->valueAxis()->setLabel("ln(v(t))");
-            //ui.plot_power_law->graph(0)->keyAxis()->setLabel("ln(R(t))");
-            ui.plot_power_law->graph(2)->setData(lnC, best_line);
-            //ui.plot_power_law->graph(0)->valueAxis()->setRange(*std::min_element(lnHand_vel.begin(), lnHand_vel.end()),
-                                                             // *std::max_element(lnHand_vel.begin(), lnHand_vel.end()));
-            ui.plot_power_law->graph(2)->rescaleAxes();
-
-
-            ui.plot_power_law->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-            ui.plot_power_law->replot();
-
-
-        }else{
-            ui.plot_hand_pos->plotLayout()->clear();
-            ui.plot_hand_pos->clearGraphs();
-            ui.plot_power_law->plotLayout()->clear();
-            ui.plot_power_law->clearGraphs();
-        }
-    }
-
-    // plot the hand velocity norm
-    ui.plot_hand_vel->plotLayout()->clear();
-    ui.plot_hand_vel->clearGraphs();
-    ui.plot_hand_vel->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
-    QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_hand_vel);
-    wideAxisRect->setupFullAxesBox(true);
-    QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_hand_vel);
-    wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
-    // move newly created axes on "axes" layer and grids on "grid" layer:
-    for (QCPAxisRect *rect : ui.plot_hand_vel->axisRects())
-    {
-      for (QCPAxis *axis : rect->axes())
-      {
-        axis->setLayer("axes");
-        axis->grid()->setLayer("grid");
-      }
-    }
-    QString title("Hand velocity");
-    ui.plot_hand_vel->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_hand_vel,title));
-    ui.plot_hand_vel->plotLayout()->addElement(1, 0, wideAxisRect);
-
-    ui.plot_hand_vel->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-    ui.plot_hand_vel->graph(0)->setPen(QPen(Qt::red));
-    ui.plot_hand_vel->graph(0)->setName(title);
-    ui.plot_hand_vel->graph(0)->valueAxis()->setLabel("hand velocity [mm/s]");
-    ui.plot_hand_vel->graph(0)->keyAxis()->setLabel("time [s]");
-    ui.plot_hand_vel->graph(0)->setData(qtime, qhand_vel);
-    ui.plot_hand_vel->graph(0)->valueAxis()->setRange(*std::min_element(qhand_vel.begin(), qhand_vel.end()),
-                                                      *std::max_element(qhand_vel.begin(), qhand_vel.end()));
-    ui.plot_hand_vel->graph(0)->rescaleAxes();    
-    ui.plot_hand_vel->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-    ui.plot_hand_vel->replot();
-
-
-    // plot the joints values
-    this->mResultsJointsdlg->setupPlots(this->jointsPosition_mov,this->jointsVelocity_mov,this->jointsAcceleration_mov,this->timesteps_mov);
-}
-
-
+} // if the problem has been solved
 
 }
 
@@ -2151,33 +1864,44 @@ void MainWindow::on_pushButton_append_mov_clicked()
     ui.pushButton_save_task->setEnabled(true);
 
     if(curr_task->getProblem(ui.listWidget_movs->currentRow())->getSolved()){
-
         this->jointsPosition_task.push_back(this->jointsPosition_mov);
         this->jointsVelocity_task.push_back(this->jointsVelocity_mov);
         this->jointsAcceleration_task.push_back(this->jointsAcceleration_mov);
         this->timesteps_task.push_back(this->timesteps_mov);
         this->tols_stop_task.push_back(this->tols_stop_mov);
-
-
          QStringList h_headers; bool h_head=false; QStringList v_headers;
          std::vector<std::vector<QString>> task_steps;
          vector<MatrixXd> pos_mov; vector<MatrixXd> vel_mov; vector<MatrixXd> acc_mov; vector<vector<double>> tstep_mov;
          double task_duration = 0.0; double mov_duration = 0.0; double stage_duration = 0.0;
+         vector<double> time_task; uint tot_steps = 0;
          for(size_t h=0; h< this->jointsPosition_task.size();++h){
              pos_mov = this->jointsPosition_task.at(h);
              vel_mov = this->jointsVelocity_task.at(h);
              acc_mov = this->jointsAcceleration_task.at(h);
              tstep_mov = this->timesteps_task.at(h);
              mov_duration = 0.0;
+             double time_init;
+             if(time_task.empty()){
+                 time_init=0.0;
+             }else{
+                 time_init=time_task.at(time_task.size()-1);
+             }
+             vector<double> time_mov;
              for (size_t k=0; k< pos_mov.size();++k){
                  MatrixXd jointPosition_stage = pos_mov.at(k);
                  MatrixXd jointVelocity_stage = vel_mov.at(k);
                  MatrixXd jointAcceleration_stage = acc_mov.at(k);
                  vector<double> tstep_stage = tstep_mov.at(k);
+                 vector<double> time_stage(tstep_stage.size());
+                 time_stage.at(0) = time_init;
                  stage_duration = 0.0;
                  std::vector<QString> stage_step;
                  for(int i =0; i< jointPosition_stage.rows(); ++i){
-                     if(i>0){stage_duration += tstep_stage.at(i);}
+                     tot_steps++;
+                     if(i>0){
+                         time_stage.at(i) = time_stage.at(i-1) + tstep_stage.at(i-1);
+                         stage_duration += tstep_stage.at(i);
+                     }
                      stage_step.clear();
                      v_headers.push_back(QString("Step ")+QString::number(i));
                      for (int j=0; j<jointPosition_stage.cols();++j){
@@ -2191,9 +1915,14 @@ void MainWindow::on_pushButton_append_mov_clicked()
                      task_steps.push_back(stage_step);
                  }// stage rows
                  mov_duration +=stage_duration;
+                 time_mov.reserve(time_stage.size());
+                 std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time_mov));
              }// movements
              task_duration +=mov_duration;
+             time_task.reserve(time_mov.size());
+             std::copy (time_mov.begin(), time_mov.end(), std::back_inserter(time_task));
          }//task
+         this->qtime_task = QVector<double>::fromStdVector(time_task);
 
          ui.tableWidget_sol_task->setColumnCount(h_headers.size());
          ui.tableWidget_sol_task->setHorizontalHeaderLabels(h_headers);
@@ -2212,7 +1941,35 @@ void MainWindow::on_pushButton_append_mov_clicked()
          // set part of the task
          curr_task->getProblem(ui.listWidget_movs->currentRow())->setPartOfTask(true);
 
-    }
+         // compute the hand values
+         this->handPosition_task.resize(tot_steps); this->handVelocityNorm_task.resize(tot_steps);
+         int step = 0;
+         int arm_code = this->curr_task->getProblem(ui.listWidget_movs->currentRow())->getMovement()->getArm();
+         for(size_t j=0;j<this->jointsPosition_task.size();++j){
+             vector<MatrixXd> pos_mov = this->jointsPosition_task.at(j);
+             vector<MatrixXd> vel_mov = this->jointsVelocity_task.at(j);
+             for (size_t k=0; k< pos_mov.size();++k){
+                 MatrixXd pos_stage = pos_mov.at(k);
+                 MatrixXd vel_stage = vel_mov.at(k);
+                 for(int i=0;i<pos_stage.rows();++i){
+                     // position
+                     VectorXd pos_row = pos_stage.block<1,JOINTS_ARM>(i,0);
+                     vector<double> posture; posture.resize(pos_row.size());
+                     VectorXd::Map(&posture[0], pos_row.size()) = pos_row;
+                     this->curr_scene->getHumanoid()->getHandPos(arm_code,this->handPosition_task.at(step),posture);
+                     // velocity norm
+                     VectorXd vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
+                     vector<double> velocities; velocities.resize(vel_row.size());
+                     VectorXd::Map(&velocities[0], vel_row.size()) = vel_row;
+                     this->handVelocityNorm_task.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(arm_code,posture,velocities);
+                     step++;
+                 }
+             }
+         }
+
+
+
+    } // if the problem has been solved
 
 
 
@@ -2393,9 +2150,111 @@ void MainWindow::onListScenarioItemClicked(QListWidgetItem *item)
 }
 
 
-void MainWindow::on_pushButton_joints_results_clicked()
+void MainWindow::on_pushButton_plot_mov_clicked()
 {
+
+    // plot the hand velocity norm
+    if(!this->handVelocityNorm_mov.empty()){
+        QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_mov);
+        ui.plot_hand_vel_mov->plotLayout()->clear();
+        ui.plot_hand_vel_mov->clearGraphs();
+        ui.plot_hand_vel_mov->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_hand_vel_mov);
+        wideAxisRect->setupFullAxesBox(true);
+        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_hand_vel_mov);
+        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+        // move newly created axes on "axes" layer and grids on "grid" layer:
+        for (QCPAxisRect *rect : ui.plot_hand_vel_mov->axisRects())
+        {
+          for (QCPAxis *axis : rect->axes())
+          {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+          }
+        }
+        QString title("Hand velocity");
+        ui.plot_hand_vel_mov->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_hand_vel_mov,title));
+        ui.plot_hand_vel_mov->plotLayout()->addElement(1, 0, wideAxisRect);
+
+        ui.plot_hand_vel_mov->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+        ui.plot_hand_vel_mov->graph(0)->setPen(QPen(Qt::red));
+        ui.plot_hand_vel_mov->graph(0)->setName(title);
+        ui.plot_hand_vel_mov->graph(0)->valueAxis()->setLabel("hand velocity [mm/s]");
+        ui.plot_hand_vel_mov->graph(0)->keyAxis()->setLabel("time [s]");
+        ui.plot_hand_vel_mov->graph(0)->setData(this->qtime_mov, qhand_vel);
+        ui.plot_hand_vel_mov->graph(0)->valueAxis()->setRange(*std::min_element(qhand_vel.begin(), qhand_vel.end()),
+                                                          *std::max_element(qhand_vel.begin(), qhand_vel.end()));
+        ui.plot_hand_vel_mov->graph(0)->rescaleAxes();
+        ui.plot_hand_vel_mov->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        ui.plot_hand_vel_mov->replot();
+    }else{
+        ui.plot_hand_vel_mov->plotLayout()->clear();
+        ui.plot_hand_vel_mov->clearGraphs();
+    }
+}
+
+void MainWindow::on_pushButton_plot_task_clicked()
+{
+    // plot the hand velocity norm
+    if(!this->handVelocityNorm_task.empty()){
+        QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_task);
+        ui.plot_hand_vel_task->plotLayout()->clear();
+        ui.plot_hand_vel_task->clearGraphs();
+        ui.plot_hand_vel_task->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_hand_vel_task);
+        wideAxisRect->setupFullAxesBox(true);
+        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_hand_vel_task);
+        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+        // move newly created axes on "axes" layer and grids on "grid" layer:
+        for (QCPAxisRect *rect : ui.plot_hand_vel_task->axisRects())
+        {
+          for (QCPAxis *axis : rect->axes())
+          {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+          }
+        }
+        QString title("Hand velocity");
+        ui.plot_hand_vel_task->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_hand_vel_task,title));
+        ui.plot_hand_vel_task->plotLayout()->addElement(1, 0, wideAxisRect);
+
+        ui.plot_hand_vel_task->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+        ui.plot_hand_vel_task->graph(0)->setPen(QPen(Qt::red));
+        ui.plot_hand_vel_task->graph(0)->setName(title);
+        ui.plot_hand_vel_task->graph(0)->valueAxis()->setLabel("hand velocity [mm/s]");
+        ui.plot_hand_vel_task->graph(0)->keyAxis()->setLabel("time [s]");
+        ui.plot_hand_vel_task->graph(0)->setData(this->qtime_task, qhand_vel);
+        ui.plot_hand_vel_task->graph(0)->valueAxis()->setRange(*std::min_element(qhand_vel.begin(), qhand_vel.end()),
+                                                          *std::max_element(qhand_vel.begin(), qhand_vel.end()));
+        ui.plot_hand_vel_task->graph(0)->rescaleAxes();
+        ui.plot_hand_vel_task->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        ui.plot_hand_vel_task->replot();
+    }else{
+        ui.plot_hand_vel_task->plotLayout()->clear();
+        ui.plot_hand_vel_task->clearGraphs();
+    }
+
+}
+
+void MainWindow::on_pushButton_joints_results_mov_clicked()
+{
+    if(!this->jointsPosition_mov.empty())
+        this->mResultsJointsdlg->setupPlots(this->jointsPosition_mov,this->jointsVelocity_mov,this->jointsAcceleration_mov,this->timesteps_mov);
     this->mResultsJointsdlg->show();
+}
+
+void MainWindow::on_pushButton_joints_results_task_clicked()
+{
+    if(!this->jointsPosition_task.empty())
+        this->mResultsJointsdlg->setupPlots(this->jointsPosition_task,this->jointsVelocity_task,this->jointsAcceleration_task,this->timesteps_task);
+    this->mResultsJointsdlg->show();
+}
+
+void MainWindow::on_pushButton_power_law_clicked()
+{
+    if(!this->handPosition_task.empty())
+        this->mPowerLawdlg->setupPlots(this->handPosition_task,this->timesteps_task);
+    this->mPowerLawdlg->show();
 }
 
 
@@ -2467,263 +2326,6 @@ long long MainWindow::GetTimeMs64() {
  ret += (tv.tv_sec * 1000);
  return ret;
 #endif
-}
-
-int MainWindow::doPCA(vector<vector<double> > &data, vector<vector<double> > &data_red)
-{
-    MatrixXd mat(data.size(),data.at(0).size());
-    for (size_t i = 0; i < data.size(); ++i) {
-        vector<double> row = data.at(i);
-      for (size_t j = 0; j < row.size(); ++j) {
-          mat(i,j)=row.at(j);
-      }
-    }
-    // Principal component analisys
-    Pca *pca = new Pca();
-    int init_result = pca->Calculate(mat,true,true,true);
-    if (0 != init_result) {
-      qnode.log(QNode::Error,"There is an error during PCA calculation!");
-      return -1;
-    }
-    vector<double> sd = pca->sd(),
-                  prop_of_var = pca->prop_of_var(),
-                  cum_prop = pca->cum_prop(),
-                  scores = pca->scores();
-    vector<unsigned int> el_cols = pca->eliminated_columns();
-    double         kaiser = pca->kaiser(),
-                  thresh95 = pca->thresh95();
-    unsigned int
-                  ncols = pca->ncols(),
-                  nrows = pca->nrows();
-    string method = pca->method();
-    delete pca;
-
-    // Save the result to text file
-    struct stat st = {0};
-    if (stat("results", &st) == -1) {
-        mkdir("results", 0700);
-    }
-    if (stat("results/planning", &st) == -1) {
-        mkdir("results/planning", 0700);
-    }
-    if (stat("results/planning/pca", &st) == -1) {
-        mkdir("results/planning/pca", 0700);
-    }
-    QString path("results/planning/pca/");
-    QString fname = path+QString("pca_out.txt");
-
-    ofstream outfile(fname.toStdString());
-    if (!outfile) {
-      cerr << "Can't create output file!" << endl;
-      return -1;
-    }
-    outfile << "Initial matrix: " << endl;
-    for (unsigned int i = 0; i < mat.rows(); ++i) {
-      for (unsigned int j = 0; j < mat.cols(); ++j) {
-        outfile << setw(7) << mat(i,j) << " ";
-      }
-      outfile << endl;
-    }
-    if (0 != el_cols.size()) {
-      outfile << "\nNumbers of eliminated columns (0 based):\n";
-      copy(el_cols.begin(), el_cols.end(), std::ostream_iterator<unsigned int>(outfile, " "));
-      outfile << "\n\nMatrix after the eliminating: " << endl;
-      for (unsigned int i = 0; i < mat.rows(); ++i) {
-        for (unsigned int j = 0; j < mat.cols(); ++j) {
-          if ( std::find(el_cols.begin(), el_cols.end(), j) == el_cols.end() ) {
-            outfile << setw(7) << mat(i,j) << " ";
-          }
-        }
-        outfile << endl;
-      }
-    }
-    outfile << "\n\n" << method << " method was used\n";
-    outfile << "\n\nStandard deviation:\n";
-    copy(sd.begin(), sd.end(), std::ostream_iterator<float>(outfile, " "));
-    outfile << "\n\nProportion of variance:\n";
-    copy(prop_of_var.begin(), prop_of_var.end(), std::ostream_iterator<float>(outfile, " "));
-    outfile << "\n\nCumulative proportion:\n";
-    copy(cum_prop.begin(), cum_prop.end(), std::ostream_iterator<float>(outfile, " "));
-    outfile << "\n\nKaiser criterion: " << kaiser;
-    outfile << "\n\n95% threshold criterion: " << thresh95 << endl;
-
-    outfile << "\n\nRotated data: " << endl;
-    unsigned int row_lim = nrows,
-                 col_lim = ncols;
-    if (scores.size() != nrows * ncols) {
-      row_lim = (nrows < ncols)? nrows : ncols,
-      col_lim = (ncols < nrows)? ncols : nrows;
-    }
-    for (unsigned int i = 0; i < row_lim; ++i) {
-      for (unsigned int j = 0; j < col_lim; ++j) {
-        outfile << setw(13) << scores[j + col_lim*i];
-      }
-      outfile << endl;
-    }
-
-    // export data reduced in dimentionality
-    data_red.clear();
-    data_red.resize(data.size());
-    data_red.at(0).resize(thresh95);
-
-    for (size_t i = 0; i < data.size(); ++i) {
-      vector<double> data_row = data.at(i);
-      vector<double> data_red_row;
-      for (size_t j = 0; j < data_row.size(); ++j) {
-          if(sd.at(j)>=0.95){
-              data_red_row.push_back(data_row.at(j));
-          }
-      }
-      data_red.at(i) = data_red_row;
-    }
-
-    outfile << "\n\nMatrix reduced according to the kaiser criterion: " << endl;
-    for (size_t i = 0; i < data_red.size(); ++i) {
-      vector<double> data_red_row = data_red.at(i);
-      for (size_t j = 0; j < data_red_row.size(); ++j) {
-          outfile << setw(7) << data_red_row.at(j) << " ";
-      }
-      outfile << endl;
-    }
-
-    outfile.close();
-    return 0;
-}
-
-
-
-void MainWindow::getDerivative(QVector<double> &function, QVector<double> &step_values, QVector<double> &derFunction)
-{
-    // Formula of the numarical differentiation with 5 points
-       // f'0 = (-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h) + h^4/5*f^(5)(c_0)
-       // f'1 = ( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h) - h^4/20*f^(5)(c_1)
-       // f'2 = (  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h) + h^4/30*f^(5)(c_2)
-       // f'3 = ( -1*f0 +  6*f1 - 18*f2 + 10*f3 +  3*f4)/(12*h) - h^4/20*f^(5)(c_3)
-       // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
-
-
-       int h = 1;
-       int tnsample;
-       double f0;
-       double f1;
-       double f2;
-       double f3;
-       double f4;
-       double step_value;
-
-       // 1st point
-       // f'0 = (-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h) + h^4/5*f^(5)(c_0)
-       tnsample = 0;
-       f0 = function.at(tnsample);
-       f1 = function.at(tnsample+1);
-       f2 = function.at(tnsample+2);
-       f3 = function.at(tnsample+3);
-       f4 = function.at(tnsample+4);
-       step_value = step_values.at(tnsample);
-       derFunction.push_back(((-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h))/step_value);
-
-       // 2nd point
-       // f'1 = ( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h) - h^4/20*f^(5)(c_1)
-       tnsample = 1;
-       f0 = function.at(tnsample-1);
-       f1 = function.at(tnsample);
-       f2 = function.at(tnsample+1);
-       f3 = function.at(tnsample+2);
-       f4 = function.at(tnsample+3);
-       step_value = step_values.at(tnsample);
-       derFunction.push_back((( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h))/step_value);
-
-       // 3rd point
-       // f'2 = (  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h) + h^4/30*f^(5)(c_2)
-       for (int i=2; i< function.size() -2;++i){     // centered
-           f0 = function.at(i-2);
-           f1 = function.at(i-1);
-           f2 = function.at(i);
-           f3 = function.at(i+1);
-           f4 = function.at(i+2);
-           step_value = step_values.at(i);
-           derFunction.push_back(((  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h))/step_value);
-       }
-
-       // 4th point
-       // f'3 = ( -1*f0 +  6*f1 - 18*f2 + 10*f3 +  3*f4)/(12*h) - h^4/20*f^(5)(c_3)
-       tnsample = function.size()-2;
-       f0 = function.at(tnsample-3);
-       f1 = function.at(tnsample-2);
-       f2 = function.at(tnsample-1);
-       f3 = function.at(tnsample);
-       f4 = function.at(tnsample+1);
-       step_value = step_values.at(tnsample);
-       derFunction.push_back((( -f0+6*f1-18*f2+10*f3+3*f4)/(12*h))/step_value);
-
-       // 5th point
-       // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
-       tnsample = function.size()-1;
-       f0 = function.at(tnsample-4);
-       f1 = function.at(tnsample-3);
-       f2 = function.at(tnsample-2);
-       f3 = function.at(tnsample-1);
-       f4 = function.at(tnsample);
-       step_value = step_values.at(tnsample);
-       derFunction.push_back(((  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h))/step_value);
-
-}
-
-int MainWindow::linreg(const QVector<double> &x, const QVector<double> &y, double *b, double *m, double *r)
-{
-    double mm,bb,rr;
-
-    double   sumx = 0.0;                        /* sum of x                      */
-    double   sumx2 = 0.0;                       /* sum of x^2                   */
-    double   sumxy = 0.0;                       /* sum of x * y                  */
-    double   sumy = 0.0;                        /* sum of y                      */
-    //double   sumy2 = 0.0;                       /* sum of y^2                   */
-
-    int n = x.size();
-
-   for (int i=0; i<n ;++i)
-    {
-      sumx  += x.at(i);
-      sumx2 += pow((x.at(i)),2);
-      sumxy += x.at(i) * y.at(i);
-      sumy  += y.at(i);
-      //sumy2 += pow(y.at(i),2);
-    }
-
-   double   meanx = ((double)sumx)/n;                        /* mean of x                      */
-   double   meanx2 = ((double)sumx2)/n;                       /* mean of x^2                   */
-   double   meanxy = ((double)sumxy)/n;                       /* mean of x * y                  */
-   double   meany = ((double)sumy)/n;                        /* mean of y                      */
-   //double   meany2 = sumy2/n;                       /* mean of y^2                   */
-
-   double denom = (pow(meanx,2) - meanx2);
-   if (denom == 0) {
-       // can't solve the problem.
-       *m = 0;
-       *b = 0;
-       *r = 0;
-       return 1;
-   }
-
-   mm = ((double)((meanx*meany) - meanxy)) / denom;
-   bb = meany - mm*meanx;
-
-   /* compute correlation coeff     */
-   double se_y = 0.0; /* squared error in y or total variation in y */
-   double se_line = 0.0; /* squared error of the fitted line */
-   for(int i=0; i<n; ++i)
-   {
-       se_y += pow((y.at(i) - meany),2);
-       se_line += pow((y.at(i)-(mm*x.at(i)+bb)),2);
-   }
-   rr = 1 - (((double)se_line)/se_y);
-
-   // results
-   *m = mm;
-   *b = bb;
-   *r = rr;
-
-   return 0;
 }
 
 

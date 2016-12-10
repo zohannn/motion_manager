@@ -2558,9 +2558,10 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
 #endif
 
 
-
-    for(int i=0; i < task->getProblemNumber(); ++i){ //for loop movements
-      if(task->getProblem(i)->getPartOfTask() && task->getProblem(i)->getSolved()){
+    int hh=0; // it counts problems that do not belong to the task
+    for(int kk=0; kk < task->getProblemNumber(); ++kk){ //for loop movements
+      if(task->getProblem(kk)->getPartOfTask() && task->getProblem(kk)->getSolved()){
+          int i = kk - hh;
           vector<MatrixXd> traj_mov = traj_task.at(i);
           vector<MatrixXd> vel_mov = vel_task.at(i);
           vector<vector<double>> timesteps_mov = timesteps_task.at(i);
@@ -2851,7 +2852,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
           task->getProblem(i)->getMovement()->setExecuted(true);
 
         } // if prob is part of the task
-
+      hh++;
       }// for loop movements
       log(QNode::Info,string("Task completed"));
 

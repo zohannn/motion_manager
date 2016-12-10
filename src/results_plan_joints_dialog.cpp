@@ -128,6 +128,129 @@ void ResultsJointsDialog::setupPlots(vector<MatrixXd> &pos, vector<MatrixXd> &ve
 
 }
 
+void ResultsJointsDialog::setupPlots(vector<vector<MatrixXd> > &pos, vector<vector<MatrixXd> > &vel, vector<vector<MatrixXd> > &acc, vector<vector<vector<double> > > &timesteps)
+{
+
+    const double radtodeg = 180.0/static_cast<double>(M_PI);
+
+    vector<double> time;
+    QVector<double> pos_joint1, vel_joint1, acc_joint1;
+    QVector<double> pos_joint2, vel_joint2, acc_joint2;
+    QVector<double> pos_joint3, vel_joint3, acc_joint3;
+    QVector<double> pos_joint4, vel_joint4, acc_joint4;
+    QVector<double> pos_joint5, vel_joint5, acc_joint5;
+    QVector<double> pos_joint6, vel_joint6, acc_joint6;
+    QVector<double> pos_joint7, vel_joint7, acc_joint7;
+    QVector<double> pos_joint8, vel_joint8, acc_joint8;
+    QVector<double> pos_joint9, vel_joint9, acc_joint9;
+    QVector<double> pos_joint10, vel_joint10, acc_joint10;
+    QVector<double> pos_joint11, vel_joint11, acc_joint11;
+
+    for(size_t h=0; h<pos.size();++h){
+        vector<MatrixXd> pos_mov = pos.at(h);
+        vector<MatrixXd> vel_mov = vel.at(h);
+        vector<MatrixXd> acc_mov = acc.at(h);
+        vector<vector<double>> tstep_mov = timesteps.at(h);
+        double time_init;
+        if(time.empty()){
+            time_init=0.0;
+        }else{
+            time_init=time.at(time.size()-1);
+        }
+        vector<double> time_mov;
+        for(size_t i=0; i<pos_mov.size();++i){
+            MatrixXd pos_stage = pos_mov.at(i);
+            MatrixXd vel_stage = vel_mov.at(i);
+            MatrixXd acc_stage = acc_mov.at(i);
+            vector<double> tsteps_stage = tstep_mov.at(i);
+            vector<double> time_stage(tsteps_stage.size());
+            time_stage.at(0) = time_init;
+            for(int k=0;k<pos_stage.rows();++k){
+                if(k>0){time_stage.at(k) = time_stage.at(k-1) + tsteps_stage.at(k-1);}
+                for(int j=0;j<pos_stage.cols();++j){
+                    switch(j){
+                    case 0:// joint 1
+                        pos_joint1.push_back(radtodeg*pos_stage(k,j));
+                        vel_joint1.push_back(radtodeg*vel_stage(k,j));
+                        acc_joint1.push_back(radtodeg*acc_stage(k,j));
+                        break;
+                    case 1://joint 2
+                        pos_joint2.push_back(radtodeg*pos_stage(k,j));
+                        vel_joint2.push_back(radtodeg*vel_stage(k,j));
+                        acc_joint2.push_back(radtodeg*acc_stage(k,j));
+                        break;
+                    case 2://joint 3
+                        pos_joint3.push_back(radtodeg*pos_stage(k,j));
+                        vel_joint3.push_back(radtodeg*vel_stage(k,j));
+                        acc_joint3.push_back(radtodeg*acc_stage(k,j));
+                        break;
+                    case 3://joint 4
+                        pos_joint4.push_back(radtodeg*pos_stage(k,j));
+                        vel_joint4.push_back(radtodeg*vel_stage(k,j));
+                        acc_joint4.push_back(radtodeg*acc_stage(k,j));
+                        break;
+                    case 4://joint 5
+                        pos_joint5.push_back(radtodeg*pos_stage(k,j));
+                        vel_joint5.push_back(radtodeg*vel_stage(k,j));
+                        acc_joint5.push_back(radtodeg*acc_stage(k,j));
+                        break;
+                    case 5://joint 6
+                        pos_joint6.push_back(radtodeg*pos_stage(k,j));
+                        vel_joint6.push_back(radtodeg*vel_stage(k,j));
+                        acc_joint6.push_back(radtodeg*acc_stage(k,j));
+                        break;
+                    case 6://joint 7
+                        pos_joint7.push_back(radtodeg*pos_stage(k,j));
+                        vel_joint7.push_back(radtodeg*vel_stage(k,j));
+                        acc_joint7.push_back(radtodeg*acc_stage(k,j));
+                        break;
+                    case 7://joint 8
+                        pos_joint8.push_back(radtodeg*pos_stage(k,j));
+                        vel_joint8.push_back(radtodeg*vel_stage(k,j));
+                        acc_joint8.push_back(radtodeg*acc_stage(k,j));
+                        break;
+                    case 8://joint 9
+                        pos_joint9.push_back(radtodeg*pos_stage(k,j));
+                        vel_joint9.push_back(radtodeg*vel_stage(k,j));
+                        acc_joint9.push_back(radtodeg*acc_stage(k,j));
+                        break;
+                    case 9://joint 10
+                        pos_joint10.push_back(radtodeg*pos_stage(k,j));
+                        vel_joint10.push_back(radtodeg*vel_stage(k,j));
+                        acc_joint10.push_back(radtodeg*acc_stage(k,j));
+                        break;
+                    case 10://joint 11
+                        pos_joint11.push_back(radtodeg*pos_stage(k,j));
+                        vel_joint11.push_back(radtodeg*vel_stage(k,j));
+                        acc_joint11.push_back(radtodeg*acc_stage(k,j));
+                        break;
+                    }
+                }
+            }// stage
+            time_mov.reserve(time_stage.size());
+            std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time_mov));
+        }// mov
+        time.reserve(time_mov.size());
+        std::copy (time_mov.begin(), time_mov.end(), std::back_inserter(time));
+    }// task
+    QVector<double> qtime = QVector<double>::fromStdVector(time);
+
+    plotJoint(ui->plot_joint_1,QString("Joint 1"),qtime,pos_joint1,vel_joint1,acc_joint1); // plot joint 1
+    plotJoint(ui->plot_joint_2,QString("Joint 2"),qtime,pos_joint2,vel_joint2,acc_joint2); // plot joint 2
+    plotJoint(ui->plot_joint_3,QString("Joint 3"),qtime,pos_joint3,vel_joint3,acc_joint3); // plot joint 3
+    plotJoint(ui->plot_joint_4,QString("Joint 4"),qtime,pos_joint4,vel_joint4,acc_joint4); // plot joint 4
+    plotJoint(ui->plot_joint_5,QString("Joint 5"),qtime,pos_joint5,vel_joint5,acc_joint5); // plot joint 5
+    plotJoint(ui->plot_joint_6,QString("Joint 6"),qtime,pos_joint6,vel_joint6,acc_joint6); // plot joint 6
+    plotJoint(ui->plot_joint_7,QString("Joint 7"),qtime,pos_joint7,vel_joint7,acc_joint7); // plot joint 7
+    plotJoint(ui->plot_joint_8,QString("Joint 8"),qtime,pos_joint8,vel_joint8,acc_joint8); // plot joint 8
+    plotJoint(ui->plot_joint_9,QString("Joint 9"),qtime,pos_joint9,vel_joint9,acc_joint9); // plot joint 9
+    plotJoint(ui->plot_joint_10,QString("Joint 10"),qtime,pos_joint10,vel_joint10,acc_joint10); // plot joint 10
+    plotJoint(ui->plot_joint_11,QString("Joint 11"),qtime,pos_joint11,vel_joint11,acc_joint11); // plot joint 11
+
+
+
+}
+
 void ResultsJointsDialog::plotJoint(QCustomPlot *plot, QString title, QVector<double> &time, QVector<double> &pos, QVector<double> &vel, QVector<double> &acc)
 {
     plot->plotLayout()->clear();

@@ -7,7 +7,6 @@
 *****************************************************************************/
 #include <qcustomplot.h>
 #include <qcpdocumentobject.h>
-#include <pca.hpp>
 #include <QtGui/QMainWindow>
 #include <QtGui/QListWidgetItem>
 #include <boost/smart_ptr.hpp>
@@ -24,6 +23,7 @@
 #include "prmdialog.hpp"
 #include "prmstardialog.hpp"
 #include "results_plan_joints_dialog.hpp"
+#include "power_law_dialog.hpp"
 
 using namespace std;
 
@@ -77,33 +77,6 @@ public:
           Thanks to stackoverflow.com: http://stackoverflow.com/questions/1861294/how-to-calculate-execution-time-of-a-code-snippet-in-c
           */
         long long GetTimeMs64();
-
-        /**
-         * @brief doPCA
-         * @param data
-         * @param data_red
-         * @return -1 in case of error, 0 otherwise
-         */
-        int doPCA(vector<vector<double>>& data, vector<vector<double> > &data_red);
-
-        /**
-         * @brief getDerivative
-         * @param function
-         * @param step_values
-         * @param derFunction
-         */
-        void getDerivative(QVector<double> &function, QVector<double> &step_values, QVector<double> &derFunction);
-
-        /**
-         * @brief linreg
-         * @param x array of data
-         * @param y array of data
-         * @param b output intercept
-         * @param m output slope
-         * @param r output correlation coefficient (can be NULL if you don't want it)
-         * @return
-         */
-         int linreg(const QVector<double> &x, const QVector<double> &y, double* b, double* m, double* r);
 
 
 public Q_SLOTS:
@@ -314,9 +287,29 @@ public Q_SLOTS:
         void onListScenarioItemClicked(QListWidgetItem* item);
 
         /**
-         * @brief on_pushButton_joints_results_clicked
+         * @brief on_pushButton_plot_mov_clicked
          */
-        void on_pushButton_joints_results_clicked();
+        void on_pushButton_plot_mov_clicked();
+
+        /**
+         * @brief on_pushButton_plot_task_clicked
+         */
+        void on_pushButton_plot_task_clicked();
+
+        /**
+         * @brief on_pushButton_joints_results_mov_clicked
+         */
+        void on_pushButton_joints_results_mov_clicked();
+
+        /**
+         * @brief on_pushButton_joints_results_task_clicked
+         */
+        void on_pushButton_joints_results_task_clicked();
+
+        /**
+         * @brief on_pushButton_power_law_clicked
+         */
+        void on_pushButton_power_law_clicked();
 
 
 
@@ -333,9 +326,11 @@ private:
         PRMDialog *mPRMdlg; /**< handle of the PRM tuning dialog */
         PRMstarDialog *mPRMstardlg; /**< handle of the PRM star tuning dlg */
         ResultsJointsDialog *mResultsJointsdlg;/**< handle of the results joints dlg*/
+        PowerLawDialog *mPowerLawdlg; /**< handle of the 2/3 power law dialog*/
         int scenario_id; /**< id of the current scenario */
 
         vector< vector < double > > timesteps_mov; /**< current time steps of the movement */
+        QVector<double> qtime_mov; /**< time of the current movement for plotting */
         vector<double> tols_stop_mov; /**< vector of the tolerances to stop each stage in the movement */
         vector< MatrixXd > jointsAcceleration_mov; /**< trajectory of the joint acceleration of the movement */
         vector< MatrixXd > jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
@@ -344,6 +339,7 @@ private:
         vector< vector< MatrixXd > > jointsVelocity_task; /**< trajectory of the joint velocity of the task */
         vector< vector< MatrixXd > > jointsPosition_task; /**< trajectory of the joint position of the task */
         vector< vector< vector < double > > > timesteps_task; /**< vector of time steps of each movement in the task */
+        QVector<double> qtime_task;/**< time of the current task for plotting */
         vector<vector<double>> tols_stop_task; /**< vector of the tolerances to stop each movement in the task */
         vector<string> vel_steps; /**< steps of the trajectory for saving/loading file */
 
@@ -352,6 +348,12 @@ private:
         vector<vector<double>> handLinearVelocity_mov; /**< hand linear velocity during the movement */
         vector<vector<double>> handAngularVelocity_mov;/**< hand angular velocity during the movement */
         vector<double> handVelocityNorm_mov; /**< hand velocity norm during the movement */
+
+        vector<vector<double>> handPosition_task; /**< hand position during the task. 0=x,1=y,2=z */
+        vector<vector<double>> handOrientation_task; /**< hand orientation during the task. */
+        vector<vector<double>> handLinearVelocity_task; /**< hand linear velocity during the task */
+        vector<vector<double>> handAngularVelocity_task;/**< hand angular velocity during the task */
+        vector<double> handVelocityNorm_task; /**< hand velocity norm during the task */
 
         moveit_plannerPtr m_planner; /**< MoveIt! Libraries planner */
         bool moveit_mov; /**< true if the movement has been planned by the moveit planner, false otherwise */

@@ -50,6 +50,14 @@ public:
      */
     void setupPlots(vector<MatrixXd> &pos,vector<MatrixXd> &vel,vector<MatrixXd> &acc,vector<vector<double>> &timesteps);
 
+    /**
+     * @brief setupPlots
+     * @param pos
+     * @param vel
+     * @param acc
+     * @param timesteps
+     */
+    void setupPlots(vector<vector<MatrixXd>> &pos, vector<vector<MatrixXd>> &vel,vector<vector<MatrixXd>> &acc,vector<vector<vector<double>>> &timesteps);
 
 private:
     Ui::ResultsJointsDialog *ui; /**< handle of the user interface */

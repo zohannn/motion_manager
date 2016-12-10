@@ -217,7 +217,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1031,68 +1031,113 @@ p, li { white-space: pre-wrap; }
        <attribute name="title">
         <string>Planning</string>
        </attribute>
-       <widget class="QPushButton" name="pushButton_joints_results">
+       <widget class="QTabWidget" name="tabWidget_plan">
         <property name="geometry">
          <rect>
-          <x>20</x>
-          <y>410</y>
-          <width>161</width>
-          <height>23</height>
+          <x>0</x>
+          <y>0</y>
+          <width>1071</width>
+          <height>441</height>
          </rect>
         </property>
-        <property name="text">
-         <string>show results of the joints</string>
+        <property name="currentIndex">
+         <number>0</number>
         </property>
-       </widget>
-       <widget class="QCustomPlot" name="plot_hand_pos" native="true">
-        <property name="geometry">
-         <rect>
-          <x>370</x>
-          <y>10</y>
-          <width>321</width>
-          <height>231</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QCustomPlot" name="plot_hand_vel" native="true">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>10</y>
-          <width>331</width>
-          <height>231</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QCustomPlot" name="plot_power_law" native="true">
-        <property name="geometry">
-         <rect>
-          <x>720</x>
-          <y>10</y>
-          <width>341</width>
-          <height>231</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QCustomPlot" name="plot_curvature" native="true">
-        <property name="geometry">
-         <rect>
-          <x>370</x>
-          <y>250</y>
-          <width>321</width>
-          <height>181</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QCustomPlot" name="plot_vel_tan" native="true">
-        <property name="geometry">
-         <rect>
-          <x>710</x>
-          <y>250</y>
-          <width>351</width>
-          <height>181</height>
-         </rect>
-        </property>
+        <widget class="QWidget" name="tab_results_plan_mov">
+         <attribute name="title">
+          <string>Movement</string>
+         </attribute>
+         <widget class="QCustomPlot" name="plot_hand_vel_mov" native="true">
+          <property name="geometry">
+           <rect>
+            <x>340</x>
+            <y>10</y>
+            <width>330</width>
+            <height>230</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_joints_results_mov">
+          <property name="geometry">
+           <rect>
+            <x>900</x>
+            <y>380</y>
+            <width>161</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>show results of the joints</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_plot_mov">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>380</y>
+            <width>80</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Plot</string>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="tab_results_plan_task">
+         <attribute name="title">
+          <string>Task</string>
+         </attribute>
+         <widget class="QPushButton" name="pushButton_joints_results_task">
+          <property name="geometry">
+           <rect>
+            <x>690</x>
+            <y>380</y>
+            <width>161</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>show results of the joints</string>
+          </property>
+         </widget>
+         <widget class="QCustomPlot" name="plot_hand_vel_task" native="true">
+          <property name="geometry">
+           <rect>
+            <x>350</x>
+            <y>20</y>
+            <width>330</width>
+            <height>230</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_power_law">
+          <property name="geometry">
+           <rect>
+            <x>870</x>
+            <y>380</y>
+            <width>191</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>show 2/3 power law results</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_plot_task">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>380</y>
+            <width>80</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Plot</string>
+          </property>
+         </widget>
+        </widget>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_2">
