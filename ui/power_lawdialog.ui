@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>40</y>
+     <y>30</y>
      <width>300</width>
      <height>200</height>
     </rect>
@@ -26,8 +26,8 @@
   <widget class="QCustomPlot" name="plot_curvature" native="true">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>280</y>
+     <x>40</x>
+     <y>240</y>
      <width>300</width>
      <height>200</height>
     </rect>
@@ -36,21 +36,34 @@
   <widget class="QCustomPlot" name="plot_23" native="true">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>50</y>
-     <width>471</width>
-     <height>271</height>
+     <x>430</x>
+     <y>100</y>
+     <width>501</width>
+     <height>301</height>
     </rect>
    </property>
   </widget>
   <widget class="QCustomPlot" name="plot_ang_vel" native="true">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>340</y>
+     <x>30</x>
+     <y>460</y>
      <width>300</width>
      <height>200</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_save">
+   <property name="geometry">
+    <rect>
+     <x>1010</x>
+     <y>650</y>
+     <width>80</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save</string>
    </property>
   </widget>
  </widget>

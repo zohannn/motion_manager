@@ -10,6 +10,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <iostream>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/format.hpp>
 #include <ui_power_lawdialog.h>
 #include <eigen3/Eigen/Dense>
 #include <pca.hpp>
@@ -28,7 +31,10 @@ class PowerLawDialog : public QDialog
 
 public Q_SLOTS:
 
-
+    /**
+     * @brief on_pushButton_save_clicked
+     */
+    void on_pushButton_save_clicked();
 
 public:
     /**
