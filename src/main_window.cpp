@@ -881,7 +881,7 @@ void MainWindow::on_pushButton_plan_clicked()
                 int fing_base = 0; int fing_1 = 1; int fing_2 = 4; int fing_3 = 6;
                 bool move;
                 if(m_results->trajectory_stages.size()>1){
-                     // pick and place movements
+                    // pick and place movements
                     move=false;
                     rob_traj_pre = m_results->trajectory_stages.at(1);
                     points_pre = rob_traj_pre.joint_trajectory.points;
@@ -1201,7 +1201,7 @@ if(solved){
     uint tot_steps=0;
     QStringList h_headers; bool h_head=false; QStringList v_headers;
     double mov_duration = 0.0;
-    vector<double> time;
+    vector<double> time; QVector<double> tot_timesteps;
     std::vector<std::vector<QString>> mov_steps;
     for (size_t k=0; k< this->jointsPosition_mov.size();++k){
         MatrixXd jointPosition_stage = this->jointsPosition_mov.at(k);
@@ -1220,6 +1220,7 @@ if(solved){
         double stage_duration = 0.0;
         for(int i = 0; i< jointPosition_stage.rows(); ++i){
             tot_steps++;
+            tot_timesteps.push_back(timestep_stage.at(i));
             if(i>0){
                 stage_duration += timestep_stage.at(i);
                 time_stage.at(i) = time_stage.at(i-1) + timestep_stage.at(i-1);
@@ -1268,13 +1269,38 @@ if(solved){
         this->tols_stop_mov.push_back(tol_stop);
     }
 
-    // compute the hand values
+    // compute the hand values and the accelerations
     this->handPosition_mov.resize(tot_steps); this->handVelocityNorm_mov.resize(tot_steps);
     int step = 0;
     int arm_code = prob->getMovement()->getArm();
+    // accelerations
+    VectorXd jointsAcceleration1_mov;
+    VectorXd jointsAcceleration2_mov;
+    VectorXd jointsAcceleration3_mov;
+    VectorXd jointsAcceleration4_mov;
+    VectorXd jointsAcceleration5_mov;
+    VectorXd jointsAcceleration6_mov;
+    VectorXd jointsAcceleration7_mov;
+    VectorXd jointsAcceleration8_mov;
+    VectorXd jointsAcceleration9_mov;
+    VectorXd jointsAcceleration10_mov;
+    VectorXd jointsAcceleration11_mov;
     for (size_t k=0; k< this->jointsPosition_mov.size();++k){
         MatrixXd pos_stage = this->jointsPosition_mov.at(k);
         MatrixXd vel_stage = this->jointsVelocity_mov.at(k);
+        MatrixXd acc_stage = this->jointsAcceleration_mov.at(k);
+        int rows = jointsAcceleration1_mov.rows();
+        jointsAcceleration1_mov.conservativeResize(acc_stage.rows());
+        jointsAcceleration2_mov.conservativeResize(acc_stage.rows());
+        jointsAcceleration3_mov.conservativeResize(acc_stage.rows());
+        jointsAcceleration4_mov.conservativeResize(acc_stage.rows());
+        jointsAcceleration5_mov.conservativeResize(acc_stage.rows());
+        jointsAcceleration6_mov.conservativeResize(acc_stage.rows());
+        jointsAcceleration7_mov.conservativeResize(acc_stage.rows());
+        jointsAcceleration8_mov.conservativeResize(acc_stage.rows());
+        jointsAcceleration9_mov.conservativeResize(acc_stage.rows());
+        jointsAcceleration10_mov.conservativeResize(acc_stage.rows());
+        jointsAcceleration11_mov.conservativeResize(acc_stage.rows());
         for(int i=0;i<pos_stage.rows();++i){
             // position
             VectorXd pos_row = pos_stage.block<1,JOINTS_ARM>(i,0);
@@ -1287,8 +1313,146 @@ if(solved){
             VectorXd::Map(&velocities[0], vel_row.size()) = vel_row;
             this->handVelocityNorm_mov.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(arm_code,posture,velocities);
             step++;
+            // accelerations
+            jointsAcceleration1_mov(i+rows) = acc_stage(i,0);
+            jointsAcceleration2_mov(i+rows) = acc_stage(i,1);
+            jointsAcceleration3_mov(i+rows) = acc_stage(i,2);
+            jointsAcceleration4_mov(i+rows) = acc_stage(i,3);
+            jointsAcceleration5_mov(i+rows) = acc_stage(i,4);
+            jointsAcceleration6_mov(i+rows) = acc_stage(i,5);
+            jointsAcceleration7_mov(i+rows) = acc_stage(i,6);
+            jointsAcceleration8_mov(i+rows) = acc_stage(i,7);
+            jointsAcceleration9_mov(i+rows) = acc_stage(i,8);
+            jointsAcceleration10_mov(i+rows) = acc_stage(i,9);
+            jointsAcceleration11_mov(i+rows) = acc_stage(i,10);
+
         }
+    }    
+    // --- compute the cost of the trajectory according to the jerk principle --- //
+
+    // acc1
+    vector<double> acc1_mov; acc1_mov.resize(jointsAcceleration1_mov.size());
+    VectorXd::Map(&acc1_mov[0], jointsAcceleration1_mov.size()) = jointsAcceleration1_mov;
+    QVector<double> acc1 = QVector<double>::fromStdVector(acc1_mov);
+    QVector<double> der_acc1;
+    // acc2
+    vector<double> acc2_mov; acc2_mov.resize(jointsAcceleration2_mov.size());
+    VectorXd::Map(&acc2_mov[0], jointsAcceleration2_mov.size()) = jointsAcceleration2_mov;
+    QVector<double> acc2 = QVector<double>::fromStdVector(acc2_mov);
+    QVector<double> der_acc2;
+    // acc3
+    vector<double> acc3_mov; acc3_mov.resize(jointsAcceleration3_mov.size());
+    VectorXd::Map(&acc3_mov[0], jointsAcceleration3_mov.size()) = jointsAcceleration3_mov;
+    QVector<double> acc3 = QVector<double>::fromStdVector(acc3_mov);
+    QVector<double> der_acc3;
+    // acc4
+    vector<double> acc4_mov; acc4_mov.resize(jointsAcceleration4_mov.size());
+    VectorXd::Map(&acc4_mov[0], jointsAcceleration4_mov.size()) = jointsAcceleration4_mov;
+    QVector<double> acc4 = QVector<double>::fromStdVector(acc4_mov);
+    QVector<double> der_acc4;
+    // acc5
+    vector<double> acc5_mov; acc5_mov.resize(jointsAcceleration5_mov.size());
+    VectorXd::Map(&acc5_mov[0], jointsAcceleration5_mov.size()) = jointsAcceleration5_mov;
+    QVector<double> acc5 = QVector<double>::fromStdVector(acc5_mov);
+    QVector<double> der_acc5;
+    // acc6
+    vector<double> acc6_mov; acc6_mov.resize(jointsAcceleration6_mov.size());
+    VectorXd::Map(&acc6_mov[0], jointsAcceleration6_mov.size()) = jointsAcceleration6_mov;
+    QVector<double> acc6 = QVector<double>::fromStdVector(acc6_mov);
+    QVector<double> der_acc6;
+    // acc7
+    vector<double> acc7_mov; acc7_mov.resize(jointsAcceleration7_mov.size());
+    VectorXd::Map(&acc7_mov[0], jointsAcceleration7_mov.size()) = jointsAcceleration7_mov;
+    QVector<double> acc7 = QVector<double>::fromStdVector(acc7_mov);
+    QVector<double> der_acc7;
+    // acc8
+    vector<double> acc8_mov; acc8_mov.resize(jointsAcceleration8_mov.size());
+    VectorXd::Map(&acc8_mov[0], jointsAcceleration8_mov.size()) = jointsAcceleration8_mov;
+    QVector<double> acc8 = QVector<double>::fromStdVector(acc8_mov);
+    QVector<double> der_acc8;
+    // acc9
+    vector<double> acc9_mov; acc9_mov.resize(jointsAcceleration9_mov.size());
+    VectorXd::Map(&acc9_mov[0], jointsAcceleration9_mov.size()) = jointsAcceleration9_mov;
+    QVector<double> acc9 = QVector<double>::fromStdVector(acc9_mov);
+    QVector<double> der_acc9;
+    // acc10
+    vector<double> acc10_mov; acc10_mov.resize(jointsAcceleration10_mov.size());
+    VectorXd::Map(&acc10_mov[0], jointsAcceleration10_mov.size()) = jointsAcceleration10_mov;
+    QVector<double> acc10 = QVector<double>::fromStdVector(acc10_mov);
+    QVector<double> der_acc10;
+    // acc11
+    vector<double> acc11_mov; acc11_mov.resize(jointsAcceleration11_mov.size());
+    VectorXd::Map(&acc11_mov[0], jointsAcceleration11_mov.size()) = jointsAcceleration11_mov;
+    QVector<double> acc11 = QVector<double>::fromStdVector(acc11_mov);
+    QVector<double> der_acc11;
+
+    // derivatives
+    this->getDerivative(acc1,tot_timesteps,der_acc1);
+    this->getDerivative(acc2,tot_timesteps,der_acc2);
+    this->getDerivative(acc3,tot_timesteps,der_acc3);
+    this->getDerivative(acc4,tot_timesteps,der_acc4);
+    this->getDerivative(acc5,tot_timesteps,der_acc5);
+    this->getDerivative(acc6,tot_timesteps,der_acc6);
+    this->getDerivative(acc7,tot_timesteps,der_acc7);
+    this->getDerivative(acc8,tot_timesteps,der_acc8);
+    this->getDerivative(acc9,tot_timesteps,der_acc9);
+    this->getDerivative(acc10,tot_timesteps,der_acc10);
+    this->getDerivative(acc11,tot_timesteps,der_acc11);
+
+    // squared derivatives
+    QVector<double> squared_der_acc1;
+    QVector<double> squared_der_acc2;
+    QVector<double> squared_der_acc3;
+    QVector<double> squared_der_acc4;
+    QVector<double> squared_der_acc5;
+    QVector<double> squared_der_acc6;
+    QVector<double> squared_der_acc7;
+    QVector<double> squared_der_acc8;
+    QVector<double> squared_der_acc9;
+    QVector<double> squared_der_acc10;
+    QVector<double> squared_der_acc11;
+
+    for(size_t i=0;i<der_acc1.size();++i){
+        squared_der_acc1.push_back(pow(der_acc1.at(i),2));
+        squared_der_acc2.push_back(pow(der_acc2.at(i),2));
+        squared_der_acc3.push_back(pow(der_acc3.at(i),2));
+        squared_der_acc4.push_back(pow(der_acc4.at(i),2));
+        squared_der_acc5.push_back(pow(der_acc5.at(i),2));
+        squared_der_acc6.push_back(pow(der_acc6.at(i),2));
+        squared_der_acc7.push_back(pow(der_acc7.at(i),2));
+        squared_der_acc8.push_back(pow(der_acc8.at(i),2));
+        squared_der_acc9.push_back(pow(der_acc9.at(i),2));
+        squared_der_acc10.push_back(pow(der_acc10.at(i),2));
+        squared_der_acc11.push_back(pow(der_acc11.at(i),2));
     }
+
+
+    // sum of the jerks
+    QVector<double> sum_jerks;
+    for(size_t i=0;i<squared_der_acc1.size();++i){
+        sum_jerks.push_back(squared_der_acc1.at(i)+
+                            squared_der_acc2.at(i)+
+                            squared_der_acc3.at(i)+
+                            squared_der_acc4.at(i)+
+                            squared_der_acc5.at(i)+
+                            squared_der_acc6.at(i)+
+                            squared_der_acc7.at(i)+
+                            squared_der_acc8.at(i)+
+                            squared_der_acc9.at(i)+
+                            squared_der_acc10.at(i)+
+                            squared_der_acc11.at(i));
+    }
+    // total cost
+    double cost_jerk =0.0;
+    for(size_t i=0;i<tot_timesteps.size();++i){
+        cost_jerk += sum_jerks.at(i)*tot_timesteps.at(i);
+    }
+    cost_jerk = cost_jerk/2;
+
+    ui.label_cost_value->setText(QString::number(cost_jerk));
+
+
+
 
 } // if the problem has been solved
 
@@ -1654,21 +1818,36 @@ void MainWindow::on_pushButton_load_task_clicked()
         std::vector<std::vector<QString>> task_steps;
         vector<MatrixXd> pos_mov; vector<MatrixXd> vel_mov; vector<MatrixXd> acc_mov; vector<vector<double>> tstep_mov; vector<double> tstep_stage;
         double task_duration = 0.0; double mov_duration = 0.0; double stage_duration = 0.0;
+        vector<double> time_task; uint tot_steps = 0;
         for(size_t h=0; h< this->jointsPosition_task.size();++h){
             pos_mov = this->jointsPosition_task.at(h);
             vel_mov = this->jointsVelocity_task.at(h);
             acc_mov = this->jointsAcceleration_task.at(h);
             tstep_mov = this->timesteps_task.at(h);
-            mov_duration = 0;
+            mov_duration = 0.0;
+            double time_init;
+            if(time_task.empty()){
+                time_init=0.0;
+            }else{
+                time_init=time_task.at(time_task.size()-1);
+            }
+            vector<double> time_mov;
             for (size_t k=0; k< pos_mov.size();++k){
                 MatrixXd jointPosition_stage = pos_mov.at(k);
                 MatrixXd jointVelocity_stage = vel_mov.at(k);
                 MatrixXd jointAcceleration_stage = acc_mov.at(k);
                 tstep_stage = tstep_mov.at(k);
+                vector<double> time_stage(tstep_stage.size());
+                time_stage.at(0) = time_init;
+                stage_duration = 0.0;
                 std::vector<QString> stage_step;
-                stage_duration = 0;
+                stage_duration = 0.0;
                 for(int i =0; i< jointPosition_stage.rows(); ++i){
-                    stage_duration += tstep_stage.at(i);
+                    tot_steps++;
+                    if(i>0){
+                        time_stage.at(i) = time_stage.at(i-1) + tstep_stage.at(i-1);
+                        stage_duration += tstep_stage.at(i);
+                    }
                     stage_step.clear();
                     v_headers.push_back(QString("Step ")+QString::number(i));
                     for (int j=0; j<jointPosition_stage.cols();++j){
@@ -1682,9 +1861,14 @@ void MainWindow::on_pushButton_load_task_clicked()
                     task_steps.push_back(stage_step);
                 }// stage rows
                 mov_duration += stage_duration;
+                time_mov.reserve(time_stage.size());
+                std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time_mov));
             }// movements
             task_duration +=mov_duration;
+            time_task.reserve(time_mov.size());
+            std::copy (time_mov.begin(), time_mov.end(), std::back_inserter(time_task));
         }//task
+        this->qtime_task = QVector<double>::fromStdVector(time_task);
 
         ui.tableWidget_sol_task->setColumnCount(h_headers.size());
         ui.tableWidget_sol_task->setHorizontalHeaderLabels(h_headers);
@@ -1700,6 +1884,31 @@ void MainWindow::on_pushButton_load_task_clicked()
         ui.label_totalTime_value_task->setText(QString::number(task_duration).toStdString().c_str());
         ui.tabWidget_sol->setEnabled(true);
         ui.tabWidget_sol->setCurrentIndex(1);
+
+        // compute the hand values
+        this->handPosition_task.resize(tot_steps); this->handVelocityNorm_task.resize(tot_steps);
+        int step = 0;
+        for(size_t j=0;j<this->jointsPosition_task.size();++j){
+            vector<MatrixXd> pos_mov = this->jointsPosition_task.at(j);
+            vector<MatrixXd> vel_mov = this->jointsVelocity_task.at(j);
+            for (size_t k=0; k< pos_mov.size();++k){
+                MatrixXd pos_stage = pos_mov.at(k);
+                MatrixXd vel_stage = vel_mov.at(k);
+                for(int i=0;i<pos_stage.rows();++i){
+                    // position
+                    VectorXd pos_row = pos_stage.block<1,JOINTS_ARM>(i,0);
+                    vector<double> posture; posture.resize(pos_row.size());
+                    VectorXd::Map(&posture[0], pos_row.size()) = pos_row;
+                    this->curr_scene->getHumanoid()->getHandPos(arm_code,this->handPosition_task.at(step),posture);
+                    // velocity norm
+                    VectorXd vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
+                    vector<double> velocities; velocities.resize(vel_row.size());
+                    VectorXd::Map(&velocities[0], vel_row.size()) = vel_row;
+                    this->handVelocityNorm_task.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(arm_code,posture,velocities);
+                    step++;
+                }
+            }
+        }
 
 
     }
@@ -1722,40 +1931,46 @@ void MainWindow::on_pushButton_save_task_clicked()
     QFile f( filename );
     if(f.open( QIODevice::WriteOnly )){
         QTextStream stream( &f );
+        int h=0; // numbers of problems that are not in the current task
         for(int i=0; i <ui.listWidget_movs->count(); ++i){
-            stream << "# " << ui.listWidget_movs->item(i)->text().toStdString().c_str()<< endl;
-            vector< MatrixXd > traj_mov = this->jointsPosition_task.at(i);
-            vector< MatrixXd > vel_mov = this->jointsVelocity_task.at(i);
-            vector< MatrixXd > acc_mov = this->jointsAcceleration_task.at(i);
-            vector< vector< double > > timesteps_mov = this->timesteps_task.at(i);
-            vector< double > tols_stop_mov = this->tols_stop_task.at(i);
+            if((curr_task->getProblem(i)->getSolved()) && curr_task->getProblem(i)->getPartOfTask()){
+                stream << "# " << ui.listWidget_movs->item(i)->text().toStdString().c_str()<< endl;
+                vector< MatrixXd > traj_mov = this->jointsPosition_task.at(i-h);
+                vector< MatrixXd > vel_mov = this->jointsVelocity_task.at(i-h);
+                vector< MatrixXd > acc_mov = this->jointsAcceleration_task.at(i-h);
+                vector< vector< double > > timesteps_mov = this->timesteps_task.at(i-h);
+                vector< double > tols_stop_mov = this->tols_stop_task.at(i-h);
 
-            for(size_t j=0;j < traj_mov.size(); ++j){
-                stream << "Movement stage: "<< QString::number(j+1).toStdString().c_str()<< endl;
-                MatrixXd traj = traj_mov.at(j);
-                MatrixXd vel = vel_mov.at(j);
-                MatrixXd acc = acc_mov.at(j);
-                vector< double > timestep_stage  = timesteps_mov.at(j);
-                double tol_stop = tols_stop_mov.at(j);
-                stream << "tol stop="<< QString::number(tol_stop).toStdString().c_str()<< endl;
+                for(size_t j=0;j < traj_mov.size(); ++j){
+                    stream << "Movement stage: "<< QString::number(j+1).toStdString().c_str()<< endl;
+                    MatrixXd traj = traj_mov.at(j);
+                    MatrixXd vel = vel_mov.at(j);
+                    MatrixXd acc = acc_mov.at(j);
+                    vector< double > timestep_stage  = timesteps_mov.at(j);
+                    double tol_stop = tols_stop_mov.at(j);
+                    stream << "tol stop="<< QString::number(tol_stop).toStdString().c_str()<< endl;
 
-                for(int r=0; r < traj.rows(); ++r){
-                    double timestep = timestep_stage.at(r);
-                    stream << "step="<< QString::number(r).toStdString().c_str()<<", ";
-                    stream << "time step="<< QString::number(timestep).toStdString().c_str()<< ", ";
-                    for(int c=0; c < traj.cols(); ++c){
-                        stream << "Joint "<<QString::number(c+1).toStdString().c_str()<<"="<<
-                                  QString::number(traj(r,c)*180/M_PI,'g',3).toStdString().c_str()<<"|"<<
-                                  QString::number(vel(r,c)*180/M_PI,'g',3).toStdString().c_str()<<"|"<<
-                                  QString::number(acc(r,c)*180/M_PI,'g',3).toStdString().c_str();
-                        if(c==traj.cols()-1){stream << endl;}else{stream<<", ";}
-                    }// for loop columns
-                }// for loop rows
-            }// for loop movement
+                    for(int r=0; r < traj.rows(); ++r){
+                        double timestep = timestep_stage.at(r);
+                        stream << "step="<< QString::number(r).toStdString().c_str()<<", ";
+                        stream << "time step="<< QString::number(timestep).toStdString().c_str()<< ", ";
+                        for(int c=0; c < traj.cols(); ++c){
+                            stream << "Joint "<<QString::number(c+1).toStdString().c_str()<<"="<<
+                                      QString::number(traj(r,c)*180/M_PI,'g',3).toStdString().c_str()<<"|"<<
+                                      QString::number(vel(r,c)*180/M_PI,'g',3).toStdString().c_str()<<"|"<<
+                                      QString::number(acc(r,c)*180/M_PI,'g',3).toStdString().c_str();
+                            if(c==traj.cols()-1){stream << endl;}else{stream<<", ";}
+                        }// for loop columns
+                    }// for loop rows
+                }// for loop movement
+            }else{
+                h++;
+            }
         }// for loop task
         stream << "#END" <<endl;
 
-    }
+
+    }// open file
     f.close();
 
 
@@ -2328,6 +2543,94 @@ long long MainWindow::GetTimeMs64() {
 #endif
 }
 
+
+
+void MainWindow::getDerivative(QVector<double> &function, QVector<double> &step_values, QVector<double> &derFunction)
+{
+    // Formula of the numarical differentiation with 5 points
+       // f'0 = (-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h) + h^4/5*f^(5)(c_0)
+       // f'1 = ( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h) - h^4/20*f^(5)(c_1)
+       // f'2 = (  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h) + h^4/30*f^(5)(c_2)
+       // f'3 = ( -1*f0 +  6*f1 - 18*f2 + 10*f3 +  3*f4)/(12*h) - h^4/20*f^(5)(c_3)
+       // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
+
+
+       int h = 1;
+       int tnsample;
+       double f0;
+       double f1;
+       double f2;
+       double f3;
+       double f4;
+       double step_value;
+
+       // 1st point
+       // f'0 = (-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h) + h^4/5*f^(5)(c_0)
+       tnsample = 0;
+       f0 = function.at(tnsample);
+       f1 = function.at(tnsample+1);
+       f2 = function.at(tnsample+2);
+       f3 = function.at(tnsample+3);
+       f4 = function.at(tnsample+4);
+       step_value = step_values.at(tnsample);
+       if(step_value==0)
+           step_value=0.01;
+       derFunction.push_back(((-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h))/step_value);
+
+       // 2nd point
+       // f'1 = ( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h) - h^4/20*f^(5)(c_1)
+       tnsample = 1;
+       f0 = function.at(tnsample-1);
+       f1 = function.at(tnsample);
+       f2 = function.at(tnsample+1);
+       f3 = function.at(tnsample+2);
+       f4 = function.at(tnsample+3);
+       step_value = step_values.at(tnsample);
+       if(step_value==0)
+           step_value=0.01;
+       derFunction.push_back((( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h))/step_value);
+
+       // 3rd point
+       // f'2 = (  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h) + h^4/30*f^(5)(c_2)
+       for (int i=2; i< function.size() -2;++i){     // centered
+           f0 = function.at(i-2);
+           f1 = function.at(i-1);
+           f2 = function.at(i);
+           f3 = function.at(i+1);
+           f4 = function.at(i+2);
+           step_value = step_values.at(i);
+           if(step_value==0)
+               step_value=0.01;
+           derFunction.push_back(((  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h))/step_value);
+       }
+
+       // 4th point
+       // f'3 = ( -1*f0 +  6*f1 - 18*f2 + 10*f3 +  3*f4)/(12*h) - h^4/20*f^(5)(c_3)
+       tnsample = function.size()-2;
+       f0 = function.at(tnsample-3);
+       f1 = function.at(tnsample-2);
+       f2 = function.at(tnsample-1);
+       f3 = function.at(tnsample);
+       f4 = function.at(tnsample+1);
+       step_value = step_values.at(tnsample);
+       if(step_value==0)
+           step_value=0.01;
+       derFunction.push_back((( -f0+6*f1-18*f2+10*f3+3*f4)/(12*h))/step_value);
+
+       // 5th point
+       // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
+       tnsample = function.size()-1;
+       f0 = function.at(tnsample-4);
+       f1 = function.at(tnsample-3);
+       f2 = function.at(tnsample-2);
+       f3 = function.at(tnsample-1);
+       f4 = function.at(tnsample);
+       step_value = step_values.at(tnsample);
+       if(step_value==0)
+           step_value=0.01;
+       derFunction.push_back(((  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h))/step_value);
+
+}
 
 
 

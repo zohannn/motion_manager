@@ -1083,6 +1083,32 @@ p, li { white-space: pre-wrap; }
            <string>Plot</string>
           </property>
          </widget>
+         <widget class="QWidget" name="layoutWidget">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>280</y>
+            <width>431</width>
+            <height>17</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="label_cost">
+             <property name="text">
+              <string>Cost of the integration of the jerk [rad^2/s^5]:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_cost_value">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
         <widget class="QWidget" name="tab_results_plan_task">
          <attribute name="title">

@@ -499,6 +499,8 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
        f3 = function.at(tnsample+3);
        f4 = function.at(tnsample+4);
        step_value = step_values.at(tnsample);
+       if(step_value==0)
+           step_value=0.01;
        derFunction.push_back(((-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h))/step_value);
 
        // 2nd point
@@ -510,6 +512,8 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
        f3 = function.at(tnsample+2);
        f4 = function.at(tnsample+3);
        step_value = step_values.at(tnsample);
+       if(step_value==0)
+           step_value=0.01;
        derFunction.push_back((( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h))/step_value);
 
        // 3rd point
@@ -521,6 +525,8 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
            f3 = function.at(i+1);
            f4 = function.at(i+2);
            step_value = step_values.at(i);
+           if(step_value==0)
+               step_value=0.01;
            derFunction.push_back(((  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h))/step_value);
        }
 
@@ -533,6 +539,8 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
        f3 = function.at(tnsample);
        f4 = function.at(tnsample+1);
        step_value = step_values.at(tnsample);
+       if(step_value==0)
+           step_value=0.01;
        derFunction.push_back((( -f0+6*f1-18*f2+10*f3+3*f4)/(12*h))/step_value);
 
        // 5th point
@@ -544,6 +552,8 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
        f3 = function.at(tnsample-1);
        f4 = function.at(tnsample);
        step_value = step_values.at(tnsample);
+       if(step_value==0)
+           step_value=0.01;
        derFunction.push_back(((  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h))/step_value);
 
 }

@@ -78,6 +78,15 @@ public:
           */
         long long GetTimeMs64();
 
+        /**
+         * @brief getDerivative
+         * @param function
+         * @param step_values
+         * @param derFunction
+         */
+        void getDerivative(QVector<double> &function, QVector<double> &step_values, QVector<double> &derFunction);
+
+
 
 public Q_SLOTS:
 
