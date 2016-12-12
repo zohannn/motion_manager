@@ -24,6 +24,7 @@
 #include "prmstardialog.hpp"
 #include "results_plan_joints_dialog.hpp"
 #include "power_law_dialog.hpp"
+#include "hand_velocity_dialog.hpp"
 
 using namespace std;
 
@@ -320,6 +321,11 @@ public Q_SLOTS:
          */
         void on_pushButton_power_law_clicked();
 
+        /**
+         * @brief on_pushButton_comp_hand_vel_mov_clicked
+         */
+        void on_pushButton_comp_hand_vel_mov_clicked();
+
 
 
 private:
@@ -336,6 +342,7 @@ private:
         PRMstarDialog *mPRMstardlg; /**< handle of the PRM star tuning dlg */
         ResultsJointsDialog *mResultsJointsdlg;/**< handle of the results joints dlg*/
         PowerLawDialog *mPowerLawdlg; /**< handle of the 2/3 power law dialog*/
+        HandVelocityDialog *mHandVeldlg; /**< handle of the hand velocity components dlg */
         int scenario_id; /**< id of the current scenario */
 
         vector< vector < double > > timesteps_mov; /**< current time steps of the movement */

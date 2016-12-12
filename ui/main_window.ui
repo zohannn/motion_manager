@@ -1087,27 +1087,66 @@ p, li { white-space: pre-wrap; }
           <property name="geometry">
            <rect>
             <x>20</x>
-            <y>280</y>
-            <width>431</width>
+            <y>320</y>
+            <width>331</width>
             <height>17</height>
            </rect>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
-            <widget class="QLabel" name="label_cost">
+            <widget class="QLabel" name="label_cost_joints">
              <property name="text">
-              <string>Cost of the integration of the jerk [rad^2/s^5]:</string>
+              <string>Normalized jerk cost of the joints:</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="label_cost_value">
+            <widget class="QLabel" name="label_cost_joints_value">
              <property name="text">
               <string/>
              </property>
             </widget>
            </item>
           </layout>
+         </widget>
+         <widget class="QWidget" name="layoutWidget_2">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>340</y>
+            <width>331</width>
+            <height>17</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QLabel" name="label_cost_hand">
+             <property name="text">
+              <string>Normalized jerk cost of the hand:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_cost_hand_value">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QPushButton" name="pushButton_comp_hand_vel_mov">
+          <property name="geometry">
+           <rect>
+            <x>340</x>
+            <y>250</y>
+            <width>331</width>
+            <height>21</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>show the components of the hand velocity</string>
+          </property>
          </widget>
         </widget>
         <widget class="QWidget" name="tab_results_plan_task">

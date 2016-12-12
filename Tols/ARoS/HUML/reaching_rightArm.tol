@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUML ,Movement: Reaching, Arm: right, Object: 
+# 
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
@@ -34,8 +34,7 @@ Hand_tip_2=15.0
 Hand_tip_3=15.0
 
 # Joint Expanse factors
-lambda_1=0.1
-
+lambda_1=1.0
 lambda_2=1.0
 
 lambda_3=1.0
@@ -315,6 +314,7 @@ target_y=0
 target_z=1000
 
 target_roll=1.57
+
 target_pitch=-3.14
 
 target_yaw=0.0

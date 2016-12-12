@@ -58,6 +58,18 @@ public Q_SLOTS:
      */
     void checkAddPlane(int state);
 
+    /**
+     * @brief checkSetHandCond
+     * @param state
+     */
+    void checkSetHandCond(int state);
+
+    /**
+     * @brief checkSetHandCondApproach
+     * @param state
+     */
+    void checkSetHandCondApproach(int state);
+
 
 public:
 

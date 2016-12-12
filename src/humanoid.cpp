@@ -1148,10 +1148,7 @@ void Humanoid::getRightHandVel(vector<double> &vel)
 {
     std::vector<double> posture; std::vector<double> velocities;
     this->getRightArmPosture(posture); this->getRightArmVelocities(velocities);
-    VectorXd hand_vel;
-    directDiffKinematicsSingleArm(1,posture,velocities,hand_vel);
-    vel.resize(hand_vel.size());
-    VectorXd::Map(&vel[0], hand_vel.size()) = hand_vel;
+    directDiffKinematicsSingleArm(1,posture,velocities,vel);
 }
 
 double Humanoid::getRightHandVelNorm()
@@ -1306,10 +1303,7 @@ void Humanoid::getLeftHandVel(vector<double> &vel)
 {
     std::vector<double> posture; std::vector<double> velocities;
     this->getLeftArmPosture(posture); this->getLeftArmVelocities(velocities);
-    VectorXd hand_vel;
-    directDiffKinematicsSingleArm(2,posture,velocities,hand_vel);
-    vel.resize(hand_vel.size());
-    VectorXd::Map(&vel[0], hand_vel.size()) = hand_vel;
+    directDiffKinematicsSingleArm(2,posture,velocities,vel);
 }
 
 double Humanoid::getLeftHandVelNorm()
@@ -1407,10 +1401,7 @@ void Humanoid::getHandPos(int arm, vector<double> &pos, vector<double> &posture)
 
 void Humanoid::getHandVel(int arm, vector<double> &vel, vector<double> &posture, vector<double> &velocities)
 {
-    VectorXd hand_vel;
-    directDiffKinematicsSingleArm(arm,posture,velocities,hand_vel);
-    vel.resize(hand_vel.size());
-    VectorXd::Map(&vel[0], hand_vel.size()) = hand_vel;
+    directDiffKinematicsSingleArm(arm,posture,velocities,vel);
 }
 
 double Humanoid::getHandVelNorm(int arm, vector<double> &posture, vector<double> &velocities)
@@ -2071,7 +2062,7 @@ void Humanoid::directKinematicsSingleArm(int arm, std::vector<double>& posture)
 
 }
 
-void Humanoid::directDiffKinematicsSingleArm(int arm,vector<double> posture, vector<double> velocities, VectorXd& hand_vel)
+void Humanoid::directDiffKinematicsSingleArm(int arm,vector<double> posture, vector<double> velocities, vector<double>& hand_vel)
 {
     VectorXd joint_velocities;
     Matrix4d T;
@@ -2185,7 +2176,143 @@ void Humanoid::directDiffKinematicsSingleArm(int arm,vector<double> posture, vec
         JacobianArm.col(i) = column;
         joint_velocities(i) = velocities.at(i);
     }
-    hand_vel = JacobianArm*joint_velocities;
+    VectorXd hand_vel_xd = JacobianArm*joint_velocities;
+    hand_vel.clear();
+    hand_vel.resize(hand_vel_xd.size());
+    VectorXd::Map(&hand_vel[0], hand_vel_xd.size()) = hand_vel_xd;
+
+}
+
+void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double> &velocities)
+{
+
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    MatrixXd JacobianArm(6,JOINTS_ARM);
+
+    Vector3d pos0;
+    Vector3d z0;
+    Vector3d pos1;
+    Vector3d z1;
+    Vector3d pos2;
+    Vector3d z2;
+    Vector3d pos3;
+    Vector3d z3;
+    Vector3d pos4;
+    Vector3d z4;
+    Vector3d pos5;
+    Vector3d z5;
+    Vector3d pos6;
+    Vector3d z6;
+
+    vector<double> handPos; Vector3d pos_hand;
+    this->getHandPos(arm,handPos,posture);
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+    pos_hand << handPos.at(0), handPos.at(1), handPos.at(2);
+
+
+    for (int i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d diff;
+        Vector3d cross;
+        Vector3d zi;
+        switch(i){
+        case 0:
+            z0 = T.block(0,2,3,1);
+            pos0 = T.block(0,3,3,1);
+            diff = pos_hand - pos0;
+            cross = z0.cross(diff);
+            zi=z0;
+            break;
+        case 1:
+            z1 = T.block(0,2,3,1);
+            pos1 = T.block(0,3,3,1);
+            diff = pos_hand - pos1;
+            cross = z1.cross(diff);
+            zi=z1;
+            break;
+        case 2:
+            z2 = T.block(0,2,3,1);
+            pos2 = T.block(0,3,3,1);
+            diff = pos_hand - pos2;
+            cross = z2.cross(diff);
+            zi=z2;
+            break;
+        case 3:
+            z3 = T.block(0,2,3,1);
+            pos3 = T.block(0,3,3,1);
+            diff = pos_hand - pos3;
+            cross = z3.cross(diff);
+            zi=z3;
+            break;
+        case 4:
+            z4 = T.block(0,2,3,1);
+            pos4 = T.block(0,3,3,1);
+            diff = pos_hand - pos4;
+            cross = z4.cross(diff);
+            zi=z4;
+            break;
+        case 5:
+            z5 = T.block(0,2,3,1);
+            pos5 = T.block(0,3,3,1);
+            diff = pos_hand - pos5;
+            cross = z5.cross(diff);
+            zi=z5;
+            break;
+        case 6:
+            z6 = T.block(0,2,3,1);
+            pos6 = T.block(0,3,3,1);
+            diff = pos_hand - pos6;
+            cross = z6.cross(diff);
+            zi=z6;
+            break;
+        }
+        VectorXd column(6); column << cross, zi;
+        JacobianArm.col(i) = column;
+    }
+
+    double k; // damping factor
+    MatrixXd I = MatrixXd::Identity(6,6);
+    MatrixXd JacobianArmT = JacobianArm.transpose();
+    MatrixXd JJ = JacobianArm*JacobianArmT;
+    if(abs(JJ.determinant())<0.001){
+        k = 0.01;
+    }else{
+        k=0.0;
+    }
+    MatrixXd JT = JacobianArmT*(JJ+pow(k,2)*I);
+    VectorXd hand_vel_xd(6);
+    hand_vel_xd << hand_vel.at(0),hand_vel.at(1),hand_vel.at(2),hand_vel.at(3),hand_vel.at(4),hand_vel.at(5);
+    VectorXd joint_velocities = JT*hand_vel_xd;
+    velocities.clear();
+    velocities.resize(joint_velocities.size());
+    VectorXd::Map(&velocities[0], joint_velocities.size()) = joint_velocities;
 
 }
 

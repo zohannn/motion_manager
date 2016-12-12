@@ -15,6 +15,8 @@ TolDialogHUML::TolDialogHUML(QWidget *parent) :
      QObject::connect(ui->checkBox_retreat, SIGNAL(stateChanged(int)), this, SLOT(checkRetreat(int)));
      QObject::connect(ui->checkBox_sel_final_posture, SIGNAL(stateChanged(int)), this, SLOT(checkFinalPosture(int)));
      QObject::connect(ui->checkBox_add_plane, SIGNAL(stateChanged(int)), this, SLOT(checkAddPlane(int)));
+     QObject::connect(ui->checkBox_hand_cond, SIGNAL(stateChanged(int)), this, SLOT(checkHandCond(int)));
+     QObject::connect(ui->checkBox_hand_cond_approach, SIGNAL(stateChanged(int)), this, SLOT(checkHandCondApproach(int)));
 
     if(ui->checkBox_approach->isChecked()){
         ui->groupBox_pre_grasp->setEnabled(false);
@@ -1094,6 +1096,63 @@ void TolDialogHUML::checkAddPlane(int state)
         //checked
         ui->groupBox_plane->setEnabled(true);
     }
+}
+
+void TolDialogHUML::checkSetHandCond(int state)
+{
+    /*
+    if(state==0){
+        // -- unchecked -- //
+        ui->groupBox_init_hand_vel->setEnabled(false);
+        ui->groupBox_final_hand_vel->setEnabled(false);
+        //ui->groupBox_init_hand_acc->setEnabled(false);
+        //ui->groupBox_final_hand_acc->setEnabled(false);
+    }else{
+        // -- checked -- //
+        ui->groupBox_init_hand_vel->setEnabled(true);
+        ui->groupBox_final_hand_vel->setEnabled(true);
+        //ui->groupBox_init_hand_acc->setEnabled(true);
+        //ui->groupBox_final_hand_acc->setEnabled(true);
+
+        // init vel
+        ui->lineEdit_init_vel_1->setEnabled(false);
+        ui->lineEdit_init_vel_2->setEnabled(false);
+        ui->lineEdit_init_vel_3->setEnabled(false);
+        ui->lineEdit_init_vel_4->setEnabled(false);
+        ui->lineEdit_init_vel_5->setEnabled(false);
+        ui->lineEdit_init_vel_6->setEnabled(false);
+        ui->lineEdit_init_vel_7->setEnabled(false);
+        // final vel
+        ui->lineEdit_final_vel_1->setEnabled(false);
+        ui->lineEdit_final_vel_2->setEnabled(false);
+        ui->lineEdit_final_vel_3->setEnabled(false);
+        ui->lineEdit_final_vel_4->setEnabled(false);
+        ui->lineEdit_final_vel_5->setEnabled(false);
+        ui->lineEdit_final_vel_6->setEnabled(false);
+        ui->lineEdit_final_vel_7->setEnabled(false);
+        // init acc
+        //ui->lineEdit_init_acc_1->setEnabled(false);
+        //ui->lineEdit_init_acc_2->setEnabled(false);
+        //ui->lineEdit_init_acc_3->setEnabled(false);
+        //ui->lineEdit_init_acc_4->setEnabled(false);
+        //ui->lineEdit_init_acc_5->setEnabled(false);
+        //ui->lineEdit_init_acc_6->setEnabled(false);
+        //ui->lineEdit_init_acc_7->setEnabled(false);
+        // final acc
+        //ui->lineEdit_final_acc_1->setEnabled(false);
+        //ui->lineEdit_final_acc_2->setEnabled(false);
+        //ui->lineEdit_final_acc_3->setEnabled(false);
+        //ui->lineEdit_final_acc_4->setEnabled(false);
+        //ui->lineEdit_final_acc_5->setEnabled(false);
+        //ui->lineEdit_final_acc_6->setEnabled(false);
+        //ui->lineEdit_final_acc_7->setEnabled(false);
+    }
+    */
+}
+
+void TolDialogHUML::checkSetHandCondApproach(int state)
+{
+
 }
 
 

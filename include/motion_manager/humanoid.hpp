@@ -915,7 +915,7 @@ private:
      * @param velocities
      * @param hand_vel
      */
-    void directDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> velocities, VectorXd &hand_vel);
+    void directDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> velocities, vector<double> &hand_vel);
 
     /**
      * @brief This method computes the direct kinematic of both arms
@@ -931,6 +931,15 @@ private:
      * @param Fingers
      */
     void directKinematicsFinger(DHparams& p,Matrix4d& T_ext,Matrix4d& T_H_0_pos,int id_fing, MatrixXd& Fingers);
+
+    /**
+     * @brief inverseDiffKinematicsSingleArm
+     * @param arm
+     * @param posture
+     * @param hand_vel
+     * @param velocities
+     */
+    void inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double>& velocities);
 
     /**
      * @brief This method computes the transformation matrix from the D-H parameters
