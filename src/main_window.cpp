@@ -2138,6 +2138,38 @@ void MainWindow::on_pushButton_load_task_clicked()
             }
         }
 
+        // compute njs, nmu and planning time
+        // njs
+        double sum_njs = std::accumulate(this->njs_task.begin(), this->njs_task.end(), 0.0);
+        double mean_njs = ((double)sum_njs) / this->njs_task.size();
+        string mean_njs_str =  boost::str(boost::format("%.2f") % (mean_njs));
+        boost::replace_all(mean_njs_str,",",".");
+        double sq_sum_njs = std::inner_product(this->njs_task.begin(), this->njs_task.end(), this->njs_task.begin(), 0.0);
+        double stdev_njs = std::sqrt(((double)sq_sum_njs) / this->njs_task.size() - mean_njs * mean_njs);
+        string stdev_njs_str =  boost::str(boost::format("%.2f") % (stdev_njs));
+        boost::replace_all(stdev_njs_str,",",".");
+        ui.label_cost_hand_value_task->setText(QString::fromStdString(mean_njs_str)+QString("(")+QString::fromStdString(stdev_njs_str)+QString(")"));
+        // nmu
+        double sum_nmu = std::accumulate(this->nmu_task.begin(), this->nmu_task.end(), 0.0);
+        double mean_nmu = ((double)sum_nmu) / this->nmu_task.size();
+        string mean_nmu_str =  boost::str(boost::format("%.2f") % (mean_nmu));
+        boost::replace_all(mean_nmu_str,",",".");
+        double sq_sum_nmu = std::inner_product(this->nmu_task.begin(), this->nmu_task.end(), this->nmu_task.begin(), 0.0);
+        double stdev_nmu = std::sqrt(((double)sq_sum_nmu) / this->nmu_task.size() - mean_nmu * mean_nmu);
+        string stdev_nmu_str =  boost::str(boost::format("%.2f") % (stdev_nmu));
+        boost::replace_all(stdev_nmu_str,",",".");
+        ui.label_nmu_task->setText(QString::fromStdString(mean_nmu_str)+QString("(")+QString::fromStdString(stdev_nmu_str)+QString(")"));
+        // planning time
+        double sum_prob = std::accumulate(this->prob_time_task.begin(), this->prob_time_task.end(), 0.0);
+        double mean_prob = ((double)sum_prob) / this->prob_time_task.size();
+        string mean_prob_str =  boost::str(boost::format("%.2f") % (mean_prob));
+        boost::replace_all(mean_prob_str,",",".");
+        double sq_sum_prob = std::inner_product(this->prob_time_task.begin(), this->prob_time_task.end(), this->prob_time_task.begin(), 0.0);
+        double stdev_prob = std::sqrt(((double)sq_sum_prob) / this->prob_time_task.size() - mean_prob * mean_prob);
+        string stdev_prob_str =  boost::str(boost::format("%.2f") % (stdev_prob));
+        boost::replace_all(stdev_prob_str,",",".");
+        ui.label_solving_time_task->setText(QString::fromStdString(mean_prob_str)+QString("(")+QString::fromStdString(stdev_prob_str)+QString(")"));
+
 
     }
     f.close();
@@ -2415,6 +2447,39 @@ void MainWindow::on_pushButton_append_mov_clicked()
                  }
              }
          }
+
+         // compute njs, nmu and planning time
+         // njs
+         double sum_njs = std::accumulate(this->njs_task.begin(), this->njs_task.end(), 0.0);
+         double mean_njs = ((double)sum_njs) / this->njs_task.size();
+         string mean_njs_str =  boost::str(boost::format("%.2f") % (mean_njs));
+         boost::replace_all(mean_njs_str,",",".");
+         double sq_sum_njs = std::inner_product(this->njs_task.begin(), this->njs_task.end(), this->njs_task.begin(), 0.0);
+         double stdev_njs = std::sqrt(((double)sq_sum_njs) / this->njs_task.size() - mean_njs * mean_njs);
+         string stdev_njs_str =  boost::str(boost::format("%.2f") % (stdev_njs));
+         boost::replace_all(stdev_njs_str,",",".");
+         ui.label_cost_hand_value_task->setText(QString::fromStdString(mean_njs_str)+QString("(")+QString::fromStdString(stdev_njs_str)+QString(")"));
+         // nmu
+         double sum_nmu = std::accumulate(this->nmu_task.begin(), this->nmu_task.end(), 0.0);
+         double mean_nmu = ((double)sum_nmu) / this->nmu_task.size();
+         string mean_nmu_str =  boost::str(boost::format("%.2f") % (mean_nmu));
+         boost::replace_all(mean_nmu_str,",",".");
+         double sq_sum_nmu = std::inner_product(this->nmu_task.begin(), this->nmu_task.end(), this->nmu_task.begin(), 0.0);
+         double stdev_nmu = std::sqrt(((double)sq_sum_nmu) / this->nmu_task.size() - mean_nmu * mean_nmu);
+         string stdev_nmu_str =  boost::str(boost::format("%.2f") % (stdev_nmu));
+         boost::replace_all(stdev_nmu_str,",",".");
+         ui.label_nmu_task->setText(QString::fromStdString(mean_nmu_str)+QString("(")+QString::fromStdString(stdev_nmu_str)+QString(")"));
+         // planning time
+         double sum_prob = std::accumulate(this->prob_time_task.begin(), this->prob_time_task.end(), 0.0);
+         double mean_prob = ((double)sum_prob) / this->prob_time_task.size();
+         string mean_prob_str =  boost::str(boost::format("%.2f") % (mean_prob));
+         boost::replace_all(mean_prob_str,",",".");
+         double sq_sum_prob = std::inner_product(this->prob_time_task.begin(), this->prob_time_task.end(), this->prob_time_task.begin(), 0.0);
+         double stdev_prob = std::sqrt(((double)sq_sum_prob) / this->prob_time_task.size() - mean_prob * mean_prob);
+         string stdev_prob_str =  boost::str(boost::format("%.2f") % (stdev_prob));
+         boost::replace_all(stdev_prob_str,",",".");
+         ui.label_solving_time_task->setText(QString::fromStdString(mean_prob_str)+QString("(")+QString::fromStdString(stdev_prob_str)+QString(")"));
+
 
 
 
@@ -2728,7 +2793,7 @@ void MainWindow::on_pushButton_save_res_mov_clicked()
         mkdir("results/planning/mov", 0700);
     }
     QString path("results/planning/mov/");
-    ui.plot_hand_vel_task->savePdf(path+QString("hand_vel_mov.pdf"),true,0,0,QString(),QString("Module of the Hand velocity"));
+    ui.plot_hand_vel_mov->savePdf(path+QString("hand_vel_mov.pdf"),true,0,0,QString(),QString("Module of the Hand velocity"));
 
     string filename("results_mov.txt");
     ofstream results;
