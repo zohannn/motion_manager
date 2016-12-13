@@ -1083,32 +1083,6 @@ p, li { white-space: pre-wrap; }
            <string>Plot</string>
           </property>
          </widget>
-         <widget class="QWidget" name="layoutWidget">
-          <property name="geometry">
-           <rect>
-            <x>20</x>
-            <y>290</y>
-            <width>331</width>
-            <height>17</height>
-           </rect>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QLabel" name="label_cost_joints">
-             <property name="text">
-              <string>Normalized jerk cost of the joints: </string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_cost_joints_value">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
          <widget class="QWidget" name="layoutWidget_2">
           <property name="geometry">
            <rect>
@@ -1200,6 +1174,19 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </widget>
+         <widget class="QPushButton" name="pushButton_save_res_mov">
+          <property name="geometry">
+           <rect>
+            <x>100</x>
+            <y>380</y>
+            <width>80</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Save</string>
+          </property>
+         </widget>
         </widget>
         <widget class="QWidget" name="tab_results_plan_task">
          <attribute name="title">
@@ -1252,6 +1239,19 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="text">
            <string>Plot</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pushButton_save_res_task">
+          <property name="geometry">
+           <rect>
+            <x>100</x>
+            <y>380</y>
+            <width>80</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Save</string>
           </property>
          </widget>
         </widget>

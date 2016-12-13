@@ -329,6 +329,16 @@ public Q_SLOTS:
          */
         void on_pushButton_comp_hand_vel_mov_clicked();
 
+        /**
+         * @brief on_pushButton_save_res_mov_clicked
+         */
+        void on_pushButton_save_res_mov_clicked();
+
+        /**
+         * @brief on_pushButton_save_res_task_clicked
+         */
+        void on_pushButton_save_res_task_clicked();
+
 
 
 private:
@@ -367,12 +377,18 @@ private:
         vector<vector<double>> handLinearVelocity_mov; /**< hand linear velocity during the movement */
         vector<vector<double>> handAngularVelocity_mov;/**< hand angular velocity during the movement */
         vector<double> handVelocityNorm_mov; /**< hand velocity norm during the movement */
+        double prob_time_mov;/**< time taken to solve the problem */
+        double njs_mov;/**< normalized jerk score of the movement */
+        int nmu_mov;/**< number of the movement units */
 
         vector<vector<double>> handPosition_task; /**< hand position during the task. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_task; /**< hand orientation during the task. */
         vector<vector<double>> handLinearVelocity_task; /**< hand linear velocity during the task */
         vector<vector<double>> handAngularVelocity_task;/**< hand angular velocity during the task */
         vector<double> handVelocityNorm_task; /**< hand velocity norm during the task */
+        vector<double> prob_time_task;/**< time taken to solve the problems in the task */
+        vector<double> njs_task;/**< normalized jerk scores of the movements in the task */
+        vector<int> nmu_task;/**< number of the movement units in the task */
 
         moveit_plannerPtr m_planner; /**< MoveIt! Libraries planner */
         bool moveit_mov; /**< true if the movement has been planned by the moveit planner, false otherwise */

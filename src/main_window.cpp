@@ -1203,8 +1203,8 @@ void MainWindow::on_pushButton_plan_clicked()
 // --- RESULTS --- //
 if(solved){
     // time taken to solve the problem
-    double prob_time = prob->getTime();
-    ui.label_solving_time->setText(QString::number(prob_time));
+    this->prob_time_mov = prob->getTime();
+    ui.label_solving_time->setText(QString::number(this->prob_time_mov));
 
     uint tot_steps=0;
     QStringList h_headers; bool h_head=false; QStringList v_headers;
@@ -1282,6 +1282,7 @@ if(solved){
     this->handLinearVelocity_mov.resize(tot_steps); this->handAngularVelocity_mov.resize(tot_steps);
     int step = 0;
     int arm_code = prob->getMovement()->getArm();
+    /*
     // positions
     VectorXd jointsPosition1_mov;
     VectorXd jointsPosition2_mov;
@@ -1306,10 +1307,12 @@ if(solved){
     VectorXd jointsAcceleration9_mov;
     VectorXd jointsAcceleration10_mov;
     VectorXd jointsAcceleration11_mov;
+    */
     for (size_t k=0; k< this->jointsPosition_mov.size();++k){
         MatrixXd pos_stage = this->jointsPosition_mov.at(k);
         MatrixXd vel_stage = this->jointsVelocity_mov.at(k);
         MatrixXd acc_stage = this->jointsAcceleration_mov.at(k);
+        /*
         int rows = jointsAcceleration1_mov.rows();
         // positions
         jointsPosition1_mov.conservativeResize(rows+pos_stage.rows());
@@ -1335,6 +1338,7 @@ if(solved){
         jointsAcceleration9_mov.conservativeResize(rows+acc_stage.rows());
         jointsAcceleration10_mov.conservativeResize(rows+acc_stage.rows());
         jointsAcceleration11_mov.conservativeResize(rows+acc_stage.rows());
+        */
         for(int i=0;i<pos_stage.rows();++i){
             // position
             VectorXd pos_row = pos_stage.block<1,JOINTS_ARM>(i,0);
@@ -1350,6 +1354,7 @@ if(solved){
             this->handLinearVelocity_mov.at(step) = {hand_vel.at(0),hand_vel.at(1),hand_vel.at(2)};
             this->handAngularVelocity_mov.at(step) = {hand_vel.at(3),hand_vel.at(4),hand_vel.at(5)};
             step++;
+            /*
             //positions
             jointsPosition1_mov(i+rows) = pos_stage(i,0);
             jointsPosition2_mov(i+rows) = pos_stage(i,1);
@@ -1374,11 +1379,15 @@ if(solved){
             jointsAcceleration9_mov(i+rows) = acc_stage(i,8);
             jointsAcceleration10_mov(i+rows) = acc_stage(i,9);
             jointsAcceleration11_mov(i+rows) = acc_stage(i,10);
+            */
 
         }
     }    
+
+
     // --- compute the cost of the trajectory according to the jerk principle --- //
 
+    /*
     // positions
     // pos1
     vector<double> pos1_mov; pos1_mov.resize(jointsPosition1_mov.size());
@@ -1595,7 +1604,7 @@ if(solved){
         cost_jerk_11 += squared_der_acc11.at(i)*(pow(duration_11,5)/pow(length_11,2))*tot_timesteps.at(i);
     }
 
-    // normalized total jerk cost
+    // normalized total jerk cost of the joints
     double total_cost_jerk = sqrt(0.5*cost_jerk_1)+
                             sqrt(0.5*cost_jerk_2)+
                             sqrt(0.5*cost_jerk_3)+
@@ -1608,6 +1617,7 @@ if(solved){
                             sqrt(0.5*cost_jerk_10)+
                             sqrt(0.5*cost_jerk_11);
     ui.label_cost_joints_value->setText(QString::number(total_cost_jerk));
+    */
 
     // normlized jerk cost of the hand
     QVector<double> handPosition_mov_x; QVector<double> handPosition_mov_y; QVector<double> handPosition_mov_z;
@@ -1642,16 +1652,16 @@ if(solved){
                          pow((handPosition_mov_y.at(handPosition_mov_y.size()-1)-handPosition_mov_y.at(0)),2)+
                          pow((handPosition_mov_z.at(handPosition_mov_z.size()-1)-handPosition_mov_z.at(0)),2));
     double total_cost_jerk_hand=0.0;
-    for(size_t i=1;i<tot_timesteps.size();++i){
+    for(size_t i=0;i<tot_timesteps.size();++i){
         total_cost_jerk_hand += pow(jerk_hand.at(i),2)*tot_timesteps.at(i);
     }
     total_cost_jerk_hand = sqrt(0.5*total_cost_jerk_hand*(pow(duration,5)/pow(length,2)));
-
     ui.label_cost_hand_value->setText(QString::number(total_cost_jerk_hand));
+    this->njs_mov = total_cost_jerk_hand;
 
     // -- compute the number of movement units -- //
-    int nmu = this->getNumberMovementUnits(this->handVelocityNorm_mov,this->qtime_mov);
-    ui.label_nmu->setText(QString::number(nmu));
+    this->nmu_mov = this->getNumberMovementUnits(this->handVelocityNorm_mov,this->qtime_mov);
+    ui.label_nmu->setText(QString::number(this->nmu_mov));
 
 } // if the problem has been solved
 
@@ -1740,6 +1750,9 @@ void MainWindow::on_pushButton_load_task_clicked()
     this->jointsPosition_task.clear();
     this->timesteps_task.clear();
     this->tols_stop_task.clear();
+    this->njs_task.clear();
+    this->nmu_task.clear();
+    this->prob_time_task.clear();
     this->jointsPosition_mov.clear();
     this->jointsVelocity_mov.clear();
     this->jointsAcceleration_mov.clear();
@@ -1986,6 +1999,24 @@ void MainWindow::on_pushButton_load_task_clicked()
                 if(QString::compare(fields.at(0).simplified(),QString("tol stop"),Qt::CaseInsensitive)==0){
                     tols_stop_mov.push_back(fields.at(1).toDouble());
                 }
+            }else if(line.at(0)==QChar('n')){
+
+                QStringList fields = line.split("=");
+                if(QString::compare(fields.at(0).simplified(),QString("njs"),Qt::CaseInsensitive)==0){
+                    this->njs_task.push_back(fields.at(1).toDouble());
+                }
+            }else if(line.at(0)==QChar('n')){
+
+                QStringList fields = line.split("=");
+                if(QString::compare(fields.at(0).simplified(),QString("nmu"),Qt::CaseInsensitive)==0){
+                    this->nmu_task.push_back(fields.at(1).toDouble());
+                }
+            }else if(line.at(0)==QChar('p')){
+
+                QStringList fields = line.split("=");
+                if(QString::compare(fields.at(0).simplified(),QString("prob_time"),Qt::CaseInsensitive)==0){
+                    this->prob_time_task.push_back(fields.at(1).toDouble());
+                }
             }else{
                 pos_stage.conservativeResize(pos_stage.rows()+1,JOINTS_ARM+JOINTS_HAND);
                 vel_stage.conservativeResize(vel_stage.rows()+1,JOINTS_ARM+JOINTS_HAND);
@@ -2137,6 +2168,12 @@ void MainWindow::on_pushButton_save_task_clicked()
                 vector< MatrixXd > acc_mov = this->jointsAcceleration_task.at(i-h);
                 vector< vector< double > > timesteps_mov = this->timesteps_task.at(i-h);
                 vector< double > tols_stop_mov = this->tols_stop_task.at(i-h);
+                double njs = this->njs_task.at(i-h);
+                int nmu = this->nmu_task.at(i-h);
+                double prob_time = this->prob_time_task.at(i-h);
+                stream << "njs="<< QString::number(njs).toStdString().c_str()<< endl;
+                stream << "nmu="<< QString::number(nmu).toStdString().c_str()<< endl;
+                stream << "prob_time="<< QString::number(prob_time).toStdString().c_str()<< endl;
 
                 for(size_t j=0;j < traj_mov.size(); ++j){
                     stream << "Movement stage: "<< QString::number(j+1).toStdString().c_str()<< endl;
@@ -2281,6 +2318,9 @@ void MainWindow::on_pushButton_append_mov_clicked()
         this->jointsAcceleration_task.push_back(this->jointsAcceleration_mov);
         this->timesteps_task.push_back(this->timesteps_mov);
         this->tols_stop_task.push_back(this->tols_stop_mov);
+        this->njs_task.push_back(this->njs_mov);
+        this->nmu_task.push_back(this->nmu_mov);
+        this->prob_time_task.push_back(this->prob_time_mov);
          QStringList h_headers; bool h_head=false; QStringList v_headers;
          std::vector<std::vector<QString>> task_steps;
          vector<MatrixXd> pos_mov; vector<MatrixXd> vel_mov; vector<MatrixXd> acc_mov; vector<vector<double>> tstep_mov;
@@ -2671,6 +2711,143 @@ void MainWindow::on_pushButton_comp_hand_vel_mov_clicked()
     if(!this->handLinearVelocity_mov.empty())
         this->mHandVeldlg->setupPlots(this->handLinearVelocity_mov,this->handAngularVelocity_mov,this->qtime_mov);
     this->mHandVeldlg->show();
+
+}
+
+void MainWindow::on_pushButton_save_res_mov_clicked()
+{
+
+    struct stat st = {0};
+    if (stat("results", &st) == -1) {
+        mkdir("results", 0700);
+    }
+    if (stat("results/planning", &st) == -1) {
+        mkdir("results/planning", 0700);
+    }
+    if (stat("results/planning/mov", &st) == -1) {
+        mkdir("results/planning/mov", 0700);
+    }
+    QString path("results/planning/mov/");
+    ui.plot_hand_vel_task->savePdf(path+QString("hand_vel_mov.pdf"),true,0,0,QString(),QString("Module of the Hand velocity"));
+
+    string filename("results_mov.txt");
+    ofstream results;
+    results.open(path.toStdString()+filename);
+
+    results << string("# NORMALIZED JERK SCORE \n");
+    string njs_str =  boost::str(boost::format("%.2f") % (this->njs_mov));
+    boost::replace_all(njs_str,",",".");
+    results << string("njs =")+njs_str+string(";\n");
+
+    results << string("# NUMBER OF MOVEMENT UNITS \n");
+    string nmu_str =  boost::str(boost::format("%.2f") % (this->nmu_mov));
+    boost::replace_all(nmu_str,",",".");
+    results << string("nmu =")+nmu_str+string(";\n");
+
+    results << string("# TIME TAKEN TO PLAN THE MOVEMENT [ms] \n");
+    string time_str =  boost::str(boost::format("%.2f") % (this->prob_time_mov));
+    boost::replace_all(time_str,",",".");
+    results << string("prob_time =")+time_str+string(";\n");
+
+    results.close();
+
+
+}
+
+void MainWindow::on_pushButton_save_res_task_clicked()
+{
+    struct stat st = {0};
+    if (stat("results", &st) == -1) {
+        mkdir("results", 0700);
+    }
+    if (stat("results/planning", &st) == -1) {
+        mkdir("results/planning", 0700);
+    }
+    if (stat("results/planning/task", &st) == -1) {
+        mkdir("results/planning/task", 0700);
+    }
+    QString path("results/planning/task/");
+    ui.plot_hand_vel_task->savePdf(path+QString("hand_vel_task.pdf"),true,0,0,QString(),QString("Module of the Hand velocity"));
+
+    string filename("results_task.txt");
+    ofstream results;
+    results.open(path.toStdString()+filename);
+
+    results << string("# NORMALIZED JERK SCORE \n");
+    results << string("njs = ");
+    for(size_t i=0;i<this->njs_task.size();++i){
+        string njs_str =  boost::str(boost::format("%.2f") % (this->njs_task.at(i)));
+        boost::replace_all(njs_str,",",".");
+        if(i==(this->njs_task.size()-1)){
+            results << njs_str+" \n";
+        }else{
+            results << njs_str+" ";
+        }
+    }
+    // mean
+    double sum_njs = std::accumulate(this->njs_task.begin(), this->njs_task.end(), 0.0);
+    double mean_njs = ((double)sum_njs) / this->njs_task.size();
+    string mean_njs_str =  boost::str(boost::format("%.2f") % (mean_njs));
+    boost::replace_all(mean_njs_str,",",".");
+    results << string("mean njs = ")+mean_njs_str+string(" \n");
+    // standard deviation
+    double sq_sum_njs = std::inner_product(this->njs_task.begin(), this->njs_task.end(), this->njs_task.begin(), 0.0);
+    double stdev_njs = std::sqrt(((double)sq_sum_njs) / this->njs_task.size() - mean_njs * mean_njs);
+    string stdev_njs_str =  boost::str(boost::format("%.2f") % (stdev_njs));
+    boost::replace_all(stdev_njs_str,",",".");
+    results << string("sd njs = ")+stdev_njs_str+string(" \n");
+
+
+    results << string("# NUMBER OF MOVEMENT UNITS \n");
+    results << string("nmu = ");
+    for(size_t i=0;i<this->nmu_task.size();++i){
+        string nmu_str =  boost::str(boost::format("%.2f") % (this->nmu_task.at(i)));
+        boost::replace_all(nmu_str,",",".");
+        if(i==(this->nmu_task.size()-1)){
+            results << nmu_str+" \n";
+        }else{
+            results << nmu_str+" ";
+        }
+    }
+    // mean
+    double sum_nmu = std::accumulate(this->nmu_task.begin(), this->nmu_task.end(), 0.0);
+    double mean_nmu = ((double)sum_nmu) / this->nmu_task.size();
+    string mean_nmu_str =  boost::str(boost::format("%.2f") % (mean_nmu));
+    boost::replace_all(mean_nmu_str,",",".");
+    results << string("mean nmu = ")+mean_nmu_str+string(" \n");
+    // standard deviation
+    double sq_sum_nmu = std::inner_product(this->nmu_task.begin(), this->nmu_task.end(), this->nmu_task.begin(), 0.0);
+    double stdev_nmu = std::sqrt(((double)sq_sum_nmu) / this->nmu_task.size() - mean_nmu * mean_nmu);
+    string stdev_nmu_str =  boost::str(boost::format("%.2f") % (stdev_nmu));
+    boost::replace_all(stdev_nmu_str,",",".");
+    results << string("sd nmu = ")+stdev_nmu_str+string(" \n");
+
+    results << string("# TIME TAKEN TO PLAN THE MOVEMENT [ms] \n");
+    results << string("prob_time = ");
+    for(size_t i=0;i<this->prob_time_task.size();++i){
+        string prob_str =  boost::str(boost::format("%.2f") % (this->prob_time_task.at(i)));
+        boost::replace_all(prob_str,",",".");
+        if(i==(this->prob_time_task.size()-1)){
+            results << prob_str+" \n";
+        }else{
+            results << prob_str+" ";
+        }
+    }
+    // mean
+    double sum_prob = std::accumulate(this->prob_time_task.begin(), this->prob_time_task.end(), 0.0);
+    double mean_prob = ((double)sum_prob) / this->prob_time_task.size();
+    string mean_prob_str =  boost::str(boost::format("%.2f") % (mean_prob));
+    boost::replace_all(mean_prob_str,",",".");
+    results << string("mean plan time = ")+mean_prob_str+string(" \n");
+    // standard deviation
+    double sq_sum_prob = std::inner_product(this->prob_time_task.begin(), this->prob_time_task.end(), this->prob_time_task.begin(), 0.0);
+    double stdev_prob = std::sqrt(((double)sq_sum_prob) / this->prob_time_task.size() - mean_prob * mean_prob);
+    string stdev_prob_str =  boost::str(boost::format("%.2f") % (stdev_prob));
+    boost::replace_all(stdev_prob_str,",",".");
+    results << string("sd plan time = ")+stdev_prob_str+string(" \n");
+
+    results.close();
+
 
 }
 
