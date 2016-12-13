@@ -151,19 +151,19 @@ void ResultsJointsDialog::setupPlots(vector<vector<MatrixXd> > &pos, vector<vect
         vector<MatrixXd> vel_mov = vel.at(h);
         vector<MatrixXd> acc_mov = acc.at(h);
         vector<vector<double>> tstep_mov = timesteps.at(h);
-        double time_init;
-        if(time.empty()){
-            time_init=0.0;
-        }else{
-            time_init=time.at(time.size()-1);
-        }
-        vector<double> time_mov;
+
         for(size_t i=0; i<pos_mov.size();++i){
             MatrixXd pos_stage = pos_mov.at(i);
             MatrixXd vel_stage = vel_mov.at(i);
             MatrixXd acc_stage = acc_mov.at(i);
             vector<double> tsteps_stage = tstep_mov.at(i);
             vector<double> time_stage(tsteps_stage.size());
+            double time_init;
+            if(time.empty()){
+                time_init=0.0;
+            }else{
+                time_init=time.at(time.size()-1);
+            }
             time_stage.at(0) = time_init;
             for(int k=0;k<pos_stage.rows();++k){
                 if(k>0){time_stage.at(k) = time_stage.at(k-1) + tsteps_stage.at(k-1);}
@@ -227,11 +227,9 @@ void ResultsJointsDialog::setupPlots(vector<vector<MatrixXd> > &pos, vector<vect
                     }
                 }
             }// stage
-            time_mov.reserve(time_stage.size());
-            std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time_mov));
+            time.reserve(time_stage.size());
+            std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time));
         }// mov
-        time.reserve(time_mov.size());
-        std::copy (time_mov.begin(), time_mov.end(), std::back_inserter(time));
     }// task
     QVector<double> qtime = QVector<double>::fromStdVector(time);
 

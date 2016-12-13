@@ -2561,14 +2561,14 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
     int hh=0; // it counts problems that do not belong to the task
     for(int kk=0; kk < task->getProblemNumber(); ++kk){ //for loop movements
       if(task->getProblem(kk)->getPartOfTask() && task->getProblem(kk)->getSolved()){
-          int i = kk - hh;
-          vector<MatrixXd> traj_mov = traj_task.at(i);
-          vector<MatrixXd> vel_mov = vel_task.at(i);
-          vector<vector<double>> timesteps_mov = timesteps_task.at(i);
-          vector<double> tols_stop_mov = tols_stop_task.at(i);
+          int ii = kk - hh;
+          vector<MatrixXd> traj_mov = traj_task.at(ii);
+          vector<MatrixXd> vel_mov = vel_task.at(ii);
+          vector<vector<double>> timesteps_mov = timesteps_task.at(ii);
+          vector<double> tols_stop_mov = tols_stop_task.at(ii);
           double tol_stop_stage;
           std::vector<double> timesteps_stage;
-          movementPtr mov = task->getProblem(i)->getMovement();
+          movementPtr mov = task->getProblem(kk)->getMovement();
           //BOOST_LOG_SEV(lg, info) << "Movement = " << mov->getInfoLine();
           this->curr_mov = mov;
           arm_code = mov->getArm();
@@ -2849,10 +2849,12 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
           }//for loop stages
           // movement complete          
           log(QNode::Info,string("Movement completed"));
-          task->getProblem(i)->getMovement()->setExecuted(true);
+          task->getProblem(kk)->getMovement()->setExecuted(true);
 
-        } // if prob is part of the task
-      hh++;
+        }else{
+            hh++;
+        }// if prob is part of the task
+
       }// for loop movements
       log(QNode::Info,string("Task completed"));
 

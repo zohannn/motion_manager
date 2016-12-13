@@ -2366,7 +2366,7 @@
    </widget>
    <widget class="QWidget" name="tab_huml_pick">
     <attribute name="title">
-     <string>Pick settings</string>
+     <string>Pick &amp;&amp; Place settings</string>
     </attribute>
     <widget class="QGroupBox" name="groupBox_pre_grasp">
      <property name="geometry">
@@ -2638,7 +2638,7 @@
       </rect>
      </property>
      <property name="title">
-      <string>Final velocity [rad/s]</string>
+      <string>Approach vel [rad/s]</string>
      </property>
      <widget class="QWidget" name="layoutWidget_6">
       <property name="geometry">
@@ -2825,7 +2825,7 @@
       </rect>
      </property>
      <property name="title">
-      <string>Final acceleration  [rad/s^2]</string>
+      <string>Approach acc  [rad/s^2]</string>
      </property>
      <widget class="QWidget" name="layoutWidget_7">
       <property name="geometry">
@@ -3035,7 +3035,7 @@
       </rect>
      </property>
      <property name="title">
-      <string>Final hand velocity</string>
+      <string>Approach hand vel</string>
      </property>
      <widget class="QWidget" name="layoutWidget_35">
       <property name="geometry">
@@ -3147,7 +3147,7 @@
       </rect>
      </property>
      <property name="title">
-      <string>Final hand acceleration</string>
+      <string>Approach hand acc</string>
      </property>
      <widget class="QWidget" name="layoutWidget_36">
       <property name="geometry">
@@ -3262,146 +3262,11 @@
       <string>set hand conditions</string>
      </property>
     </widget>
-   </widget>
-   <widget class="QWidget" name="tab_huml_place">
-    <attribute name="title">
-     <string>Place settings</string>
-    </attribute>
-    <widget class="QGroupBox" name="groupBox_post_place">
-     <property name="geometry">
-      <rect>
-       <x>330</x>
-       <y>20</y>
-       <width>261</width>
-       <height>181</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string>Post-place retreating Parameters</string>
-     </property>
-     <widget class="QWidget" name="layoutWidget_dist_3">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>141</width>
-        <height>27</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_21">
-       <item>
-        <widget class="QLabel" name="label_38">
-         <property name="text">
-          <string>distance [mm]</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEdit_post_place_dist">
-         <property name="text">
-          <string>0</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QGroupBox" name="groupBox_11">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>60</y>
-        <width>191</width>
-        <height>111</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Direction of retreating</string>
-      </property>
-      <widget class="QWidget" name="layoutWidget_16">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>50</y>
-         <width>71</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_35">
-        <item>
-         <widget class="QLabel" name="label_103">
-          <property name="text">
-           <string>Y</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_post_place_y">
-          <property name="text">
-           <string>0</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="layoutWidget_17">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>80</y>
-         <width>71</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_36">
-        <item>
-         <widget class="QLabel" name="label_104">
-          <property name="text">
-           <string>Z</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_post_place_z">
-          <property name="text">
-           <string>0</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="layoutWidget_eng_tol_pos_5">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>71</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_37">
-        <item>
-         <widget class="QLabel" name="label_105">
-          <property name="text">
-           <string>X</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_post_place_x">
-          <property name="text">
-           <string>0</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </widget>
     <widget class="QGroupBox" name="groupBox_pre_place">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>20</y>
+       <y>260</y>
        <width>251</width>
        <height>181</height>
       </rect>
@@ -3409,7 +3274,7 @@
      <property name="title">
       <string>Pre-place approaching Parameters</string>
      </property>
-     <widget class="QWidget" name="layoutWidget_dist_4">
+     <widget class="QWidget" name="layoutWidget_dist_5">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -3418,9 +3283,9 @@
         <height>27</height>
        </rect>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_22">
+      <layout class="QHBoxLayout" name="horizontalLayout_101">
        <item>
-        <widget class="QLabel" name="label_39">
+        <widget class="QLabel" name="label_186">
          <property name="text">
           <string>distance [mm]</string>
          </property>
@@ -3435,7 +3300,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="groupBox_12">
+     <widget class="QGroupBox" name="groupBox_13">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -3447,7 +3312,7 @@
       <property name="title">
        <string>Direction of approaching</string>
       </property>
-      <widget class="QWidget" name="layoutWidget_18">
+      <widget class="QWidget" name="layoutWidget_24">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -3456,9 +3321,9 @@
          <height>27</height>
         </rect>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_38">
+       <layout class="QHBoxLayout" name="horizontalLayout_102">
         <item>
-         <widget class="QLabel" name="label_106">
+         <widget class="QLabel" name="label_187">
           <property name="text">
            <string>Y</string>
           </property>
@@ -3473,7 +3338,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="layoutWidget_19">
+      <widget class="QWidget" name="layoutWidget_25">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -3482,9 +3347,9 @@
          <height>27</height>
         </rect>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_39">
+       <layout class="QHBoxLayout" name="horizontalLayout_103">
         <item>
-         <widget class="QLabel" name="label_107">
+         <widget class="QLabel" name="label_188">
           <property name="text">
            <string>Z</string>
           </property>
@@ -3499,7 +3364,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="layoutWidget_eng_tol_pos_6">
+      <widget class="QWidget" name="layoutWidget_eng_tol_pos_9">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -3508,9 +3373,9 @@
          <height>27</height>
         </rect>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_40">
+       <layout class="QHBoxLayout" name="horizontalLayout_104">
         <item>
-         <widget class="QLabel" name="label_108">
+         <widget class="QLabel" name="label_189">
           <property name="text">
            <string>X</string>
           </property>
@@ -3527,11 +3392,11 @@
       </widget>
      </widget>
     </widget>
-    <widget class="QLabel" name="label_pick_2">
+    <widget class="QLabel" name="label_pick_3">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>210</y>
+       <y>450</y>
        <width>361</width>
        <height>41</height>
       </rect>
@@ -3546,6 +3411,136 @@
       <string>The direction of approaching and retreating are taken 
  with respect to the frame of the target in the new location</string>
      </property>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_post_place">
+     <property name="geometry">
+      <rect>
+       <x>270</x>
+       <y>260</y>
+       <width>241</width>
+       <height>181</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Post-place retreating Parameters</string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_dist_6">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>141</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_105">
+       <item>
+        <widget class="QLabel" name="label_190">
+         <property name="text">
+          <string>distance [mm]</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_post_place_dist">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_14">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>191</width>
+        <height>111</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Direction of retreating</string>
+      </property>
+      <widget class="QWidget" name="layoutWidget_26">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>50</y>
+         <width>71</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_106">
+        <item>
+         <widget class="QLabel" name="label_191">
+          <property name="text">
+           <string>Y</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_post_place_y">
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget_27">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>80</y>
+         <width>71</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_107">
+        <item>
+         <widget class="QLabel" name="label_192">
+          <property name="text">
+           <string>Z</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_post_place_z">
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget_eng_tol_pos_10">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>71</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_108">
+        <item>
+         <widget class="QLabel" name="label_193">
+          <property name="text">
+           <string>X</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_post_place_x">
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_huml_move">

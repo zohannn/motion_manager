@@ -15,8 +15,8 @@ TolDialogHUML::TolDialogHUML(QWidget *parent) :
      QObject::connect(ui->checkBox_retreat, SIGNAL(stateChanged(int)), this, SLOT(checkRetreat(int)));
      QObject::connect(ui->checkBox_sel_final_posture, SIGNAL(stateChanged(int)), this, SLOT(checkFinalPosture(int)));
      QObject::connect(ui->checkBox_add_plane, SIGNAL(stateChanged(int)), this, SLOT(checkAddPlane(int)));
-     QObject::connect(ui->checkBox_hand_cond, SIGNAL(stateChanged(int)), this, SLOT(checkHandCond(int)));
-     QObject::connect(ui->checkBox_hand_cond_approach, SIGNAL(stateChanged(int)), this, SLOT(checkHandCondApproach(int)));
+     //QObject::connect(ui->checkBox_hand_cond, SIGNAL(stateChanged(int)), this, SLOT(checkHandCond(int)));
+     //QObject::connect(ui->checkBox_hand_cond_approach, SIGNAL(stateChanged(int)), this, SLOT(checkHandCondApproach(int)));
 
     if(ui->checkBox_approach->isChecked()){
         ui->groupBox_pre_grasp->setEnabled(false);
@@ -1098,9 +1098,10 @@ void TolDialogHUML::checkAddPlane(int state)
     }
 }
 
+    /*
 void TolDialogHUML::checkSetHandCond(int state)
 {
-    /*
+
     if(state==0){
         // -- unchecked -- //
         ui->groupBox_init_hand_vel->setEnabled(false);
@@ -1147,14 +1148,15 @@ void TolDialogHUML::checkSetHandCond(int state)
         //ui->lineEdit_final_acc_6->setEnabled(false);
         //ui->lineEdit_final_acc_7->setEnabled(false);
     }
-    */
-}
 
+}
+    */
+/*
 void TolDialogHUML::checkSetHandCondApproach(int state)
 {
 
 }
-
+*/
 
 bool TolDialogHUML::getRandInit()
 {

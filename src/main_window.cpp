@@ -2021,19 +2021,19 @@ void MainWindow::on_pushButton_load_task_clicked()
             acc_mov = this->jointsAcceleration_task.at(h);
             tstep_mov = this->timesteps_task.at(h);
             mov_duration = 0.0;
-            double time_init;
-            if(time_task.empty()){
-                time_init=0.0;
-            }else{
-                time_init=time_task.at(time_task.size()-1);
-            }
-            vector<double> time_mov;
+
             for (size_t k=0; k< pos_mov.size();++k){
                 MatrixXd jointPosition_stage = pos_mov.at(k);
                 MatrixXd jointVelocity_stage = vel_mov.at(k);
                 MatrixXd jointAcceleration_stage = acc_mov.at(k);
                 tstep_stage = tstep_mov.at(k);
                 vector<double> time_stage(tstep_stage.size());
+                double time_init;
+                if(time_task.empty()){
+                    time_init=0.0;
+                }else{
+                    time_init=time_task.at(time_task.size()-1);
+                }
                 time_stage.at(0) = time_init;
                 stage_duration = 0.0;
                 std::vector<QString> stage_step;
@@ -2057,12 +2057,10 @@ void MainWindow::on_pushButton_load_task_clicked()
                     task_steps.push_back(stage_step);
                 }// stage rows
                 mov_duration += stage_duration;
-                time_mov.reserve(time_stage.size());
-                std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time_mov));
+                time_task.reserve(time_stage.size());
+                std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time_task));
             }// movements
             task_duration +=mov_duration;
-            time_task.reserve(time_mov.size());
-            std::copy (time_mov.begin(), time_mov.end(), std::back_inserter(time_task));
         }//task
         this->qtime_task = QVector<double>::fromStdVector(time_task);
 
@@ -2291,19 +2289,18 @@ void MainWindow::on_pushButton_append_mov_clicked()
              acc_mov = this->jointsAcceleration_task.at(h);
              tstep_mov = this->timesteps_task.at(h);
              mov_duration = 0.0;
-             double time_init;
-             if(time_task.empty()){
-                 time_init=0.0;
-             }else{
-                 time_init=time_task.at(time_task.size()-1);
-             }
-             vector<double> time_mov;
              for (size_t k=0; k< pos_mov.size();++k){
                  MatrixXd jointPosition_stage = pos_mov.at(k);
                  MatrixXd jointVelocity_stage = vel_mov.at(k);
                  MatrixXd jointAcceleration_stage = acc_mov.at(k);
                  vector<double> tstep_stage = tstep_mov.at(k);
                  vector<double> time_stage(tstep_stage.size());
+                 double time_init;
+                 if(time_task.empty()){
+                     time_init=0.0;
+                 }else{
+                     time_init=time_task.at(time_task.size()-1);
+                 }
                  time_stage.at(0) = time_init;
                  stage_duration = 0.0;
                  std::vector<QString> stage_step;
@@ -2326,12 +2323,10 @@ void MainWindow::on_pushButton_append_mov_clicked()
                      task_steps.push_back(stage_step);
                  }// stage rows
                  mov_duration +=stage_duration;
-                 time_mov.reserve(time_stage.size());
-                 std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time_mov));
+                 time_task.reserve(time_stage.size());
+                 std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time_task));
              }// movements
              task_duration +=mov_duration;
-             time_task.reserve(time_mov.size());
-             std::copy (time_mov.begin(), time_mov.end(), std::back_inserter(time_task));
          }//task
          this->qtime_task = QVector<double>::fromStdVector(time_task);
 
