@@ -7,6 +7,7 @@
 *****************************************************************************/
 #include <qcustomplot.h>
 #include <qcpdocumentobject.h>
+#include <persistence1d.hpp>
 #include <QtGui/QMainWindow>
 #include <QtGui/QListWidgetItem>
 #include <boost/smart_ptr.hpp>
@@ -27,6 +28,7 @@
 #include "hand_velocity_dialog.hpp"
 
 using namespace std;
+using namespace p1d;
 
 /** This is the main namespace of the program */
 namespace motion_manager {
@@ -72,13 +74,6 @@ public:
          */
         void closeEvent(QCloseEvent *event);
 
-        /* Returns the amount of milliseconds elapsed since the UNIX epoch. Works on both
-         * windows and linux.
-
-          Thanks to stackoverflow.com: http://stackoverflow.com/questions/1861294/how-to-calculate-execution-time-of-a-code-snippet-in-c
-          */
-        long long GetTimeMs64();
-
         /**
          * @brief getDerivative
          * @param function
@@ -86,6 +81,14 @@ public:
          * @param derFunction
          */
         void getDerivative(QVector<double> &function, QVector<double> &step_values, QVector<double> &derFunction);
+
+        /**
+         * @brief getNumberMovementUnits
+         * @param function
+         * @param time
+         * @return
+         */
+        int getNumberMovementUnits(vector<double> &function, QVector<double> &time);
 
 
 

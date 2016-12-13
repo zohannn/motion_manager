@@ -172,9 +172,23 @@ public:
      */
     int getErrLog();
 
+    /* Returns the amount of milliseconds elapsed since the UNIX epoch. Works on both
+     * windows and linux.
+
+      Thanks to stackoverflow.com: http://stackoverflow.com/questions/1861294/how-to-calculate-execution-time-of-a-code-snippet-in-c
+      */
+    long long GetTimeMs64();
+
+    /**
+     * @brief getTime
+     * @return
+     */
+    double getTime();
+
 private:
 
     bool solved; /**< true if the problem has been solved */
+    double exec_time;/**< time taken by the functions of the planning libraries [ms]*/
 
    /**
      * @brief error log of the problem (TO DO!!!!!!!!!!!!!!!!!!!!)

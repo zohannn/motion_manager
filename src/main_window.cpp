@@ -1202,6 +1202,10 @@ void MainWindow::on_pushButton_plan_clicked()
 
 // --- RESULTS --- //
 if(solved){
+    // time taken to solve the problem
+    double prob_time = prob->getTime();
+    ui.label_solving_time->setText(QString::number(prob_time));
+
     uint tot_steps=0;
     QStringList h_headers; bool h_head=false; QStringList v_headers;
     double mov_duration = 0.0;
@@ -1577,7 +1581,7 @@ if(solved){
     double cost_jerk_9=0.0;
     double cost_jerk_10=0.0;
     double cost_jerk_11=0.0;
-    for(size_t i=0;i<tot_timesteps.size();++i){
+    for(size_t i=1;i<tot_timesteps.size();++i){
         cost_jerk_1 += squared_der_acc1.at(i)*(pow(duration_1,5)/pow(length_1,2))*tot_timesteps.at(i);
         cost_jerk_2 += squared_der_acc2.at(i)*(pow(duration_2,5)/pow(length_2,2))*tot_timesteps.at(i);
         cost_jerk_3 += squared_der_acc3.at(i)*(pow(duration_3,5)/pow(length_3,2))*tot_timesteps.at(i);
@@ -1638,17 +1642,16 @@ if(solved){
                          pow((handPosition_mov_y.at(handPosition_mov_y.size()-1)-handPosition_mov_y.at(0)),2)+
                          pow((handPosition_mov_z.at(handPosition_mov_z.size()-1)-handPosition_mov_z.at(0)),2));
     double total_cost_jerk_hand=0.0;
-    for(size_t i=0;i<tot_timesteps.size();++i){
+    for(size_t i=1;i<tot_timesteps.size();++i){
         total_cost_jerk_hand += pow(jerk_hand.at(i),2)*tot_timesteps.at(i);
     }
     total_cost_jerk_hand = sqrt(0.5*total_cost_jerk_hand*(pow(duration,5)/pow(length,2)));
 
     ui.label_cost_hand_value->setText(QString::number(total_cost_jerk_hand));
 
-
-
-
-
+    // -- compute the number of movement units -- //
+    int nmu = this->getNumberMovementUnits(this->handVelocityNorm_mov,this->qtime_mov);
+    ui.label_nmu->setText(QString::number(nmu));
 
 } // if the problem has been solved
 
@@ -2715,32 +2718,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 	QMainWindow::closeEvent(event);
 }
 
-long long MainWindow::GetTimeMs64() {
-#ifdef WIN32
- /* Windows */
- FILETIME ft;
- LARGE_INTEGER li;
- /* Get the amount of 100 nano seconds intervals elapsed since January 1, 1601 (UTC) and copy it
-  * to a LARGE_INTEGER structure. */
- GetSystemTimeAsFileTime(&ft);
- li.LowPart = ft.dwLowDateTime;
- li.HighPart = ft.dwHighDateTime;
- unsigned long long ret = li.QuadPart;
- ret -= 116444736000000000LL; /* Convert from file time to UNIX epoch time. */
- ret /= 10000; /* From 100 nano seconds (10^-7) to 1 millisecond (10^-3) intervals */
- return ret;
-#else
- /* Linux */
- struct timeval tv;
- gettimeofday(&tv, NULL);
- uint64_t ret = tv.tv_usec;
- /* Convert from micro seconds (10^-6) to milliseconds (10^-3) */
- ret /= 1000;
- /* Adds the seconds (10^0) after converting them to milliseconds (10^-3) */
- ret += (tv.tv_sec * 1000);
- return ret;
-#endif
-}
+
 
 
 
@@ -2828,6 +2806,44 @@ void MainWindow::getDerivative(QVector<double> &function, QVector<double> &step_
        if(step_value==0)
            step_value=0.01;
        derFunction.push_back(((  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h))/step_value);
+
+}
+
+int MainWindow::getNumberMovementUnits(vector<double> &function, QVector<double> &time)
+{
+    int nmu = 0;
+    vector<float> ffunc(function.begin(),function.end());
+    double maxfunc = *std::max_element(ffunc.begin(), ffunc.end());
+    double perc = ((double)10)/100;
+    double threshold = maxfunc*perc;
+
+    Persistence1D p;
+    p.RunPersistence(ffunc);
+
+    //Get all extrema with a persistence larger than perst.
+    double perst = 5;
+    vector< TPairedExtrema > Extrema;
+    p.GetPairedExtrema(Extrema, perst);
+
+    //Print all found pairs - pairs are sorted ascending wrt. persistence.
+    for(vector< TPairedExtrema >::iterator it = Extrema.begin(); it != Extrema.end(); it++)
+    {
+
+        /*
+        cout << "Persistence: " << (*it).Persistence
+             << " minimum: " << ffunc.at((*it).MinIndex) << " minimum index: " << (*it).MinIndex
+             << " maximum: " << ffunc.at((*it).MaxIndex) << " maximum index: " << (*it).MaxIndex
+             << std::endl;
+        */
+
+
+        double slope = (ffunc.at((*it).MaxIndex)-ffunc.at((*it).MinIndex))/(time.at((*it).MaxIndex)-time.at((*it).MinIndex));
+        if(abs(slope)>threshold)
+            nmu++;
+    }
+
+
+    return nmu;
 
 }
 

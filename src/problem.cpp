@@ -1023,29 +1023,40 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
     params.mov_specs.finalHand = finalHand;
 
     HUMotion::planning_result_ptr res;
+    long long curr_time;
     switch(mov_type){
     case 0:// reach-to-grasp
         params.mov_specs.target = target;
+        curr_time = this->GetTimeMs64();
         res =  this->h_planner->plan_pick(params,initPosture);
+        this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
     case 1:// reaching
         if(this->use_posture){
+          curr_time = this->GetTimeMs64();
           res = this->h_planner->plan_move(params,initPosture,this->move_final_arm);
+          this->exec_time = double(this->GetTimeMs64()-curr_time);
         }else{
          params.mov_specs.target=this->move_target;
+         curr_time = this->GetTimeMs64();
          res = this->h_planner->plan_move(params,initPosture);
+         this->exec_time = double(this->GetTimeMs64()-curr_time);
         }
         break;
     case 2://transport
         break;
     case 3://engage
         params.mov_specs.target = place_location;
+        curr_time = this->GetTimeMs64();
         res = this->h_planner->plan_place(params,initPosture);
+        this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
     case 4:// disengage
         break;
     case 5:// go-park
+        curr_time = this->GetTimeMs64();
         res = this->h_planner->plan_move(params,initPosture,homePosture);
+        this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
     }
     this->h_params = params;
@@ -1156,17 +1167,24 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     params.finalHand = finalHand;
 
     moveit_planning::PlanningResultPtr res;
+    long long curr_time;
     switch(mov_type){
     case 0:// reach-to-grasp
         params.target = target;
+        curr_time = this->GetTimeMs64();
         res =  this->m_planner->pick(params);
+        this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
     case 1:// reaching
         if(this->use_posture){
+          curr_time = this->GetTimeMs64();
           res = this->m_planner->move(params,this->move_final_arm);
+          this->exec_time = double(this->GetTimeMs64()-curr_time);
         }else{
           params.target=this->move_target;
+          curr_time = this->GetTimeMs64();
           res = this->m_planner->move(params);
+          this->exec_time = double(this->GetTimeMs64()-curr_time);
         }
         break;
     case 2://transport
@@ -1174,12 +1192,16 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     case 3://engage
         params.support_surface = obj_eng->getName();
         params.target = place_location;
+        curr_time = this->GetTimeMs64();
         res =  this->m_planner->place(params);
+        this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
     case 4:// disengage
         break;
     case 5:// go-park
+        curr_time = this->GetTimeMs64();
         res = this->m_planner->move(params,homePosture);
+        this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
     }
     this->m_params = params;
@@ -1188,6 +1210,39 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     return res;
 
 
+}
+
+long long Problem::GetTimeMs64()
+{
+#ifdef WIN32
+ /* Windows */
+ FILETIME ft;
+ LARGE_INTEGER li;
+ /* Get the amount of 100 nano seconds intervals elapsed since January 1, 1601 (UTC) and copy it
+  * to a LARGE_INTEGER structure. */
+ GetSystemTimeAsFileTime(&ft);
+ li.LowPart = ft.dwLowDateTime;
+ li.HighPart = ft.dwHighDateTime;
+ unsigned long long ret = li.QuadPart;
+ ret -= 116444736000000000LL; /* Convert from file time to UNIX epoch time. */
+ ret /= 10000; /* From 100 nano seconds (10^-7) to 1 millisecond (10^-3) intervals */
+ return ret;
+#else
+ /* Linux */
+ struct timeval tv;
+ gettimeofday(&tv, NULL);
+ uint64_t ret = tv.tv_usec;
+ /* Convert from micro seconds (10^-6) to milliseconds (10^-3) */
+ ret /= 1000;
+ /* Adds the seconds (10^0) after converting them to milliseconds (10^-3) */
+ ret += (tv.tv_sec * 1000);
+ return ret;
+#endif
+}
+
+double Problem::getTime()
+{
+    return this->exec_time;
 }
 
 

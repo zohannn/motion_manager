@@ -5,27 +5,27 @@ Shoulder_radius=80.0
 
 Elbow_radius=70.0
 
-Wrist_radius=60.0
+Wrist_radius=40
 
-Hand_radius=50
+Hand_radius=30
 
-Hand_1_1=25
+Hand_1_1=15
 
-Hand_1_2=25
+Hand_1_2=15
 
-Hand_1_3=25
+Hand_1_3=15
 
-Hand_2_1=25
+Hand_2_1=10
 
-Hand_2_2=25
+Hand_2_2=10
 
-Hand_2_3=25
+Hand_2_3=10
 
-Hand_3_1=20
+Hand_3_1=5
 
-Hand_3_2=20
+Hand_3_2=5
 
-Hand_3_3=20
+Hand_3_3=5
 
 Hand_tip_1=5
 
@@ -58,12 +58,19 @@ lambda_11=1.0
 
 # Initial Velocity 
 init_vel_1=0.54
+
 init_vel_2=0.13
+
 init_vel_3=-0.09
+
 init_vel_4=-0.02
+
 init_vel_5=0.34
+
 init_vel_6=-0.71
+
 init_vel_7=-0.12
+
 init_vel_8=0.0
 
 init_vel_9=0.0
@@ -74,12 +81,19 @@ init_vel_11=0.0
 
 # Final Velocity 
 final_vel_1=-0.71
+
 final_vel_2=0.21
+
 final_vel_3=0.79
+
 final_vel_4=-0.15
+
 final_vel_5=0.38
+
 final_vel_6=-0.34
+
 final_vel_7=-0.24
+
 final_vel_8=0.0
 
 final_vel_9=0.0
@@ -90,12 +104,19 @@ final_vel_11=0.0
 
 # Initial Acceleration 
 init_acc_1=-0.98
+
 init_acc_2=-0.22
+
 init_acc_3=0.12
+
 init_acc_4=0.03
+
 init_acc_5=-0.53
+
 init_acc_6=0.94
+
 init_acc_7=0.19
+
 init_acc_8=0.0
 
 init_acc_9=0.0
@@ -106,12 +127,19 @@ init_acc_11=0.0
 
 # Final Acceleration 
 final_acc_1=-1.15
+
 final_acc_2=0.23
+
 final_acc_3=1.26
+
 final_acc_4=-0.24
+
 final_acc_5=0.41
+
 final_acc_6=-0.37
+
 final_acc_7=-0.24
+
 final_acc_8=0.0
 
 final_acc_9=0.0
@@ -122,12 +150,19 @@ final_acc_11=0.0
 
 # Velocity Approach
 vel_approach_1=-0.24
+
 vel_approach_2=-0.12
+
 vel_approach_3=0.04
+
 vel_approach_4=0.05
+
 vel_approach_5=-0.06
+
 vel_approach_6=0.08
+
 vel_approach_7=-0.18
+
 vel_approach_8=0.0
 
 vel_approach_9=0.0
@@ -138,12 +173,19 @@ vel_approach_11=0.0
 
 # Acceleration Approach
 acc_approach_1=0.27
+
 acc_approach_2=0.14
+
 acc_approach_3=-0.05
+
 acc_approach_4=-0.06
+
 acc_approach_5=0.07
+
 acc_approach_6=-0.09
+
 acc_approach_7=0.21
+
 acc_approach_8=0.0
 
 acc_approach_9=0.0
@@ -190,24 +232,15 @@ tar_yz_2=5
 tar_yz_3=5
 
 # Tolerances with the obstacles [mm]
-obs_xx_1=50
-
-obs_xx_2=50
-
-obs_xx_3=50
-
-obs_yy_1=50
-
-obs_yy_2=50
-
-obs_yy_3=50
-
-obs_zz_1=50
-
-obs_zz_2=50
-
-obs_zz_3=50
-
+obs_xx_1=5
+obs_xx_2=5
+obs_xx_3=5
+obs_yy_1=5
+obs_yy_2=5
+obs_yy_3=5
+obs_zz_1=5
+obs_zz_2=5
+obs_zz_3=5
 obs_xy_1=5
 
 obs_xy_2=5
@@ -255,14 +288,14 @@ pre_place_y=0
 
 pre_place_z=1
 
-pre_place_dist=70
+pre_place_dist=75
 post_place_x=0
 
 post_place_y=1
 
 post_place_z=0
 
-post_place_dist=160
+post_place_dist=140
 
 # Move settings
 target_x=-400
@@ -323,9 +356,8 @@ add_plane=false
 max_velocity=50
 
 steps=20
-
 tar_av=true
 ob_av=true
 approach=true
 retreat=true
-rand_init=true
+rand_init=false

@@ -1087,7 +1087,7 @@ p, li { white-space: pre-wrap; }
           <property name="geometry">
            <rect>
             <x>20</x>
-            <y>320</y>
+            <y>290</y>
             <width>331</width>
             <height>17</height>
            </rect>
@@ -1096,7 +1096,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QLabel" name="label_cost_joints">
              <property name="text">
-              <string>Normalized jerk cost of the joints:</string>
+              <string>Normalized jerk cost of the joints: </string>
              </property>
             </widget>
            </item>
@@ -1113,7 +1113,7 @@ p, li { white-space: pre-wrap; }
           <property name="geometry">
            <rect>
             <x>20</x>
-            <y>340</y>
+            <y>310</y>
             <width>331</width>
             <height>17</height>
            </rect>
@@ -1122,7 +1122,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QLabel" name="label_cost_hand">
              <property name="text">
-              <string>Normalized jerk cost of the hand:</string>
+              <string>Normalized jerk cost of the hand: </string>
              </property>
             </widget>
            </item>
@@ -1147,6 +1147,58 @@ p, li { white-space: pre-wrap; }
           <property name="text">
            <string>show the components of the hand velocity</string>
           </property>
+         </widget>
+         <widget class="QWidget" name="layoutWidget_3">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>350</y>
+            <width>331</width>
+            <height>17</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QLabel" name="label_cost_hand_2">
+             <property name="text">
+              <string>Solving time [ms]:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_solving_time">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="layoutWidget_4">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>330</y>
+            <width>331</width>
+            <height>17</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QLabel" name="label_cost_hand_3">
+             <property name="text">
+              <string>Number of movement units: </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_nmu">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </widget>
         <widget class="QWidget" name="tab_results_plan_task">

@@ -158,6 +158,15 @@ link_directories(
     ${EIGENPCA_HOME}/${CMAKE_BUILD_TYPE}/lib
 )
 
+# -- Persistence1D
+set(PERSISTENCE1D_HOME /home/$ENV{USER}/Persistence1D)
+include_directories(
+    ${PERSISTENCE1D_HOME}/${CMAKE_BUILD_TYPE}/include
+)
+link_directories(
+    ${PERSISTENCE1D_HOME}/${CMAKE_BUILD_TYPE}/lib
+)
+
 ##############################################################################
 # Binaries
 ##############################################################################
@@ -192,6 +201,9 @@ endif()
 # -- EigenPCA
 target_link_libraries(${PROJECT_NAME} EigenPCA)
 
+# -- Persistence1D
+target_link_libraries(${PROJECT_NAME} Persistence1D)
+
 ##############################################################################
 # Testing
 ##############################################################################
@@ -223,6 +235,9 @@ if(TEST)
     endif()
     # -- EigenPCA
     target_link_libraries(${PROJECT_NAME} libEigenPCA)
+
+    # -- Persistence1D
+    target_link_libraries(${PROJECT_NAME} Persistence1D)
 
     enable_testing ()
 
