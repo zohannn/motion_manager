@@ -39,13 +39,13 @@ post_place_dist=0
 # Move settings
 target_x=-400
 
-target_y=500
+target_y=0
 
 target_z=1000
 
-target_roll=0.79
+target_roll=1.57
 
-target_pitch=-1.57
+target_pitch=-3.14
 
 target_yaw=0.0
 

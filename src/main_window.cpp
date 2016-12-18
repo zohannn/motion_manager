@@ -2503,6 +2503,19 @@ void MainWindow::on_pushButton_clear_task_clicked()
     this->timesteps_mov.clear();
     this->tols_stop_task.clear();
     this->tols_stop_mov.clear();
+    this->handPosition_mov.clear();
+    this->handOrientation_mov.clear();
+    this->handLinearVelocity_mov.clear();
+    this->handAngularVelocity_mov.clear();
+    this->handVelocityNorm_mov.clear();
+    this->handPosition_task.clear();
+    this->handOrientation_task.clear();
+    this->handLinearVelocity_task.clear();
+    this->handAngularVelocity_task.clear();
+    this->handVelocityNorm_task.clear();
+    this->nmu_task.clear();
+    this->njs_task.clear();
+    this->prob_time_task.clear();
 
     ui.tableWidget_sol_task->clear();
     ui.tableWidget_sol_mov->clear();

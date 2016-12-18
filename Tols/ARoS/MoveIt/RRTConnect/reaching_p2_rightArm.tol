@@ -1,5 +1,5 @@
 ### Parameters of the RRT planner in MoveIt! ###
-# 
+# Planner: RRTConnect ,Movement: Reaching, Arm: right, Object: 
 # Configuration settings
 config=RRTkConfigDefault
 # Pick settings
@@ -37,9 +37,9 @@ post_place_z=0
 post_place_dist=0
 
 # Move settings
-target_x=-400
+target_x=-200
 
-target_y=0
+target_y=500
 
 target_z=1000
 
@@ -72,23 +72,23 @@ final_hand_3=1.22
 final_hand_4=1.22
 
 sel_final=false
-plane_point1_x=0.0
+plane_point1_x=-400
 
 plane_point1_y=0.0
 
-plane_point1_z=0.0
+plane_point1_z=1000
 
-plane_point2_x=0.0
+plane_point2_x=-100
 
-plane_point2_y=0.0
+plane_point2_y=500
 
-plane_point2_z=0.0
+plane_point2_z=1000
 
-plane_point3_x=0.0
+plane_point3_x=-200
 
-plane_point3_y=0.0
+plane_point3_y=600
 
-plane_point3_z=0.0
+plane_point3_z=1000
 
-add_plane=false
+add_plane=true
 # Others
