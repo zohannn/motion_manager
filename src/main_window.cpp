@@ -839,7 +839,7 @@ void MainWindow::on_pushButton_plan_clicked()
         moveit_plan = true;
         mPRMstardlg->setInfo(prob->getInfoLine());
         // configuration
-        m_params.config = mRRTdlg->getConfig();
+        m_params.config = mPRMstardlg->getConfig();
         // pick/place settings
         mPRMstardlg->getPreGraspApproach(m_params.pre_grasp_approach); // pick approach
         mPRMstardlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
@@ -1282,63 +1282,10 @@ if(solved){
     this->handLinearVelocity_mov.resize(tot_steps); this->handAngularVelocity_mov.resize(tot_steps);
     int step = 0;
     int arm_code = prob->getMovement()->getArm();
-    /*
-    // positions
-    VectorXd jointsPosition1_mov;
-    VectorXd jointsPosition2_mov;
-    VectorXd jointsPosition3_mov;
-    VectorXd jointsPosition4_mov;
-    VectorXd jointsPosition5_mov;
-    VectorXd jointsPosition6_mov;
-    VectorXd jointsPosition7_mov;
-    VectorXd jointsPosition8_mov;
-    VectorXd jointsPosition9_mov;
-    VectorXd jointsPosition10_mov;
-    VectorXd jointsPosition11_mov;
-    // accelerations
-    VectorXd jointsAcceleration1_mov;
-    VectorXd jointsAcceleration2_mov;
-    VectorXd jointsAcceleration3_mov;
-    VectorXd jointsAcceleration4_mov;
-    VectorXd jointsAcceleration5_mov;
-    VectorXd jointsAcceleration6_mov;
-    VectorXd jointsAcceleration7_mov;
-    VectorXd jointsAcceleration8_mov;
-    VectorXd jointsAcceleration9_mov;
-    VectorXd jointsAcceleration10_mov;
-    VectorXd jointsAcceleration11_mov;
-    */
     for (size_t k=0; k< this->jointsPosition_mov.size();++k){
         MatrixXd pos_stage = this->jointsPosition_mov.at(k);
         MatrixXd vel_stage = this->jointsVelocity_mov.at(k);
         MatrixXd acc_stage = this->jointsAcceleration_mov.at(k);
-        /*
-        int rows = jointsAcceleration1_mov.rows();
-        // positions
-        jointsPosition1_mov.conservativeResize(rows+pos_stage.rows());
-        jointsPosition2_mov.conservativeResize(rows+pos_stage.rows());
-        jointsPosition3_mov.conservativeResize(rows+pos_stage.rows());
-        jointsPosition4_mov.conservativeResize(rows+pos_stage.rows());
-        jointsPosition5_mov.conservativeResize(rows+pos_stage.rows());
-        jointsPosition6_mov.conservativeResize(rows+pos_stage.rows());
-        jointsPosition7_mov.conservativeResize(rows+pos_stage.rows());
-        jointsPosition8_mov.conservativeResize(rows+pos_stage.rows());
-        jointsPosition9_mov.conservativeResize(rows+pos_stage.rows());
-        jointsPosition10_mov.conservativeResize(rows+pos_stage.rows());
-        jointsPosition11_mov.conservativeResize(rows+pos_stage.rows());
-        //accelerations
-        jointsAcceleration1_mov.conservativeResize(rows+acc_stage.rows());
-        jointsAcceleration2_mov.conservativeResize(rows+acc_stage.rows());
-        jointsAcceleration3_mov.conservativeResize(rows+acc_stage.rows());
-        jointsAcceleration4_mov.conservativeResize(rows+acc_stage.rows());
-        jointsAcceleration5_mov.conservativeResize(rows+acc_stage.rows());
-        jointsAcceleration6_mov.conservativeResize(rows+acc_stage.rows());
-        jointsAcceleration7_mov.conservativeResize(rows+acc_stage.rows());
-        jointsAcceleration8_mov.conservativeResize(rows+acc_stage.rows());
-        jointsAcceleration9_mov.conservativeResize(rows+acc_stage.rows());
-        jointsAcceleration10_mov.conservativeResize(rows+acc_stage.rows());
-        jointsAcceleration11_mov.conservativeResize(rows+acc_stage.rows());
-        */
         for(int i=0;i<pos_stage.rows();++i){
             // position
             VectorXd pos_row = pos_stage.block<1,JOINTS_ARM>(i,0);
@@ -1354,270 +1301,10 @@ if(solved){
             this->handLinearVelocity_mov.at(step) = {hand_vel.at(0),hand_vel.at(1),hand_vel.at(2)};
             this->handAngularVelocity_mov.at(step) = {hand_vel.at(3),hand_vel.at(4),hand_vel.at(5)};
             step++;
-            /*
-            //positions
-            jointsPosition1_mov(i+rows) = pos_stage(i,0);
-            jointsPosition2_mov(i+rows) = pos_stage(i,1);
-            jointsPosition3_mov(i+rows) = pos_stage(i,2);
-            jointsPosition4_mov(i+rows) = pos_stage(i,3);
-            jointsPosition5_mov(i+rows) = pos_stage(i,4);
-            jointsPosition6_mov(i+rows) = pos_stage(i,5);
-            jointsPosition7_mov(i+rows) = pos_stage(i,6);
-            jointsPosition8_mov(i+rows) = pos_stage(i,7);
-            jointsPosition9_mov(i+rows) = pos_stage(i,8);
-            jointsPosition10_mov(i+rows) = pos_stage(i,9);
-            jointsPosition11_mov(i+rows) = pos_stage(i,10);
-            // accelerations
-            jointsAcceleration1_mov(i+rows) = acc_stage(i,0);
-            jointsAcceleration2_mov(i+rows) = acc_stage(i,1);
-            jointsAcceleration3_mov(i+rows) = acc_stage(i,2);
-            jointsAcceleration4_mov(i+rows) = acc_stage(i,3);
-            jointsAcceleration5_mov(i+rows) = acc_stage(i,4);
-            jointsAcceleration6_mov(i+rows) = acc_stage(i,5);
-            jointsAcceleration7_mov(i+rows) = acc_stage(i,6);
-            jointsAcceleration8_mov(i+rows) = acc_stage(i,7);
-            jointsAcceleration9_mov(i+rows) = acc_stage(i,8);
-            jointsAcceleration10_mov(i+rows) = acc_stage(i,9);
-            jointsAcceleration11_mov(i+rows) = acc_stage(i,10);
-            */
-
         }
     }    
 
 
-    // --- compute the cost of the trajectory according to the jerk principle --- //
-
-    /*
-    // positions
-    // pos1
-    vector<double> pos1_mov; pos1_mov.resize(jointsPosition1_mov.size());
-    VectorXd::Map(&pos1_mov[0], jointsPosition1_mov.size()) = jointsPosition1_mov;
-    QVector<double> pos1 = QVector<double>::fromStdVector(pos1_mov);
-    // pos2
-    vector<double> pos2_mov; pos2_mov.resize(jointsPosition2_mov.size());
-    VectorXd::Map(&pos2_mov[0], jointsPosition2_mov.size()) = jointsPosition2_mov;
-    QVector<double> pos2 = QVector<double>::fromStdVector(pos2_mov);
-    // pos3
-    vector<double> pos3_mov; pos3_mov.resize(jointsPosition3_mov.size());
-    VectorXd::Map(&pos3_mov[0], jointsPosition3_mov.size()) = jointsPosition3_mov;
-    QVector<double> pos3 = QVector<double>::fromStdVector(pos3_mov);
-    // pos4
-    vector<double> pos4_mov; pos4_mov.resize(jointsPosition4_mov.size());
-    VectorXd::Map(&pos4_mov[0], jointsPosition4_mov.size()) = jointsPosition4_mov;
-    QVector<double> pos4 = QVector<double>::fromStdVector(pos4_mov);
-    // pos5
-    vector<double> pos5_mov; pos5_mov.resize(jointsPosition5_mov.size());
-    VectorXd::Map(&pos5_mov[0], jointsPosition5_mov.size()) = jointsPosition5_mov;
-    QVector<double> pos5 = QVector<double>::fromStdVector(pos5_mov);
-    // pos6
-    vector<double> pos6_mov; pos6_mov.resize(jointsPosition6_mov.size());
-    VectorXd::Map(&pos6_mov[0], jointsPosition6_mov.size()) = jointsPosition6_mov;
-    QVector<double> pos6 = QVector<double>::fromStdVector(pos6_mov);
-    // pos7
-    vector<double> pos7_mov; pos7_mov.resize(jointsPosition7_mov.size());
-    VectorXd::Map(&pos7_mov[0], jointsPosition7_mov.size()) = jointsPosition7_mov;
-    QVector<double> pos7 = QVector<double>::fromStdVector(pos7_mov);
-    // pos8
-    vector<double> pos8_mov; pos8_mov.resize(jointsPosition8_mov.size());
-    VectorXd::Map(&pos8_mov[0], jointsPosition8_mov.size()) = jointsPosition8_mov;
-    QVector<double> pos8 = QVector<double>::fromStdVector(pos8_mov);
-    // pos9
-    vector<double> pos9_mov; pos9_mov.resize(jointsPosition9_mov.size());
-    VectorXd::Map(&pos9_mov[0], jointsPosition9_mov.size()) = jointsPosition9_mov;
-    QVector<double> pos9 = QVector<double>::fromStdVector(pos9_mov);
-    // pos10
-    vector<double> pos10_mov; pos10_mov.resize(jointsPosition10_mov.size());
-    VectorXd::Map(&pos10_mov[0], jointsPosition10_mov.size()) = jointsPosition10_mov;
-    QVector<double> pos10 = QVector<double>::fromStdVector(pos10_mov);
-    // pos11
-    vector<double> pos11_mov; pos11_mov.resize(jointsPosition11_mov.size());
-    VectorXd::Map(&pos11_mov[0], jointsPosition11_mov.size()) = jointsPosition11_mov;
-    QVector<double> pos11 = QVector<double>::fromStdVector(pos11_mov);
-
-    // accelerations
-    // acc1
-    vector<double> acc1_mov; acc1_mov.resize(jointsAcceleration1_mov.size());
-    VectorXd::Map(&acc1_mov[0], jointsAcceleration1_mov.size()) = jointsAcceleration1_mov;
-    QVector<double> acc1 = QVector<double>::fromStdVector(acc1_mov);
-    QVector<double> der_acc1;
-    // acc2
-    vector<double> acc2_mov; acc2_mov.resize(jointsAcceleration2_mov.size());
-    VectorXd::Map(&acc2_mov[0], jointsAcceleration2_mov.size()) = jointsAcceleration2_mov;
-    QVector<double> acc2 = QVector<double>::fromStdVector(acc2_mov);
-    QVector<double> der_acc2;
-    // acc3
-    vector<double> acc3_mov; acc3_mov.resize(jointsAcceleration3_mov.size());
-    VectorXd::Map(&acc3_mov[0], jointsAcceleration3_mov.size()) = jointsAcceleration3_mov;
-    QVector<double> acc3 = QVector<double>::fromStdVector(acc3_mov);
-    QVector<double> der_acc3;
-    // acc4
-    vector<double> acc4_mov; acc4_mov.resize(jointsAcceleration4_mov.size());
-    VectorXd::Map(&acc4_mov[0], jointsAcceleration4_mov.size()) = jointsAcceleration4_mov;
-    QVector<double> acc4 = QVector<double>::fromStdVector(acc4_mov);
-    QVector<double> der_acc4;
-    // acc5
-    vector<double> acc5_mov; acc5_mov.resize(jointsAcceleration5_mov.size());
-    VectorXd::Map(&acc5_mov[0], jointsAcceleration5_mov.size()) = jointsAcceleration5_mov;
-    QVector<double> acc5 = QVector<double>::fromStdVector(acc5_mov);
-    QVector<double> der_acc5;
-    // acc6
-    vector<double> acc6_mov; acc6_mov.resize(jointsAcceleration6_mov.size());
-    VectorXd::Map(&acc6_mov[0], jointsAcceleration6_mov.size()) = jointsAcceleration6_mov;
-    QVector<double> acc6 = QVector<double>::fromStdVector(acc6_mov);
-    QVector<double> der_acc6;
-    // acc7
-    vector<double> acc7_mov; acc7_mov.resize(jointsAcceleration7_mov.size());
-    VectorXd::Map(&acc7_mov[0], jointsAcceleration7_mov.size()) = jointsAcceleration7_mov;
-    QVector<double> acc7 = QVector<double>::fromStdVector(acc7_mov);
-    QVector<double> der_acc7;
-    // acc8
-    vector<double> acc8_mov; acc8_mov.resize(jointsAcceleration8_mov.size());
-    VectorXd::Map(&acc8_mov[0], jointsAcceleration8_mov.size()) = jointsAcceleration8_mov;
-    QVector<double> acc8 = QVector<double>::fromStdVector(acc8_mov);
-    QVector<double> der_acc8;
-    // acc9
-    vector<double> acc9_mov; acc9_mov.resize(jointsAcceleration9_mov.size());
-    VectorXd::Map(&acc9_mov[0], jointsAcceleration9_mov.size()) = jointsAcceleration9_mov;
-    QVector<double> acc9 = QVector<double>::fromStdVector(acc9_mov);
-    QVector<double> der_acc9;
-    // acc10
-    vector<double> acc10_mov; acc10_mov.resize(jointsAcceleration10_mov.size());
-    VectorXd::Map(&acc10_mov[0], jointsAcceleration10_mov.size()) = jointsAcceleration10_mov;
-    QVector<double> acc10 = QVector<double>::fromStdVector(acc10_mov);
-    QVector<double> der_acc10;
-    // acc11
-    vector<double> acc11_mov; acc11_mov.resize(jointsAcceleration11_mov.size());
-    VectorXd::Map(&acc11_mov[0], jointsAcceleration11_mov.size()) = jointsAcceleration11_mov;
-    QVector<double> acc11 = QVector<double>::fromStdVector(acc11_mov);
-    QVector<double> der_acc11;
-
-    // joint legths and duration
-    double length_1=0.0; double duration_1=0.0;
-    double length_2=0.0; double duration_2=0.0;
-    double length_3=0.0; double duration_3=0.0;
-    double length_4=0.0; double duration_4=0.0;
-    double length_5=0.0; double duration_5=0.0;
-    double length_6=0.0; double duration_6=0.0;
-    double length_7=0.0; double duration_7=0.0;
-    double length_8=0.0; double duration_8=0.0;
-    double length_9=0.0; double duration_9=0.0;
-    double length_10=0.0; double duration_10=0.0;
-    double length_11=0.0; double duration_11=0.0;
-    for(size_t i=1;i<pos1.size();++i){
-        length_1 += abs(pos1.at(i)-pos1.at(i-1)); duration_1 += abs(this->qtime_mov.at(i)-this->qtime_mov.at(i-1));
-        length_2 += abs(pos2.at(i)-pos2.at(i-1)); duration_2 += abs(this->qtime_mov.at(i)-this->qtime_mov.at(i-1));
-        length_3 += abs(pos3.at(i)-pos3.at(i-1)); duration_3 += abs(this->qtime_mov.at(i)-this->qtime_mov.at(i-1));
-        length_4 += abs(pos4.at(i)-pos4.at(i-1)); duration_4 += abs(this->qtime_mov.at(i)-this->qtime_mov.at(i-1));
-        length_5 += abs(pos5.at(i)-pos5.at(i-1)); duration_5 += abs(this->qtime_mov.at(i)-this->qtime_mov.at(i-1));
-        length_6 += abs(pos6.at(i)-pos6.at(i-1)); duration_6 += abs(this->qtime_mov.at(i)-this->qtime_mov.at(i-1));
-        length_7 += abs(pos7.at(i)-pos7.at(i-1)); duration_7 += abs(this->qtime_mov.at(i)-this->qtime_mov.at(i-1));
-        length_8 += abs(pos8.at(i)-pos8.at(i-1)); duration_8 += abs(this->qtime_mov.at(i)-this->qtime_mov.at(i-1));
-        length_9 += abs(pos9.at(i)-pos9.at(i-1)); duration_9 += abs(this->qtime_mov.at(i)-this->qtime_mov.at(i-1));
-        length_10 += abs(pos10.at(i)-pos10.at(i-1)); duration_10 += abs(this->qtime_mov.at(i)-this->qtime_mov.at(i-1));
-        length_11 += abs(pos11.at(i)-pos11.at(i-1)); duration_11 += abs(this->qtime_mov.at(i)-this->qtime_mov.at(i-1));
-    }
-    if(length_1==0)
-        length_1=0.0001;
-    if(length_2==0)
-        length_2=0.0001;
-    if(length_3==0)
-        length_3=0.0001;
-    if(length_4==0)
-        length_4=0.0001;
-    if(length_5==0)
-        length_5=0.0001;
-    if(length_6==0)
-        length_6=0.0001;
-    if(length_7==0)
-        length_7=0.0001;
-    if(length_8==0)
-        length_8=0.0001;
-    if(length_9==0)
-        length_9=0.0001;
-    if(length_10==0)
-        length_10=0.0001;
-    if(length_11==0)
-        length_11=0.0001;
-    // acceleration derivatives
-    this->getDerivative(acc1,tot_timesteps,der_acc1);
-    this->getDerivative(acc2,tot_timesteps,der_acc2);
-    this->getDerivative(acc3,tot_timesteps,der_acc3);
-    this->getDerivative(acc4,tot_timesteps,der_acc4);
-    this->getDerivative(acc5,tot_timesteps,der_acc5);
-    this->getDerivative(acc6,tot_timesteps,der_acc6);
-    this->getDerivative(acc7,tot_timesteps,der_acc7);
-    this->getDerivative(acc8,tot_timesteps,der_acc8);
-    this->getDerivative(acc9,tot_timesteps,der_acc9);
-    this->getDerivative(acc10,tot_timesteps,der_acc10);
-    this->getDerivative(acc11,tot_timesteps,der_acc11);
-
-    // squared derivatives
-    QVector<double> squared_der_acc1;
-    QVector<double> squared_der_acc2;
-    QVector<double> squared_der_acc3;
-    QVector<double> squared_der_acc4;
-    QVector<double> squared_der_acc5;
-    QVector<double> squared_der_acc6;
-    QVector<double> squared_der_acc7;
-    QVector<double> squared_der_acc8;
-    QVector<double> squared_der_acc9;
-    QVector<double> squared_der_acc10;
-    QVector<double> squared_der_acc11;
-
-    for(size_t i=0;i<der_acc1.size();++i){
-        squared_der_acc1.push_back(pow(der_acc1.at(i),2));
-        squared_der_acc2.push_back(pow(der_acc2.at(i),2));
-        squared_der_acc3.push_back(pow(der_acc3.at(i),2));
-        squared_der_acc4.push_back(pow(der_acc4.at(i),2));
-        squared_der_acc5.push_back(pow(der_acc5.at(i),2));
-        squared_der_acc6.push_back(pow(der_acc6.at(i),2));
-        squared_der_acc7.push_back(pow(der_acc7.at(i),2));
-        squared_der_acc8.push_back(pow(der_acc8.at(i),2));
-        squared_der_acc9.push_back(pow(der_acc9.at(i),2));
-        squared_der_acc10.push_back(pow(der_acc10.at(i),2));
-        squared_der_acc11.push_back(pow(der_acc11.at(i),2));
-    }
-
-    // normalized jerk cost of the joints
-    double cost_jerk_1=0.0;
-    double cost_jerk_2=0.0;
-    double cost_jerk_3=0.0;
-    double cost_jerk_4=0.0;
-    double cost_jerk_5=0.0;
-    double cost_jerk_6=0.0;
-    double cost_jerk_7=0.0;
-    double cost_jerk_8=0.0;
-    double cost_jerk_9=0.0;
-    double cost_jerk_10=0.0;
-    double cost_jerk_11=0.0;
-    for(size_t i=1;i<tot_timesteps.size();++i){
-        cost_jerk_1 += squared_der_acc1.at(i)*(pow(duration_1,5)/pow(length_1,2))*tot_timesteps.at(i);
-        cost_jerk_2 += squared_der_acc2.at(i)*(pow(duration_2,5)/pow(length_2,2))*tot_timesteps.at(i);
-        cost_jerk_3 += squared_der_acc3.at(i)*(pow(duration_3,5)/pow(length_3,2))*tot_timesteps.at(i);
-        cost_jerk_4 += squared_der_acc4.at(i)*(pow(duration_4,5)/pow(length_4,2))*tot_timesteps.at(i);
-        cost_jerk_5 += squared_der_acc5.at(i)*(pow(duration_5,5)/pow(length_5,2))*tot_timesteps.at(i);
-        cost_jerk_6 += squared_der_acc6.at(i)*(pow(duration_6,5)/pow(length_6,2))*tot_timesteps.at(i);
-        cost_jerk_7 += squared_der_acc7.at(i)*(pow(duration_7,5)/pow(length_7,2))*tot_timesteps.at(i);
-        cost_jerk_8 += squared_der_acc8.at(i)*(pow(duration_8,5)/pow(length_8,2))*tot_timesteps.at(i);
-        cost_jerk_9 += squared_der_acc9.at(i)*(pow(duration_9,5)/pow(length_9,2))*tot_timesteps.at(i);
-        cost_jerk_10 += squared_der_acc10.at(i)*(pow(duration_10,5)/pow(length_10,2))*tot_timesteps.at(i);
-        cost_jerk_11 += squared_der_acc11.at(i)*(pow(duration_11,5)/pow(length_11,2))*tot_timesteps.at(i);
-    }
-
-    // normalized total jerk cost of the joints
-    double total_cost_jerk = sqrt(0.5*cost_jerk_1)+
-                            sqrt(0.5*cost_jerk_2)+
-                            sqrt(0.5*cost_jerk_3)+
-                            sqrt(0.5*cost_jerk_4)+
-                            sqrt(0.5*cost_jerk_5)+
-                            sqrt(0.5*cost_jerk_6)+
-                            sqrt(0.5*cost_jerk_7)+
-                            sqrt(0.5*cost_jerk_8)+
-                            sqrt(0.5*cost_jerk_9)+
-                            sqrt(0.5*cost_jerk_10)+
-                            sqrt(0.5*cost_jerk_11);
-    ui.label_cost_joints_value->setText(QString::number(total_cost_jerk));
-    */
 
     // normlized jerk cost of the hand
     QVector<double> handPosition_mov_x; QVector<double> handPosition_mov_y; QVector<double> handPosition_mov_z;
@@ -1668,6 +1355,22 @@ if(solved){
 }
 
 
+void MainWindow::on_pushButton_plan_trials_clicked()
+{
+    int trials = 100;
+    int success = 0;
+    for (int i =0; i<trials;++i){
+        this->on_pushButton_plan_clicked();
+        if(this->curr_task->getProblem(ui.listWidget_movs->currentRow())->getSolved()){
+            success++;
+            this->on_pushButton_append_mov_clicked();
+        }
+    }
+
+    double rate = 100*success/trials;
+    ui.label_rate_task->setText(QString::number(rate));
+
+}
 
 
 void MainWindow::on_pushButton_execMov_pressed()
@@ -2829,6 +2532,11 @@ void MainWindow::on_pushButton_save_res_mov_clicked()
 
     results.close();
 
+    QString pdf_qstr = path+QString("hand_vel_mov.pdf"); string pdf_str = pdf_qstr.toStdString();
+    QString svg_qstr = path+QString("hand_vel_mov.svg"); string svg_str = svg_qstr.toStdString();
+    string cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
 
 }
 
@@ -2924,7 +2632,16 @@ void MainWindow::on_pushButton_save_res_task_clicked()
     boost::replace_all(stdev_prob_str,",",".");
     results << string("sd plan time = ")+stdev_prob_str+string(" \n");
 
+    string rate_success = ui.label_rate_task->text().toStdString();
+    results << string("rate of success [%] = ")+rate_success+string(" \n");
+
+
     results.close();
+
+    QString pdf_qstr = path+QString("hand_vel_task.pdf"); string pdf_str = pdf_qstr.toStdString();
+    QString svg_qstr = path+QString("hand_vel_task.svg"); string svg_str = svg_qstr.toStdString();
+    string cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
 
 
 }

@@ -754,7 +754,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="pushButton_tuning">
        <property name="geometry">
         <rect>
-         <x>340</x>
+         <x>10</x>
          <y>130</y>
          <width>85</width>
          <height>26</height>
@@ -762,6 +762,19 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="text">
         <string>Tuning</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_plan_trials">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>130</y>
+         <width>201</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Plan with statistics</string>
        </property>
       </widget>
      </widget>
@@ -1258,7 +1271,7 @@ p, li { white-space: pre-wrap; }
           <property name="geometry">
            <rect>
             <x>20</x>
-            <y>310</y>
+            <y>290</y>
             <width>521</width>
             <height>17</height>
            </rect>
@@ -1284,7 +1297,7 @@ p, li { white-space: pre-wrap; }
           <property name="geometry">
            <rect>
             <x>20</x>
-            <y>330</y>
+            <y>310</y>
             <width>521</width>
             <height>17</height>
            </rect>
@@ -1310,7 +1323,7 @@ p, li { white-space: pre-wrap; }
           <property name="geometry">
            <rect>
             <x>20</x>
-            <y>350</y>
+            <y>330</y>
             <width>521</width>
             <height>17</height>
            </rect>
@@ -1325,6 +1338,32 @@ p, li { white-space: pre-wrap; }
            </item>
            <item>
             <widget class="QLabel" name="label_solving_time_task">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="layoutWidget_8">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>350</y>
+            <width>521</width>
+            <height>17</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <item>
+            <widget class="QLabel" name="label_cost_hand_7">
+             <property name="text">
+              <string>Rate of success [%]:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_rate_task">
              <property name="text">
               <string/>
              </property>
