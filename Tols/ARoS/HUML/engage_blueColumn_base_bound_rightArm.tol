@@ -6,6 +6,7 @@ Shoulder_radius=80.0
 Elbow_radius=40.0
 
 Wrist_radius=5
+
 Hand_radius=5
 
 Hand_1_1=5
@@ -304,7 +305,7 @@ post_place_y=1
 
 post_place_z=0
 
-post_place_dist=140
+post_place_dist=150
 
 # Move settings
 target_x=-400
@@ -370,4 +371,4 @@ tar_av=true
 ob_av=true
 approach=true
 retreat=true
-rand_init=false
+rand_init=true

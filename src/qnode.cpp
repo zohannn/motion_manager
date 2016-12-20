@@ -2450,65 +2450,6 @@ mov->setExecuted(true);
 
 return true;
 
-
-
-
-    // ----- pre-movement operations -------- //
-/*
-    switch (mov_type) {
-
-    case 0: // reach-to-grasp
-
-        //tol_stop = 3*static_cast<double>(M_PI)/180;
-
-        break;
-    case 1: // reaching
-        break;
-
-    case 2: // transport
-        break;
-
-    case 3: // engage
-
-         //tol_stop = 1.6*static_cast<double>(M_PI)/180;
-
-        break;
-
-    case 4: // disengage
-        break;
-
-    case 5: // go home
-        //tol_stop = 1.7*static_cast<double>(M_PI)/180;
-        //ros::spinOnce();// handle ROS messages
-
-        if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
-            add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
-            vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
-
-            //if(obj_in_hand){
-                srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
-                srvset_parent.request.parentHandle = -1; // parentless object
-                srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
-                add_client.call(srvset_parent);
-                if (srvset_parent.response.result != 1){
-                    log(QNode::Error,string("Error in grasping the object "));
-                }
-#if HAND ==1
-                this->openBarrettHand(arm_code);
-#endif
-
-            //}
-            ros::spinOnce();// handle ROS messages
-            pre_time=simulationTime-TotalTime; //time took to open the hand
-        }
-
-
-
-        break;
-    }
-
-    */
-
 }
 
 
@@ -2557,6 +2498,11 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
 
 #endif
 
+    // start the simulation
+    add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
+    vrep_common::simRosStartSimulation srvstart;
+    add_client.call(srvstart);
+    ros::spinOnce(); // first handle ROS messages
 
     int hh=0; // it counts problems that do not belong to the task
     for(int kk=0; kk < task->getProblemNumber(); ++kk){ //for loop movements
@@ -2598,12 +2544,6 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
               h_attach = left_attach;
               break;
           }
-          // start the simulation
-          add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
-          vrep_common::simRosStartSimulation srvstart;
-          add_client.call(srvstart);
-          ros::spinOnce(); // first handle ROS messages
-
 
           for(size_t j=0; j <traj_mov.size();++j){ //for loop stages
               switch (mov_type){ // TO REVIEW !!!
@@ -2655,14 +2595,14 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                     // 5. Let's prepare a publisher of those values:
                     ros::Publisher pub=node.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
                     tb = pre_time;
-                    for (int i = 1; i< vel.rows(); ++i){
+                    for (int i = 0; i< vel.rows()-1; ++i){
 
                         //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
 
-                        VectorXd ya = vel.row(i-1);
-                        VectorXd yb = vel.row(i);
-                        VectorXd yat = traj.row(i-1);
-                        VectorXd ybt = traj.row(i);
+                        VectorXd ya = vel.row(i);
+                        VectorXd yb = vel.row(i+1);
+                        VectorXd yat = traj.row(i);
+                        VectorXd ybt = traj.row(i+1);
 
                         ta = tb;
                         tb = ta + timesteps_stage.at(i);
@@ -2749,7 +2689,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
 
                                     //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", ya = " << ya(k)*180/static_cast<double>(M_PI) << ", yb = "<< yb(k)*180/static_cast<double>(M_PI);
                                     //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
-                                                               //", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
+                                                              // ", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
 #if HAND==1
 
                                     if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3)) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
@@ -2869,89 +2809,6 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
       TotalTime=simulationTime;
 
       return true;
-
-
-
-
-        //BOOST_LOG_SEV(lg, info) << "Step_prev = " << steps_prev;
-/*
-        vel.resize(steps+1,vel_task.cols());
-        for (int j = 0; j < vel.rows(); ++j){
-            for(int k = 0; k < vel.cols();++k){
-                vel(j,k) = vel_task(j+steps_prev,k);
-            }
-        }
-
-        traj.resize(steps+1,traj_task.cols());
-        for (int j = 0; j < traj.rows(); ++j){
-            for(int k = 0; k < traj.cols();++k){
-                traj(j,k) = traj_task(j+steps_prev,k);
-            }
-        }
-        steps_prev +=steps+1;
-*/
-
-
-/*
-
-        // ----- pre-movement operations -------- //
-
-
-        double pre_time=0.0;
-
-        switch (mov_type) {
-
-        case 0: // reach-to-grasp
-
-            //tol_stop = 1.7*static_cast<double>(M_PI)/180;
-
-            break;
-        case 1: // reaching
-            break;
-
-        case 2: // transport
-            break;
-
-        case 3: // engage
-
-            //tol_stop = 1.5*static_cast<double>(M_PI)/180;
-
-            break;
-
-        case 4: // disengage
-            break;
-
-        case 5: // go home
-            //ros::spinOnce(); // handle ROS messages
-
-            //tol_stop = 1.7*static_cast<double>(M_PI)/180;
-            if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
-                add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
-                vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
-
-                //if(obj_in_hand){
-                    srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
-                    srvset_parent.request.parentHandle = -1; // parentless object
-                    srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
-                    add_client.call(srvset_parent);
-                    if (srvset_parent.response.result != 1){
-                        log(QNode::Error,string("Error in grasping the object "));
-                    }
-#if HAND==1
-                    this->openBarrettHand(arm_code);
-#endif
-                //}
-                ros::spinOnce(); // handle ROS messages
-                pre_time = simulationTime - timeTot; // update the total time of the movement
-            }
-
-            break;
-        }
-
-
-
-*/
-
 
 
 
