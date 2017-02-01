@@ -635,6 +635,32 @@ void PowerLawDialog::on_pushButton_save_clicked()
     ui->plot_curvature->savePdf(path+QString("radius.pdf"),true,0,0,QString(),QString("Curvature radius"));
     ui->plot_ang_vel->savePdf(path+QString("vel_tan.pdf"),true,0,0,QString(),QString("Tangiental velocity"));
     ui->plot_23->savePdf(path+QString("power_law.pdf"),true,0,0,QString(),QString("Power law"));
+
+    QString pdf_qstr; string pdf_str;
+    QString svg_qstr; string svg_str;
+    string cmdLine;
+
+    pdf_qstr = path+QString("hand_pos.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("hand_pos.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("radius.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("radius.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("vel_tan.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("vel_tan.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("power_law.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("power_law.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+
 }
 
 

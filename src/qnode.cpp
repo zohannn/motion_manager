@@ -2076,17 +2076,18 @@ void QNode::rightProxCallback(const vrep_common::ProximitySensorData& data)
         int arm_code = this->curr_mov->getArm();
         if (arm_code == 1){
             //right arm
-            int h_obj;
+            int h_obj; int h_obj_body;
             int mov_type = this->curr_mov->getType();
             switch (mov_type) {
             case 0: // reach-to-grasp
-                h_obj= this->curr_mov->getObject()->getHandleBody(); // visible handle of the object we want to grasp
+                h_obj_body = this->curr_mov->getObject()->getHandleBody(); // visible handle of the object we want to grasp
+                h_obj = this->curr_mov->getObject()->getHandle(); // non visible handle of the object we want to grasp
                 h_detobj = data.detectedObject.data; // handle of the object currently detected
                 //BOOST_LOG_SEV(lg, info) << "h_obj = " << h_obj ;
                 //BOOST_LOG_SEV(lg, info) << "\n " ;
                 //BOOST_LOG_SEV(lg, info) << "h_detobj = " << h_detobj ;
                 //BOOST_LOG_SEV(lg, info) << "\n " ;
-                obj_in_hand = (h_obj == h_detobj);
+                obj_in_hand = (h_obj == h_detobj) || (h_obj_body == h_detobj);
                 break;
             case 1: // reaching
                 break;
@@ -2376,6 +2377,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
         }// for loop steps
 
         // ----- post-movement operations -------- //
+        //ros::spinOnce(); // handle ROS messages
         add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
         vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
         switch (mov_type) {

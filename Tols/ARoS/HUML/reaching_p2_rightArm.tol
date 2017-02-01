@@ -309,9 +309,7 @@ post_place_dist=0
 
 # Move settings
 target_x=-200
-
-target_y=500
-
+target_y=600
 target_z=1000
 
 target_roll=1.57
