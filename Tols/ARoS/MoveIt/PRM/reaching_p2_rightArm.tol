@@ -1,7 +1,7 @@
 ### Parameters of the RRT planner in MoveIt! ###
-# Planner: RRTConnect ,Movement: Reaching, Arm: right, Object: 
+# Planner: PRM ,Movement: Reaching, Arm: right, Object: 
 # Configuration settings
-config=RRTkConfigDefault
+config=PRMkConfigDefault
 # Pick settings
 pre_grasp_x=0
 
@@ -38,7 +38,6 @@ post_place_dist=0
 
 # Move settings
 target_x=-200
-
 target_y=600
 target_z=1000
 
