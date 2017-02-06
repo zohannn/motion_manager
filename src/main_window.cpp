@@ -2497,6 +2497,16 @@ void MainWindow::on_pushButton_comp_hand_vel_mov_clicked()
 
 }
 
+void MainWindow::on_pushButton_plot_hand_pos_mov_clicked()
+{
+
+    this->plot_ptr.reset(new Plot());
+    this->plot_ptr->setParent(this->ui.plot_hand_pos_mov);
+    this->plot_ptr->resize(522,329);
+    this->plot_ptr->show();
+
+}
+
 void MainWindow::on_pushButton_save_res_mov_clicked()
 {
 

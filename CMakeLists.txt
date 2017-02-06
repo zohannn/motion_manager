@@ -36,6 +36,10 @@ find_package(Boost REQUIRED COMPONENTS log_setup log thread filesystem)
 include_directories( ${Boost_INCLUDE_DIRS})
 link_directories( ${Boost_LIBRARY_DIRS} )
 
+find_package(OpenGL)
+find_package(GLUT)
+include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} ${QT_QTOPENGL_INCLUDE_DIR})
+
 
 ##############################################################################
 # Qt Environment
@@ -140,6 +144,15 @@ link_directories(
     ${QCUSTOMPLOT_HOME}/${CMAKE_BUILD_TYPE}/lib
 )
 
+# -- QwtPlot3D
+set(QWTPLOT3D_HOME /home/$ENV{USER}/qwtplot3d)
+include_directories(
+    ${QWTPLOT3D_HOME}/include
+)
+link_directories(
+    ${QWTPLOT3D_HOME}/${CMAKE_BUILD_TYPE}/lib
+)
+
 # -- QCPDocumentObject
 set(QCPDOCUMENTOBJECT_HOME /home/$ENV{USER}/qcpdocumentobject)
 include_directories(
@@ -198,11 +211,17 @@ else()
     target_link_libraries(${PROJECT_NAME} qcustomplot qcpdocumentobject)
 endif()
 
+# -- QwtPlot3D
+target_link_libraries(${PROJECT_NAME} qwtplot3d)
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${QT_QTOPENGL_LIBRARY} GLU)
+
 # -- EigenPCA
 target_link_libraries(${PROJECT_NAME} EigenPCA)
 
 # -- Persistence1D
 target_link_libraries(${PROJECT_NAME} Persistence1D)
+
+
 
 ##############################################################################
 # Testing
@@ -233,8 +252,10 @@ if(TEST)
     else()
         target_link_libraries(${PROJECT_NAME} qcustomplot qcpdocumentobject)
     endif()
+    # -- QwtPlot3D
+    target_link_libraries(${PROJECT_NAME} qwtplot3d)
     # -- EigenPCA
-    target_link_libraries(${PROJECT_NAME} libEigenPCA)
+    target_link_libraries(${PROJECT_NAME} EigenPCA)
 
     # -- Persistence1D
     target_link_libraries(${PROJECT_NAME} Persistence1D)

@@ -8,6 +8,10 @@
 #include <qcustomplot.h>
 #include <qcpdocumentobject.h>
 #include <persistence1d.hpp>
+#include <qwt3d_surfaceplot.h>
+#include <qwt3d_function.h>
+#include <qwt3d_plot.h>
+#include <qwt3d_enrichment_std.h>
 #include <QtGui/QMainWindow>
 #include <QtGui/QListWidgetItem>
 #include <boost/smart_ptr.hpp>
@@ -30,8 +34,71 @@
 using namespace std;
 using namespace p1d;
 
+using namespace Qwt3D;
+
+
+
+
+
 /** This is the main namespace of the program */
 namespace motion_manager {
+
+class Rosenbrock : public Function
+{
+public:
+
+  Rosenbrock(SurfacePlot* pw)
+  :Function(pw)
+  {
+  }
+
+  double operator()(double x, double y)
+  {
+    return log((1-x)*(1-x) + 100 * (y - x*x)*(y - x*x)) / 8;
+  }
+};
+
+
+class Plot : public SurfacePlot
+{
+public:
+    Plot()
+    {
+        setTitle("A Simple SurfacePlot Demonstration");
+
+        Rosenbrock rosenbrock(this);
+
+        rosenbrock.setMesh(41,31);
+        rosenbrock.setDomain(-1.73,1.5,-1.5,1.5);
+        rosenbrock.setMinZ(-10);
+
+        rosenbrock.create();
+
+        setRotation(30,0,15);
+        setScale(1,1,1);
+        setShift(0.15,0,0);
+        setZoom(0.9);
+
+        for (unsigned i=0; i!=coordinates()->axes.size(); ++i)
+        {
+          coordinates()->axes[i].setMajors(7);
+          coordinates()->axes[i].setMinors(4);
+        }
+
+
+        coordinates()->axes[X1].setLabelString("x-axis");
+        coordinates()->axes[Y1].setLabelString("y-axis");
+        coordinates()->axes[Z1].setLabelString(QChar (0x38f)); // Omega - see http://www.unicode.org/charts/
+
+
+        setCoordinateStyle(BOX);
+
+        setPlotStyle(Dot(1.0,false));
+
+        updateData();
+        updateGL();
+    }
+};
 
 
 
@@ -330,6 +397,11 @@ public Q_SLOTS:
         void on_pushButton_power_law_clicked();
 
         /**
+         * @brief on_pushButton_plot_hand_pos_mov_clicked
+         */
+        void on_pushButton_plot_hand_pos_mov_clicked();
+
+        /**
          * @brief on_pushButton_comp_hand_vel_mov_clicked
          */
         void on_pushButton_comp_hand_vel_mov_clicked();
@@ -405,6 +477,8 @@ private:
         taskPtr curr_task;/**< current task */
         scenarioPtr init_scene; /**< initial scenario */
         scenarioPtr curr_scene; /**< current scenario */
+
+        boost::shared_ptr<Plot> plot_ptr;
 
         // --- Park postures for ARoS --- //
 
