@@ -361,6 +361,65 @@ void ResultsJointsDialog::on_pushButton_save_joints_plots_clicked()
     ui->plot_joint_10->savePdf(path+QString("joint10.pdf"),true,0,0,QString(),QString("Kinematics of the joint 10"));
     ui->plot_joint_11->savePdf(path+QString("joint11.pdf"),true,0,0,QString(),QString("Kinematics of the joint 11"));
 
+    QString pdf_qstr; string pdf_str;
+    QString svg_qstr; string svg_str;
+    string cmdLine;
+
+    pdf_qstr = path+QString("joint1.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("joint1.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("joint2.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("joint2.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("joint3.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("joint3.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("joint4.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("joint4.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("joint5.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("joint5.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("joint6.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("joint6.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("joint7.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("joint7.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("joint8.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("joint8.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("joint9.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("joint9.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("joint10.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("joint10.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("joint11.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("joint11.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
 }
 
 
