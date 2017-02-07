@@ -36,6 +36,7 @@ find_package(Boost REQUIRED COMPONENTS log_setup log thread filesystem)
 include_directories( ${Boost_INCLUDE_DIRS})
 link_directories( ${Boost_LIBRARY_DIRS} )
 
+
 find_package(OpenGL)
 find_package(GLUT)
 include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} ${QT_QTOPENGL_INCLUDE_DIR})
@@ -47,7 +48,8 @@ include_directories( ${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS} ${QT_QTOPENGL_
 
 # this comes from qt_build's qt-ros.cmake which is automatically 
 # included via the dependency call in package.xml
-rosbuild_prepare_qt4(QtCore QtGui QApplication) # Add the appropriate components to the component list here
+rosbuild_prepare_qt4(QtCore QtGui) # Add the appropriate components to the component list here
+
 
 ##############################################################################
 # Sections
@@ -214,6 +216,8 @@ endif()
 # -- QwtPlot3D
 target_link_libraries(${PROJECT_NAME} qwtplot3d)
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${QT_QTOPENGL_LIBRARY} GLU)
+
+
 
 # -- EigenPCA
 target_link_libraries(${PROJECT_NAME} EigenPCA)

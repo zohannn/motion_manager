@@ -62,13 +62,13 @@ public Q_SLOTS:
      * @brief checkSetHandCond
      * @param state
      */
-    void checkSetHandCond(int state);
+    //void checkSetHandCond(int state);
 
     /**
      * @brief checkSetHandCondApproach
      * @param state
      */
-    void checkSetHandCondApproach(int state);
+    //void checkSetHandCondApproach(int state);
 
 
 public:
