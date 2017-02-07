@@ -94,7 +94,8 @@ double HandPosFunction::operator ()(double x, double y)
        double x_curr = hand_point.at(0);
        double y_curr = hand_point.at(1);
        double z_curr = hand_point.at(2);
-       if((abs(x-x_curr)<=0.1) && (abs(y-y_curr)<=0.1)){
+       //if((pow((x-x_curr),2)<=0.001) && (pow((y-y_curr),2)<=0.001)){
+       if((x==x_curr) && (y==y_curr)){
            z = z_curr;
        }
    }

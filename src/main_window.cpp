@@ -2432,6 +2432,12 @@ void MainWindow::on_pushButton_plot_mov_clicked()
 
 void MainWindow::on_pushButton_plot_task_clicked()
 {
+    // plot the 3D hand position
+    this->handPosPlot_task_ptr.reset(new HandPosPlot(this->handPosition_task));
+    this->handPosPlot_task_ptr->setParent(this->ui.plot_hand_pos_task);
+    this->handPosPlot_task_ptr->resize(522,329);
+    this->handPosPlot_task_ptr->show();
+
     // plot the hand velocity norm
     if(!this->handVelocityNorm_task.empty()){
         QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_task);
@@ -2578,6 +2584,12 @@ void MainWindow::on_pushButton_save_res_task_clicked()
     QString path("results/planning/task/");
     ui.plot_hand_vel_task->savePdf(path+QString("hand_vel_task.pdf"),true,0,0,QString(),QString("Module of the Hand velocity"));
 
+    VectorWriter* handler = (VectorWriter*)IO::outputHandler("PDF");
+    handler->setTextMode(VectorWriter::NATIVE);
+    handler->setFormat("PDF");
+    string hand_pos_file = path.toStdString()+string("hand_pos_task.pdf");
+    IO::save(this->handPosPlot_task_ptr.get(), hand_pos_file.c_str(),  "PDF" );
+
     string filename("results_task.txt");
     ofstream results;
     results.open(path.toStdString()+filename);
@@ -2661,9 +2673,18 @@ void MainWindow::on_pushButton_save_res_task_clicked()
 
     results.close();
 
-    QString pdf_qstr = path+QString("hand_vel_task.pdf"); string pdf_str = pdf_qstr.toStdString();
-    QString svg_qstr = path+QString("hand_vel_task.svg"); string svg_str = svg_qstr.toStdString();
-    string cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    QString pdf_qstr; string pdf_str;
+    QString svg_qstr; string svg_str;
+    string cmdLine;
+
+    pdf_qstr = path+QString("hand_pos_task.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("hand_pos_task.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("hand_vel_task.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("hand_vel_task.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
     system(cmdLine.c_str());
 
 

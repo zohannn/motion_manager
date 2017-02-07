@@ -1214,16 +1214,6 @@ p, li { white-space: pre-wrap; }
            <string>show results of the joints</string>
           </property>
          </widget>
-         <widget class="QCustomPlot" name="plot_hand_vel_task" native="true">
-          <property name="geometry">
-           <rect>
-            <x>350</x>
-            <y>20</y>
-            <width>330</width>
-            <height>230</height>
-           </rect>
-          </property>
-         </widget>
          <widget class="QPushButton" name="pushButton_power_law">
           <property name="geometry">
            <rect>
@@ -1263,107 +1253,105 @@ p, li { white-space: pre-wrap; }
            <string>Save</string>
           </property>
          </widget>
-         <widget class="QWidget" name="layoutWidget_5">
+         <widget class="QWidget" name="">
           <property name="geometry">
            <rect>
-            <x>20</x>
-            <y>290</y>
-            <width>521</width>
-            <height>17</height>
-           </rect>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_7">
-           <item>
-            <widget class="QLabel" name="label_cost_hand_4">
-             <property name="text">
-              <string>Normalized jerk cost of the hand. Mean(SD): </string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_cost_hand_value_task">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="layoutWidget_6">
-          <property name="geometry">
-           <rect>
-            <x>20</x>
-            <y>310</y>
-            <width>521</width>
-            <height>17</height>
-           </rect>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_8">
-           <item>
-            <widget class="QLabel" name="label_cost_hand_5">
-             <property name="text">
-              <string>Number of movement units. Mean(SD): </string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_nmu_task">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="layoutWidget_7">
-          <property name="geometry">
-           <rect>
-            <x>20</x>
-            <y>330</y>
-            <width>521</width>
-            <height>17</height>
-           </rect>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_9">
-           <item>
-            <widget class="QLabel" name="label_cost_hand_6">
-             <property name="text">
-              <string>Solving time [ms]. Mean(SD):</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_solving_time_task">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="layoutWidget_8">
-          <property name="geometry">
-           <rect>
-            <x>20</x>
+            <x>10</x>
             <y>350</y>
-            <width>521</width>
-            <height>17</height>
+            <width>1051</width>
+            <height>20</height>
            </rect>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
-            <widget class="QLabel" name="label_cost_hand_7">
-             <property name="text">
-              <string>Rate of success [%]:</string>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <item>
+              <widget class="QLabel" name="label_cost_hand_4">
+               <property name="text">
+                <string>NJS of the hand. Mean(SD): </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_cost_hand_value_task">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
            <item>
-            <widget class="QLabel" name="label_rate_task">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <item>
+              <widget class="QLabel" name="label_cost_hand_5">
+               <property name="text">
+                <string>NMU. Mean(SD): </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_nmu_task">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <item>
+              <widget class="QLabel" name="label_cost_hand_6">
+               <property name="text">
+                <string>Solving time [ms]. Mean(SD):</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_solving_time_task">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_10">
+             <item>
+              <widget class="QLabel" name="label_cost_hand_7">
+               <property name="text">
+                <string>Rate of success [%]:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_rate_task">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>10</y>
+            <width>1051</width>
+            <height>331</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_13">
+           <item>
+            <widget class="QWidget" name="plot_hand_pos_task" native="true"/>
+           </item>
+           <item>
+            <widget class="QCustomPlot" name="plot_hand_vel_task" native="true"/>
            </item>
           </layout>
          </widget>
