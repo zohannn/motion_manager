@@ -1054,7 +1054,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab_results_plan_mov">
          <attribute name="title">
@@ -1204,7 +1204,7 @@ p, li { white-space: pre-wrap; }
          <widget class="QPushButton" name="pushButton_joints_results_task">
           <property name="geometry">
            <rect>
-            <x>690</x>
+            <x>480</x>
             <y>380</y>
             <width>161</width>
             <height>23</height>
@@ -1253,7 +1253,7 @@ p, li { white-space: pre-wrap; }
            <string>Save</string>
           </property>
          </widget>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>10</x>
@@ -1337,7 +1337,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>10</x>
@@ -1354,6 +1354,19 @@ p, li { white-space: pre-wrap; }
             <widget class="QCustomPlot" name="plot_hand_vel_task" native="true"/>
            </item>
           </layout>
+         </widget>
+         <widget class="QPushButton" name="pushButton_power_law_3D">
+          <property name="geometry">
+           <rect>
+            <x>660</x>
+            <y>380</y>
+            <width>191</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>show 1/6 power law results</string>
+          </property>
          </widget>
         </widget>
        </widget>

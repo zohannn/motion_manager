@@ -6,6 +6,7 @@ HandPosFunction::HandPosFunction(SurfacePlot* pw, vector<vector<double>>& hand_p
     : Function(pw)
 {
     handPos = hand_pos;
+    plotted.resize(hand_pos.size(),false);
 }
 
 double HandPosFunction::getX_min()
@@ -89,14 +90,25 @@ double HandPosFunction::getZ_max()
 double HandPosFunction::operator ()(double x, double y)
 {
    double z = this->getZ_min()-5;
+   vector<double> handPos_x; vector<double> handPos_y; vector<double> handPos_z;
+   for(size_t i=0;i<handPos.size();++i)
+   {
+       vector<double> hand_point = handPos.at(i);
+       handPos_x.push_back(hand_point.at(0));
+       handPos_y.push_back(hand_point.at(1));
+       handPos_z.push_back(hand_point.at(2));
+   }
+
    for(size_t i=0; i < handPos.size();++i){
        vector<double> hand_point = handPos.at(i);
        double x_curr = hand_point.at(0);
        double y_curr = hand_point.at(1);
        double z_curr = hand_point.at(2);
        //if((pow((x-x_curr),2)<=0.001) && (pow((y-y_curr),2)<=0.001)){
-       if((x==x_curr) && (y==y_curr)){
-           z = z_curr;
+       if((x==x_curr) && (y==y_curr) && (plotted.at(i)==false)){
+            z=z_curr;
+            plotted.at(i)==true;
+            break;
        }
    }
    return z;

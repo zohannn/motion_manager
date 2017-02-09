@@ -79,6 +79,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mPowerLawdlg = new PowerLawDialog(this);
     mPowerLawdlg->setModal(false);
 
+    // create the Power Law 3D dialog
+    mPowerLaw3Ddlg = new PowerLaw3DDialog(this);
+    mPowerLaw3Ddlg->setModal(false);
+
     // create the Hand velocity components dialog
     mHandVeldlg = new HandVelocityDialog(this);
     mHandVeldlg->setModal(false);
@@ -2498,6 +2502,13 @@ void MainWindow::on_pushButton_power_law_clicked()
     if(!this->handPosition_task.empty())
         this->mPowerLawdlg->setupPlots(this->handPosition_task,this->timesteps_task);
     this->mPowerLawdlg->show();
+}
+
+void MainWindow::on_pushButton_power_law_3D_clicked()
+{
+    if(!this->handPosition_task.empty())
+        this->mPowerLaw3Ddlg->setupPlots(this->handPosition_task,this->timesteps_task);
+    this->mPowerLaw3Ddlg->show();
 }
 
 void MainWindow::on_pushButton_comp_hand_vel_mov_clicked()

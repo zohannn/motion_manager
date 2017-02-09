@@ -18,7 +18,7 @@ PowerLawDialog::~PowerLawDialog()
 
 void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<vector<vector<double> > > &timesteps)
 {
-
+    // time
     vector<double> time_task; QVector<double> tot_timesteps; vector<int> index;
     for(size_t i=0; i<timesteps.size();++i){
         vector<vector<double>> tsteps_mov = timesteps.at(i);

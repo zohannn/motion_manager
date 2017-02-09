@@ -35,6 +35,7 @@ private:
     double y_max;/**< maximum value of the y coordinate of the hand position */
     double z_min;/**< minimum value of the z coordinate of the hand position */
     double z_max;/**< maximum value of the z coordinate of the hand position */
+    vector<bool> plotted;
 };
 
 }// namespace motion_manager
