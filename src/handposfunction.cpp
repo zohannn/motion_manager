@@ -6,84 +6,79 @@ HandPosFunction::HandPosFunction(SurfacePlot* pw, vector<vector<double>>& hand_p
     : Function(pw)
 {
     handPos = hand_pos;
-    plotted.resize(hand_pos.size(),false);
+    //plotted.resize(hand_pos.size(),false);
 }
 
 double HandPosFunction::getX_min()
 {
-    double min = 1e+50;
-    for(size_t i=0; i < handPos.size();++i){
+    vector<double> handPos_x;
+    for(size_t i=0;i<handPos.size();++i)
+    {
         vector<double> hand_point = handPos.at(i);
-        double curr = hand_point.at(0);
-        if(min > curr){
-            min = curr;
-        }
+        handPos_x.push_back(hand_point.at(0));
     }
+    double min = *min_element(handPos_x.begin(), handPos_x.end());
     return min;
 }
 
 double HandPosFunction::getX_max()
 {
-    double max = 1e-50;
-    for(size_t i=0; i < handPos.size();++i){
+
+    vector<double> handPos_x;
+    for(size_t i=0;i<handPos.size();++i)
+    {
         vector<double> hand_point = handPos.at(i);
-        double curr = hand_point.at(0);
-        if(max < curr){
-            max = curr;
-        }
+        handPos_x.push_back(hand_point.at(0));
     }
+    double max = *max_element(handPos_x.begin(), handPos_x.end());
     return max;
 }
 
 double HandPosFunction::getY_min()
 {
-    double min = 1e+50;
-    for(size_t i=0; i < handPos.size();++i){
+    vector<double> handPos_y;
+    for(size_t i=0;i<handPos.size();++i)
+    {
         vector<double> hand_point = handPos.at(i);
-        double curr = hand_point.at(1);
-        if(min > curr){
-            min = curr;
-        }
+        handPos_y.push_back(hand_point.at(1));
     }
+    double min = *min_element(handPos_y.begin(), handPos_y.end());
     return min;
 }
 
 double HandPosFunction::getY_max()
 {
-    double max = 1e-50;
-    for(size_t i=0; i < handPos.size();++i){
+    vector<double> handPos_y;
+    for(size_t i=0;i<handPos.size();++i)
+    {
         vector<double> hand_point = handPos.at(i);
-        double curr = hand_point.at(1);
-        if(max < curr){
-            max = curr;
-        }
+        handPos_y.push_back(hand_point.at(1));
     }
+    double max = *max_element(handPos_y.begin(), handPos_y.end());
     return max;
 }
 
 double HandPosFunction::getZ_min()
 {
-    double min = 1e+50;
-    for(size_t i=0; i < handPos.size();++i){
+    vector<double> handPos_z;
+    for(size_t i=0;i<handPos.size();++i)
+    {
         vector<double> hand_point = handPos.at(i);
-        double curr = hand_point.at(2);
-        if(min > curr){
-            min = curr;
-        }
+        handPos_z.push_back(hand_point.at(2));
     }
+    double min = *min_element(handPos_z.begin(), handPos_z.end());
     return min;
 }
 
 double HandPosFunction::getZ_max()
 {
-    double max = 1e-50;
-    for(size_t i=0; i < handPos.size();++i){
+    vector<double> handPos_z;
+    for(size_t i=0;i<handPos.size();++i)
+    {
         vector<double> hand_point = handPos.at(i);
-        double curr = hand_point.at(2);
-        if(max < curr){
-            max = curr;
-        }
+        handPos_z.push_back(hand_point.at(2));
     }
+    double max = *max_element(handPos_z.begin(), handPos_z.end());
     return max;
 }
 
@@ -98,16 +93,15 @@ double HandPosFunction::operator ()(double x, double y)
        handPos_y.push_back(hand_point.at(1));
        handPos_z.push_back(hand_point.at(2));
    }
-
    for(size_t i=0; i < handPos.size();++i){
        vector<double> hand_point = handPos.at(i);
        double x_curr = hand_point.at(0);
        double y_curr = hand_point.at(1);
        double z_curr = hand_point.at(2);
        //if((pow((x-x_curr),2)<=0.001) && (pow((y-y_curr),2)<=0.001)){
-       if((x==x_curr) && (y==y_curr) && (plotted.at(i)==false)){
+       if((x==x_curr) && (y==y_curr)){// && (plotted.at(i)==false)){
             z=z_curr;
-            plotted.at(i)==true;
+            //plotted.at(i)==true;
             break;
        }
    }
@@ -136,6 +130,10 @@ bool HandPosFunction::create()
     }
 
     /* get the data */
+    std::sort (handPos_x.begin(), handPos_x.end()); // sort into ascending order
+    std::sort (handPos_y.begin(), handPos_y.end()); // sort into ascending order
+    x_min = getX_min(); x_max = getX_max();
+    y_min = getY_min(); y_max = getY_max();
     for (size_t i = 0; i < handPos_x.size(); ++i)
     {
         for (size_t j = 0; j < handPos_y.size(); ++j)
@@ -156,7 +154,7 @@ bool HandPosFunction::create()
     }
     else
     {
-        ((SurfacePlot*)plotwidget_p)->loadFromData(data, umesh_p, vmesh_p, minu_p, maxu_p, minv_p, maxv_p);
+        ((SurfacePlot*)plotwidget_p)->loadFromData(data, handPos_x.size(), handPos_y.size(), x_min, x_max, y_min, y_max);
     }
 
     for ( size_t i = 0; i < handPos_x.size(); i++)
