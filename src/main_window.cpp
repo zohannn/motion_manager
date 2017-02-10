@@ -1633,6 +1633,15 @@ void MainWindow::on_pushButton_load_task_clicked()
                     this->curr_task->addProblem(prob.get());
                 }else if(QString::compare(mov_type,QString("Reaching"),Qt::CaseInsensitive)==0){
                     mov_id=1;
+                    problemPtr prob;
+                    if(plan_id==0){
+                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get()))));
+                    }else{
+                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                    }
+                    prob->setSolved(true);
+                    prob->setPartOfTask(true);
+                    this->curr_task->addProblem(prob.get());
                 }else if(QString::compare(mov_type,QString("Transport"),Qt::CaseInsensitive)==0){
                     mov_id=2;
                 }else if(QString::compare(mov_type,QString("Engage"),Qt::CaseInsensitive)==0){

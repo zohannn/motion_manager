@@ -123,15 +123,15 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             double eexp = ((double)3)/2; double num; double den;
             for(size_t i=0; i<pos_u.size();++i){
                 num = pow(pow(der_pos_u_1.at(i),2)+pow(der_pos_v_1.at(i),2),eexp);
-                den = 1000*abs((der_pos_u_1.at(i)*der_pos_v_2.at(i))-(der_pos_v_1.at(i)*der_pos_u_2.at(i)));
-                R.push_back(((double)num)/den); // [m]
-                C.push_back(((double)1)/R.at(i)); // [m^-1]
+                den = abs((der_pos_u_1.at(i)*der_pos_v_2.at(i))-(der_pos_v_1.at(i)*der_pos_u_2.at(i)));
+                R.push_back(((double)num)/den); // [mm]
+                C.push_back(((double)1)/R.at(i)); // [mm^-1]
             }
 
             // angular and tangential velocity
             QVector<double> theta; QVector<double> der_theta; QVector<double> ln_theta; QVector<double> vel_tan; QVector<double> ln_vel_tan;
             for(size_t i=0; i< pos_u.size(); ++i){
-                theta.push_back(std::atan2(pos_v.at(i)/1000,pos_u.at(i)/1000));
+                theta.push_back(std::atan2(pos_v.at(i),pos_u.at(i)));
             }
             this->getDerivative(theta,tot_timesteps,der_theta);
 
@@ -180,7 +180,7 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             ui->plot_curvature->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
             ui->plot_curvature->graph(0)->setPen(QPen(Qt::blue));
             ui->plot_curvature->graph(0)->setName(title);
-            ui->plot_curvature->graph(0)->valueAxis()->setLabel("curvature radius [m]");
+            ui->plot_curvature->graph(0)->valueAxis()->setLabel("curvature radius [mm]");
             ui->plot_curvature->graph(0)->keyAxis()->setLabel("time [s]");
             ui->plot_curvature->graph(0)->setData(qtime, R);
             ui->plot_curvature->graph(0)->valueAxis()->setRange(*std::min_element(R.begin(), R.end()),
@@ -215,7 +215,7 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             ui->plot_ang_vel->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
             ui->plot_ang_vel->graph(0)->setPen(QPen(Qt::blue));
             ui->plot_ang_vel->graph(0)->setName(title);
-            ui->plot_ang_vel->graph(0)->valueAxis()->setLabel(" [m/s]");
+            ui->plot_ang_vel->graph(0)->valueAxis()->setLabel(" [mm/s]");
             ui->plot_ang_vel->graph(0)->keyAxis()->setLabel("time [s]");
             ui->plot_ang_vel->graph(0)->setData(qtime, vel_tan);
 
@@ -271,8 +271,8 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             ui->plot_23->graph(0)->setLineStyle(QCPGraph::lsNone);
             ui->plot_23->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross, 4));
             ui->plot_23->graph(0)->setName("ln(V)/ln(R)");
-            ui->plot_23->graph(0)->valueAxis()->setLabel("ln(V) [m/s]");
-            ui->plot_23->graph(0)->keyAxis()->setLabel("ln(R) [m]");
+            ui->plot_23->graph(0)->valueAxis()->setLabel("ln(V) [mm/s]");
+            ui->plot_23->graph(0)->keyAxis()->setLabel("ln(R) [mm]");
             //ui->plot_23->graph(0)->setData(lnR, ln_vel_tan);
             ui->plot_23->graph(0)->setData(lnR_mean, ln_vel_tan_mean);
             //ui->plot_23->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel_tan.begin(), ln_vel_tan.end()),

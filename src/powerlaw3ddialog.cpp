@@ -50,9 +50,9 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     QVector<double> pos_x; QVector<double> pos_y; QVector<double> pos_z;
     for(size_t i=0; i<hand_position.size();++i){
         vector<double> hand_point = hand_position.at(i);
-        pos_x.push_back(hand_point.at(0)/1000); // [m]
-        pos_y.push_back(hand_point.at(1)/1000); // [m]
-        pos_z.push_back(hand_point.at(2)/1000); // [m]
+        pos_x.push_back(hand_point.at(0)); // [mm]
+        pos_y.push_back(hand_point.at(1)); // [mm]
+        pos_z.push_back(hand_point.at(2)); // [mm]
     }
     // first derivatives
     QVector<double> der_pos_x_1; QVector<double> der_pos_y_1; QVector<double> der_pos_z_1;
@@ -156,7 +156,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_curvature->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
     ui->plot_curvature->graph(0)->setPen(QPen(Qt::blue));
     ui->plot_curvature->graph(0)->setName(title);
-    ui->plot_curvature->graph(0)->valueAxis()->setLabel("curvature [1/m]");
+    ui->plot_curvature->graph(0)->valueAxis()->setLabel("curvature [1/mm]");
     ui->plot_curvature->graph(0)->keyAxis()->setLabel("time [s]");
     ui->plot_curvature->graph(0)->setData(qtime, K);
     ui->plot_curvature->graph(0)->valueAxis()->setRange(*std::min_element(K.begin(), K.end()),
@@ -189,7 +189,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_torsion->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
     ui->plot_torsion->graph(0)->setPen(QPen(Qt::blue));
     ui->plot_torsion->graph(0)->setName(title);
-    ui->plot_torsion->graph(0)->valueAxis()->setLabel("torsion [1/m]");
+    ui->plot_torsion->graph(0)->valueAxis()->setLabel("torsion [1/mm]");
     ui->plot_torsion->graph(0)->keyAxis()->setLabel("time [s]");
     ui->plot_torsion->graph(0)->setData(qtime, T);
     ui->plot_torsion->graph(0)->valueAxis()->setRange(*std::min_element(T.begin(), T.end()),
@@ -225,8 +225,8 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_16->graph(0)->setLineStyle(QCPGraph::lsNone);
     ui->plot_16->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross, 4));
     ui->plot_16->graph(0)->setName("ln(V)/ln(K^2|T|)");
-    ui->plot_16->graph(0)->valueAxis()->setLabel("ln(V) [m/s]");
-    ui->plot_16->graph(0)->keyAxis()->setLabel("ln(K^2|T|) [1/m]");
+    ui->plot_16->graph(0)->valueAxis()->setLabel("ln(V) [mm/s]");
+    ui->plot_16->graph(0)->keyAxis()->setLabel("ln(K^2|T|) [1/mm]");
     ui->plot_16->graph(0)->setData(ln_x_mean, ln_vel_mean);
     ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel_mean.begin(), ln_vel_mean.end()),
                                                  *std::max_element(ln_vel_mean.begin(), ln_vel_mean.end()));
