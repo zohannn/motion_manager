@@ -242,7 +242,7 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             ui->plot_curvature->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
             ui->plot_curvature->replot();
 
-            // plot the angular velocity
+            // plot the velocity
             ui->plot_ang_vel->plotLayout()->clear();
             ui->plot_ang_vel->clearGraphs();
             ui->plot_ang_vel->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
@@ -259,7 +259,7 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
                 axis->grid()->setLayer("grid");
               }
             }
-            title = "Tangential velocity";
+            title = "Velocity";
             ui->plot_ang_vel->plotLayout()->addElement(0,0, new QCPPlotTitle(ui->plot_ang_vel,title));
             ui->plot_ang_vel->plotLayout()->addElement(1, 0, wideAxisRect);
 

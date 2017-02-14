@@ -169,6 +169,42 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_curvature->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
     ui->plot_curvature->replot();
 
+    // plot the velocity
+    ui->plot_vel->plotLayout()->clear();
+    ui->plot_vel->clearGraphs();
+    ui->plot_vel->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+    wideAxisRect = new QCPAxisRect(ui->plot_vel);
+    wideAxisRect->setupFullAxesBox(true);
+    marginGroup = new QCPMarginGroup(ui->plot_vel);
+    wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+    // move newly created axes on "axes" layer and grids on "grid" layer:
+    for (QCPAxisRect *rect : ui->plot_vel->axisRects())
+    {
+      for (QCPAxis *axis : rect->axes())
+      {
+        axis->setLayer("axes");
+        axis->grid()->setLayer("grid");
+      }
+    }
+    title = "Velocity";
+    ui->plot_vel->plotLayout()->addElement(0,0, new QCPPlotTitle(ui->plot_vel,title));
+    ui->plot_vel->plotLayout()->addElement(1, 0, wideAxisRect);
+
+    ui->plot_vel->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+    ui->plot_vel->graph(0)->setPen(QPen(Qt::blue));
+    ui->plot_vel->graph(0)->setName(title);
+    ui->plot_vel->graph(0)->valueAxis()->setLabel(" [m/s]");
+    ui->plot_vel->graph(0)->keyAxis()->setLabel("time [s]");
+    ui->plot_vel->graph(0)->setData(qtime, vel);
+
+    ui->plot_vel->graph(0)->valueAxis()->setRange(*std::min_element(vel.begin(), vel.end()),
+                                                       *std::max_element(vel.begin(), vel.end()));
+    ui->plot_vel->graph(0)->rescaleAxes();
+
+
+    ui->plot_vel->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ui->plot_vel->replot();
+
     // plot the torsion
     ui->plot_torsion->plotLayout()->clear();
     ui->plot_torsion->clearGraphs();
@@ -442,6 +478,7 @@ void PowerLaw3DDialog::on_pushButton_save_clicked()
     QString path("results/planning/power_law_3D/");
 
     ui->plot_curvature->savePdf(path+QString("curvature.pdf"),true,0,0,QString(),QString("Curvature"));
+    ui->plot_vel->savePdf(path+QString("velocity.pdf"),true,0,0,QString(),QString("Velocity"));
     ui->plot_torsion->savePdf(path+QString("torsion.pdf"),true,0,0,QString(),QString("Torsion"));
     ui->plot_16->savePdf(path+QString("power_law_3D.pdf"),true,0,0,QString(),QString("3D Power law"));
 
@@ -452,6 +489,11 @@ void PowerLaw3DDialog::on_pushButton_save_clicked()
 
     pdf_qstr = path+QString("curvature.pdf"); pdf_str = pdf_qstr.toStdString();
     svg_qstr = path+QString("curvature.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("velocity.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("velocity.svg"); svg_str = svg_qstr.toStdString();
     cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
     system(cmdLine.c_str());
 

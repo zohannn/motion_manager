@@ -42,7 +42,12 @@
        <widget class="QCustomPlot" name="plot_curvature" native="true"/>
       </item>
       <item>
-       <widget class="QCustomPlot" name="plot_torsion" native="true"/>
+       <widget class="QCustomPlot" name="plot_vel" native="true"/>
+      </item>
+      <item>
+       <widget class="QCustomPlot" name="plot_torsion" native="true">
+        <zorder>plot_vel</zorder>
+       </widget>
       </item>
      </layout>
     </item>
