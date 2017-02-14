@@ -46,6 +46,29 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
     }// task
     QVector<double> qtime = QVector<double>::fromStdVector(time_task);
 
+    // --- Hand Position --- //
+    QVector<double> pos_x; QVector<double> pos_y; QVector<double> pos_z;
+    for(size_t i=0; i<hand_position.size();++i){
+        vector<double> hand_point = hand_position.at(i);
+        pos_x.push_back(hand_point.at(0)/1000); // [m]
+        pos_y.push_back(hand_point.at(1)/1000); // [m]
+        pos_z.push_back(hand_point.at(2)/1000); // [m]
+    }
+
+    // first derivatives
+    QVector<double> der_pos_x_1; QVector<double> der_pos_y_1; QVector<double> der_pos_z_1;
+    this->getDerivative(pos_x,tot_timesteps,der_pos_x_1);
+    this->getDerivative(pos_y,tot_timesteps,der_pos_y_1);
+    this->getDerivative(pos_z,tot_timesteps,der_pos_z_1);
+
+
+    // --- Velocity --- //
+    QVector<double> vel;
+    for(int i=0; i<der_pos_x_1.size();++i){
+        Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
+        vel.push_back(der_1.norm());
+    }
+
     // PCA of the hand position
     vector<vector<double>> hand_position_red;
     int pca_hand = this->doPCA(hand_position,hand_position_red);
@@ -56,8 +79,8 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             QVector<double> pos_u; QVector<double> pos_v;
             for(size_t i=0;i<hand_position_red.size();++i){
                 vector<double> row = hand_position_red.at(i);
-                pos_u.push_back(row.at(0));
-                pos_v.push_back(row.at(1));
+                pos_u.push_back(row.at(0)); // [mm]
+                pos_v.push_back(row.at(1)); // [mm]
             }
             /*
             // ecc ellipse
@@ -106,7 +129,6 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             ui->plot_hand_pos->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
             ui->plot_hand_pos->replot();
 
-            // --- Curvature radius --- //
             // first derivatives
             QVector<double> der_pos_u_1; QVector<double> der_pos_v_1;
             this->getDerivative(pos_u,tot_timesteps,der_pos_u_1);
@@ -115,7 +137,29 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             QVector<double> der_pos_u_2; QVector<double> der_pos_v_2;
             this->getDerivative(der_pos_u_1,tot_timesteps,der_pos_u_2);
             this->getDerivative(der_pos_v_1,tot_timesteps,der_pos_v_2);
+            // third derivatives
+            QVector<double> der_pos_u_3; QVector<double> der_pos_v_3;
+            this->getDerivative(der_pos_u_2,tot_timesteps,der_pos_u_3);
+            this->getDerivative(der_pos_v_2,tot_timesteps,der_pos_v_3);
 
+
+            // --- Curvature and Tangential Velocity --- //
+            QVector<double> C; // Curvature
+            QVector<double> lnC; // Curvature
+            QVector<double> vel_tan; // Velocity
+            QVector<double> ln_vel_tan; // Velocity
+            for(int i=0; i<der_pos_u_1.size();++i){
+                Vector2d der_1(der_pos_u_1.at(i),der_pos_v_1.at(i));
+                Vector2d der_2(der_pos_u_2.at(i),der_pos_v_2.at(i));
+                double num = abs((der_1(0)*der_2(1))-(der_1(1)*der_2(0)));
+                double den = pow(der_1.norm(),3);
+                C.push_back((double)num/den); // [m^⁻1]
+                lnC.push_back(log(C.at(i)));
+                vel_tan.push_back(vel.at(i));
+                ln_vel_tan.push_back(vel_tan.at(i));
+            }
+
+            /*
             QVector<double> C;// curvature
             QVector<double> lnC;
             QVector<double> R;// curvature radius
@@ -123,11 +167,13 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             double eexp = ((double)3)/2; double num; double den;
             for(size_t i=0; i<pos_u.size();++i){
                 num = pow(pow(der_pos_u_1.at(i),2)+pow(der_pos_v_1.at(i),2),eexp);
-                den = abs((der_pos_u_1.at(i)*der_pos_v_2.at(i))-(der_pos_v_1.at(i)*der_pos_u_2.at(i)));
-                R.push_back(((double)num)/den); // [mm]
-                C.push_back(((double)1)/R.at(i)); // [mm^-1]
+                den = 1000*abs((der_pos_u_1.at(i)*der_pos_v_2.at(i))-(der_pos_v_1.at(i)*der_pos_u_2.at(i)));
+                R.push_back(((double)num)/den); // [m]
+                C.push_back(((double)1)/R.at(i)); // [m^-1]
             }
+            */
 
+/*
             // angular and tangential velocity
             QVector<double> theta; QVector<double> der_theta; QVector<double> ln_theta; QVector<double> vel_tan; QVector<double> ln_vel_tan;
             for(size_t i=0; i< pos_u.size(); ++i){
@@ -136,15 +182,18 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             this->getDerivative(theta,tot_timesteps,der_theta);
 
             for(size_t i=0; i<der_theta.size();++i){
-                vel_tan.push_back(R.at(i)*der_theta.at(i));
+                //vel_tan.push_back(R.at(i)*der_theta.at(i)); // [m/s]
+                vel_tan.push_back(((double)sqrt(pow(der_pos_u_1.at(i),2)+pow(der_pos_v_1.at(i),2)))/1000);// [m/s]
                 //if(abs(der_theta.at(i))>0.05){
-                    ln_theta.push_back(abs(der_theta.at(i)));
+                    //ln_theta.push_back(abs(der_theta.at(i)));
                     lnC.push_back(log(C.at(i)));
                     ln_vel_tan.push_back(abs(vel_tan.at(i)));
-                    lnR.push_back(log(R.at(i)));
+                    //lnR.push_back(log(R.at(i)));
                 //}
             }
+            */
 
+/*
             QVector<double> ln_vel_tan_mean; QVector<double> lnR_mean;
             for(size_t i=0; i<index.size();++i){
                 if(i==0){
@@ -155,6 +204,8 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
                     ln_vel_tan_mean.push_back((double)accumulate( ln_vel_tan.begin()+index.at(i-1), ln_vel_tan.begin()+index.at(i), 0.0)/(index.at(i)-index.at(i-1)));
                 }
             }
+            */
+
 
             // plot the curvature
             ui->plot_curvature->plotLayout()->clear();
@@ -173,18 +224,18 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
                 axis->grid()->setLayer("grid");
               }
             }
-            title = "Curvature radius";
+            title = "Curvature";
             ui->plot_curvature->plotLayout()->addElement(0,0, new QCPPlotTitle(ui->plot_curvature,title));
             ui->plot_curvature->plotLayout()->addElement(1, 0, wideAxisRect);
 
             ui->plot_curvature->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
             ui->plot_curvature->graph(0)->setPen(QPen(Qt::blue));
             ui->plot_curvature->graph(0)->setName(title);
-            ui->plot_curvature->graph(0)->valueAxis()->setLabel("curvature radius [mm]");
+            ui->plot_curvature->graph(0)->valueAxis()->setLabel("curvature [1/m]");
             ui->plot_curvature->graph(0)->keyAxis()->setLabel("time [s]");
-            ui->plot_curvature->graph(0)->setData(qtime, R);
-            ui->plot_curvature->graph(0)->valueAxis()->setRange(*std::min_element(R.begin(), R.end()),
-                                                               *std::max_element(R.begin(), R.end()));
+            ui->plot_curvature->graph(0)->setData(qtime, C);
+            ui->plot_curvature->graph(0)->valueAxis()->setRange(*std::min_element(C.begin(), C.end()),
+                                                               *std::max_element(C.begin(), C.end()));
             ui->plot_curvature->graph(0)->rescaleAxes();
 
 
@@ -215,7 +266,7 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             ui->plot_ang_vel->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
             ui->plot_ang_vel->graph(0)->setPen(QPen(Qt::blue));
             ui->plot_ang_vel->graph(0)->setName(title);
-            ui->plot_ang_vel->graph(0)->valueAxis()->setLabel(" [mm/s]");
+            ui->plot_ang_vel->graph(0)->valueAxis()->setLabel(" [m/s]");
             ui->plot_ang_vel->graph(0)->keyAxis()->setLabel("time [s]");
             ui->plot_ang_vel->graph(0)->setData(qtime, vel_tan);
 
@@ -229,20 +280,20 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
 
             // R-squared regression
             double q,m,r;
-            //this->linreg(lnC,ln_theta,&q,&m,&r);
+            this->linreg(lnC,ln_vel_tan,&q,&m,&r);
+            //this->linreg(lnR_mean,ln_vel_tan_mean,&q,&m,&r);
             //this->linreg(lnR,ln_vel_tan,&q,&m,&r);
-            this->linreg(lnR_mean,ln_vel_tan_mean,&q,&m,&r);
 
             std::cout << " m = " << m << " q = " << q << " R^2 = " << r << endl;
             QVector<double> ln_vel_fit; QVector<double> best_line;
-            double m_best = ((double)1)/3;
+            double m_best = ((double)-1)/3;
             //double m_best = ((double)2)/3;
-            //for(size_t i=0; i < lnC.size(); ++i){
-            for(size_t i=0; i < lnR_mean.size(); ++i){
-                //ln_vel_fit.push_back(m*lnC.at(i)+q);
-                ln_vel_fit.push_back(m*lnR_mean.at(i)+q);
-                //best_line.push_back(m_best*lnC.at(i)+q);
-                best_line.push_back(m_best*lnR_mean.at(i)+q);
+            for(size_t i=0; i < lnC.size(); ++i){
+            //for(size_t i=0; i < lnR_mean.size(); ++i){
+                ln_vel_fit.push_back(m*lnC.at(i)+q);
+                //ln_vel_fit.push_back(m*lnR_mean.at(i)+q);
+                best_line.push_back(m_best*lnC.at(i)+q);
+                //best_line.push_back(m_best*lnR_mean.at(i)+q);
             }
 
             // plot power law
@@ -262,7 +313,7 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
                 axis->grid()->setLayer("grid");
               }
             }
-            title = "Tangential Velocity / Curvature radius";
+            title = "Two-third power law";
             ui->plot_23->plotLayout()->addElement(0,0, new QCPPlotTitle(ui->plot_23,title));
             ui->plot_23->plotLayout()->addElement(1, 0, wideAxisRect);
 
@@ -271,14 +322,14 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             ui->plot_23->graph(0)->setLineStyle(QCPGraph::lsNone);
             ui->plot_23->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross, 4));
             ui->plot_23->graph(0)->setName("ln(V)/ln(R)");
-            ui->plot_23->graph(0)->valueAxis()->setLabel("ln(V) [mm/s]");
-            ui->plot_23->graph(0)->keyAxis()->setLabel("ln(R) [mm]");
-            //ui->plot_23->graph(0)->setData(lnR, ln_vel_tan);
-            ui->plot_23->graph(0)->setData(lnR_mean, ln_vel_tan_mean);
-            //ui->plot_23->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel_tan.begin(), ln_vel_tan.end()),
-              //                                           *std::max_element(ln_vel_tan.begin(), ln_vel_tan.end()));
-            ui->plot_23->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel_tan_mean.begin(), ln_vel_tan_mean.end()),
-                                                         *std::max_element(ln_vel_tan_mean.begin(), ln_vel_tan_mean.end()));
+            ui->plot_23->graph(0)->valueAxis()->setLabel("ln(V) [m/s]");
+            ui->plot_23->graph(0)->keyAxis()->setLabel("ln(C) [m^-1]");
+            ui->plot_23->graph(0)->setData(lnC, ln_vel_tan);
+            //ui->plot_23->graph(0)->setData(lnR_mean, ln_vel_tan_mean);
+            ui->plot_23->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel_tan.begin(), ln_vel_tan.end()),
+                                                         *std::max_element(ln_vel_tan.begin(), ln_vel_tan.end()));
+            //ui->plot_23->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel_tan_mean.begin(), ln_vel_tan_mean.end()),
+              //                                           *std::max_element(ln_vel_tan_mean.begin(), ln_vel_tan_mean.end()));
             ui->plot_23->graph(0)->rescaleAxes();
 
 
@@ -289,7 +340,8 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             QString name = QString::fromStdString(string("slope=")+m_str+string(" R^2=")+r_str);
             ui->plot_23->graph(1)->setName(name);
 
-            ui->plot_23->graph(1)->setData(lnR_mean, ln_vel_fit);
+            //ui->plot_23->graph(1)->setData(lnR_mean, ln_vel_fit);
+            ui->plot_23->graph(1)->setData(lnC, ln_vel_fit);
             //ui.plot_power_law->graph(0)->valueAxis()->setRange(*std::min_element(lnHand_vel.begin(), lnHand_vel.end()),
                                                              // *std::max_element(lnHand_vel.begin(), lnHand_vel.end()));
             ui->plot_23->graph(1)->rescaleAxes();
@@ -298,7 +350,8 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             ui->plot_23->graph(2)->setPen(QPen(Qt::blue));
             ui->plot_23->graph(2)->setName("best fit");
 
-            ui->plot_23->graph(2)->setData(lnR_mean, best_line);
+            //ui->plot_23->graph(2)->setData(lnR_mean, best_line);
+            ui->plot_23->graph(2)->setData(lnC, best_line);
             //ui.plot_power_law->graph(0)->valueAxis()->setRange(*std::min_element(lnHand_vel.begin(), lnHand_vel.end()),
                                                              // *std::max_element(lnHand_vel.begin(), lnHand_vel.end()));
             ui->plot_23->graph(2)->rescaleAxes();
@@ -501,7 +554,7 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
        step_value = step_values.at(tnsample);
        if(step_value==0)
            step_value=0.01;
-       derFunction.push_back(((-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h))/step_value);
+       derFunction.push_back((double)(-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h*step_value));
 
        // 2nd point
        // f'1 = ( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h) - h^4/20*f^(5)(c_1)
@@ -514,7 +567,7 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
        step_value = step_values.at(tnsample);
        if(step_value==0)
            step_value=0.01;
-       derFunction.push_back((( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h))/step_value);
+       derFunction.push_back((double)( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h*step_value));
 
        // 3rd point
        // f'2 = (  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h) + h^4/30*f^(5)(c_2)
@@ -527,7 +580,7 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
            step_value = step_values.at(i);
            if(step_value==0)
                step_value=0.01;
-           derFunction.push_back(((  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h))/step_value);
+           derFunction.push_back((double)(  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h*step_value));
        }
 
        // 4th point
@@ -541,7 +594,7 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
        step_value = step_values.at(tnsample);
        if(step_value==0)
            step_value=0.01;
-       derFunction.push_back((( -f0+6*f1-18*f2+10*f3+3*f4)/(12*h))/step_value);
+       derFunction.push_back((double)( -f0+6*f1-18*f2+10*f3+3*f4)/(12*h*step_value));
 
        // 5th point
        // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
@@ -554,7 +607,7 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
        step_value = step_values.at(tnsample);
        if(step_value==0)
            step_value=0.01;
-       derFunction.push_back(((  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h))/step_value);
+       derFunction.push_back((double)(  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h*step_value));
 
 }
 
@@ -626,10 +679,10 @@ void PowerLawDialog::on_pushButton_save_clicked()
     if (stat("results/planning", &st) == -1) {
         mkdir("results/planning", 0700);
     }
-    if (stat("results/planning/power_law", &st) == -1) {
-        mkdir("results/planning/power_law", 0700);
+    if (stat("results/planning/power_law_2D", &st) == -1) {
+        mkdir("results/planning/power_law_2D", 0700);
     }
-    QString path("results/planning/power_law/");
+    QString path("results/planning/power_law_2D/");
 
     ui->plot_hand_pos->savePdf(path+QString("hand_pos.pdf"),true,0,0,QString(),QString("Hand position"));
     ui->plot_curvature->savePdf(path+QString("radius.pdf"),true,0,0,QString(),QString("Curvature radius"));

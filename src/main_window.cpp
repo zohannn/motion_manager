@@ -1716,13 +1716,13 @@ void MainWindow::on_pushButton_load_task_clicked()
                 if(QString::compare(fields.at(0).simplified(),QString("tol stop"),Qt::CaseInsensitive)==0){
                     tols_stop_mov.push_back(fields.at(1).toDouble());
                 }
-            }else if(line.at(0)==QChar('n')){
+            }else if((line.at(0)==QChar('n')) && (line.at(1)==QChar('j'))){
 
                 QStringList fields = line.split("=");
                 if(QString::compare(fields.at(0).simplified(),QString("njs"),Qt::CaseInsensitive)==0){
                     this->njs_task.push_back(fields.at(1).toDouble());
                 }
-            }else if(line.at(0)==QChar('n')){
+            }else if((line.at(0)==QChar('n')) && (line.at(1)==QChar('m'))){
 
                 QStringList fields = line.split("=");
                 if(QString::compare(fields.at(0).simplified(),QString("nmu"),Qt::CaseInsensitive)==0){
@@ -2760,90 +2760,92 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::getDerivative(QVector<double> &function, QVector<double> &step_values, QVector<double> &derFunction)
 {
-    // Formula of the numarical differentiation with 5 points
-       // f'0 = (-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h) + h^4/5*f^(5)(c_0)
-       // f'1 = ( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h) - h^4/20*f^(5)(c_1)
-       // f'2 = (  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h) + h^4/30*f^(5)(c_2)
-       // f'3 = ( -1*f0 +  6*f1 - 18*f2 + 10*f3 +  3*f4)/(12*h) - h^4/20*f^(5)(c_3)
-       // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
-
-
        const double MIN_STEP_VALUE = 0.1;
 
-       int h = 1;
-       int tnsample;
-       double f0;
-       double f1;
-       double f2;
-       double f3;
-       double f4;
-       double step_value;
+       // Formula of the numarical differentiation with 5 points
+          // f'0 = (-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h) + h^4/5*f^(5)(c_0)
+          // f'1 = ( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h) - h^4/20*f^(5)(c_1)
+          // f'2 = (  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h) + h^4/30*f^(5)(c_2)
+          // f'3 = ( -1*f0 +  6*f1 - 18*f2 + 10*f3 +  3*f4)/(12*h) - h^4/20*f^(5)(c_3)
+          // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
 
-       // 1st point
-       // f'0 = (-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h) + h^4/5*f^(5)(c_0)
-       tnsample = 0;
-       f0 = function.at(tnsample);
-       f1 = function.at(tnsample+1);
-       f2 = function.at(tnsample+2);
-       f3 = function.at(tnsample+3);
-       f4 = function.at(tnsample+4);
-       step_value = step_values.at(tnsample);
-       if(step_value < 0.1)
-           step_value=MIN_STEP_VALUE;
-       derFunction.push_back(((-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h))/step_value);
 
-       // 2nd point
-       // f'1 = ( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h) - h^4/20*f^(5)(c_1)
-       tnsample = 1;
-       f0 = function.at(tnsample-1);
-       f1 = function.at(tnsample);
-       f2 = function.at(tnsample+1);
-       f3 = function.at(tnsample+2);
-       f4 = function.at(tnsample+3);
-       step_value = step_values.at(tnsample);
-       if(step_value < 0.1)
-           step_value=MIN_STEP_VALUE;
-       derFunction.push_back((( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h))/step_value);
+          int h = 1;
+          int tnsample;
+          double f0;
+          double f1;
+          double f2;
+          double f3;
+          double f4;
+          double step_value;
 
-       // 3rd point
-       // f'2 = (  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h) + h^4/30*f^(5)(c_2)
-       for (int i=2; i< function.size() -2;++i){     // centered
-           f0 = function.at(i-2);
-           f1 = function.at(i-1);
-           f2 = function.at(i);
-           f3 = function.at(i+1);
-           f4 = function.at(i+2);
-           step_value = step_values.at(i);
-           if(step_value < 0.1)
-               step_value=0.01;
-           derFunction.push_back(((  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h))/step_value);
-       }
+          // 1st point
+          // f'0 = (-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h) + h^4/5*f^(5)(c_0)
+          tnsample = 0;
+          f0 = function.at(tnsample);
+          f1 = function.at(tnsample+1);
+          f2 = function.at(tnsample+2);
+          f3 = function.at(tnsample+3);
+          f4 = function.at(tnsample+4);
+          step_value = step_values.at(tnsample);
+          if(step_value==0)
+              step_value=MIN_STEP_VALUE;
+          derFunction.push_back((double)(-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h*step_value));
 
-       // 4th point
-       // f'3 = ( -1*f0 +  6*f1 - 18*f2 + 10*f3 +  3*f4)/(12*h) - h^4/20*f^(5)(c_3)
-       tnsample = function.size()-2;
-       f0 = function.at(tnsample-3);
-       f1 = function.at(tnsample-2);
-       f2 = function.at(tnsample-1);
-       f3 = function.at(tnsample);
-       f4 = function.at(tnsample+1);
-       step_value = step_values.at(tnsample);
-       if(step_value < 0.1)
-           step_value=MIN_STEP_VALUE;
-       derFunction.push_back((( -f0+6*f1-18*f2+10*f3+3*f4)/(12*h))/step_value);
+          // 2nd point
+          // f'1 = ( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h) - h^4/20*f^(5)(c_1)
+          tnsample = 1;
+          f0 = function.at(tnsample-1);
+          f1 = function.at(tnsample);
+          f2 = function.at(tnsample+1);
+          f3 = function.at(tnsample+2);
+          f4 = function.at(tnsample+3);
+          step_value = step_values.at(tnsample);
+          if(step_value==0)
+              step_value=MIN_STEP_VALUE;
+          derFunction.push_back((double)( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h*step_value));
 
-       // 5th point
-       // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
-       tnsample = function.size()-1;
-       f0 = function.at(tnsample-4);
-       f1 = function.at(tnsample-3);
-       f2 = function.at(tnsample-2);
-       f3 = function.at(tnsample-1);
-       f4 = function.at(tnsample);
-       step_value = step_values.at(tnsample);
-       if(step_value < 0.1)
-           step_value=MIN_STEP_VALUE;
-       derFunction.push_back(((  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h))/step_value);
+          // 3rd point
+          // f'2 = (  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h) + h^4/30*f^(5)(c_2)
+          for (int i=2; i< function.size() -2;++i){     // centered
+              f0 = function.at(i-2);
+              f1 = function.at(i-1);
+              f2 = function.at(i);
+              f3 = function.at(i+1);
+              f4 = function.at(i+2);
+              step_value = step_values.at(i);
+              if(step_value==0)
+                  step_value=0.01;
+              derFunction.push_back((double)(  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h*step_value));
+          }
+
+          // 4th point
+          // f'3 = ( -1*f0 +  6*f1 - 18*f2 + 10*f3 +  3*f4)/(12*h) - h^4/20*f^(5)(c_3)
+          tnsample = function.size()-2;
+          f0 = function.at(tnsample-3);
+          f1 = function.at(tnsample-2);
+          f2 = function.at(tnsample-1);
+          f3 = function.at(tnsample);
+          f4 = function.at(tnsample+1);
+          step_value = step_values.at(tnsample);
+          if(step_value==0)
+              step_value=MIN_STEP_VALUE;
+          derFunction.push_back((double)( -f0+6*f1-18*f2+10*f3+3*f4)/(12*h*step_value));
+
+          // 5th point
+          // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
+          tnsample = function.size()-1;
+          f0 = function.at(tnsample-4);
+          f1 = function.at(tnsample-3);
+          f2 = function.at(tnsample-2);
+          f3 = function.at(tnsample-1);
+          f4 = function.at(tnsample);
+          step_value = step_values.at(tnsample);
+          if(step_value==0)
+              step_value=MIN_STEP_VALUE;
+          derFunction.push_back((double)(  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h*step_value));
+
+
 
 }
 

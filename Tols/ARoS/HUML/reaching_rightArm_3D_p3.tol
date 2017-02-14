@@ -308,13 +308,14 @@ post_place_z=0
 post_place_dist=0
 
 # Move settings
-target_x=-200
-target_y=600
-target_z=1000
+target_x=-300
 
-target_roll=1.57
+target_y=300
 
-target_pitch=-3.14
+target_z=1300
+target_roll=0.79
+
+target_pitch=-1.57
 
 target_yaw=0.0
 
@@ -359,7 +360,7 @@ plane_point3_y=600
 
 plane_point3_z=1000
 
-add_plane=true
+add_plane=false
 # Others
 max_velocity=50
 
