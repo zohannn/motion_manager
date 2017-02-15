@@ -46,6 +46,7 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
     }// task
     QVector<double> qtime = QVector<double>::fromStdVector(time_task);
 
+    /*
     // --- Hand Position --- //
     QVector<double> pos_x; QVector<double> pos_y; QVector<double> pos_z;
     for(size_t i=0; i<hand_position.size();++i){
@@ -68,6 +69,7 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
         Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
         vel.push_back(der_1.norm());
     }
+    */
 
     // PCA of the hand position
     vector<vector<double>> hand_position_red;
@@ -146,6 +148,8 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             // --- Curvature and Tangential Velocity --- //
             QVector<double> C; // Curvature
             QVector<double> lnC; // Curvature
+            QVector<double> R; // Curvature radius
+            QVector<double> lnR; // Curvature radius
             QVector<double> vel_tan; // Velocity
             QVector<double> ln_vel_tan; // Velocity
             for(int i=0; i<der_pos_u_1.size();++i){
@@ -155,7 +159,9 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
                 double den = pow(der_1.norm(),3);
                 C.push_back((double)num/den); // [m^⁻1]
                 lnC.push_back(log(C.at(i)));
-                vel_tan.push_back(vel.at(i));
+                R.push_back(((double)1)/C.at(i)); // [m]
+                lnR.push_back(log(R.at(i)));
+                vel_tan.push_back(((double)sqrt(pow(der_1(0),2)+pow(der_1(1),2)))/1000); // [m/s]
                 ln_vel_tan.push_back(vel_tan.at(i));
             }
 
@@ -175,23 +181,24 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
 
 /*
             // angular and tangential velocity
-            QVector<double> theta; QVector<double> der_theta; QVector<double> ln_theta; QVector<double> vel_tan; QVector<double> ln_vel_tan;
+            QVector<double> theta; QVector<double> der_theta; QVector<double> ln_theta;
             for(size_t i=0; i< pos_u.size(); ++i){
                 theta.push_back(std::atan2(pos_v.at(i),pos_u.at(i)));
             }
             this->getDerivative(theta,tot_timesteps,der_theta);
 
             for(size_t i=0; i<der_theta.size();++i){
-                //vel_tan.push_back(R.at(i)*der_theta.at(i)); // [m/s]
-                vel_tan.push_back(((double)sqrt(pow(der_pos_u_1.at(i),2)+pow(der_pos_v_1.at(i),2)))/1000);// [m/s]
+                vel_tan.push_back(R.at(i)*der_theta.at(i)); // [m/s]
+                //vel_tan.push_back(((double)sqrt(pow(der_pos_u_1.at(i),2)+pow(der_pos_v_1.at(i),2)))/1000);// [m/s]
                 //if(abs(der_theta.at(i))>0.05){
                     //ln_theta.push_back(abs(der_theta.at(i)));
-                    lnC.push_back(log(C.at(i)));
-                    ln_vel_tan.push_back(abs(vel_tan.at(i)));
+                    //lnC.push_back(log(C.at(i)));
+                ln_vel_tan.push_back(abs(vel_tan.at(i)));
                     //lnR.push_back(log(R.at(i)));
                 //}
             }
             */
+
 
 /*
             QVector<double> ln_vel_tan_mean; QVector<double> lnR_mean;

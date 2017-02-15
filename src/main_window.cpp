@@ -694,7 +694,6 @@ void MainWindow::on_pushButton_plan_clicked()
         mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
         mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
         tols.steps = mTolHumldlg->getSteps();// number of steps
-        tols.totalTime = 1.0; // 1 = plan the 100% of the movement
         // pick / place settings
         tols.mov_specs.approach = mTolHumldlg->getApproach();
         tols.mov_specs.retreat = mTolHumldlg->getRetreat();
