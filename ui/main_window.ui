@@ -1371,9 +1371,9 @@ p, li { white-space: pre-wrap; }
         </widget>
        </widget>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="tab_results_learn">
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Learning</string>
        </attribute>
       </widget>
      </widget>

@@ -101,13 +101,16 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     }
 
     // --- Curvature and Torsion , Velocity--- //
-    QVector<double> ln_vel;; QVector<double> ln_x; //vector<int> index_x;
+    QVector<double> ln_vel;; QVector<double> ln_x;
     for(int i=0; i<der_pos_x_1.size();++i){
+
         if(abs(T.at(i))>=2){// threshold value taken into account to eliminate the torsion cups and planar regions
             ln_x.push_back(log(pow(K.at(i),2)*abs(T.at(i))));
             ln_vel.push_back(log(vel.at(i)));
-            //index_x.push_back(ln_x.size());
         }
+
+        //ln_x.push_back(log(pow(K.at(i),2)));
+        //ln_vel.push_back(log(vel.at(i)));
     }
     /*
 
@@ -193,7 +196,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_vel->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
     ui->plot_vel->graph(0)->setPen(QPen(Qt::blue));
     ui->plot_vel->graph(0)->setName(title);
-    ui->plot_vel->graph(0)->valueAxis()->setLabel(" [m/s]");
+    ui->plot_vel->graph(0)->valueAxis()->setLabel("velocity [m/s]");
     ui->plot_vel->graph(0)->keyAxis()->setLabel("time [s]");
     ui->plot_vel->graph(0)->setData(qtime, vel);
 
@@ -264,9 +267,9 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_16->graph(0)->setPen(QPen(Qt::black));
     ui->plot_16->graph(0)->setLineStyle(QCPGraph::lsNone);
     ui->plot_16->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross, 4));
-    ui->plot_16->graph(0)->setName("ln(V)/ln(K^2|T|)");
+    ui->plot_16->graph(0)->setName("ln(V)/ln(C^2|T|)");
     ui->plot_16->graph(0)->valueAxis()->setLabel("ln(V) [m/s]");
-    ui->plot_16->graph(0)->keyAxis()->setLabel("ln(K^2|T|) [m^-3]");
+    ui->plot_16->graph(0)->keyAxis()->setLabel("ln(C^2|T|) [m^-3]");
     ui->plot_16->graph(0)->setData(ln_x, ln_vel);
     ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel.begin(), ln_vel.end()),
                                                  *std::max_element(ln_vel.begin(), ln_vel.end()));
@@ -286,7 +289,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
 
     ui->plot_16->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
     ui->plot_16->graph(2)->setPen(QPen(Qt::blue));
-    ui->plot_16->graph(2)->setName("best fit");
+    ui->plot_16->graph(2)->setName(QString("best fit slope: ")+QString::number(m_best));
 
     ui->plot_16->graph(2)->setData(ln_x, best_line);
     ui->plot_16->graph(2)->rescaleAxes();
