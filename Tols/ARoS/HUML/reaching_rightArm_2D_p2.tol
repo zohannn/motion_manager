@@ -308,7 +308,7 @@ post_place_z=0
 post_place_dist=0
 
 # Move settings
-target_x=-100
+target_x=-300
 
 target_y=300
 

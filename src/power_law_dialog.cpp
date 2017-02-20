@@ -19,7 +19,8 @@ PowerLawDialog::~PowerLawDialog()
 void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<vector<vector<double> > > &timesteps)
 {
     // time
-    vector<double> time_task; QVector<double> tot_timesteps; vector<int> index;
+    vector<double> time_task; QVector<double> tot_timesteps;
+    vector<int> index;
     for(size_t i=0; i<timesteps.size();++i){
         vector<vector<double>> tsteps_mov = timesteps.at(i);
         double time_init;
@@ -144,8 +145,10 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             QVector<double> lnX; // Curvature^2
             QVector<double> lnY; // Velocity
             for(size_t i=0;  i<C.size();++i){
-                   lnX.push_back(log(pow(C.at(i),2)));
-                   lnY.push_back(ln_vel_tan.at(i));
+                //if(C.at(i)<=0.1){
+                    lnX.push_back(log(pow(C.at(i),2)));
+                    lnY.push_back(ln_vel_tan.at(i));
+                //}
             }
 
             /*
@@ -183,18 +186,19 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             */
 
 
-/*
-            QVector<double> ln_vel_tan_mean; QVector<double> lnR_mean;
+
+            QVector<double> lnY_mean; QVector<double> lnX_mean;
             for(size_t i=0; i<index.size();++i){
                 if(i==0){
-                    lnR_mean.push_back((double)accumulate( lnR.begin(), lnR.begin()+index.at(i), 0.0)/index.at(i));
-                    ln_vel_tan_mean.push_back((double)accumulate( ln_vel_tan.begin(), ln_vel_tan.begin()+index.at(i), 0.0)/index.at(i));
+                    lnX_mean.push_back((double)accumulate( lnX.begin(), lnX.begin()+index.at(i), 0.0)/index.at(i));
+                    lnY_mean.push_back((double)accumulate( lnY.begin(), lnY.begin()+index.at(i), 0.0)/index.at(i));
                 }else{
-                    lnR_mean.push_back((double)accumulate( lnR.begin()+index.at(i-1), lnR.begin()+index.at(i), 0.0)/(index.at(i)-index.at(i-1)));
-                    ln_vel_tan_mean.push_back((double)accumulate( ln_vel_tan.begin()+index.at(i-1), ln_vel_tan.begin()+index.at(i), 0.0)/(index.at(i)-index.at(i-1)));
+                    lnX_mean.push_back((double)accumulate( lnX.begin()+index.at(i-1), lnX.begin()+index.at(i), 0.0)/(index.at(i)-index.at(i-1)));
+                    lnY_mean.push_back((double)accumulate( lnY.begin()+index.at(i-1), lnY.begin()+index.at(i), 0.0)/(index.at(i)-index.at(i-1)));
                 }
             }
-            */
+
+
 
 
             // plot the curvature
@@ -270,21 +274,16 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
 
             // R-squared regression
             double q,m,r;
-            //this->linreg(lnC,ln_vel_tan,&q,&m,&r);
-            this->linreg(lnX,ln_vel_tan,&q,&m,&r);
-            //this->linreg(lnR_mean,ln_vel_tan_mean,&q,&m,&r);
-            //this->linreg(lnR,ln_vel_tan,&q,&m,&r);
+
+            //this->linreg(lnX,lnY,&q,&m,&r);
+            this->linreg(lnX_mean,lnY_mean,&q,&m,&r);
 
             std::cout << " m = " << m << " q = " << q << " R^2 = " << r << endl;
             QVector<double> ln_vel_fit; QVector<double> best_line;
             double m_best = ((double)-1)/6;
-            //double m_best = ((double)2)/3;
-            for(size_t i=0; i < lnC.size(); ++i){
-            //for(size_t i=0; i < lnR_mean.size(); ++i){
-                ln_vel_fit.push_back(m*lnC.at(i)+q);
-                //ln_vel_fit.push_back(m*lnR_mean.at(i)+q);
-                best_line.push_back(m_best*lnC.at(i)+q);
-                //best_line.push_back(m_best*lnR_mean.at(i)+q);
+            for(size_t i=0; i < lnX.size(); ++i){
+                ln_vel_fit.push_back(m*lnX.at(i)+q);
+                best_line.push_back(m_best*lnX.at(i)+q);
             }
 
             // plot power law
@@ -315,12 +314,13 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             ui->plot_23->graph(0)->setName("ln(V)/ln(C^2)");
             ui->plot_23->graph(0)->valueAxis()->setLabel("ln(V) [m/s]");
             ui->plot_23->graph(0)->keyAxis()->setLabel("ln(C^2) [m^-2]");
-            ui->plot_23->graph(0)->setData(lnX, lnY);
-            //ui->plot_23->graph(0)->setData(lnR_mean, ln_vel_tan_mean);
-            ui->plot_23->graph(0)->valueAxis()->setRange(*std::min_element(lnY.begin(), lnY.end()),
-                                                         *std::max_element(lnY.begin(), lnY.end()));
-            //ui->plot_23->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel_tan_mean.begin(), ln_vel_tan_mean.end()),
-              //                                           *std::max_element(ln_vel_tan_mean.begin(), ln_vel_tan_mean.end()));
+            //ui->plot_23->graph(0)->setData(lnX, lnY);
+            //ui->plot_23->graph(0)->valueAxis()->setRange(*std::min_element(lnY.begin(), lnY.end()),
+              //                                           *std::max_element(lnY.begin(), lnY.end()));
+            ui->plot_23->graph(0)->setData(lnX_mean, lnY_mean);
+            ui->plot_23->graph(0)->valueAxis()->setRange(*std::min_element(lnY_mean.begin(), lnY_mean.end()),
+                                                         *std::max_element(lnY_mean.begin(), lnY_mean.end()));
+
             ui->plot_23->graph(0)->rescaleAxes();
 
 
@@ -332,7 +332,7 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             ui->plot_23->graph(1)->setName(name);
 
             //ui->plot_23->graph(1)->setData(lnR_mean, ln_vel_fit);
-            ui->plot_23->graph(1)->setData(lnC, ln_vel_fit);
+            ui->plot_23->graph(1)->setData(lnX, ln_vel_fit);
             //ui.plot_power_law->graph(0)->valueAxis()->setRange(*std::min_element(lnHand_vel.begin(), lnHand_vel.end()),
                                                              // *std::max_element(lnHand_vel.begin(), lnHand_vel.end()));
             ui->plot_23->graph(1)->rescaleAxes();
@@ -342,7 +342,7 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             ui->plot_23->graph(2)->setName(QString("best fit slope: ")+QString::number(m_best));
 
             //ui->plot_23->graph(2)->setData(lnR_mean, best_line);
-            ui->plot_23->graph(2)->setData(lnC, best_line);
+            ui->plot_23->graph(2)->setData(lnX, best_line);
             //ui.plot_power_law->graph(0)->valueAxis()->setRange(*std::min_element(lnHand_vel.begin(), lnHand_vel.end()),
                                                              // *std::max_element(lnHand_vel.begin(), lnHand_vel.end()));
             ui->plot_23->graph(2)->rescaleAxes();
