@@ -102,32 +102,41 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     }
 
     // --- Curvature and Torsion , Velocity--- //
-    QVector<double> ln_vel;; QVector<double> ln_x;    
+    QVector<double> ln_vel;; QVector<double> ln_x;
+    QVector<int> index_t(index.size()); int k=0; int h=0; int hh;
     for(int i=0; i<der_pos_x_1.size();++i){
+        int mov_size = index.at(k);
+        if(i>=mov_size){
+            hh = index_t.at(h);
+            h++;
+            index_t.replace(h,hh);
+            k++;
+        }
         if(abs(T.at(i))>=2){// threshold value taken into account to eliminate the torsion cups and planar regions
             ln_x.push_back(log(pow(K.at(i),2)*abs(T.at(i))));
             ln_vel.push_back(log(vel.at(i)));
+            index_t.replace(h,index_t.at(h)+1);
         }
     }
 
 
     // --- Mean of the axis --- //
     QVector<double> ln_vel_mean; QVector<double> ln_x_mean;
-    for(size_t i=0; i<index.size();++i){
+    for(size_t i=0; i<index_t.size();++i){
         if(i==0){
-            ln_x_mean.push_back((double)accumulate( ln_x.begin(), ln_x.begin()+index.at(i), 0.0)/index.at(i));
-            ln_vel_mean.push_back((double)accumulate( ln_vel.begin(), ln_vel.begin()+index.at(i), 0.0)/index.at(i));
+            ln_x_mean.push_back((double)accumulate( ln_x.begin(), ln_x.begin()+index_t.at(i), 0.0)/index_t.at(i));
+            ln_vel_mean.push_back((double)accumulate( ln_vel.begin(), ln_vel.begin()+index_t.at(i), 0.0)/index_t.at(i));
         }else{
-            ln_x_mean.push_back((double)accumulate( ln_x.begin()+index.at(i-1), ln_x.begin()+index.at(i), 0.0)/(index.at(i)-index.at(i-1)));
-            ln_vel_mean.push_back((double)accumulate( ln_vel.begin()+index.at(i-1), ln_vel.begin()+index.at(i), 0.0)/(index.at(i)-index.at(i-1)));
+            ln_x_mean.push_back((double)accumulate( ln_x.begin()+index_t.at(i-1), ln_x.begin()+index_t.at(i), 0.0)/(index_t.at(i)-index_t.at(i-1)));
+            ln_vel_mean.push_back((double)accumulate( ln_vel.begin()+index_t.at(i-1), ln_vel.begin()+index_t.at(i), 0.0)/(index_t.at(i)-index_t.at(i-1)));
         }
     }
 
 
     // R-squared regression
     double q,m,r;
-    //this->linreg(ln_x,ln_vel,&q,&m,&r);
-    this->linreg(ln_x_mean,ln_vel_mean,&q,&m,&r);
+    this->linreg(ln_x,ln_vel,&q,&m,&r);
+    //this->linreg(ln_x_mean,ln_vel_mean,&q,&m,&r);
     std::cout << " m = " << m << " q = " << q << " R^2 = " << r << endl;
     QVector<double> ln_vel_fit; QVector<double> best_line;
     double m_best = ((double)-1)/6;
@@ -199,7 +208,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_vel->graph(0)->setData(qtime, vel);
 
     ui->plot_vel->graph(0)->valueAxis()->setRange(*std::min_element(vel.begin(), vel.end()),
-                                                       *std::max_element(vel.begin(), vel.end()));
+                                                  *std::max_element(vel.begin(), vel.end()));
     ui->plot_vel->graph(0)->rescaleAxes();
 
 
@@ -234,7 +243,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_torsion->graph(0)->keyAxis()->setLabel("time [s]");
     ui->plot_torsion->graph(0)->setData(qtime, T);
     ui->plot_torsion->graph(0)->valueAxis()->setRange(*std::min_element(T.begin(), T.end()),
-                                                       *std::max_element(T.begin(), T.end()));
+                                                      *std::max_element(T.begin(), T.end()));
     ui->plot_torsion->graph(0)->rescaleAxes();
     ui->plot_torsion->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
     ui->plot_torsion->replot();
@@ -268,12 +277,12 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_16->graph(0)->setName("ln(V)/ln(C^2|T|)");
     ui->plot_16->graph(0)->valueAxis()->setLabel("ln(V) [m/s]");
     ui->plot_16->graph(0)->keyAxis()->setLabel("ln(C^2|T|) [m^-3]");
-    //ui->plot_16->graph(0)->setData(ln_x, ln_vel);
-    //ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel.begin(), ln_vel.end()),
-      //                                           *std::max_element(ln_vel.begin(), ln_vel.end()));
-    ui->plot_16->graph(0)->setData(ln_x_mean, ln_vel_mean);
-    ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel_mean.begin(), ln_vel_mean.end()),
-                                                 *std::max_element(ln_vel_mean.begin(), ln_vel_mean.end()));
+    ui->plot_16->graph(0)->setData(ln_x, ln_vel);
+    ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel.begin(), ln_vel.end()),
+                                                 *std::max_element(ln_vel.begin(), ln_vel.end()));
+    //ui->plot_16->graph(0)->setData(ln_x_mean, ln_vel_mean);
+    //ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel_mean.begin(), ln_vel_mean.end()),
+      //                                           *std::max_element(ln_vel_mean.begin(), ln_vel_mean.end()));
     ui->plot_16->graph(0)->rescaleAxes();
 
 

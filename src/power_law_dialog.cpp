@@ -144,11 +144,20 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
 
             QVector<double> lnX; // Curvature^2
             QVector<double> lnY; // Velocity
+            QVector<int> index_t(index.size()); int k=0; int h=0; int hh;
             for(size_t i=0;  i<C.size();++i){
-                //if(C.at(i)<=0.1){
+                int mov_size = index.at(k);
+                if(i>=mov_size){
+                    hh = index_t.at(h);
+                    h++;
+                    index_t.replace(h,hh);
+                    k++;
+                }
+                if(C.at(i)>=0.001){
                     lnX.push_back(log(pow(C.at(i),2)));
                     lnY.push_back(ln_vel_tan.at(i));
-                //}
+                    index_t.replace(h,index_t.at(h)+1);
+                }
             }
 
             /*
@@ -188,13 +197,13 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
 
 
             QVector<double> lnY_mean; QVector<double> lnX_mean;
-            for(size_t i=0; i<index.size();++i){
+            for(size_t i=0; i<index_t.size();++i){
                 if(i==0){
-                    lnX_mean.push_back((double)accumulate( lnX.begin(), lnX.begin()+index.at(i), 0.0)/index.at(i));
-                    lnY_mean.push_back((double)accumulate( lnY.begin(), lnY.begin()+index.at(i), 0.0)/index.at(i));
+                    lnX_mean.push_back((double)accumulate( lnX.begin(), lnX.begin()+index_t.at(i), 0.0)/index_t.at(i));
+                    lnY_mean.push_back((double)accumulate( lnY.begin(), lnY.begin()+index_t.at(i), 0.0)/index_t.at(i));
                 }else{
-                    lnX_mean.push_back((double)accumulate( lnX.begin()+index.at(i-1), lnX.begin()+index.at(i), 0.0)/(index.at(i)-index.at(i-1)));
-                    lnY_mean.push_back((double)accumulate( lnY.begin()+index.at(i-1), lnY.begin()+index.at(i), 0.0)/(index.at(i)-index.at(i-1)));
+                    lnX_mean.push_back((double)accumulate( lnX.begin()+index_t.at(i-1), lnX.begin()+index_t.at(i), 0.0)/(index_t.at(i)-index_t.at(i-1)));
+                    lnY_mean.push_back((double)accumulate( lnY.begin()+index_t.at(i-1), lnY.begin()+index_t.at(i), 0.0)/(index_t.at(i)-index_t.at(i-1)));
                 }
             }
 
