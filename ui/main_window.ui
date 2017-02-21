@@ -738,44 +738,64 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_plan">
+      <widget class="QWidget" name="">
        <property name="geometry">
         <rect>
-         <x>440</x>
+         <x>0</x>
          <y>130</y>
-         <width>201</width>
-         <height>26</height>
+         <width>161</width>
+         <height>25</height>
         </rect>
        </property>
-       <property name="text">
-        <string>Plan the selected movement</string>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_14">
+        <item>
+         <widget class="QPushButton" name="pushButton_tuning">
+          <property name="text">
+           <string>Tuning</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_plan">
+          <property name="text">
+           <string>Plan</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
-      <widget class="QPushButton" name="pushButton_tuning">
+      <widget class="QWidget" name="">
        <property name="geometry">
         <rect>
-         <x>10</x>
+         <x>260</x>
          <y>130</y>
-         <width>85</width>
-         <height>26</height>
+         <width>375</width>
+         <height>25</height>
         </rect>
        </property>
-       <property name="text">
-        <string>Tuning</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_plan_trials">
-       <property name="geometry">
-        <rect>
-         <x>230</x>
-         <y>130</y>
-         <width>201</width>
-         <height>26</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Plan with statistics</string>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_15">
+        <item>
+         <widget class="QPushButton" name="pushButton_plan_2d_power_law">
+          <property name="text">
+           <string>Plan 2D power law</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_plan_3d_power_law">
+          <property name="text">
+           <string>Plan 3D power law</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_plan_trials">
+          <property name="text">
+           <string>Plan with statistics</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
      <widget class="QTabWidget" name="tabWidget_sol">

@@ -80,13 +80,19 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
 
     // --- Curvature --- //
     QVector<double> K; // Curvature
+    //double curv_th = 10; // curvature threshold
     for(int i=0; i<der_pos_x_1.size();++i){
         Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
         Vector3d der_2(der_pos_x_2.at(i),der_pos_y_2.at(i),der_pos_z_2.at(i));
         Vector3d cross = der_1.cross(der_2);
         double num = cross.norm();
         double den = pow(der_1.norm(),3);
-        K.push_back((double)num/den);
+        double curv = ((double)num)/den;
+        //if(curv>=curv_th){
+          //  K.push_back(curv_th);
+        //}else{
+        K.push_back(curv);
+        //}
     }
     // --- Torsion --- //
     QVector<double> T; // Torsion
@@ -112,7 +118,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
             index_t.replace(h,hh);
             k++;
         }
-        if(abs(T.at(i))>=2){// threshold value taken into account to eliminate the torsion cups and planar regions
+        if((abs(T.at(i))>=2) && (K.at(i)>=0.001)){// threshold value taken into account to eliminate the torsion cups and planar regions
             ln_x.push_back(log(pow(K.at(i),2)*abs(T.at(i))));
             ln_vel.push_back(log(vel.at(i)));
             index_t.replace(h,index_t.at(h)+1);
@@ -135,8 +141,8 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
 
     // R-squared regression
     double q,m,r;
-    this->linreg(ln_x,ln_vel,&q,&m,&r);
-    //this->linreg(ln_x_mean,ln_vel_mean,&q,&m,&r);
+    //this->linreg(ln_x,ln_vel,&q,&m,&r);
+    this->linreg(ln_x_mean,ln_vel_mean,&q,&m,&r);
     std::cout << " m = " << m << " q = " << q << " R^2 = " << r << endl;
     QVector<double> ln_vel_fit; QVector<double> best_line;
     double m_best = ((double)-1)/6;
@@ -280,9 +286,9 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_16->graph(0)->setData(ln_x, ln_vel);
     ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel.begin(), ln_vel.end()),
                                                  *std::max_element(ln_vel.begin(), ln_vel.end()));
-    //ui->plot_16->graph(0)->setData(ln_x_mean, ln_vel_mean);
-    //ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel_mean.begin(), ln_vel_mean.end()),
-      //                                           *std::max_element(ln_vel_mean.begin(), ln_vel_mean.end()));
+    ui->plot_16->graph(0)->setData(ln_x_mean, ln_vel_mean);
+    ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel_mean.begin(), ln_vel_mean.end()),
+                                                 *std::max_element(ln_vel_mean.begin(), ln_vel_mean.end()));
     ui->plot_16->graph(0)->rescaleAxes();
 
 
@@ -340,6 +346,8 @@ void PowerLaw3DDialog::getDerivative(QVector<double> &function, QVector<double> 
        // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
 
 
+       const double MIN_STEP_VALUE = 0.1;
+
        int h = 1;
        int tnsample;
        double f0;
@@ -359,7 +367,7 @@ void PowerLaw3DDialog::getDerivative(QVector<double> &function, QVector<double> 
        f4 = function.at(tnsample+4);
        step_value = step_values.at(tnsample);
        if(step_value==0)
-           step_value=0.01;
+           step_value=MIN_STEP_VALUE;
        derFunction.push_back((double)(-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h*step_value));
 
        // 2nd point
@@ -372,7 +380,7 @@ void PowerLaw3DDialog::getDerivative(QVector<double> &function, QVector<double> 
        f4 = function.at(tnsample+3);
        step_value = step_values.at(tnsample);
        if(step_value==0)
-           step_value=0.01;
+           step_value=MIN_STEP_VALUE;
        derFunction.push_back((double)( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h*step_value));
 
        // 3rd point
@@ -385,7 +393,7 @@ void PowerLaw3DDialog::getDerivative(QVector<double> &function, QVector<double> 
            f4 = function.at(i+2);
            step_value = step_values.at(i);
            if(step_value==0)
-               step_value=0.01;
+               step_value=MIN_STEP_VALUE;
            derFunction.push_back((double)(  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h*step_value));
        }
 
@@ -399,7 +407,7 @@ void PowerLaw3DDialog::getDerivative(QVector<double> &function, QVector<double> 
        f4 = function.at(tnsample+1);
        step_value = step_values.at(tnsample);
        if(step_value==0)
-           step_value=0.01;
+           step_value=MIN_STEP_VALUE;
        derFunction.push_back((double)( -f0+6*f1-18*f2+10*f3+3*f4)/(12*h*step_value));
 
        // 5th point
@@ -412,7 +420,7 @@ void PowerLaw3DDialog::getDerivative(QVector<double> &function, QVector<double> 
        f4 = function.at(tnsample);
        step_value = step_values.at(tnsample);
        if(step_value==0)
-           step_value=0.01;
+           step_value=MIN_STEP_VALUE;
        derFunction.push_back((double)(  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h*step_value));
 
 }

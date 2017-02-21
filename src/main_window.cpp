@@ -1500,7 +1500,7 @@ void MainWindow::on_pushButton_load_task_clicked()
                     a_mov.push_back(acc_stage);
                     timesteps_mov.push_back(timesteps_stage);
                 }
-                // the previous movement hs finished
+                // the previous movement has finished
                 if(!t_mov.empty()){
                     this->jointsPosition_task.push_back(t_mov);
                     this->jointsVelocity_task.push_back(w_mov);
@@ -1747,9 +1747,9 @@ void MainWindow::on_pushButton_load_task_clicked()
                     for(int k=0; k < JOINTS_ARM+JOINTS_HAND; ++k){
                         if(QString::compare(fields1.at(0).simplified(),QString("Joint ")+QString::number(k+1),Qt::CaseInsensitive)==0){
                             QStringList fields2 = fields1.at(1).split("|");
-                            pos_stage(row,k) = fields2.at(0).toDouble()*M_PI/180;
-                            vel_stage(row,k) = fields2.at(1).toDouble()*M_PI/180;
-                            acc_stage(row,k) = fields2.at(2).toDouble()*M_PI/180;
+                            pos_stage(row,k) = ((double)fields2.at(0).toDouble()*M_PI)/180;
+                            vel_stage(row,k) = ((double)fields2.at(1).toDouble()*M_PI)/180;
+                            acc_stage(row,k) = ((double)fields2.at(2).toDouble()*M_PI)/180;
                         }else if(QString::compare(fields1.at(0).simplified(),QString("step"),Qt::CaseInsensitive)==0){break;}
                     }
                 } // for loop columns

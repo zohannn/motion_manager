@@ -197,15 +197,28 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
 
 
             QVector<double> lnY_mean; QVector<double> lnX_mean;
+            QVector<double> C_mean; // Medium Curvature
+            QVector<double> V_mean; // Medium Velocity
             for(size_t i=0; i<index_t.size();++i){
                 if(i==0){
+                    //C_mean.push_back((double)accumulate( C.begin(), C.begin()+index_t.at(i), 0.0)/index_t.at(i));
+                    //V_mean.push_back((double)accumulate( vel_tan.begin(), vel_tan.begin()+index_t.at(i), 0.0)/index_t.at(i));
                     lnX_mean.push_back((double)accumulate( lnX.begin(), lnX.begin()+index_t.at(i), 0.0)/index_t.at(i));
                     lnY_mean.push_back((double)accumulate( lnY.begin(), lnY.begin()+index_t.at(i), 0.0)/index_t.at(i));
                 }else{
+                    //C_mean.push_back((double)accumulate( C.begin()+index_t.at(i-1), C.begin()+index_t.at(i), 0.0)/(index_t.at(i)-index_t.at(i-1)));
+                    //V_mean.push_back((double)accumulate( vel_tan.begin()+index_t.at(i-1), vel_tan.begin()+index_t.at(i), 0.0)/(index_t.at(i)-index_t.at(i-1)));
                     lnX_mean.push_back((double)accumulate( lnX.begin()+index_t.at(i-1), lnX.begin()+index_t.at(i), 0.0)/(index_t.at(i)-index_t.at(i-1)));
                     lnY_mean.push_back((double)accumulate( lnY.begin()+index_t.at(i-1), lnY.begin()+index_t.at(i), 0.0)/(index_t.at(i)-index_t.at(i-1)));
                 }
             }
+            /*
+
+            for(size_t i=0;  i<index_t.size();++i){
+                lnX_mean.push_back(log(pow(C_mean.at(i),2)));
+                lnY_mean.push_back(log(V_mean.at(i)));
+            }
+*/
 
 
 
@@ -534,6 +547,8 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
        // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
 
 
+       const double MIN_STEP_VALUE = 0.1;
+
        int h = 1;
        int tnsample;
        double f0;
@@ -553,7 +568,7 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
        f4 = function.at(tnsample+4);
        step_value = step_values.at(tnsample);
        if(step_value==0)
-           step_value=0.01;
+           step_value=MIN_STEP_VALUE;
        derFunction.push_back((double)(-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h*step_value));
 
        // 2nd point
@@ -566,7 +581,7 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
        f4 = function.at(tnsample+3);
        step_value = step_values.at(tnsample);
        if(step_value==0)
-           step_value=0.01;
+           step_value=MIN_STEP_VALUE;
        derFunction.push_back((double)( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h*step_value));
 
        // 3rd point
@@ -579,7 +594,7 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
            f4 = function.at(i+2);
            step_value = step_values.at(i);
            if(step_value==0)
-               step_value=0.01;
+               step_value=MIN_STEP_VALUE;
            derFunction.push_back((double)(  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h*step_value));
        }
 
@@ -593,7 +608,7 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
        f4 = function.at(tnsample+1);
        step_value = step_values.at(tnsample);
        if(step_value==0)
-           step_value=0.01;
+           step_value=MIN_STEP_VALUE;
        derFunction.push_back((double)( -f0+6*f1-18*f2+10*f3+3*f4)/(12*h*step_value));
 
        // 5th point
@@ -606,7 +621,7 @@ void PowerLawDialog::getDerivative(QVector<double> &function, QVector<double> &s
        f4 = function.at(tnsample);
        step_value = step_values.at(tnsample);
        if(step_value==0)
-           step_value=0.01;
+           step_value=MIN_STEP_VALUE;
        derFunction.push_back((double)(  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h*step_value));
 
 }
