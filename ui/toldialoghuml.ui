@@ -1140,7 +1140,7 @@
       <item>
        <widget class="QLineEdit" name="lineEdit_steps">
         <property name="text">
-         <string>30</string>
+         <string>20</string>
         </property>
        </widget>
       </item>
@@ -3948,7 +3948,7 @@
          <item>
           <widget class="QLineEdit" name="lineEdit_final_hand_2">
            <property name="text">
-            <string>0.0</string>
+            <string>1.22</string>
            </property>
           </widget>
          </item>
@@ -3966,7 +3966,7 @@
          <item>
           <widget class="QLineEdit" name="lineEdit_final_hand_3">
            <property name="text">
-            <string>0.0</string>
+            <string>1.22</string>
            </property>
           </widget>
          </item>
@@ -3984,7 +3984,7 @@
          <item>
           <widget class="QLineEdit" name="lineEdit_final_hand_4">
            <property name="text">
-            <string>0.0</string>
+            <string>1.22</string>
            </property>
           </widget>
          </item>

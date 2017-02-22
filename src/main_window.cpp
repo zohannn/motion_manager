@@ -1375,6 +1375,87 @@ void MainWindow::on_pushButton_plan_trials_clicked()
     ui.label_rate_task->setText(QString::number(rate));
 
 }
+void MainWindow::on_pushButton_plan_3d_power_law_clicked()
+{
+    int n_traj=100;
+    std::vector<double> move_target;
+    double x; double x_min = -800; double x_max = 0;
+    double y; double y_min = 0; double y_max = 600;
+    double z; double z_min = 900; double z_max = 1500;
+    double roll; double roll_min = -3.14; double roll_max = 3.14;
+    double pitch; double pitch_min = -3.14; double pitch_max = 3.14;
+    double yaw; double yaw_min = -3.14; double yaw_max = 3.14;
+
+
+    for(int i =0; i<n_traj;++i){
+
+        // add a reaching problem
+        int planner_id = ui.comboBox_planner->currentIndex(); // planner
+        ui.comboBox_mov->setCurrentIndex(1); // reaching movement
+        ui.comboBox_Task->setCurrentIndex(0); // single arm movement
+        ui.radioButton_right->setChecked(true); // right arm
+        this->on_pushButton_addMov_clicked();
+
+        bool solved=false;
+
+        while(!solved){
+
+            // generate random numbers
+            std::srand(std::time(NULL));
+            x = x_min + (x_max-x_min)*(rand() / double(RAND_MAX));
+            std::srand(std::time(NULL));
+            y = y_min + (y_max-y_min)*(rand() / double(RAND_MAX));
+            std::srand(std::time(NULL));
+            z = z_min + (z_max-z_min)*(rand() / double(RAND_MAX));
+            std::srand(std::time(NULL));
+            roll = roll_min + (roll_max-roll_min)*(rand() / double(RAND_MAX));
+            std::srand(std::time(NULL));
+            pitch = pitch_min + (pitch_max-pitch_min)*(rand() / double(RAND_MAX));
+            std::srand(std::time(NULL));
+            yaw = yaw_min + (yaw_max-yaw_min)*(rand() / double(RAND_MAX));
+
+
+            // set the parameters
+            move_target.clear();
+            move_target.push_back(x);
+            move_target.push_back(y);
+            move_target.push_back(z);
+            move_target.push_back(roll);
+            move_target.push_back(pitch);
+            move_target.push_back(yaw);
+
+            switch(planner_id){
+                case 0: // HUML
+                    mTolHumldlg->setTargetMove(move_target);
+                break;
+                case 1: // RRT
+                    mRRTdlg->setTargetMove(move_target);
+                break;
+
+            }
+
+            this->on_pushButton_plan_clicked();
+            problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
+            if(prob->getSolved()){
+                this->on_pushButton_append_mov_clicked();
+                this->on_pushButton_execMov_clicked();
+                if(planner_id!=0){
+                    this->on_pushButton_execMov_moveit_clicked();
+                }
+                solved = true;
+            }else{
+                solved = false;
+            }
+
+        }
+    }
+
+
+
+
+
+
+}
 
 
 void MainWindow::on_pushButton_execMov_pressed()

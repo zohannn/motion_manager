@@ -243,6 +243,12 @@ public:
     void getTargetMove(std::vector<double> &target);
 
     /**
+     * @brief setTargetMove
+     * @param target
+     */
+    void setTargetMove(std::vector<double> &target);
+
+    /**
      * @brief getFinalHand
      * @param finalHand
      */
