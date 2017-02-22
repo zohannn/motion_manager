@@ -693,7 +693,6 @@ void MainWindow::on_pushButton_plan_clicked()
         mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
         mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
         mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
-        tols.steps = mTolHumldlg->getSteps();// number of steps
         // pick / place settings
         tols.mov_specs.approach = mTolHumldlg->getApproach();
         tols.mov_specs.retreat = mTolHumldlg->getRetreat();
@@ -1379,8 +1378,8 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
 {
     int n_traj=100;
     std::vector<double> move_target;
-    double x; double x_min = -800; double x_max = 0;
-    double y; double y_min = 0; double y_max = 600;
+    double x; double x_min = -600; double x_max = -100;
+    double y; double y_min = 0; double y_max = 800;
     double z; double z_min = 900; double z_max = 1500;
     double roll; double roll_min = -3.14; double roll_max = 3.14;
     double pitch; double pitch_min = -3.14; double pitch_max = 3.14;
@@ -1403,15 +1402,10 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             // generate random numbers
             std::srand(std::time(NULL));
             x = x_min + (x_max-x_min)*(rand() / double(RAND_MAX));
-            std::srand(std::time(NULL));
             y = y_min + (y_max-y_min)*(rand() / double(RAND_MAX));
-            std::srand(std::time(NULL));
             z = z_min + (z_max-z_min)*(rand() / double(RAND_MAX));
-            std::srand(std::time(NULL));
             roll = roll_min + (roll_max-roll_min)*(rand() / double(RAND_MAX));
-            std::srand(std::time(NULL));
             pitch = pitch_min + (pitch_max-pitch_min)*(rand() / double(RAND_MAX));
-            std::srand(std::time(NULL));
             yaw = yaw_min + (yaw_max-yaw_min)*(rand() / double(RAND_MAX));
 
 
@@ -1425,11 +1419,23 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             move_target.push_back(yaw);
 
             switch(planner_id){
-                case 0: // HUML
-                    mTolHumldlg->setTargetMove(move_target);
+            case 0: // HUML
+                mTolHumldlg->setTargetMove(move_target);
                 break;
-                case 1: // RRT
-                    mRRTdlg->setTargetMove(move_target);
+            case 1: // RRT
+                mRRTdlg->setTargetMove(move_target);
+                break;
+            case 2: // RRT Connect
+                mRRTConnectdlg->setTargetMove(move_target);
+                break;
+            case 3: // RRT Star
+                mRRTstardlg->setTargetMove(move_target);
+                break;
+            case 4: // PRM
+                mPRMdlg->setTargetMove(move_target);
+                break;
+            case 5: // PRM Star
+                mPRMstardlg->setTargetMove(move_target);
                 break;
 
             }
@@ -1447,13 +1453,10 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
                 solved = false;
             }
 
+            sleep(1);
+
         }
     }
-
-
-
-
-
 
 }
 
@@ -1942,7 +1945,7 @@ void MainWindow::on_pushButton_load_task_clicked()
         string mean_njs_str =  boost::str(boost::format("%.2f") % (mean_njs));
         boost::replace_all(mean_njs_str,",",".");
         double sq_sum_njs = std::inner_product(this->njs_task.begin(), this->njs_task.end(), this->njs_task.begin(), 0.0);
-        double stdev_njs = std::sqrt(((double)sq_sum_njs) / this->njs_task.size() - mean_njs * mean_njs);
+        double stdev_njs = std::sqrt((((double)sq_sum_njs) / this->njs_task.size()) - pow(mean_njs,2));
         string stdev_njs_str =  boost::str(boost::format("%.2f") % (stdev_njs));
         boost::replace_all(stdev_njs_str,",",".");
         ui.label_cost_hand_value_task->setText(QString::fromStdString(mean_njs_str)+QString("(")+QString::fromStdString(stdev_njs_str)+QString(")"));
@@ -1952,7 +1955,7 @@ void MainWindow::on_pushButton_load_task_clicked()
         string mean_nmu_str =  boost::str(boost::format("%.2f") % (mean_nmu));
         boost::replace_all(mean_nmu_str,",",".");
         double sq_sum_nmu = std::inner_product(this->nmu_task.begin(), this->nmu_task.end(), this->nmu_task.begin(), 0.0);
-        double stdev_nmu = std::sqrt(((double)sq_sum_nmu) / this->nmu_task.size() - mean_nmu * mean_nmu);
+        double stdev_nmu = std::sqrt((((double)sq_sum_nmu) / this->nmu_task.size()) - pow(mean_nmu,2));
         string stdev_nmu_str =  boost::str(boost::format("%.2f") % (stdev_nmu));
         boost::replace_all(stdev_nmu_str,",",".");
         ui.label_nmu_task->setText(QString::fromStdString(mean_nmu_str)+QString("(")+QString::fromStdString(stdev_nmu_str)+QString(")"));
@@ -1962,7 +1965,7 @@ void MainWindow::on_pushButton_load_task_clicked()
         string mean_prob_str =  boost::str(boost::format("%.2f") % (mean_prob));
         boost::replace_all(mean_prob_str,",",".");
         double sq_sum_prob = std::inner_product(this->prob_time_task.begin(), this->prob_time_task.end(), this->prob_time_task.begin(), 0.0);
-        double stdev_prob = std::sqrt(((double)sq_sum_prob) / this->prob_time_task.size() - mean_prob * mean_prob);
+        double stdev_prob = std::sqrt((((double)sq_sum_prob) / this->prob_time_task.size()) - pow(mean_prob,2));
         string stdev_prob_str =  boost::str(boost::format("%.2f") % (stdev_prob));
         boost::replace_all(stdev_prob_str,",",".");
         ui.label_solving_time_task->setText(QString::fromStdString(mean_prob_str)+QString("(")+QString::fromStdString(stdev_prob_str)+QString(")"));
@@ -2253,7 +2256,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
          string mean_njs_str =  boost::str(boost::format("%.2f") % (mean_njs));
          boost::replace_all(mean_njs_str,",",".");
          double sq_sum_njs = std::inner_product(this->njs_task.begin(), this->njs_task.end(), this->njs_task.begin(), 0.0);
-         double stdev_njs = std::sqrt(((double)sq_sum_njs) / this->njs_task.size() - mean_njs * mean_njs);
+         double stdev_njs = std::sqrt((((double)sq_sum_njs) / this->njs_task.size()) - pow(mean_njs,2));
          string stdev_njs_str =  boost::str(boost::format("%.2f") % (stdev_njs));
          boost::replace_all(stdev_njs_str,",",".");
          ui.label_cost_hand_value_task->setText(QString::fromStdString(mean_njs_str)+QString("(")+QString::fromStdString(stdev_njs_str)+QString(")"));
@@ -2263,7 +2266,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
          string mean_nmu_str =  boost::str(boost::format("%.2f") % (mean_nmu));
          boost::replace_all(mean_nmu_str,",",".");
          double sq_sum_nmu = std::inner_product(this->nmu_task.begin(), this->nmu_task.end(), this->nmu_task.begin(), 0.0);
-         double stdev_nmu = std::sqrt(((double)sq_sum_nmu) / this->nmu_task.size() - mean_nmu * mean_nmu);
+         double stdev_nmu = std::sqrt((((double)sq_sum_nmu) / this->nmu_task.size()) - pow(mean_nmu,2));
          string stdev_nmu_str =  boost::str(boost::format("%.2f") % (stdev_nmu));
          boost::replace_all(stdev_nmu_str,",",".");
          ui.label_nmu_task->setText(QString::fromStdString(mean_nmu_str)+QString("(")+QString::fromStdString(stdev_nmu_str)+QString(")"));
@@ -2273,7 +2276,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
          string mean_prob_str =  boost::str(boost::format("%.2f") % (mean_prob));
          boost::replace_all(mean_prob_str,",",".");
          double sq_sum_prob = std::inner_product(this->prob_time_task.begin(), this->prob_time_task.end(), this->prob_time_task.begin(), 0.0);
-         double stdev_prob = std::sqrt(((double)sq_sum_prob) / this->prob_time_task.size() - mean_prob * mean_prob);
+         double stdev_prob = std::sqrt((((double)sq_sum_prob) / this->prob_time_task.size()) - pow(mean_prob,2));
          string stdev_prob_str =  boost::str(boost::format("%.2f") % (stdev_prob));
          boost::replace_all(stdev_prob_str,",",".");
          ui.label_solving_time_task->setText(QString::fromStdString(mean_prob_str)+QString("(")+QString::fromStdString(stdev_prob_str)+QString(")"));

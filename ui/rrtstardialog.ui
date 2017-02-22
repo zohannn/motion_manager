@@ -1395,7 +1395,7 @@ range = 0.0 goal_bias = 0.05 delay_collision_checking = 1 </string>
          <item>
           <widget class="QLineEdit" name="lineEdit_final_hand_2">
            <property name="text">
-            <string>0.0</string>
+            <string>1.22</string>
            </property>
           </widget>
          </item>
@@ -1413,7 +1413,7 @@ range = 0.0 goal_bias = 0.05 delay_collision_checking = 1 </string>
          <item>
           <widget class="QLineEdit" name="lineEdit_final_hand_3">
            <property name="text">
-            <string>0.0</string>
+            <string>1.22</string>
            </property>
           </widget>
          </item>
@@ -1431,7 +1431,7 @@ range = 0.0 goal_bias = 0.05 delay_collision_checking = 1 </string>
          <item>
           <widget class="QLineEdit" name="lineEdit_final_hand_4">
            <property name="text">
-            <string>0.0</string>
+            <string>1.22</string>
            </property>
           </widget>
          </item>

@@ -108,12 +108,6 @@ void TolDialogHUML::getTolsTarget(MatrixXd &tols)
 }
 
 
-int TolDialogHUML::getSteps()
-{
-
-    return ui->lineEdit_steps->text().toInt();
-}
-
 
 double TolDialogHUML::getWMax()
 {
@@ -605,7 +599,6 @@ void TolDialogHUML::on_pushButton_save_clicked()
        if (ui->checkBox_add_plane->isChecked()){ stream << "add_plane=true"<< endl;}else{stream << "add_plane=false"<< endl;}       
        stream << "# Others" << endl;
        stream << "max_velocity="<< ui->lineEdit_w_max->text().toStdString().c_str() <<endl;
-       stream << "steps=" << ui->lineEdit_steps->text().toStdString().c_str()<< endl;
        if (ui->checkBox_tar_av->isChecked()){ stream << "tar_av=false"<< endl;}else{stream << "tar_av=true"<< endl;}
        if (ui->checkBox_ob_av->isChecked()){stream << "ob_av=false"<< endl;}else{stream << "ob_av=true"<< endl;}
        if(ui->checkBox_approach->isChecked()){stream << "approach=false"<<endl;}else{stream << "approach=true"<<endl;}
@@ -1006,8 +999,6 @@ void TolDialogHUML::on_pushButton_load_clicked()
                     }
                 }else if(QString::compare(fields.at(0),QString("max_velocity"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_w_max->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("steps"),Qt::CaseInsensitive)==0){
-                    ui->lineEdit_steps->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("tar_av"),Qt::CaseInsensitive)==0){
                     if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
                         ui->checkBox_tar_av->setChecked(true);

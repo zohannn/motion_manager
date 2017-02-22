@@ -84,6 +84,17 @@ void RRTstarDialog::getTargetMove(std::vector<double> &target)
     target.push_back(ui->lineEdit_target_yaw->text().toDouble());
 }
 
+void RRTstarDialog::setTargetMove(std::vector<double> &target)
+{
+    ui->lineEdit_target_x->setText(QString::number(target.at(0)));
+    ui->lineEdit_target_y->setText(QString::number(target.at(1)));
+    ui->lineEdit_target_z->setText(QString::number(target.at(2)));
+    ui->lineEdit_target_roll->setText(QString::number(target.at(3)));
+    ui->lineEdit_target_pitch->setText(QString::number(target.at(4)));
+    ui->lineEdit_target_yaw->setText(QString::number(target.at(5)));
+
+}
+
 void RRTstarDialog::getFinalArm(std::vector<double> &finalArm)
 {
     finalArm.clear();

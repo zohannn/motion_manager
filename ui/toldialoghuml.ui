@@ -1120,32 +1120,6 @@
       </layout>
      </widget>
     </widget>
-    <widget class="QWidget" name="layoutWidget_nsteps">
-     <property name="geometry">
-      <rect>
-       <x>710</x>
-       <y>530</y>
-       <width>238</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_14">
-      <item>
-       <widget class="QLabel" name="label_42">
-        <property name="text">
-         <string>Number of Steps</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="lineEdit_steps">
-        <property name="text">
-         <string>20</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
    </widget>
    <widget class="QWidget" name="tab_huml_bounds">
     <attribute name="title">

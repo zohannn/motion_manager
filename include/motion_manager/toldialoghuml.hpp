@@ -115,11 +115,6 @@ public:
      */
     void getTolsTarget(MatrixXd& tols);
 
-    /**
-     * @brief This method gets the number of steps in a movement
-     * @return
-     */
-    int getSteps();
 
     /**
      * @brief This method gets the maximum angula velocity allowed for each joint
