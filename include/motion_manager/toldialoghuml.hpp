@@ -117,10 +117,16 @@ public:
 
 
     /**
-     * @brief This method gets the maximum angula velocity allowed for each joint
+     * @brief This method gets the maximum angula velocity allowed for each joint [deg/sec]
      * @return
      */
     double getWMax();
+
+    /**
+     * @brief This method gets the maximum angula velocity allowed for each joint [deg/sec]
+     * @param w
+     */
+    void setWMax(double w);
 
 
     /**

@@ -1376,7 +1376,8 @@ void MainWindow::on_pushButton_plan_trials_clicked()
 }
 void MainWindow::on_pushButton_plan_3d_power_law_clicked()
 {
-    int n_traj=1;
+    int n_traj=100;
+    double wmax = 50.0; // 50 deg/sec
     std::vector<double> move_target;
     double x; double x_min = -600; double x_max = -100;
     double y; double y_min = 0; double y_max = 800;
@@ -1421,6 +1422,7 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             switch(planner_id){
             case 0: // HUML
                 mTolHumldlg->setTargetMove(move_target);
+                mTolHumldlg->setWMax(wmax);
                 break;
             case 1: // RRT
                 mRRTdlg->setTargetMove(move_target);
