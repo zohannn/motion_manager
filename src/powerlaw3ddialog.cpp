@@ -54,6 +54,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
         pos_x.push_back(hand_point.at(0)/1000); // [m]
         pos_y.push_back(hand_point.at(1)/1000); // [m]
         pos_z.push_back(hand_point.at(2)/1000); // [m]
+
     }
     // first derivatives
     QVector<double> der_pos_x_1; QVector<double> der_pos_y_1; QVector<double> der_pos_z_1;
