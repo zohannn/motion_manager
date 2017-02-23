@@ -1376,7 +1376,7 @@ void MainWindow::on_pushButton_plan_trials_clicked()
 }
 void MainWindow::on_pushButton_plan_3d_power_law_clicked()
 {
-    int n_traj=100;
+    int n_traj=1;
     std::vector<double> move_target;
     double x; double x_min = -600; double x_max = -100;
     double y; double y_min = 0; double y_max = 800;

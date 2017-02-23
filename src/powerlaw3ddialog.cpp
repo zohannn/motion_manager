@@ -118,7 +118,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
             index_t.replace(h,hh);
             k++;
         }
-        if((abs(T.at(i))>=2) && (K.at(i)>=0.001)){// threshold value taken into account to eliminate the torsion cups and planar regions
+        if((abs(T.at(i))>=2) && (K.at(i)>=0.001) && (K.at(i)<=5)){// threshold value taken into account to eliminate the torsion cups and planar regions
             ln_x.push_back(log(pow(K.at(i),2)*abs(T.at(i))));
             ln_vel.push_back(log(vel.at(i)));
             index_t.replace(h,index_t.at(h)+1);
@@ -141,8 +141,8 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
 
     // R-squared regression
     double q,m,r;
-    //this->linreg(ln_x,ln_vel,&q,&m,&r);
-    this->linreg(ln_x_mean,ln_vel_mean,&q,&m,&r);
+    this->linreg(ln_x,ln_vel,&q,&m,&r);
+    //this->linreg(ln_x_mean,ln_vel_mean,&q,&m,&r);
     std::cout << " m = " << m << " q = " << q << " R^2 = " << r << endl;
     QVector<double> ln_vel_fit; QVector<double> best_line;
     double m_best = ((double)-1)/6;
@@ -284,11 +284,11 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_16->graph(0)->valueAxis()->setLabel("ln(V) [m/s]");
     ui->plot_16->graph(0)->keyAxis()->setLabel("ln(C^2|T|) [m^-3]");
     ui->plot_16->graph(0)->setData(ln_x, ln_vel);
-    //ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel.begin(), ln_vel.end()),
-      //                                           *std::max_element(ln_vel.begin(), ln_vel.end()));
-    ui->plot_16->graph(0)->setData(ln_x_mean, ln_vel_mean);
-    ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel_mean.begin(), ln_vel_mean.end()),
-                                                 *std::max_element(ln_vel_mean.begin(), ln_vel_mean.end()));
+    ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel.begin(), ln_vel.end()),
+                                                 *std::max_element(ln_vel.begin(), ln_vel.end()));
+    //ui->plot_16->graph(0)->setData(ln_x_mean, ln_vel_mean);
+    //ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel_mean.begin(), ln_vel_mean.end()),
+      //                                           *std::max_element(ln_vel_mean.begin(), ln_vel_mean.end()));
     ui->plot_16->graph(0)->rescaleAxes();
 
 
