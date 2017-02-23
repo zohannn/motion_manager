@@ -118,7 +118,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
             index_t.replace(h,hh);
             k++;
         }
-        if((abs(T.at(i))>=2) && (K.at(i)>=0.001) && (K.at(i)<=5)){// threshold value taken into account to eliminate the torsion cups and planar regions
+        if((abs(T.at(i))>=2) && (K.at(i)>=0.001)){// threshold value taken into account to eliminate the torsion cups and planar regions
             ln_x.push_back(log(pow(K.at(i),2)*abs(T.at(i))));
             ln_vel.push_back(log(vel.at(i)));
             index_t.replace(h,index_t.at(h)+1);
