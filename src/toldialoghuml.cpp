@@ -115,6 +115,12 @@ double TolDialogHUML::getWMax()
     return ui->lineEdit_w_max->text().toDouble();
 }
 
+void TolDialogHUML::setWMax(double w)
+{
+
+    ui->lineEdit_w_max->setText(QString::number(w));
+}
+
 
 
 

@@ -1376,7 +1376,8 @@ void MainWindow::on_pushButton_plan_trials_clicked()
 }
 void MainWindow::on_pushButton_plan_3d_power_law_clicked()
 {
-    int n_traj=1;
+    int n_traj=100;
+    double wmax = 50.0; // 50 deg/sec
     std::vector<double> move_target;
     double x; double x_min = -600; double x_max = -100;
     double y; double y_min = 0; double y_max = 800;
@@ -1421,6 +1422,7 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             switch(planner_id){
             case 0: // HUML
                 mTolHumldlg->setTargetMove(move_target);
+                mTolHumldlg->setWMax(wmax);
                 break;
             case 1: // RRT
                 mRRTdlg->setTargetMove(move_target);
@@ -2022,9 +2024,9 @@ void MainWindow::on_pushButton_save_task_clicked()
                         stream << "time step="<< QString::number(timestep).toStdString().c_str()<< ", ";
                         for(int c=0; c < traj.cols(); ++c){
                             stream << "Joint "<<QString::number(c+1).toStdString().c_str()<<"="<<
-                                      QString::number(traj(r,c)*180/M_PI,'g',3).toStdString().c_str()<<"|"<<
-                                      QString::number(vel(r,c)*180/M_PI,'g',3).toStdString().c_str()<<"|"<<
-                                      QString::number(acc(r,c)*180/M_PI,'g',3).toStdString().c_str();
+                                      QString::number(((double)traj(r,c)*180)/M_PI,'f',6).toStdString().c_str()<<"|"<<
+                                      QString::number(((double)vel(r,c)*180)/M_PI,'f',6).toStdString().c_str()<<"|"<<
+                                      QString::number(((double)acc(r,c)*180)/M_PI,'f',6).toStdString().c_str();
                             if(c==traj.cols()-1){stream << endl;}else{stream<<", ";}
                         }// for loop columns
                     }// for loop rows
