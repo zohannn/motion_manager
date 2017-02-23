@@ -2685,13 +2685,6 @@ void MainWindow::on_pushButton_save_res_task_clicked()
         mkdir("results/planning/task", 0700);
     }
     QString path("results/planning/task/");
-    ui.plot_hand_vel_task->savePdf(path+QString("hand_vel_task.pdf"),true,0,0,QString(),QString("Module of the Hand velocity"));
-
-    VectorWriter* handler = (VectorWriter*)IO::outputHandler("PDF");
-    handler->setTextMode(VectorWriter::NATIVE);
-    handler->setFormat("PDF");
-    string hand_pos_file = path.toStdString()+string("hand_pos_task.pdf");
-    IO::save(this->handPosPlot_task_ptr.get(), hand_pos_file.c_str(),  "PDF" );
 
     string filename("results_task.txt");
     ofstream results;
@@ -2775,6 +2768,15 @@ void MainWindow::on_pushButton_save_res_task_clicked()
 
 
     results.close();
+
+    ui.plot_hand_vel_task->savePdf(path+QString("hand_vel_task.pdf"),true,0,0,QString(),QString("Module of the Hand velocity"));
+
+    VectorWriter* handler = (VectorWriter*)IO::outputHandler("PDF");
+    handler->setTextMode(VectorWriter::NATIVE);
+    handler->setFormat("PDF");
+    string hand_pos_file = path.toStdString()+string("hand_pos_task.pdf");
+    IO::save(this->handPosPlot_task_ptr.get(), hand_pos_file.c_str(),  "PDF" );
+
 
     QString pdf_qstr; string pdf_str;
     QString svg_qstr; string svg_str;

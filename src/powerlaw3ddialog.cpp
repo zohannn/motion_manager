@@ -283,7 +283,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_16->graph(0)->setName("ln(V)/ln(C^2|T|)");
     ui->plot_16->graph(0)->valueAxis()->setLabel("ln(V) [m/s]");
     ui->plot_16->graph(0)->keyAxis()->setLabel("ln(C^2|T|) [m^-3]");
-    //ui->plot_16->graph(0)->setData(ln_x, ln_vel);
+    ui->plot_16->graph(0)->setData(ln_x, ln_vel);
     //ui->plot_16->graph(0)->valueAxis()->setRange(*std::min_element(ln_vel.begin(), ln_vel.end()),
       //                                           *std::max_element(ln_vel.begin(), ln_vel.end()));
     ui->plot_16->graph(0)->setData(ln_x_mean, ln_vel_mean);
