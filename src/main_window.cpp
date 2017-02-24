@@ -140,7 +140,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
     ui.listWidget_scenario->addItem(QString("Assembly scenario: Toy vehicle with ARoS"));
     ui.listWidget_scenario->addItem(QString("Empty scenario: empty scenario with ARoS"));
-    ui.listWidget_scenario->addItem(QString("Empty scenario: empty scenario with ARoS and NO self collisions"));
+    ui.listWidget_scenario->addItem(QString("Empty scenario: empty scenario with ARoS and NO collisions"));
     //ui.listWidget_scenario->addItem(QString("Assistive scenario: beverages with ARoS"));
     //ui.listWidget_scenario->addItem(QString("Organizing scenario: shelfs and objects with ARoS"));
 
@@ -1406,9 +1406,9 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
     double x; double x_min = -600; double x_max = -100;
     double y; double y_min = 200; double y_max = 800;
     double z; double z_min = 900; double z_max = 1500;
-    double roll; double roll_min = 0; double roll_max = 0.79;
-    double pitch; double pitch_min = -1.57; double pitch_max = 0;
-    double yaw; double yaw_min = 0; double yaw_max = 0;
+    double roll; double roll_min = 0; double roll_max = 1.57;
+    double pitch; double pitch_min = -1.57; double pitch_max = 1.57;
+    double yaw; double yaw_min = 0; double yaw_max = 0.20;
 
 
     for(int i =0; i<n_traj;++i){
