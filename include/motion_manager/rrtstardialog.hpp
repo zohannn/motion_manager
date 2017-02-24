@@ -86,6 +86,12 @@ public:
     std::string getConfig();
 
     /**
+     * @brief setConfig
+     * @param conf
+     */
+    void setConfig(int conf);
+
+    /**
      * @brief This method sets the information about the tuning of the planner
      * @param info
      */

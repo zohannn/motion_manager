@@ -1446,7 +1446,7 @@ bool QNode::getElements(scenarioPtr scene)
 
         break;
 
-    case 3:
+    case 3: case 4:
         // Empty scenario: empty scenario with ARoS
         // get the number of objects in the scenario
         add_client = n.serviceClient<vrep_common::simRosGetIntegerSignal>("/vrep/simRosGetIntegerSignal");
@@ -1753,19 +1753,19 @@ bool QNode::getElements(scenarioPtr scene)
             throw string("Error while retrieving elements from the scenario");
         }
         break;
-    case 4:
+    case 5:
         // Assistive scenario: beverages with ARoS
         //TO DO
         break;
-    case 5:
+    case 6:
         // Assistive scenario: beverages with Jarde
         //TO DO
         break;
-    case 6:
+    case 7:
         // Organizing scenario: shelfs and objects with ARoS
         //TO DO
         break;
-    case 7:
+    case 8:
         // Organizing scenario: shelfs ad objects with Jarde
         //TO DO
         break;
@@ -2320,7 +2320,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                         case 0: //error
                             // TO DO
                             break;
-                        case 1: case 3:// Toy vehicle scenario with AROS, empty scenario with ARoS
+                        case 1: case 3: case 4: // Toy vehicle scenario with AROS, empty scenario with ARoS
                             if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed){
                                 dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
                             }else if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4))){
@@ -2672,7 +2672,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                                     switch(scenarioID){
                                     case 0: //error
                                         break;
-                                    case 1: case 3:// Toy vehicle scenario with AROS, empty scenario with ARoS
+                                    case 1: case 3: case 4:// Toy vehicle scenario with AROS, empty scenario with ARoS
                                         if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed){
                                             dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
                                         }else if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4))){
