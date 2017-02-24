@@ -26,11 +26,11 @@
     <string>Save</string>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
+     <x>21</x>
+     <y>21</y>
      <width>1071</width>
      <height>671</height>
     </rect>
@@ -45,14 +45,19 @@
        <widget class="QCustomPlot" name="plot_vel" native="true"/>
       </item>
       <item>
-       <widget class="QCustomPlot" name="plot_torsion" native="true">
-        <zorder>plot_vel</zorder>
-       </widget>
+       <widget class="QCustomPlot" name="plot_torsion" native="true"/>
       </item>
      </layout>
     </item>
     <item>
-     <widget class="QCustomPlot" name="plot_16" native="true"/>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QCustomPlot" name="plot_16" native="true"/>
+      </item>
+      <item>
+       <widget class="QCustomPlot" name="plot_acc" native="true"/>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

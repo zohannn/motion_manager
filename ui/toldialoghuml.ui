@@ -4336,14 +4336,30 @@
   <widget class="QCheckBox" name="checkBox_rand_init">
    <property name="geometry">
     <rect>
-     <x>300</x>
-     <y>700</y>
+     <x>500</x>
+     <y>650</y>
      <width>169</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>random initialization</string>
+    <string>enable random initialization</string>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_coll">
+   <property name="geometry">
+    <rect>
+     <x>500</x>
+     <y>620</y>
+     <width>169</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>disable collisions</string>
    </property>
    <property name="checked">
     <bool>false</bool>
@@ -4355,6 +4371,7 @@
   <zorder>tabWidget</zorder>
   <zorder>groupBox_constraints_2</zorder>
   <zorder>checkBox_rand_init</zorder>
+  <zorder>checkBox_coll</zorder>
  </widget>
  <resources/>
  <connections>

@@ -73,6 +73,27 @@ std::string RRTstarDialog::getConfig()
 
 }
 
+void RRTstarDialog::setConfig(int conf)
+{
+    switch (conf) {
+    case 0: // PathLengthOptimizationObjective
+        ui->radioButton_default->setChecked(true);
+        break;
+    case 1: // MaximizeMinClearanceObjective
+        ui->radioButton_1->setChecked(true);
+        break;
+    case 2: // StateCostIntegralObjective
+        ui->radioButton_2->setChecked(true);
+        break;
+    case 3: // MinimaxObjective
+        ui->radioButton_3->setChecked(true);
+        break;
+    default: // PathLengthOptimizationObjective
+        ui->radioButton_default->setChecked(true);
+        break;
+    }
+}
+
 void RRTstarDialog::getTargetMove(std::vector<double> &target)
 {
     target.clear();

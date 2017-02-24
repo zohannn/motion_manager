@@ -140,6 +140,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
     ui.listWidget_scenario->addItem(QString("Assembly scenario: Toy vehicle with ARoS"));
     ui.listWidget_scenario->addItem(QString("Empty scenario: empty scenario with ARoS"));
+    ui.listWidget_scenario->addItem(QString("Empty scenario: empty scenario with ARoS and NO collisions"));
     //ui.listWidget_scenario->addItem(QString("Assistive scenario: beverages with ARoS"));
     //ui.listWidget_scenario->addItem(QString("Organizing scenario: shelfs and objects with ARoS"));
 
@@ -343,6 +344,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 
     scenarios.push_back(QString("Assembly scenario: Toy vehicle with ARoS"));
     scenarios.push_back(QString("Empty scenario: empty scenario with ARoS"));
+    scenarios.push_back(QString("Empty scenario: empty scenario with ARoS and NO collisions"));
     //scenarios.push_back(QString("Assistive scenario: beverages with ARoS"));
     //scenarios.push_back(QString("Organizing scenario: shelfs and objects with ARoS"));
 
@@ -356,6 +358,8 @@ void MainWindow::on_pushButton_loadScenario_clicked()
          if(equal==0){
              // Empty scenario with ARoS
              string path_vrep_emptyscene_aros = PATH_SCENARIOS+string("/vrep/empty_aros.ttt");
+             // Empty scenario: empty scenario with ARoS and NO self collisions
+             string path_vrep_emptyscene_aros_no_self_coll = PATH_SCENARIOS+string("/vrep/empty_aros_no_coll.ttt");
              // Toy vehicle scenario with ARoS
              //string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
              string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros_bill.ttt");
@@ -438,10 +442,29 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 
 #endif
                  break;
-             case 2:// Assistive scenario: beverages
+             case 2: //Empty scenario: empty scenario with ARoS and NO self collisions
+                 this->scenario_id = 3;
+                 if (qnode.loadScenario(path_vrep_emptyscene_aros_no_self_coll,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Empty scenario: empty scenario with ARoS and NO collisions HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Empty scenario: empty scenario with ARoS and NO collisions");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+
+                 }else{
+                     qnode.log(QNode::Error,std::string("Empty scenario: empty scenario with ARoS and NO collisions HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+                 break;
+             case 3:// Assistive scenario: beverages
                  //TO DO
                  break;
-             case 3: // Organizing scenario: shelfs ad objects
+             case 4: // Organizing scenario: shelfs ad objects
                  //TO DO
                  break;
 
@@ -701,6 +724,7 @@ void MainWindow::on_pushButton_plan_clicked()
         mTolHumldlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
         mTolHumldlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
         tols.mov_specs.rand_init = mTolHumldlg->getRandInit(); // random initialization for "plan" stages
+        tols.mov_specs.coll = mTolHumldlg->getColl(); // collisions option
         // move settings
         mTolHumldlg->getTargetMove(move_target);
         mTolHumldlg->getFinalHand(move_final_hand);
@@ -1380,11 +1404,11 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
     double wmax = 50.0; // 50 deg/sec
     std::vector<double> move_target;
     double x; double x_min = -600; double x_max = -100;
-    double y; double y_min = 0; double y_max = 800;
+    double y; double y_min = 200; double y_max = 800;
     double z; double z_min = 900; double z_max = 1500;
-    double roll; double roll_min = -3.14; double roll_max = 3.14;
-    double pitch; double pitch_min = -3.14; double pitch_max = 3.14;
-    double yaw; double yaw_min = -3.14; double yaw_max = 3.14;
+    double roll; double roll_min = 0; double roll_max = 1.57;
+    double pitch; double pitch_min = -1.57; double pitch_max = 1.57;
+    double yaw; double yaw_min = 0; double yaw_max = 0.20;
 
 
     for(int i =0; i<n_traj;++i){
@@ -1423,6 +1447,8 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             case 0: // HUML
                 mTolHumldlg->setTargetMove(move_target);
                 mTolHumldlg->setWMax(wmax);
+                mTolHumldlg->setRandInit(true); // enable random initialization
+                mTolHumldlg->setColl(false); // disable collisions
                 break;
             case 1: // RRT
                 mRRTdlg->setTargetMove(move_target);
@@ -1432,6 +1458,7 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
                 break;
             case 3: // RRT Star
                 mRRTstardlg->setTargetMove(move_target);
+                mRRTstardlg->setConfig(0);
                 break;
             case 4: // PRM
                 mPRMdlg->setTargetMove(move_target);
@@ -1446,10 +1473,11 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
             if(prob->getSolved()){
                 this->on_pushButton_append_mov_clicked();
-                this->on_pushButton_execMov_clicked();
                 if(planner_id!=0){
                     this->on_pushButton_execMov_moveit_clicked();
                 }
+                this->on_pushButton_execMov_clicked();
+
                 solved = true;
             }else{
                 solved = false;
@@ -2073,6 +2101,9 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     // Empty Scenario with ARoS
     string path_vrep_empty_aros = PATH_SCENARIOS+string("/vrep/empty_aros.ttt");
 
+    // Empty scenario: empty scenario with ARoS and NO self collisions
+    string path_vrep_emptyscene_aros_no_self_coll = PATH_SCENARIOS+string("/vrep/empty_aros_no_coll.ttt");
+
     // Toy vehicle scenario with ARoS
     //string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
     string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros_bill.ttt");
@@ -2102,22 +2133,29 @@ void MainWindow::on_pushButton_scene_reset_clicked()
         // Empty scenario with ARoS
         path = path_vrep_empty_aros;
         title = string("Empty scenario with ARoS");
-        success = string("Empty scenario with ARoS with ARoS HAS BEEN LOADED");
-        failure = string("Empty scenario with ARoS with ARoS HAS NOT BEEN LOADED");
-        break;
+        success = string("Empty scenario with ARoS HAS BEEN LOADED");
+        failure = string("Empty scenario with ARoS HAS NOT BEEN LOADED");
+        break;        
     case 3:
+        // Empty scenario: empty scenario with ARoS and NO self collisions
+        path = path_vrep_emptyscene_aros_no_self_coll;
+        title = string("Empty scenario: empty scenario with ARoS and NO collisions");
+        success = string("Empty scenario: empty scenario with ARoS and NO collisions with ARoS HAS BEEN LOADED");
+        failure = string("Empty scenario: empty scenario with ARoS and NO collisions HAS NOT BEEN LOADED");
+        break;
+    case 4:
         // Assistive scenario: beverages with ARoS
         //TO DO
         break;
-    case 4:
+    case 5:
         // Assistive scenario: beverages with Avatar
         //TO DO
         break;
-    case 5:
+    case 6:
         // Organizing scenario: shelfs and objects with ARoS
         //TO DO
         break;
-    case 6:
+    case 7:
         // Organizing scenario: shelfs ad objects with Avatar
         //TO DO
 
@@ -2461,11 +2499,17 @@ void MainWindow::onListScenarioItemClicked(QListWidgetItem *item)
                 break;
 
             case 2:
+                //Empty scenario: empty with ARoS and No collisions
+                ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
+                                                         "ARoS moves in a empty workspace and no collisions are taken into account"));
+                break;
+
+            case 3:
                 //Assistive scenario: beverages with ARoS
 
                 break;
 
-            case 3:
+            case 4:
                 //Organizing scenario: shelfs and objects with ARoS
 
                 break;

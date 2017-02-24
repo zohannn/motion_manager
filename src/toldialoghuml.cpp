@@ -610,6 +610,7 @@ void TolDialogHUML::on_pushButton_save_clicked()
        if(ui->checkBox_approach->isChecked()){stream << "approach=false"<<endl;}else{stream << "approach=true"<<endl;}
        if(ui->checkBox_retreat->isChecked()){stream << "retreat=false"<<endl;}else{stream << "retreat=true"<<endl;}
        if(ui->checkBox_rand_init->isChecked()){stream << "rand_init=true"<<endl;}else{stream << "rand_init=false"<<endl;}
+       if(ui->checkBox_coll->isChecked()){stream << "coll=false"<<endl;}else{stream << "coll=true"<<endl;}
        //stream << "# END" << endl;
 
 
@@ -1030,12 +1031,19 @@ void TolDialogHUML::on_pushButton_load_clicked()
                         ui->checkBox_retreat->setChecked(false);
                     }
                 }else if(QString::compare(fields.at(0),QString("rand_init"),Qt::CaseInsensitive)==0){
-                if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
-                    ui->checkBox_rand_init->setChecked(false);
-                }else{
-                    ui->checkBox_rand_init->setChecked(true);
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_rand_init->setChecked(false);
+                    }else{
+                        ui->checkBox_rand_init->setChecked(true);
+                    }
+                }else if(QString::compare(fields.at(0),QString("coll"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_coll->setChecked(true);
+                    }else{
+                        ui->checkBox_coll->setChecked(false);
+                    }
+
                 }
-            }
 
             }
 
@@ -1168,6 +1176,21 @@ void TolDialogHUML::checkSetHandCondApproach(int state)
 bool TolDialogHUML::getRandInit()
 {
     return ui->checkBox_rand_init->isChecked();
+}
+
+void TolDialogHUML::setRandInit(bool rand)
+{
+    ui->checkBox_rand_init->setChecked(rand);
+}
+
+bool TolDialogHUML::getColl()
+{
+    return !ui->checkBox_coll->isChecked();
+}
+
+void TolDialogHUML::setColl(bool coll)
+{
+    ui->checkBox_coll->setChecked(!coll);
 }
 
 bool TolDialogHUML::get_use_final_posture()

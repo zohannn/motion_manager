@@ -238,6 +238,24 @@ public:
     bool getRandInit();
 
     /**
+     * @brief setRandInit
+     * @param rand
+     */
+    void setRandInit(bool rand);
+
+    /**
+     * @brief getColl
+     * @return  true if collisions are enabled
+     */
+    bool getColl();
+
+    /**
+     * @brief setColl
+     * @param coll, true to enable them
+     */
+    void setColl(bool coll=true);
+
+    /**
      * @brief getTargetMove
      * @param target
      */

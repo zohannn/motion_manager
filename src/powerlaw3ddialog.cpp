@@ -22,6 +22,10 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     // time
     vector<double> time_task; QVector<double> tot_timesteps;
     vector<int> index;
+    QVector<double> K; // Curvature
+    QVector<double> T; // Torsion
+    QVector<double> vel; // Velocity
+    QVector<double> acc; // Acceleration
     for(size_t i=0; i<timesteps.size();++i){
         vector<vector<double>> tsteps_mov = timesteps.at(i);
         double time_init;
@@ -87,14 +91,17 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
         this->getDerivative(der_pos_z_2,tot_timesteps,der_pos_z_3);
 
         // --- Velocity --- //
-        QVector<double> vel;
         for(int i=0; i<der_pos_x_1.size();++i){
             Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
             vel.push_back(der_1.norm());
         }
+        // --- Acceleration --- //
+        for(int i=0; i<der_pos_x_2.size();++i){
+            Vector3d der_2(der_pos_x_2.at(i),der_pos_y_2.at(i),der_pos_z_2.at(i));
+            acc.push_back(der_2.norm());
+        }
 
         // --- Curvature --- //
-        QVector<double> K; // Curvature
         //double curv_th = 10; // curvature threshold
         for(int i=0; i<der_pos_x_1.size();++i){
             Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
@@ -111,8 +118,8 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
             K.push_back(curv);
             //}
         }
+
         // --- Torsion --- //
-        QVector<double> T; // Torsion
         for(int i=0; i<der_pos_x_1.size();++i){
             Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
             Vector3d der_2(der_pos_x_2.at(i),der_pos_y_2.at(i),der_pos_z_2.at(i));
@@ -300,7 +307,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
 
 */
 
-    /*
+
     // plot the curvature
     ui->plot_curvature->plotLayout()->clear();
     ui->plot_curvature->clearGraphs();
@@ -370,6 +377,42 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_vel->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
     ui->plot_vel->replot();
 
+    // plot the acceleration
+    ui->plot_acc->plotLayout()->clear();
+    ui->plot_acc->clearGraphs();
+    ui->plot_acc->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+    wideAxisRect = new QCPAxisRect(ui->plot_acc);
+    wideAxisRect->setupFullAxesBox(true);
+    marginGroup = new QCPMarginGroup(ui->plot_acc);
+    wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+    // move newly created axes on "axes" layer and grids on "grid" layer:
+    for (QCPAxisRect *rect : ui->plot_acc->axisRects())
+    {
+      for (QCPAxis *axis : rect->axes())
+      {
+        axis->setLayer("axes");
+        axis->grid()->setLayer("grid");
+      }
+    }
+    title = "Acceleration";
+    ui->plot_acc->plotLayout()->addElement(0,0, new QCPPlotTitle(ui->plot_acc,title));
+    ui->plot_acc->plotLayout()->addElement(1, 0, wideAxisRect);
+
+    ui->plot_acc->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+    ui->plot_acc->graph(0)->setPen(QPen(Qt::blue));
+    ui->plot_acc->graph(0)->setName(title);
+    ui->plot_acc->graph(0)->valueAxis()->setLabel("acceleration [m/s^2]");
+    ui->plot_acc->graph(0)->keyAxis()->setLabel("time [s]");
+    ui->plot_acc->graph(0)->setData(qtime, acc);
+
+    ui->plot_acc->graph(0)->valueAxis()->setRange(*std::min_element(acc.begin(), acc.end()),
+                                                  *std::max_element(acc.begin(), acc.end()));
+    ui->plot_acc->graph(0)->rescaleAxes();
+
+
+    ui->plot_acc->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ui->plot_acc->replot();
+
     // plot the torsion
     ui->plot_torsion->plotLayout()->clear();
     ui->plot_torsion->clearGraphs();
@@ -402,17 +445,17 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_torsion->graph(0)->rescaleAxes();
     ui->plot_torsion->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
     ui->plot_torsion->replot();
-*/
+
 
     // plot power law
     ui->plot_16->plotLayout()->clear();
     ui->plot_16->clearGraphs();
     ui->plot_16->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
-    QCPAxisRect *wideAxisRect = new QCPAxisRect(ui->plot_16);
-    //wideAxisRect = new QCPAxisRect(ui->plot_16);
+    //QCPAxisRect *wideAxisRect = new QCPAxisRect(ui->plot_16);
+    wideAxisRect = new QCPAxisRect(ui->plot_16);
     wideAxisRect->setupFullAxesBox(true);
-    QCPMarginGroup *marginGroup = new QCPMarginGroup(ui->plot_16);
-    //marginGroup = new QCPMarginGroup(ui->plot_16);
+    //QCPMarginGroup *marginGroup = new QCPMarginGroup(ui->plot_16);
+    marginGroup = new QCPMarginGroup(ui->plot_16);
     wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
     // move newly created axes on "axes" layer and grids on "grid" layer:
     for (QCPAxisRect *rect : ui->plot_16->axisRects())
@@ -423,7 +466,8 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
         axis->grid()->setLayer("grid");
       }
     }
-    QString title = "One-sixth power law";
+    //QString title = "One-sixth power law";
+    title = "One-sixth power law";
     ui->plot_16->plotLayout()->addElement(0,0, new QCPPlotTitle(ui->plot_16,title));
     ui->plot_16->plotLayout()->addElement(1, 0, wideAxisRect);
 
