@@ -1403,12 +1403,19 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
     int n_traj=100;
     double wmax = 50.0; // 50 deg/sec
     std::vector<double> move_target;
+
+    humanoidPtr hh = this->curr_scene->getHumanoid();
+    Matrix4d T_hand; Matrix3d R_hand; vector<double> pos_hand;
+
+    // see Brami et al. 2003
+    // mm
     double x; double x_min = -600; double x_max = -100;
     double y; double y_min = 200; double y_max = 800;
     double z; double z_min = 900; double z_max = 1500;
-    double roll; double roll_min = 0; double roll_max = 1.57;
-    double pitch; double pitch_min = -1.57; double pitch_max = 1.57;
-    double yaw; double yaw_min = 0; double yaw_max = 0.20;
+    // rad
+    double roll; double roll_min = -0.7; double roll_max = 0.7;
+    double pitch; double pitch_min = -3.14 ; double pitch_max = -1.57;
+    double yaw; double yaw_min = -0.3; double yaw_max = 0.3;
 
 
     for(int i =0; i<n_traj;++i){
@@ -1429,8 +1436,29 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             x = x_min + (x_max-x_min)*(rand() / double(RAND_MAX));
             y = y_min + (y_max-y_min)*(rand() / double(RAND_MAX));
             z = z_min + (z_max-z_min)*(rand() / double(RAND_MAX));
-            roll = roll_min + (roll_max-roll_min)*(rand() / double(RAND_MAX));
-            pitch = pitch_min + (pitch_max-pitch_min)*(rand() / double(RAND_MAX));
+            Vector4d p(x,y,z,1);
+            hh->getRightHandPos(pos_hand); Vector3d p_hand(pos_hand.at(0),pos_hand.at(1),pos_hand.at(2));
+            hh->getRightHandOr(R_hand);
+            T_hand.block<3,3>(0,0) = R_hand;
+            T_hand.block<3,1>(0,3) = p_hand;
+            T_hand(3,0)=0; T_hand(3,1)=0; T_hand(3,2)=0; T_hand(3,3)=1;
+            Vector4d p_point = T_hand*p; Vector3d point(p_point(0),p_point(1),p_point(2));
+            double mov_dist = point.norm();
+            double mov_dir = atan2(point(2),point(1));
+            roll = 0.33*mov_dir+0.7;
+            if(roll<roll_min)
+                roll=roll_min;
+            if(roll>roll_max)
+                roll=roll_max;
+            pitch = 0.00175* mov_dist -4.3;
+            if (pitch<pitch_min)
+                pitch=pitch_min;
+            if(pitch>pitch_max)
+                pitch=pitch_max;
+
+
+            //roll = roll_min + (roll_max-roll_min)*(rand() / double(RAND_MAX));
+            //pitch = pitch_min + (pitch_max-pitch_min)*(rand() / double(RAND_MAX));
             yaw = yaw_min + (yaw_max-yaw_min)*(rand() / double(RAND_MAX));
 
 
@@ -1447,7 +1475,7 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             case 0: // HUML
                 mTolHumldlg->setTargetMove(move_target);
                 mTolHumldlg->setWMax(wmax);
-                mTolHumldlg->setRandInit(true); // enable random initialization
+                mTolHumldlg->setRandInit(false); // disable random initialization
                 mTolHumldlg->setColl(false); // disable collisions
                 break;
             case 1: // RRT
