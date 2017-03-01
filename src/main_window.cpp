@@ -1486,13 +1486,14 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
                 break;
             case 3: // RRT Star
                 mRRTstardlg->setTargetMove(move_target);
-                mRRTstardlg->setConfig(0);
+                mRRTstardlg->setConfig(0); // PathLengthOptimizationObjective
                 break;
             case 4: // PRM
                 mPRMdlg->setTargetMove(move_target);
                 break;
             case 5: // PRM Star
                 mPRMstardlg->setTargetMove(move_target);
+                mPRMstardlg->setConfig(0); // PathLengthOptimizationObjective
                 break;
 
             }

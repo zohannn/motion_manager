@@ -26,6 +26,8 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     QVector<double> T; // Torsion
     QVector<double> vel; // Velocity
     QVector<double> acc; // Acceleration
+    double coeff_tot=0; // sum of the coefficient
+    int n_coeff=0; // number of the non-zero coefficient
     for(size_t i=0; i<timesteps.size();++i){
         vector<vector<double>> tsteps_mov = timesteps.at(i);
         double time_init;
@@ -60,6 +62,8 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
 
     QVector<double> ln_vel_tot; QVector<double> ln_x_tot;
     vector<double> q_tot; vector<double> m_tot; vector<double> r_tot;
+    vector<double> q_tot_w; vector<double> m_tot_w; vector<double> r_tot_w;
+    vector<double> q_tot_2w; vector<double> m_tot_2w; vector<double> r_tot_2w;
 
     for(size_t i=0; i<hand_position_task.size();++i){
         vector<vector<vector<double>>> hand_position_mov = hand_position_task.at(i);
@@ -154,7 +158,12 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
         // R-squared regression
         double q,m,r;
         this->linreg(ln_x,ln_vel,&q,&m,&r);
+        if(ln_x.size()!=0)
+            n_coeff++;
+        double coeff = ((double)ln_x.size())/T.size();
         q_tot.push_back(q); m_tot.push_back(m); r_tot.push_back(r);
+        q_tot_w.push_back(coeff*q); m_tot_w.push_back(coeff*m); r_tot_w.push_back(coeff*r);
+        q_tot_2w.push_back(coeff*pow(q,2)); m_tot_2w.push_back(coeff*pow(m,2)); r_tot_2w.push_back(coeff*pow(r,2));
         //this->linreg(ln_x_mean,ln_vel_mean,&q,&m,&r);
         //std::cout << " m = " << m << " q = " << q << " R^2 = " << r << endl;
         //QVector<double> ln_vel_fit; //QVector<double> best_line;
@@ -168,25 +177,35 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
             ln_x_tot.push_back(ln_x.at(i));
             ln_vel_tot.push_back(ln_vel.at(i));
         }
+        coeff_tot +=coeff;
 
     }// task
 
+    double norm;
+    if(n_coeff==1){
+        norm=1;
+    }else{
+        norm=((double)n_coeff)/(n_coeff-1);
+    }
 
     // q
-    double sum_q = std::accumulate(q_tot.begin(), q_tot.end(), 0.0);
-    double mean_q = ((double)sum_q) / q_tot.size();
-    double sq_sum_q = std::inner_product(q_tot.begin(), q_tot.end(), q_tot.begin(), 0.0);
-    double stdev_q = std::sqrt((((double)sq_sum_q) / q_tot.size()) - pow(mean_q,2));
+    double sum_q = std::accumulate(q_tot_w.begin(), q_tot_w.end(), 0.0);
+    //double mean_q = ((double)sum_q) / q_tot.size();
+    double mean_q = ((double)sum_q) / coeff_tot;
+    double sq_sum_q = std::accumulate(q_tot_2w.begin(), q_tot_2w.end(), 0.0);
+    double stdev_q = std::sqrt(norm*((((double)sq_sum_q) / coeff_tot) - pow(mean_q,2)));
     // m
-    double sum_m = std::accumulate(m_tot.begin(), m_tot.end(), 0.0);
-    double mean_m = ((double)sum_m) / m_tot.size();
-    double sq_sum_m = std::inner_product(m_tot.begin(), m_tot.end(), m_tot.begin(), 0.0);
-    double stdev_m = std::sqrt((((double)sq_sum_m) / m_tot.size()) - pow(mean_m,2));
+    double sum_m = std::accumulate(m_tot_w.begin(), m_tot_w.end(), 0.0);
+    //double mean_m = ((double)sum_m) / m_tot.size();
+    double mean_m = ((double)sum_m) / coeff_tot;
+    double sq_sum_m = std::accumulate(m_tot_2w.begin(), m_tot_2w.end(), 0.0);
+    double stdev_m = std::sqrt(norm*((((double)sq_sum_m) / coeff_tot) - pow(mean_m,2)));
     // r
-    double sum_r = std::accumulate(r_tot.begin(), r_tot.end(), 0.0);
-    double mean_r = ((double)sum_r) / r_tot.size();
-    double sq_sum_r = std::inner_product(r_tot.begin(), r_tot.end(), r_tot.begin(), 0.0);
-    double stdev_r = std::sqrt((((double)sq_sum_r) / r_tot.size()) - pow(mean_r,2));
+    double sum_r = std::accumulate(r_tot_w.begin(), r_tot_w.end(), 0.0);
+    //double mean_r = ((double)sum_r) / r_tot.size();
+    double mean_r = ((double)sum_r) / coeff_tot;
+    double sq_sum_r = std::accumulate(r_tot_2w.begin(), r_tot_2w.end(), 0.0);
+    double stdev_r = std::sqrt(norm*((((double)sq_sum_r) / coeff_tot) - pow(mean_r,2)));
 
     QVector<double> ln_vel_tot_fit; QVector<double> best_line;
     double m_best = ((double)-1)/6;
