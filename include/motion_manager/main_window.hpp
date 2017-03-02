@@ -182,6 +182,11 @@ public Q_SLOTS:
         void on_pushButton_plan_3d_power_law_clicked();
 
         /**
+         * @brief on_pushButton_plan_2d_power_law_clicked
+         */
+        void on_pushButton_plan_2d_power_law_clicked();
+
+        /**
          * @brief This method plans the selected movement
          */
         void on_pushButton_plan_pressed();

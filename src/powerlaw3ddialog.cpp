@@ -36,6 +36,16 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
         }else{
             time_init=time_task.at(time_task.size()-1);
         }
+        int offset;
+        if(i==0){
+            offset=0;
+        }else{
+            vector<vector<vector<double>>> h_mov = hand_position_task.at(i-1);
+            for(size_t ii=0; ii<h_mov.size();ii++){
+                vector<vector<double>> h_stage = h_mov.at(ii);
+                offset += h_stage.size();
+            }
+        }
         vector<double> time_mov;
         vector<vector<vector<double>>> hand_position_mov;
         for(size_t j=0; j<tsteps_mov.size();++j){
@@ -46,7 +56,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
             for(size_t k=0;k<tsteps_stage.size();++k){
                 tot_timesteps.push_back(tsteps_stage.at(k));
                 if(k>0){time_stage.at(k) = time_stage.at(k-1) + tsteps_stage.at(k-1);}
-                hand_position_stage.push_back(hand_position.at(k));
+                hand_position_stage.push_back(hand_position.at(k+offset));
             }// stage
             index.push_back(tot_timesteps.size());
             time_mov.reserve(time_stage.size());
@@ -68,31 +78,35 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     for(size_t i=0; i<hand_position_task.size();++i){
         vector<vector<vector<double>>> hand_position_mov = hand_position_task.at(i);
         QVector<double> pos_x; QVector<double> pos_y; QVector<double> pos_z;
+        QVector<double> timesteps_mov;
+        vector<vector<double>> tsteps_mov = timesteps.at(i);
         for(size_t j=0; j<hand_position_mov.size();++j){
             vector<vector<double>> hand_position_stage = hand_position_mov.at(j);
+            vector<double> tsteps_stage = tsteps_mov.at(j);
             for(size_t h=0; h<hand_position_stage.size();++h){
                 vector<double> hand_point = hand_position_stage.at(h);
+                timesteps_mov.push_back(tsteps_stage.at(h));
                 pos_x.push_back(hand_point.at(0)/1000); // [m]
                 pos_y.push_back(hand_point.at(1)/1000); // [m]
                 pos_z.push_back(hand_point.at(2)/1000); // [m]
-            }
+            }//stage
         } // mov
 
         // first derivatives
         QVector<double> der_pos_x_1; QVector<double> der_pos_y_1; QVector<double> der_pos_z_1;
-        this->getDerivative(pos_x,tot_timesteps,der_pos_x_1);
-        this->getDerivative(pos_y,tot_timesteps,der_pos_y_1);
-        this->getDerivative(pos_z,tot_timesteps,der_pos_z_1);
+        this->getDerivative(pos_x,timesteps_mov,der_pos_x_1);
+        this->getDerivative(pos_y,timesteps_mov,der_pos_y_1);
+        this->getDerivative(pos_z,timesteps_mov,der_pos_z_1);
         // second derivatives
         QVector<double> der_pos_x_2; QVector<double> der_pos_y_2; QVector<double> der_pos_z_2;
-        this->getDerivative(der_pos_x_1,tot_timesteps,der_pos_x_2);
-        this->getDerivative(der_pos_y_1,tot_timesteps,der_pos_y_2);
-        this->getDerivative(der_pos_z_1,tot_timesteps,der_pos_z_2);
+        this->getDerivative(der_pos_x_1,timesteps_mov,der_pos_x_2);
+        this->getDerivative(der_pos_y_1,timesteps_mov,der_pos_y_2);
+        this->getDerivative(der_pos_z_1,timesteps_mov,der_pos_z_2);
         //third derivatives
         QVector<double> der_pos_x_3; QVector<double> der_pos_y_3; QVector<double> der_pos_z_3;
-        this->getDerivative(der_pos_x_2,tot_timesteps,der_pos_x_3);
-        this->getDerivative(der_pos_y_2,tot_timesteps,der_pos_y_3);
-        this->getDerivative(der_pos_z_2,tot_timesteps,der_pos_z_3);
+        this->getDerivative(der_pos_x_2,timesteps_mov,der_pos_x_3);
+        this->getDerivative(der_pos_y_2,timesteps_mov,der_pos_y_3);
+        this->getDerivative(der_pos_z_2,timesteps_mov,der_pos_z_3);
 
         // --- Velocity --- //
         for(int i=0; i<der_pos_x_1.size();++i){
@@ -214,6 +228,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
         best_line.push_back(m_best*ln_x_tot.at(i)+mean_q);
     }
 
+<<<<<<< HEAD
     /*
     // --- Hand Position --- //
     QVector<double> pos_x; QVector<double> pos_y; QVector<double> pos_z;
@@ -326,6 +341,8 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
 
 */
 
+=======
+>>>>>>> eb58ceb1fe1890f5941cf560855cdbbe569982cf
 
     // plot the curvature
     ui->plot_curvature->plotLayout()->clear();

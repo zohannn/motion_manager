@@ -144,6 +144,14 @@ public:
      */
     void getPlaneParameters(std::vector<double> &params, std::vector<double> &point1, std::vector<double> &point2, std::vector<double> &point3);
 
+    /**
+     * @brief setPlaneParameters
+     * @param point1
+     * @param point2
+     * @param point3
+     */
+    void setPlaneParameters(std::vector<double> &point1,std::vector<double> &point2,std::vector<double> &point3);
+
 
 private:
     Ui::PRMstarDialog *ui; /**< handle of the user interface */
