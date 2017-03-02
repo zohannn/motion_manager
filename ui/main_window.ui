@@ -728,6 +728,19 @@ p, li { white-space: pre-wrap; }
         <string>Plan 3D power law</string>
        </property>
       </widget>
+      <widget class="QPushButton" name="pushButton_plan_2d_power_law">
+       <property name="geometry">
+        <rect>
+         <x>270</x>
+         <y>360</y>
+         <width>137</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Plan 2D power law</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_task">
       <property name="geometry">
@@ -936,14 +949,6 @@ p, li { white-space: pre-wrap; }
           <string>Execute MoveIt</string>
          </property>
         </widget>
-        <zorder>layoutWidget_time_mov</zorder>
-        <zorder>tableWidget_sol_mov</zorder>
-        <zorder>layoutWidget_tol_stop</zorder>
-        <zorder>pushButton_execMov</zorder>
-        <zorder>pushButton_stop_mov</zorder>
-        <zorder>pushButton_append_mov</zorder>
-        <zorder>pushButton_execMov_moveit</zorder>
-        <zorder>groupBox_task</zorder>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_task">

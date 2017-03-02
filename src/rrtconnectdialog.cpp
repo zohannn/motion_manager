@@ -115,6 +115,21 @@ void RRTConnectDialog::getFinalHand(std::vector<double> &finalHand)
 }
 
 
+void RRTConnectDialog::setPlaneParameters(std::vector<double> &point1,std::vector<double> &point2,std::vector<double> &point3)
+{
+    if(!point1.empty() && !point2.empty() && !point3.empty()){
+        ui->lineEdit_point_1_x->setText(QString::number(point1.at(0)/1000));
+        ui->lineEdit_point_1_y->setText(QString::number(point1.at(1)/1000));
+        ui->lineEdit_point_1_z->setText(QString::number(point1.at(2)/1000));
+        ui->lineEdit_point_2_x->setText(QString::number(point2.at(0)/1000));
+        ui->lineEdit_point_2_y->setText(QString::number(point2.at(1)/1000));
+        ui->lineEdit_point_2_z->setText(QString::number(point2.at(2)/1000));
+        ui->lineEdit_point_3_x->setText(QString::number(point3.at(0)/1000));
+        ui->lineEdit_point_3_y->setText(QString::number(point3.at(1)/1000));
+        ui->lineEdit_point_3_z->setText(QString::number(point3.at(2)/1000));
+    }
+}
+
 void RRTConnectDialog::getPlaneParameters(std::vector<double> &params,
                                    std::vector<double> &point1,
                                    std::vector<double> &point2,

@@ -1520,6 +1520,122 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
 }
 
 
+void MainWindow::on_pushButton_plan_2d_power_law_clicked()
+{
+    int n_traj=100;
+    double wmax = 50.0; // 50 deg/sec
+    std::vector<double> move_target;
+
+
+    // mm
+    double x; double x_min = -600; double x_max = -100;
+    double y; double y_min = 200; double y_max = 800;
+    double z = 1000;
+    // rad
+    double roll = 0.79;
+    double pitch = -1.57;
+    double yaw = 0;
+
+    // plane
+    std::vector<double> point1={-400,0,1000};
+    std::vector<double> point2={-100,500,1000};
+    std::vector<double> point3={-200,600,1000};
+
+
+    for(int i =0; i<n_traj;++i){
+
+        // add a reaching problem
+        int planner_id = ui.comboBox_planner->currentIndex(); // planner
+        ui.comboBox_mov->setCurrentIndex(1); // reaching movement
+        ui.comboBox_Task->setCurrentIndex(0); // single arm movement
+        ui.radioButton_right->setChecked(true); // right arm
+        this->on_pushButton_addMov_clicked();
+
+        bool solved=false;
+
+        while(!solved){
+
+            // generate random numbers
+            std::srand(std::time(NULL));
+            x = x_min + (x_max-x_min)*(rand() / double(RAND_MAX));
+            y = y_min + (y_max-y_min)*(rand() / double(RAND_MAX));
+
+
+            // set the parameters
+            move_target.clear();
+            move_target.push_back(x);
+            move_target.push_back(y);
+            move_target.push_back(z);
+            move_target.push_back(roll);
+            move_target.push_back(pitch);
+            move_target.push_back(yaw);
+
+            switch(planner_id){
+            case 0: // HUML
+                mTolHumldlg->setTargetMove(move_target);
+                mTolHumldlg->setWMax(wmax);
+                mTolHumldlg->setRandInit(false); // disable random initialization
+                mTolHumldlg->setColl(false); // disable collisions
+                // plane constraints
+                mTolHumldlg->checkAddPlane(1);
+                mTolHumldlg->setPlaneParameters(point1,point2,point3);
+                break;
+            case 1: // RRT
+                mRRTdlg->setTargetMove(move_target);
+                // plane constraints
+                mRRTdlg->checkAddPlane(1);
+                mRRTdlg->setPlaneParameters(point1,point2,point3);
+                break;
+            case 2: // RRT Connect
+                mRRTConnectdlg->setTargetMove(move_target);
+                // plane constraints
+                mRRTConnectdlg->checkAddPlane(1);
+                mRRTConnectdlg->setPlaneParameters(point1,point2,point3);
+                break;
+            case 3: // RRT Star
+                mRRTstardlg->setTargetMove(move_target);
+                mRRTstardlg->setConfig(0); // PathLengthOptimizationObjective
+                // plane constraints
+                mRRTstardlg->checkAddPlane(1);
+                mRRTstardlg->setPlaneParameters(point1,point2,point3);
+                break;
+            case 4: // PRM
+                mPRMdlg->setTargetMove(move_target);
+                // plane constraints
+                mPRMdlg->checkAddPlane(1);
+                mPRMdlg->setPlaneParameters(point1,point2,point3);
+                break;
+            case 5: // PRM Star
+                mPRMstardlg->setTargetMove(move_target);
+                mPRMstardlg->setConfig(0); // PathLengthOptimizationObjective
+                // plane constraints
+                mPRMstardlg->checkAddPlane(1);
+                mPRMstardlg->setPlaneParameters(point1,point2,point3);
+                break;
+
+            }
+
+            this->on_pushButton_plan_clicked();
+            problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
+            if(prob->getSolved()){
+                this->on_pushButton_append_mov_clicked();
+                if(planner_id!=0){
+                    this->on_pushButton_execMov_moveit_clicked();
+                }
+                this->on_pushButton_execMov_clicked();
+
+                solved = true;
+            }else{
+                solved = false;
+            }
+
+            sleep(1);
+
+        }
+    }
+}
+
+
 void MainWindow::on_pushButton_execMov_pressed()
 {
 
