@@ -23,12 +23,12 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
     vector<double> time_task; QVector<double> tot_timesteps;
     vector<int> index;
     QVector<double> pos_x; QVector<double> pos_y; //QVector<double> pos_z;
-    QVector<double> C; // Curvature
-    QVector<double> lnC; // Curvature
+    QVector<double> C; // Curvature of the task
+    QVector<double> lnC; // Curvature of the task
     //QVector<double> R; // Curvature radius
     //QVector<double> lnR; // Curvature radius
-    QVector<double> vel_tan; // Velocity
-    QVector<double> ln_vel_tan; // Velocity
+    QVector<double> vel_tan; // Velocity of the task
+    QVector<double> ln_vel_tan; // Velocity of the task
 
     double coeff_tot=0; // sum of the coefficient
     int n_coeff=0; // number of the non-zero coefficient
@@ -113,6 +113,10 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
         this->getDerivative(der_pos_v_2,timesteps_mov,der_pos_v_3);
 
         // --- Curvature and Tangential Velocity --- //
+        QVector<double> C_mov; // Curvature of the movement
+        QVector<double> lnC_mov; // Curvature of the movement
+        QVector<double> vel_tan_mov; // Velocity of the movement
+        QVector<double> ln_vel_tan_mov; // Velocity of the movement
         for(int i=0; i<der_pos_u_1.size();++i){
             Vector2d der_1(der_pos_u_1.at(i),der_pos_v_1.at(i));
             Vector2d der_2(der_pos_u_2.at(i),der_pos_v_2.at(i));
@@ -122,45 +126,51 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
                 den=0.0001;
             C.push_back((double)num/den); // [m^⁻1]
             lnC.push_back(log(C.at(i)));
+            C_mov.push_back((double)num/den); // [m^⁻1]
+            lnC_mov.push_back(log(C_mov.at(i)));
             //R.push_back(((double)1)/C.at(i)); // [m]
             //lnR.push_back(log(R.at(i)));
             vel_tan.push_back(((double)sqrt(pow(der_1(0),2)+pow(der_1(1),2)))); // [m/s]
             ln_vel_tan.push_back(log(vel_tan.at(i)));
+            vel_tan_mov.push_back(((double)sqrt(pow(der_1(0),2)+pow(der_1(1),2)))); // [m/s]
+            ln_vel_tan_mov.push_back(log(vel_tan_mov.at(i)));
         }
 
         QVector<double> lnX; // Curvature^2
         QVector<double> lnY; // Velocity
-        QVector<int> index_t(index.size()); int k=0; int h=0; int hh;
-        for(size_t i=0;  i<C.size();++i){
-            int mov_size = index.at(k);
-            if(i>=mov_size){
-                hh = index_t.at(h);
-                h++;
-                index_t.replace(h,hh);
-                k++;
-            }
-            if(C.at(i)>=0.0001){
-                lnX.push_back(log(pow(C.at(i),2)));
-                lnY.push_back(ln_vel_tan.at(i));
-                index_t.replace(h,index_t.at(h)+1);
+        //QVector<int> index_t(index.size()); int k=0; int h=0; int hh;
+        for(size_t i=0;  i<C_mov.size();++i){
+            //int mov_size = index.at(k);
+            //if(i>=mov_size){
+              //  hh = index_t.at(h);
+              //  h++;
+              //  index_t.replace(h,hh);
+              //  k++;
+            //}
+            if(C_mov.at(i)>=0.0001){
+                lnX.push_back(log(pow(C_mov.at(i),2)));
+                lnY.push_back(ln_vel_tan_mov.at(i));
+                //index_t.replace(h,index_t.at(h)+1);
             }
         }
 
-        // R-squared regression
-        double q,m,r;
-        this->linreg(lnX,lnY,&q,&m,&r);
-        if(lnX.size()!=0)
-            n_coeff++;
-        double coeff = ((double)lnX.size())/C.size();
-        q_tot.push_back(q); m_tot.push_back(m); r_tot.push_back(r);
-        q_tot_w.push_back(coeff*q); m_tot_w.push_back(coeff*m); r_tot_w.push_back(coeff*r);
-        q_tot_2w.push_back(coeff*pow(q,2)); m_tot_2w.push_back(coeff*pow(m,2)); r_tot_2w.push_back(coeff*pow(r,2));
+        if(!lnX.empty()){
+            // R-squared regression
+            double q,m,r;
+            this->linreg(lnX,lnY,&q,&m,&r);
+            if(lnX.size()!=0)
+                n_coeff++;
+            double coeff = ((double)lnX.size())/C_mov.size();
+            q_tot.push_back(q); m_tot.push_back(m); r_tot.push_back(r);
+            q_tot_w.push_back(coeff*q); m_tot_w.push_back(coeff*m); r_tot_w.push_back(coeff*r);
+            q_tot_2w.push_back(coeff*pow(q,2)); m_tot_2w.push_back(coeff*pow(m,2)); r_tot_2w.push_back(coeff*pow(r,2));
 
-        for(int i=0; i<lnX.size();++i){
-            lnX_tot.push_back(lnX.at(i));
-            lnY_tot.push_back(lnY.at(i));
+            for(int i=0; i<lnX.size();++i){
+                lnX_tot.push_back(lnX.at(i));
+                lnY_tot.push_back(lnY.at(i));
+            }
+            coeff_tot +=coeff;
         }
-        coeff_tot +=coeff;
     }// task
 
     double norm;

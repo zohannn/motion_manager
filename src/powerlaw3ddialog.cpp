@@ -22,10 +22,10 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     // time
     vector<double> time_task; QVector<double> tot_timesteps;
     vector<int> index;
-    QVector<double> K; // Curvature
-    QVector<double> T; // Torsion
-    QVector<double> vel; // Velocity
-    QVector<double> acc; // Acceleration
+    QVector<double> K; // Curvature of the task
+    QVector<double> T; // Torsion of the task
+    QVector<double> vel; // Velocity of the task
+    QVector<double> acc; // Acceleration of the task
     double coeff_tot=0; // sum of the coefficient
     int n_coeff=0; // number of the non-zero coefficient
     for(size_t i=0; i<timesteps.size();++i){
@@ -109,17 +109,22 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
         this->getDerivative(der_pos_z_2,timesteps_mov,der_pos_z_3);
 
         // --- Velocity --- //
+        QVector<double> vel_mov; // velocity of the movement
         for(int i=0; i<der_pos_x_1.size();++i){
             Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
             vel.push_back(der_1.norm());
+            vel_mov.push_back(der_1.norm());
         }
         // --- Acceleration --- //
+        QVector<double> acc_mov; // acceleration of the movement
         for(int i=0; i<der_pos_x_2.size();++i){
             Vector3d der_2(der_pos_x_2.at(i),der_pos_y_2.at(i),der_pos_z_2.at(i));
             acc.push_back(der_2.norm());
+            acc_mov.push_back(der_2.norm());
         }
 
         // --- Curvature --- //
+        QVector<double> K_mov; // curvature of the movement
         //double curv_th = 10; // curvature threshold
         for(int i=0; i<der_pos_x_1.size();++i){
             Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
@@ -134,10 +139,12 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
               //  K.push_back(curv_th);
             //}else{
             K.push_back(curv);
+            K_mov.push_back(curv);
             //}
         }
 
         // --- Torsion --- //
+        QVector<double> T_mov; // torsion of the movement
         for(int i=0; i<der_pos_x_1.size();++i){
             Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
             Vector3d der_2(der_pos_x_2.at(i),der_pos_y_2.at(i),der_pos_z_2.at(i));
@@ -149,49 +156,52 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
             if(den==0)
                 den=0.0001;
             T.push_back((double)num/den);
+            T_mov.push_back((double)num/den);
         }
 
         // --- Curvature and Torsion , Velocity--- //
-        QVector<double> ln_vel; QVector<double> ln_x;
-        QVector<int> index_t(index.size()); int k=0; int h=0; int hh;
+        QVector<double> ln_vel_mov; QVector<double> ln_x_mov;
+        //QVector<int> index_t(index.size()); int k=0; int h=0; int hh;
         for(int i=0; i<der_pos_x_1.size();++i){
-            int mov_size = index.at(k);
-            if(i>=mov_size){
-                hh = index_t.at(h);
-                h++;
-                index_t.replace(h,hh);
-                k++;
-            }
-            if((abs(T.at(i))>=2) && (K.at(i)>=0.0001)){// threshold value taken into account to eliminate the torsion cups and planar regions
-                ln_x.push_back(log(pow(K.at(i),2)*abs(T.at(i))));
-                ln_vel.push_back(log(vel.at(i)));
-                index_t.replace(h,index_t.at(h)+1);
+            //int mov_size = index.at(k);
+            //if(i>=mov_size){
+              //  hh = index_t.at(h);
+              //  h++;
+              //  index_t.replace(h,hh);
+              //  k++;
+            //}
+            if((abs(T_mov.at(i))>=2) && (K_mov.at(i)>=0.0001)){// threshold value taken into account to eliminate the torsion cups and planar regions
+                ln_x_mov.push_back(log(pow(K_mov.at(i),2)*abs(T_mov.at(i))));
+                ln_vel_mov.push_back(log(vel_mov.at(i)));
+                //index_t.replace(h,index_t.at(h)+1);
             }
         }
 
-        // R-squared regression
-        double q,m,r;
-        this->linreg(ln_x,ln_vel,&q,&m,&r);
-        if(ln_x.size()!=0)
-            n_coeff++;
-        double coeff = ((double)ln_x.size())/T.size();
-        q_tot.push_back(q); m_tot.push_back(m); r_tot.push_back(r);
-        q_tot_w.push_back(coeff*q); m_tot_w.push_back(coeff*m); r_tot_w.push_back(coeff*r);
-        q_tot_2w.push_back(coeff*pow(q,2)); m_tot_2w.push_back(coeff*pow(m,2)); r_tot_2w.push_back(coeff*pow(r,2));
-        //this->linreg(ln_x_mean,ln_vel_mean,&q,&m,&r);
-        //std::cout << " m = " << m << " q = " << q << " R^2 = " << r << endl;
-        //QVector<double> ln_vel_fit; //QVector<double> best_line;
-        //double m_best = ((double)-1)/6;
-        //for(int i=0; i < ln_x.size(); ++i){
-            //ln_vel_fit.push_back(m*ln_x.at(i)+q);
-            //best_line.push_back(m_best*ln_x.at(i)+q);
-        //}
+        if(!ln_x_mov.empty()){
+            // R-squared regression
+            double q,m,r;
+            this->linreg(ln_x_mov,ln_vel_mov,&q,&m,&r);
+            if(ln_x_mov.size()!=0)
+                n_coeff++;
+            double coeff = ((double)ln_x_mov.size())/T_mov.size();
+            q_tot.push_back(q); m_tot.push_back(m); r_tot.push_back(r);
+            q_tot_w.push_back(coeff*q); m_tot_w.push_back(coeff*m); r_tot_w.push_back(coeff*r);
+            q_tot_2w.push_back(coeff*pow(q,2)); m_tot_2w.push_back(coeff*pow(m,2)); r_tot_2w.push_back(coeff*pow(r,2));
+            //this->linreg(ln_x_mean,ln_vel_mean,&q,&m,&r);
+            //std::cout << " m = " << m << " q = " << q << " R^2 = " << r << endl;
+            //QVector<double> ln_vel_fit; //QVector<double> best_line;
+            //double m_best = ((double)-1)/6;
+            //for(int i=0; i < ln_x.size(); ++i){
+                //ln_vel_fit.push_back(m*ln_x.at(i)+q);
+                //best_line.push_back(m_best*ln_x.at(i)+q);
+            //}
 
-        for(int i=0; i<ln_x.size();++i){
-            ln_x_tot.push_back(ln_x.at(i));
-            ln_vel_tot.push_back(ln_vel.at(i));
+            for(int i=0; i<ln_x_mov.size();++i){
+                ln_x_tot.push_back(ln_x_mov.at(i));
+                ln_vel_tot.push_back(ln_vel_mov.at(i));
+            }
+            coeff_tot +=coeff;
         }
-        coeff_tot +=coeff;
 
     }// task
 
@@ -228,7 +238,6 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
         best_line.push_back(m_best*ln_x_tot.at(i)+mean_q);
     }
 
-<<<<<<< HEAD
     /*
     // --- Hand Position --- //
     QVector<double> pos_x; QVector<double> pos_y; QVector<double> pos_z;
@@ -341,8 +350,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
 
 */
 
-=======
->>>>>>> eb58ceb1fe1890f5941cf560855cdbbe569982cf
+
 
     // plot the curvature
     ui->plot_curvature->plotLayout()->clear();
