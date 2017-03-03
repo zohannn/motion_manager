@@ -82,7 +82,7 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
 
     for(size_t i=0; i<hand_position_task.size();++i){
         vector<vector<vector<double>>> hand_position_mov = hand_position_task.at(i);
-        QVector<double> pos_u; QVector<double> pos_v;
+        QVector<double> pos_u; QVector<double> pos_v; QVector<double> pos_w;
         vector<vector<double>> tsteps_mov = timesteps.at(i);
         QVector<double> timesteps_mov;
         for(size_t j=0; j<hand_position_mov.size();++j){
@@ -95,26 +95,32 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
                 pos_y.push_back(hand_point.at(1)); // [mm]
                 //pos_z.push_back(hand_point.at(2)/1000); // [m]
 
-                pos_u.push_back(hand_point.at(0)/1000); // [m]
-                pos_v.push_back(hand_point.at(1)/1000); // [m]
+                pos_u.push_back(hand_point.at(0)/1000); // [m] u = x
+                pos_v.push_back(hand_point.at(1)/1000); // [m] v = y
+                pos_w.push_back(hand_point.at(2)/1000); // [m] w = z
             }
         } // mov
         // first derivatives
-        QVector<double> der_pos_u_1; QVector<double> der_pos_v_1;
+        QVector<double> der_pos_u_1; QVector<double> der_pos_v_1; QVector<double> der_pos_w_1;
         this->getDerivative(pos_u,timesteps_mov,der_pos_u_1);
         this->getDerivative(pos_v,timesteps_mov,der_pos_v_1);
+        this->getDerivative(pos_w,timesteps_mov,der_pos_w_1);
         // second derivatives
-        QVector<double> der_pos_u_2; QVector<double> der_pos_v_2;
+        QVector<double> der_pos_u_2; QVector<double> der_pos_v_2; QVector<double> der_pos_w_2;
         this->getDerivative(der_pos_u_1,timesteps_mov,der_pos_u_2);
         this->getDerivative(der_pos_v_1,timesteps_mov,der_pos_v_2);
+        this->getDerivative(der_pos_w_1,timesteps_mov,der_pos_w_2);
         // third derivatives
-        QVector<double> der_pos_u_3; QVector<double> der_pos_v_3;
+        QVector<double> der_pos_u_3; QVector<double> der_pos_v_3; QVector<double> der_pos_w_3;
         this->getDerivative(der_pos_u_2,timesteps_mov,der_pos_u_3);
         this->getDerivative(der_pos_v_2,timesteps_mov,der_pos_v_3);
+        this->getDerivative(der_pos_w_2,timesteps_mov,der_pos_w_3);
 
         // --- Curvature and Tangential Velocity --- //
         QVector<double> C_mov; // Curvature of the movement
         QVector<double> lnC_mov; // Curvature of the movement
+        QVector<double> R_mov; // Radius of the Curvature of the movement
+        QVector<double> lnR_mov; // Radius of the Curvature of the movement
         QVector<double> vel_tan_mov; // Velocity of the movement
         QVector<double> ln_vel_tan_mov; // Velocity of the movement
         for(int i=0; i<der_pos_u_1.size();++i){
@@ -122,35 +128,37 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
             Vector2d der_2(der_pos_u_2.at(i),der_pos_v_2.at(i));
             double num = abs((der_1(0)*der_2(1))-(der_1(1)*der_2(0)));
             double den = pow(der_1.norm(),3);
+
             if(den==0)
                 den=0.0001;
             C.push_back((double)num/den); // [m^⁻1]
             lnC.push_back(log(C.at(i)));
             C_mov.push_back((double)num/den); // [m^⁻1]
             lnC_mov.push_back(log(C_mov.at(i)));
-            //R.push_back(((double)1)/C.at(i)); // [m]
-            //lnR.push_back(log(R.at(i)));
-            vel_tan.push_back(((double)sqrt(pow(der_1(0),2)+pow(der_1(1),2)))); // [m/s]
+            R_mov.push_back(((double)1)/C_mov.at(i)); // [m]
+            lnR_mov.push_back(log(R_mov.at(i)));
+
+            vel_tan.push_back(der_1.norm()); // [m/s]
             ln_vel_tan.push_back(log(vel_tan.at(i)));
-            vel_tan_mov.push_back(((double)sqrt(pow(der_1(0),2)+pow(der_1(1),2)))); // [m/s]
+            vel_tan_mov.push_back(der_1.norm()); // [m/s]
             ln_vel_tan_mov.push_back(log(vel_tan_mov.at(i)));
         }
 
-        QVector<double> lnX; // Curvature^2
-        QVector<double> lnY; // Velocity
-        //QVector<int> index_t(index.size()); int k=0; int h=0; int hh;
+        // angular velocity
+        QVector<double> theta_mov; QVector<double> der_theta_mov;
+        for(size_t i=0; i< pos_u.size(); ++i){
+            theta_mov.push_back(std::atan2(pos_v.at(i),pos_u.at(i)));
+        }
+        this->getDerivative(theta_mov,timesteps_mov,der_theta_mov);
+
+        QVector<double> lnX; // Radius of the Curvature
+        QVector<double> lnY; // Tangential Velocity
         for(size_t i=0;  i<C_mov.size();++i){
-            //int mov_size = index.at(k);
-            //if(i>=mov_size){
-              //  hh = index_t.at(h);
-              //  h++;
-              //  index_t.replace(h,hh);
-              //  k++;
-            //}
             if(C_mov.at(i)>=0.0001){
-                lnX.push_back(log(pow(C_mov.at(i),2)));
+                lnX.push_back(log(abs(C_mov.at(i))));
                 lnY.push_back(ln_vel_tan_mov.at(i));
-                //index_t.replace(h,index_t.at(h)+1);
+                //lnX.push_back(lnR_mov.at(i));
+                //lnY.push_back(log(abs(der_theta_mov.at(i))));
             }
         }
 
@@ -200,7 +208,7 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
     double stdev_r = std::sqrt(norm*((((double)sq_sum_r) / coeff_tot) - pow(mean_r,2)));
 
     QVector<double> ln_vel_tot_fit; QVector<double> best_line;
-    double m_best = ((double)-1)/6;
+    double m_best = ((double)-1)/3;
     for(int i=0; i < lnX_tot.size(); ++i){
         ln_vel_tot_fit.push_back(mean_m*lnX_tot.at(i)+mean_q);
         best_line.push_back(m_best*lnX_tot.at(i)+mean_q);
@@ -337,9 +345,9 @@ void PowerLawDialog::setupPlots(vector<vector<double> > &hand_position, vector<v
     ui->plot_23->graph(0)->setPen(QPen(Qt::black));
     ui->plot_23->graph(0)->setLineStyle(QCPGraph::lsNone);
     ui->plot_23->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCross, 4));
-    ui->plot_23->graph(0)->setName("ln(V)/ln(C^2)");
+    ui->plot_23->graph(0)->setName("ln(V)/ln(C)");
     ui->plot_23->graph(0)->valueAxis()->setLabel("ln(V) [m/s]");
-    ui->plot_23->graph(0)->keyAxis()->setLabel("ln(C^2) [m^-2]");
+    ui->plot_23->graph(0)->keyAxis()->setLabel("ln(C) [1/m]");
     ui->plot_23->graph(0)->setData(lnX_tot, lnY_tot);
     ui->plot_23->graph(0)->valueAxis()->setRange(*std::min_element(lnY_tot.begin(), lnY_tot.end()),
                                                  *std::max_element(lnY_tot.begin(), lnY_tot.end()));

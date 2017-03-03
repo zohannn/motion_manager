@@ -292,6 +292,12 @@ public:
     bool get_add_plane();
 
     /**
+     * @brief set_add_plane
+     * @param plane
+     */
+    void set_add_plane(bool plane);
+
+    /**
      * @brief getPlaneParameters
      * a*x+b*y+c*z+d=0
      * @param params

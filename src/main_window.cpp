@@ -1450,7 +1450,7 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
                 roll=roll_min;
             if(roll>roll_max)
                 roll=roll_max;
-            pitch = 0.00175* mov_dist -4.3;
+            pitch = 0.00175* mov_dist -0.08;
             if (pitch<pitch_min)
                 pitch=pitch_min;
             if(pitch>pitch_max)
@@ -1524,22 +1524,31 @@ void MainWindow::on_pushButton_plan_2d_power_law_clicked()
 {
     int n_traj=100;
     double wmax = 50.0; // 50 deg/sec
+    int plane=0; // 0 = transverse plane, 1 = coronal plane, 2 = sagittal plane
+    if (ui.radioButton_transverse->isChecked())
+    {
+        plane=0;
+    }else if(ui.radioButton_coronal->isChecked()){
+        plane=1;
+    }else if(ui.radioButton_sagittal->isChecked()){
+        plane=2;
+    }
     std::vector<double> move_target;
 
 
     // mm
     double x; double x_min = -600; double x_max = -100;
     double y; double y_min = 200; double y_max = 800;
-    double z = 1000;
+    double z; double z_min = 1000; double z_max = 1500;
     // rad
-    double roll = 0.79;
+    double roll = 0;
     double pitch = -1.57;
     double yaw = 0;
 
     // plane
-    std::vector<double> point1={-400,0,1000};
-    std::vector<double> point2={-100,500,1000};
-    std::vector<double> point3={-200,600,1000};
+    //std::vector<double> point1={-400,0,1000};
+    //std::vector<double> point2={-100,500,1000};
+    //std::vector<double> point3={-200,600,1000};
 
 
     for(int i =0; i<n_traj;++i){
@@ -1557,8 +1566,24 @@ void MainWindow::on_pushButton_plan_2d_power_law_clicked()
 
             // generate random numbers
             std::srand(std::time(NULL));
-            x = x_min + (x_max-x_min)*(rand() / double(RAND_MAX));
-            y = y_min + (y_max-y_min)*(rand() / double(RAND_MAX));
+
+            switch(plane){
+            case 0: // transverse plane
+                x = x_min + (x_max-x_min)*(rand() / double(RAND_MAX));
+                y = y_min + (y_max-y_min)*(rand() / double(RAND_MAX));
+                z = z_min;
+                break;
+            case 1: // coronal plane
+                x = x_min;
+                y = y_min + (y_max-y_min)*(rand() / double(RAND_MAX));
+                z = z_min + (z_max-z_min)*(rand() / double(RAND_MAX));
+                break;
+            case 2: // sagittal plane
+                x = x_min + (x_max-x_min)*(rand() / double(RAND_MAX));
+                y = y_min+200;
+                z = z_min + (z_max-z_min)*(rand() / double(RAND_MAX));
+                break;
+            }
 
 
             // set the parameters
@@ -1577,40 +1602,40 @@ void MainWindow::on_pushButton_plan_2d_power_law_clicked()
                 mTolHumldlg->setRandInit(false); // disable random initialization
                 mTolHumldlg->setColl(false); // disable collisions
                 // plane constraints
-                mTolHumldlg->checkAddPlane(1);
-                mTolHumldlg->setPlaneParameters(point1,point2,point3);
+                //mTolHumldlg->set_add_plane(true);
+                //mTolHumldlg->setPlaneParameters(point1,point2,point3);
                 break;
             case 1: // RRT
                 mRRTdlg->setTargetMove(move_target);
                 // plane constraints
-                mRRTdlg->checkAddPlane(1);
-                mRRTdlg->setPlaneParameters(point1,point2,point3);
+                //mRRTdlg->set_add_plane(true);
+                //mRRTdlg->setPlaneParameters(point1,point2,point3);
                 break;
             case 2: // RRT Connect
                 mRRTConnectdlg->setTargetMove(move_target);
                 // plane constraints
-                mRRTConnectdlg->checkAddPlane(1);
-                mRRTConnectdlg->setPlaneParameters(point1,point2,point3);
+                //mRRTConnectdlg->set_add_plane(true);
+                //mRRTConnectdlg->setPlaneParameters(point1,point2,point3);
                 break;
             case 3: // RRT Star
                 mRRTstardlg->setTargetMove(move_target);
                 mRRTstardlg->setConfig(0); // PathLengthOptimizationObjective
                 // plane constraints
-                mRRTstardlg->checkAddPlane(1);
-                mRRTstardlg->setPlaneParameters(point1,point2,point3);
+                //mRRTstardlg->set_add_plane(true);
+                //mRRTstardlg->setPlaneParameters(point1,point2,point3);
                 break;
             case 4: // PRM
                 mPRMdlg->setTargetMove(move_target);
                 // plane constraints
-                mPRMdlg->checkAddPlane(1);
-                mPRMdlg->setPlaneParameters(point1,point2,point3);
+                //mPRMdlg->set_add_plane(true);
+                //mPRMdlg->setPlaneParameters(point1,point2,point3);
                 break;
             case 5: // PRM Star
                 mPRMstardlg->setTargetMove(move_target);
                 mPRMstardlg->setConfig(0); // PathLengthOptimizationObjective
                 // plane constraints
-                mPRMstardlg->checkAddPlane(1);
-                mPRMstardlg->setPlaneParameters(point1,point2,point3);
+                //mPRMstardlg->set_add_plane(true);
+                //mPRMstardlg->setPlaneParameters(point1,point2,point3);
                 break;
 
             }

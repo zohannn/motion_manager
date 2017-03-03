@@ -493,39 +493,11 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="layoutWidget_obj">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>140</y>
-         <width>265</width>
-         <height>54</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_obj">
-        <item>
-         <widget class="QLabel" name="label_objects">
-          <property name="text">
-           <string>Select the object involved in the movement</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBox_objects">
-          <item>
-           <property name="text">
-            <string>none</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-       </layout>
-      </widget>
       <widget class="QGroupBox" name="groupBox_grip">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>260</y>
+         <y>250</y>
          <width>161</width>
          <height>91</height>
         </rect>
@@ -667,28 +639,6 @@ p, li { white-space: pre-wrap; }
         <string>Add Movement</string>
        </property>
       </widget>
-      <widget class="QWidget" name="layoutWidget_eng_obj">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>200</y>
-         <width>265</width>
-         <height>54</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_eng_obj">
-        <item>
-         <widget class="QLabel" name="label_objects_eng">
-          <property name="text">
-           <string>Select the object engaged the movement</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBox_objects_eng"/>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
@@ -715,12 +665,68 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-      <widget class="QPushButton" name="pushButton_plan_3d_power_law">
+      <widget class="QGroupBox" name="groupBox_power_law">
        <property name="geometry">
         <rect>
          <x>270</x>
+         <y>240</y>
+         <width>141</width>
+         <height>141</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>2D power law</string>
+       </property>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>122</width>
+          <height>106</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QRadioButton" name="radioButton_transverse">
+           <property name="text">
+            <string>transverse</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radioButton_coronal">
+           <property name="text">
+            <string>coronal</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radioButton_sagittal">
+           <property name="text">
+            <string>sagittal</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_plan_2d_power_law">
+           <property name="text">
+            <string>Plan 2D power law</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QPushButton" name="pushButton_plan_3d_power_law">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
          <y>390</y>
-         <width>137</width>
+         <width>121</width>
          <height>23</height>
         </rect>
        </property>
@@ -728,18 +734,51 @@ p, li { white-space: pre-wrap; }
         <string>Plan 3D power law</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="pushButton_plan_2d_power_law">
+      <widget class="QWidget" name="">
        <property name="geometry">
         <rect>
-         <x>270</x>
-         <y>360</y>
-         <width>137</width>
-         <height>23</height>
+         <x>10</x>
+         <y>140</y>
+         <width>171</width>
+         <height>100</height>
         </rect>
        </property>
-       <property name="text">
-        <string>Plan 2D power law</string>
-       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_obj">
+          <item>
+           <widget class="QLabel" name="label_objects">
+            <property name="text">
+             <string>Select the involved object</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBox_objects">
+            <item>
+             <property name="text">
+              <string>none</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_eng_obj">
+          <item>
+           <widget class="QLabel" name="label_objects_eng">
+            <property name="text">
+             <string>Select the engaged object</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBox_objects_eng"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_task">
@@ -1080,7 +1119,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab_results_plan_mov">
          <attribute name="title">
@@ -1241,6 +1280,9 @@ p, li { white-space: pre-wrap; }
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_power_law">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="geometry">
            <rect>
             <x>870</x>

@@ -449,6 +449,11 @@ bool RRTstarDialog::get_add_plane()
 }
 
 
+void RRTstarDialog::set_add_plane(bool plane)
+{
+    ui->checkBox_add_plane->setChecked(plane);
+}
+
 
 
 } // namespace motion_manager

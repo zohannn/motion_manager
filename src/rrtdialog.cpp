@@ -420,4 +420,9 @@ bool RRTDialog::get_add_plane()
     return ui->checkBox_add_plane->isChecked();
 }
 
+void RRTDialog::set_add_plane(bool plane)
+{
+    ui->checkBox_add_plane->setChecked(plane);
+}
+
 } // namespace motion_manager

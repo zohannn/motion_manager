@@ -448,6 +448,11 @@ bool PRMstarDialog::get_add_plane()
     return ui->checkBox_add_plane->isChecked();
 }
 
+void PRMstarDialog::set_add_plane(bool plane)
+{
+    ui->checkBox_add_plane->setChecked(plane);
+}
+
 
 
 
