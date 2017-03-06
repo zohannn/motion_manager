@@ -2929,7 +2929,21 @@ void MainWindow::on_pushButton_save_res_task_clicked()
     string stdev_njs_str =  boost::str(boost::format("%.2f") % (stdev_njs));
     boost::replace_all(stdev_njs_str,",",".");
     results << string("sd njs = ")+stdev_njs_str+string(" \n");
-
+    //median
+    double median_njs = this->getMedian(this->njs_task);
+    string median_njs_str =  boost::str(boost::format("%.2f") % (median_njs));
+    boost::replace_all(median_njs_str,",",".");
+    results << string("median njs = ")+median_njs_str+string(" \n");
+    // 1st quartile
+    double first_quartile_njs = this->getFirstQuartile(this->njs_task);
+    string first_quartile_njs_str =  boost::str(boost::format("%.2f") % (first_quartile_njs));
+    boost::replace_all(first_quartile_njs_str,",",".");
+    results << string("first quartile njs = ")+first_quartile_njs_str+string(" \n");
+    // 3rd quartile
+    double third_quartile_njs = this->getThirdQuartile(this->njs_task);
+    string third_quartile_njs_str =  boost::str(boost::format("%.2f") % (third_quartile_njs));
+    boost::replace_all(third_quartile_njs_str,",",".");
+    results << string("third quartile njs = ")+third_quartile_njs_str+string(" \n");
 
     results << string("# NUMBER OF MOVEMENT UNITS \n");
     results << string("nmu = ");
@@ -2954,6 +2968,22 @@ void MainWindow::on_pushButton_save_res_task_clicked()
     string stdev_nmu_str =  boost::str(boost::format("%.2f") % (stdev_nmu));
     boost::replace_all(stdev_nmu_str,",",".");
     results << string("sd nmu = ")+stdev_nmu_str+string(" \n");
+    //median
+    double median_nmu = this->getMedian(this->nmu_task);
+    string median_nmu_str =  boost::str(boost::format("%.2f") % (median_nmu));
+    boost::replace_all(median_nmu_str,",",".");
+    results << string("median nmu = ")+median_nmu_str+string(" \n");
+    // 1st quartile
+    double first_quartile_nmu = this->getFirstQuartile(this->nmu_task);
+    string first_quartile_nmu_str =  boost::str(boost::format("%.2f") % (first_quartile_nmu));
+    boost::replace_all(first_quartile_nmu_str,",",".");
+    results << string("first quartile nmu = ")+first_quartile_nmu_str+string(" \n");
+    // 3rd quartile
+    double third_quartile_nmu = this->getThirdQuartile(this->nmu_task);
+    string third_quartile_nmu_str =  boost::str(boost::format("%.2f") % (third_quartile_nmu));
+    boost::replace_all(third_quartile_nmu_str,",",".");
+    results << string("third quartile nmu = ")+third_quartile_nmu_str+string(" \n");
+
 
     results << string("# TIME TAKEN TO PLAN THE MOVEMENT [ms] \n");
     results << string("prob_time = ");
@@ -2978,6 +3008,21 @@ void MainWindow::on_pushButton_save_res_task_clicked()
     string stdev_prob_str =  boost::str(boost::format("%.2f") % (stdev_prob));
     boost::replace_all(stdev_prob_str,",",".");
     results << string("sd plan time = ")+stdev_prob_str+string(" \n");
+    //median
+    double median_prob = this->getMedian(this->prob_time_task);
+    string median_prob_str =  boost::str(boost::format("%.2f") % (median_prob));
+    boost::replace_all(median_prob_str,",",".");
+    results << string("median prob = ")+median_prob_str+string(" \n");
+    // 1st quartile
+    double first_quartile_prob = this->getFirstQuartile(this->prob_time_task);
+    string first_quartile_prob_str =  boost::str(boost::format("%.2f") % (first_quartile_prob));
+    boost::replace_all(first_quartile_prob_str,",",".");
+    results << string("first quartile plan time = ")+first_quartile_prob_str+string(" \n");
+    // 3rd quartile
+    double third_quartile_prob = this->getThirdQuartile(this->prob_time_task);
+    string third_quartile_prob_str =  boost::str(boost::format("%.2f") % (third_quartile_prob));
+    boost::replace_all(third_quartile_prob_str,",",".");
+    results << string("third quartile plan time = ")+third_quartile_prob_str+string(" \n");
 
     string rate_success = ui.label_rate_task->text().toStdString();
     results << string("rate of success [%] = ")+rate_success+string(" \n");
@@ -2991,7 +3036,9 @@ void MainWindow::on_pushButton_save_res_task_clicked()
     handler->setTextMode(VectorWriter::NATIVE);
     handler->setFormat("PDF");
     string hand_pos_file = path.toStdString()+string("hand_pos_task.pdf");
-    IO::save(this->handPosPlot_task_ptr.get(), hand_pos_file.c_str(),  "PDF" );
+    if(this->handPosPlot_task_ptr!=nullptr){
+        IO::save(this->handPosPlot_task_ptr.get(), hand_pos_file.c_str(),  "PDF" );
+    }
 
 
     QString pdf_qstr; string pdf_str;
@@ -3186,6 +3233,122 @@ int MainWindow::getNumberMovementUnits(vector<double> &function, QVector<double>
 
     return nmu;
 
+}
+
+double MainWindow::getMedian(vector<double> v)
+{
+    double median;
+    size_t size = v.size();
+
+    sort(v.begin(), v.end());
+
+    if (size  % 2 == 0)
+    {
+        median = (v[size / 2 - 1] + v[size / 2]) / 2;
+    }
+    else
+    {
+        median = v[size / 2];
+    }
+
+    return median;
+}
+
+double MainWindow::getFirstQuartile(vector<double> v)
+{
+    double first_quartile;
+    size_t size = v.size()/4;
+
+    sort(v.begin(), v.end());
+
+    if (size  % 2 == 0)
+    {
+        first_quartile = (v[size / 2 - 1] + v[size / 2]) / 2;
+    }
+    else
+    {
+        first_quartile = v[size / 2];
+    }
+
+    return first_quartile;
+}
+
+double MainWindow::getThirdQuartile(vector<double> v)
+{
+    double third_quartile;
+    size_t size = 3*(v.size()/4);
+    size_t size_1 = v.size()/4;
+
+    sort(v.begin(), v.end());
+
+    if (size_1  % 2 == 0)
+    {
+        third_quartile = (v[size + size_1/2 - 1] + v[size + size_1/2]) / 2;
+    }
+    else
+    {
+        third_quartile = v[size + size_1/2];
+    }
+
+    return third_quartile;
+}
+
+double MainWindow::getMedian(vector<int> v)
+{
+    double median;
+    size_t size = v.size();
+
+    sort(v.begin(), v.end());
+
+    if (size  % 2 == 0)
+    {
+        median = (v[size / 2 - 1] + v[size / 2]) / 2;
+    }
+    else
+    {
+        median = v[size / 2];
+    }
+
+    return median;
+}
+
+double MainWindow::getFirstQuartile(vector<int> v)
+{
+    double first_quartile;
+    size_t size = v.size()/4;
+
+    sort(v.begin(), v.end());
+
+    if (size  % 2 == 0)
+    {
+        first_quartile = (v[size / 2 - 1] + v[size / 2]) / 2;
+    }
+    else
+    {
+        first_quartile = v[size / 2];
+    }
+
+    return first_quartile;
+}
+
+double MainWindow::getThirdQuartile(vector<int> v)
+{
+    double third_quartile;
+    size_t size = 3*(v.size()/4);
+    size_t size_1 = v.size()/4;
+
+    sort(v.begin(), v.end());
+
+    if (size_1  % 2 == 0)
+    {
+        third_quartile = (v[size + size_1/2 - 1] + v[size + size_1/2]) / 2;
+    }
+    else
+    {
+        third_quartile = v[size + size_1/2];
+    }
+
+    return third_quartile;
 }
 
 

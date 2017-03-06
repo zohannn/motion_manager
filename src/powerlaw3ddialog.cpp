@@ -543,7 +543,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
 
     ui->plot_16->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
     ui->plot_16->graph(2)->setPen(QPen(Qt::blue));
-    ui->plot_16->graph(2)->setName(QString("best fit slope: ")+QString::number(m_best));
+    ui->plot_16->graph(2)->setName(QString("best fit slope: ")+QString::number(m_best,'f',2));
 
     ui->plot_16->graph(2)->setData(ln_x_tot, best_line);
     ui->plot_16->graph(2)->rescaleAxes();

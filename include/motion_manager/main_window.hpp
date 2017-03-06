@@ -97,6 +97,48 @@ public:
          */
         int getNumberMovementUnits(vector<double> &function, QVector<double> &time);
 
+        /**
+         * @brief getMedian
+         * @param v
+         * @return
+         */
+        double getMedian(vector<double> v);
+
+        /**
+         * @brief getFirstQuartile
+         * @param v
+         * @return
+         */
+        double getFirstQuartile(vector<double> v);
+
+        /**
+         * @brief getThirdQuartile
+         * @param v
+         * @return
+         */
+        double getThirdQuartile(vector<double> v);
+
+        /**
+         * @brief getMedian
+         * @param v
+         * @return
+         */
+        double getMedian(vector<int> v);
+
+        /**
+         * @brief getFirstQuartile
+         * @param v
+         * @return
+         */
+        double getFirstQuartile(vector<int> v);
+
+        /**
+         * @brief getThirdQuartile
+         * @param v
+         * @return
+         */
+        double getThirdQuartile(vector<int> v);
+
 
 
 public Q_SLOTS:
