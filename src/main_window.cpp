@@ -1414,7 +1414,7 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
     double z; double z_min = 900; double z_max = 1500;
     // rad
     double roll; double roll_min = -0.7; double roll_max = 0.7;
-    double pitch; double pitch_min = -3.14 ; double pitch_max = -1.57;
+    double pitch; double pitch_min = -3.14 ; double pitch_max = 0;
     double yaw; double yaw_min = -0.3; double yaw_max = 0.3;
 
 
@@ -1442,15 +1442,17 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             T_hand.block<3,3>(0,0) = R_hand;
             T_hand.block<3,1>(0,3) = p_hand;
             T_hand(3,0)=0; T_hand(3,1)=0; T_hand(3,2)=0; T_hand(3,3)=1;
-            Vector4d p_point = T_hand*p; Vector3d point(p_point(0),p_point(1),p_point(2));
+            Vector4d p_point = (T_hand.inverse())*p; Vector3d point(p_point(0),p_point(1),p_point(2));
             double mov_dist = point.norm();
             double mov_dir = atan2(point(2),point(1));
             roll = 0.33*mov_dir+0.7;
+            //roll = 0.33*mov_dir+0.7;
             if(roll<roll_min)
                 roll=roll_min;
             if(roll>roll_max)
                 roll=roll_max;
-            pitch = 0.00175* mov_dist -0.08;
+            //pitch = 0.00175* mov_dist-0.08;
+            pitch = 0.00175* mov_dist-1.5;
             if (pitch<pitch_min)
                 pitch=pitch_min;
             if(pitch>pitch_max)
