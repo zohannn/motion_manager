@@ -125,7 +125,7 @@ add_library(HUML STATIC IMPORTED)
 set_property(TARGET HUML PROPERTY IMPORTED_LOCATION ${HUML_HOME}/${CMAKE_BUILD_TYPE}/libHUML.a)
 
 # -- IPOPT Solver
-set(IPOPT_HOME /home/gianpaolo/CoinIpopt)
+set(IPOPT_HOME /home/$ENV{USER}/CoinIpopt)
 include_directories(
     ${IPOPT_HOME}/${CMAKE_BUILD_TYPE}/include/coin
     ${IPOPT_HOME}/${CMAKE_BUILD_TYPE}/include/coin/ThirdParty

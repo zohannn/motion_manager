@@ -1400,8 +1400,8 @@ void MainWindow::on_pushButton_plan_trials_clicked()
 }
 void MainWindow::on_pushButton_plan_3d_power_law_clicked()
 {
-    int n_traj=100;
-    double wmax = 50.0; // 50 deg/sec
+    int n_traj=10;
+    double wmax = 100.0; // max joint velocity [deg/sec]
     std::vector<double> move_target;
 
     humanoidPtr hh = this->curr_scene->getHumanoid();
@@ -1413,9 +1413,15 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
     double y; double y_min = 200; double y_max = 800;
     double z; double z_min = 900; double z_max = 1500;
     // rad
+    double roll; double roll_min = -3.14; double roll_max = 3.14;
+    double pitch; double pitch_min = -3.14 ; double pitch_max = 3.14;
+    double yaw; double yaw_min = 1; double yaw_max = 1.5;
+/*
     double roll; double roll_min = -0.7; double roll_max = 0.7;
     double pitch; double pitch_min = -3.14 ; double pitch_max = 0;
-    double yaw; double yaw_min = -0.3; double yaw_max = 0.3;
+    double yaw; double yaw_min = 0.3; double yaw_max = 0.6;
+    //double yaw; double yaw_min = 1; double yaw_max = 1;
+*/
 
 
     for(int i =0; i<n_traj;++i){
@@ -1436,6 +1442,8 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             x = x_min + (x_max-x_min)*(rand() / double(RAND_MAX));
             y = y_min + (y_max-y_min)*(rand() / double(RAND_MAX));
             z = z_min + (z_max-z_min)*(rand() / double(RAND_MAX));
+
+
             Vector4d p(x,y,z,1);
             hh->getRightHandPos(pos_hand); Vector3d p_hand(pos_hand.at(0),pos_hand.at(1),pos_hand.at(2));
             hh->getRightHandOr(R_hand);
@@ -1445,24 +1453,25 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             Vector4d p_point = (T_hand.inverse())*p; Vector3d point(p_point(0),p_point(1),p_point(2));
             double mov_dist = point.norm();
             double mov_dir = atan2(point(2),point(1));
-            roll = 0.33*mov_dir+0.7;
+            roll = 0.33*mov_dir-0.7;
             //roll = 0.33*mov_dir+0.7;
             if(roll<roll_min)
                 roll=roll_min;
             if(roll>roll_max)
                 roll=roll_max;
             //pitch = 0.00175* mov_dist-0.08;
-            pitch = 0.00175* mov_dist-1.5;
+            pitch = -0.00175* mov_dist+0.1;
             if (pitch<pitch_min)
                 pitch=pitch_min;
             if(pitch>pitch_max)
                 pitch=pitch_max;
 
 
-            //roll = roll_min + (roll_max-roll_min)*(rand() / double(RAND_MAX));
-            //pitch = pitch_min + (pitch_max-pitch_min)*(rand() / double(RAND_MAX));
+            /*
+            roll = roll_min + (roll_max-roll_min)*(rand() / double(RAND_MAX));
+            pitch = pitch_min + (pitch_max-pitch_min)*(rand() / double(RAND_MAX));
+            */
             yaw = yaw_min + (yaw_max-yaw_min)*(rand() / double(RAND_MAX));
-
 
             // set the parameters
             move_target.clear();
@@ -1513,6 +1522,7 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             }else{
                 solved = false;
             }
+
 
             sleep(1);
 
