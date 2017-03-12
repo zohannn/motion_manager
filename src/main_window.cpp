@@ -1400,12 +1400,12 @@ void MainWindow::on_pushButton_plan_trials_clicked()
 }
 void MainWindow::on_pushButton_plan_3d_power_law_clicked()
 {
-    int n_traj=10;
-    double wmax = 100.0; // max joint velocity [deg/sec]
+    int n_traj=100;
+    double wmax = 50.0; // max joint velocity [deg/sec]
     std::vector<double> move_target;
 
-    humanoidPtr hh = this->curr_scene->getHumanoid();
-    Matrix4d T_hand; Matrix3d R_hand; vector<double> pos_hand;
+    //humanoidPtr hh = this->curr_scene->getHumanoid();
+    //Matrix4d T_hand; Matrix3d R_hand; vector<double> pos_hand;
 
     // see Brami et al. 2003
     // mm
@@ -1413,9 +1413,9 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
     double y; double y_min = 200; double y_max = 800;
     double z; double z_min = 900; double z_max = 1500;
     // rad
-    double roll; double roll_min = -3.14; double roll_max = 3.14;
-    double pitch; double pitch_min = -3.14 ; double pitch_max = 3.14;
-    double yaw; double yaw_min = 1; double yaw_max = 1.5;
+    double roll = 0.79; //double roll_min = -3.14; double roll_max = 3.14;
+    double pitch = -1.57; //double pitch_min = -3.14 ; double pitch_max = 3.14;
+    double yaw = 0; //double yaw_min = 1; double yaw_max = 1.5;
 /*
     double roll; double roll_min = -0.7; double roll_max = 0.7;
     double pitch; double pitch_min = -3.14 ; double pitch_max = 0;
@@ -1443,7 +1443,7 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             y = y_min + (y_max-y_min)*(rand() / double(RAND_MAX));
             z = z_min + (z_max-z_min)*(rand() / double(RAND_MAX));
 
-
+/*
             Vector4d p(x,y,z,1);
             hh->getRightHandPos(pos_hand); Vector3d p_hand(pos_hand.at(0),pos_hand.at(1),pos_hand.at(2));
             hh->getRightHandOr(R_hand);
@@ -1467,11 +1467,12 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
                 pitch=pitch_max;
 
 
-            /*
+
             roll = roll_min + (roll_max-roll_min)*(rand() / double(RAND_MAX));
             pitch = pitch_min + (pitch_max-pitch_min)*(rand() / double(RAND_MAX));
-            */
+
             yaw = yaw_min + (yaw_max-yaw_min)*(rand() / double(RAND_MAX));
+            */
 
             // set the parameters
             move_target.clear();
