@@ -4,3 +4,7 @@
 #define PATH_SCENARIOS "@PATH_SCENARIOS@"
 // HAND
 #define HAND @HAND@
+
+
+// MOVEIT
+#define MOVEIT @MOVEIT@

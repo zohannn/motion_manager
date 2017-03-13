@@ -170,8 +170,10 @@ bool  QNode::loadScenario(const std::string& path,int id)
             break;
 
         }
+#if MOVEIT==1
         // planning scene of RViZ
         planning_scene_interface_ptr.reset(new moveit::planning_interface::PlanningSceneInterface());
+#endif
         return true;
     }else{
         return false;
@@ -180,6 +182,7 @@ bool  QNode::loadScenario(const std::string& path,int id)
 
 }
 
+#if MOVEIT==1
 void QNode::loadRVizScenario(std::vector<objectPtr> &objs)
 {
     vector<string> rem_object_ids;
@@ -243,6 +246,7 @@ void QNode::loadRVizScenario(std::vector<objectPtr> &objs)
     ros::WallDuration(5.0).sleep();
 
 }
+#endif
 
 void QNode::resetSimTime()
 {

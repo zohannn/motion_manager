@@ -19,12 +19,6 @@ find_package(catkin REQUIRED COMPONENTS
 )
 include_directories(${catkin_INCLUDE_DIRS})
 
-find_package(aros_moveit_planner REQUIRED COMPONENTS
-  humanoid_planner
-)
-include_directories(${aros_moveit_planner_INCLUDE_DIRS})
-
-
 
 # Use this to define what the package will export (e.g. libs, headers).
 # Since the default here is to produce only a binary, we don't worry about
@@ -73,6 +67,18 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 # Settings
 ##############################################################################
 
+## MoveIt! configuration
+# MOVEIT=0. do not use the moveit planner
+# MOVEIT=1, use the moveit planner
+set (MOVEIT 0)
+
+if(MOVEIT)
+    find_package(aros_moveit_planner REQUIRED COMPONENTS
+      humanoid_planner
+    )
+    include_directories(${aros_moveit_planner_INCLUDE_DIRS})
+endif()
+
 ## Humanoid parts configuration
 # 1 means that the part is present and it is taken into account for the generation of the trajectories,
 # 0 otherwise.
@@ -113,6 +119,7 @@ set(TEST 0)
 # DOC=0. do not make the documentation
 # DOC=1, make the documentation
 set(DOC 0)
+
 
 ##############################################################################
 # External libraries
@@ -191,9 +198,11 @@ target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${catkin_LIBRARIES} ${Boos
 # ********** link external libraries ********
 # Human-like Upper-limbs Motion Library (HUML)
 target_link_libraries(${PROJECT_NAME} HUML)
-# Humanoid moveit planner Library
-target_link_libraries(${PROJECT_NAME} humanoid_planner)
 
+if(MOVEIT)
+    # Humanoid moveit planner Library
+    target_link_libraries(${PROJECT_NAME} humanoid_planner)
+endif()
 
 # -- IPOPT Solver
 target_link_libraries(${PROJECT_NAME} libipopt.a)

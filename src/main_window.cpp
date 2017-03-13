@@ -42,10 +42,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     // create Vrep Communication dialog
     mvrepCommdlg = new VrepCommDialog(&qnode, this);
     mvrepCommdlg->setModal(true);
-
+#if MOVEIT==1
     // create RViz Communication dialog
     mrvizCommdlg = new RVizCommDialog(&qnode, this);
     mrvizCommdlg->setModal(true);
+#endif
 
     //create HUML Tuning dialog
     mTolHumldlg = new TolDialogHUML(this);
@@ -105,9 +106,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
     // V-REP connected signal
     QObject::connect(mvrepCommdlg, SIGNAL(vrepConnected(bool)), this, SLOT(updateVrepStatus(bool)));
-
+#if MOVEIT==1
     // RViz connectedsignal
     QObject::connect(mrvizCommdlg, SIGNAL(rvizConnected(bool)), this, SLOT(updateRVizStatus(bool)));
+#endif
 
 
     // new element in the scenario signal
@@ -129,6 +131,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     **********************/    
     ui.tabWidget_main->setCurrentIndex(0);
     ui.tabWidget_sol->setCurrentIndex(0);
+#if MOVEIT==0
+    ui.pushButton_execMov_moveit->setEnabled(false);
+    ui.comboBox_planner->clear();
+    ui.comboBox_planner->addItem(QString("HUML"));
+#endif
 
     // scenarios
 #if HAND == 0
@@ -191,9 +198,15 @@ void MainWindow::updateVrepStatus(bool c)
 
     if (c){
         ui.labelVrepComm->setText(QString("on-line"));
+#if MOVEIT==1
         ui.actionRViz_Communication->setEnabled(true);
         ui.labelStatusRViz->setEnabled(true);
         ui.labelRVizComm->setEnabled(true);
+#elif MOVEIT==0
+        ui.tab_scenario->setEnabled(true);
+        ui.groupBox_selectScenario->setEnabled(true);
+
+#endif
         //ui.tab_scenario->setEnabled(true);
         //ui.groupBox_selectScenario->setEnabled(true);
         //ui.listWidget_scenario->setCurrentRow(0);
@@ -284,13 +297,13 @@ void MainWindow::on_actionVrep_Communication_triggered()
 
     mvrepCommdlg->show();
 }
-
+#if MOVEIT==1
 void MainWindow::on_actionRViz_Communication_triggered()
 {
 
     mrvizCommdlg->show();
 }
-
+#endif
 
 /*****************************************************************************
 ** Implementation [Configuration]
@@ -405,7 +418,9 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      string title = string("Assembly scenario: the Toy vehicle with ARoS");
                      init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
                      curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
                      this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
 
                  }else{
                      qnode.log(QNode::Error,std::string("Assembly scenario: the Toy vehicle with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
@@ -431,7 +446,9 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      string title = string("Empty scenario: empty with ARoS");
                      init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
                      curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
                      this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
 
                  }else{
                      qnode.log(QNode::Error,std::string("Empty scenario: empty scenario with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
@@ -452,7 +469,9 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      string title = string("Empty scenario: empty scenario with ARoS and NO collisions");
                      init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
                      curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
                      this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
 
                  }else{
                      qnode.log(QNode::Error,std::string("Empty scenario: empty scenario with ARoS and NO collisions HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
@@ -514,7 +533,9 @@ void MainWindow::on_pushButton_getElements_clicked()
             ui.tabWidget_sol->setEnabled(false);
             // load the objects into RViz
             std::vector<objectPtr> objs; this->curr_scene->getObjects(objs);
+#if MOVEIT==1
             qnode.loadRVizScenario(objs);
+#endif
             qnode.log(QNode::Info,string("The elements of the scenario are now available"));
 
         }else{
@@ -598,7 +619,9 @@ void MainWindow::on_pushButton_addMov_clicked()
                     if(planner_id==0){
                         curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                     }else{
+#if MOVEIT==1
                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+#endif
                     }
                     success=true;
 
@@ -628,7 +651,9 @@ void MainWindow::on_pushButton_addMov_clicked()
                      if(planner_id==0){
                         curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                      }else{
+#if MOVEIT==1
                         curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+#endif
                      }
                      success=true;
 
@@ -643,7 +668,9 @@ void MainWindow::on_pushButton_addMov_clicked()
                  if(planner_id==0){
                     curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel),new Scenario(*(this->curr_scene.get()))));
                 }else{
+#if MOVEIT==1
                     curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel),new Scenario(*(this->curr_scene.get())),this->m_planner));
+#endif
                  }
                  success=true;
 
@@ -676,7 +703,9 @@ void MainWindow::on_pushButton_plan_clicked()
     std::vector<double> move_final_hand;
     std::vector<double> move_final_arm;
     bool use_final;
+#if MOVEIT==1
     moveit_planning::moveit_params m_params;
+#endif
     bool moveit_plan = false;
 
     bool solved = false;
@@ -767,6 +796,7 @@ void MainWindow::on_pushButton_plan_clicked()
         }
         break;
     case 1: // RRT
+#if MOVEIT==1
         moveit_plan = true;
         mRRTdlg->setInfo(prob->getInfoLine());
         // configuration
@@ -787,10 +817,11 @@ void MainWindow::on_pushButton_plan_clicked()
 
         m_results = prob->solve(m_params); // plan the movement
         ui.pushButton_plan->setCheckable(false);
-
+#endif
         break;
 
     case 2: // RRT Connect
+#if MOVEIT==1
         moveit_plan = true;
         mRRTConnectdlg->setInfo(prob->getInfoLine());
         // configuration
@@ -811,10 +842,12 @@ void MainWindow::on_pushButton_plan_clicked()
 
         m_results = prob->solve(m_params); // plan the movement
         ui.pushButton_plan->setCheckable(false);
+#endif
 
         break;
 
     case 3: // RRT star
+#if MOVEIT==1
         moveit_plan = true;
         mRRTstardlg->setInfo(prob->getInfoLine());
         // configuration
@@ -835,10 +868,11 @@ void MainWindow::on_pushButton_plan_clicked()
 
         m_results = prob->solve(m_params); // plan the movement
         ui.pushButton_plan->setCheckable(false);
-
+#endif
         break;
 
     case 4: // PRM
+#if MOVEIT==1
         moveit_plan = true;
         mPRMdlg->setInfo(prob->getInfoLine());
         // configuration
@@ -859,10 +893,11 @@ void MainWindow::on_pushButton_plan_clicked()
 
         m_results = prob->solve(m_params); // plan the movement
         ui.pushButton_plan->setCheckable(false);
-
+#endif
         break;
 
     case 5: // PRM star
+#if MOVEIT==1
         moveit_plan = true;
         mPRMstardlg->setInfo(prob->getInfoLine());
         // configuration
@@ -883,7 +918,7 @@ void MainWindow::on_pushButton_plan_clicked()
 
         m_results = prob->solve(m_params); // plan the movement
         ui.pushButton_plan->setCheckable(false);
-
+#endif
         break;
 
     } // switch planners
@@ -891,6 +926,7 @@ void MainWindow::on_pushButton_plan_clicked()
 }catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
 }catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
 
+#if MOVEIT==1
     if(moveit_plan){
         if(m_results!=nullptr){
             if(m_results->status==1){
@@ -1225,6 +1261,7 @@ void MainWindow::on_pushButton_plan_clicked()
             qnode.log(QNode::Error,std::string("The planning has failed: unknown status"));
         }
     }
+#endif
 
 
 // --- RESULTS --- //
@@ -1515,7 +1552,9 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             if(prob->getSolved()){
                 this->on_pushButton_append_mov_clicked();
                 if(planner_id!=0){
+#if MOVEIT==1
                     this->on_pushButton_execMov_moveit_clicked();
+#endif
                 }
                 this->on_pushButton_execMov_clicked();
 
@@ -1658,7 +1697,9 @@ void MainWindow::on_pushButton_plan_2d_power_law_clicked()
             if(prob->getSolved()){
                 this->on_pushButton_append_mov_clicked();
                 if(planner_id!=0){
+#if MOVEIT==1
                     this->on_pushButton_execMov_moveit_clicked();
+#endif
                 }
                 this->on_pushButton_execMov_clicked();
 
@@ -1694,12 +1735,13 @@ void MainWindow::on_pushButton_execMov_clicked()
     qnode.execMovement(this->jointsPosition_mov,this->jointsVelocity_mov,this->timesteps_mov, this->tols_stop_mov, this->curr_mov, this->curr_scene);
 
 }
-
+#if MOVEIT==1
 void MainWindow::on_pushButton_execMov_moveit_clicked()
 {
     if(this->moveit_mov)
         this->m_planner->execute(m_results);
 }
+#endif
 
 void MainWindow::on_pushButton_stop_mov_clicked()
 {
@@ -1922,7 +1964,9 @@ void MainWindow::on_pushButton_load_task_clicked()
                     if(plan_id==0){
                         prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                     }else{
+#if MOVEIT==1
                         prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+#endif
                     }
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
@@ -1933,7 +1977,9 @@ void MainWindow::on_pushButton_load_task_clicked()
                     if(plan_id==0){
                         prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get()))));
                     }else{
+#if MOVEIT==1
                         prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get())),this->m_planner));
+#endif
                     }
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
@@ -1962,7 +2008,9 @@ void MainWindow::on_pushButton_load_task_clicked()
                     if(plan_id==0){
                         prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
                     }else{
+#if MOVEIT==1
                         prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+#endif
                     }
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
@@ -1975,7 +2023,9 @@ void MainWindow::on_pushButton_load_task_clicked()
                     if(plan_id==0){
                         prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get()))));
                     }else{
+#if MOVEIT==1
                         prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get())),this->m_planner));
+#endif
                     }
                     prob->setSolved(true);
                     prob->setPartOfTask(true);
@@ -2268,7 +2318,9 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     this->jointsPosition_mov.clear();
     this->timesteps_mov.clear();
     this->tols_stop_mov.clear();
+#if MOVEIT==1
     this->m_planner.reset(new moveit_planning::HumanoidPlanner(this->init_scene->getName()));
+#endif
 
     this->curr_scene = scenarioPtr(new Scenario(*(this->init_scene.get())));
     qnode.resetSimTime();
@@ -2350,7 +2402,9 @@ void MainWindow::on_pushButton_scene_reset_clicked()
         ui.groupBox_getElements->setEnabled(true);
         ui.groupBox_homePosture->setEnabled(true);
         std::vector<objectPtr> objs; this->curr_scene->getObjects(objs);
+#if MOVEIT==1
         qnode.loadRVizScenario(objs);
+#endif
     }else{
         qnode.log(QNode::Error,failure);
         ui.groupBox_getElements->setEnabled(false);

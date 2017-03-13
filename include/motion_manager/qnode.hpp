@@ -108,12 +108,13 @@ public:
          * @return
          */
         bool loadScenario(const string &path,int id);
-
+#if MOVEIT==1
         /**
          * @brief loadRVizScenario
          * @param objs
          */
         void loadRVizScenario(std::vector<objectPtr>& objs);
+#endif()
 
         /**
          * @brief This method gets the elements of the scenario
@@ -259,7 +260,9 @@ private:
         ros::Subscriber subWheel2; /**< ROS sunscriber to the topic /vrep/Wheel2_pose (obj_id=7 in the toy vehicle scenario) */
         ros::Subscriber subBase; /**< ROS sunscriber to the topic /vrep/Base_pose (obj_id=8 in the toy vehicle scenario) */
         // -----------------------------------------------------------------------------------------------------------------------------------
+#if MOVEIT==1
         boost::shared_ptr<moveit::planning_interface::PlanningSceneInterface> planning_scene_interface_ptr;/**< scene interface */
+#endif()
         QStringListModel logging_model; /**< list of loggings */
         bool simulationRunning; /**< true if the simulation in V-REP is running */
         double simulationTime;/**< current time of the simulation */

@@ -158,10 +158,12 @@ public Q_SLOTS:
          */
         void on_actionVrep_Communication_triggered();
 
+#if MOVEIT==1
         /**
          * @brief This method shows the RViz communication dialog
          */
         void on_actionRViz_Communication_triggered();
+#endif
 
         /**
          * @brief This method loads the selected scenario
@@ -237,11 +239,12 @@ public Q_SLOTS:
          * @brief This method executes the selected movement
          */
         void on_pushButton_execMov_clicked();
-
+#if MOVEIT==1
         /**
          * @brief on_pushButton_execMov_moveit_clicked
          */
         void on_pushButton_execMov_moveit_clicked();
+#endif
 
         /**
          * @brief on_pushButton_execMov_moveit_pressed
@@ -417,7 +420,9 @@ private:
         QNode qnode; /**< ROS node handle */
         RosCommDialog *mrosCommdlg; /**< handle of the ROS communication dialog */
         VrepCommDialog *mvrepCommdlg; /**< handle of the V-REP communication dialog */
+#if MOVEIT==1
         RVizCommDialog *mrvizCommdlg; /**< handle of the RViz communication dialog */
+#endif
         TolDialogHUML *mTolHumldlg; /**< handle of the HUML tuning dialog */
         RRTDialog *mRRTdlg; /**< handle of the RRT tuning dialog */
         RRTConnectDialog *mRRTConnectdlg; /**< handle of the RRT Connect tuning dialog */
@@ -462,10 +467,12 @@ private:
         vector<double> njs_task;/**< normalized jerk scores of the movements in the task */
         vector<int> nmu_task;/**< number of the movement units in the task */
 
-        moveit_plannerPtr m_planner; /**< MoveIt! Libraries planner */
         bool moveit_mov; /**< true if the movement has been planned by the moveit planner, false otherwise */
         HUMotion::planning_result_ptr h_results; /**< results of the HUML planner */
+#if MOVEIT==1
+        moveit_plannerPtr m_planner; /**< MoveIt! Libraries planner */
         moveit_planning::PlanningResultPtr m_results; /**< results of the moveit planner */
+#endif
 
 
         movementPtr curr_mov; /**< current movement */

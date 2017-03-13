@@ -58,7 +58,9 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
         HUMotion::HUMPlanner::joints_arm = JOINTS_ARM;
         HUMotion::HUMPlanner::joints_hand = JOINTS_HAND;
         HUMotion::HUMPlanner::n_phalange = N_PHALANGE;
+#if MOVEIT==1
         this->m_planner = nullptr;
+#endif
         this->h_planner.reset(new HUMotion::HUMPlanner(scene_name));
         // set the current obstacles and targets of the scenario
         vector<objectPtr> scene_objects;
@@ -160,6 +162,7 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
 
 }
 
+#if MOVEIT==1
 Problem::Problem(int planner_id, Movement *mov, Scenario *scene, moveit_plannerPtr m_plannerPtr)
 {
     this->rightFinalPosture = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
@@ -206,6 +209,7 @@ Problem::Problem(int planner_id, Movement *mov, Scenario *scene, moveit_plannerP
 
 
 }
+#endif
 
 Problem::Problem(const Problem& s)
 {
@@ -230,9 +234,11 @@ Problem::Problem(const Problem& s)
     this->targetAxis = s.targetAxis;
     this->mov = movementPtr(new Movement(*s.mov.get()));
     this->scene = scenarioPtr(new Scenario(*s.scene.get()));
+#if MOVEIT==1
     if(s.m_planner!=nullptr){
         this->m_planner = moveit_plannerPtr(new moveit_planning::HumanoidPlanner(*s.m_planner.get()));
     }
+#endif
     if(s.h_planner!=nullptr){
         this->h_planner = h_plannerPtr(new HUMotion::HUMPlanner(*s.h_planner.get()));
     }
@@ -1065,7 +1071,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
     return res;
 }
 
-
+#if MOVEIT==1
 moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params &params)
 {
     this->solved = false;
@@ -1211,6 +1217,7 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
 
 
 }
+#endif
 
 long long Problem::GetTimeMs64()
 {
