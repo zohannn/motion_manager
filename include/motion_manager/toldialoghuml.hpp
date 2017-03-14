@@ -193,13 +193,13 @@ public:
      * @brief getVelApproach
      * @param vel_approach
      */
-    void getVelApproach(std::vector<double>& vel_approach);
+    //void getVelApproach(std::vector<double>& vel_approach);
 
     /**
      * @brief getAccApproach
      * @param acc_approach
      */
-    void getAccApproach(std::vector<double>& acc_approach);
+    //void getAccApproach(std::vector<double>& acc_approach);
 
     /**
      * @brief getPreGraspApproach

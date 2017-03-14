@@ -730,8 +730,8 @@ void MainWindow::on_pushButton_plan_clicked()
         mTolHumldlg->getFinalVel(tols.bounds.vel_f); // final velocity
         mTolHumldlg->getInitAcc(tols.bounds.acc_0); // initial acceleration
         mTolHumldlg->getFinalAcc(tols.bounds.acc_f); // final acceleration
-        mTolHumldlg->getVelApproach(tols.vel_approach); // velocity approach
-        mTolHumldlg->getAccApproach(tols.acc_approach); // acceleration approach
+        //mTolHumldlg->getVelApproach(tols.vel_approach); // velocity approach
+        //mTolHumldlg->getAccApproach(tols.acc_approach); // acceleration approach
         // tolerances for the obstacles
         mTolHumldlg->getTolsObstacles(tols.final_tolsObstacles); // final posture tols
         tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
