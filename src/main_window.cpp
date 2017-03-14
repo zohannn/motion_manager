@@ -219,8 +219,8 @@ void MainWindow::updateVrepStatus(bool c)
         //ui.groupBox_selectScenario->setEnabled(false);
         //ui.listWidget_scenario->setCurrentRow(0);
     }
-    //ui.pushButton_loadScenario->setEnabled(false);
-    //ui.groupBox_getElements->setEnabled(false);
+    ui.pushButton_loadScenario->setEnabled(false);
+    ui.groupBox_getElements->setEnabled(false);
 }
 
 void MainWindow::updateRVizStatus(bool c)
