@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Results about he 1/6 power law</string>
+   <string>Results about the 1/6 power law</string>
   </property>
   <widget class="QPushButton" name="pushButton_save">
    <property name="geometry">
@@ -26,7 +26,7 @@
     <string>Save</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>21</x>

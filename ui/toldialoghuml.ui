@@ -2603,6 +2603,9 @@
      </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_vel_approach">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>530</x>
@@ -2790,6 +2793,9 @@
      </widget>
     </widget>
     <widget class="QGroupBox" name="groupBox_acc_approach">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>720</x>

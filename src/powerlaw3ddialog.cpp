@@ -28,36 +28,34 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     QVector<double> acc; // Acceleration of the task
     double coeff_tot=0; // sum of the coefficient
     int n_coeff=0; // number of the non-zero coefficient
+    int offset=0; // offset to go trough the stages of hand_position
     for(size_t i=0; i<timesteps.size();++i){
         vector<vector<double>> tsteps_mov = timesteps.at(i);
-        double time_init;
+        double time_init_mov;
         if(time_task.empty()){
-            time_init=0.0;
+            time_init_mov=0.0;
         }else{
-            time_init=time_task.at(time_task.size()-1);
-        }
-        int offset;
-        if(i==0){
-            offset=0;
-        }else{
-            vector<vector<vector<double>>> h_mov = hand_position_task.at(i-1);
-            for(size_t ii=0; ii<h_mov.size();ii++){
-                vector<vector<double>> h_stage = h_mov.at(ii);
-                offset += h_stage.size();
-            }
+            time_init_mov=time_task.at(time_task.size()-1);
         }
         vector<double> time_mov;
         vector<vector<vector<double>>> hand_position_mov;
         for(size_t j=0; j<tsteps_mov.size();++j){
             vector<double> tsteps_stage = tsteps_mov.at(j);
             vector<double> time_stage(tsteps_stage.size());
-            time_stage.at(0) = time_init;
+            double time_init_stage;
+            if(time_mov.empty()){
+                time_init_stage = time_init_mov;
+            }else{
+                time_init_stage = time_mov.at(time_mov.size()-1);
+            }
+            time_stage.at(0) = time_init_stage;
             vector<vector<double>> hand_position_stage;
             for(size_t k=0;k<tsteps_stage.size();++k){
                 tot_timesteps.push_back(tsteps_stage.at(k));
                 if(k>0){time_stage.at(k) = time_stage.at(k-1) + tsteps_stage.at(k-1);}
                 hand_position_stage.push_back(hand_position.at(k+offset));
             }// stage
+            offset += hand_position_stage.size();
             index.push_back(tot_timesteps.size());
             time_mov.reserve(time_stage.size());
             std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time_mov));

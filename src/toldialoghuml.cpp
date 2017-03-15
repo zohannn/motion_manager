@@ -230,6 +230,7 @@ void TolDialogHUML::getFinalAcc(std::vector<double> &final_acc)
 }
 
 /*
+
 void TolDialogHUML::getVelApproach(std::vector<double> &vel_approach)
 {
     vel_approach.clear();
@@ -261,8 +262,8 @@ void TolDialogHUML::getAccApproach(std::vector<double> &acc_approach)
     acc_approach.push_back(ui->lineEdit_acc_approach_10->text().toDouble());
     acc_approach.push_back(ui->lineEdit_acc_approach_11->text().toDouble());
 }
-*/
 
+*/
 void TolDialogHUML::getPreGraspApproach(std::vector<double> &pre_grasp)
 {
     pre_grasp.clear();
