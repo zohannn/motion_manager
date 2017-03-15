@@ -29,6 +29,8 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     double coeff_tot=0; // sum of the coefficient
     int n_coeff=0; // number of the non-zero coefficient
     int offset=0; // offset to go trough the stages of hand_position
+    this->slopes.clear(); this->r_squared.clear(); this->n_points.clear();
+
     for(size_t i=0; i<timesteps.size();++i){
         vector<vector<double>> tsteps_mov = timesteps.at(i);
         double time_init_mov;
@@ -161,22 +163,14 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
         QVector<double> ln_vel_mov; QVector<double> ln_x_mov;
         //QVector<int> index_t(index.size()); int k=0; int h=0; int hh;
         for(int i=0; i<der_pos_x_1.size();++i){
-            //int mov_size = index.at(k);
-            //if(i>=mov_size){
-              //  hh = index_t.at(h);
-              //  h++;
-              //  index_t.replace(h,hh);
-              //  k++;
-            //}
             if((abs(T_mov.at(i))>=2) && (K_mov.at(i)>=0.0001)){// threshold value taken into account to eliminate the torsion cups and planar regions
                 ln_x_mov.push_back(log(pow(K_mov.at(i),2)*abs(T_mov.at(i))));
                 ln_vel_mov.push_back(log(vel_mov.at(i)));
-                //index_t.replace(h,index_t.at(h)+1);
             }
         }
 
-        if(!ln_x_mov.empty()){
-            // R-squared regression
+        if(ln_x_mov.size()>1){
+            // R-squared linear regression
             double q,m,r;
             this->linreg(ln_x_mov,ln_vel_mov,&q,&m,&r);
             if(ln_x_mov.size()!=0)
@@ -185,20 +179,22 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
             q_tot.push_back(q); m_tot.push_back(m); r_tot.push_back(r);
             q_tot_w.push_back(coeff*q); m_tot_w.push_back(coeff*m); r_tot_w.push_back(coeff*r);
             q_tot_2w.push_back(coeff*pow(q,2)); m_tot_2w.push_back(coeff*pow(m,2)); r_tot_2w.push_back(coeff*pow(r,2));
-            //this->linreg(ln_x_mean,ln_vel_mean,&q,&m,&r);
-            //std::cout << " m = " << m << " q = " << q << " R^2 = " << r << endl;
-            //QVector<double> ln_vel_fit; //QVector<double> best_line;
-            //double m_best = ((double)-1)/6;
-            //for(int i=0; i < ln_x.size(); ++i){
-                //ln_vel_fit.push_back(m*ln_x.at(i)+q);
-                //best_line.push_back(m_best*ln_x.at(i)+q);
-            //}
 
             for(int i=0; i<ln_x_mov.size();++i){
                 ln_x_tot.push_back(ln_x_mov.at(i));
                 ln_vel_tot.push_back(ln_vel_mov.at(i));
             }
             coeff_tot +=coeff;
+
+            this->slopes.push_back(m);
+            this->r_squared.push_back(r);
+            this->n_points.push_back(ln_x_mov.size());
+
+        }else{
+            // no relevant data
+            this->slopes.push_back(9999);
+            this->r_squared.push_back(9999);
+            this->n_points.push_back(9999);
         }
 
     }// task
@@ -235,119 +231,6 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
         ln_vel_tot_fit.push_back(mean_m*ln_x_tot.at(i)+mean_q);
         best_line.push_back(m_best*ln_x_tot.at(i)+mean_q);
     }
-
-    /*
-    // --- Hand Position --- //
-    QVector<double> pos_x; QVector<double> pos_y; QVector<double> pos_z;
-    for(size_t i=0; i<hand_position.size();++i){
-        vector<double> hand_point = hand_position.at(i);
-        pos_x.push_back(hand_point.at(0)/1000); // [m]
-        pos_y.push_back(hand_point.at(1)/1000); // [m]
-        pos_z.push_back(hand_point.at(2)/1000); // [m]
-
-    }
-    // first derivatives
-    QVector<double> der_pos_x_1; QVector<double> der_pos_y_1; QVector<double> der_pos_z_1;
-    this->getDerivative(pos_x,tot_timesteps,der_pos_x_1);
-    this->getDerivative(pos_y,tot_timesteps,der_pos_y_1);
-    this->getDerivative(pos_z,tot_timesteps,der_pos_z_1);
-    // second derivatives
-    QVector<double> der_pos_x_2; QVector<double> der_pos_y_2; QVector<double> der_pos_z_2;
-    this->getDerivative(der_pos_x_1,tot_timesteps,der_pos_x_2);
-    this->getDerivative(der_pos_y_1,tot_timesteps,der_pos_y_2);
-    this->getDerivative(der_pos_z_1,tot_timesteps,der_pos_z_2);
-    //third derivatives
-    QVector<double> der_pos_x_3; QVector<double> der_pos_y_3; QVector<double> der_pos_z_3;
-    this->getDerivative(der_pos_x_2,tot_timesteps,der_pos_x_3);
-    this->getDerivative(der_pos_y_2,tot_timesteps,der_pos_y_3);
-    this->getDerivative(der_pos_z_2,tot_timesteps,der_pos_z_3);
-
-    // --- Velocity --- //
-    QVector<double> vel;
-    for(int i=0; i<der_pos_x_1.size();++i){
-        Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
-        vel.push_back(der_1.norm());
-    }
-
-    // --- Curvature --- //
-    QVector<double> K; // Curvature
-    //double curv_th = 10; // curvature threshold
-    for(int i=0; i<der_pos_x_1.size();++i){
-        Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
-        Vector3d der_2(der_pos_x_2.at(i),der_pos_y_2.at(i),der_pos_z_2.at(i));
-        Vector3d cross = der_1.cross(der_2);
-        double num = cross.norm();
-        double den = pow(der_1.norm(),3);
-        if(den==0)
-            den=0.0001;
-        double curv = ((double)num)/den;
-        //if(curv>=curv_th){
-          //  K.push_back(curv_th);
-        //}else{
-        K.push_back(curv);
-        //}
-    }
-    // --- Torsion --- //
-    QVector<double> T; // Torsion
-    for(int i=0; i<der_pos_x_1.size();++i){
-        Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
-        Vector3d der_2(der_pos_x_2.at(i),der_pos_y_2.at(i),der_pos_z_2.at(i));
-        Vector3d der_3(der_pos_x_3.at(i),der_pos_y_3.at(i),der_pos_z_3.at(i));
-        Vector3d cross = der_2.cross(der_3);
-        double num = der_1.dot(cross);
-        Vector3d cross_1 = der_1.cross(der_2);
-        double den = pow(cross_1.norm(),2);
-        if(den==0)
-            den=0.0001;
-        T.push_back((double)num/den);
-    }
-
-    // --- Curvature and Torsion , Velocity--- //
-    QVector<double> ln_vel;; QVector<double> ln_x;
-    QVector<int> index_t(index.size()); int k=0; int h=0; int hh;
-    for(int i=0; i<der_pos_x_1.size();++i){
-        int mov_size = index.at(k);
-        if(i>=mov_size){
-            hh = index_t.at(h);
-            h++;
-            index_t.replace(h,hh);
-            k++;
-        }
-        if((abs(T.at(i))>=2) && (K.at(i)>=0.0001)){// threshold value taken into account to eliminate the torsion cups and planar regions
-            ln_x.push_back(log(pow(K.at(i),2)*abs(T.at(i))));
-            ln_vel.push_back(log(vel.at(i)));
-            index_t.replace(h,index_t.at(h)+1);
-        }
-    }
-
-
-    // --- Mean of the axis --- //
-    QVector<double> ln_vel_mean; QVector<double> ln_x_mean;
-    for(size_t i=0; i<index_t.size();++i){
-        if(i==0){
-            ln_x_mean.push_back((double)accumulate( ln_x.begin(), ln_x.begin()+index_t.at(i), 0.0)/index_t.at(i));
-            ln_vel_mean.push_back((double)accumulate( ln_vel.begin(), ln_vel.begin()+index_t.at(i), 0.0)/index_t.at(i));
-        }else{
-            ln_x_mean.push_back((double)accumulate( ln_x.begin()+index_t.at(i-1), ln_x.begin()+index_t.at(i), 0.0)/(index_t.at(i)-index_t.at(i-1)));
-            ln_vel_mean.push_back((double)accumulate( ln_vel.begin()+index_t.at(i-1), ln_vel.begin()+index_t.at(i), 0.0)/(index_t.at(i)-index_t.at(i-1)));
-        }
-    }
-
-
-    // R-squared regression
-    double q,m,r;
-    this->linreg(ln_x,ln_vel,&q,&m,&r);
-    //this->linreg(ln_x_mean,ln_vel_mean,&q,&m,&r);
-    std::cout << " m = " << m << " q = " << q << " R^2 = " << r << endl;
-    QVector<double> ln_vel_fit; QVector<double> best_line;
-    double m_best = ((double)-1)/6;
-    for(int i=0; i < ln_x.size(); ++i){
-        ln_vel_fit.push_back(m*ln_x.at(i)+q);
-        best_line.push_back(m_best*ln_x.at(i)+q);
-    }
-
-*/
-
 
 
     // plot the curvature
@@ -752,6 +635,7 @@ void PowerLaw3DDialog::on_pushButton_save_clicked()
 
     ui->plot_curvature->savePdf(path+QString("curvature.pdf"),true,0,0,QString(),QString("Curvature"));
     ui->plot_vel->savePdf(path+QString("velocity.pdf"),true,0,0,QString(),QString("Velocity"));
+    ui->plot_acc->savePdf(path+QString("acceleration.pdf"),true,0,0,QString(),QString("Acceleration"));
     ui->plot_torsion->savePdf(path+QString("torsion.pdf"),true,0,0,QString(),QString("Torsion"));
     ui->plot_16->savePdf(path+QString("power_law_3D.pdf"),true,0,0,QString(),QString("3D Power law"));
 
@@ -770,6 +654,11 @@ void PowerLaw3DDialog::on_pushButton_save_clicked()
     cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
     system(cmdLine.c_str());
 
+    pdf_qstr = path+QString("acceleration.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("acceleration.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
     pdf_qstr = path+QString("torsion.pdf"); pdf_str = pdf_qstr.toStdString();
     svg_qstr = path+QString("torsion.svg"); svg_str = svg_qstr.toStdString();
     cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
@@ -779,6 +668,20 @@ void PowerLaw3DDialog::on_pushButton_save_clicked()
     svg_qstr = path+QString("power_law_3D.svg"); svg_str = svg_qstr.toStdString();
     cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
     system(cmdLine.c_str());
+
+    // csv
+    string filename_csv("results.csv");
+    ofstream results_csv;
+    results_csv.open(path.toStdString()+filename_csv);
+    results_csv << "TRAJ,SLOPES,R^2,NUMBER OF POINTS \n";
+    for(size_t i=0;i<this->slopes.size();++i){
+        string slope_str =  boost::str(boost::format("%.8f") % (this->slopes.at(i)));
+        string r_str =  boost::str(boost::format("%.8f") % (this->r_squared.at(i)));
+        string points_str =  boost::str(boost::format("%.8f") % (this->n_points.at(i)));
+        boost::replace_all(slope_str,",","."); boost::replace_all(r_str,",","."); boost::replace_all(points_str,",",".");
+        results_csv << QString::number(i+1).toStdString()+","+slope_str+","+r_str+","+points_str+" \n";
+    }
+    results_csv.close();
 
 
 }

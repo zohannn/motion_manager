@@ -42,11 +42,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     // create Vrep Communication dialog
     mvrepCommdlg = new VrepCommDialog(&qnode, this);
     mvrepCommdlg->setModal(true);
-#if MOVEIT==1
+
     // create RViz Communication dialog
     mrvizCommdlg = new RVizCommDialog(&qnode, this);
     mrvizCommdlg->setModal(true);
-#endif
+
 
     //create HUML Tuning dialog
     mTolHumldlg = new TolDialogHUML(this);
@@ -106,10 +106,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
     // V-REP connected signal
     QObject::connect(mvrepCommdlg, SIGNAL(vrepConnected(bool)), this, SLOT(updateVrepStatus(bool)));
-#if MOVEIT==1
+
     // RViz connectedsignal
     QObject::connect(mrvizCommdlg, SIGNAL(rvizConnected(bool)), this, SLOT(updateRVizStatus(bool)));
-#endif
+
 
 
     // new element in the scenario signal
@@ -2969,6 +2969,7 @@ void MainWindow::on_pushButton_save_res_task_clicked()
     }
     QString path("results/planning/task/");
 
+    // txt
     string filename("results_task.txt");
     ofstream results;
     results.open(path.toStdString()+filename);
@@ -3096,6 +3097,20 @@ void MainWindow::on_pushButton_save_res_task_clicked()
 
 
     results.close();
+
+    // csv
+    string filename_csv("results_task.csv");
+    ofstream results_csv;
+    results_csv.open(path.toStdString()+filename_csv);
+    results_csv << "TRAJ,NJS,NMU,PLANNING TIME [ms] \n";
+    for(size_t i=0;i<this->njs_task.size();++i){
+        string njs_str =  boost::str(boost::format("%.8f") % (this->njs_task.at(i)));
+        string nmu_str =  boost::str(boost::format("%.8f") % (this->nmu_task.at(i)));
+        string prob_str =  boost::str(boost::format("%.8f") % (this->prob_time_task.at(i)));
+        boost::replace_all(njs_str,",","."); boost::replace_all(nmu_str,",","."); boost::replace_all(prob_str,",",".");
+        results_csv << QString::number(i+1).toStdString()+","+njs_str+","+nmu_str+","+prob_str+" \n";
+    }
+    results_csv.close();
 
     ui.plot_hand_vel_task->savePdf(path+QString("hand_vel_task.pdf"),true,0,0,QString(),QString("Module of the Hand velocity"));
 

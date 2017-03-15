@@ -57,7 +57,9 @@ public:
 
 private:
     Ui::powerLaw3DDialog *ui; /**< handle of the user interface */
-
+    std::vector<double> slopes; /**< slopes of the linear regression to be print */
+    std::vector<double> r_squared; /**< R^2 of the linear regression to be print */
+    std::vector<double> n_points; /**< number of points of each regression to be print */
 
     /**
      * @brief getDerivative
