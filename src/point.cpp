@@ -11,15 +11,23 @@ Point::Point()
 Point::Point(string name, pos ppos, orient oor)
 {
     this->m_name = name;
-    this->m_pos = ppos;
-    this->m_or = oor;
+    this->m_pos.Xpos = ppos.Xpos;
+    this->m_pos.Ypos = ppos.Ypos;
+    this->m_pos.Zpos = ppos.Zpos;
+    this->m_or.pitch = oor.pitch;
+    this->m_or.roll = oor.roll;
+    this->m_or.yaw = oor.yaw;
 }
 
 Point::Point(const Point &pt)
 {
     this->m_name = pt.m_name;
-    this->m_pos = pt.m_pos;
-    this->m_or = pt.m_or;
+    this->m_pos.Xpos = pt.m_pos.Xpos;
+    this->m_pos.Ypos = pt.m_pos.Ypos;
+    this->m_pos.Zpos = pt.m_pos.Zpos;
+    this->m_or.pitch = pt.m_or.pitch;
+    this->m_or.roll = pt.m_or.roll;
+    this->m_or.yaw = pt.m_or.yaw;
 }
 
 Point::~Point(){

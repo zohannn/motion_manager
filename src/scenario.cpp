@@ -15,9 +15,12 @@ Scenario::Scenario(const Scenario &scene)
     this->m_name=scene.m_name;
     this->m_scenarioID=scene.m_scenarioID;
 
+    this->objs_list.clear();
     if(!scene.objs_list.empty()){
-        this->objs_list = std::vector<objectPtr>(scene.objs_list.size());
-        std::copy(scene.objs_list.begin(),scene.objs_list.end(),this->objs_list.begin());
+        for(size_t i=0; i<scene.objs_list.size();++i){
+           objectPtr obj = scene.objs_list.at(i);
+           this->objs_list.push_back(objectPtr(new Object(*obj.get())));
+        }
     }
 
     this->hPtr=humanoidPtr(new Humanoid(*scene.hPtr.get()));

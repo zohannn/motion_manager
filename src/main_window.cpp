@@ -521,9 +521,9 @@ void MainWindow::on_pushButton_getElements_clicked()
 
 
     try{
-        if (qnode.getElements(init_scene)){
+        if (qnode.getElements(this->curr_scene)){
 
-            this->curr_scene = scenarioPtr(new Scenario(*(this->init_scene.get()))); //update the current scenario
+            this->init_scene = scenarioPtr(new Scenario(*(this->curr_scene.get()))); //set the init scenario
             this->curr_task = taskPtr(new Task());
             ui.pushButton_getElements->setEnabled(false);
             ui.tab_plan->setEnabled(true);

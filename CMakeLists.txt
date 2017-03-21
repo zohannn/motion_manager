@@ -125,11 +125,11 @@ set(DOC 0)
 # External libraries
 ##############################################################################
 
-# ----- Human-like Upper-limbs Motion Library (HUML) -------- #
-set(HUML_HOME /home/$ENV{USER}/HUML)
-include_directories(${HUML_HOME}/include)
-add_library(HUML STATIC IMPORTED)
-set_property(TARGET HUML PROPERTY IMPORTED_LOCATION ${HUML_HOME}/${CMAKE_BUILD_TYPE}/libHUML.a)
+# ----- Human-like Upper-limbs Motion Planner (HUMP) -------- #
+set(HUMP_HOME /home/$ENV{USER}/HUMP)
+include_directories(${HUMp_HOME}/include)
+add_library(HUMP STATIC IMPORTED)
+set_property(TARGET HUMP PROPERTY IMPORTED_LOCATION ${HUMP_HOME}/${CMAKE_BUILD_TYPE}/libHUMP.a)
 
 # -- IPOPT Solver
 set(IPOPT_HOME /home/$ENV{USER}/CoinIpopt)
@@ -196,8 +196,8 @@ add_executable(${PROJECT_NAME} ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP}
 target_link_libraries(${PROJECT_NAME} ${QT_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
 # ********** link external libraries ********
-# Human-like Upper-limbs Motion Library (HUML)
-target_link_libraries(${PROJECT_NAME} HUML)
+# Human-like Upper-limbs Motion Planner (HUMP)
+target_link_libraries(${PROJECT_NAME} HUMP)
 
 if(MOVEIT)
     # Humanoid moveit planner Library
