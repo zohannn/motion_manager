@@ -127,7 +127,7 @@ set(DOC 0)
 
 # ----- Human-like Upper-limbs Motion Planner (HUMP) -------- #
 set(HUMP_HOME /home/$ENV{USER}/HUMP)
-include_directories(${HUMp_HOME}/include)
+include_directories(${HUMP_HOME}/include)
 add_library(HUMP STATIC IMPORTED)
 set_property(TARGET HUMP PROPERTY IMPORTED_LOCATION ${HUMP_HOME}/${CMAKE_BUILD_TYPE}/libHUMP.a)
 
