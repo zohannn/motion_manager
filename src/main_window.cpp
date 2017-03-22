@@ -48,9 +48,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mrvizCommdlg->setModal(true);
 
 
-    //create HUML Tuning dialog
-    mTolHumldlg = new TolDialogHUML(this);
-    mTolHumldlg->setModal(true);
+    //create HUMP Tuning dialog
+    mTolHumpdlg = new TolDialogHUMP(this);
+    mTolHumpdlg->setModal(true);
 
     //create RRT Tuning dialog
     mRRTdlg = new RRTDialog(this);
@@ -134,7 +134,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 #if MOVEIT==0
     ui.pushButton_execMov_moveit->setEnabled(false);
     ui.comboBox_planner->clear();
-    ui.comboBox_planner->addItem(QString("HUML"));
+    ui.comboBox_planner->addItem(QString("HUMP"));
 #endif
 
     // scenarios
@@ -315,8 +315,8 @@ void MainWindow::on_pushButton_tuning_clicked()
     problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
     int planner_id = prob->getPlannerID();
     switch(planner_id){
-    case 0: // HUML
-        mTolHumldlg->show();
+    case 0: // HUMP
+        mTolHumpdlg->show();
         break;
     case 1: // RRT
         mRRTdlg->show();
@@ -698,7 +698,7 @@ void MainWindow::on_pushButton_plan_clicked()
     ui.tabWidget_sol->setCurrentIndex(0);    
     problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
     int planner_id = prob->getPlannerID();
-    HUMotion::huml_params  tols;
+    HUMotion::hump_params  tols;
     std::vector<double> move_target;
     std::vector<double> move_final_hand;
     std::vector<double> move_final_arm;
@@ -712,56 +712,56 @@ void MainWindow::on_pushButton_plan_clicked()
  try{
     switch(planner_id){
 
-    case 0: // HUML
+    case 0: // HUMP
         moveit_plan = false;
-        mTolHumldlg->setInfo(prob->getInfoLine());
+        mTolHumpdlg->setInfo(prob->getInfoLine());
         // --- Tolerances for the final posture selection ---- //
-        tols.tolTarPos = mTolHumldlg->getTolTarPos(); // target position tolerances
-        tols.tolTarOr = mTolHumldlg->getTolTarOr(); // target orientation tolerances
-        mTolHumldlg->getTolsArm(tols.tolsArm);// tolerances of the arm : radius in [mm]
-        mTolHumldlg->getTolsHand(tols.tolsHand);// tolerances of the hand: radius in [mm]
-        tols.target_avoidance = mTolHumldlg->getTargetAvoidance();// target avoidance
-        tols.obstacle_avoidance = mTolHumldlg->getObstacleAvoidance(); //obstacle avoidance
-        mTolHumldlg->getLambda(tols.lambda_final); // joint expense factors
-        mTolHumldlg->getLambda(tols.lambda_bounce); // joint expense factors
+        tols.tolTarPos = mTolHumpdlg->getTolTarPos(); // target position tolerances
+        tols.tolTarOr = mTolHumpdlg->getTolTarOr(); // target orientation tolerances
+        mTolHumpdlg->getTolsArm(tols.tolsArm);// tolerances of the arm : radius in [mm]
+        mTolHumpdlg->getTolsHand(tols.tolsHand);// tolerances of the hand: radius in [mm]
+        tols.target_avoidance = mTolHumpdlg->getTargetAvoidance();// target avoidance
+        tols.obstacle_avoidance = mTolHumpdlg->getObstacleAvoidance(); //obstacle avoidance
+        mTolHumpdlg->getLambda(tols.lambda_final); // joint expense factors
+        mTolHumpdlg->getLambda(tols.lambda_bounce); // joint expense factors
         // --- Tolerances for the bounce posture selection ---- //
-        tols.w_max = std::vector<double>(tols.lambda_final.size(),mTolHumldlg->getWMax()); // max joint velocity
-        mTolHumldlg->getInitVel(tols.bounds.vel_0); // initial velocity
-        mTolHumldlg->getFinalVel(tols.bounds.vel_f); // final velocity
-        mTolHumldlg->getInitAcc(tols.bounds.acc_0); // initial acceleration
-        mTolHumldlg->getFinalAcc(tols.bounds.acc_f); // final acceleration
-        //mTolHumldlg->getVelApproach(tols.vel_approach); // velocity approach
-        //mTolHumldlg->getAccApproach(tols.acc_approach); // acceleration approach
+        tols.w_max = std::vector<double>(tols.lambda_final.size(),mTolHumpdlg->getWMax()); // max joint velocity
+        mTolHumpdlg->getInitVel(tols.bounds.vel_0); // initial velocity
+        mTolHumpdlg->getFinalVel(tols.bounds.vel_f); // final velocity
+        mTolHumpdlg->getInitAcc(tols.bounds.acc_0); // initial acceleration
+        mTolHumpdlg->getFinalAcc(tols.bounds.acc_f); // final acceleration
+        //mTolHumpdlg->getVelApproach(tols.vel_approach); // velocity approach
+        //mTolHumpdlg->getAccApproach(tols.acc_approach); // acceleration approach
         // tolerances for the obstacles
-        mTolHumldlg->getTolsObstacles(tols.final_tolsObstacles); // final posture tols
+        mTolHumpdlg->getTolsObstacles(tols.final_tolsObstacles); // final posture tols
         tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
         tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1));
-        mTolHumldlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(0));
-        mTolHumldlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(1));
+        mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(0));
+        mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(1));
         // tolerances for the target
         tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
         tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
         tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
-        mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
-        mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
-        mTolHumldlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
+        mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
+        mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
+        mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
         // pick / place settings
-        tols.mov_specs.approach = mTolHumldlg->getApproach();
-        tols.mov_specs.retreat = mTolHumldlg->getRetreat();
-        mTolHumldlg->getPreGraspApproach(tols.mov_specs.pre_grasp_approach); // pick approach
-        mTolHumldlg->getPostGraspRetreat(tols.mov_specs.post_grasp_retreat); // pick retreat
-        mTolHumldlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
-        mTolHumldlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
-        tols.mov_specs.rand_init = mTolHumldlg->getRandInit(); // random initialization for "plan" stages
-        tols.mov_specs.coll = mTolHumldlg->getColl(); // collisions option
+        tols.mov_specs.approach = mTolHumpdlg->getApproach();
+        tols.mov_specs.retreat = mTolHumpdlg->getRetreat();
+        mTolHumpdlg->getPreGraspApproach(tols.mov_specs.pre_grasp_approach); // pick approach
+        mTolHumpdlg->getPostGraspRetreat(tols.mov_specs.post_grasp_retreat); // pick retreat
+        mTolHumpdlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
+        mTolHumpdlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
+        tols.mov_specs.rand_init = mTolHumpdlg->getRandInit(); // random initialization for "plan" stages
+        tols.mov_specs.coll = mTolHumpdlg->getColl(); // collisions option
         // move settings
-        mTolHumldlg->getTargetMove(move_target);
-        mTolHumldlg->getFinalHand(move_final_hand);
-        mTolHumldlg->getFinalArm(move_final_arm);
-        use_final = mTolHumldlg->get_use_final_posture();
+        mTolHumpdlg->getTargetMove(move_target);
+        mTolHumpdlg->getFinalHand(move_final_hand);
+        mTolHumpdlg->getFinalArm(move_final_arm);
+        use_final = mTolHumpdlg->get_use_final_posture();
         prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
-        tols.mov_specs.use_move_plane = mTolHumldlg->get_add_plane();
-        mTolHumldlg->getPlaneParameters(tols.mov_specs.plane_params);
+        tols.mov_specs.use_move_plane = mTolHumpdlg->get_add_plane();
+        mTolHumpdlg->getPlaneParameters(tols.mov_specs.plane_params);
 
         h_results = prob->solve(tols); // plan the movement
 
@@ -1521,11 +1521,11 @@ void MainWindow::on_pushButton_plan_3d_power_law_clicked()
             move_target.push_back(yaw);
 
             switch(planner_id){
-            case 0: // HUML
-                mTolHumldlg->setTargetMove(move_target);
-                mTolHumldlg->setWMax(wmax);
-                mTolHumldlg->setRandInit(false); // disable random initialization
-                mTolHumldlg->setColl(false); // disable collisions
+            case 0: // HUMP
+                mTolHumpdlg->setTargetMove(move_target);
+                mTolHumpdlg->setWMax(wmax);
+                mTolHumpdlg->setRandInit(false); // disable random initialization
+                mTolHumpdlg->setColl(false); // disable collisions
                 break;
             case 1: // RRT
                 mRRTdlg->setTargetMove(move_target);
@@ -1648,14 +1648,14 @@ void MainWindow::on_pushButton_plan_2d_power_law_clicked()
             move_target.push_back(yaw);
 
             switch(planner_id){
-            case 0: // HUML
-                mTolHumldlg->setTargetMove(move_target);
-                mTolHumldlg->setWMax(wmax);
-                mTolHumldlg->setRandInit(false); // disable random initialization
-                mTolHumldlg->setColl(false); // disable collisions
+            case 0: // HUMP
+                mTolHumpdlg->setTargetMove(move_target);
+                mTolHumpdlg->setWMax(wmax);
+                mTolHumpdlg->setRandInit(false); // disable random initialization
+                mTolHumpdlg->setColl(false); // disable collisions
                 // plane constraints
-                //mTolHumldlg->set_add_plane(true);
-                //mTolHumldlg->setPlaneParameters(point1,point2,point3);
+                //mTolHumpdlg->set_add_plane(true);
+                //mTolHumpdlg->setPlaneParameters(point1,point2,point3);
                 break;
             case 1: // RRT
                 mRRTdlg->setTargetMove(move_target);
@@ -1881,7 +1881,7 @@ void MainWindow::on_pushButton_load_task_clicked()
                 }
 
                 //get the planner id
-                if(QString::compare(plan_type,QString("HUML"),Qt::CaseInsensitive)==0){
+                if(QString::compare(plan_type,QString("HUMP"),Qt::CaseInsensitive)==0){
                     plan_id=0;
                 }else if(QString::compare(plan_type,QString("RRT"),Qt::CaseInsensitive)==0){
                     plan_id=1;

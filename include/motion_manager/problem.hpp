@@ -11,7 +11,7 @@
     #include <aros_moveit_planner/humanoid_moveit_planner.hpp>
 #endif
 // ******************************************* //
-// *** Human-like Upper-limbs Motion Library (HUML) *** //
+// *** Human-like Upper-limbs Motion Library (HUMP) *** //
 #include <humplanner.hpp>
 // ************ //
 
@@ -116,11 +116,11 @@ public:
     void setMoveSettings(std::vector<double> &tar, std::vector<double> &final_hand, std::vector<double> &final_arm, bool use_posture);
 
     /**
-     * @brief This method solves the problem given the tolerances and the parameters of the planner HUML
+     * @brief This method solves the problem given the tolerances and the parameters of the planner HUMP
      * @param tols
      * @return
      */
-    HUMotion::planning_result_ptr solve(HUMotion::huml_params& params);
+    HUMotion::planning_result_ptr solve(HUMotion::hump_params& params);
 
 #if MOVEIT==1
     /**
@@ -233,7 +233,7 @@ private:
 #if MOVEIT==1
     moveit_planning::moveit_params m_params; /**< parameters of the moveit Humanoid planner */
 #endif
-    HUMotion::huml_params h_params; /**< parameters of the HUML planner */
+    HUMotion::hump_params h_params; /**< parameters of the HUMP planner */
     movementPtr mov; /**< movement to be planned */
     scenarioPtr scene; /**< current scene */
     int targetAxis; /**< approaching direction towards the target: 0 = none , 1 = x axis , 2 = y axis, 3 = z axis*/

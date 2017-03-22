@@ -45,14 +45,14 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
     this->scene = scenarioPtr(scene);
     this->planner_id=planner_id;
 
-    bool huml = false;
+    bool hump = false;
 
-    if (planner_id==0){huml = true;this->planner_name = "HUML";}
+    if (planner_id==0){hump = true;this->planner_name = "HUMP";}
 
     string scene_name = this->scene->getName();
     //int scene_id = this->scene->getID();
 
-    if (huml){
+    if (hump){
         // --- Human-like movement planner settings --- //
         HUMotion::HUMPlanner::hand_fingers = HAND_FINGERS;
         HUMotion::HUMPlanner::joints_arm = JOINTS_ARM;
@@ -65,17 +65,17 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
         // set the current obstacles and targets of the scenario
         vector<objectPtr> scene_objects;
         if(this->scene->getObjects(scene_objects)){
-            HUMotion::objectPtr huml_obj; // object of the planner
+            HUMotion::objectPtr hump_obj; // object of the planner
             objectPtr obj;
             for(size_t i=0; i < scene_objects.size(); ++i){
                 obj = scene_objects.at(i);
                 std::vector<double> position = {obj->getPos().Xpos,obj->getPos().Ypos,obj->getPos().Zpos};
                 std::vector<double> orientation = {obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
                 std::vector<double> dimension = {obj->getSize().Xsize,obj->getSize().Ysize,obj->getSize().Zsize};
-                huml_obj.reset(new HUMotion::Object(obj->getName()));
-                huml_obj->setParams(position,orientation,dimension);
+                hump_obj.reset(new HUMotion::Object(obj->getName()));
+                hump_obj->setParams(position,orientation,dimension);
                 if(!obj->isTargetRightEnabled() && !obj->isTargetLeftEnabled()){
-                    this->h_planner->addObstacle(huml_obj); // the object is an obstacle for the planner
+                    this->h_planner->addObstacle(hump_obj); // the object is an obstacle for the planner
                 }
             }
         }else{
@@ -118,44 +118,44 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
 
 #if HAND==0
         human_hand hhand = this->scene->getHumanoid()->getHumanHand();
-        HUMotion::HumanHand huml_hhand;
-        huml_hhand.maxAperture = hhand.maxAperture;
-        huml_hhand.thumb.uTx = hhand.thumb.uTx;
-        huml_hhand.thumb.uTy = hhand.thumb.uTy;
-        huml_hhand.thumb.uTz = hhand.thumb.uTz;
-        huml_hhand.thumb.thumb_specs.a = hhand.thumb.thumb_specs.a;
-        huml_hhand.thumb.thumb_specs.alpha = hhand.thumb.thumb_specs.alpha;
-        huml_hhand.thumb.thumb_specs.d = hhand.thumb.thumb_specs.d;
-        huml_hhand.thumb.thumb_specs.theta = hhand.thumb.thumb_specs.theta;
-        vector<HUMotion::HumanFinger> huml_fings = huml_hhand.fingers;
+        HUMotion::HumanHand hump_hhand;
+        hump_hhand.maxAperture = hhand.maxAperture;
+        hump_hhand.thumb.uTx = hhand.thumb.uTx;
+        hump_hhand.thumb.uTy = hhand.thumb.uTy;
+        hump_hhand.thumb.uTz = hhand.thumb.uTz;
+        hump_hhand.thumb.thumb_specs.a = hhand.thumb.thumb_specs.a;
+        hump_hhand.thumb.thumb_specs.alpha = hhand.thumb.thumb_specs.alpha;
+        hump_hhand.thumb.thumb_specs.d = hhand.thumb.thumb_specs.d;
+        hump_hhand.thumb.thumb_specs.theta = hhand.thumb.thumb_specs.theta;
+        vector<HUMotion::HumanFinger> hump_fings = hump_hhand.fingers;
         vector<human_finger> fings = hhand.fingers;
         for(size_t i=0; i<fings.size();++i){
             human_finger fing = fings.at(i);
-            HUMotion::HumanFinger huml_fing = huml_fings.at(i);
-            huml_fing.ux = fing.ux; huml_fing.uy = fing.uy; huml_fing.uz = fing.uz;
-            huml_fing.finger_specs.a = fing.finger_specs.a;
-            huml_fing.finger_specs.alpha = fing.finger_specs.alpha;
-            huml_fing.finger_specs.d = fing.finger_specs.d;
-            huml_fing.finger_specs.theta = fing.finger_specs.theta;
-            huml_fings.at(i) = huml_fing;
+            HUMotion::HumanFinger hump_fing = hump_fings.at(i);
+            hump_fing.ux = fing.ux; hump_fing.uy = fing.uy; hump_fing.uz = fing.uz;
+            hump_fing.finger_specs.a = fing.finger_specs.a;
+            hump_fing.finger_specs.alpha = fing.finger_specs.alpha;
+            hump_fing.finger_specs.d = fing.finger_specs.d;
+            hump_fing.finger_specs.theta = fing.finger_specs.theta;
+            hump_fings.at(i) = hump_fing;
         }
-        huml_hhand.fingers = huml_fings;
+        hump_hhand.fingers = hump_fings;
 #elif HAND==1
         barrett_hand b_hand = this->scene->getHumanoid()->getBarrettHand();
         std::vector<int> rk; this->scene->getHumanoid()->getRK(rk);
         std::vector<int> jk; this->scene->getHumanoid()->getRK(jk);
-        HUMotion::BarrettHand huml_bhand;
-        huml_bhand.A1 = b_hand.A1;
-        huml_bhand.A2 = b_hand.A2;
-        huml_bhand.A3 = b_hand.A3;
-        huml_bhand.Aw = b_hand.Aw;
-        huml_bhand.D3 = b_hand.D3;
-        huml_bhand.maxAperture = b_hand.maxAperture;
-        huml_bhand.phi2 = b_hand.phi2;
-        huml_bhand.phi3 = b_hand.phi3;
-        huml_bhand.rk = rk;
-        huml_bhand.jk = jk;
-        h_planner->setBarrettHand(huml_bhand);
+        HUMotion::BarrettHand hump_bhand;
+        hump_bhand.A1 = b_hand.A1;
+        hump_bhand.A2 = b_hand.A2;
+        hump_bhand.A3 = b_hand.A3;
+        hump_bhand.Aw = b_hand.Aw;
+        hump_bhand.D3 = b_hand.D3;
+        hump_bhand.maxAperture = b_hand.maxAperture;
+        hump_bhand.phi2 = b_hand.phi2;
+        hump_bhand.phi3 = b_hand.phi3;
+        hump_bhand.rk = rk;
+        hump_bhand.jk = jk;
+        h_planner->setBarrettHand(hump_bhand);
 #endif
 
     }
@@ -185,7 +185,7 @@ Problem::Problem(int planner_id, Movement *mov, Scenario *scene, moveit_plannerP
 
     switch(planner_id){
     case 0:
-        this->planner_name = "HUML";
+        this->planner_name = "HUMP";
         break;
     case 1:
         this->planner_name = "RRT";
@@ -260,7 +260,7 @@ void Problem::setPlannerID(int id)
     switch(id){
 
     case 0:
-        this->planner_name = "HUML";
+        this->planner_name = "HUMP";
         break;
     case 1:
         this->planner_name = "RRT";
@@ -914,7 +914,7 @@ movementPtr Problem::getMovement()
     return this->mov;
 }
 
-HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
+HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
 {
 
     this->solved = false;
@@ -1007,18 +1007,18 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::huml_params &params)
         place_location.push_back(eng1->getOr().pitch);
         place_location.push_back(eng1->getOr().yaw);
 
-        HUMotion::objectPtr huml_obj;
+        HUMotion::objectPtr hump_obj;
         target = {tar->getPos().Xpos, tar->getPos().Ypos, tar->getPos().Zpos,tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
         std::vector<double> position = {obj->getPos().Xpos,obj->getPos().Ypos,obj->getPos().Zpos};
         std::vector<double> orientation = {obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
         std::vector<double> dimension = {obj->getSize().Xsize,obj->getSize().Ysize,obj->getSize().Zsize};
-        huml_obj.reset(new HUMotion::Object(obj->getName()));
-        huml_obj->setParams(position,orientation,dimension);
+        hump_obj.reset(new HUMotion::Object(obj->getName()));
+        hump_obj->setParams(position,orientation,dimension);
 
         // movement settings
         params.mov_specs.griptype = this->mov->getGrip();
         params.mov_specs.dHO = dHO;
-        params.mov_specs.obj = huml_obj;
+        params.mov_specs.obj = hump_obj;
 
     }
 

@@ -1,11 +1,11 @@
-#ifndef TOLDIALOGHUML_H
-#define TOLDIALOGHUML_H
+#ifndef TOLDIALOGHUMP_H
+#define TOLDIALOGHUMP_H
 
 #include<QFileDialog>
 #include <QFile>
 #include <QTextStream>
 #include<QMessageBox>
-#include <ui_toldialoghuml.h>
+#include <ui_toldialoghump.h>
 #include <eigen3/Eigen/Dense>
 #include "config.hpp"
 
@@ -14,11 +14,11 @@ namespace motion_manager{
 using namespace std;
 using namespace Eigen;
 
-//! The TolDialogHUML class
+//! The TolDialogHUMP class
 /**
  * @brief This class defines the tuning process of the human-like motion planner
  */
-class TolDialogHUML : public QDialog
+class TolDialogHUMP : public QDialog
 {
     Q_OBJECT
 
@@ -74,15 +74,15 @@ public Q_SLOTS:
 public:
 
     /**
-     * @brief TolDialogHUML, a constructor
+     * @brief TolDialogHUMP, a constructor
      * @param parent
      */
-    explicit TolDialogHUML(QWidget *parent = 0);
+    explicit TolDialogHUMP(QWidget *parent = 0);
 
     /**
-     * @brief TolDialogHUML, a destructor
+     * @brief TolDialogHUMP, a destructor
      */
-    ~TolDialogHUML();
+    ~TolDialogHUMP();
 
     /**
      * @brief This method gets the tolerances of the arm
@@ -318,11 +318,11 @@ public:
 
 
 private:
-    Ui::TolDialogHUML *ui; /**< handle of the user interface */
+    Ui::TolDialogHUMP *ui; /**< handle of the user interface */
     string infoLine; /**< information about the tuning of the planner */
     bool rand_init;
 };
 
 } // namespace motion_manager
 
-#endif // TOLDIALOGHUML_H
+#endif // TOLDIALOGHUMP_H

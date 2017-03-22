@@ -594,7 +594,7 @@ p, li { white-space: pre-wrap; }
          <widget class="QComboBox" name="comboBox_planner">
           <item>
            <property name="text">
-            <string>HUML</string>
+            <string>HUMP</string>
            </property>
           </item>
           <item>
