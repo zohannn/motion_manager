@@ -21,8 +21,6 @@ TolDialogHUML::TolDialogHUML(QWidget *parent) :
     if(ui->checkBox_approach->isChecked()){
         ui->groupBox_pre_grasp->setEnabled(false);
         ui->groupBox_pre_place->setEnabled(false);
-        ui->groupBox_vel_approach->setEnabled(false);
-        ui->groupBox_acc_approach->setEnabled(false);
         ui->label_pick->setEnabled(false);
     }
     if(ui->checkBox_retreat->isChecked()){
@@ -510,6 +508,7 @@ void TolDialogHUML::on_pushButton_save_clicked()
        stream << "final_acc_9=" << ui->lineEdit_final_acc_9->text().toStdString().c_str() << endl;
        stream << "final_acc_10=" << ui->lineEdit_final_acc_10->text().toStdString().c_str() << endl;
        stream << "final_acc_11=" << ui->lineEdit_final_acc_11->text().toStdString().c_str() << endl;
+       /*
        stream << "# Velocity Approach" << endl;
        stream << "vel_approach_1=" << ui->lineEdit_vel_approach_1->text().toStdString().c_str() << endl;
        stream << "vel_approach_2=" << ui->lineEdit_vel_approach_2->text().toStdString().c_str() << endl;
@@ -534,6 +533,7 @@ void TolDialogHUML::on_pushButton_save_clicked()
        stream << "acc_approach_9=" << ui->lineEdit_acc_approach_9->text().toStdString().c_str() << endl;
        stream << "acc_approach_10=" << ui->lineEdit_acc_approach_10->text().toStdString().c_str() << endl;
        stream << "acc_approach_11=" << ui->lineEdit_acc_approach_11->text().toStdString().c_str() << endl;
+       */
        stream << "# Tolerances with the target [mm]" << endl;
        stream << "tar_xx_1=" << ui->lineEdit_tar_xx_1->text().toStdString().c_str()<< endl;
        stream << "tar_xx_2=" << ui->lineEdit_tar_xx_2->text().toStdString().c_str()<< endl;
@@ -807,6 +807,7 @@ void TolDialogHUML::on_pushButton_load_clicked()
                     ui->lineEdit_final_acc_10->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("final_acc_11"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_final_acc_11->setText(fields.at(1));
+                    /*
                 }else if(QString::compare(fields.at(0),QString("vel_approach_1"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_vel_approach_1->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("vel_approach_2"),Qt::CaseInsensitive)==0){
@@ -851,6 +852,7 @@ void TolDialogHUML::on_pushButton_load_clicked()
                     ui->lineEdit_acc_approach_10->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("acc_approach_11"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_acc_approach_11->setText(fields.at(1));
+                    */
                 }else if(QString::compare(fields.at(0),QString("tar_xx_1"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_tar_xx_1->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("tar_xx_2"),Qt::CaseInsensitive)==0){
@@ -1080,15 +1082,11 @@ void TolDialogHUML::checkApproach(int state)
         // unchecked
         ui->groupBox_pre_grasp->setEnabled(true);
         ui->groupBox_pre_place->setEnabled(true);
-        ui->groupBox_vel_approach->setEnabled(true);
-        ui->groupBox_acc_approach->setEnabled(true);
         ui->label_pick->setEnabled(true);
     }else{
         //checked
         ui->groupBox_pre_grasp->setEnabled(false);
         ui->groupBox_pre_place->setEnabled(false);
-        ui->groupBox_vel_approach->setEnabled(false);
-        ui->groupBox_acc_approach->setEnabled(false);
         ui->label_pick->setEnabled(false);
     }
 }

@@ -2397,9 +2397,9 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                     if (srvset_parent.response.result != 1){
                         log(QNode::Error,string("Error in grasping the object "));
                     }
-#if HAND == 1
-                    this->closeBarrettHand(arm_code);
-#endif
+//#if HAND == 1
+                    //this->closeBarrettHand(arm_code);
+//#endif
                 }
             }
             break;
@@ -2749,9 +2749,9 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                                 if (srvset_parent.response.result != 1){
                                     log(QNode::Error,string("Error in grasping the object "));
                                 }
-#if HAND == 1
-                        this->closeBarrettHand(arm_code);
-#endif
+//#if HAND == 1
+                        //this->closeBarrettHand(arm_code);
+//#endif
                             }
                         }
                         break;

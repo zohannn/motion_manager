@@ -5,27 +5,27 @@ Shoulder_radius=80.0
 
 Elbow_radius=70.0
 
-Wrist_radius=60.0
+Wrist_radius=40
 
-Hand_radius=50
+Hand_radius=15
 
-Hand_1_1=25
+Hand_1_1=10
 
-Hand_1_2=25
+Hand_1_2=10
 
-Hand_1_3=25
+Hand_1_3=10
 
-Hand_2_1=25
+Hand_2_1=10
 
-Hand_2_2=25
+Hand_2_2=10
 
-Hand_2_3=25
+Hand_2_3=10
 
-Hand_3_1=20
+Hand_3_1=5
 
-Hand_3_2=20
+Hand_3_2=5
 
-Hand_3_3=20
+Hand_3_3=5
 
 Hand_tip_1=5
 
@@ -34,9 +34,9 @@ Hand_tip_2=5
 Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=1.0
+lambda_1=0.5
 
-lambda_2=1.0
+lambda_2=1
 
 lambda_3=1.0
 
@@ -57,13 +57,20 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-1.31
-init_vel_2=-0.2
-init_vel_3=0.73
-init_vel_4=-0.54
-init_vel_5=-0.31
-init_vel_6=-0.26
-init_vel_7=-0.19
+init_vel_1=-0.22
+
+init_vel_2=0.06
+
+init_vel_3=0.12
+
+init_vel_4=-0.19
+
+init_vel_5=0
+
+init_vel_6=-0.01
+
+init_vel_7=0.01
+
 init_vel_8=0.0
 
 init_vel_9=0.0
@@ -73,19 +80,19 @@ init_vel_10=0.0
 init_vel_11=0.0
 
 # Final Velocity 
-final_vel_1=0.0
+final_vel_1=0
 
-final_vel_2=0.0
+final_vel_2=0
 
-final_vel_3=0.0
+final_vel_3=0
 
-final_vel_4=0.0
+final_vel_4=0
 
-final_vel_5=0.0
+final_vel_5=0
 
-final_vel_6=0.0
+final_vel_6=0
 
-final_vel_7=0.0
+final_vel_7=0
 
 final_vel_8=0.0
 
@@ -96,13 +103,20 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=1.85
-init_acc_2=0.28
-init_acc_3=-1.05
-init_acc_4=0.73
-init_acc_5=0.46
-init_acc_6=0.38
-init_acc_7=0.26
+init_acc_1=0
+
+init_acc_2=0
+
+init_acc_3=0
+
+init_acc_4=0
+
+init_acc_5=0
+
+init_acc_6=0
+
+init_acc_7=0
+
 init_acc_8=0.0
 
 init_acc_9=0.0
@@ -112,19 +126,19 @@ init_acc_10=0.0
 init_acc_11=0.0
 
 # Final Acceleration 
-final_acc_1=0.0
+final_acc_1=0
 
-final_acc_2=0.0
+final_acc_2=0
 
-final_acc_3=0.0
+final_acc_3=0
 
-final_acc_4=0.0
+final_acc_4=0
 
-final_acc_5=0.0
+final_acc_5=0
 
-final_acc_6=0.0
+final_acc_6=0
 
-final_acc_7=0.0
+final_acc_7=0
 
 final_acc_8=0.0
 
@@ -134,125 +148,79 @@ final_acc_10=0.0
 
 final_acc_11=0.0
 
-# Velocity Approach
-vel_approach_1=0.0
-
-vel_approach_2=0.0
-
-vel_approach_3=0.0
-
-vel_approach_4=0.0
-
-vel_approach_5=0.0
-
-vel_approach_6=0.0
-
-vel_approach_7=0.0
-
-vel_approach_8=0.0
-
-vel_approach_9=0.0
-
-vel_approach_10=0.0
-
-vel_approach_11=0.0
-
-# Acceleration Approach
-acc_approach_1=0.0
-
-acc_approach_2=0.0
-
-acc_approach_3=0.0
-
-acc_approach_4=0.0
-
-acc_approach_5=0.0
-
-acc_approach_6=0.0
-
-acc_approach_7=0.0
-
-acc_approach_8=0.0
-
-acc_approach_9=0.0
-
-acc_approach_10=0.0
-
-acc_approach_11=0.0
-
 # Tolerances with the target [mm]
-tar_xx_1=5
+tar_xx_1=0
 
-tar_xx_2=5
+tar_xx_2=0
 
-tar_xx_3=5
+tar_xx_3=0
 
-tar_yy_1=5
+tar_yy_1=0
 
-tar_yy_2=5
+tar_yy_2=0
 
-tar_yy_3=5
+tar_yy_3=0
 
-tar_zz_1=5
+tar_zz_1=0
 
-tar_zz_2=5
+tar_zz_2=0
 
-tar_zz_3=5
+tar_zz_3=0
 
-tar_xy_1=5
+tar_xy_1=0
 
-tar_xy_2=5
+tar_xy_2=0
 
-tar_xy_3=5
+tar_xy_3=0
 
-tar_xz_1=5
+tar_xz_1=0
 
-tar_xz_2=5
+tar_xz_2=0
 
-tar_xz_3=5
+tar_xz_3=0
 
-tar_yz_1=5
+tar_yz_1=0
 
-tar_yz_2=5
+tar_yz_2=0
 
-tar_yz_3=5
+tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
-obs_xx_1=5
+obs_xx_1=0
 
-obs_xx_2=5
+obs_xx_2=0
 
-obs_xx_3=5
+obs_xx_3=0
 
-obs_yy_1=5
+obs_yy_1=0
 
-obs_yy_2=5
+obs_yy_2=0
 
-obs_yy_3=5
+obs_yy_3=0
 
-obs_zz_1=5
+obs_zz_1=0
 
-obs_zz_2=5
+obs_zz_2=0
 
-obs_zz_3=5
+obs_zz_3=0
 
-obs_xy_1=5
+obs_xy_1=0
 
-obs_xy_2=5
+obs_xy_2=0
 
-obs_xy_3=5
+obs_xy_3=0
 
-obs_xz_1=5
+obs_xz_1=0
 
-obs_xz_2=5
+obs_xz_2=0
 
-obs_xz_3=5
+obs_xz_3=0
 
-obs_yz_1=5
+obs_yz_1=0
 
-obs_yz_2=5
+obs_yz_2=0
 
-obs_yz_3=5
+obs_yz_3=0
 
 # Tolerances for the final posture
 tar_pos=1.0
@@ -283,7 +251,7 @@ pre_place_y=0
 
 pre_place_z=1
 
-pre_place_dist=80
+pre_place_dist=30
 
 post_place_x=0
 
@@ -291,8 +259,7 @@ post_place_y=1
 
 post_place_z=0
 
-post_place_dist=100
-
+post_place_dist=30
 # Move settings
 target_x=-400
 
@@ -351,10 +318,9 @@ add_plane=false
 # Others
 max_velocity=50
 
-steps=20
-
 tar_av=true
 ob_av=true
 approach=true
 retreat=true
 rand_init=false
+coll=true
