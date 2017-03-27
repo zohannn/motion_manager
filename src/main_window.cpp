@@ -987,7 +987,7 @@ void MainWindow::on_pushButton_plan_clicked()
                         jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         for(size_t j=0; j<points.size();++j){
                             if(j==points.size()-1){
-                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                                timesteps_stage_aux.push_back(0.0);
                             }else{
                                 timesteps_stage_aux.push_back(points.at(j+1).time_from_start.toSec()-points.at(j).time_from_start.toSec());
                             }
@@ -1017,9 +1017,8 @@ void MainWindow::on_pushButton_plan_clicked()
                         jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         for(size_t j=0; j<points.size();++j){
-                            //timesteps_stage_aux.push_back(0.0);
                             if(j==points.size()-1){
-                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                                timesteps_stage_aux.push_back(0.0);
                             }else{
                                 timesteps_stage_aux.push_back(points.at(j+1).time_from_start.toSec()-points.at(j).time_from_start.toSec());
                             }
@@ -1070,7 +1069,7 @@ void MainWindow::on_pushButton_plan_clicked()
                         jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         for(size_t j=0; j<points.size();++j){
                             if(j==points.size()-1){
-                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                                timesteps_stage_aux.push_back(0.0);
                             }else{
                                 timesteps_stage_aux.push_back(points.at(j+1).time_from_start.toSec()-points.at(j).time_from_start.toSec());
                             }
@@ -1101,9 +1100,8 @@ void MainWindow::on_pushButton_plan_clicked()
                         jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         for(size_t j=0; j<points.size();++j){
-                            //timesteps_stage_aux.push_back(0.0);
                             if(j==points.size()-1){
-                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                                timesteps_stage_aux.push_back(0.0);
                             }else{
                                 timesteps_stage_aux.push_back(points.at(j+1).time_from_start.toSec()-points.at(j).time_from_start.toSec());
                             }
@@ -1154,7 +1152,7 @@ void MainWindow::on_pushButton_plan_clicked()
                         jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         for(size_t j=0; j<points.size();++j){
                             if(j==points.size()-1){
-                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                                timesteps_stage_aux.push_back(0.0);
                             }else{
                                 timesteps_stage_aux.push_back(points.at(j+1).time_from_start.toSec()-points.at(j).time_from_start.toSec());
                             }
@@ -1186,7 +1184,7 @@ void MainWindow::on_pushButton_plan_clicked()
                         jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         for(size_t j=0; j<points.size();++j){
                             if(j==points.size()-1){
-                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                                timesteps_stage_aux.push_back(0.0);
                             }else{
                                 timesteps_stage_aux.push_back(points.at(j+1).time_from_start.toSec()-points.at(j).time_from_start.toSec());
                             }
