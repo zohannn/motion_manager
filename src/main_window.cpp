@@ -971,7 +971,7 @@ void MainWindow::on_pushButton_plan_clicked()
                 }else{move=true;}
 
 
-                double time_from_start = 0.0;
+                //double time_from_start = 0.0;
                 for(size_t i=0; i<m_results->trajectory_stages.size(); ++i){
                     std::string traj_descr = m_results->trajectory_descriptions.at(i);
                     moveit_msgs::RobotTrajectory rob_traj;
@@ -986,10 +986,10 @@ void MainWindow::on_pushButton_plan_clicked()
                         jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         for(size_t j=0; j<points.size();++j){
-                            if(j==0){
-                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
-                            }else{
+                            if(j==points.size()-1){
                                 timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                            }else{
+                                timesteps_stage_aux.push_back(points.at(j+1).time_from_start.toSec()-points.at(j).time_from_start.toSec());
                             }
                             trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
                             for(size_t k=0; k<traj_pnt.positions.size()+JOINTS_HAND;++k){
@@ -1004,7 +1004,7 @@ void MainWindow::on_pushButton_plan_clicked()
                                 }
                             }
                         }// points
-                        time_from_start += points.at(points.size()-1).time_from_start.toSec();
+                        //time_from_start += points.at(points.size()-1).time_from_start.toSec();
                         timesteps_stage_plan = timesteps_stage_aux;
                         jointsPosition_stage_plan = jointsPosition_stage_aux;
                         jointsVelocity_stage_plan = jointsVelocity_stage_aux;
@@ -1017,7 +1017,12 @@ void MainWindow::on_pushButton_plan_clicked()
                         jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         for(size_t j=0; j<points.size();++j){
-                            timesteps_stage_aux.push_back(0.0);
+                            //timesteps_stage_aux.push_back(0.0);
+                            if(j==points.size()-1){
+                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                            }else{
+                                timesteps_stage_aux.push_back(points.at(j+1).time_from_start.toSec()-points.at(j).time_from_start.toSec());
+                            }
                             trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
                             for(size_t k=0; k<JOINTS_ARM+JOINTS_HAND;++k){
                                 if(k<JOINTS_ARM){
@@ -1064,10 +1069,10 @@ void MainWindow::on_pushButton_plan_clicked()
                         jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         for(size_t j=0; j<points.size();++j){
-                            if(j==0){
-                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
-                            }else{
+                            if(j==points.size()-1){
                                 timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                            }else{
+                                timesteps_stage_aux.push_back(points.at(j+1).time_from_start.toSec()-points.at(j).time_from_start.toSec());
                             }
                             trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
                             for(size_t k=0; k<traj_pnt.positions.size()+JOINTS_HAND;++k){
@@ -1082,7 +1087,7 @@ void MainWindow::on_pushButton_plan_clicked()
                                 }
                             }
                         }// points
-                        time_from_start += points.at(points.size()-1).time_from_start.toSec();
+                        //time_from_start += points.at(points.size()-1).time_from_start.toSec();
                         timesteps_stage_approach = timesteps_stage_aux;
                         jointsPosition_stage_approach = jointsPosition_stage_aux;
                         jointsVelocity_stage_approach = jointsVelocity_stage_aux;
@@ -1096,7 +1101,12 @@ void MainWindow::on_pushButton_plan_clicked()
                         jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         for(size_t j=0; j<points.size();++j){
-                            timesteps_stage_aux.push_back(0.0);
+                            //timesteps_stage_aux.push_back(0.0);
+                            if(j==points.size()-1){
+                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                            }else{
+                                timesteps_stage_aux.push_back(points.at(j+1).time_from_start.toSec()-points.at(j).time_from_start.toSec());
+                            }
                             trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
                             for(size_t k=0; k<JOINTS_ARM+JOINTS_HAND;++k){
                                 if(k<JOINTS_ARM){
@@ -1143,10 +1153,10 @@ void MainWindow::on_pushButton_plan_clicked()
                         jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         for(size_t j=0; j<points.size();++j){
-                            if(j==0){
-                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
-                            }else{
+                            if(j==points.size()-1){
                                 timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                            }else{
+                                timesteps_stage_aux.push_back(points.at(j+1).time_from_start.toSec()-points.at(j).time_from_start.toSec());
                             }
                             trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
                             for(size_t k=0; k<traj_pnt.positions.size()+JOINTS_HAND;++k){
@@ -1161,7 +1171,7 @@ void MainWindow::on_pushButton_plan_clicked()
                                 }
                             }
                         }// points
-                        time_from_start += points.at(points.size()-1).time_from_start.toSec();
+                        //time_from_start += points.at(points.size()-1).time_from_start.toSec();
                         timesteps_stage_retreat = timesteps_stage_aux;
                         jointsPosition_stage_retreat = jointsPosition_stage_aux;
                         jointsVelocity_stage_retreat = jointsVelocity_stage_aux;
@@ -1175,10 +1185,10 @@ void MainWindow::on_pushButton_plan_clicked()
                         jointsVelocity_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         jointsAcceleration_stage_aux = MatrixXd::Zero(points.size(),JOINTS_ARM+JOINTS_HAND);
                         for(size_t j=0; j<points.size();++j){
-                            if(j==0){
-                                timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec());
-                            }else{
+                            if(j==points.size()-1){
                                 timesteps_stage_aux.push_back(points.at(j).time_from_start.toSec()-points.at(j-1).time_from_start.toSec());
+                            }else{
+                                timesteps_stage_aux.push_back(points.at(j+1).time_from_start.toSec()-points.at(j).time_from_start.toSec());
                             }
                             trajectory_msgs::JointTrajectoryPoint traj_pnt = points.at(j);
                             for(size_t k=0; k<traj_pnt.positions.size();++k){
@@ -1205,7 +1215,7 @@ void MainWindow::on_pushButton_plan_clicked()
                                 }
                             }
                         }// points
-                        time_from_start += points.at(points.size()-1).time_from_start.toSec();
+                        //time_from_start += points.at(points.size()-1).time_from_start.toSec();
                         timesteps_stage_plan = timesteps_stage_aux;
                         jointsPosition_stage_plan = jointsPosition_stage_aux;
                         jointsVelocity_stage_plan = jointsVelocity_stage_aux;
