@@ -2925,6 +2925,7 @@ void MainWindow::on_pushButton_save_res_mov_clicked()
     string hand_pos_file = path.toStdString()+string("hand_pos_mov.pdf");
     IO::save(this->handPosPlot_mov_ptr.get(), hand_pos_file.c_str(),  "PDF" );
 
+    // results
     string filename("results_mov.txt");
     ofstream results;
     results.open(path.toStdString()+filename);
@@ -2945,6 +2946,48 @@ void MainWindow::on_pushButton_save_res_mov_clicked()
     results << string("prob_time =")+time_str+string(";\n");
 
     results.close();
+
+    // hand position
+    if(!this->handPosition_mov.empty()){
+        string filename_hand_pos("hand_pos_mov.txt");
+        ofstream hand_pos;
+        hand_pos.open(path.toStdString()+filename_hand_pos);
+
+        hand_pos << string("# HAND POSITION \n");
+        hand_pos << string("# x [mm], y [mm], z [mm] \n");
+
+        for(size_t i=0;i<this->handPosition_mov.size();++i){
+            vector<double> point = this->handPosition_mov.at(i);
+            string x_str =  boost::str(boost::format("%.2f") % (point.at(0)));
+            boost::replace_all(x_str,",",".");
+            string y_str =  boost::str(boost::format("%.2f") % (point.at(1)));
+            boost::replace_all(y_str,",",".");
+            string z_str =  boost::str(boost::format("%.2f") % (point.at(2)));
+            boost::replace_all(z_str,",",".");
+            hand_pos << x_str+string(", ")+y_str+string(", ")+z_str+string("\n");
+        }
+        hand_pos.close();
+    }
+    // hand velocity
+    if(!this->handVelocityNorm_mov.empty()){
+        string filename_hand_vel("hand_vel_mov.txt");
+        ofstream hand_vel;
+        hand_vel.open(path.toStdString()+filename_hand_vel);
+
+        hand_vel << string("# HAND VELOCITY NORM \n");
+        hand_vel << string("# velocity [mm/s], time [s] \n");
+
+        for(size_t i=0;i<this->handVelocityNorm_mov.size();++i){
+            double vel = this->handVelocityNorm_mov.at(i);
+            double time = this->qtime_mov.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            hand_vel << vel_str+string(", ")+t_str+string("\n");
+        }
+        hand_vel.close();
+    }
 
     QString pdf_qstr; string pdf_str;
     QString svg_qstr; string svg_str;
@@ -3128,6 +3171,48 @@ void MainWindow::on_pushButton_save_res_task_clicked()
     string hand_pos_file = path.toStdString()+string("hand_pos_task.pdf");
     if(this->handPosPlot_task_ptr!=nullptr){
         IO::save(this->handPosPlot_task_ptr.get(), hand_pos_file.c_str(),  "PDF" );
+    }
+
+    // hand position
+    if(!this->handPosition_task.empty()){
+        string filename_hand_pos("hand_pos_task.txt");
+        ofstream hand_pos;
+        hand_pos.open(path.toStdString()+filename_hand_pos);
+
+        hand_pos << string("# HAND POSITION \n");
+        hand_pos << string("# x [mm], y [mm], z [mm] \n");
+
+        for(size_t i=0;i<this->handPosition_task.size();++i){
+            vector<double> point = this->handPosition_task.at(i);
+            string x_str =  boost::str(boost::format("%.2f") % (point.at(0)));
+            boost::replace_all(x_str,",",".");
+            string y_str =  boost::str(boost::format("%.2f") % (point.at(1)));
+            boost::replace_all(y_str,",",".");
+            string z_str =  boost::str(boost::format("%.2f") % (point.at(2)));
+            boost::replace_all(z_str,",",".");
+            hand_pos << x_str+string(", ")+y_str+string(", ")+z_str+string("\n");
+        }
+        hand_pos.close();
+    }
+    // hand velocity
+    if(!this->handVelocityNorm_task.empty()){
+        string filename_hand_vel("hand_vel_task.txt");
+        ofstream hand_vel;
+        hand_vel.open(path.toStdString()+filename_hand_vel);
+
+        hand_vel << string("# HAND VELOCITY NORM \n");
+        hand_vel << string("# velocity [mm/s], time [s] \n");
+
+        for(size_t i=0;i<this->handVelocityNorm_task.size();++i){
+            double vel = this->handVelocityNorm_task.at(i);
+            double time = this->qtime_task.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            hand_vel << vel_str+string(", ")+t_str+string("\n");
+        }
+        hand_vel.close();
     }
 
 
