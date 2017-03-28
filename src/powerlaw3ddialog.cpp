@@ -490,7 +490,7 @@ void PowerLaw3DDialog::getDerivative(QVector<double> &function, QVector<double> 
            //step_value=MIN_STEP_VALUE;
            derFunction.push_back(MIN_DER_VALUE);
        }else{
-            derFunction.push_back((double)(-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h*step_value));
+           derFunction.push_back((double)(-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h*step_value));
        }
 
        // 2nd point
@@ -541,6 +541,7 @@ void PowerLaw3DDialog::getDerivative(QVector<double> &function, QVector<double> 
        }else{
            derFunction.push_back((double)( -f0+6*f1-18*f2+10*f3+3*f4)/(12*h*step_value));
        }
+
 
        // 5th point
        // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
