@@ -517,7 +517,7 @@ void MainWindow::on_pushButton_plan_pressed()
 
     qnode.log(QNode::Info,string("planning the selected movement. . ."));
     ui.pushButton_plan->setCheckable(true);
-    ui.tableWidget_sol_mov->clear();//ui.listWidget_sol_mov->clear();
+    ui.tableWidget_sol_mov->clear();
     ui.label_totalTime_value_mov->clear();
 }
 
@@ -526,7 +526,7 @@ void MainWindow::on_pushButton_plan_pressed()
 void MainWindow::on_pushButton_getElements_clicked()
 {
 
-
+    ui.listWidget_elements->clear();
     try{
         if (qnode.getElements(this->curr_scene)){
 
