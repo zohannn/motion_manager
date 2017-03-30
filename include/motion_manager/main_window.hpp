@@ -434,6 +434,7 @@ private:
         PowerLaw3DDialog *mPowerLaw3Ddlg; /**< handle of the 1/6 power law dialog*/
         HandVelocityDialog *mHandVeldlg; /**< handle of the hand velocity components dlg */
         int scenario_id; /**< id of the current scenario */
+        QVector<QString> scenarios;  /**< list of scenarios */
 
         vector< vector < double > > timesteps_mov; /**< current time steps of the movement */
         QVector<double> qtime_mov; /**< time of the current movement for plotting */

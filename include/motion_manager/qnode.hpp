@@ -260,6 +260,13 @@ private:
         ros::Subscriber subWheel2; /**< ROS sunscriber to the topic /vrep/Wheel2_pose (obj_id=7 in the toy vehicle scenario) */
         ros::Subscriber subBase; /**< ROS sunscriber to the topic /vrep/Base_pose (obj_id=8 in the toy vehicle scenario) */
         // -----------------------------------------------------------------------------------------------------------------------------------
+        // Human Assistance scenario ----------------------------------------------------------------------------------------------------------
+        ros::Subscriber subBottleTea; /**< ROS sunscriber to the topic /vrep/BottleTea_pose (obj_id=0 in the Human Assistance scenario) */
+        ros::Subscriber subBottleCoffee; /**< ROS sunscriber to the topic /vrep/BottleCoffee_pose (obj_id=1 in the Human Assistance scenario) */
+        ros::Subscriber subBottleJuice; /**< ROS sunscriber to the topic /vrep/BottleJuice_pose (obj_id=2 in the Human Assistance scenario) */
+        ros::Subscriber subCup; /**< ROS sunscriber to the topic /vrep/Cup_pose (obj_id=3 in the Human Assistance scenario) */
+        ros::Subscriber subCup1; /**< ROS sunscriber to the topic /vrep/Cup1_pose (obj_id=4 in the Human Assistance scenario) */
+        // -----------------------------------------------------------------------------------------------------------------------------------
 #if MOVEIT==1
         boost::shared_ptr<moveit::planning_interface::PlanningSceneInterface> planning_scene_interface_ptr;/**< scene interface */
 #endif()
@@ -385,6 +392,37 @@ private:
         void BaseCallback(const geometry_msgs::PoseStamped& data);
 
         //void TableCallback(const geometry_msgs::PoseStamped& data);
+
+        // Human Assistance scenario ----------------------------------------------------------------------------------
+        /**
+         * @brief This is the callback to retrieve the state of the bottle tea (human assistance scenario)
+         * @param data
+         */
+        void BottleTeaCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the bottle coffee (human assistance scenario)
+         * @param data
+         */
+        void BottleCoffeeCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the bottle juice (human assistance scenario)
+         * @param data
+         */
+        void BottleJuiceCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the cup (human assistance scenario)
+         * @param data
+         */
+        void CupCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the cup 1 (human assistance scenario)
+         * @param data
+         */
+        void Cup1Callback(const geometry_msgs::PoseStamped& data);
 
         /**
          * @brief This method returns the linear interpolation

@@ -169,6 +169,21 @@ bool  QNode::loadScenario(const std::string& path,int id)
 
             break;
 
+        case 4:
+            // Human assistance scenario: Serving a drink with ARoS
+            // Bottle Tea (obj_id = 0)
+            subBottleTea = n.subscribe("/vrep/BottleTea_pose",1,&QNode::BottleTeaCallback,this);
+            // Bottle Coffee (obj_id = 1)
+            subBottleCoffee = n.subscribe("/vrep/BottleCoffee_pose",1,&QNode::BottleCoffeeCallback,this);
+            // Bottle Juice (obj_id = 2)
+            subBottleJuice = n.subscribe("/vrep/BottleJuice_pose",1,&QNode::BottleJuiceCallback,this);
+            // Cup (obj_id = 3)
+            subCup = n.subscribe("/vrep/Cup_pose",1,&QNode::CupCallback,this);
+            // Cup 1 (obj_id = 4)
+            subCup1 = n.subscribe("/vrep/Cup1_pose",1,&QNode::Cup1Callback,this);
+
+            break;
+
         }
 #if MOVEIT==1
         // planning scene of RViZ
@@ -1918,6 +1933,63 @@ void QNode::TableCallback(const geometry_msgs::PoseStamped &data)
 }
 
 */
+
+
+void QNode::BottleTeaCallback(const geometry_msgs::PoseStamped &data)
+{
+
+    //BOOST_LOG_SEV(lg, info) << "bottle_tea_callback"  ;
+
+    int obj_id = 0;
+    string name = string("BottleTea");
+
+    this->updateObjectInfo(obj_id,name,data);
+}
+
+void QNode::BottleCoffeeCallback(const geometry_msgs::PoseStamped &data)
+{
+
+    //BOOST_LOG_SEV(lg, info) << "bottle_coffee_callback"  ;
+
+    int obj_id = 1;
+    string name = string("BottleCoffee");
+
+    this->updateObjectInfo(obj_id,name,data);
+}
+
+void QNode::BottleJuiceCallback(const geometry_msgs::PoseStamped &data)
+{
+
+    //BOOST_LOG_SEV(lg, info) << "bottle_juice_callback"  ;
+
+    int obj_id = 2;
+    string name = string("BottleJuice");
+
+    this->updateObjectInfo(obj_id,name,data);
+}
+
+void QNode::CupCallback(const geometry_msgs::PoseStamped &data)
+{
+
+    //BOOST_LOG_SEV(lg, info) << "cup_callback"  ;
+
+    int obj_id = 3;
+    string name = string("Cup");
+
+    this->updateObjectInfo(obj_id,name,data);
+}
+
+void QNode::Cup1Callback(const geometry_msgs::PoseStamped &data)
+{
+
+    //BOOST_LOG_SEV(lg, info) << "cup_1_callback"  ;
+
+    int obj_id = 4;
+    string name = string("Cup1");
+
+    this->updateObjectInfo(obj_id,name,data);
+}
+
 void QNode::updateObjectInfo(int obj_id, string name, const geometry_msgs::PoseStamped &data)
 {
 
