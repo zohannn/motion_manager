@@ -737,13 +737,35 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>140</y>
+         <x>11</x>
+         <y>193</y>
          <width>171</width>
-         <height>100</height>
+         <height>46</height>
         </rect>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <layout class="QVBoxLayout" name="verticalLayout_eng_obj">
+        <item>
+         <widget class="QLabel" name="label_objects_eng">
+          <property name="text">
+           <string>Select the engaged object</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_objects_eng"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>11</x>
+         <y>139</y>
+         <width>341</width>
+         <height>48</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_15">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_obj">
           <item>
@@ -765,16 +787,28 @@ p, li { white-space: pre-wrap; }
          </layout>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_eng_obj">
+         <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
-           <widget class="QLabel" name="label_objects_eng">
+           <widget class="QLabel" name="label_poses">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
-             <string>Select the engaged object</string>
+             <string>Select the involved pose</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="comboBox_objects_eng"/>
+           <widget class="QComboBox" name="comboBox_poses">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <item>
+             <property name="text">
+              <string>none</string>
+             </property>
+            </item>
+           </widget>
           </item>
          </layout>
         </item>

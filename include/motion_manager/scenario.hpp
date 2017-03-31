@@ -3,11 +3,13 @@
 
 #include "humanoid.hpp"
 #include "object.hpp"
+#include "pose.hpp"
 
 namespace motion_manager{
 
 typedef boost::shared_ptr<Humanoid> humanoidPtr; /**< shared pointer to a humanoid */
 typedef boost::shared_ptr<Object> objectPtr; /**< shared pointer to an object*/
+typedef boost::shared_ptr<Pose> posePtr; /**< shared pointer to a pose*/
 
 //! The Scenario Class
 /**
@@ -58,6 +60,13 @@ public:
     void setObject(int pos, objectPtr obj);
 
     /**
+     * @brief This method insert a pose in the vector of poses at the position pos
+     * @param pos
+     * @param pt
+     */
+    void setPose(int pos, posePtr pt);
+
+    /**
      * @brief This method gets the name of the scenario
      * @return
      */
@@ -83,10 +92,23 @@ public:
     bool getObjects(vector<objectPtr>& objs);
 
     /**
-     * @brief This method adds a new object to the scenario
-     * @param obj
+     * @brief This method get the list of the poses in the scenario
+     * @param pts
+     * @return
      */
-    void addObject(Object* obj);
+    bool getPoses(vector<posePtr>& pts);
+
+    /**
+     * @brief This method adds a new object to the scenario
+     * @param obj_ptr
+     */
+    void addObject(objectPtr obj_ptr);
+
+    /**
+     * @brief addPose
+     * @param pose_ptr
+     */
+    void addPose(posePtr pose_ptr);
 
     /**
      * @brief This method gets the object at the position pos in the vector of objects
@@ -96,6 +118,13 @@ public:
     objectPtr getObject(int pos);
 
     /**
+     * @brief getPose
+     * @param pos
+     * @return
+     */
+    posePtr getPose(int pos);
+
+    /**
      * @brief This method gets the object named "obj_name"
      * @param obj_name
      * @return
@@ -103,10 +132,17 @@ public:
     objectPtr getObject(string obj_name);
 
     /**
-     * @brief This method adds the humanoid robot to the scenario
-     * @param hh
+     * @brief getPose
+     * @param pose_name
+     * @return
      */
-    void addHumanoid(Humanoid* hh);
+    posePtr getPose(string pose_name);
+
+    /**
+     * @brief This method adds the humanoid robot to the scenario
+     * @param hh_ptr
+     */
+    void addHumanoid(humanoidPtr hh_ptr);
 
 
 private:
@@ -114,6 +150,7 @@ private:
     string m_name; /**< the name of the scenario*/
     int m_scenarioID; /**< the ID of the scenario*/
     vector<objectPtr> objs_list; /**< the objects in the scenario */
+    vector<posePtr> poses_list; /**< the poses in the scenario */
     humanoidPtr hPtr; /**< the humanoid robot in the scenario */
 
 

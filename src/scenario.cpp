@@ -22,6 +22,13 @@ Scenario::Scenario(const Scenario &scene)
            this->objs_list.push_back(objectPtr(new Object(*obj.get())));
         }
     }
+    this->poses_list.clear();
+    if(!scene.poses_list.empty()){
+        for(size_t i=0; i<scene.poses_list.size();++i){
+           posePtr pt = scene.poses_list.at(i);
+           this->poses_list.push_back(posePtr(new Pose(*pt.get())));
+        }
+    }
 
     this->hPtr=humanoidPtr(new Humanoid(*scene.hPtr.get()));
 }
@@ -52,6 +59,12 @@ void Scenario::setObject(int pos, objectPtr obj)
 
 }
 
+void Scenario::setPose(int pos, posePtr pt)
+{
+
+    this->poses_list.at(pos) = posePtr(new Pose(*pt.get()));
+
+}
 
 string Scenario::getName()
 {
@@ -84,11 +97,29 @@ bool Scenario::getObjects(vector<objectPtr> &objs)
 
 }
 
-
-void Scenario::addObject(Object* ob)
+bool Scenario::getPoses(vector<posePtr> &pts)
 {
 
-    this->objs_list.push_back(objectPtr(new Object(*ob)));
+    if(!this->poses_list.empty()){
+        pts = std::vector<posePtr>(this->poses_list.size());
+        std::copy(this->poses_list.begin(),this->poses_list.end(),pts.begin());
+        return true;
+    }else{
+        return false;
+    }
+
+}
+
+
+void Scenario::addObject(objectPtr obj_ptr)
+{
+
+    this->objs_list.push_back(objectPtr(new Object(*obj_ptr.get())));
+}
+
+void Scenario::addPose(posePtr pose_ptr)
+{
+    this->poses_list.push_back(posePtr(new Pose(*pose_ptr.get())));
 }
 
 objectPtr Scenario::getObject(int pos)
@@ -99,6 +130,14 @@ objectPtr Scenario::getObject(int pos)
 
     return (*ii);
 
+}
+
+posePtr Scenario::getPose(int pos)
+{
+    std::vector<posePtr>::iterator ii = this->poses_list.begin();
+    advance(ii,pos);
+
+    return (*ii);
 }
 
 objectPtr Scenario::getObject(string obj_name)
@@ -116,10 +155,26 @@ objectPtr Scenario::getObject(string obj_name)
     return obj;
 }
 
-void Scenario::addHumanoid(Humanoid* hh)
+posePtr Scenario::getPose(string pose_name)
 {
 
-    this->hPtr = humanoidPtr(hh);
+    posePtr pose = NULL;
+
+    for(std::size_t i=0; i<this->poses_list.size();++i){
+        string name = this->poses_list.at(i)->getName();
+        if(boost::iequals(name,pose_name)){
+            pose=this->poses_list.at(i);
+            break;
+        }
+    }
+    return pose;
+}
+
+
+void Scenario::addHumanoid(humanoidPtr hh_ptr)
+{
+
+    this->hPtr = humanoidPtr(new Humanoid(*hh_ptr.get()));
 }
 
 

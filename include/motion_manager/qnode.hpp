@@ -233,6 +233,12 @@ Q_SIGNALS:
         void newObject(string value);
 
         /**
+         * @brief This method signals a new pose in the scenario
+         * @param value
+         */
+        void newPose(string value);
+
+        /**
          * @brief This method signals that a new joint is part of the humanoid
          * @param value
          */

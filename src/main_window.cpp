@@ -115,6 +115,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     // new element in the scenario signal
     QObject::connect(&qnode, SIGNAL(newElement(string)),this,SLOT(addElement(string)));
     QObject::connect(&qnode, SIGNAL(newObject(string)),this,SLOT(addObject(string)));
+    QObject::connect(&qnode, SIGNAL(newPose(string)),this,SLOT(addPose(string)));
 
     // update an element in the scenario signal
     QObject::connect(&qnode, SIGNAL(updateElement(int,string)),this,SLOT(updateElement(int,string)));
@@ -266,6 +267,12 @@ void MainWindow::addObject(string value)
    ui.comboBox_objects_eng->addItem(QString(value.c_str()));
 }
 
+void MainWindow::addPose(string value)
+{
+
+   ui.comboBox_poses->addItem(QString(value.c_str()));
+}
+
 
 void MainWindow::updateHomePosture(string value)
 {
@@ -282,7 +289,7 @@ void MainWindow::updateHomePosture(string value)
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox::about(this, tr("About the motion manager"),tr("<h2>motion_manager version 0.10</h2><p>Copyright: Gianpaolo Gulletta</p><p>The motion manager is a ROS package."
+    QMessageBox::about(this, tr("About the motion manager"),tr("<h2>motion_manager version 1.10</h2><p>Copyright: Gianpaolo Gulletta</p><p>The motion manager is a ROS package."
                                                            "This software is designed to plan the movements of the arms for any humanoid robot</p>"));
 }
 
@@ -2359,6 +2366,9 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros_bill.ttt");
     //string path_rviz_toyscene_aros = PATH_SCENARIOS+string("/rviz/toy_vehicle_aros.scene");
 
+    // Drinking Service task with ARoS
+    string path_vrep_drinking_aros = PATH_SCENARIOS+string("/vrep/DrinkingServiceTask_aros_bill.ttt");
+
     // Toy vehicle scenario with Jarde
     string path_vrep_toyscene_jarde = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_jarde.ttt");
     //string path_rviz_toyscene_jarde = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
@@ -2395,7 +2405,10 @@ void MainWindow::on_pushButton_scene_reset_clicked()
         break;
     case 4:
         // Assistive scenario: beverages with ARoS
-        //TO DO
+        path = path_vrep_drinking_aros;
+        title = string("Human assistance scenario: Serving a drink with ARoS");
+        success = string("Human assistance scenario: Serving a drink with ARoS HAS BEEN LOADED");
+        failure = string("Human assistance scenario: Serving a drink with ARoS HAS NOT BEEN LOADED");
         break;
     case 5:
         // Assistive scenario: beverages with Avatar
@@ -2657,6 +2670,8 @@ void MainWindow::on_comboBox_mov_currentIndexChanged(int i)
             ui.comboBox_objects_eng->setEnabled(false);
             ui.label_objects->setEnabled(true);
             ui.groupBox_grip->setEnabled(true);
+            ui.comboBox_poses->setEnabled(false);
+            ui.label_poses->setEnabled(false);
             break;
         case 1:
         // Reaching
@@ -2664,6 +2679,8 @@ void MainWindow::on_comboBox_mov_currentIndexChanged(int i)
             ui.comboBox_objects_eng->setEnabled(false);
             ui.label_objects->setEnabled(false);
             ui.groupBox_grip->setEnabled(false);
+            ui.comboBox_poses->setEnabled(true);
+            ui.label_poses->setEnabled(true);
             break;
         case 2:
         // Transport
@@ -2671,6 +2688,8 @@ void MainWindow::on_comboBox_mov_currentIndexChanged(int i)
             ui.comboBox_objects_eng->setEnabled(false);
             ui.label_objects->setEnabled(true);
             ui.groupBox_grip->setEnabled(true);
+            ui.comboBox_poses->setEnabled(true);
+            ui.label_poses->setEnabled(true);
             break;
         case 3:
         //Engage
@@ -2678,6 +2697,8 @@ void MainWindow::on_comboBox_mov_currentIndexChanged(int i)
             ui.comboBox_objects_eng->setEnabled(true);
             ui.label_objects->setEnabled(true);
             ui.groupBox_grip->setEnabled(true);
+            ui.comboBox_poses->setEnabled(false);
+            ui.label_poses->setEnabled(false);
             break;
         case 4:
         //Disengage
@@ -2685,6 +2706,8 @@ void MainWindow::on_comboBox_mov_currentIndexChanged(int i)
             ui.comboBox_objects_eng->setEnabled(true);
             ui.label_objects->setEnabled(true);
             ui.groupBox_grip->setEnabled(true);
+            ui.comboBox_poses->setEnabled(true);
+            ui.label_poses->setEnabled(true);
             break;
         case 5:
         // Go park
@@ -2692,6 +2715,8 @@ void MainWindow::on_comboBox_mov_currentIndexChanged(int i)
             ui.comboBox_objects_eng->setEnabled(false);
             ui.label_objects->setEnabled(false);
             ui.groupBox_grip->setEnabled(false);
+            ui.comboBox_poses->setEnabled(false);
+            ui.label_poses->setEnabled(false);
             break;
 
     }
@@ -2757,8 +2782,9 @@ void MainWindow::onListScenarioItemClicked(QListWidgetItem *item)
                 break;
 
             case 3:
-                //Assistive scenario: beverages with ARoS
-
+                //Human assistance scenario: beverages with ARoS
+                ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
+                                                         "ARoS serves a drink to a human patient"));
                 break;
 
             case 4:

@@ -355,6 +355,12 @@ public Q_SLOTS:
         void addObject(string value);
 
         /**
+         * @brief addPose
+         * @param value
+         */
+        void addPose(string value);
+
+        /**
          * @brief This methods updates the home posture of the humanoid
          * @param value
          */

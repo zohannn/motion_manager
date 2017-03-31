@@ -306,7 +306,9 @@ bool QNode::getElements(scenarioPtr scene)
     sleep(1);
 
     int n_objs; // total number of objects in the scenario
+    int n_poses; // total number of poses in the scenario
     int cnt_obj = 0; // index of the object being loaded
+    int cnt_pose = 0; // index of the pose being loaded
     std::string signPrefix = ""; // prefix of each object
     std::string infoLine; // info line in the list of elements
     std::string signTarRight = "_targetRight";
@@ -334,14 +336,21 @@ bool QNode::getElements(scenarioPtr scene)
     // **** object info **** //
     std::string obj_info_str;
     std::vector<double> obj_info_vec;
-
+    std::vector<std::string> objs_prefix;
+    // **** pose info **** //
+    std::string pose_info_str;
+    std::vector<double> pose_info_vec;
+    pos pose_pos;// position of the pose
+    orient pose_or;// orientation of the pose
+    std::vector<std::string> poses_prefix; // names of the poses
+    std::vector<bool> poses_rel; // relations of the poses
+    std::vector<int> poses_obj_id; // id of the related object
 
     vrep_common::simRosGetIntegerSignal srvi;
     vrep_common::simRosGetFloatSignal srvf;
     vrep_common::simRosGetStringSignal srvs;
     vrep_common::simRosGetObjectHandle srv_get_handle;
     ros::ServiceClient client_getHandle;
-    std::vector<std::string> objs_prefix;
 
     // name of the humanoid
     std::string Hname;
@@ -370,6 +379,7 @@ bool QNode::getElements(scenarioPtr scene)
     int rows;
 
     const string NOBJECTS = string("n_objects");
+    const string NPOSES = string("n_poses");
 
     // parameters of the barrett hand
     double maxAp; //[m]
@@ -532,7 +542,7 @@ bool QNode::getElements(scenarioPtr scene)
                 ob->setHandleBody(srv_get_handle.response.handle);
 
                 // add the object to the scenario
-                scene->addObject(ob);
+                scene->addObject(objectPtr(ob));
 
                 cnt_obj++;
             }else{
@@ -785,10 +795,7 @@ bool QNode::getElements(scenarioPtr scene)
                                           min_llimits,max_llimits);
             hptr->setMatRight(mat_right);
             hptr->setMatLeft(mat_left);
-            scene->addHumanoid(hptr);
-            // display info of the humanoid
-            infoLine = hptr->getInfoLine();
-            Q_EMIT newElement(infoLine);
+
             // get the postures
             std::vector<double> rightp;
             std::vector<double> leftp;
@@ -806,6 +813,10 @@ bool QNode::getElements(scenarioPtr scene)
                                        QString::number(leftp.at(i)*180/static_cast<double>(M_PI)).toStdString());
                 Q_EMIT newJoint(lj.at(i));
             }
+            // display info of the humanoid
+            infoLine = hptr->getInfoLine();
+            Q_EMIT newElement(infoLine);
+            scene->addHumanoid(humanoidPtr(hptr));
 #else
             throw("You have probably chosen the wrong hand type");
 
@@ -921,7 +932,7 @@ bool QNode::getElements(scenarioPtr scene)
                 client_getHandle.call(srv_get_handle);
                 ob->setHandleBody(srv_get_handle.response.handle);
 
-                scene->addObject(ob);
+                scene->addObject(objectPtr(ob));
 
                 cnt_obj++;
 
@@ -1721,12 +1732,6 @@ bool QNode::getElements(scenarioPtr scene)
             hptr->setMatRight(mat_right);
             hptr->setMatLeft(mat_left);
 
-            scene->addHumanoid(hptr);
-
-            // display info of the humanoid
-            infoLine = hptr->getInfoLine();
-            Q_EMIT newElement(infoLine);
-
             // get the postures
             std::vector<double> rightp;
             std::vector<double> leftp;
@@ -1746,6 +1751,11 @@ bool QNode::getElements(scenarioPtr scene)
                                        QString::number(leftp.at(i)*180/static_cast<double>(M_PI)).toStdString());
                 Q_EMIT newJoint(lj.at(i));
             }
+            // display info of the humanoid
+            infoLine = hptr->getInfoLine();
+            Q_EMIT newElement(infoLine);
+
+            scene->addHumanoid(humanoidPtr(hptr));
 #else
             throw("You have probably chosen the wrong hand type");
 
@@ -1757,13 +1767,18 @@ bool QNode::getElements(scenarioPtr scene)
     case 5:
         // Human assistance scenario: Serving a drink with ARoS
 
-        // get the number of objects in the scenario
+        // get the number of objects and the number of poses in the scenario
         add_client = n.serviceClient<vrep_common::simRosGetIntegerSignal>("/vrep/simRosGetIntegerSignal");
 
         srvi.request.signalName = NOBJECTS;
         add_client.call(srvi);
         if (srvi.response.result == 1){
              n_objs= srvi.response.signalValue;
+        }else{succ = false; throw string("Communication error");}
+        srvi.request.signalName = NPOSES;
+        add_client.call(srvi);
+        if (srvi.response.result == 1){
+             n_poses= srvi.response.signalValue;
         }else{succ = false; throw string("Communication error");}
 
         // get the info of the scenario
@@ -1777,7 +1792,6 @@ bool QNode::getElements(scenarioPtr scene)
         objs_prefix.push_back("Cup");            // obj_id = 3
         objs_prefix.push_back("Cup1");           // obj_id = 4
         objs_prefix.push_back("Table");          // obj_id = 5
-
 
         while(cnt_obj < n_objs){
             signPrefix = objs_prefix[cnt_obj];
@@ -1842,6 +1856,7 @@ bool QNode::getElements(scenarioPtr scene)
                 infoLine = ob->getInfoLine();
                 Q_EMIT newElement(infoLine);
                 Q_EMIT newObject(ob->getName());
+                Q_EMIT newPose(ob->getName()+string("_home"));
 
                 // get the handles  of the object
                 //handle of the object
@@ -1854,7 +1869,7 @@ bool QNode::getElements(scenarioPtr scene)
                 ob->setHandleBody(srv_get_handle.response.handle);
 
                 // add the object to the scenario
-                scene->addObject(ob);
+                scene->addObject(objectPtr(ob));
 
                 cnt_obj++;
             }else{
@@ -1862,6 +1877,54 @@ bool QNode::getElements(scenarioPtr scene)
                 throw string("Error while retrieving the objects of the scenario");
             }
         } // while loop objects
+
+        // this is the order of the poses in this scenario
+        // pose_id = 0
+        poses_prefix.push_back("BottleTea_pose1");
+        poses_rel.push_back(true);
+        poses_obj_id.push_back(0);
+        // pose_id = 1
+        poses_prefix.push_back("BottleTea_pose2");
+        poses_rel.push_back(true);
+        poses_obj_id.push_back(0);
+
+        while(cnt_pose < n_poses){
+            signPrefix = poses_prefix[cnt_pose];
+
+            add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
+            srvs.request.signalName = signPrefix + string("Info");
+            add_client.call(srvs);
+            if (srvs.response.result == 1){
+                 pose_info_str = srvs.response.signalValue;
+            }else{succ = false;}
+
+            if (succ){
+                floatCount = pose_info_str.size()/sizeof(float);
+                if(!pose_info_vec.empty()){pose_info_vec.clear();}
+                for (int k=0;k<floatCount;++k)
+                    pose_info_vec.push_back(static_cast<double>(((float*)pose_info_str.c_str())[k]));
+
+                // position of the pose
+                pose_pos.Xpos = pose_info_vec.at(0)*1000; //[mm]
+                pose_pos.Ypos = pose_info_vec.at(1)*1000; //[mm]
+                pose_pos.Zpos = pose_info_vec.at(2)*1000; //[mm]
+                // orientation of the pose
+                pose_or.roll = pose_info_vec.at(3)*static_cast<double>(M_PI)/180; //[rad]
+                pose_or.pitch = pose_info_vec.at(4)*static_cast<double>(M_PI)/180; //[rad]
+                pose_or.yaw = pose_info_vec.at(5)*static_cast<double>(M_PI)/180;//[rad]
+
+                Pose* ps = new Pose(signPrefix,pose_pos,pose_or,poses_rel[cnt_pose],poses_obj_id[cnt_pose]);
+
+                Q_EMIT newPose(ps->getName());
+                // add the pose to the scenario
+                scene->addPose(posePtr(ps));
+
+                cnt_pose++;
+            }else{
+                throw string("Error while retrieving the poses of the scenario");
+            }
+
+        }// while loop poses
 
         // get the info of the Humanoid
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
@@ -2098,10 +2161,6 @@ bool QNode::getElements(scenarioPtr scene)
                                           min_llimits,max_llimits);
             hptr->setMatRight(mat_right);
             hptr->setMatLeft(mat_left);
-            scene->addHumanoid(hptr);
-            // display info of the humanoid
-            infoLine = hptr->getInfoLine();
-            Q_EMIT newElement(infoLine);
             // get the postures
             std::vector<double> rightp;
             std::vector<double> leftp;
@@ -2119,6 +2178,11 @@ bool QNode::getElements(scenarioPtr scene)
                                        QString::number(leftp.at(i)*180/static_cast<double>(M_PI)).toStdString());
                 Q_EMIT newJoint(lj.at(i));
             }
+            // display info of the humanoid
+            infoLine = hptr->getInfoLine();
+            Q_EMIT newElement(infoLine);
+
+            scene->addHumanoid(humanoidPtr(hptr));
 #else
             throw("You have probably chosen the wrong hand type");
 
@@ -2750,7 +2814,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                         case 0: //error
                             // TO DO
                             break;
-                        case 1: case 3: case 4: // Toy vehicle scenario with AROS, empty scenario with ARoS
+                        case 1: case 3: case 4: case 5: // Toy vehicle scenario with AROS, empty scenario with ARoS, human assistance with ARoS
                             if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed){
                                 dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
                             }else if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4))){
