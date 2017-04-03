@@ -739,7 +739,7 @@ void MainWindow::on_pushButton_plan_clicked()
         mTolHumpdlg->getLambda(tols.lambda_final); // joint expense factors
         mTolHumpdlg->getLambda(tols.lambda_bounce); // joint expense factors
         // --- Tolerances for the bounce posture selection ---- //
-        tols.w_max = std::vector<double>(tols.lambda_final.size(),mTolHumpdlg->getWMax()); // max joint velocity
+        tols.w_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getWMax()*M_PI/180)); // max joint velocity
         mTolHumpdlg->getInitVel(tols.bounds.vel_0); // initial velocity
         mTolHumpdlg->getFinalVel(tols.bounds.vel_f); // final velocity
         mTolHumpdlg->getInitAcc(tols.bounds.acc_0); // initial acceleration

@@ -1,3 +1,18 @@
+#=========================================================================
+#   Institute:   University of Minho
+#                Dept. of Industrial Electronics
+#
+#   File:        CMakeLists.txt
+#
+#   Maintainer:  Gianpaolo Gulletta
+#   Email:       gianpaologulletta@gmail.com;
+#   Date:        2016 01 12
+#
+#   Description: The Motion Manager
+#
+#   Credits:
+#==========================================================================
+
 ##############################################################################
 # CMake
 ##############################################################################
