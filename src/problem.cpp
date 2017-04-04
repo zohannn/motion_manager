@@ -907,6 +907,29 @@ bool Problem::invKinHand(double d_obj,int hand_id,std::vector<double>& sols)
 
 }
 
+bool Problem::getRPY(std::vector<double>& rpy, Matrix3d& Rot)
+{
+    if((Rot.cols()==3) && (Rot.rows()==3))
+    {// the matrix is not empy
+        rpy.resize(3,0);
+        if((Rot(0,0)<1e-10) && (Rot(1,0)<1e-10))
+        {// singularity
+            rpy.at(0) = 0; // roll
+            rpy.at(1) = std::atan2(-Rot(2,0),Rot(0,0)); // pitch
+            rpy.at(2) = std::atan2(-Rot(1,2),Rot(1,1)); // yaw
+            return false;
+        }else{
+            rpy.at(0) = std::atan2(Rot(1,0),Rot(0,0)); // roll
+            double sp = std::sin(rpy.at(0)); double cp = std::cos(rpy.at(0));
+            rpy.at(1) = std::atan2(-Rot(2,0),cp*Rot(0,0)+sp*Rot(1,0)); // pitch
+            rpy.at(2) = std::atan2(sp*Rot(0,2)-cp*Rot(1,2),cp*Rot(1,1)-sp*Rot(0,1)); // yaw
+            return true;
+        }
+    }else{
+        return false;
+    }
+}
+
 
 
 movementPtr Problem::getMovement()
@@ -935,11 +958,14 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
     targetPtr tar;
     objectPtr obj; engagePtr eng;
     objectPtr obj_eng; engagePtr eng1;
+    posePtr pose;
+    Matrix3d R_hand;
     if(mov_type!=1 && mov_type!=5){
         try{ // compute the final posture of the fingers according to the object involved in the movement
             this->finalPostureFingers(arm_code);
         }catch(const string message){throw message;}
         obj = this->mov->getObject();
+        pose = this->mov->getPose();
         // engaging info
         obj_eng = this->mov->getObjectEng();
         eng = obj->getEngagePoint();
@@ -953,6 +979,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         this->scene->getHumanoid()->getRightShoulderPos(shPos);
         this->scene->getHumanoid()->getRightPosture(initPosture);
         this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
+        this->scene->getHumanoid()->getRightHandOr(R_hand);
         if(mov_type==5){
           this->scene->getHumanoid()->getRightHandHomePosture(finalHand);
         }else if(mov_type==1){
@@ -967,6 +994,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         this->scene->getHumanoid()->getLeftShoulderPos(shPos);
         this->scene->getHumanoid()->getLeftPosture(initPosture);
         this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
+        this->scene->getHumanoid()->getLeftHandOr(R_hand);
         if(mov_type==5){
           this->scene->getHumanoid()->getLeftHandHomePosture(finalHand);
         }else if(mov_type==1){
@@ -981,6 +1009,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
     // shoulder position (center of the reacheble workspace )
     this->h_planner->setShpos(shPos);
     std::vector<double> target;
+    std::vector<double> tar_pose;
     std::vector<double> place_location;
     if(mov_type!=1 && mov_type!=5){
         // compute the position of the engage point relative to the target frame
@@ -988,6 +1017,10 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         pos eng_pos = eng->getPos();
         Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
         Matrix3d Rot_tar_inv = Rot_tar.inverse();
+        Matrix3d R_tar_hand = Rot_tar_inv * R_hand;
+        Matrix3d Rot_pose; pose->RPY_matrix(Rot_pose);
+        Matrix3d Rot_new_tar = Rot_pose * R_tar_hand;
+        std::vector<double>rpy_new_tar; this->getRPY(rpy_new_tar,Rot_new_tar);
         Vector3d diff;
         diff(0) = eng_pos.Xpos - tar_pos.Xpos;
         diff(1) = eng_pos.Ypos - tar_pos.Ypos;
@@ -1009,6 +1042,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
 
         HUMotion::objectPtr hump_obj;
         target = {tar->getPos().Xpos, tar->getPos().Ypos, tar->getPos().Zpos,tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
+        tar_pose = {pose->getPos().Xpos, pose->getPos().Ypos, pose->getPos().Zpos,rpy_new_tar.at(0),rpy_new_tar.at(1),rpy_new_tar.at(2)};
         std::vector<double> position = {obj->getPos().Xpos,obj->getPos().Ypos,obj->getPos().Zpos};
         std::vector<double> orientation = {obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
         std::vector<double> dimension = {obj->getSize().Xsize,obj->getSize().Ysize,obj->getSize().Zsize};
@@ -1050,6 +1084,10 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         }
         break;
     case 2://transport
+        params.mov_specs.target = tar_pose;
+        curr_time = this->GetTimeMs64();
+        res = this->h_planner->plan_place(params,initPosture);
+        this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
     case 3://engage
         params.mov_specs.target = place_location;
@@ -1057,7 +1095,11 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         res = this->h_planner->plan_place(params,initPosture);
         this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
-    case 4:// disengage
+    case 4:// disengage // TO DO
+        //params.mov_specs.target = pose;
+        //curr_time = this->GetTimeMs64();
+        //res = this->h_planner->plan_place(params,initPosture);
+        //this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
     case 5:// go-park
         curr_time = this->GetTimeMs64();

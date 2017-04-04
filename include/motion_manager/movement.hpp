@@ -2,10 +2,12 @@
 #define MOVEMENT_HPP
 
 #include "object.hpp"
+#include "pose.hpp"
 
 namespace motion_manager{
 
 typedef boost::shared_ptr<Object> objectPtr;
+typedef boost::shared_ptr<Pose> posePtr;
 
 //! The Movement class
 /**
@@ -35,6 +37,14 @@ public:
      * @brief Movement, a constructor
      * @param type
      * @param arm
+     * @param pose
+     */
+    Movement(int type, int arm, posePtr pose);
+
+    /**
+     * @brief Movement, a constructor
+     * @param type
+     * @param arm
      * @param obj
      * @param grip_id
      * @param prec
@@ -51,6 +61,29 @@ public:
      * @param prec
      */
     Movement(int type, int arm, objectPtr obj, objectPtr obj_eng, int grip_id, bool prec);
+
+    /**
+     * @brief Movement, a constructor
+     * @param type
+     * @param arm
+     * @param obj
+     * @param obj_eng
+     * @param pose
+     * @param grip_id
+     * @param prec
+     */
+    Movement(int type, int arm, objectPtr obj, objectPtr obj_eng, posePtr pose,int grip_id, bool prec);
+
+    /**
+     * @brief Movement, a constructor
+     * @param type
+     * @param arm
+     * @param obj
+     * @param pose
+     * @param grip_id
+     * @param prec
+     */
+    Movement(int type, int arm, objectPtr obj, posePtr pose, int grip_id, bool prec);
 
     /**
      * @brief Movement, a copy constructor
@@ -138,6 +171,12 @@ public:
     objectPtr getObject();
 
     /**
+     * @brief This method gets the object that is being manipulated during the movement
+     * @return
+     */
+    posePtr getPose();
+
+    /**
      * @brief This method gets the object that is being manipulated before the movement starts
      * @return
      */
@@ -205,6 +244,7 @@ private:
     objectPtr obj; /**< object being manipulated in the movement */
     objectPtr obj_init; /**< object being manipulated before the movement starts */
     objectPtr obj_eng; /**< object involved in engaging/disengaging movements */
+    posePtr pose; /**< pose involved in transport/disengaging/reaching movements*/
     bool executed; /**< true if the movement has been executed, false otherwise */
 
     // Types of movements

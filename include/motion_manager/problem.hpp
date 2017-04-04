@@ -271,6 +271,14 @@ private:
      */
     bool invKinHand(double d_obj,int hand_id,std::vector<double>& sols);
 
+    /**
+     * @brief getRPY
+     * @param rpy
+     * @param Rot
+     * @return
+     */
+    bool getRPY(std::vector<double>& rpy, Matrix3d& Rot);
+
 };
 
 }// namespace motion_manager

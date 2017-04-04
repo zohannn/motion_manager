@@ -606,8 +606,8 @@ void MainWindow::on_pushButton_addMov_clicked()
                 arm_sel=0;
             }
 
-             if (ui.comboBox_objects->isEnabled() && ui.comboBox_objects_eng->isEnabled() && ui.groupBox_grip->isEnabled()){
-                 // engage, disengage movements
+             if (ui.comboBox_objects->isEnabled() && ui.comboBox_objects_eng->isEnabled() && ui.groupBox_grip->isEnabled() && !ui.comboBox_poses->isEnabled()){
+                 // engage movements
                 string obj_name = ui.comboBox_objects->currentText().toStdString();
                 string obj_eng_name = ui.comboBox_objects_eng->currentText().toStdString();
 
@@ -638,14 +638,45 @@ void MainWindow::on_pushButton_addMov_clicked()
 #endif
                     }
                     success=true;
-
                 }else{qnode.log(QNode::Error,std::string("The movement requires two objects"));}
+             }else if(ui.comboBox_objects->isEnabled() && ui.comboBox_objects_eng->isEnabled() && ui.groupBox_grip->isEnabled() && ui.comboBox_poses->isEnabled()){
+                 // disengage movements
+                string obj_name = ui.comboBox_objects->currentText().toStdString();
+                string obj_eng_name = ui.comboBox_objects_eng->currentText().toStdString();
+                objectPtr obj = curr_scene->getObject(obj_name);
+                objectPtr obj_eng = curr_scene->getObject(obj_eng_name);
+                string pose_name = ui.comboBox_poses->currentText().toStdString();
+                posePtr pose = curr_scene->getPose(pose_name);
 
-             }else if(ui.comboBox_objects->isEnabled() && ui.groupBox_grip->isEnabled()){
-                  // reach-to- grasp movement, transport movements
+                if(obj!=NULL && obj_eng!=NULL && pose!=NULL){
+                    int grip_id = ui.comboBox_grip->currentIndex();
+                    bool prec = ui.radioButton_prec->isChecked();
+                    //bool full = ui.radioButton_full->isChecked();
+                    switch (arm_sel){
+                    case 0: // dual arm
+                        // TO DO
+                    case 1: // right arm
+                         obj->setTargetRightEnabled(true);
+                         obj->setTargetLeftEnabled(false);
+                        break;
+                    case 2: // left arm
+                        obj->setTargetLeftEnabled(true);
+                        obj->setTargetRightEnabled(false);
+                        break;
+                    }
+                    if(planner_id==0){
+                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,pose,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                    }else{
+#if MOVEIT==1
+                       curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,pose,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+#endif
+                    }
+                    success=true;
+                }else{qnode.log(QNode::Error,std::string("The movement requires two objects and a pose"));}
+             }else if(ui.comboBox_objects->isEnabled() && ui.groupBox_grip->isEnabled() && !ui.comboBox_poses->isEnabled()){
+                  // reach-to-grasp movements
                  string obj_name = ui.comboBox_objects->currentText().toStdString();
                  objectPtr obj = curr_scene->getObject(obj_name);
-
                  if(obj!=NULL){
                      int grip_id = ui.comboBox_grip->currentIndex();
                      bool prec = ui.radioButton_prec->isChecked();
@@ -670,10 +701,27 @@ void MainWindow::on_pushButton_addMov_clicked()
 #endif
                      }
                      success=true;
-
                  }else{qnode.log(QNode::Error,std::string("The movement requires an object"));}
+             }else if(ui.comboBox_objects->isEnabled() && ui.groupBox_grip->isEnabled() && ui.comboBox_poses->isEnabled()){
+                 // transport movements
+                 string obj_name = ui.comboBox_objects->currentText().toStdString();
+                 objectPtr obj = curr_scene->getObject(obj_name);
+                 string pose_name = ui.comboBox_poses->currentText().toStdString();
+                 posePtr pose = curr_scene->getPose(pose_name);
+                 if(obj!=NULL || pose!=NULL){
+                     int grip_id = ui.comboBox_grip->currentIndex();
+                     bool prec = ui.radioButton_prec->isChecked();
+                     if(planner_id==0){
+                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,pose,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                     }else{
+#if MOVEIT==1
+                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,pose,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+#endif
+                     }
+                     success=true;
+                 }else{qnode.log(QNode::Error,std::string("The movement requires an object and a pose"));}
              }else{
-                 // go-park and reaching movements
+                 // go-park movement and reaching movements
                  std::vector<objectPtr> objects; this->curr_scene->getObjects(objects);
                  for(size_t i=0;i<objects.size();++i){
                      this->curr_scene->getObject(i)->setTargetRightEnabled(false);
@@ -687,9 +735,7 @@ void MainWindow::on_pushButton_addMov_clicked()
 #endif
                  }
                  success=true;
-
              }
-
              if(success){
                  qnode.log(QNode::Info,std::string("The movement has been added to the current task"));
                  ui.groupBox_task->setEnabled(true);
@@ -700,8 +746,6 @@ void MainWindow::on_pushButton_addMov_clicked()
                  ui.listWidget_movs->setCurrentRow(ui.listWidget_movs->count()-1);
 
              }
-
-
         }
 } // add movement
 

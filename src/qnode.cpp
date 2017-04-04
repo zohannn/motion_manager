@@ -1852,11 +1852,13 @@ bool QNode::getElements(scenarioPtr scene)
                                     new Target(signPrefix + signTarLeft,tarLeft_pos,tarLeft_or),
                                     new EngagePoint(signPrefix + signEngage, engage_pos, engage_or));
 
+                Pose* ps = new Pose(signPrefix+string("_home"),obj_pos,obj_or,true,cnt_obj);
+
 
                 infoLine = ob->getInfoLine();
                 Q_EMIT newElement(infoLine);
                 Q_EMIT newObject(ob->getName());
-                Q_EMIT newPose(ob->getName()+string("_home"));
+                 Q_EMIT newPose(ps->getName());
 
                 // get the handles  of the object
                 //handle of the object
@@ -1870,6 +1872,8 @@ bool QNode::getElements(scenarioPtr scene)
 
                 // add the object to the scenario
                 scene->addObject(objectPtr(ob));
+                // add the pose to the scenario
+                scene->addPose(posePtr(ps));
 
                 cnt_obj++;
             }else{
@@ -3166,7 +3170,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                                     switch(scenarioID){
                                     case 0: //error
                                         break;
-                                    case 1: case 3: case 4:// Toy vehicle scenario with AROS, empty scenario with ARoS
+                                    case 1: case 3: case 4: case 5: // Toy vehicle scenario with AROS, empty scenario with ARoS, human assistance with ARoS
                                         if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed){
                                             dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
                                         }else if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4))){

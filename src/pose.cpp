@@ -5,7 +5,15 @@ namespace motion_manager{
 
 Pose::Pose()
 {
-
+    this->m_name = "";
+    this->m_pos.Xpos = 0;
+    this->m_pos.Ypos = 0;
+    this->m_pos.Zpos = 0;
+    this->m_or.pitch = 0;
+    this->m_or.roll = 0;
+    this->m_or.yaw = 0;
+    this->obj_related = false;
+    this->obj_id = -1;
 }
 
 Pose::Pose(string name, pos ppos, orient oor)
