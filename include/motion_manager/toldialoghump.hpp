@@ -226,6 +226,12 @@ public:
     void getPostPlaceRetreat(std::vector<double>& post_place);
 
     /**
+     * @brief setInitJointsVel
+     * @param init_vel
+     */
+    void setInitJointsVel(std::vector<double>& init_vel);
+
+    /**
      * @brief This method sets the information about the tuning of the planner
      * @param info
      */

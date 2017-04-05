@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Pose: , Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
@@ -234,7 +234,7 @@ pre_grasp_y=1
 
 pre_grasp_z=0
 
-pre_grasp_dist=100
+pre_grasp_dist=160
 post_grasp_x=0
 
 post_grasp_y=1

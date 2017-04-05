@@ -358,6 +358,24 @@ void TolDialogHUMP::setPlaneParameters(std::vector<double> &point1,std::vector<d
     }
 }
 
+void TolDialogHUMP::setInitJointsVel(std::vector<double>& init_vel)
+{
+    if(!init_vel.empty())
+    {
+        ui->lineEdit_init_vel_1->setText(QString::number(init_vel.at(0)));
+        ui->lineEdit_init_vel_2->setText(QString::number(init_vel.at(1)));
+        ui->lineEdit_init_vel_3->setText(QString::number(init_vel.at(2)));
+        ui->lineEdit_init_vel_4->setText(QString::number(init_vel.at(3)));
+        ui->lineEdit_init_vel_5->setText(QString::number(init_vel.at(4)));
+        ui->lineEdit_init_vel_6->setText(QString::number(init_vel.at(5)));
+        ui->lineEdit_init_vel_7->setText(QString::number(init_vel.at(6)));
+        ui->lineEdit_init_vel_8->setText(QString::number(init_vel.at(7)));
+        ui->lineEdit_init_vel_9->setText(QString::number(init_vel.at(8)));
+        ui->lineEdit_init_vel_10->setText(QString::number(init_vel.at(9)));
+        ui->lineEdit_init_vel_11->setText(QString::number(init_vel.at(10)));
+    }
+}
+
 void TolDialogHUMP::getPlaneParameters(std::vector<double> &params)
 {
     params.clear(); double a,b,c,d;

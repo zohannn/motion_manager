@@ -959,7 +959,6 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
     objectPtr obj; engagePtr eng;
     objectPtr obj_eng; engagePtr eng1;
     posePtr pose;
-    Matrix3d R_hand;
     if(mov_type!=1 && mov_type!=5){
         try{ // compute the final posture of the fingers according to the object involved in the movement
             this->finalPostureFingers(arm_code);
@@ -979,7 +978,6 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         this->scene->getHumanoid()->getRightShoulderPos(shPos);
         this->scene->getHumanoid()->getRightPosture(initPosture);
         this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
-        this->scene->getHumanoid()->getRightHandOr(R_hand);
         if(mov_type==5){
           this->scene->getHumanoid()->getRightHandHomePosture(finalHand);
         }else if(mov_type==1){
@@ -994,7 +992,6 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         this->scene->getHumanoid()->getLeftShoulderPos(shPos);
         this->scene->getHumanoid()->getLeftPosture(initPosture);
         this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
-        this->scene->getHumanoid()->getLeftHandOr(R_hand);
         if(mov_type==5){
           this->scene->getHumanoid()->getLeftHandHomePosture(finalHand);
         }else if(mov_type==1){
@@ -1017,10 +1014,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         pos eng_pos = eng->getPos();
         Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
         Matrix3d Rot_tar_inv = Rot_tar.inverse();
-        Matrix3d R_tar_hand = Rot_tar_inv * R_hand;
         Matrix3d Rot_pose; pose->RPY_matrix(Rot_pose);
-        Matrix3d Rot_new_tar = Rot_pose * R_tar_hand;
-        std::vector<double>rpy_new_tar; this->getRPY(rpy_new_tar,Rot_new_tar);
         Vector3d diff;
         diff(0) = eng_pos.Xpos - tar_pos.Xpos;
         diff(1) = eng_pos.Ypos - tar_pos.Ypos;
@@ -1042,7 +1036,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
 
         HUMotion::objectPtr hump_obj;
         target = {tar->getPos().Xpos, tar->getPos().Ypos, tar->getPos().Zpos,tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
-        tar_pose = {pose->getPos().Xpos, pose->getPos().Ypos, pose->getPos().Zpos,rpy_new_tar.at(0),rpy_new_tar.at(1),rpy_new_tar.at(2)};
+        tar_pose = {pose->getPos().Xpos, pose->getPos().Ypos, pose->getPos().Zpos, pose->getOr().roll, pose->getOr().pitch, pose->getOr().yaw};
         std::vector<double> position = {obj->getPos().Xpos,obj->getPos().Ypos,obj->getPos().Zpos};
         std::vector<double> orientation = {obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
         std::vector<double> dimension = {obj->getSize().Xsize,obj->getSize().Ysize,obj->getSize().Zsize};

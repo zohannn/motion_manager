@@ -307,6 +307,11 @@ public Q_SLOTS:
         void on_pushButton_stop_task_clicked();
 
         /**
+         * @brief This method saves the end posture data
+         */
+        void on_pushButton_save_end_posture_clicked();
+
+        /**
          * This method is signalled by the underlying model. When the model changes,
          * this will drop the cursor down to the last line in the QListview to ensure
          * the user can always see the latest log message.
@@ -448,6 +453,9 @@ private:
         vector< MatrixXd > jointsAcceleration_mov; /**< trajectory of the joint acceleration of the movement */
         vector< MatrixXd > jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
         vector< MatrixXd > jointsPosition_mov; /**< trajectory of the joint position of the movement */
+        vector<double> jointsEndPosition_mov; /**< end joint position of the movement */
+        vector<double> jointsEndVelocity_mov; /**< end joint velocity of the movement */
+        vector<double> jointsEndAcceleration_mov; /**< end joint acceleration of the movement */
         vector< vector< MatrixXd > > jointsAcceleration_task; /**< trajectory of the joint acceleration of the task */
         vector< vector< MatrixXd > > jointsVelocity_task; /**< trajectory of the joint velocity of the task */
         vector< vector< MatrixXd > > jointsPosition_task; /**< trajectory of the joint position of the task */

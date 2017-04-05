@@ -324,6 +324,7 @@ void MainWindow::on_pushButton_tuning_clicked()
     int planner_id = prob->getPlannerID();
     switch(planner_id){
     case 0: // HUMP
+        mTolHumpdlg->setInitJointsVel(this->jointsEndVelocity_mov);
         mTolHumpdlg->show();
         break;
     case 1: // RRT
@@ -1822,6 +1823,28 @@ void MainWindow::on_pushButton_stop_task_clicked()
     qnode.stopSim();
     qnode.resetSimTime();
     qnode.resetGlobals();
+}
+
+void MainWindow::on_pushButton_save_end_posture_clicked()
+{
+    this->jointsEndAcceleration_mov.clear();
+    this->jointsEndVelocity_mov.clear();
+    this->jointsEndPosition_mov.clear();
+
+    if(!this->jointsPosition_mov.empty()){
+        MatrixXd joints_pos = this->jointsPosition_mov.back();
+        MatrixXd joints_vel = this->jointsVelocity_mov.back();
+        MatrixXd joints_acc = this->jointsAcceleration_mov.back();
+        VectorXd end_pos = joints_pos.row(joints_pos.rows()-1);
+        VectorXd end_vel = joints_vel.row(joints_vel.rows()-1);
+        VectorXd end_acc = joints_acc.row(joints_acc.rows()-1);
+        this->jointsEndPosition_mov.resize(end_pos.size());
+        VectorXd::Map(&this->jointsEndPosition_mov[0], end_pos.size()) = end_pos;
+        this->jointsEndVelocity_mov.resize(end_vel.size());
+        VectorXd::Map(&this->jointsEndVelocity_mov[0], end_vel.size()) = end_vel;
+        this->jointsEndAcceleration_mov.resize(end_acc.size());
+        VectorXd::Map(&this->jointsEndAcceleration_mov[0], end_acc.size()) = end_acc;
+    }
 }
 
 void MainWindow::on_pushButton_execTask_pressed(){
