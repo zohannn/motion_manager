@@ -2699,14 +2699,28 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
         case 1: // reaching
             approach=false;
             break;
-        case 2:// transport
-            if(k==1){approach=true;}else{approach=false;}
-            break;
-        case 3: // engage
+        case 2: case 3: // transport, engage
             if(k==1){approach=true;}else{approach=false;}
             if(k==2){
                 retreat=true;
                 closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
+                //ros::spinOnce();// handle ROS messages
+                if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
+                    add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                    vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                    //if(obj_in_hand){
+                        srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                        srvset_parent.request.parentHandle = -1; // parentless object
+                        srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                        add_client.call(srvset_parent);
+                        if (srvset_parent.response.result != 1){
+                            log(QNode::Error,string("Error in releasing the object "));
+                        }
+                    //}
+                }
+//#if HAND ==1
+//              this->openBarrettHand(arm_code);
+//#endif
             }else{retreat=false;}
             break;
         case 4:// disengage
@@ -2716,6 +2730,8 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
             approach = false;
             break;
         }
+
+
 
         MatrixXd traj = traj_mov.at(k);
         MatrixXd vel = vel_mov.at(k);
@@ -2876,13 +2892,13 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 
         // ----- post-movement operations -------- //
         //ros::spinOnce(); // handle ROS messages
-        add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
-        vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
         switch (mov_type) {
         case 0: // reach-to grasp
             // grasp the object
             if(obj_in_hand){
                 if(approach){
+                    add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                    vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
                     //srvset_parent.request.handle = h_detobj;
                     srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
                     srvset_parent.request.parentHandle = h_attach;
@@ -2902,29 +2918,10 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
         case 2: // transport
             break;
         case 3: // engage
-            if(approach){
-            //ros::spinOnce();// handle ROS messages
-            if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
-                add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
-                vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
-                //if(obj_in_hand){
-                    srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
-                    srvset_parent.request.parentHandle = -1; // parentless object
-                    srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
-                    add_client.call(srvset_parent);
-                    if (srvset_parent.response.result != 1){
-                        log(QNode::Error,string("Error in releasing the object "));
-                    }
-                //}
-            }
-//#if HAND ==1
-  //              this->openBarrettHand(arm_code);
-//#endif
-            }
             break;
         case 4: // disengage
             break;
-        case 5: // go home
+        case 5: // go park
             break;
         }
     } // if subscriber
@@ -3053,14 +3050,28 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
               case 1: // reaching
                   approach=false;
                   break;
-              case 2:// transport
-                  if(j==1){approach=true;}else{approach=false;}
-                  break;
-              case 3: // engage
+              case 2: case 3: // transport, engage
                   if(j==1){approach=true;}else{approach=false;}
                   if(j==2){
                       retreat=true;
                       closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
+                      //ros::spinOnce();// handle ROS messages
+                      if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
+                          add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                          vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                          //if(obj_in_hand){
+                              srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                              srvset_parent.request.parentHandle = -1; // parentless object
+                              srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                              add_client.call(srvset_parent);
+                              if (srvset_parent.response.result != 1){
+                                  log(QNode::Error,string("Error in releasing the object "));
+                              }
+                          //}
+                      }
+      //#if HAND ==1
+      //              this->openBarrettHand(arm_code);
+      //#endif
                   }else{retreat=false;}
                   break;
               case 4:// disengage
@@ -3254,25 +3265,6 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                     case 2: // transport
                         break;
                     case 3: // engage
-                        if(approach){
-                        //ros::spinOnce();// handle ROS messages
-                        if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
-                            add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
-                            vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
-                            //if(obj_in_hand){
-                                srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
-                                srvset_parent.request.parentHandle = -1; // parentless object
-                                srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
-                                add_client.call(srvset_parent);
-                                if (srvset_parent.response.result != 1){
-                                    log(QNode::Error,string("Error in releasing the object "));
-                                }
-                            //}
-                        }
-//#if HAND ==1
-  //              this->openBarrettHand(arm_code);
-//#endif
-                        }
                         break;
                     case 4: // disengage
                         break;

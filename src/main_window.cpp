@@ -1873,6 +1873,7 @@ void MainWindow::on_pushButton_load_task_clicked()
     int grip_id; QString grip_type;
     QString obj_str; objectPtr obj;
     QString obj_eng_str; objectPtr obj_eng;
+    QString pose_str; posePtr pose;
     bool prec;
     int row=0;
     MatrixXd pos_stage;
@@ -1964,6 +1965,8 @@ void MainWindow::on_pushButton_load_task_clicked()
                         obj_str=fields1.at(1).simplified();
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Object Engaged"),Qt::CaseInsensitive)==0){
                         obj_eng_str=fields1.at(1).simplified();
+                    }else if(QString::compare(fields1.at(0).simplified(),QString("Pose"),Qt::CaseInsensitive)==0){
+                        pose_str=fields1.at(1).simplified();
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Grip Type"),Qt::CaseInsensitive)==0){
                         grip_type=fields1.at(1).simplified();
                     }
@@ -2075,6 +2078,18 @@ void MainWindow::on_pushButton_load_task_clicked()
                     this->curr_task->addProblem(prob.get());
                 }else if(QString::compare(mov_type,QString("Transport"),Qt::CaseInsensitive)==0){
                     mov_id=2;
+                    problemPtr prob;
+                    pose = this->curr_scene->getPose(pose_str.toStdString());
+                    if(plan_id==0){
+                       prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,pose,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                    }else{
+#if MOVEIT==1
+                       prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,pose,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+#endif
+                    }
+                    prob->setSolved(true);
+                    prob->setPartOfTask(true);
+                    this->curr_task->addProblem(prob.get());
                 }else if(QString::compare(mov_type,QString("Engage"),Qt::CaseInsensitive)==0){
                     mov_id=3;
                     //get the object
