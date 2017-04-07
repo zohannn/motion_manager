@@ -7,7 +7,7 @@ Elbow_radius=70.0
 
 Wrist_radius=60.0
 
-Hand_radius=30
+Hand_radius=50
 
 Hand_1_1=25.0
 
@@ -34,7 +34,7 @@ Hand_tip_2=5
 Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=0.5
+lambda_1=0.95
 
 lambda_2=1
 
@@ -234,7 +234,8 @@ pre_grasp_y=1
 
 pre_grasp_z=0
 
-pre_grasp_dist=160
+pre_grasp_dist=100
+
 post_grasp_x=0
 
 post_grasp_y=1
