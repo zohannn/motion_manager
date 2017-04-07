@@ -1154,19 +1154,6 @@ p, li { white-space: pre-wrap; }
          <attribute name="title">
           <string>Movement</string>
          </attribute>
-         <widget class="QPushButton" name="pushButton_joints_results_mov">
-          <property name="geometry">
-           <rect>
-            <x>900</x>
-            <y>380</y>
-            <width>161</width>
-            <height>23</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>show results of the joints</string>
-          </property>
-         </widget>
          <widget class="QPushButton" name="pushButton_plot_mov">
           <property name="geometry">
            <rect>
@@ -1178,19 +1165,6 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="text">
            <string>Plot</string>
-          </property>
-         </widget>
-         <widget class="QPushButton" name="pushButton_comp_hand_vel_mov">
-          <property name="geometry">
-           <rect>
-            <x>550</x>
-            <y>380</y>
-            <width>331</width>
-            <height>21</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>show the components of the hand velocity</string>
           </property>
          </widget>
          <widget class="QPushButton" name="pushButton_save_res_mov">
@@ -1287,6 +1261,32 @@ p, li { white-space: pre-wrap; }
            </item>
            <item>
             <widget class="QCustomPlot" name="plot_hand_vel_mov" native="true"/>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="">
+          <property name="geometry">
+           <rect>
+            <x>630</x>
+            <y>380</y>
+            <width>431</width>
+            <height>25</height>
+           </rect>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_17">
+           <item>
+            <widget class="QPushButton" name="pushButton_comp_vel_mov">
+             <property name="text">
+              <string>show the components of the velocities</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton_joints_results_mov">
+             <property name="text">
+              <string>show results of the joints</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

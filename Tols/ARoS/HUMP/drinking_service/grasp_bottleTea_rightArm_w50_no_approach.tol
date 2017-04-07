@@ -1,38 +1,28 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
-Shoulder_radius=80.0
+Shoulder_radius=90
+Elbow_radius=80
+Wrist_radius=70
+Hand_radius=30
+Hand_1_1=25.0
 
-Elbow_radius=70.0
+Hand_1_2=25.0
 
-Wrist_radius=60
+Hand_1_3=25.0
 
-Hand_radius=50
+Hand_2_1=25.0
 
-Hand_1_1=25
+Hand_2_2=25.0
 
-Hand_1_2=25
+Hand_2_3=25.0
 
-Hand_1_3=25
-
-Hand_2_1=25
-
-Hand_2_2=25
-
-Hand_2_3=25
-
-Hand_3_1=15
-
-Hand_3_2=15
-
-Hand_3_3=15
-
+Hand_3_1=25
+Hand_3_2=25
+Hand_3_3=25
 Hand_tip_1=5
-
 Hand_tip_2=5
-
 Hand_tip_3=5
-
 # Joint Expanse factors
 lambda_1=1
 
@@ -57,27 +47,27 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.021091
+init_vel_1=0.0
 
-init_vel_2=0.0240941
+init_vel_2=0.0
 
-init_vel_3=-0.00881013
+init_vel_3=0.0
 
-init_vel_4=-0.0565341
+init_vel_4=0.0
 
-init_vel_5=0.00274234
+init_vel_5=0.0
 
-init_vel_6=0.0338745
+init_vel_6=0.0
 
-init_vel_7=0.0337459
+init_vel_7=0.0
 
-init_vel_8=0
+init_vel_8=0.0
 
-init_vel_9=0
+init_vel_9=0.0
 
-init_vel_10=0
+init_vel_10=0.0
 
-init_vel_11=0
+init_vel_11=0.0
 
 # Final Velocity 
 final_vel_1=0
@@ -103,19 +93,19 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=0
+init_acc_1=0.0
 
-init_acc_2=0
+init_acc_2=0.0
 
-init_acc_3=0
+init_acc_3=0.0
 
-init_acc_4=0
+init_acc_4=0.0
 
-init_acc_5=0
+init_acc_5=0.0
 
-init_acc_6=0
+init_acc_6=0.0
 
-init_acc_7=0
+init_acc_7=0.0
 
 init_acc_8=0.0
 
@@ -150,11 +140,8 @@ final_acc_11=0.0
 
 # Tolerances with the target [mm]
 tar_xx_1=0
-
 tar_xx_2=0
-
 tar_xx_3=0
-
 tar_yy_1=0
 
 tar_yy_2=0
@@ -186,15 +173,24 @@ tar_yz_2=0
 tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
-obs_xx_1=80
-obs_xx_2=80
-obs_xx_3=80
-obs_yy_1=90
-obs_yy_2=90
-obs_yy_3=90
-obs_zz_1=100
-obs_zz_2=100
-obs_zz_3=100
+obs_xx_1=0
+
+obs_xx_2=0
+
+obs_xx_3=0
+
+obs_yy_1=0
+
+obs_yy_2=0
+
+obs_yy_3=0
+
+obs_zz_1=0
+
+obs_zz_2=0
+
+obs_zz_3=0
+
 obs_xy_1=0
 
 obs_xy_2=0
@@ -221,36 +217,36 @@ tar_or=0.001
 # Pick settings
 pre_grasp_x=0
 
-pre_grasp_y=1
+pre_grasp_y=0.707106781
 
-pre_grasp_z=0
+pre_grasp_z=0.707106781
 
-pre_grasp_dist=35
+pre_grasp_dist=80
 
 post_grasp_x=0
 
-post_grasp_y=1
+post_grasp_y=0
 
-post_grasp_z=0
+post_grasp_z=1
 
-post_grasp_dist=40
+post_grasp_dist=100
 
 # Place settings
 pre_place_x=0
 
 pre_place_y=0
 
-pre_place_z=1
+pre_place_z=0
 
-pre_place_dist=55
+pre_place_dist=0
 
 post_place_x=0
 
-post_place_y=1
+post_place_y=0
 
 post_place_z=0
 
-post_place_dist=100
+post_place_dist=0
 
 # Move settings
 target_x=-400
@@ -312,7 +308,7 @@ max_velocity=50
 
 tar_av=true
 ob_av=true
-approach=true
-retreat=false
+approach=false
+retreat=true
 rand_init=false
 coll=true

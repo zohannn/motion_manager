@@ -2620,13 +2620,13 @@ void QNode::leftProxCallback(const vrep_common::ProximitySensorData& data)
 }
 
 
-bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>& vel_mov, std::vector<std::vector<double>> timesteps, std::vector<double> tols_stop, movementPtr mov, scenarioPtr scene)
+bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>& vel_mov, std::vector<std::vector<double>> timesteps, std::vector<double> tols_stop, std::vector<string>& traj_descr,movementPtr mov, scenarioPtr scene)
 {
 
     this->curr_scene = scene;
     int scenarioID = scene->getID();
     this->curr_mov = mov; int mov_type = mov->getType();  int arm_code = mov->getArm();
-    bool approach; bool retreat;
+    bool plan; bool approach; bool retreat;
     bool hand_closed;
     switch (mov_type){
     case 0: case 1: case 5: // reach-to-grasp, reaching, go-park
@@ -2692,17 +2692,39 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
 
     for (size_t k=0; k< traj_mov.size();++k){  // for loop stages
 
-        switch (mov_type){// TO REVIEW!!!!
+        string mov_descr = traj_descr.at(k);
+        if(strcmp(mov_descr.c_str(),"plan")==0){
+            plan=true; approach=false; retreat=false;
+        }else if(strcmp(mov_descr.c_str(),"approach")==0){
+            plan=false; approach=true; retreat=false;
+        }else if(strcmp(mov_descr.c_str(),"retreat")==0){
+            plan=false; approach=false; retreat=true;
+        }
+
+        switch (mov_type){
         case 0: // reach-to-grasp
-            if(k==1){approach=true;}else{approach=false;}
+            if(retreat){
+                if(obj_in_hand){
+                    add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                    vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                    //srvset_parent.request.handle = h_detobj;
+                    srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                    srvset_parent.request.parentHandle = h_attach;
+                    srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                    add_client.call(srvset_parent);
+                    if (srvset_parent.response.result != 1){
+                        log(QNode::Error,string("Error in grasping the object "));
+                    }
+//#if HAND == 1
+                //this->closeBarrettHand(arm_code);
+//#endif
+                }
+            }
             break;
         case 1: // reaching
-            approach=false;
             break;
         case 2: case 3: // transport, engage
-            if(k==1){approach=true;}else{approach=false;}
-            if(k==2){
-                retreat=true;
+            if(retreat){
                 closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
                 //ros::spinOnce();// handle ROS messages
                 if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
@@ -2721,13 +2743,11 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
 //#if HAND ==1
 //              this->openBarrettHand(arm_code);
 //#endif
-            }else{retreat=false;}
+            }
             break;
         case 4:// disengage
-            if(k==1){approach=true;}else{approach=false;}
             break;
         case 5: // go-park
-            approach = false;
             break;
         }
 
@@ -2895,8 +2915,8 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
         switch (mov_type) {
         case 0: // reach-to grasp
             // grasp the object
-            if(obj_in_hand){
-                if(approach){
+            if(approach ||(plan && (traj_mov.size()==1))){
+                if(obj_in_hand){
                     add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
                     vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
                     //srvset_parent.request.handle = h_detobj;
@@ -2951,7 +2971,7 @@ return true;
 
 
 
-bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double>>>& timesteps_task, vector<vector<double>>& tols_stop_task, taskPtr task, scenarioPtr scene)
+bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double>>>& timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task,taskPtr task, scenarioPtr scene)
 {
     bool hand_closed; closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
     ros::NodeHandle node;
@@ -2968,8 +2988,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
     int h_attach; // handle of the attachment point of the hand
     bool f_reached;
     VectorXd f_posture; // the final posture of the movement
-    bool approach;
-    bool retreat;
+    bool plan; bool approach; bool retreat;
     double pre_time;
 
 
@@ -3012,6 +3031,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
           double tol_stop_stage;
           std::vector<double> timesteps_stage;
           movementPtr mov = task->getProblem(kk)->getMovement();
+          vector<string> traj_descr_mov = traj_descr_task.at(ii);
           //BOOST_LOG_SEV(lg, info) << "Movement = " << mov->getInfoLine();
           this->curr_mov = mov;
           arm_code = mov->getArm();
@@ -3043,17 +3063,40 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
           }
 
           for(size_t j=0; j <traj_mov.size();++j){ //for loop stages
-              switch (mov_type){ // TO REVIEW !!!
+
+              string mov_descr = traj_descr_mov.at(j);
+              if(strcmp(mov_descr.c_str(),"plan")==0){
+                  plan=true; approach=false; retreat=false;
+              }else if(strcmp(mov_descr.c_str(),"approach")==0){
+                  plan=false; approach=true; retreat=false;
+              }else if(strcmp(mov_descr.c_str(),"retreat")==0){
+                  plan=false; approach=false; retreat=true;
+              }
+
+              switch (mov_type){
               case 0: // reach-to-grasp
-                  if(j==1){approach=true;}else{approach=false;}
+                  if(retreat){
+                      if(obj_in_hand){
+                          add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                          vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                          //srvset_parent.request.handle = h_detobj;
+                          srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                          srvset_parent.request.parentHandle = h_attach;
+                          srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                          add_client.call(srvset_parent);
+                          if (srvset_parent.response.result != 1){
+                              log(QNode::Error,string("Error in grasping the object "));
+                          }
+      //#if HAND == 1
+                      //this->closeBarrettHand(arm_code);
+      //#endif
+                      }
+                  }
                   break;
               case 1: // reaching
-                  approach=false;
                   break;
               case 2: case 3: // transport, engage
-                  if(j==1){approach=true;}else{approach=false;}
-                  if(j==2){
-                      retreat=true;
+                  if(retreat){
                       closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
                       //ros::spinOnce();// handle ROS messages
                       if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
@@ -3072,13 +3115,11 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
       //#if HAND ==1
       //              this->openBarrettHand(arm_code);
       //#endif
-                  }else{retreat=false;}
+                  }
                   break;
               case 4:// disengage
-                  if(j==1){approach=true;}else{approach=false;}
                   break;
               case 5: // go-park
-                  approach = false;
                   break;
               }
 
@@ -3244,8 +3285,8 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                     switch (mov_type) {
                     case 0: // reach-to grasp
                         // grasp the object
-                        if(obj_in_hand){
-                            if(approach){
+                        if(approach ||(plan && (traj_mov.size()==1))){
+                            if(obj_in_hand){
                                 //srvset_parent.request.handle = h_detobj;
                                 srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
                                 srvset_parent.request.parentHandle = h_attach;

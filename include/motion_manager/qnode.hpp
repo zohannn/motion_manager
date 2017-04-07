@@ -137,11 +137,12 @@ public:
          * @param vel_mov
          * @param timesteps
          * @param tols_stop
+         * @param traj_descr
          * @param mov
          * @param scene
          * @return
          */
-        bool execMovement(vector<MatrixXd>& traj_mov, vector<MatrixXd>& vel_mov, std::vector<std::vector<double> > timesteps, vector<double> tols_stop, movementPtr mov, scenarioPtr scene);
+        bool execMovement(vector<MatrixXd>& traj_mov, vector<MatrixXd>& vel_mov, std::vector<std::vector<double> > timesteps,vector<double> tols_stop, std::vector<string>& traj_descr,movementPtr mov, scenarioPtr scene);
 
         /**
          * @brief execTask
@@ -149,11 +150,12 @@ public:
          * @param vel_task
          * @param timesteps_task
          * @param tols_stop_task
+         * @param traj_descr_task
          * @param task
          * @param scene
          * @return
          */
-        bool execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double> > > &timesteps_task, vector<vector<double>>& tols_stop_task, taskPtr task, scenarioPtr scene);
+        bool execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double> > > &timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task,taskPtr task, scenarioPtr scene);
 
         /**
          * @brief This method sets to zero the time of simulation

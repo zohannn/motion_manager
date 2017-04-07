@@ -29,7 +29,7 @@
 #include "results_plan_joints_dialog.hpp"
 #include "power_law_dialog.hpp"
 #include "powerlaw3ddialog.hpp"
-#include "hand_velocity_dialog.hpp"
+#include "comp_velocity_dialog.hpp"
 #include "handposplot.hpp"
 
 using namespace std;
@@ -410,9 +410,9 @@ public Q_SLOTS:
 
 
         /**
-         * @brief on_pushButton_comp_hand_vel_mov_clicked
+         * @brief on_pushButton_comp_vel_mov_clicked
          */
-        void on_pushButton_comp_hand_vel_mov_clicked();
+        void on_pushButton_comp_vel_mov_clicked();
 
         /**
          * @brief on_pushButton_save_res_mov_clicked
@@ -443,7 +443,7 @@ private:
         ResultsJointsDialog *mResultsJointsdlg;/**< handle of the results joints dlg*/
         PowerLawDialog *mPowerLawdlg; /**< handle of the 2/3 power law dialog*/
         PowerLaw3DDialog *mPowerLaw3Ddlg; /**< handle of the 1/6 power law dialog*/
-        HandVelocityDialog *mHandVeldlg; /**< handle of the hand velocity components dlg */
+        CompVelocityDialog *mCompVeldlg; /**< handle of the velocity components dlg */
         int scenario_id; /**< id of the current scenario */
         QVector<QString> scenarios;  /**< list of scenarios */
 
@@ -453,12 +453,14 @@ private:
         vector< MatrixXd > jointsAcceleration_mov; /**< trajectory of the joint acceleration of the movement */
         vector< MatrixXd > jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
         vector< MatrixXd > jointsPosition_mov; /**< trajectory of the joint position of the movement */
+        vector< string > traj_descr_mov; /**< description of the trajectories */
         vector<double> jointsEndPosition_mov; /**< end joint position of the movement */
         vector<double> jointsEndVelocity_mov; /**< end joint velocity of the movement */
         vector<double> jointsEndAcceleration_mov; /**< end joint acceleration of the movement */
         vector< vector< MatrixXd > > jointsAcceleration_task; /**< trajectory of the joint acceleration of the task */
         vector< vector< MatrixXd > > jointsVelocity_task; /**< trajectory of the joint velocity of the task */
         vector< vector< MatrixXd > > jointsPosition_task; /**< trajectory of the joint position of the task */
+        vector<vector< string >> traj_descr_task; /**< description of the trajectories of the task*/
         vector< vector< vector < double > > > timesteps_task; /**< vector of time steps of each movement in the task */
         QVector<double> qtime_task;/**< time of the current task for plotting */
         vector<vector<double>> tols_stop_task; /**< vector of the tolerances to stop each movement in the task */
@@ -468,7 +470,16 @@ private:
         vector<vector<double>> handOrientation_mov; /**< hand orientation during the movement. */
         vector<vector<double>> handLinearVelocity_mov; /**< hand linear velocity during the movement */
         vector<vector<double>> handAngularVelocity_mov;/**< hand angular velocity during the movement */
+        vector<vector<double>> wristLinearVelocity_mov; /**< wrist linear velocity during the movement */
+        vector<vector<double>> wristAngularVelocity_mov;/**< wrist angular velocity during the movement */
+        vector<vector<double>> elbowLinearVelocity_mov; /**< elbow linear velocity during the movement */
+        vector<vector<double>> elbowAngularVelocity_mov;/**< elbow angular velocity during the movement */
+        vector<vector<double>> shoulderLinearVelocity_mov; /**< shoulder linear velocity during the movement */
+        vector<vector<double>> shoulderAngularVelocity_mov;/**< shoulder angular velocity during the movement */
         vector<double> handVelocityNorm_mov; /**< hand velocity norm during the movement */
+        vector<double> wristVelocityNorm_mov; /**< wrist velocity norm during the movement */
+        vector<double> elbowVelocityNorm_mov; /**< elbow velocity norm during the movement */
+        vector<double> shoulderVelocityNorm_mov; /**< shoulder velocity norm during the movement */
         double prob_time_mov;/**< time taken to solve the problem */
         double njs_mov;/**< normalized jerk score of the movement */
         int nmu_mov;/**< number of the movement units */

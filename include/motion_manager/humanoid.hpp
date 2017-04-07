@@ -732,6 +732,60 @@ public:
     double getHandVelNorm(int arm, vector<double>& posture,vector<double>& velocities);
 
     /**
+     * @brief getWristVel
+     * @param arm
+     * @param vel
+     * @param posture
+     * @param velocities
+     */
+    void getWristVel(int arm, vector<double>& vel, vector<double>& posture,vector<double>& velocities);
+
+    /**
+     * @brief getWristVelNorm
+     * @param arm
+     * @param posture
+     * @param velocities
+     * @return
+     */
+    double getWristVelNorm(int arm, vector<double>& posture,vector<double>& velocities);
+
+    /**
+     * @brief getElbowVel
+     * @param arm
+     * @param vel
+     * @param posture
+     * @param velocities
+     */
+    void getElbowVel(int arm, vector<double>& vel, vector<double>& posture,vector<double>& velocities);
+
+    /**
+     * @brief getElbowVelNorm
+     * @param arm
+     * @param posture
+     * @param velocities
+     * @return
+     */
+    double getElbowVelNorm(int arm,vector<double>& posture,vector<double>& velocities);
+
+    /**
+     * @brief getShoulderVel
+     * @param arm
+     * @param vel
+     * @param posture
+     * @param velocities
+     */
+    void getShoulderVel(int arm, vector<double>& vel, vector<double>& posture,vector<double>& velocities);
+
+    /**
+     * @brief getShoulderVelNorm
+     * @param arm
+     * @param posture
+     * @param velocities
+     * @return
+     */
+    double getShoulderVelNorm(int arm, vector<double>& posture,vector<double>& velocities);
+
+    /**
      * @brief This method gets information about the humanoid
      * @return
      */
@@ -913,9 +967,10 @@ private:
      * @param arm
      * @param posture
      * @param velocities
-     * @param hand_vel
+     * @param vel
+     * @param mod: 0=shoulder, 1=elbow, 2=wrist, 3=hand
      */
-    void directDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> velocities, vector<double> &hand_vel);
+    void directDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> velocities, vector<double> &vel, int mod);
 
     /**
      * @brief This method computes the direct kinematic of both arms

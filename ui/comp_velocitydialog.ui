@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CompVelocityDialog</class>
+ <widget class="QDialog" name="CompVelocityDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1131</width>
+    <height>688</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Velocity Components</string>
+  </property>
+  <widget class="QTabWidget" name="tabWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>1111</width>
+     <height>671</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="tab_hand">
+    <attribute name="title">
+     <string>Hand</string>
+    </attribute>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>1081</width>
+       <height>591</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_x" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_y" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_z" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_lin_vel" native="true"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_wx" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_wy" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_wz" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_ang_vel" native="true"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QPushButton" name="pushButton_save_hand">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>610</y>
+       <width>80</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_wrist">
+    <attribute name="title">
+     <string>Wrist</string>
+    </attribute>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>1081</width>
+       <height>591</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QCustomPlot" name="plot_wrist_x" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_wrist_y" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_wrist_z" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_wrist_lin_vel" native="true"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QCustomPlot" name="plot_wrist_wx" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_wrist_wy" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_wrist_wz" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_wrist_ang_vel" native="true"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QPushButton" name="pushButton_save_wrist">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>610</y>
+       <width>80</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_elbow">
+    <attribute name="title">
+     <string>Elbow</string>
+    </attribute>
+    <widget class="QWidget" name="layoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>1081</width>
+       <height>591</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QCustomPlot" name="plot_elbow_x" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_elbow_y" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_elbow_z" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_elbow_lin_vel" native="true"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QCustomPlot" name="plot_elbow_wx" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_elbow_wy" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_elbow_wz" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_elbow_ang_vel" native="true"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QPushButton" name="pushButton_save_elbow">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>610</y>
+       <width>80</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_shoulder">
+    <attribute name="title">
+     <string>Shoulder</string>
+    </attribute>
+    <widget class="QWidget" name="layoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>1081</width>
+       <height>591</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="QCustomPlot" name="plot_shoulder_x" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_shoulder_y" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_shoulder_z" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_shoulder_lin_vel" native="true"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QCustomPlot" name="plot_shoulder_wx" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_shoulder_wy" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_shoulder_wz" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_shoulder_ang_vel" native="true"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QPushButton" name="pushButton_save_shoulder">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>610</y>
+       <width>80</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
