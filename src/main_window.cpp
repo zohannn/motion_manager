@@ -145,10 +145,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
 #elif HAND == 1
 
-    scenarios.push_back(QString("Assembly scenario: Toy vehicle with ARoS"));
+    scenarios.push_back(QString("Assembly scenario: Toy vehicle with ARoS and Bill"));
     scenarios.push_back(QString("Empty scenario: empty scenario with ARoS"));
     scenarios.push_back(QString("Empty scenario: empty scenario with ARoS and NO collisions"));
     scenarios.push_back(QString("Human assistance scenario: Serving a drink with ARoS"));
+    //scenarios.push_back(QString("Assembly scenario: Toy vehicle with ARoS"));
 
 #endif
 
@@ -369,6 +370,9 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              // Toy vehicle scenario with Jarde
              string path_vrep_toyscene_jarde = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_jarde.ttt");
              //string path_rviz_toyscene_jarde = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
+             // Toy vehicle scenario with ARoS
+             //string path_vrep_toyscene_aros_1 = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
+             //string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros_bill.ttt");
 
              switch(i){
              case 0: // Assembly scenario
@@ -802,10 +806,10 @@ void MainWindow::on_pushButton_plan_clicked()
         tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
         tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
         mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
-        //tols.singleArm_tolsTarget.at(1) = tols.singleArm_tolsTarget.at(0)/100;
-        //tols.singleArm_tolsTarget.at(2) = tols.singleArm_tolsTarget.at(0)/100;
-        mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
-        mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
+        tols.singleArm_tolsTarget.at(1) = tols.singleArm_tolsTarget.at(0)/100;
+        tols.singleArm_tolsTarget.at(2) = 0*tols.singleArm_tolsTarget.at(0);
+        //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
+        //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
         // pick / place settings
         tols.mov_specs.approach = mTolHumpdlg->getApproach();
         tols.mov_specs.retreat = mTolHumpdlg->getRetreat();
