@@ -868,6 +868,8 @@ void MainWindow::on_pushButton_plan_clicked()
         // configuration
         m_params.config = mRRTdlg->getConfig();
         // pick/place settings
+        m_params.approach = mRRTdlg->getApproach();
+        m_params.retreat = mRRTdlg->getRetreat();
         mRRTdlg->getPreGraspApproach(m_params.pre_grasp_approach); // pick approach
         mRRTdlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
         mRRTdlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
@@ -893,6 +895,8 @@ void MainWindow::on_pushButton_plan_clicked()
         // configuration
         m_params.config = mRRTConnectdlg->getConfig();
         // pick/place settings
+        m_params.approach = mRRTConnectdlg->getApproach();
+        m_params.retreat = mRRTConnectdlg->getRetreat();
         mRRTConnectdlg->getPreGraspApproach(m_params.pre_grasp_approach); // pick approach
         mRRTConnectdlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
         mRRTConnectdlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
@@ -919,6 +923,8 @@ void MainWindow::on_pushButton_plan_clicked()
         // configuration
         m_params.config = mRRTstardlg->getConfig();
         // pick/place settings
+        m_params.approach = mRRTstardlg->getApproach();
+        m_params.retreat = mRRTstardlg->getRetreat();
         mRRTstardlg->getPreGraspApproach(m_params.pre_grasp_approach); // pick approach
         mRRTstardlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
         mRRTstardlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
@@ -944,6 +950,8 @@ void MainWindow::on_pushButton_plan_clicked()
         // configuration
         m_params.config = mPRMdlg->getConfig();
         // pick/place settings
+        m_params.approach = mPRMdlg->getApproach();
+        m_params.retreat = mPRMdlg->getRetreat();
         mPRMdlg->getPreGraspApproach(m_params.pre_grasp_approach); // pick approach
         mPRMdlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
         mPRMdlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
@@ -969,6 +977,8 @@ void MainWindow::on_pushButton_plan_clicked()
         // configuration
         m_params.config = mPRMstardlg->getConfig();
         // pick/place settings
+        m_params.approach = mPRMstardlg->getApproach();
+        m_params.retreat = mPRMstardlg->getRetreat();
         mPRMstardlg->getPreGraspApproach(m_params.pre_grasp_approach); // pick approach
         mPRMstardlg->getPostGraspRetreat(m_params.post_grasp_retreat); // pick retreat
         mPRMstardlg->getPrePlaceApproach(m_params.pre_place_approach); // place approach
@@ -1305,31 +1315,40 @@ void MainWindow::on_pushButton_plan_clicked()
                     this->traj_descr_mov.clear();
                     this->traj_descr_mov.push_back("plan");
                 }else{
+                    this->traj_descr_mov.clear();
                     //positions
                     this->jointsPosition_mov.clear();
                     this->jointsPosition_mov.push_back(jointsPosition_stage_plan);
-                    this->jointsPosition_mov.push_back(jointsPosition_stage_approach);
-                    this->jointsPosition_mov.push_back(jointsPosition_stage_retreat);
+                    this->traj_descr_mov.push_back("plan");
+                    if(jointsPosition_stage_approach.rows()!=0){
+                        this->jointsPosition_mov.push_back(jointsPosition_stage_approach);
+                        this->traj_descr_mov.push_back("approach");
+                    }
+                    if(jointsPosition_stage_retreat.rows()!=0){
+                        this->jointsPosition_mov.push_back(jointsPosition_stage_retreat);
+                        this->traj_descr_mov.push_back("retreat");
+                    }
                     //velocities
                     this->jointsVelocity_mov.clear();
                     this->jointsVelocity_mov.push_back(jointsVelocity_stage_plan);
-                    this->jointsVelocity_mov.push_back(jointsVelocity_stage_approach);
-                    this->jointsVelocity_mov.push_back(jointsVelocity_stage_retreat);
+                    if(jointsVelocity_stage_approach.rows()!=0)
+                        this->jointsVelocity_mov.push_back(jointsVelocity_stage_approach);
+                    if(jointsVelocity_stage_retreat.rows()!=0)
+                        this->jointsVelocity_mov.push_back(jointsVelocity_stage_retreat);
                     //accelerations
                     this->jointsAcceleration_mov.clear();
                     this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_plan);
-                    this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_approach);
-                    this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_retreat);
+                    if(jointsAcceleration_stage_approach.rows()!=0)
+                        this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_approach);
+                    if(jointsAcceleration_stage_retreat.rows()!=0)
+                        this->jointsAcceleration_mov.push_back(jointsAcceleration_stage_retreat);
                     //time steps
                     this->timesteps_mov.clear();
                     this->timesteps_mov.push_back(timesteps_stage_plan);
-                    this->timesteps_mov.push_back(timesteps_stage_approach);
-                    this->timesteps_mov.push_back(timesteps_stage_retreat);
-                    // descriptions
-                    this->traj_descr_mov.clear();
-                    this->traj_descr_mov.push_back("plan");
-                    this->traj_descr_mov.push_back("approach");
-                    this->traj_descr_mov.push_back("retreat");
+                    if(!timesteps_stage_approach.empty())
+                        this->timesteps_mov.push_back(timesteps_stage_approach);
+                    if(!timesteps_stage_retreat.empty())
+                        this->timesteps_mov.push_back(timesteps_stage_retreat);
                 }
                 this->moveit_mov = true;
                 solved=true;

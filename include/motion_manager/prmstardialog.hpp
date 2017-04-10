@@ -43,6 +43,19 @@ public Q_SLOTS:
      */
     void checkAddPlane(int state);
 
+    /**
+     * @brief checkApproach
+     * @param state
+     */
+    void checkApproach(int state);
+
+    /**
+     * @brief checkRetreat
+     * @param state
+     */
+    void checkRetreat(int state);
+
+
 public:
     /**
      * @brief PRMstarDialog, a constructor
@@ -158,6 +171,17 @@ public:
      */
     void setPlaneParameters(std::vector<double> &point1,std::vector<double> &point2,std::vector<double> &point3);
 
+    /**
+     * @brief getApproach
+     * @return
+     */
+    bool getApproach();
+
+    /**
+     * @brief getRetreat
+     * @return
+     */
+    bool getRetreat();
 
 private:
     Ui::PRMstarDialog *ui; /**< handle of the user interface */

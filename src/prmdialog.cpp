@@ -8,6 +8,8 @@ PRMDialog::PRMDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    QObject::connect(ui->checkBox_approach, SIGNAL(stateChanged(int)), this, SLOT(checkApproach(int)));
+    QObject::connect(ui->checkBox_retreat, SIGNAL(stateChanged(int)), this, SLOT(checkRetreat(int)));
     QObject::connect(ui->checkBox_sel_final_posture, SIGNAL(stateChanged(int)), this, SLOT(checkFinalPosture(int)));
     QObject::connect(ui->checkBox_add_plane, SIGNAL(stateChanged(int)), this, SLOT(checkAddPlane(int)));
     this->config = std::string("PRMkConfigDefault");
@@ -187,6 +189,16 @@ void PRMDialog::getPlaneParameters(std::vector<double> &params,
     }
 }
 
+bool PRMDialog::getApproach()
+{
+    return !ui->checkBox_approach->isChecked();
+}
+
+bool PRMDialog::getRetreat()
+{
+    return !ui->checkBox_retreat->isChecked();
+}
+
 // Q_SLOTS
 
 void PRMDialog::on_pushButton_save_clicked()
@@ -249,6 +261,8 @@ void PRMDialog::on_pushButton_save_clicked()
         stream << "plane_point3_y=" << ui->lineEdit_point_3_y->text().toStdString().c_str() << endl;
         stream << "plane_point3_z=" << ui->lineEdit_point_3_z->text().toStdString().c_str() << endl;
         if (ui->checkBox_add_plane->isChecked()){ stream << "add_plane=true"<< endl;}else{stream << "add_plane=false"<< endl;}
+        if(ui->checkBox_approach->isChecked()){stream << "approach=false"<<endl;}else{stream << "approach=true"<<endl;}
+        if(ui->checkBox_retreat->isChecked()){stream << "retreat=false"<<endl;}else{stream << "retreat=true"<<endl;}
         stream << "# Others" << endl;
 
     }
@@ -367,6 +381,18 @@ void PRMDialog::on_pushButton_load_clicked()
                     }else{
                         ui->checkBox_add_plane->setChecked(true);
                     }
+                }else if(QString::compare(fields.at(0),QString("approach"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_approach->setChecked(true);
+                    }else{
+                        ui->checkBox_approach->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("retreat"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_retreat->setChecked(true);
+                    }else{
+                        ui->checkBox_retreat->setChecked(false);
+                    }
                 }
             }
 
@@ -426,6 +452,36 @@ bool PRMDialog::get_add_plane()
 void PRMDialog::set_add_plane(bool plane)
 {
     ui->checkBox_add_plane->setChecked(plane);
+}
+
+void PRMDialog::checkApproach(int state)
+{
+    if(state==0){
+        // unchecked
+        ui->groupBox_pre_grasp->setEnabled(true);
+        ui->groupBox_pre_place->setEnabled(true);
+        ui->label_pick->setEnabled(true);
+    }else{
+        //checked
+        ui->groupBox_pre_grasp->setEnabled(false);
+        ui->groupBox_pre_place->setEnabled(false);
+        ui->label_pick->setEnabled(false);
+    }
+}
+
+void PRMDialog::checkRetreat(int state)
+{
+    if(state==0){
+        // unchecked
+        ui->groupBox_post_grasp->setEnabled(true);
+        ui->groupBox_post_place->setEnabled(true);
+        ui->label_pick->setEnabled(true);
+    }else{
+        //checked
+        ui->groupBox_post_grasp->setEnabled(false);
+        ui->groupBox_post_place->setEnabled(false);
+        ui->label_pick->setEnabled(false);
+    }
 }
 
 
