@@ -1,5 +1,5 @@
 ### Parameters of the RRT planner in MoveIt! ###
-# Planner: RRT ,Movement: Engage, Arm: right, Object: BlueColumn, Object Engaged: Base, Grip Type: Full Side thumb left
+# Planner: RRT ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Pose: , Grip Type: Full Side thumb left
 # Configuration settings
 config=RRTkConfigDefault
 # Pick settings
@@ -91,4 +91,6 @@ plane_point3_y=0.0
 plane_point3_z=0.0
 
 add_plane=false
+approach=true
+retreat=true
 # Others

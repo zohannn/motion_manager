@@ -1014,38 +1014,27 @@ void MainWindow::on_pushButton_plan_clicked()
                 std::vector<double> timesteps_stage_plan; std::vector<double> timesteps_stage_approach; std::vector<double> timesteps_stage_retreat;
 
                 // get the initial posture of the fingers
-                std::vector<double> init_hand_pos;
-                std::vector<double> init_hand_vel;
-                std::vector<double> init_hand_acc;
-                moveit_msgs::RobotTrajectory rob_traj_pre;
-                vector<trajectory_msgs::JointTrajectoryPoint> points_pre;
-                trajectory_msgs::JointTrajectoryPoint traj_pnt_pre;
+                std::vector<double> init_hand_pos = std::vector<double>(JOINTS_HAND,0);
+                std::vector<double> init_hand_vel = std::vector<double>(JOINTS_HAND,0);
+                std::vector<double> init_hand_acc = std::vector<double>(JOINTS_HAND,0);
+                int arm_code = this->curr_mov->getArm();
+                switch(arm_code){
+                case 0:// both arm
+                    // TO DO
+                    break;
+                case 1:// right arm
+                    this->curr_scene->getHumanoid()->getRightHandPosture(init_hand_pos);
+                    break;
+                case 2: // left arm
+                    this->curr_scene->getHumanoid()->getLeftHandPosture(init_hand_pos);
+                    break;
+                }
+
                 // positions of the fingers in the Barrett Hand
                 int fing_base = 0; int fing_1 = 1; int fing_2 = 4; int fing_3 = 6;
-                bool move;
-                if(m_results->trajectory_stages.size()>1){
-                    // pick and place movements
-                    move=false;
-                    rob_traj_pre = m_results->trajectory_stages.at(1);
-                    points_pre = rob_traj_pre.joint_trajectory.points;
-                    traj_pnt_pre = points_pre.at(0);
-                    //positions
-                    init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_base));
-                    init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_1));
-                    init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_2));
-                    init_hand_pos.push_back(traj_pnt_pre.positions.at(fing_3));
-                    //velocities
-                    init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_base));
-                    init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_1));
-                    init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_2));
-                    init_hand_vel.push_back(traj_pnt_pre.velocities.at(fing_3));
-                    //accelerations
-                    init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_base));
-                    init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_1));
-                    init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_2));
-                    init_hand_acc.push_back(traj_pnt_pre.accelerations.at(fing_3));
-                }else{move=true;}
-
+                bool move = false;
+                if(m_results->trajectory_stages.size()==1)
+                    move=true;
 
                 //double time_from_start = 0.0;
                 for(size_t i=0; i<m_results->trajectory_stages.size(); ++i){

@@ -5,11 +5,9 @@ config=RRTkConfigDefault
 # Pick settings
 pre_grasp_x=0
 
-pre_grasp_y=0.707106781
-
-pre_grasp_z=0.707106781
-
-pre_grasp_dist=160
+pre_grasp_y=0
+pre_grasp_z=1
+pre_grasp_dist=0
 post_grasp_x=0
 
 post_grasp_y=0
@@ -23,16 +21,13 @@ pre_place_x=0
 
 pre_place_y=0
 
-pre_place_z=0
-
-pre_place_dist=0
-
+pre_place_z=1
+pre_place_dist=55
 post_place_x=0
 
 post_place_y=0
 
-post_place_z=0
-
+post_place_z=1
 post_place_dist=0
 
 # Move settings
@@ -91,5 +86,5 @@ plane_point3_z=0.0
 
 add_plane=false
 approach=true
-retreat=true
+retreat=false
 # Others

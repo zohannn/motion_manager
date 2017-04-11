@@ -1127,11 +1127,13 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     targetPtr tar;
     objectPtr obj; engagePtr eng;
     objectPtr obj_eng; engagePtr eng1;
+    posePtr pose;
     if(mov_type!=1 && mov_type!=5){
         try{ // compute the final posture of the fingers according to the object involved in the movement
             this->finalPostureFingers(arm_code);
         }catch(const string message){throw message;}
         obj = this->mov->getObject();
+        pose = this->mov->getPose();
         // engaging info
         obj_eng = this->mov->getObjectEng();
         eng = obj->getEngagePoint();
@@ -1167,6 +1169,7 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         break;
     }
     std::vector<double> target;
+    std::vector<double> tar_pose;
     std::vector<double> place_location;
     if(mov_type!=1 && mov_type!=5){
         // compute the position of the engage point relative to the target frame
@@ -1174,6 +1177,7 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         pos eng_pos = eng->getPos();
         Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
         Matrix3d Rot_tar_inv = Rot_tar.inverse();
+        Matrix3d Rot_pose; pose->RPY_matrix(Rot_pose);
         Vector3d diff;
         diff(0) = eng_pos.Xpos - tar_pos.Xpos;
         diff(1) = eng_pos.Ypos - tar_pos.Ypos;
@@ -1195,6 +1199,9 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
 
         target = {tar->getPos().Xpos/1000, tar->getPos().Ypos/1000, tar->getPos().Zpos/1000,
                   tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
+
+        tar_pose = {pose->getPos().Xpos/1000, pose->getPos().Ypos/1000, pose->getPos().Zpos/1000,
+                    pose->getOr().roll, pose->getOr().pitch, pose->getOr().yaw};
 
         // movement settings
         params.dHO = dHO/1000;
@@ -1230,6 +1237,10 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         }
         break;
     case 2://transport
+        params.target = tar_pose;
+        curr_time = this->GetTimeMs64();
+        res =  this->m_planner->place(params);
+        this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
     case 3://engage
         params.support_surface = obj_eng->getName();
