@@ -2128,6 +2128,9 @@ void MainWindow::on_pushButton_load_task_clicked()
                 }else if(QString::compare(mov_type,QString("Transport"),Qt::CaseInsensitive)==0){
                     mov_id=2;
                     problemPtr prob;
+                    //get the object
+                    obj = this->curr_scene->getObject(obj_str.toStdString());
+                    // get the pose
                     pose = this->curr_scene->getPose(pose_str.toStdString());
                     if(plan_id==0){
                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,pose,grip_id,prec),new Scenario(*(this->curr_scene.get()))));

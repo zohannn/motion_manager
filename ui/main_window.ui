@@ -903,7 +903,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="title">
-         <string>The planned Movement: [deg]|[deg/s]|[deg/s^2]</string>
+         <string>The planned movement: [deg]|[deg/s]|[deg/s^2]</string>
         </property>
         <widget class="QWidget" name="layoutWidget_time_mov">
          <property name="geometry">
@@ -1264,7 +1264,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="">
+         <widget class="QWidget" name="layoutWidget">
           <property name="geometry">
            <rect>
             <x>630</x>
