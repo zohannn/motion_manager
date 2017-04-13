@@ -58,19 +58,12 @@ lambda_11=1.0
 
 # Initial Velocity 
 init_vel_1=0
-
 init_vel_2=0
-
 init_vel_3=0
-
 init_vel_4=0
-
 init_vel_5=0
-
 init_vel_6=0
-
 init_vel_7=0
-
 init_vel_8=0
 
 init_vel_9=0
@@ -193,11 +186,17 @@ obs_xx_2=0
 obs_xx_3=0
 
 obs_yy_1=0
+
 obs_yy_2=0
+
 obs_yy_3=0
-obs_zz_1=40
-obs_zz_2=40
-obs_zz_3=40
+
+obs_zz_1=30
+
+obs_zz_2=30
+
+obs_zz_3=30
+
 obs_xy_1=0
 
 obs_xy_2=0
@@ -224,11 +223,11 @@ tar_or=0.001
 # Pick settings
 pre_grasp_x=0
 
-pre_grasp_y=1
+pre_grasp_y=0
 
 pre_grasp_z=0
 
-pre_grasp_dist=35
+pre_grasp_dist=0
 
 post_grasp_x=0
 
@@ -245,7 +244,7 @@ pre_place_y=0
 
 pre_place_z=1
 
-pre_place_dist=55
+pre_place_dist=5
 
 post_place_x=0
 
@@ -315,7 +314,7 @@ max_velocity=50
 
 tar_av=true
 ob_av=true
-approach=false
+approach=true
 retreat=false
 rand_init=false
 coll=true

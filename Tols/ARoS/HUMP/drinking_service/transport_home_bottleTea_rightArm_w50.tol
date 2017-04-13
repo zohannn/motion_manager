@@ -8,6 +8,7 @@ Elbow_radius=70.0
 Wrist_radius=60
 
 Hand_radius=50
+
 Hand_1_1=25
 
 Hand_1_2=25
@@ -34,7 +35,6 @@ Hand_tip_3=5
 
 # Joint Expanse factors
 lambda_1=1
-
 lambda_2=1
 
 lambda_3=1.0
@@ -175,11 +175,17 @@ tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
 obs_xx_1=50
+
 obs_xx_2=50
+
 obs_xx_3=50
+
 obs_yy_1=50
+
 obs_yy_2=50
+
 obs_yy_3=50
+
 obs_zz_1=100
 obs_zz_2=100
 obs_zz_3=100
@@ -209,20 +215,16 @@ tar_or=0.001
 # Pick settings
 pre_grasp_x=0
 
-pre_grasp_y=1
-
+pre_grasp_y=0
 pre_grasp_z=0
 
-pre_grasp_dist=35
-
+pre_grasp_dist=0
 post_grasp_x=0
 
-post_grasp_y=1
-
+post_grasp_y=0
 post_grasp_z=0
 
-post_grasp_dist=40
-
+post_grasp_dist=0
 # Place settings
 pre_place_x=0
 
@@ -231,14 +233,14 @@ pre_place_y=0
 pre_place_z=1
 
 pre_place_dist=50
+
 post_place_x=0
 
 post_place_y=1
 
 post_place_z=0
 
-post_place_dist=100
-
+post_place_dist=120
 # Move settings
 target_x=-400
 

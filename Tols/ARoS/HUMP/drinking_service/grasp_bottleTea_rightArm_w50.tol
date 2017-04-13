@@ -230,10 +230,9 @@ tar_or=0.001
 # Pick settings
 pre_grasp_x=0
 
-pre_grasp_y=0
-pre_grasp_z=1
-pre_grasp_dist=80
-
+pre_grasp_y=0.707106781
+pre_grasp_z=0.707106781
+pre_grasp_dist=160
 post_grasp_x=0
 
 post_grasp_y=0

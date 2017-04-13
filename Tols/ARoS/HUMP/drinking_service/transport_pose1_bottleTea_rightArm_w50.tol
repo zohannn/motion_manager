@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
@@ -57,28 +57,17 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.021091
-
-init_vel_2=0.0240941
-
-init_vel_3=-0.00881013
-
-init_vel_4=-0.0565341
-
-init_vel_5=0.00274234
-
-init_vel_6=0.0338745
-
-init_vel_7=0.0337459
-
+init_vel_1=-0.0169567
+init_vel_2=0.0203871
+init_vel_3=-0.00715164
+init_vel_4=-0.0451411
+init_vel_5=0.00323087
+init_vel_6=0.0269285
+init_vel_7=0.0266657
 init_vel_8=0
-
 init_vel_9=0
-
 init_vel_10=0
-
 init_vel_11=0
-
 # Final Velocity 
 final_vel_1=0
 
@@ -187,14 +176,23 @@ tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
 obs_xx_1=80
+
 obs_xx_2=80
+
 obs_xx_3=80
+
 obs_yy_1=90
+
 obs_yy_2=90
+
 obs_yy_3=90
+
 obs_zz_1=100
+
 obs_zz_2=100
+
 obs_zz_3=100
+
 obs_xy_1=0
 
 obs_xy_2=0
@@ -225,8 +223,7 @@ pre_grasp_y=1
 
 pre_grasp_z=0
 
-pre_grasp_dist=35
-
+pre_grasp_dist=60
 post_grasp_x=0
 
 post_grasp_y=1
