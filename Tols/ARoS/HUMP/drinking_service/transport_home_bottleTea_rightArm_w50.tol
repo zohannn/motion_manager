@@ -22,11 +22,8 @@ Hand_2_2=25
 Hand_2_3=25
 
 Hand_3_1=15
-
 Hand_3_2=15
-
 Hand_3_3=15
-
 Hand_tip_1=5
 
 Hand_tip_2=5
@@ -175,17 +172,11 @@ tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
 obs_xx_1=50
-
 obs_xx_2=50
-
 obs_xx_3=50
-
 obs_yy_1=50
-
 obs_yy_2=50
-
 obs_yy_3=50
-
 obs_zz_1=100
 obs_zz_2=100
 obs_zz_3=100
@@ -216,15 +207,19 @@ tar_or=0.001
 pre_grasp_x=0
 
 pre_grasp_y=0
+
 pre_grasp_z=0
 
 pre_grasp_dist=0
+
 post_grasp_x=0
 
 post_grasp_y=0
+
 post_grasp_z=0
 
 post_grasp_dist=0
+
 # Place settings
 pre_place_x=0
 
@@ -241,6 +236,7 @@ post_place_y=1
 post_place_z=0
 
 post_place_dist=120
+
 # Move settings
 target_x=-400
 

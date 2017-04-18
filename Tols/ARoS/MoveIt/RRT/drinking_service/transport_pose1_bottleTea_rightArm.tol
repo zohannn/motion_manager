@@ -6,8 +6,11 @@ config=RRTkConfigDefault
 pre_grasp_x=0
 
 pre_grasp_y=0
+
 pre_grasp_z=1
+
 pre_grasp_dist=0
+
 post_grasp_x=0
 
 post_grasp_y=0
@@ -22,12 +25,14 @@ pre_place_x=0
 pre_place_y=0
 
 pre_place_z=1
-pre_place_dist=55
+
+pre_place_dist=60
 post_place_x=0
 
 post_place_y=0
 
 post_place_z=1
+
 post_place_dist=0
 
 # Move settings

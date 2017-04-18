@@ -1,7 +1,7 @@
 ### Parameters of the RRT planner in MoveIt! ###
-# Planner: PRMstar ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose2, Grip Type: Full Side thumb left
+# Planner: PRMstar ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full Side thumb left
 # Configuration settings
-config=PRMstarkConfigDefault
+config=RRTkConfigDefault
 # Pick settings
 pre_grasp_x=0
 
@@ -26,7 +26,8 @@ pre_place_y=0
 
 pre_place_z=1
 
-pre_place_dist=1
+pre_place_dist=5
+
 post_place_x=0
 
 post_place_y=0
