@@ -275,6 +275,18 @@ private:
         ros::Subscriber subCup; /**< ROS sunscriber to the topic /vrep/Cup_pose (obj_id=3 in the Human Assistance scenario) */
         ros::Subscriber subCup1; /**< ROS sunscriber to the topic /vrep/Cup1_pose (obj_id=4 in the Human Assistance scenario) */
         // -----------------------------------------------------------------------------------------------------------------------------------
+        // Challenging scenario ----------------------------------------------------------------------------------------------------------
+        ros::Subscriber subCup_shelf; /**< ROS sunscriber to the topic /vrep/Cup_pose (obj_id=0 in the Human Challenging scenario) */
+        ros::Subscriber subShelf; /**< ROS sunscriber to the topic /vrep/Shelf_pose (obj_id=1 in the Challenging scenario) */
+        ros::Subscriber subShelf_1_b; /**< ROS sunscriber to the topic /vrep/Shelf_1_b_pose (obj_id=2 in the Challenging scenario) */
+        ros::Subscriber subShelf_2_a; /**< ROS sunscriber to the topic /vrep/Shelf_2_a_pose (obj_id=3 in the Challenging scenario) */
+        ros::Subscriber subShelf_2_b; /**< ROS sunscriber to the topic /vrep/Shelf_2_b_pose (obj_id=4 in the Challenging scenario) */
+        ros::Subscriber subShelf_3; /**< ROS sunscriber to the topic /vrep/Shelf_3_pose (obj_id=5 in the Challenging scenario) */
+        ros::Subscriber subShelf_4_a; /**< ROS sunscriber to the topic /vrep/Shelf_4_a_pose (obj_id=6 in the Challenging scenario) */
+        ros::Subscriber subShelf_4_b; /**< ROS sunscriber to the topic /vrep/Shelf_4_b_pose (obj_id=7 in the Challenging scenario) */
+        ros::Subscriber subShelf_4_c; /**< ROS sunscriber to the topic /vrep/Shelf_4_c_pose (obj_id=8 in the Challenging scenario) */
+        ros::Subscriber subShelf_4_d; /**< ROS sunscriber to the topic /vrep/Shelf_4_d_pose (obj_id=9 in the Challenging scenario) */
+        // -----------------------------------------------------------------------------------------------------------------------------------
 #if MOVEIT==1
         boost::shared_ptr<moveit::planning_interface::PlanningSceneInterface> planning_scene_interface_ptr;/**< scene interface */
 #endif()
@@ -431,6 +443,68 @@ private:
          * @param data
          */
         void Cup1Callback(const geometry_msgs::PoseStamped& data);
+
+        // Challenging scenario ----------------------------------------------------------------------------------
+
+        /**
+         * @brief This is the callback to retrieve the state of the cup (challenging scenario)
+         * @param data
+         */
+        void Cup_shelfCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the shelf (challenging scenario)
+         * @param data
+         */
+        void ShelfCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the shelf_1_b (challenging scenario)
+         * @param data
+         */
+        void Shelf_1_bCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the shelf_2_a (challenging scenario)
+         * @param data
+         */
+        void Shelf_2_aCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the shelf_2_b (challenging scenario)
+         * @param data
+         */
+        void Shelf_2_bCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the shelf_3 (challenging scenario)
+         * @param data
+         */
+        void Shelf_3Callback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the shelf_4_a (challenging scenario)
+         * @param data
+         */
+        void Shelf_4_aCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the shelf_4_b (challenging scenario)
+         * @param data
+         */
+        void Shelf_4_bCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the shelf_4_c (challenging scenario)
+         * @param data
+         */
+        void Shelf_4_cCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the shelf_4_d (challenging scenario)
+         * @param data
+         */
+        void Shelf_4_dCallback(const geometry_msgs::PoseStamped& data);
 
         /**
          * @brief This method returns the linear interpolation

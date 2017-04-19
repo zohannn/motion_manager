@@ -149,7 +149,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     scenarios.push_back(QString("Empty scenario: empty scenario with ARoS"));
     scenarios.push_back(QString("Empty scenario: empty scenario with ARoS and NO collisions"));
     scenarios.push_back(QString("Human assistance scenario: Serving a drink with ARoS"));
-    //scenarios.push_back(QString("Assembly scenario: Toy vehicle with ARoS"));
+    scenarios.push_back(QString("Challenging scenario: picking a cup from a shelf with ARoS"));
 
 #endif
 
@@ -370,9 +370,8 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              // Toy vehicle scenario with Jarde
              string path_vrep_toyscene_jarde = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_jarde.ttt");
              //string path_rviz_toyscene_jarde = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
-             // Toy vehicle scenario with ARoS
-             //string path_vrep_toyscene_aros_1 = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros.ttt");
-             //string path_vrep_toyscene_aros = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros_bill.ttt");
+             // Challengingscenario with ARoS
+             string path_vrep_challenge_aros = PATH_SCENARIOS+string("/vrep/NarrowShelf_aros.ttt");
 
              switch(i){
              case 0: // Assembly scenario
@@ -502,8 +501,29 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                  }
 #endif
                  break;
-             case 4: // Organizing scenario: shelfs ad objects
-                 //TO DO
+             case 4: // Challenging scenario
+#if HAND==0
+
+#elif HAND==1
+                this->scenario_id = 5;
+                 if (qnode.loadScenario(path_vrep_challenge_aros,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Challenging scenario: picking a cup from a shelf with ARoS HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Challenging scenario: picking a cup from a shelf with ARoS");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
+                     this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
+                 }else{
+                     qnode.log(QNode::Error,std::string("Challenging scenario: picking a cup from a shelf with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+#endif
                  break;
 
              }
@@ -2930,8 +2950,9 @@ void MainWindow::onListScenarioItemClicked(QListWidgetItem *item)
                 break;
 
             case 4:
-                //Organizing scenario: shelfs and objects with ARoS
-
+                //Challenging scenario: picking a cup from a shelf with ARoS
+                ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
+                                                         "ARoS picks and places a cup on a narrow shelf"));
                 break;
 
             }
