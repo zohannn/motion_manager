@@ -232,6 +232,12 @@ public:
     void setInitJointsVel(std::vector<double>& init_vel);
 
     /**
+     * @brief setInitJointsAcc
+     * @param init_acc
+     */
+    void setInitJointsAcc(std::vector<double>& init_acc);
+
+    /**
      * @brief This method sets the information about the tuning of the planner
      * @param info
      */

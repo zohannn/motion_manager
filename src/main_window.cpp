@@ -327,6 +327,7 @@ void MainWindow::on_pushButton_tuning_clicked()
     switch(planner_id){
     case 0: // HUMP
         mTolHumpdlg->setInitJointsVel(this->jointsEndVelocity_mov);
+        mTolHumpdlg->setInitJointsAcc(this->jointsEndAcceleration_mov);
         mTolHumpdlg->show();
         break;
     case 1: // RRT

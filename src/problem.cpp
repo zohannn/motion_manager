@@ -951,6 +951,9 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
     int hand_code = 1;
 #endif
     std::vector<double> shPos;
+    std::vector<double> elPos;
+    std::vector<double> wrPos;
+    std::vector<double> haPos;
     double dHO;
     std::vector<double> finalHand;
     std::vector<double> homePosture;
@@ -976,6 +979,9 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         break;
     case 1://right arm
         this->scene->getHumanoid()->getRightShoulderPos(shPos);
+        this->scene->getHumanoid()->getRightElbowPos(elPos);
+        this->scene->getHumanoid()->getRightWristPos(wrPos);
+        this->scene->getHumanoid()->getRightHandPos(haPos);
         this->scene->getHumanoid()->getRightPosture(initPosture);
         this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
         if(mov_type==5){
@@ -990,6 +996,9 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         break;
     case 2:// left arm
         this->scene->getHumanoid()->getLeftShoulderPos(shPos);
+        this->scene->getHumanoid()->getLeftElbowPos(elPos);
+        this->scene->getHumanoid()->getLeftWristPos(wrPos);
+        this->scene->getHumanoid()->getLeftHandPos(haPos);
         this->scene->getHumanoid()->getLeftPosture(initPosture);
         this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
         if(mov_type==5){
@@ -1003,8 +1012,10 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         }
         break;
     }
-    // shoulder position (center of the reacheble workspace )
-    this->h_planner->setShpos(shPos);
+    this->h_planner->setShpos(shPos); // shoulder position (center of the reacheble workspace )
+    this->h_planner->setElpos(elPos); // elbow position
+    this->h_planner->setWrpos(wrPos); // wrist position
+    this->h_planner->setHapos(haPos); // hand position
     std::vector<double> target;
     std::vector<double> tar_pose;
     std::vector<double> place_location;
