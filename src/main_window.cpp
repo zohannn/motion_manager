@@ -42,11 +42,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     // create Vrep Communication dialog
     mvrepCommdlg = new VrepCommDialog(&qnode, this);
     mvrepCommdlg->setModal(true);
-
+#if MOVEIT==1
     // create RViz Communication dialog
     mrvizCommdlg = new RVizCommDialog(&qnode, this);
     mrvizCommdlg->setModal(true);
-
+#endif
 
     //create HUMP Tuning dialog
     mTolHumpdlg = new TolDialogHUMP(this);
@@ -107,9 +107,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     // V-REP connected signal
     QObject::connect(mvrepCommdlg, SIGNAL(vrepConnected(bool)), this, SLOT(updateVrepStatus(bool)));
 
+#if MOVEIT==1
     // RViz connectedsignal
     QObject::connect(mrvizCommdlg, SIGNAL(rvizConnected(bool)), this, SLOT(updateRVizStatus(bool)));
-
+#endif
 
 
     // new element in the scenario signal
