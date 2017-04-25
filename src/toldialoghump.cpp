@@ -666,6 +666,7 @@ void TolDialogHUMP::on_pushButton_save_clicked()
        if(ui->checkBox_retreat->isChecked()){stream << "retreat=false"<<endl;}else{stream << "retreat=true"<<endl;}
        if(ui->checkBox_rand_init->isChecked()){stream << "rand_init=true"<<endl;}else{stream << "rand_init=false"<<endl;}
        if(ui->checkBox_coll->isChecked()){stream << "coll=false"<<endl;}else{stream << "coll=true"<<endl;}
+       if(ui->checkBox_straight_line->isChecked()){stream << "straight_line=true"<<endl;}else{stream << "straight_line=false"<<endl;}
        //stream << "# END" << endl;
 
 
@@ -1100,6 +1101,13 @@ void TolDialogHUMP::on_pushButton_load_clicked()
                         ui->checkBox_coll->setChecked(false);
                     }
 
+                }else if(QString::compare(fields.at(0),QString("straight_line"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_straight_line->setChecked(false);
+                    }else{
+                        ui->checkBox_straight_line->setChecked(true);
+                    }
+
                 }
 
             }
@@ -1254,6 +1262,16 @@ bool TolDialogHUMP::get_use_final_posture()
 bool TolDialogHUMP::get_add_plane()
 {
     return ui->checkBox_add_plane->isChecked();
+}
+
+bool TolDialogHUMP::get_straight_line()
+{
+    return ui->checkBox_straight_line->isChecked();
+}
+
+void TolDialogHUMP::setStraightLine(bool straight)
+{
+    ui->checkBox_straight_line->setChecked(straight);
 }
 
 void TolDialogHUMP::set_add_plane(bool plane)

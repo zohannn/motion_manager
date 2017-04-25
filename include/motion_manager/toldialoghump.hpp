@@ -304,6 +304,18 @@ public:
     bool get_add_plane();
 
     /**
+     * @brief get_straight_line
+     * @return
+     */
+    bool get_straight_line();
+
+    /**
+     * @brief setStraightLine
+     * @param straight
+     */
+    void setStraightLine(bool straight=true);
+
+    /**
      * @brief set_add_plane
      * @param plane
      */

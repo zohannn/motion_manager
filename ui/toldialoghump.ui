@@ -2438,6 +2438,19 @@
       </widget>
      </widget>
     </widget>
+    <widget class="QCheckBox" name="checkBox_straight_line">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>520</y>
+       <width>231</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Hand straight line trajectory</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_huml_move">
     <attribute name="title">
@@ -3255,7 +3268,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>501</x>
