@@ -2537,6 +2537,9 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     string path_vrep_toyscene_jarde = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_jarde.ttt");
     //string path_rviz_toyscene_jarde = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
 
+    // Challengingscenario with ARoS
+    string path_vrep_challenge_aros = PATH_SCENARIOS+string("/vrep/NarrowShelf_aros.ttt");
+
     switch(scene_id){
 
     case 0:
@@ -2575,17 +2578,17 @@ void MainWindow::on_pushButton_scene_reset_clicked()
         failure = string("Human assistance scenario: Serving a drink with ARoS HAS NOT BEEN LOADED");
         break;
     case 5:
-        // Assistive scenario: beverages with Avatar
-        //TO DO
+        // Challenge scenario with ARoS
+        path = path_vrep_challenge_aros;
+        title = string("Challenging scenario: picking a cup from a shelf with ARoS");
+        success = string("Challenging scenario: picking a cup from a shelf with ARoS HAS BEEN LOADED");
+        failure = string("Challenging scenario: picking a cup from a shelf with ARoS HAS NOT BEEN LOADED");
         break;
     case 6:
-        // Organizing scenario: shelfs and objects with ARoS
-        //TO DO
+        // TO DO
         break;
     case 7:
-        // Organizing scenario: shelfs ad objects with Avatar
         //TO DO
-
         break;
     }
 

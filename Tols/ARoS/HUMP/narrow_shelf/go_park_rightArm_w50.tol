@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: Cup, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: Cup, Object Engaged: , Pose: Cup_pose, Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80
 
@@ -7,7 +7,7 @@ Elbow_radius=70
 
 Wrist_radius=60
 
-Hand_radius=50
+Hand_radius=40
 
 Hand_1_1=25
 
@@ -57,28 +57,17 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=0.0
-
-init_vel_2=0.0
-
-init_vel_3=0.0
-
-init_vel_4=0.0
-
-init_vel_5=0.0
-
-init_vel_6=0.0
-
-init_vel_7=0.0
-
-init_vel_8=0.0
-
-init_vel_9=0.0
-
-init_vel_10=0.0
-
-init_vel_11=0.0
-
+init_vel_1=-0.0840016
+init_vel_2=0.00883095
+init_vel_3=-0.0142455
+init_vel_4=-0.0803622
+init_vel_5=-0.00829154
+init_vel_6=-0.0214383
+init_vel_7=-0.00414421
+init_vel_8=0
+init_vel_9=-0.0713238
+init_vel_10=-0.0713238
+init_vel_11=-0.0713238
 # Final Velocity 
 final_vel_1=0
 
@@ -103,28 +92,17 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=0.0
-
-init_acc_2=0.0
-
-init_acc_3=0.0
-
-init_acc_4=0.0
-
-init_acc_5=0.0
-
-init_acc_6=0.0
-
-init_acc_7=0.0
-
-init_acc_8=0.0
-
-init_acc_9=0.0
-
-init_acc_10=0.0
-
-init_acc_11=0.0
-
+init_acc_1=-0.0472818
+init_acc_2=0.00497066
+init_acc_3=-0.00801833
+init_acc_4=-0.0452333
+init_acc_5=-0.00466704
+init_acc_6=-0.0120669
+init_acc_7=-0.00233264
+init_acc_8=0
+init_acc_9=-0.0401459
+init_acc_10=-0.0401459
+init_acc_11=-0.0401459
 # Final Acceleration 
 final_acc_1=0
 
@@ -230,17 +208,19 @@ tar_or=0.001
 # Pick settings
 pre_grasp_x=0
 
-pre_grasp_y=1
+pre_grasp_y=0
 
 pre_grasp_z=0
 
-pre_grasp_dist=160
+pre_grasp_dist=0
 
 post_grasp_x=0
 
-post_grasp_y=0.965925826
-post_grasp_z=0.258819045
-post_grasp_dist=180
+post_grasp_y=0
+
+post_grasp_z=0
+
+post_grasp_dist=0
 
 # Place settings
 pre_place_x=0

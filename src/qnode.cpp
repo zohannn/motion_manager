@@ -268,7 +268,6 @@ void QNode::loadRVizScenario(std::vector<objectPtr> &objs)
             mesh_file = "shelf/shelf_4.dae";
         }
 
-
         std::vector<double> rpy = {obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
         Matrix3d Rot; this->RPY_matrix(rpy,Rot); Quaterniond q(Rot);
 
@@ -297,7 +296,7 @@ void QNode::loadRVizScenario(std::vector<objectPtr> &objs)
         co.mesh_poses[0].orientation.x= q.x();
         co.mesh_poses[0].orientation.y= q.y();
         co.mesh_poses[0].orientation.z= q.z();
-            add_collision_objects.push_back(co);
+        add_collision_objects.push_back(co);
     }
     // remove
     planning_scene_interface_ptr->removeCollisionObjects(rem_object_ids);

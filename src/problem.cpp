@@ -1108,7 +1108,9 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     this->solved = false;
     int arm_code =  this->mov->getArm();
     int mov_type = this->mov->getType();
+    int sceneID = this->scene->getID();
     params.support_surface = "Table";
+
 #if HAND==0
     // Human Hand
     int hand_code = 0;
@@ -1214,6 +1216,9 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     long long curr_time;
     switch(mov_type){
     case 0:// reach-to-grasp
+        if (sceneID==6){
+            params.support_surface = "Shelf_4_c";
+        }
         params.target = target;
         curr_time = this->GetTimeMs64();
         res =  this->m_planner->pick(params);
@@ -1232,6 +1237,9 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         }
         break;
     case 2://transport
+        if (sceneID==6){
+            params.support_surface = "Shelf_2_a";
+        }
         params.target = tar_pose;
         curr_time = this->GetTimeMs64();
         res =  this->m_planner->place(params);
