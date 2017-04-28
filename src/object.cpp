@@ -16,6 +16,30 @@ Object::Object()
     this->p_targetLeft = targetPtr(new Target());
     this->p_engage = engagePtr(new EngagePoint());
 
+    pos tar_right_pos = this->p_targetRight->getPos();
+    pos tar_left_pos = this->p_targetLeft->getPos();
+    pos eng_pos = this->p_engage->getPos();
+
+    Matrix3d Rot_tar_right; this->p_targetRight->RPY_matrix(Rot_tar_right);
+    Matrix3d Rot_tar_right_inv = Rot_tar_right.inverse();
+    Vector3d diff_right;
+    diff_right(0) = eng_pos.Xpos - tar_right_pos.Xpos;
+    diff_right(1) = eng_pos.Ypos - tar_right_pos.Ypos;
+    diff_right(2) = eng_pos.Zpos - tar_right_pos.Zpos;
+    Vector3d eng_to_tar_r = Rot_tar_right_inv * diff_right;
+    this->eng_tar_right.resize(eng_to_tar_r.size());
+    VectorXd::Map(&this->eng_tar_right[0], eng_to_tar_r.size()) = eng_to_tar_r;
+
+    Matrix3d Rot_tar_left; this->p_targetLeft->RPY_matrix(Rot_tar_left);
+    Matrix3d Rot_tar_left_inv = Rot_tar_left.inverse();
+    Vector3d diff_left;
+    diff_left(0) = eng_pos.Xpos - tar_left_pos.Xpos;
+    diff_left(1) = eng_pos.Ypos - tar_left_pos.Ypos;
+    diff_left(2) = eng_pos.Zpos - tar_left_pos.Zpos;
+    Vector3d eng_to_tar_l = Rot_tar_left_inv * diff_left;
+    this->eng_tar_left.resize(eng_to_tar_l.size());
+    VectorXd::Map(&this->eng_tar_left[0], eng_to_tar_l.size()) = eng_to_tar_l;
+
     this->m_targetRightEnabled = false;
     this->m_targetLeftEnabled = false;
 
@@ -36,6 +60,30 @@ Object::Object(string name)
     this->p_targetRight = targetPtr(new Target());
     this->p_targetLeft = targetPtr(new Target());
     this->p_engage = engagePtr(new EngagePoint());
+
+    pos tar_right_pos = this->p_targetRight->getPos();
+    pos tar_left_pos = this->p_targetLeft->getPos();
+    pos eng_pos = this->p_engage->getPos();
+
+    Matrix3d Rot_tar_right; this->p_targetRight->RPY_matrix(Rot_tar_right);
+    Matrix3d Rot_tar_right_inv = Rot_tar_right.inverse();
+    Vector3d diff_right;
+    diff_right(0) = eng_pos.Xpos - tar_right_pos.Xpos;
+    diff_right(1) = eng_pos.Ypos - tar_right_pos.Ypos;
+    diff_right(2) = eng_pos.Zpos - tar_right_pos.Zpos;
+    Vector3d eng_to_tar_r = Rot_tar_right_inv * diff_right;
+    this->eng_tar_right.resize(eng_to_tar_r.size());
+    VectorXd::Map(&this->eng_tar_right[0], eng_to_tar_r.size()) = eng_to_tar_r;
+
+    Matrix3d Rot_tar_left; this->p_targetLeft->RPY_matrix(Rot_tar_left);
+    Matrix3d Rot_tar_left_inv = Rot_tar_left.inverse();
+    Vector3d diff_left;
+    diff_left(0) = eng_pos.Xpos - tar_left_pos.Xpos;
+    diff_left(1) = eng_pos.Ypos - tar_left_pos.Ypos;
+    diff_left(2) = eng_pos.Zpos - tar_left_pos.Zpos;
+    Vector3d eng_to_tar_l = Rot_tar_left_inv * diff_left;
+    this->eng_tar_left.resize(eng_to_tar_l.size());
+    VectorXd::Map(&this->eng_tar_left[0], eng_to_tar_l.size()) = eng_to_tar_l;
 
     this->m_targetRightEnabled = false;
     this->m_targetLeftEnabled = false;
@@ -59,6 +107,31 @@ Object::Object(string name, pos ppos, orient oor, dim ssize,
     this->p_targetLeft = targetPtr(pTL);
     this->p_engage = engagePtr(pEng);
 
+    pos tar_right_pos = this->p_targetRight->getPos();
+    pos tar_left_pos = this->p_targetLeft->getPos();
+    pos eng_pos = this->p_engage->getPos();
+
+    Matrix3d Rot_tar_right; this->p_targetRight->RPY_matrix(Rot_tar_right);
+    Matrix3d Rot_tar_right_inv = Rot_tar_right.inverse();
+    Vector3d diff_right;
+    diff_right(0) = eng_pos.Xpos - tar_right_pos.Xpos;
+    diff_right(1) = eng_pos.Ypos - tar_right_pos.Ypos;
+    diff_right(2) = eng_pos.Zpos - tar_right_pos.Zpos;
+    Vector3d eng_to_tar_r = Rot_tar_right_inv * diff_right;
+    this->eng_tar_right.resize(eng_to_tar_r.size());
+    VectorXd::Map(&this->eng_tar_right[0], eng_to_tar_r.size()) = eng_to_tar_r;
+
+    Matrix3d Rot_tar_left; this->p_targetLeft->RPY_matrix(Rot_tar_left);
+    Matrix3d Rot_tar_left_inv = Rot_tar_left.inverse();
+    Vector3d diff_left;
+    diff_left(0) = eng_pos.Xpos - tar_left_pos.Xpos;
+    diff_left(1) = eng_pos.Ypos - tar_left_pos.Ypos;
+    diff_left(2) = eng_pos.Zpos - tar_left_pos.Zpos;
+    Vector3d eng_to_tar_l = Rot_tar_left_inv * diff_left;
+    this->eng_tar_left.resize(eng_to_tar_l.size());
+    VectorXd::Map(&this->eng_tar_left[0], eng_to_tar_l.size()) = eng_to_tar_l;
+
+
     this->m_targetRightEnabled = false;
     this->m_targetLeftEnabled = false;
 
@@ -78,6 +151,9 @@ Object::Object(const Object &obj)
     this->p_targetRight = targetPtr(new Target(*obj.p_targetRight.get()));
     this->p_targetLeft = targetPtr(new Target(*obj.p_targetLeft.get()));
     this->p_engage = engagePtr(new EngagePoint(*obj.p_engage.get()));
+
+    this->eng_tar_right = obj.eng_tar_right;
+    this->eng_tar_left = obj.eng_tar_left;
 
     this->handle = obj.handle;
     this->handle_body = obj.handle_body;
@@ -424,6 +500,16 @@ void Object::getRPY(Matrix4d Trans, vector<double>& rpy)
     }
 
 
+}
+
+void Object::getEngTarRight(std::vector<double> &eng_to_tar)
+{
+    eng_to_tar = this->eng_tar_right;
+}
+
+void Object::getEngTarLeft(std::vector<double> &eng_to_tar)
+{
+    eng_to_tar = this->eng_tar_left;
 }
 
 } // namespace motion_manager

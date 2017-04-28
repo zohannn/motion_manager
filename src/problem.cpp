@@ -970,10 +970,12 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         eng1 = obj_eng->getEngagePoint();
     }
 
+    std::vector<double> eng_to_tar;
     switch(arm_code){
     case 0: // both arms
         break;
     case 1://right arm
+        obj->getEngTarRight(eng_to_tar);
         this->scene->getHumanoid()->getRightPosture(initPosture);
         this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
         if(mov_type==5){
@@ -987,6 +989,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         }
         break;
     case 2:// left arm
+        obj->getEngTarLeft(eng_to_tar);
         this->scene->getHumanoid()->getLeftPosture(initPosture);
         this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
         if(mov_type==5){
@@ -1005,22 +1008,22 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
     std::vector<double> place_location;
     if(mov_type!=1 && mov_type!=5){
         // compute the position of the engage point relative to the target frame
-        pos tar_pos = tar->getPos();
-        pos eng_pos = eng->getPos();
-        Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
-        Matrix3d Rot_tar_inv = Rot_tar.inverse();
-        Matrix3d Rot_pose; pose->RPY_matrix(Rot_pose);
-        Vector3d diff;
-        diff(0) = eng_pos.Xpos - tar_pos.Xpos;
-        diff(1) = eng_pos.Ypos - tar_pos.Ypos;
-        diff(2) = eng_pos.Zpos - tar_pos.Zpos;
-        Vector3d eng_to_tar; eng_to_tar = Rot_tar_inv * diff;
+        //pos tar_pos = tar->getPos();
+        //pos eng_pos = eng->getPos();
+        //Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
+        //Matrix3d Rot_tar_inv = Rot_tar.inverse();
+        //Matrix3d Rot_pose; pose->RPY_matrix(Rot_pose);
+        //Vector3d diff;
+        //diff(0) = eng_pos.Xpos - tar_pos.Xpos;
+        //diff(1) = eng_pos.Ypos - tar_pos.Ypos;
+        //diff(2) = eng_pos.Zpos - tar_pos.Zpos;
+        //Vector3d eng_to_tar; eng_to_tar = Rot_tar_inv * diff;
         // compute the position of the target when the object will be engaged
         pos eng1_pos = eng1->getPos(); // position of the engage point of the other object
         pos new_tar;
-        new_tar.Xpos=eng1_pos.Xpos - eng_to_tar(0);
-        new_tar.Ypos=eng1_pos.Ypos - eng_to_tar(1);
-        new_tar.Zpos=eng1_pos.Zpos - eng_to_tar(2);
+        new_tar.Xpos=eng1_pos.Xpos - eng_to_tar.at(0);
+        new_tar.Ypos=eng1_pos.Ypos - eng_to_tar.at(1);
+        new_tar.Zpos=eng1_pos.Zpos - eng_to_tar.at(2);
 
         place_location.push_back(new_tar.Xpos);
         place_location.push_back(new_tar.Ypos);
@@ -1137,10 +1140,12 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         eng1 = obj_eng->getEngagePoint();
     }
 
+    std::vector<double> eng_to_tar;
     switch(arm_code){
     case 0: // both arms
         break;
     case 1://right arm
+        obj->getEngTarRight(eng_to_tar);
         this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
         if(mov_type==5){
             this->scene->getHumanoid()->getRightHandHomePosture(finalHand);
@@ -1153,6 +1158,7 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         }
         break;
     case 2:// left arm
+        obj->getEngTarLeft(eng_to_tar);
         this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
         if(mov_type==5){
             this->scene->getHumanoid()->getLeftHandHomePosture(finalHand);
@@ -1170,22 +1176,22 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     std::vector<double> place_location;
     if(mov_type!=1 && mov_type!=5){
         // compute the position of the engage point relative to the target frame
-        pos tar_pos = tar->getPos();
-        pos eng_pos = eng->getPos();
-        Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
-        Matrix3d Rot_tar_inv = Rot_tar.inverse();
-        Matrix3d Rot_pose; pose->RPY_matrix(Rot_pose);
-        Vector3d diff;
-        diff(0) = eng_pos.Xpos - tar_pos.Xpos;
-        diff(1) = eng_pos.Ypos - tar_pos.Ypos;
-        diff(2) = eng_pos.Zpos - tar_pos.Zpos;
-        Vector3d eng_to_tar; eng_to_tar = Rot_tar_inv * diff;
+        //pos tar_pos = tar->getPos();
+        //pos eng_pos = eng->getPos();
+        //Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
+        //Matrix3d Rot_tar_inv = Rot_tar.inverse();
+        //Matrix3d Rot_pose; pose->RPY_matrix(Rot_pose);
+        //Vector3d diff;
+        //diff(0) = eng_pos.Xpos - tar_pos.Xpos;
+        //diff(1) = eng_pos.Ypos - tar_pos.Ypos;
+        //diff(2) = eng_pos.Zpos - tar_pos.Zpos;
+        //Vector3d eng_to_tar; eng_to_tar = Rot_tar_inv * diff;
         // compute the position of the target when the object will be engaged
         pos eng1_pos = eng1->getPos(); // position of the engage point of the other object
         pos new_tar;
-        new_tar.Xpos=eng1_pos.Xpos - eng_to_tar(0);
-        new_tar.Ypos=eng1_pos.Ypos - eng_to_tar(1);
-        new_tar.Zpos=eng1_pos.Zpos - eng_to_tar(2);
+        new_tar.Xpos=eng1_pos.Xpos - eng_to_tar.at(0);
+        new_tar.Ypos=eng1_pos.Ypos - eng_to_tar.at(1);
+        new_tar.Zpos=eng1_pos.Zpos - eng_to_tar.at(2);
 
         place_location.push_back(new_tar.Xpos/1000);
         place_location.push_back(new_tar.Ypos/1000);

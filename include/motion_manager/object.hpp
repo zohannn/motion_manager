@@ -181,6 +181,18 @@ public:
      */
     string getInfoLine();
 
+    /**
+     * @brief getEngTarRight
+     * @param eng_to_tar
+     */
+    void getEngTarRight(std::vector<double>& eng_to_tar);
+
+    /**
+     * @brief getEngTarLeft
+     * @param eng_to_tar
+     */
+    void getEngTarLeft(std::vector<double>& eng_to_tar);
+
 
 
 private:
@@ -194,6 +206,8 @@ private:
     targetPtr p_targetRight; /**< target of the right arm */
     targetPtr p_targetLeft; /**< target of the left arm */
     engagePtr p_engage; /**< engage point of the object */
+    std::vector<double> eng_tar_right; /**< position of the engage point with respect to the target right in the target right frame. x=0, y=1, z=2*/
+    std::vector<double> eng_tar_left; /**< position of the engage point with respect to the target left in the target left frame. x=0, y=1, z=2*/
     bool setup_features; /**< true if it is necessary to set up the features, false otherwise (the object might be created with no features)*/
 
     /**
