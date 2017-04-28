@@ -57,13 +57,13 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.0465999
-init_vel_2=0.00912021
-init_vel_3=0.0269974
-init_vel_4=-0.0395843
-init_vel_5=-0.00146143
-init_vel_6=0.0011916
-init_vel_7=0.00248664
+init_vel_1=-0.0829279
+init_vel_2=0.0157525
+init_vel_3=0.0484962
+init_vel_4=-0.0698925
+init_vel_5=-0.00245036
+init_vel_6=0.00134099
+init_vel_7=0.00359705
 init_vel_8=0
 init_vel_9=0
 init_vel_10=0
@@ -92,28 +92,17 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=0
-
-init_acc_2=0
-
-init_acc_3=0
-
-init_acc_4=0
-
-init_acc_5=0
-
-init_acc_6=0
-
-init_acc_7=0
-
-init_acc_8=0.0
-
-init_acc_9=0.0
-
-init_acc_10=0.0
-
-init_acc_11=0.0
-
+init_acc_1=-0.0494801
+init_acc_2=0.00939895
+init_acc_3=0.028936
+init_acc_4=-0.0417023
+init_acc_5=-0.00146204
+init_acc_6=0.000800123
+init_acc_7=0.00214623
+init_acc_8=0
+init_acc_9=0
+init_acc_10=0
+init_acc_11=0
 # Final Acceleration 
 final_acc_1=0
 
@@ -314,3 +303,4 @@ approach=true
 retreat=true
 rand_init=false
 coll=true
+straight_line=false

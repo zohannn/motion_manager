@@ -1,22 +1,24 @@
 ### Parameters of the RRT planner in MoveIt! ###
-# 
+# Planner: RRTstar ,Movement: Transport, Arm: right, Object: Cup, Object Engaged: , Pose: Cup_pose, Grip Type: Full Side thumb left
 # Configuration settings
 config=RRTkConfigDefault
 # Pick settings
 pre_grasp_x=0
 
-pre_grasp_y=1
+pre_grasp_y=0
 
 pre_grasp_z=0
 
-pre_grasp_dist=120
+pre_grasp_dist=0
+
 post_grasp_x=0
 
-post_grasp_y=0.9659
+post_grasp_y=0
 
-post_grasp_z=0.2588
+post_grasp_z=0
 
-post_grasp_dist=170
+post_grasp_dist=0
+
 # Place settings
 pre_place_x=0
 

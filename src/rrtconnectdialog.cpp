@@ -210,7 +210,7 @@ void RRTConnectDialog::on_pushButton_save_clicked()
     QFile f( filename );
     if(f.open( QIODevice::WriteOnly )){
         QTextStream stream( &f );
-        stream << "### Parameters of the RRT planner in MoveIt! ###" << endl;
+        stream << "### Parameters of the RRT Connect planner in MoveIt! ###" << endl;
         stream << "# "<< this->infoLine.c_str() << endl;
         stream << "# Configuration settings" << endl;
         stream << "config=" << this->config.c_str() << endl;
