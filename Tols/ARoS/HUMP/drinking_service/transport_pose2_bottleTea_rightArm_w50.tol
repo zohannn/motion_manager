@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose2, Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
@@ -7,8 +7,7 @@ Elbow_radius=70.0
 
 Wrist_radius=60
 
-Hand_radius=50
-
+Hand_radius=60
 Hand_1_1=25
 
 Hand_1_2=25
@@ -93,27 +92,16 @@ final_vel_11=0.0
 
 # Initial Acceleration 
 init_acc_1=0
-
 init_acc_2=0
-
 init_acc_3=0
-
 init_acc_4=0
-
 init_acc_5=0
-
 init_acc_6=0
-
 init_acc_7=0
-
-init_acc_8=0.0
-
-init_acc_9=0.0
-
-init_acc_10=0.0
-
-init_acc_11=0.0
-
+init_acc_8=0
+init_acc_9=0
+init_acc_10=0
+init_acc_11=0
 # Final Acceleration 
 final_acc_1=0
 
@@ -187,12 +175,9 @@ obs_yy_2=0
 
 obs_yy_3=0
 
-obs_zz_1=30
-
-obs_zz_2=30
-
-obs_zz_3=30
-
+obs_zz_1=50
+obs_zz_2=50
+obs_zz_3=50
 obs_xy_1=0
 
 obs_xy_2=0
@@ -240,7 +225,7 @@ pre_place_y=0
 
 pre_place_z=1
 
-pre_place_dist=5
+pre_place_dist=1
 
 post_place_x=0
 
@@ -314,3 +299,4 @@ approach=true
 retreat=false
 rand_init=false
 coll=true
+straight_line=false

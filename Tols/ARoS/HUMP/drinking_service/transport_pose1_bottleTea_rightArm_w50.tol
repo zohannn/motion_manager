@@ -1,14 +1,12 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
 Elbow_radius=70.0
 
-Wrist_radius=60
-
-Hand_radius=50
-
+Wrist_radius=130
+Hand_radius=100
 Hand_1_1=25
 
 Hand_1_2=25
@@ -57,17 +55,28 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.0169567
-init_vel_2=0.0203871
-init_vel_3=-0.00715164
-init_vel_4=-0.0451411
-init_vel_5=0.00323087
-init_vel_6=0.0269285
-init_vel_7=0.0266657
+init_vel_1=-0.0300656
+
+init_vel_2=0.0361534
+
+init_vel_3=-0.012486
+
+init_vel_4=-0.0801995
+
+init_vel_5=0.00511437
+
+init_vel_6=0.0476738
+
+init_vel_7=0.0478226
+
 init_vel_8=0
+
 init_vel_9=0
+
 init_vel_10=0
+
 init_vel_11=0
+
 # Final Velocity 
 final_vel_1=0
 
@@ -92,27 +101,27 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=0
+init_acc_1=-0.0233626
 
-init_acc_2=0
+init_acc_2=0.0280932
 
-init_acc_3=0
+init_acc_3=-0.00970232
 
-init_acc_4=0
+init_acc_4=-0.0623195
 
-init_acc_5=0
+init_acc_5=0.00397415
 
-init_acc_6=0
+init_acc_6=0.0370452
 
-init_acc_7=0
+init_acc_7=0.0371608
 
-init_acc_8=0.0
+init_acc_8=0
 
-init_acc_9=0.0
+init_acc_9=0
 
-init_acc_10=0.0
+init_acc_10=0
 
-init_acc_11=0.0
+init_acc_11=0
 
 # Final Acceleration 
 final_acc_1=0
@@ -175,12 +184,9 @@ tar_yz_2=0
 tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
-obs_xx_1=80
-
-obs_xx_2=80
-
-obs_xx_3=80
-
+obs_xx_1=10
+obs_xx_2=10
+obs_xx_3=10
 obs_yy_1=90
 
 obs_yy_2=90
@@ -220,9 +226,11 @@ tar_or=0.001
 pre_grasp_x=0
 
 pre_grasp_y=0
+
 pre_grasp_z=0
 
 pre_grasp_dist=0
+
 post_grasp_x=0
 
 post_grasp_y=1
@@ -239,6 +247,7 @@ pre_place_y=0
 pre_place_z=1
 
 pre_place_dist=60
+
 post_place_x=0
 
 post_place_y=1
@@ -311,3 +320,4 @@ approach=true
 retreat=false
 rand_init=false
 coll=true
+straight_line=false

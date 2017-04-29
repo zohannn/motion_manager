@@ -8,7 +8,6 @@ Elbow_radius=70.0
 Wrist_radius=60
 
 Hand_radius=50
-
 Hand_1_1=25
 
 Hand_1_2=25
@@ -22,17 +21,11 @@ Hand_2_2=25
 Hand_2_3=25
 
 Hand_3_1=15
-
 Hand_3_2=15
-
 Hand_3_3=15
-
-Hand_tip_1=5
-
-Hand_tip_2=5
-
-Hand_tip_3=5
-
+Hand_tip_1=0
+Hand_tip_2=0
+Hand_tip_3=0
 # Joint Expanse factors
 lambda_1=0.95
 
@@ -57,17 +50,17 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.0475681
-init_vel_2=0.0202198
-init_vel_3=0.0376439
-init_vel_4=-0.0102024
-init_vel_5=0.00661687
-init_vel_6=-0.024315
-init_vel_7=-0.0053992
+init_vel_1=-0.0841005
+init_vel_2=0.0344301
+init_vel_3=0.0670246
+init_vel_4=-0.0171165
+init_vel_5=0.0120371
+init_vel_6=-0.0427397
+init_vel_7=-0.0102988
 init_vel_8=0
-init_vel_9=-0.0280754
-init_vel_10=-0.0280754
-init_vel_11=-0.0280754
+init_vel_9=-0.064992
+init_vel_10=-0.064992
+init_vel_11=-0.064992
 # Final Velocity 
 final_vel_1=0.0
 
@@ -92,28 +85,17 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=0.0
-
-init_acc_2=0.0
-
-init_acc_3=0.0
-
-init_acc_4=0.0
-
-init_acc_5=0.0
-
-init_acc_6=0.0
-
-init_acc_7=0.0
-
-init_acc_8=0.0
-
-init_acc_9=0.0
-
-init_acc_10=0.0
-
-init_acc_11=0.0
-
+init_acc_1=-0.0477383
+init_acc_2=0.0195437
+init_acc_3=0.0380455
+init_acc_4=-0.00971588
+init_acc_5=0.00683268
+init_acc_6=-0.0242605
+init_acc_7=-0.00584595
+init_acc_8=0
+init_acc_9=-0.0368917
+init_acc_10=-0.0368917
+init_acc_11=-0.0368917
 # Final Acceleration 
 final_acc_1=0.0
 
@@ -314,3 +296,4 @@ approach=true
 retreat=true
 rand_init=false
 coll=true
+straight_line=false

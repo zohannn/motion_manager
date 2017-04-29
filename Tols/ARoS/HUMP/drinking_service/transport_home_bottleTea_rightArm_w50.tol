@@ -22,8 +22,11 @@ Hand_2_2=25
 Hand_2_3=25
 
 Hand_3_1=15
+
 Hand_3_2=15
+
 Hand_3_3=15
+
 Hand_tip_1=5
 
 Hand_tip_2=5
@@ -31,7 +34,7 @@ Hand_tip_2=5
 Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=1
+lambda_1=0.99
 lambda_2=1
 
 lambda_3=1.0
@@ -89,27 +92,16 @@ final_vel_11=0.0
 
 # Initial Acceleration 
 init_acc_1=0
-
 init_acc_2=0
-
 init_acc_3=0
-
 init_acc_4=0
-
 init_acc_5=0
-
 init_acc_6=0
-
 init_acc_7=0
-
-init_acc_8=0.0
-
-init_acc_9=0.0
-
-init_acc_10=0.0
-
-init_acc_11=0.0
-
+init_acc_8=0
+init_acc_9=0
+init_acc_10=0
+init_acc_11=0
 # Final Acceleration 
 final_acc_1=0
 
@@ -172,14 +164,23 @@ tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
 obs_xx_1=50
+
 obs_xx_2=50
+
 obs_xx_3=50
+
 obs_yy_1=50
+
 obs_yy_2=50
+
 obs_yy_3=50
+
 obs_zz_1=100
+
 obs_zz_2=100
+
 obs_zz_3=100
+
 obs_xy_1=0
 
 obs_xy_2=0
@@ -301,3 +302,4 @@ approach=true
 retreat=true
 rand_init=false
 coll=true
+straight_line=false

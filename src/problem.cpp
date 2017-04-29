@@ -975,7 +975,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
     case 0: // both arms
         break;
     case 1://right arm
-        obj->getEngTarRight(eng_to_tar);
+        if(obj!=nullptr){obj->getEngTarRight(eng_to_tar);}
         this->scene->getHumanoid()->getRightPosture(initPosture);
         this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
         if(mov_type==5){
@@ -989,7 +989,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         }
         break;
     case 2:// left arm
-        obj->getEngTarLeft(eng_to_tar);
+        if(obj!=nullptr){obj->getEngTarLeft(eng_to_tar);}
         this->scene->getHumanoid()->getLeftPosture(initPosture);
         this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
         if(mov_type==5){
@@ -1145,7 +1145,7 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     case 0: // both arms
         break;
     case 1://right arm
-        obj->getEngTarRight(eng_to_tar);
+        if(obj!=nullptr){obj->getEngTarRight(eng_to_tar);}
         this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
         if(mov_type==5){
             this->scene->getHumanoid()->getRightHandHomePosture(finalHand);
@@ -1158,7 +1158,7 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         }
         break;
     case 2:// left arm
-        obj->getEngTarLeft(eng_to_tar);
+        if(obj!=nullptr){obj->getEngTarLeft(eng_to_tar);}
         this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
         if(mov_type==5){
             this->scene->getHumanoid()->getLeftHandHomePosture(finalHand);
