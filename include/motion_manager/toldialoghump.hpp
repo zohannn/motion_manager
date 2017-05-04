@@ -226,6 +226,18 @@ public:
     void getPostPlaceRetreat(std::vector<double>& post_place);
 
     /**
+     * @brief getW_red_app
+     * @return
+     */
+    double getW_red_app();
+
+    /**
+     * @brief getW_red_ret
+     * @return
+     */
+    double getW_red_ret();
+
+    /**
      * @brief setInitJointsVel
      * @param init_vel
      */

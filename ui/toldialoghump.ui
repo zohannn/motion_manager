@@ -2441,7 +2441,7 @@
     <widget class="QCheckBox" name="checkBox_straight_line">
      <property name="geometry">
       <rect>
-       <x>30</x>
+       <x>720</x>
        <y>520</y>
        <width>231</width>
        <height>21</height>
@@ -2451,6 +2451,62 @@
       <string>Hand straight line trajectory</string>
      </property>
     </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>470</y>
+       <width>301</width>
+       <height>58</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_28">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_14">
+        <item>
+         <widget class="QLabel" name="label_194">
+          <property name="text">
+           <string>Velocity Reduction factor to approach</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_w_red_app">
+          <property name="text">
+           <string>5</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_21">
+        <item>
+         <widget class="QLabel" name="label_195">
+          <property name="text">
+           <string>Velocity Reduction factor to retreat</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_w_red_ret">
+          <property name="text">
+           <string>5</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+    <zorder>layoutWidget</zorder>
+    <zorder>groupBox_pre_grasp</zorder>
+    <zorder>groupBox_post_grasp</zorder>
+    <zorder>label_pick</zorder>
+    <zorder>groupBox_pre_place</zorder>
+    <zorder>label_pick_3</zorder>
+    <zorder>groupBox_post_place</zorder>
+    <zorder>checkBox_straight_line</zorder>
    </widget>
    <widget class="QWidget" name="tab_huml_move">
     <attribute name="title">

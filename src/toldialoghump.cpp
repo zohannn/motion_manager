@@ -299,6 +299,16 @@ void TolDialogHUMP::getPostPlaceRetreat(std::vector<double> &post_place)
     post_place.push_back(ui->lineEdit_post_place_dist->text().toDouble());
 }
 
+double TolDialogHUMP::getW_red_app()
+{
+    return ui->lineEdit_w_red_app->text().toDouble();
+}
+
+double TolDialogHUMP::getW_red_ret()
+{
+    return ui->lineEdit_w_red_ret->text().toDouble();
+}
+
 void TolDialogHUMP::getTargetMove(std::vector<double> &target)
 {
     target.clear();
@@ -629,6 +639,8 @@ void TolDialogHUMP::on_pushButton_save_clicked()
        stream << "post_place_y="<< ui->lineEdit_post_place_y->text().toStdString().c_str() << endl;
        stream << "post_place_z="<< ui->lineEdit_post_place_z->text().toStdString().c_str() << endl;
        stream << "post_place_dist="<< ui->lineEdit_post_place_dist->text().toStdString().c_str() << endl;
+       stream << "w_red_app=" << ui->lineEdit_w_red_app->text().toStdString().c_str() << endl;
+       stream << "w_red_ret=" << ui->lineEdit_w_red_ret->text().toStdString().c_str() << endl;
        stream << "# Move settings" << endl;
        stream << "target_x=" << ui->lineEdit_target_x->text().toStdString().c_str() << endl;
        stream << "target_y=" << ui->lineEdit_target_y->text().toStdString().c_str() << endl;
@@ -998,6 +1010,10 @@ void TolDialogHUMP::on_pushButton_load_clicked()
                     ui->lineEdit_post_place_z->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("post_place_dist"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_post_place_dist->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("w_red_app"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_w_red_app->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("w_red_ret"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_w_red_ret->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("target_x"),Qt::CaseInsensitive)==0){
                     ui->lineEdit_target_x->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("target_y"),Qt::CaseInsensitive)==0){
