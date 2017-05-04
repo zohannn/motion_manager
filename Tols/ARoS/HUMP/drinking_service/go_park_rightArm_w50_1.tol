@@ -57,17 +57,17 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.172049
-init_vel_2=-0.0244632
-init_vel_3=0.0777033
-init_vel_4=-0.0942867
-init_vel_5=0.0402612
-init_vel_6=-0.103376
-init_vel_7=-0.00215112
+init_vel_1=-0.173282
+init_vel_2=-0.0230918
+init_vel_3=0.0762911
+init_vel_4=-0.0962893
+init_vel_5=0.0393919
+init_vel_6=-0.0999401
+init_vel_7=0.000546356
 init_vel_8=0
-init_vel_9=-0.237604
-init_vel_10=-0.237604
-init_vel_11=-0.237604
+init_vel_9=-0.237054
+init_vel_10=-0.237054
+init_vel_11=-0.237054
 # Final Velocity 
 final_vel_1=0.0
 
@@ -92,17 +92,17 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=-0.0702667
-init_acc_2=-0.00999106
-init_acc_3=0.0317349
-init_acc_4=-0.0385078
-init_acc_5=0.0164431
-init_acc_6=-0.0422198
-init_acc_7=-0.000878541
+init_acc_1=-0.0706065
+init_acc_2=-0.00940909
+init_acc_3=0.031086
+init_acc_4=-0.0392345
+init_acc_5=0.0160509
+init_acc_6=-0.0407222
+init_acc_7=0.000222621
 init_acc_8=0
-init_acc_9=-0.0970402
-init_acc_10=-0.0970402
-init_acc_11=-0.0970402
+init_acc_9=-0.0965912
+init_acc_10=-0.0965912
+init_acc_11=-0.0965912
 # Final Acceleration 
 final_acc_1=0.0
 
@@ -240,7 +240,9 @@ post_place_z=0
 post_place_dist=0
 
 w_red_app=5
+
 w_red_ret=5
+
 # Move settings
 target_x=0
 

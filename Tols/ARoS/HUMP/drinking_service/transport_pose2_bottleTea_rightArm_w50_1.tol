@@ -92,13 +92,13 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=-0.00498374
-init_acc_2=0.047618
-init_acc_3=0.0111206
-init_acc_4=-0.0967373
-init_acc_5=0.00449317
-init_acc_6=0.0386532
-init_acc_7=0.0541551
+init_acc_1=-0.00506048
+init_acc_2=0.0474113
+init_acc_3=0.011213
+init_acc_4=-0.0967153
+init_acc_5=0.00425987
+init_acc_6=0.0386273
+init_acc_7=0.0542475
 init_acc_8=0
 init_acc_9=0
 init_acc_10=0
@@ -240,7 +240,9 @@ post_place_z=0
 post_place_dist=100
 
 w_red_app=5
+
 w_red_ret=5
+
 # Move settings
 target_x=-400
 
