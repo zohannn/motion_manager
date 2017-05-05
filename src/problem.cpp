@@ -1223,7 +1223,8 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     switch(mov_type){
     case 0:// reach-to-grasp
         if (sceneID==6){
-            params.support_surface = "Shelf_4_c";
+            params.support_surface = "Shelf_4_b";
+            params.allowed_touch_objects = {"Shelf_4_c","Shelf_3","Shelf_1_b"};
         }
         params.target = target;
         curr_time = this->GetTimeMs64();
@@ -1245,6 +1246,7 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     case 2://transport
         if (sceneID==6){
             params.support_surface = "Shelf_2_a";
+            params.allowed_touch_objects = {"Shelf_4_a","Shelf_3","Shelf"};
         }
         params.target = tar_pose;
         curr_time = this->GetTimeMs64();
