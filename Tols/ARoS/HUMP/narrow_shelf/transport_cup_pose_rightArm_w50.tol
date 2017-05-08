@@ -27,14 +27,14 @@ Hand_3_2=15
 
 Hand_3_3=15
 
-Hand_tip_1=0
+Hand_tip_1=5
 
-Hand_tip_2=0
+Hand_tip_2=5
 
-Hand_tip_3=0
+Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=0.95
+lambda_1=1
 
 lambda_2=1
 
@@ -57,13 +57,13 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.0708897
-init_vel_2=0.00357128
-init_vel_3=0.0779384
-init_vel_4=-0.0617979
-init_vel_5=0.026595
-init_vel_6=0.0261922
-init_vel_7=-0.0145117
+init_vel_1=-0.200078
+init_vel_2=0.00322331
+init_vel_3=-0.0722669
+init_vel_4=-0.153386
+init_vel_5=-0.111553
+init_vel_6=-0.000108992
+init_vel_7=-0.0105989
 init_vel_8=0
 init_vel_9=0
 init_vel_10=0
@@ -92,13 +92,13 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=-0.0351041
-init_acc_2=0.00176847
-init_acc_3=0.0385946
-init_acc_4=-0.0306019
-init_acc_5=0.0131696
-init_acc_6=0.0129702
-init_acc_7=-0.00718609
+init_acc_1=1.46002
+init_acc_2=-0.0235212
+init_acc_3=0.527348
+init_acc_4=1.11929
+init_acc_5=0.814027
+init_acc_6=0.00079534
+init_acc_7=0.0773427
 init_acc_8=0
 init_acc_9=0
 init_acc_10=0
@@ -164,23 +164,23 @@ tar_yz_2=0
 tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
-obs_xx_1=-100
+obs_xx_1=70
 
-obs_xx_2=-100
+obs_xx_2=70
 
-obs_xx_3=-100
+obs_xx_3=70
 
-obs_yy_1=-100
+obs_yy_1=70
 
-obs_yy_2=-100
+obs_yy_2=70
 
-obs_yy_3=-100
+obs_yy_3=70
 
-obs_zz_1=-100
+obs_zz_1=5
 
-obs_zz_2=-100
+obs_zz_2=5
 
-obs_zz_3=-100
+obs_zz_3=5
 
 obs_xy_1=0
 
@@ -225,11 +225,11 @@ post_grasp_dist=0
 # Place settings
 pre_place_x=0
 
-pre_place_y=0.965925826
+pre_place_y=1
 
-pre_place_z=0.258819045
+pre_place_z=0
 
-pre_place_dist=180
+pre_place_dist=320
 
 post_place_x=0
 
@@ -237,7 +237,11 @@ post_place_y=1
 
 post_place_z=0
 
-post_place_dist=170
+post_place_dist=350
+
+w_red_app=1
+
+w_red_ret=1
 
 # Move settings
 target_x=-400
@@ -303,4 +307,4 @@ approach=true
 retreat=true
 rand_init=false
 coll=true
-straight_line=false
+straight_line=true
