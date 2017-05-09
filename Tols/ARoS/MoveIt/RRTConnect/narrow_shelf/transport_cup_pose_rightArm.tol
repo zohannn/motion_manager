@@ -1,4 +1,4 @@
-### Parameters of the RRT planner in MoveIt! ###
+### Parameters of the RRT Connect planner in MoveIt! ###
 # Planner: RRTConnect ,Movement: Reach-to-grasp, Arm: right, Object: Cup, Object Engaged: , Pose: , Grip Type: Full Side thumb left
 # Configuration settings
 config=RRTkConfigDefault
@@ -22,11 +22,11 @@ post_grasp_dist=0
 # Place settings
 pre_place_x=0
 
-pre_place_y=0.9659
+pre_place_y=0.99619
 
-pre_place_z=0.2588
+pre_place_z=0.08715
 
-pre_place_dist=180
+pre_place_dist=320
 
 post_place_x=0
 
@@ -34,7 +34,7 @@ post_place_y=1
 
 post_place_z=0
 
-post_place_dist=170
+post_place_dist=350
 
 # Move settings
 target_x=0.0

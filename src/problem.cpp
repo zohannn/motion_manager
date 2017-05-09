@@ -1247,6 +1247,7 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         if (sceneID==6){
             params.support_surface = "Shelf_2_a";
             params.allowed_touch_objects = {"Shelf_4_b","Shelf_3","Shelf_1_b"};
+            tar_pose.at(2) = tar_pose.at(2) - 0.027; // the center of the object to place is decreased of 0.027 m on the z axis
         }
         params.target = tar_pose;
         curr_time = this->GetTimeMs64();
