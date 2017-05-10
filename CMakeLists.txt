@@ -112,8 +112,13 @@ endif()
 
 ## Hand configuration
 # HAND=0. Human hand
-# HAND=1, Barrett hand
+# HAND=1. Barrett hand
 set (HAND 1)
+
+## Execution of the trajectory
+# VEL=0. Execution with position
+# VEL=1. Execution with velocity
+set (VEL 0)
 
 set(MAIN_PATH ${PROJECT_SOURCE_DIR}) ## Path of the main directory
 set(PATH_SCENARIOS /home/$ENV{USER}/scenarios) ## Path of the scenarios

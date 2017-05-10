@@ -1,7 +1,7 @@
 # Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: Cup, Object Engaged: , Pose: , Grip Type: Full Side thumb left
 njs=709.812
 nmu=1
-prob_time=7809
+prob_time=7893
 Movement stage: plan
 tol stop=1e-10
 step=0, time step=0.443284, Joint 1=-137.500000|0.000000|0.000000, Joint 2=-77.939999|0.000000|0.000000, Joint 3=106.589999|0.000000|0.000000, Joint 4=-95.419997|0.000000|0.000000, Joint 5=-43.279999|0.000000|0.000000, Joint 6=-64.000000|0.000000|0.000000, Joint 7=47.970000|0.000000|0.000000, Joint 8=0.000000|0.000000|0.000000, Joint 9=69.958103|0.000000|0.000000, Joint 10=69.958117|0.000000|0.000000, Joint 11=69.958295|0.000000|0.000000

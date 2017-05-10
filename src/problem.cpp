@@ -1007,17 +1007,6 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
     std::vector<double> tar_pose;
     std::vector<double> place_location;
     if(mov_type!=1 && mov_type!=5){
-        // compute the position of the engage point relative to the target frame
-        //pos tar_pos = tar->getPos();
-        //pos eng_pos = eng->getPos();
-        //Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
-        //Matrix3d Rot_tar_inv = Rot_tar.inverse();
-        //Matrix3d Rot_pose; pose->RPY_matrix(Rot_pose);
-        //Vector3d diff;
-        //diff(0) = eng_pos.Xpos - tar_pos.Xpos;
-        //diff(1) = eng_pos.Ypos - tar_pos.Ypos;
-        //diff(2) = eng_pos.Zpos - tar_pos.Zpos;
-        //Vector3d eng_to_tar; eng_to_tar = Rot_tar_inv * diff;
         // compute the position of the target when the object will be engaged
         pos eng1_pos = eng1->getPos(); // position of the engage point of the other object
         pos new_tar;
@@ -1140,12 +1129,14 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         eng1 = obj_eng->getEngagePoint();
     }
 
-    std::vector<double> eng_to_tar;
+    std::vector<double> eng_to_obj;
+    if(obj!=nullptr){obj->getEngObj(eng_to_obj);}
+    std::vector<double> tar_to_obj;
     switch(arm_code){
     case 0: // both arms
         break;
     case 1://right arm
-        if(obj!=nullptr){obj->getEngTarRight(eng_to_tar);}
+        if(obj!=nullptr){obj->getTarRightObj(tar_to_obj);}
         this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
         if(mov_type==5){
             this->scene->getHumanoid()->getRightHandHomePosture(finalHand);
@@ -1158,7 +1149,7 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         }
         break;
     case 2:// left arm
-        if(obj!=nullptr){obj->getEngTarLeft(eng_to_tar);}
+        if(obj!=nullptr){obj->getTarLeftObj(tar_to_obj);}
         this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
         if(mov_type==5){
             this->scene->getHumanoid()->getLeftHandHomePosture(finalHand);
@@ -1175,27 +1166,16 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     std::vector<double> tar_pose;
     std::vector<double> place_location;
     if(mov_type!=1 && mov_type!=5){
-        // compute the position of the engage point relative to the target frame
-        //pos tar_pos = tar->getPos();
-        //pos eng_pos = eng->getPos();
-        //Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
-        //Matrix3d Rot_tar_inv = Rot_tar.inverse();
-        //Matrix3d Rot_pose; pose->RPY_matrix(Rot_pose);
-        //Vector3d diff;
-        //diff(0) = eng_pos.Xpos - tar_pos.Xpos;
-        //diff(1) = eng_pos.Ypos - tar_pos.Ypos;
-        //diff(2) = eng_pos.Zpos - tar_pos.Zpos;
-        //Vector3d eng_to_tar; eng_to_tar = Rot_tar_inv * diff;
         // compute the position of the target when the object will be engaged
         pos eng1_pos = eng1->getPos(); // position of the engage point of the other object
-        pos new_tar;
-        new_tar.Xpos=eng1_pos.Xpos - eng_to_tar.at(0);
-        new_tar.Ypos=eng1_pos.Ypos - eng_to_tar.at(1);
-        new_tar.Zpos=eng1_pos.Zpos - eng_to_tar.at(2);
+        pos new_obj_pos;
+        new_obj_pos.Xpos=eng1_pos.Xpos - eng_to_obj.at(0);
+        new_obj_pos.Ypos=eng1_pos.Ypos - eng_to_obj.at(1);
+        new_obj_pos.Zpos=eng1_pos.Zpos - eng_to_obj.at(2);
 
-        place_location.push_back(new_tar.Xpos/1000);
-        place_location.push_back(new_tar.Ypos/1000);
-        place_location.push_back(new_tar.Zpos/1000);
+        place_location.push_back(new_obj_pos.Xpos/1000);
+        place_location.push_back(new_obj_pos.Ypos/1000);
+        place_location.push_back(new_obj_pos.Zpos/1000);
         place_location.push_back(eng1->getOr().roll);
         place_location.push_back(eng1->getOr().pitch);
         place_location.push_back(eng1->getOr().yaw);
@@ -1203,7 +1183,12 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         target = {tar->getPos().Xpos/1000, tar->getPos().Ypos/1000, tar->getPos().Zpos/1000,
                   tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
 
-        tar_pose = {pose->getPos().Xpos/1000, pose->getPos().Ypos/1000, pose->getPos().Zpos/1000,
+        pos new_tar_pose;
+        new_tar_pose.Xpos=pose->getPos().Xpos - tar_to_obj.at(0);
+        new_tar_pose.Ypos=pose->getPos().Ypos - tar_to_obj.at(1);
+        new_tar_pose.Zpos=pose->getPos().Zpos - tar_to_obj.at(2);
+
+        tar_pose = {new_tar_pose.Xpos/1000, new_tar_pose.Ypos/1000, new_tar_pose.Zpos/1000,
                     pose->getOr().roll, pose->getOr().pitch, pose->getOr().yaw};
 
         // movement settings
@@ -1247,7 +1232,6 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         if (sceneID==6){
             params.support_surface = "Shelf_2_a";
             params.allowed_touch_objects = {"Shelf_4_b","Shelf_3","Shelf_1_b"};
-            tar_pose.at(2) = tar_pose.at(2) - 0.027; // the center of the object to place is decreased of 0.027 m on the z axis
         }
         params.target = tar_pose;
         curr_time = this->GetTimeMs64();

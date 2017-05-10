@@ -4,6 +4,8 @@
 #define PATH_SCENARIOS "@PATH_SCENARIOS@"
 // HAND
 #define HAND @HAND@
+// Execution of the trajectory
+#define VEL @VEL@
 
 
 // MOVEIT

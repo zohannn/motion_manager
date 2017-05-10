@@ -34,7 +34,7 @@ Hand_tip_2=5
 Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=1
+lambda_1=0.95
 
 lambda_2=1
 
@@ -170,17 +170,17 @@ obs_xx_2=70
 
 obs_xx_3=70
 
-obs_yy_1=70
+obs_yy_1=20
 
-obs_yy_2=70
+obs_yy_2=20
 
-obs_yy_3=70
+obs_yy_3=20
 
-obs_zz_1=5
+obs_zz_1=0
 
-obs_zz_2=5
+obs_zz_2=0
 
-obs_zz_3=5
+obs_zz_3=0
 
 obs_xy_1=0
 
@@ -225,9 +225,9 @@ post_grasp_dist=0
 # Place settings
 pre_place_x=0
 
-pre_place_y=1
+pre_place_y=0.99619
 
-pre_place_z=0
+pre_place_z=0.08715
 
 pre_place_dist=320
 

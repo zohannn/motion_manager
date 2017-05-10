@@ -193,6 +193,24 @@ public:
      */
     void getEngTarLeft(std::vector<double>& eng_to_tar);
 
+    /**
+     * @brief getTarRightObj
+     * @param tar_to_obj
+     */
+    void getTarRightObj(std::vector<double>& tar_to_obj);
+
+    /**
+     * @brief getTarLeftObj
+     * @param tar_to_obj
+     */
+    void getTarLeftObj(std::vector<double>& tar_to_obj);
+
+    /**
+     * @brief getEngObj
+     * @param eng_to_obj
+     */
+    void getEngObj(std::vector<double>& eng_to_obj);
+
 
 
 private:
@@ -208,6 +226,9 @@ private:
     engagePtr p_engage; /**< engage point of the object */
     std::vector<double> eng_tar_right; /**< position of the engage point with respect to the target right in the target right frame. x=0, y=1, z=2*/
     std::vector<double> eng_tar_left; /**< position of the engage point with respect to the target left in the target left frame. x=0, y=1, z=2*/
+    std::vector<double> eng_obj; /**< position of the engage point with respect to the object center in the object frame. x=0, y=1, z=2*/
+    std::vector<double> tar_right_obj; /**< position of the target right with respect to the object in the object frame. x=0, y=1, z=2 */
+    std::vector<double> tar_left_obj; /**< position of the target left with respect to the object in the object frame. x=0, y=1, z=2 */
     bool setup_features; /**< true if it is necessary to set up the features, false otherwise (the object might be created with no features)*/
 
     /**
