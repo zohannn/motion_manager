@@ -534,6 +534,14 @@ private:
          * @return
          */
         bool openBarrettHand(int hand);
+
+        /**
+         * @brief openBarrettHand_to_pos
+         * @param hand
+         * @param hand_posture
+         * @return
+         */
+        bool openBarrettHand_to_pos(int hand, std::vector<double>& hand_posture);
 #endif
         /**
          * @brief This method return the RPY values starting from the transformation matrix

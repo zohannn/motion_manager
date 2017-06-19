@@ -3225,7 +3225,7 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
         break;
     }
 
-    // set joints position or velocity (it depends on the scenario)
+    // set joints position or velocity (it depends on the settings)
     ros::ServiceClient client_enableSubscriber=node.serviceClient<vrep_common::simRosEnableSubscriber>("/vrep/simRosEnableSubscriber");
     vrep_common::simRosEnableSubscriber srv_enableSubscriber;
     srv_enableSubscriber.request.topicName="/"+nodeName+"/set_joints"; // the topic name
@@ -3244,7 +3244,30 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
     bool f_reached;
     double tol_stop_stage;
     std::vector<double> timesteps_stage;
+    MatrixXd traj;
+    MatrixXd vel;
     double timeTot = 0.0;
+
+    MatrixXd traj_plan_approach;
+    MatrixXd vel_plan_approach;
+    std::vector<double> timesteps_plan_approach;
+    bool join_plan_approach = false;
+
+    if(mov_type==0 || mov_type==2 || mov_type==3 || mov_type==4){
+        // reach-to-grasp, transport, engage, disengage
+        if(traj_mov.size() > 1){
+            // there is more than one stage
+            string mov_descr_1 = traj_descr.at(0);
+            string mov_descr_2 = traj_descr.at(1);
+            if((strcmp(mov_descr_1.c_str(),"plan")==0) && (strcmp(mov_descr_2.c_str(),"approach")==0)){
+                join_plan_approach = true;
+                traj_plan_approach.resize((traj_mov.at(0).rows() + traj_mov.at(1).rows()-1),traj_mov.at(0).cols());
+                vel_plan_approach.resize((vel_mov.at(0).rows() + vel_mov.at(1).rows()-1),vel_mov.at(0).cols());
+
+            }
+        }
+
+    }
 
     // start the simulation
     add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
@@ -3258,8 +3281,27 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
         string mov_descr = traj_descr.at(k);
         if(strcmp(mov_descr.c_str(),"plan")==0){
             plan=true; approach=false; retreat=false;
+            if(join_plan_approach){
+                MatrixXd tt = traj_mov.at(k);
+                MatrixXd vv = vel_mov.at(k);
+                std::vector<double> ttsteps = timesteps.at(k);
+                traj_plan_approach.topLeftCorner(tt.rows(),tt.cols()) = tt;
+                vel_plan_approach.topLeftCorner(vv.rows(),vv.cols()) = vv;
+                timesteps_plan_approach.reserve(ttsteps.size());
+                std::copy (ttsteps.begin(), ttsteps.end(), std::back_inserter(timesteps_plan_approach));
+                continue;
+            }
         }else if(strcmp(mov_descr.c_str(),"approach")==0){
             plan=false; approach=true; retreat=false;
+            if(join_plan_approach){
+                MatrixXd tt = traj_mov.at(k); MatrixXd tt_red = tt.bottomRows(tt.rows()-1);
+                MatrixXd vv = vel_mov.at(k); MatrixXd vv_red = vv.bottomRows(vv.rows()-1);
+                std::vector<double> ttsteps = timesteps.at(k);
+                traj_plan_approach.bottomLeftCorner(tt_red.rows(),tt_red.cols()) = tt_red;
+                vel_plan_approach.bottomLeftCorner(vv_red.rows(),vv_red.cols()) = vv_red;
+                timesteps_plan_approach.reserve(ttsteps.size()-1);
+                std::copy (ttsteps.begin()+1, ttsteps.end(), std::back_inserter(timesteps_plan_approach));
+            }
         }else if(strcmp(mov_descr.c_str(),"retreat")==0){
             plan=false; approach=false; retreat=true;
         }
@@ -3278,9 +3320,11 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
                     if (srvset_parent.response.result != 1){
                         log(QNode::Error,string("Error in grasping the object "));
                     }
-//#if HAND == 1
-                //this->closeBarrettHand(arm_code);
-//#endif
+#if HAND == 1
+                this->closeBarrettHand(arm_code);
+#else
+                closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
+#endif
                 }
             }
             break;
@@ -3288,7 +3332,7 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
             break;
         case 2: case 3: // transport, engage
             if(retreat){
-                closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
+                //
                 //ros::spinOnce();// handle ROS messages
                 if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
                     add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
@@ -3303,9 +3347,16 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
                         }
                     //}
                 }
-//#if HAND ==1
-//              this->openBarrettHand(arm_code);
-//#endif
+#if HAND ==1
+              //this->openBarrettHand(arm_code);
+              MatrixXd tt = traj_mov.at(k); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
+              std::vector<double> hand_init_pos;
+              hand_init_pos.resize(init_h_posture.size());
+              VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+              this->openBarrettHand_to_pos(arm_code,hand_init_pos);
+#else
+             closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
+#endif
             }
             break;
         case 4:// disengage
@@ -3315,12 +3366,16 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
         }
 
 
-
-        MatrixXd traj = traj_mov.at(k);
-        MatrixXd vel = vel_mov.at(k);
+        if(join_plan_approach && (strcmp(mov_descr.c_str(),"approach")==0)){
+            traj = traj_plan_approach;
+            vel = vel_plan_approach;
+            timesteps_stage = timesteps_plan_approach;
+        }else{
+            traj = traj_mov.at(k);
+            vel = vel_mov.at(k);
+            timesteps_stage = timesteps.at(k);
+        }
         tol_stop_stage = tols_stop.at(k);
-        timesteps_stage = timesteps.at(k);
-
         f_posture = traj.row(traj.rows()-1);
         f_reached=false;
 
@@ -3346,7 +3401,8 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
         //BOOST_LOG_SEV(lg, info) << "pre_time = " << pre_time ;
 
         tb = pre_time;
-        for (int i = 0; i< vel.rows()-1; ++i){
+        //for (int i = 0; i< vel.rows()-1; ++i){
+        for (int i = 1; i< vel.rows()-1; ++i){
             //BOOST_LOG_SEV(lg, info) << "Stage = " << k;
             //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
             VectorXd ya = vel.row(i);
@@ -3501,7 +3557,9 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                         log(QNode::Error,string("Error in grasping the object "));
                     }
 //#if HAND == 1
-                    //this->closeBarrettHand(arm_code);
+  //                  this->closeBarrettHand(arm_code);
+//#else
+  //                  closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
 //#endif
                 }
             }
@@ -3587,6 +3645,11 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
 
 #endif
 
+    // previous retreat trajectories
+    MatrixXd traj_prev_retreat;
+    MatrixXd vel_prev_retreat;
+    std::vector<double> ttsteps_prev_retreat;
+
     // start the simulation
     add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
     vrep_common::simRosStartSimulation srvstart;
@@ -3602,6 +3665,8 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
           vector<vector<double>> timesteps_mov = timesteps_task.at(ii);
           vector<double> tols_stop_mov = tols_stop_task.at(ii);
           double tol_stop_stage;
+          MatrixXd traj;
+          MatrixXd vel;
           std::vector<double> timesteps_stage;
           movementPtr mov = task->getProblem(kk)->getMovement();
           vector<string> traj_descr_mov = traj_descr_task.at(ii);
@@ -3609,6 +3674,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
           this->curr_mov = mov;
           arm_code = mov->getArm();
           mov_type = mov->getType();
+
           switch (mov_type){
           case 0: case 1: case 5: // reach-to-grasp, reaching, go-park
               closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
@@ -3617,6 +3683,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
               closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
               break;
           }
+
           switch (arm_code) {
           case 0: // dual arm
               // TODO
@@ -3635,15 +3702,116 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
               break;
           }
 
+
+
+          MatrixXd traj_ret_plan_app;
+          MatrixXd vel_ret_plan_app;
+          std::vector<double> timesteps_ret_plan_app;
+          bool join_ret_plan_app = false; bool join_ret_plan = false; bool join_plan_app = false;
+
+          if(mov_type==0 || mov_type==2 || mov_type==3 || mov_type==4){
+              // reach-to-grasp, transport, engage, disengage
+              if(traj_mov.size() > 1){
+                  // there is more than one stage
+                  string mov_descr_1 = traj_descr_mov.at(0);
+                  string mov_descr_2 = traj_descr_mov.at(1);
+                  if((strcmp(mov_descr_1.c_str(),"plan")==0) && (strcmp(mov_descr_2.c_str(),"approach")==0)){
+
+                      if(ii==0 || traj_prev_retreat.rows()==0){
+                          // first movement of the task => there is no previous retreat
+                          join_plan_app = true;
+                          traj_ret_plan_app.resize((traj_mov.at(0).rows() + traj_mov.at(1).rows()-1),traj_mov.at(0).cols());
+                          vel_ret_plan_app.resize((vel_mov.at(0).rows() + vel_mov.at(1).rows()-1),vel_mov.at(0).cols());
+                      }else{
+                          join_ret_plan_app = true;
+                          traj_ret_plan_app.resize((traj_prev_retreat.rows() + traj_mov.at(0).rows()-1 + traj_mov.at(1).rows()-1),traj_mov.at(0).cols());
+                          vel_ret_plan_app.resize((vel_prev_retreat.rows() + vel_mov.at(0).rows()-1 + vel_mov.at(1).rows()-1),vel_mov.at(0).cols());
+                      }
+                  }else if((strcmp(mov_descr_1.c_str(),"plan")==0) && (strcmp(mov_descr_2.c_str(),"retreat")==0)){
+                      if(ii!=0 && traj_prev_retreat.rows()!=0){
+                          join_ret_plan = true;
+                          traj_ret_plan_app.resize((traj_prev_retreat.rows() + traj_mov.at(0).rows()-1),traj_mov.at(0).cols());
+                          vel_ret_plan_app.resize((vel_prev_retreat.rows() + vel_mov.at(0).rows()-1),vel_mov.at(0).cols());
+                      }
+                  }
+              }else{
+                  // there is only the plan stage
+                  if(ii!=0 && traj_prev_retreat.rows()!=0){
+                      join_ret_plan = true;
+                      traj_ret_plan_app.resize((traj_prev_retreat.rows() + traj_mov.at(0).rows()-1),traj_mov.at(0).cols());
+                      vel_ret_plan_app.resize((vel_prev_retreat.rows() + vel_mov.at(0).rows()-1),vel_mov.at(0).cols());
+                  }
+              }
+          }else{
+              // reaching, go-park
+              if(ii!=0 && traj_prev_retreat.rows()!=0){
+                  join_ret_plan = true;
+                  traj_ret_plan_app.resize((traj_prev_retreat.rows() + traj_mov.at(0).rows()-1),traj_mov.at(0).cols());
+                  vel_ret_plan_app.resize((vel_prev_retreat.rows() + vel_mov.at(0).rows()-1),vel_mov.at(0).cols());
+              }
+          }
+
           for(size_t j=0; j <traj_mov.size();++j){ //for loop stages
 
               string mov_descr = traj_descr_mov.at(j);
               if(strcmp(mov_descr.c_str(),"plan")==0){
                   plan=true; approach=false; retreat=false;
+                  if(join_ret_plan_app){
+                      traj_ret_plan_app.topLeftCorner(traj_prev_retreat.rows(),traj_prev_retreat.cols()) = traj_prev_retreat;
+                      vel_ret_plan_app.topLeftCorner(vel_prev_retreat.rows(),vel_prev_retreat.cols()) = vel_prev_retreat;
+                      timesteps_ret_plan_app.reserve(ttsteps_prev_retreat.size());
+                      std::copy (ttsteps_prev_retreat.begin(), ttsteps_prev_retreat.end(), std::back_inserter(timesteps_ret_plan_app));
+                      MatrixXd tt = traj_mov.at(j); MatrixXd tt_red = tt.bottomRows(tt.rows()-1);
+                      MatrixXd vv = vel_mov.at(j); MatrixXd vv_red = vv.bottomRows(vv.rows()-1);
+                      std::vector<double> ttsteps = timesteps_mov.at(j);
+                      traj_ret_plan_app.block(traj_prev_retreat.rows(),0,tt_red.rows(),tt_red.cols()) = tt_red;
+                      vel_ret_plan_app.block(vel_prev_retreat.rows(),0,vv_red.rows(),vv_red.cols()) = vv_red;
+                      timesteps_ret_plan_app.reserve(ttsteps.size()-1);
+                      std::copy (ttsteps.begin(), ttsteps.end(), std::back_inserter(timesteps_ret_plan_app));
+                      traj_prev_retreat.resize(0,0);
+                      continue;
+                  }else if(join_ret_plan){
+                      traj_ret_plan_app.topLeftCorner(traj_prev_retreat.rows(),traj_prev_retreat.cols()) = traj_prev_retreat;
+                      vel_ret_plan_app.topLeftCorner(vel_prev_retreat.rows(),vel_prev_retreat.cols()) = vel_prev_retreat;
+                      timesteps_ret_plan_app.reserve(ttsteps_prev_retreat.size());
+                      std::copy (ttsteps_prev_retreat.begin(), ttsteps_prev_retreat.end(), std::back_inserter(timesteps_ret_plan_app));
+                      MatrixXd tt = traj_mov.at(j); MatrixXd tt_red = tt.bottomRows(tt.rows()-1);
+                      MatrixXd vv = vel_mov.at(j); MatrixXd vv_red = vv.bottomRows(vv.rows()-1);
+                      std::vector<double> ttsteps = timesteps_mov.at(j);
+                      traj_ret_plan_app.bottomLeftCorner(tt_red.rows(),tt_red.cols()) = tt_red;
+                      vel_ret_plan_app.bottomLeftCorner(vv_red.rows(),vv_red.cols()) = vv_red;
+                      timesteps_ret_plan_app.reserve(ttsteps.size()-1);
+                      std::copy (ttsteps.begin(), ttsteps.end(), std::back_inserter(timesteps_ret_plan_app));
+                      traj_prev_retreat.resize(0,0);
+                  }else if(join_plan_app){
+                      MatrixXd tt = traj_mov.at(j);
+                      MatrixXd vv = vel_mov.at(j);
+                      std::vector<double> ttsteps = timesteps_mov.at(j);
+                      traj_ret_plan_app.topLeftCorner(tt.rows(),tt.cols()) = tt;
+                      vel_ret_plan_app.topLeftCorner(vv.rows(),vv.cols()) = vv;
+                      timesteps_ret_plan_app.reserve(ttsteps.size());
+                      std::copy (ttsteps.begin(), ttsteps.end(), std::back_inserter(timesteps_ret_plan_app));
+                      continue;
+                  }
               }else if(strcmp(mov_descr.c_str(),"approach")==0){
                   plan=false; approach=true; retreat=false;
+                  if(join_ret_plan_app || join_plan_app){
+                      MatrixXd tt = traj_mov.at(j); MatrixXd tt_red = tt.bottomRows(tt.rows()-1);
+                      MatrixXd vv = vel_mov.at(j); MatrixXd vv_red = vv.bottomRows(vv.rows()-1);
+                      std::vector<double> ttsteps = timesteps_mov.at(j);
+                      traj_ret_plan_app.bottomLeftCorner(tt_red.rows(),tt_red.cols()) = tt_red;
+                      vel_ret_plan_app.bottomLeftCorner(vv_red.rows(),vv_red.cols()) = vv_red;
+                      timesteps_ret_plan_app.reserve(ttsteps.size()-1);
+                      std::copy (ttsteps.begin()+1, ttsteps.end(), std::back_inserter(timesteps_ret_plan_app));
+                  }else if(join_ret_plan){
+                      // ERROR
+                  }
               }else if(strcmp(mov_descr.c_str(),"retreat")==0){
                   plan=false; approach=false; retreat=true;
+                  traj_prev_retreat = traj_mov.at(j);
+                  vel_prev_retreat = vel_mov.at(j);
+                  ttsteps_prev_retreat = timesteps_mov.at(j);
+
               }
 
               switch (mov_type){
@@ -3660,17 +3828,20 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                           if (srvset_parent.response.result != 1){
                               log(QNode::Error,string("Error in grasping the object "));
                           }
-      //#if HAND == 1
-                      //this->closeBarrettHand(arm_code);
-      //#endif
+#if HAND == 1
+                      this->closeBarrettHand(arm_code);
+#else
+                      closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
+#endif
                       }
+                      continue;
                   }
                   break;
               case 1: // reaching
                   break;
               case 2: case 3: // transport, engage
                   if(retreat){
-                      closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
+                      //
                       //ros::spinOnce();// handle ROS messages
                       if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
                           add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
@@ -3685,9 +3856,17 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                               }
                           //}
                       }
-      //#if HAND ==1
-      //              this->openBarrettHand(arm_code);
-      //#endif
+#if HAND ==1
+                  //this->openBarrettHand(arm_code);
+                  MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
+                  std::vector<double> hand_init_pos;
+                  hand_init_pos.resize(init_h_posture.size());
+                  VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                  this->openBarrettHand_to_pos(arm_code,hand_init_pos);
+#else
+                  closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
+#endif
+                      continue;
                   }
                   break;
               case 4:// disengage
@@ -3696,11 +3875,18 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                   break;
               }
 
-              MatrixXd traj = traj_mov.at(j);
-              MatrixXd vel = vel_mov.at(j);
+              if((join_ret_plan && (strcmp(mov_descr.c_str(),"plan")==0)) || ((join_ret_plan_app || join_plan_app) && (strcmp(mov_descr.c_str(),"approach")==0))){
+                  traj = traj_ret_plan_app;
+                  vel = vel_ret_plan_app;
+                  timesteps_stage = timesteps_ret_plan_app;
+              }else{
+                  traj = traj_mov.at(j);
+                  vel = vel_mov.at(j);
+                  timesteps_stage = timesteps_mov.at(j);
+              }
+
               f_posture = traj.row(traj.rows()-1);
-              f_reached=false;
-              timesteps_stage = timesteps_mov.at(j);
+              f_reached=false;              
               tol_stop_stage = tols_stop_mov.at(j);
 
               ros::spinOnce(); // handle ROS messages
@@ -3720,7 +3906,8 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                     // 5. Let's prepare a publisher of those values:
                     ros::Publisher pub=node.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
                     tb = pre_time;
-                    for (int i = 0; i< vel.rows()-1; ++i){
+                    //for (int i = 0; i< vel.rows()-1; ++i){
+                    for (int i = 1; i< vel.rows()-1; ++i){
 
                         //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
 
@@ -3879,7 +4066,9 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                                     log(QNode::Error,string("Error in grasping the object "));
                                 }
 //#if HAND == 1
-                        //this->closeBarrettHand(arm_code);
+  //                      this->closeBarrettHand(arm_code);
+//#else
+  //                      closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
 //#endif
                             }
                         }
@@ -4945,6 +5134,62 @@ for (size_t i = 0; i < HAND_FINGERS; i++){
 
 }
 
+bool QNode::openBarrettHand_to_pos(int hand, std::vector<double>& hand_posture)
+{
+
+    MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
+    ros::NodeHandle node;
+    std::vector<double> hand2_pos;
+
+    switch (hand) {
+    case 1: // right hand
+        hand_handles = right_hand_handles;
+        hand2_pos = right_2hand_pos;
+        break;
+    case 2: // left hand
+        hand_handles = left_hand_handles;
+        hand2_pos = left_2hand_pos;
+        break;
+    }
+
+    // set the target position
+    ros::ServiceClient client_setTarPos = node.serviceClient<vrep_common::simRosSetJointTargetPosition>("/vrep/simRosSetJointTargetPosition");
+    vrep_common::simRosSetJointTargetPosition srv_setTarPos;
+
+    // set Object int parameter
+    ros::ServiceClient client_setIntParam = node.serviceClient<vrep_common::simRosSetObjectIntParameter>("/vrep/simRosSetObjectIntParameter");
+    vrep_common::simRosSetObjectIntParameter srv_setObjInt;
+
+    for (size_t i = 0; i < HAND_FINGERS; ++i){
+        // set the position control
+        srv_setObjInt.request.handle = hand_handles(i,1);
+        srv_setObjInt.request.parameter = 2001;
+        srv_setObjInt.request.parameterValue = 1;
+        client_setIntParam.call(srv_setObjInt);
+        // set the target position
+        srv_setTarPos.request.handle = hand_handles(i,1);
+        srv_setTarPos.request.targetPosition = hand_posture.at(i+1);
+        client_setTarPos.call(srv_setTarPos);
+
+        // second joint in position control
+        // set the position control
+        srv_setObjInt.request.handle = hand_handles(i,2);
+        srv_setObjInt.request.parameter = 2001;
+        srv_setObjInt.request.parameterValue = 1;
+        client_setIntParam.call(srv_setObjInt);
+        // set the target position
+        srv_setTarPos.request.handle = hand_handles(i,2);
+        srv_setTarPos.request.targetPosition = 45.0f*static_cast<double>(M_PI) / 180.0f + hand_posture.at(i+1)/3.0f ;
+        client_setTarPos.call(srv_setTarPos);
+
+        firstPartLocked[i] = false;
+        needFullOpening[i] = 0;
+        closed[i]=false;
+
+    }
+    log(QNode::Info,string("Hand open."));
+    return true;
+}
 
 bool QNode::openBarrettHand(int hand)
 {
@@ -4998,14 +5243,14 @@ while (ros::ok() && simulationRunning && (closed[0] || closed[1] || closed[2]) &
         break;
     }
 
-    /*
 
-    BOOST_LOG_SEV(lg, info) << "cnt: " << cnt << ", "<< "Hand posture: "
-                            << hand_posture.at(0)<< " "
-                            << hand_posture.at(1)<< " "
-                            << hand_posture.at(2)<< " "
-                            << hand_posture.at(3)<< " "   ;
-                            */
+
+    //BOOST_LOG_SEV(lg, info) << "cnt: " << cnt << ", "<< "Hand posture: "
+      //                      << hand_posture.at(0)<< " "
+       //                     << hand_posture.at(1)<< " "
+        //                    << hand_posture.at(2)<< " "
+        //                    << hand_posture.at(3)<< " "   ;
+
 
 
     for (size_t i = 0; i < HAND_FINGERS; i++){
@@ -5023,6 +5268,7 @@ while (ros::ok() && simulationRunning && (closed[0] || closed[1] || closed[2]) &
 
             if(hand2_pos.at(i) < 45.5*static_cast<double>(M_PI) / 180.0){
                 // unlock the first part
+
                 // set the velocity control
                 srv_setObjInt.request.handle = hand_handles(i,1);
                 srv_setObjInt.request.parameter = 2001;
@@ -5033,6 +5279,8 @@ while (ros::ok() && simulationRunning && (closed[0] || closed[1] || closed[2]) &
                 srv_setTarVel.request.handle = hand_handles(i,1);
                 srv_setTarVel.request.targetVelocity = openingVel;
                 client_setTarVel.call(srv_setTarVel);
+
+
 
                 firstPartLocked[i] = false;
 
@@ -5079,14 +5327,11 @@ while (ros::ok() && simulationRunning && (closed[0] || closed[1] || closed[2]) &
                 srv_setTarVel.request.targetVelocity = openingVel;
                 client_setTarVel.call(srv_setTarVel);
 
-                //second joint position is 1/3 of the first
-                srv_setTarPos.request.handle = hand_handles(i,2);
-                srv_setTarPos.request.targetPosition = 45.0f*static_cast<double>(M_PI) / 180.0f + hand_posture.at(i+1)/3.0f ;
-                client_setTarPos.call(srv_setTarPos);
+
 
                 //BOOST_LOG_SEV(lg, info) << "hand posture " << i << hand_posture.at(i+1) <<" Full opening NOT needed ";
 
-                if ( hand_posture.at(i+1) <= 5.0f*static_cast<double>(M_PI) / 180.0f){
+                if ( hand_posture.at(i+1) <= 36.0f*static_cast<double>(M_PI) / 180.0f){
 
                     closed[i]=false;
 
@@ -5112,6 +5357,8 @@ while (ros::ok() && simulationRunning && (closed[0] || closed[1] || closed[2]) &
 }// while loop
 
 
+
+
 for (size_t i = 0; i < HAND_FINGERS; i++){
     // set the position control
     srv_setObjInt.request.handle = hand_handles(i,1);
@@ -5127,9 +5374,10 @@ for (size_t i = 0; i < HAND_FINGERS; i++){
     srv_setObjInt.request.parameter = 2001;
     srv_setObjInt.request.parameterValue = 1;
     client_setIntParam.call(srv_setObjInt);
+
 }
 
-log(QNode::Info,string("Hand opened."));
+log(QNode::Info,string("Hand open."));
 return true;
 
 }
