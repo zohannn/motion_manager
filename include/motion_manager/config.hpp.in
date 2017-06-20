@@ -4,6 +4,9 @@
 #define PATH_SCENARIOS "@PATH_SCENARIOS@"
 // HAND
 #define HAND @HAND@
+// OPEN_CLOSE_HAND
+#define OPEN_CLOSE_HAND @OPEN_CLOSE_HAND@
+
 // Execution of the trajectory
 #define VEL @VEL@
 

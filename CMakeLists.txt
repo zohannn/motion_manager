@@ -114,6 +114,10 @@ endif()
 # HAND=0. Human hand
 # HAND=1. Barrett hand
 set (HAND 1)
+# OPEN_CLOSE_HAND=0. do not use the open and close hand functions
+# OPEN_CLOSE_HAND=1. use the open and close hand functions
+set (OPEN_CLOSE_HAND 0)
+
 
 ## Execution of the trajectory
 # VEL=0. Execution with position

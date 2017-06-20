@@ -1937,7 +1937,11 @@ void MainWindow::on_pushButton_execTask_pressed(){
 
 void MainWindow::on_pushButton_execTask_clicked()
 {
-    qnode.execTask(this->jointsPosition_task,this->jointsVelocity_task,this->timesteps_task, this->tols_stop_task, this->traj_descr_task,this->curr_task, this->curr_scene);
+    if(ui.checkBox_comp_exec->isChecked()){
+        qnode.execTask_complete(this->jointsPosition_task,this->jointsVelocity_task,this->timesteps_task, this->tols_stop_task, this->traj_descr_task,this->curr_task, this->curr_scene);
+    }else{
+        qnode.execTask(this->jointsPosition_task,this->jointsVelocity_task,this->timesteps_task, this->tols_stop_task, this->traj_descr_task,this->curr_task, this->curr_scene);
+    }
 }
 
 

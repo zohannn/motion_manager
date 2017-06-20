@@ -887,7 +887,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_mov">
        <attribute name="title">
@@ -1109,6 +1109,19 @@ p, li { white-space: pre-wrap; }
            <width>631</width>
            <height>181</height>
           </rect>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="checkBox_comp_exec">
+         <property name="geometry">
+          <rect>
+           <x>450</x>
+           <y>220</y>
+           <width>171</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>complete execution</string>
          </property>
         </widget>
        </widget>

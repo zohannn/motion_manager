@@ -37,11 +37,8 @@ Hand_tip_3=5
 lambda_1=0.95
 
 lambda_2=0.99
-
-lambda_3=1.0
-
-lambda_4=1.0
-
+lambda_3=1
+lambda_4=1
 lambda_5=1.0
 
 lambda_6=1.0
@@ -164,18 +161,15 @@ tar_yz_2=0
 tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
-obs_xx_1=35
-obs_xx_2=35
-obs_xx_3=35
-obs_yy_1=15
-obs_yy_2=15
-obs_yy_3=15
+obs_xx_1=30
+obs_xx_2=30
+obs_xx_3=30
+obs_yy_1=55
+obs_yy_2=55
+obs_yy_3=55
 obs_zz_1=0
-
 obs_zz_2=0
-
 obs_zz_3=0
-
 obs_xy_1=0
 
 obs_xy_2=0

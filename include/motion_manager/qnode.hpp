@@ -158,6 +158,18 @@ public:
         bool execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double> > > &timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task,taskPtr task, scenarioPtr scene);
 
         /**
+         * @brief execTask_complete
+         * @param traj_task
+         * @param vel_task
+         * @param timesteps_task
+         * @param tols_stop_task
+         * @param traj_descr_task
+         * @param task
+         * @param scene
+         * @return
+         */
+        bool execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double> > > &timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task,taskPtr task, scenarioPtr scene);
+        /**
          * @brief This method sets to zero the time of simulation
          */
         void resetSimTime();
