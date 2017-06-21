@@ -3191,6 +3191,7 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
     this->curr_mov = mov; int mov_type = mov->getType();  int arm_code = mov->getArm();
     bool plan; bool approach; bool retreat;
     bool hand_closed;
+
     switch (mov_type){
     case 0: case 1: case 5: // reach-to-grasp, reaching, go-park
         closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
@@ -3199,6 +3200,7 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
         closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
         break;
     }
+
 
     ros::NodeHandle node;
     double ta;
@@ -3323,7 +3325,11 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
 #if HAND == 1 && OPEN_CLOSE_HAND ==1
                 this->closeBarrettHand(arm_code);
 #else
-                closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
+                MatrixXd tt = traj_mov.at(k); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
+                std::vector<double> hand_init_pos;
+                hand_init_pos.resize(init_h_posture.size());
+                VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                this->closeBarrettHand_to_pos(arm_code,hand_init_pos);
 #endif
                 }
             }
@@ -3355,7 +3361,7 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
               VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
               this->openBarrettHand_to_pos(arm_code,hand_init_pos);
 #else
-             closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
+            closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
 #endif
             }
             break;
@@ -3678,6 +3684,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
               break;
           }
 
+
           switch (arm_code) {
           case 0: // dual arm
               // TODO
@@ -3726,7 +3733,11 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
 #if HAND == 1 && OPEN_CLOSE_HAND ==1
                       this->closeBarrettHand(arm_code);
 #else
-                      closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
+                      MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
+                      std::vector<double> hand_init_pos;
+                      hand_init_pos.resize(init_h_posture.size());
+                      VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                      this->closeBarrettHand_to_pos(arm_code,hand_init_pos);
 #endif
                       }
                   }
@@ -4079,6 +4090,7 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
           arm_code = mov->getArm();
           mov_type = mov->getType();
 
+
           switch (mov_type){
           case 0: case 1: case 5: // reach-to-grasp, reaching, go-park
               closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
@@ -4087,6 +4099,7 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
               closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
               break;
           }
+
 
           switch (arm_code) {
           case 0: // dual arm
@@ -4235,7 +4248,11 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
 #if HAND == 1 && OPEN_CLOSE_HAND ==1
                       this->closeBarrettHand(arm_code);
 #else
-                      closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
+                      MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
+                      std::vector<double> hand_init_pos;
+                      hand_init_pos.resize(init_h_posture.size());
+                      VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                      this->closeBarrettHand_to_pos(arm_code,hand_init_pos);
 #endif
                       }
                       continue;
@@ -5592,6 +5609,63 @@ bool QNode::openBarrettHand_to_pos(int hand, std::vector<double>& hand_posture)
 
     }
     log(QNode::Info,string("Hand open."));
+    return true;
+}
+
+bool QNode::closeBarrettHand_to_pos(int hand, std::vector<double>& hand_posture)
+{
+
+    MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
+    ros::NodeHandle node;
+    std::vector<double> hand2_pos;
+
+    switch (hand) {
+    case 1: // right hand
+        hand_handles = right_hand_handles;
+        hand2_pos = right_2hand_pos;
+        break;
+    case 2: // left hand
+        hand_handles = left_hand_handles;
+        hand2_pos = left_2hand_pos;
+        break;
+    }
+
+    // set the target position
+    ros::ServiceClient client_setTarPos = node.serviceClient<vrep_common::simRosSetJointTargetPosition>("/vrep/simRosSetJointTargetPosition");
+    vrep_common::simRosSetJointTargetPosition srv_setTarPos;
+
+    // set Object int parameter
+    ros::ServiceClient client_setIntParam = node.serviceClient<vrep_common::simRosSetObjectIntParameter>("/vrep/simRosSetObjectIntParameter");
+    vrep_common::simRosSetObjectIntParameter srv_setObjInt;
+
+    for (size_t i = 0; i < HAND_FINGERS; ++i){
+        // set the position control
+        srv_setObjInt.request.handle = hand_handles(i,1);
+        srv_setObjInt.request.parameter = 2001;
+        srv_setObjInt.request.parameterValue = 1;
+        client_setIntParam.call(srv_setObjInt);
+        // set the target position
+        srv_setTarPos.request.handle = hand_handles(i,1);
+        srv_setTarPos.request.targetPosition = hand_posture.at(i+1);
+        client_setTarPos.call(srv_setTarPos);
+
+        // second joint in position control
+        // set the position control
+        srv_setObjInt.request.handle = hand_handles(i,2);
+        srv_setObjInt.request.parameter = 2001;
+        srv_setObjInt.request.parameterValue = 1;
+        client_setIntParam.call(srv_setObjInt);
+        // set the target position
+        srv_setTarPos.request.handle = hand_handles(i,2);
+        srv_setTarPos.request.targetPosition = 45.0f*static_cast<double>(M_PI) / 180.0f + hand_posture.at(i+1)/3.0f ;
+        client_setTarPos.call(srv_setTarPos);
+
+        firstPartLocked[i] = true;
+        needFullOpening[i] = 1;
+        closed[i]=true;
+
+    }
+    log(QNode::Info,string("Hand closed."));
     return true;
 }
 

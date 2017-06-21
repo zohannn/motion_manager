@@ -1,0 +1,9 @@
+[Desktop Entry]
+Comment=ARoS Motion Manager
+Terminal=true
+Name=Motion Manager
+Exec=bash -i -c "roslaunch motion_manager aros_motion_manager.launch"  
+Type=Application
+Icon=/home/gianpaolo/catkin_ws/src/motion_manager/resources/images/motion_managerIcon.png
+Name[en_US]=Motion Manager
+Categories=Development;IDE;

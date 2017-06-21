@@ -1,0 +1,11 @@
+<launch>
+	<arg name="moveit" default="1" />
+	<group if="$(arg moveit)">
+			<include file="$(find aros_moveit_config)/launch/demo.launch" />
+	</group>
+    <node name="motion_manager_vrep" pkg="motion_manager" type="motion_manager_vrep.sh"  output="screen">
+    </node>
+
+	<node name="motion_manager" pkg="motion_manager" type="motion_manager" />
+
+</launch>
