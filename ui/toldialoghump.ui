@@ -3356,12 +3356,39 @@
     </item>
    </layout>
   </widget>
+  <widget class="QWidget" name="layoutWidget_max_vel_2">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>700</y>
+     <width>311</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_22">
+    <item>
+     <widget class="QLabel" name="label_42">
+      <property name="text">
+       <string>Max Acceleration of the joints [deg/sec²]</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="lineEdit_alpha_max">
+      <property name="text">
+       <string>10.0</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
   <zorder>layoutWidget</zorder>
   <zorder>layoutWidget</zorder>
   <zorder>layoutWidget_max_vel</zorder>
   <zorder>groupBox_constraints</zorder>
   <zorder>tabWidget</zorder>
   <zorder>groupBox_constraints_2</zorder>
+  <zorder>layoutWidget_max_vel_2</zorder>
  </widget>
  <resources/>
  <connections>
