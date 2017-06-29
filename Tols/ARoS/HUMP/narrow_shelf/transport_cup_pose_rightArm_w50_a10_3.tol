@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Go park, Arm: right, Object: , Object Engaged: , Pose: , Grip Type: 
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: Cup, Object Engaged: , Pose: Cup_pose, Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80
 
@@ -34,14 +34,14 @@ Hand_tip_2=5
 Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=1
+lambda_1=0.95
 lambda_2=1
 
-lambda_3=1.0
+lambda_3=1
 
-lambda_4=1.0
+lambda_4=1
 
-lambda_5=1.0
+lambda_5=1
 
 lambda_6=1.0
 
@@ -56,28 +56,17 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=0
-
-init_vel_2=0
-
-init_vel_3=0
-
-init_vel_4=0
-
-init_vel_5=0
-
-init_vel_6=0
-
-init_vel_7=0
-
+init_vel_1=-0.0636186
+init_vel_2=0.00398585
+init_vel_3=-0.0228984
+init_vel_4=-0.0494693
+init_vel_5=-0.0335724
+init_vel_6=-0.000203924
+init_vel_7=-0.0062985
 init_vel_8=0
-
 init_vel_9=0
-
 init_vel_10=0
-
 init_vel_11=0
-
 # Final Velocity 
 final_vel_1=0
 
@@ -102,28 +91,17 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=0
-
-init_acc_2=0
-
-init_acc_3=0
-
-init_acc_4=0
-
-init_acc_5=0
-
-init_acc_6=0
-
-init_acc_7=0
-
+init_acc_1=0.163888
+init_acc_2=-0.010268
+init_acc_3=0.0589886
+init_acc_4=0.127438
+init_acc_5=0.0864859
+init_acc_6=0.000525329
+init_acc_7=0.0162256
 init_acc_8=0
-
 init_acc_9=0
-
 init_acc_10=0
-
 init_acc_11=0
-
 # Final Acceleration 
 final_acc_1=0
 
@@ -185,36 +163,31 @@ tar_yz_2=0
 tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
-obs_xx_1=0
+obs_xx_1=10
+obs_xx_2=70
 
-obs_xx_2=0
+obs_xx_3=67
 
-obs_xx_3=0
+obs_yy_1=20
 
-obs_yy_1=0
+obs_yy_2=15
 
-obs_yy_2=0
+obs_yy_3=15
 
-obs_yy_3=0
+obs_zz_1=15
 
-obs_zz_1=0
-
-obs_zz_2=0
+obs_zz_2=5
 
 obs_zz_3=0
-
 obs_xy_1=0
 
-obs_xy_2=0
+obs_xy_2=15
 
 obs_xy_3=0
 
 obs_xz_1=0
-
-obs_xz_2=0
-
+obs_xz_2=15
 obs_xz_3=0
-
 obs_yz_1=0
 
 obs_yz_2=0
@@ -222,47 +195,46 @@ obs_yz_2=0
 obs_yz_3=0
 
 # Tolerances for the final posture
-tar_pos=1.0
-
+tar_pos=1
 tar_or=0.001
 
 # Pick settings
 pre_grasp_x=0
 
-pre_grasp_y=1
+pre_grasp_y=0
 
 pre_grasp_z=0
 
-pre_grasp_dist=290
+pre_grasp_dist=0
 
 post_grasp_x=0
 
-post_grasp_y=0.996194698
+post_grasp_y=0
 
-post_grasp_z=0.087155743
+post_grasp_z=0
 
-post_grasp_dist=350
+post_grasp_dist=0
 
 # Place settings
 pre_place_x=0
 
-pre_place_y=0
+pre_place_y=0.99619
 
-pre_place_z=0
+pre_place_z=0.08715
 
-pre_place_dist=0
+pre_place_dist=320
 
 post_place_x=0
 
-post_place_y=0
+post_place_y=1
 
 post_place_z=0
 
-post_place_dist=0
+post_place_dist=350
 
-w_red_app=1
+w_red_app=8
 
-w_red_ret=1
+w_red_ret=8
 
 # Move settings
 target_x=-400
