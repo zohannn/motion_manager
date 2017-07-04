@@ -1883,7 +1883,7 @@ void MainWindow::on_pushButton_execMov_moveit_pressed()
 
 void MainWindow::on_pushButton_execMov_clicked()
 {
-    qnode.execMovement(this->jointsPosition_mov,this->jointsVelocity_mov,this->timesteps_mov, this->tols_stop_mov, this->traj_descr_mov, this->curr_mov, this->curr_scene);
+    qnode.execMovement(this->jointsPosition_mov,this->jointsVelocity_mov,this->timesteps_mov, this->tols_stop_mov, this->traj_descr_mov, this->curr_mov, this->curr_scene,this->moveit_mov);
 }
 #if MOVEIT==1
 void MainWindow::on_pushButton_execMov_moveit_clicked()
@@ -1939,7 +1939,7 @@ void MainWindow::on_pushButton_execTask_pressed(){
 void MainWindow::on_pushButton_execTask_clicked()
 {
     if(ui.checkBox_comp_exec->isChecked()){
-        qnode.execTask_complete(this->jointsPosition_task,this->jointsVelocity_task,this->timesteps_task, this->tols_stop_task, this->traj_descr_task,this->curr_task, this->curr_scene);
+        qnode.execTask_complete(this->jointsPosition_task,this->jointsVelocity_task,this->timesteps_task, this->tols_stop_task, this->traj_descr_task,this->curr_task, this->curr_scene,this->moveit_task);
     }else{
         qnode.execTask(this->jointsPosition_task,this->jointsVelocity_task,this->timesteps_task, this->tols_stop_task, this->traj_descr_task,this->curr_task, this->curr_scene);
     }
@@ -2061,18 +2061,19 @@ void MainWindow::on_pushButton_load_task_clicked()
                 }
 
                 //get the planner id
+                this->moveit_task = false;
                 if(QString::compare(plan_type,QString("HUMP"),Qt::CaseInsensitive)==0){
                     plan_id=0;
                 }else if(QString::compare(plan_type,QString("RRT"),Qt::CaseInsensitive)==0){
-                    plan_id=1;
+                    plan_id=1; this->moveit_task = true;
                 }else if(QString::compare(plan_type,QString("RRTConnect"),Qt::CaseInsensitive)==0){
-                    plan_id=2;
+                    plan_id=2; this->moveit_task = true;
                 }else if(QString::compare(plan_type,QString("RRTstar"),Qt::CaseInsensitive)==0){
-                    plan_id=3;
+                    plan_id=3; this->moveit_task = true;
                 }else if(QString::compare(plan_type,QString("PRM"),Qt::CaseInsensitive)==0){
-                    plan_id=4;
+                    plan_id=4; this->moveit_task = true;
                 }else if(QString::compare(plan_type,QString("PRMstar"),Qt::CaseInsensitive)==0){
-                    plan_id=5;
+                    plan_id=5; this->moveit_task = true;
                 }
 
                 // get the grip type
@@ -2632,8 +2633,10 @@ void MainWindow::on_pushButton_append_mov_clicked()
 
     ui.tableWidget_sol_task->clear();
     ui.pushButton_save_task->setEnabled(true);
+    this->moveit_task = false;
 
     if(curr_task->getProblem(ui.listWidget_movs->currentRow())->getSolved()){
+        if(curr_task->getProblem(ui.listWidget_movs->currentRow())->getPlannerID()!=0){this->moveit_task = true;}
         this->jointsPosition_task.push_back(this->jointsPosition_mov);
         this->jointsVelocity_task.push_back(this->jointsVelocity_mov);
         this->jointsAcceleration_task.push_back(this->jointsAcceleration_mov);

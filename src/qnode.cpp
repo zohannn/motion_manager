@@ -3183,7 +3183,7 @@ void QNode::leftProxCallback(const vrep_common::ProximitySensorData& data)
 }
 
 
-bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>& vel_mov, std::vector<std::vector<double>> timesteps, std::vector<double> tols_stop, std::vector<string>& traj_descr,movementPtr mov, scenarioPtr scene)
+bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>& vel_mov, std::vector<std::vector<double>> timesteps, std::vector<double> tols_stop, std::vector<string>& traj_descr,movementPtr mov, scenarioPtr scene, bool moveit_mov)
 {
 
     this->curr_scene = scene;
@@ -3301,8 +3301,13 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
                 std::vector<double> ttsteps = timesteps.at(k);
                 traj_plan_approach.bottomLeftCorner(tt_red.rows(),tt_red.cols()) = tt_red;
                 vel_plan_approach.bottomLeftCorner(vv_red.rows(),vv_red.cols()) = vv_red;
-                timesteps_plan_approach.reserve(ttsteps.size()-1);
-                std::copy (ttsteps.begin()+1, ttsteps.end(), std::back_inserter(timesteps_plan_approach));
+                if(moveit_mov){
+                    timesteps_plan_approach.reserve(ttsteps.size());
+                    std::copy (ttsteps.begin(), ttsteps.end(), std::back_inserter(timesteps_plan_approach));
+                }else{
+                    timesteps_plan_approach.reserve(ttsteps.size()-1);
+                    std::copy (ttsteps.begin()+1, ttsteps.end(), std::back_inserter(timesteps_plan_approach));
+                }
             }
         }else if(strcmp(mov_descr.c_str(),"retreat")==0){
             plan=false; approach=false; retreat=true;
@@ -3407,8 +3412,10 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
         //BOOST_LOG_SEV(lg, info) << "pre_time = " << pre_time ;
 
         tb = pre_time;
-        //for (int i = 0; i< vel.rows()-1; ++i){
-        for (int i = 1; i< vel.rows()-1; ++i){
+        int start = 1;
+        if(moveit_mov){start=0;}
+        for (int i = start; i< vel.rows()-1; ++i){
+        //for (int i = 1; i< vel.rows()-1; ++i){
             //BOOST_LOG_SEV(lg, info) << "Stage = " << k;
             //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
             VectorXd ya = vel.row(i);
@@ -3418,7 +3425,11 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
             //BOOST_LOG_SEV(lg, info) << "timeTot = " << timeTot;
             //BOOST_LOG_SEV(lg, info) << "timesteps_stage = " << timesteps_stage.at(i);
             ta = tb;
-            tb = ta + timesteps_stage.at(i);
+            double tt_step = timesteps_stage.at(i);
+            if(tt_step<0.001){tt_step = MIN_TIMESTEP_VALUE;}
+            tb = ta + tt_step;
+            //tb = ta + timesteps_stage.at(i);
+
             //BOOST_LOG_SEV(lg, info) << "ta = " << ta;
             //BOOST_LOG_SEV(lg, info) << "tb = " << tb << "\n";
             bool interval = true;
@@ -3814,7 +3825,10 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                         VectorXd ybt = traj.row(i+1);
 
                         ta = tb;
-                        tb = ta + timesteps_stage.at(i);
+                        double tt_step = timesteps_stage.at(i);
+                        if(tt_step<0.001){tt_step = MIN_TIMESTEP_VALUE;}
+                        tb = ta + tt_step;
+                        //tb = ta + timesteps_stage.at(i);
 
                         //BOOST_LOG_SEV(lg, info) << "ta = " << ta;
                         //BOOST_LOG_SEV(lg, info) << "tb = " << tb << "\n";
@@ -4017,7 +4031,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
 
 }
 
-bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double>>>& timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task,taskPtr task, scenarioPtr scene)
+bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double>>>& timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task, taskPtr task, scenarioPtr scene, bool moveit_task)
 {
     bool hand_closed; closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
     ros::NodeHandle node;
@@ -4183,7 +4197,11 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
                       std::vector<double> ttsteps = timesteps_mov.at(j);
                       traj_ret_plan_app.block(traj_prev_retreat.rows(),0,tt_red.rows(),tt_red.cols()) = tt_red;
                       vel_ret_plan_app.block(vel_prev_retreat.rows(),0,vv_red.rows(),vv_red.cols()) = vv_red;
-                      timesteps_ret_plan_app.reserve(ttsteps.size()-1);
+                      if(moveit_task){
+                          timesteps_ret_plan_app.reserve(ttsteps.size());
+                      }else{
+                        timesteps_ret_plan_app.reserve(ttsteps.size()-1);
+                      }
                       std::copy (ttsteps.begin(), ttsteps.end(), std::back_inserter(timesteps_ret_plan_app));
                       traj_prev_retreat.resize(0,0);
                       continue;
@@ -4197,7 +4215,11 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
                       std::vector<double> ttsteps = timesteps_mov.at(j);
                       traj_ret_plan_app.bottomLeftCorner(tt_red.rows(),tt_red.cols()) = tt_red;
                       vel_ret_plan_app.bottomLeftCorner(vv_red.rows(),vv_red.cols()) = vv_red;
-                      timesteps_ret_plan_app.reserve(ttsteps.size()-1);
+                      if(moveit_task){
+                        timesteps_ret_plan_app.reserve(ttsteps.size());
+                      }else{
+                        timesteps_ret_plan_app.reserve(ttsteps.size()-1);
+                      }
                       std::copy (ttsteps.begin(), ttsteps.end(), std::back_inserter(timesteps_ret_plan_app));
                       traj_prev_retreat.resize(0,0);
                   }else if(join_plan_app){
@@ -4218,8 +4240,13 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
                       std::vector<double> ttsteps = timesteps_mov.at(j);
                       traj_ret_plan_app.bottomLeftCorner(tt_red.rows(),tt_red.cols()) = tt_red;
                       vel_ret_plan_app.bottomLeftCorner(vv_red.rows(),vv_red.cols()) = vv_red;
-                      timesteps_ret_plan_app.reserve(ttsteps.size()-1);
-                      std::copy (ttsteps.begin()+1, ttsteps.end(), std::back_inserter(timesteps_ret_plan_app));
+                      if(moveit_task){
+                        timesteps_ret_plan_app.reserve(ttsteps.size());
+                        std::copy (ttsteps.begin(), ttsteps.end(), std::back_inserter(timesteps_ret_plan_app));
+                      }else{
+                        timesteps_ret_plan_app.reserve(ttsteps.size()-1);
+                        std::copy (ttsteps.begin()+1, ttsteps.end(), std::back_inserter(timesteps_ret_plan_app));
+                      }
                   }else if(join_ret_plan){
                       // ERROR
                   }
@@ -4327,8 +4354,10 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
                     // 5. Let's prepare a publisher of those values:
                     ros::Publisher pub=node.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
                     tb = pre_time;
-                    //for (int i = 0; i< vel.rows()-1; ++i){
-                    for (int i = 1; i< vel.rows()-1; ++i){
+                    int start = 1;
+                    if(moveit_task){start=0;}
+                    for (int i = start; i< vel.rows()-1; ++i){
+                    //for (int i = 1; i< vel.rows()-1; ++i){
 
                         //BOOST_LOG_SEV(lg, info) << "Interval = " << i;
 
@@ -4338,7 +4367,10 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
                         VectorXd ybt = traj.row(i+1);
 
                         ta = tb;
-                        tb = ta + timesteps_stage.at(i);
+                        double tt_step = timesteps_stage.at(i);
+                        if(tt_step<0.001){tt_step = MIN_TIMESTEP_VALUE;}
+                        tb = ta + tt_step;
+                        //tb = ta + timesteps_stage.at(i);
 
                         //BOOST_LOG_SEV(lg, info) << "ta = " << ta;
                         //BOOST_LOG_SEV(lg, info) << "tb = " << tb << "\n";
