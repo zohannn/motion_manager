@@ -51,7 +51,7 @@ typedef boost::shared_ptr<Scenario> scenarioPtr;/**< shared pointer to the curre
 typedef boost::shared_ptr<Task> taskPtr; /**< shared pointer to the current task */
 
 
-const double MIN_TIMESTEP_VALUE = 0.1; /**< minimum value of the timestep during the execution of the movement [sec] */
+const double MIN_EXEC_TIMESTEP_VALUE = 0.3; /**< minimum value of the timestep during the execution of the movement [sec]. It is used to join the stages of the movements when timestep is zero*/
 //! The QNode class
 /**
  * @brief This method defines the ROS node and its functionalities
@@ -142,10 +142,9 @@ public:
          * @param traj_descr
          * @param mov
          * @param scene
-         * @param moveit_mov
          * @return
          */
-        bool execMovement(vector<MatrixXd>& traj_mov, vector<MatrixXd>& vel_mov, std::vector<std::vector<double> > timesteps, vector<double> tols_stop, std::vector<string>& traj_descr, movementPtr mov, scenarioPtr scene, bool moveit_mov);
+        bool execMovement(vector<MatrixXd>& traj_mov, vector<MatrixXd>& vel_mov, std::vector<std::vector<double> > timesteps, vector<double> tols_stop, std::vector<string>& traj_descr, movementPtr mov, scenarioPtr scene);
 
         /**
          * @brief execTask
@@ -169,10 +168,9 @@ public:
          * @param traj_descr_task
          * @param task
          * @param scene
-         * @param moveit_task
          * @return
          */
-        bool execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double> > > &timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task,taskPtr task, scenarioPtr scene, bool moveit_task);
+        bool execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double> > > &timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task, taskPtr task, scenarioPtr scene);
         /**
          * @brief This method sets to zero the time of simulation
          */

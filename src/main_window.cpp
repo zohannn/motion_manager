@@ -872,7 +872,11 @@ void MainWindow::on_pushButton_plan_clicked()
                     double t_stage = h_results->time_steps.at(i);
                     MatrixXd traj_stage = h_results->trajectory_stages.at(i);
                     for(int j=0;j<traj_stage.rows();++j){
-                        timesteps_stage_aux.push_back(t_stage);
+                        if(j==traj_stage.rows()-1){
+                            timesteps_stage_aux.push_back(0.0);
+                        }else{
+                            timesteps_stage_aux.push_back(t_stage);
+                        }
                     }
                     this->timesteps_mov.push_back(timesteps_stage_aux);
                 }
@@ -1883,7 +1887,7 @@ void MainWindow::on_pushButton_execMov_moveit_pressed()
 
 void MainWindow::on_pushButton_execMov_clicked()
 {
-    qnode.execMovement(this->jointsPosition_mov,this->jointsVelocity_mov,this->timesteps_mov, this->tols_stop_mov, this->traj_descr_mov, this->curr_mov, this->curr_scene,this->moveit_mov);
+    qnode.execMovement(this->jointsPosition_mov,this->jointsVelocity_mov,this->timesteps_mov, this->tols_stop_mov, this->traj_descr_mov, this->curr_mov, this->curr_scene);
 }
 #if MOVEIT==1
 void MainWindow::on_pushButton_execMov_moveit_clicked()
@@ -1939,7 +1943,7 @@ void MainWindow::on_pushButton_execTask_pressed(){
 void MainWindow::on_pushButton_execTask_clicked()
 {
     if(ui.checkBox_comp_exec->isChecked()){
-        qnode.execTask_complete(this->jointsPosition_task,this->jointsVelocity_task,this->timesteps_task, this->tols_stop_task, this->traj_descr_task,this->curr_task, this->curr_scene,this->moveit_task);
+        qnode.execTask_complete(this->jointsPosition_task,this->jointsVelocity_task,this->timesteps_task, this->tols_stop_task, this->traj_descr_task,this->curr_task, this->curr_scene);
     }else{
         qnode.execTask(this->jointsPosition_task,this->jointsVelocity_task,this->timesteps_task, this->tols_stop_task, this->traj_descr_task,this->curr_task, this->curr_scene);
     }
