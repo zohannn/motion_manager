@@ -34,7 +34,7 @@ Hand_tip_2=5
 Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=0.95
+lambda_1=1
 lambda_2=1
 
 lambda_3=1
@@ -56,13 +56,13 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.076153
-init_vel_2=0.0067099
-init_vel_3=-0.0297506
-init_vel_4=-0.0655873
-init_vel_5=-0.0347924
-init_vel_6=0.00882849
-init_vel_7=-0.0097725
+init_vel_1=-0.0861454
+init_vel_2=0.00943535
+init_vel_3=-0.0326593
+init_vel_4=-0.0603879
+init_vel_5=-0.0752869
+init_vel_6=-0.0123474
+init_vel_7=0.0280628
 init_vel_8=0
 init_vel_9=0
 init_vel_10=0
@@ -175,22 +175,19 @@ obs_yy_2=0
 
 obs_yy_3=0
 
-obs_zz_1=15
-
-obs_zz_2=5
+obs_zz_1=0
+obs_zz_2=0
 
 obs_zz_3=0
 
 obs_xy_1=0
 
-obs_xy_2=15
-
+obs_xy_2=0
 obs_xy_3=0
 
 obs_xz_1=0
 
-obs_xz_2=15
-
+obs_xz_2=0
 obs_xz_3=0
 
 obs_yz_1=0
