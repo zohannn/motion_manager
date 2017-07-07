@@ -1,13 +1,13 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_home, Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: BottleJuice_home, Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
 Elbow_radius=70.0
 
-Wrist_radius=130
+Wrist_radius=60
 
-Hand_radius=150
+Hand_radius=50
 
 Hand_1_1=25
 
@@ -34,7 +34,7 @@ Hand_tip_2=5
 Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=0.99
+lambda_1=1
 
 lambda_2=1
 
@@ -58,16 +58,27 @@ lambda_11=1.0
 
 # Initial Velocity 
 init_vel_1=0
+
 init_vel_2=0
+
 init_vel_3=0
+
 init_vel_4=0
+
 init_vel_5=0
+
 init_vel_6=0
+
 init_vel_7=0
+
 init_vel_8=0
+
 init_vel_9=0
+
 init_vel_10=0
+
 init_vel_11=0
+
 # Final Velocity 
 final_vel_1=0
 
@@ -93,16 +104,27 @@ final_vel_11=0.0
 
 # Initial Acceleration 
 init_acc_1=0
+
 init_acc_2=0
+
 init_acc_3=0
+
 init_acc_4=0
+
 init_acc_5=0
+
 init_acc_6=0
+
 init_acc_7=0
+
 init_acc_8=0
+
 init_acc_9=0
+
 init_acc_10=0
+
 init_acc_11=0
+
 # Final Acceleration 
 final_acc_1=0
 
@@ -165,19 +187,22 @@ tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
 obs_xx_1=50
+
 obs_xx_2=50
+
 obs_xx_3=50
-obs_yy_1=0
 
-obs_yy_2=0
+obs_yy_1=50
 
-obs_yy_3=0
+obs_yy_2=50
 
-obs_zz_1=0
+obs_yy_3=50
 
-obs_zz_2=0
+obs_zz_1=100
 
-obs_zz_3=0
+obs_zz_2=100
+
+obs_zz_3=100
 
 obs_xy_1=0
 
@@ -198,9 +223,9 @@ obs_yz_2=0
 obs_yz_3=0
 
 # Tolerances for the final posture
-tar_pos=2
+tar_pos=1.0
 
-tar_or=0.01
+tar_or=0.001
 
 # Pick settings
 pre_grasp_x=0
@@ -213,11 +238,11 @@ pre_grasp_dist=0
 
 post_grasp_x=0
 
-post_grasp_y=1
+post_grasp_y=0
 
 post_grasp_z=0
 
-post_grasp_dist=40
+post_grasp_dist=0
 
 # Place settings
 pre_place_x=0
@@ -226,15 +251,17 @@ pre_place_y=0
 
 pre_place_z=1
 
-pre_place_dist=60
+pre_place_dist=50
 
 post_place_x=0
 
-post_place_y=0
-post_place_z=1
+post_place_y=1
 
-post_place_dist=200
-w_red_app=3
+post_place_z=0
+
+post_place_dist=120
+
+w_red_app=5
 
 w_red_ret=5
 
@@ -295,7 +322,6 @@ plane_point3_z=0.0
 add_plane=false
 # Others
 max_velocity=50
-
 max_acceleration=10.0
 
 tar_av=true

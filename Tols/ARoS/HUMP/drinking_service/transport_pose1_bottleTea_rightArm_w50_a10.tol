@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: BottleJuice_pose1, Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
@@ -34,8 +34,7 @@ Hand_tip_2=5
 Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=1
-
+lambda_1=0.99
 lambda_2=1
 
 lambda_3=1.0
@@ -58,16 +57,27 @@ lambda_11=1.0
 
 # Initial Velocity 
 init_vel_1=-0.0499198
+
 init_vel_2=0.0600279
+
 init_vel_3=-0.0207313
+
 init_vel_4=-0.13316
+
 init_vel_5=0.00849172
+
 init_vel_6=0.0791558
+
 init_vel_7=0.0794029
+
 init_vel_8=0
+
 init_vel_9=0
+
 init_vel_10=0
+
 init_vel_11=0
+
 # Final Velocity 
 final_vel_1=0
 
@@ -93,16 +103,27 @@ final_vel_11=0.0
 
 # Initial Acceleration 
 init_acc_1=-0.0157362
+
 init_acc_2=0.0189226
+
 init_acc_3=-0.00653513
+
 init_acc_4=-0.0419762
+
 init_acc_5=0.00267685
+
 init_acc_6=0.0249523
+
 init_acc_7=0.0250302
+
 init_acc_8=0
+
 init_acc_9=0
+
 init_acc_10=0
+
 init_acc_11=0
+
 # Final Acceleration 
 final_acc_1=0
 

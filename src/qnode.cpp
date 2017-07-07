@@ -1922,13 +1922,17 @@ bool QNode::getElements(scenarioPtr scene)
 
         // this is the order of the poses in this scenario
         // pose_id = 0
-        poses_prefix.push_back("BottleTea_pose1");
+        poses_prefix.push_back("BottleJuice_pose1");
         poses_rel.push_back(true);
-        poses_obj_id.push_back(0);
+        poses_obj_id.push_back(2);
         // pose_id = 1
-        poses_prefix.push_back("BottleTea_pose2");
+        poses_prefix.push_back("BottleJuice_pose2");
         poses_rel.push_back(true);
-        poses_obj_id.push_back(0);
+        poses_obj_id.push_back(2);
+        // pose_id = 2
+        poses_prefix.push_back("BottleJuice_pose3");
+        poses_rel.push_back(true);
+        poses_obj_id.push_back(2);
 
         while(cnt_pose < n_poses){
             signPrefix = poses_prefix[cnt_pose];
