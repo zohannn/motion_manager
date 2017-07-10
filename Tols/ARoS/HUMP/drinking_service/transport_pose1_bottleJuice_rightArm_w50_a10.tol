@@ -1,13 +1,13 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Go park, Arm: right, Object: , Object Engaged: , Pose: , Grip Type: 
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: BottleJuice_pose1, Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
 Elbow_radius=70.0
 
-Wrist_radius=60
+Wrist_radius=130
 
-Hand_radius=50
+Hand_radius=100
 Hand_1_1=25
 
 Hand_1_2=25
@@ -33,9 +33,9 @@ Hand_tip_2=5
 Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=1
+lambda_1=0.99
 
-lambda_2=1.0
+lambda_2=1
 
 lambda_3=1.0
 
@@ -56,31 +56,31 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.150193
-init_vel_2=-0.0193481
-init_vel_3=0.0673932
-init_vel_4=-0.0797358
-init_vel_5=0.0316606
-init_vel_6=-0.0888242
-init_vel_7=-0.000847262
+init_vel_1=-0.0623399
+init_vel_2=0.0751892
+init_vel_3=-0.0261182
+init_vel_4=-0.166006
+init_vel_5=0.0111144
+init_vel_6=0.098712
+init_vel_7=0.0989423
 init_vel_8=0
-init_vel_9=-0.203365
-init_vel_10=-0.203365
-init_vel_11=-0.203365
+init_vel_9=0
+init_vel_10=0
+init_vel_11=0
 # Final Velocity 
-final_vel_1=0.0
+final_vel_1=0
 
-final_vel_2=0.0
+final_vel_2=0
 
-final_vel_3=0.0
+final_vel_3=0
 
-final_vel_4=0.0
+final_vel_4=0
 
-final_vel_5=0.0
+final_vel_5=0
 
-final_vel_6=0.0
+final_vel_6=0
 
-final_vel_7=0.0
+final_vel_7=0
 
 final_vel_8=0.0
 
@@ -91,31 +91,31 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=-0.0525011
-init_acc_2=-0.00676331
-init_acc_3=0.0235579
-init_acc_4=-0.0278723
-init_acc_5=0.0110672
-init_acc_6=-0.0310492
-init_acc_7=-0.000296168
+init_acc_1=-0.0245105
+init_acc_2=0.0295626
+init_acc_3=-0.010269
+init_acc_4=-0.0652694
+init_acc_5=0.00436993
+init_acc_6=0.0388112
+init_acc_7=0.0389017
 init_acc_8=0
-init_acc_9=-0.0710879
-init_acc_10=-0.0710879
-init_acc_11=-0.0710879
+init_acc_9=0
+init_acc_10=0
+init_acc_11=0
 # Final Acceleration 
-final_acc_1=0.0
+final_acc_1=0
 
-final_acc_2=0.0
+final_acc_2=0
 
-final_acc_3=0.0
+final_acc_3=0
 
-final_acc_4=0.0
+final_acc_4=0
 
-final_acc_5=0.0
+final_acc_5=0
 
-final_acc_6=0.0
+final_acc_6=0
 
-final_acc_7=0.0
+final_acc_7=0
 
 final_acc_8=0.0
 
@@ -169,17 +169,17 @@ obs_xx_2=0
 
 obs_xx_3=0
 
-obs_yy_1=0
+obs_yy_1=50
 
-obs_yy_2=0
+obs_yy_2=50
 
-obs_yy_3=0
+obs_yy_3=50
 
-obs_zz_1=0
+obs_zz_1=100
 
-obs_zz_2=0
+obs_zz_2=100
 
-obs_zz_3=0
+obs_zz_3=100
 
 obs_xy_1=0
 
@@ -215,43 +215,43 @@ pre_grasp_dist=0
 
 post_grasp_x=0
 
-post_grasp_y=0
+post_grasp_y=1
 
 post_grasp_z=0
 
-post_grasp_dist=0
+post_grasp_dist=40
 
 # Place settings
 pre_place_x=0
 
 pre_place_y=0
 
-pre_place_z=0
+pre_place_z=1
 
-pre_place_dist=0
+pre_place_dist=60
 
 post_place_x=0
 
-post_place_y=0
+post_place_y=1
 
 post_place_z=0
 
-post_place_dist=0
+post_place_dist=100
 
 w_red_app=5
 
 w_red_ret=5
 
 # Move settings
-target_x=0
+target_x=-400
 
 target_y=0
 
-target_z=0
+target_z=1000
 
-target_roll=0
+target_roll=1.57
 
-target_pitch=0
+target_pitch=-3.14
 
 target_yaw=0.0
 
@@ -305,7 +305,7 @@ max_acceleration=10.0
 tar_av=true
 ob_av=true
 approach=true
-retreat=true
+retreat=false
 rand_init=false
 coll=true
 straight_line=false
