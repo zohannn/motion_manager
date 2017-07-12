@@ -9,32 +9,29 @@ Wrist_radius=60.0
 
 Hand_radius=50
 
-Hand_1_1=5
+Hand_1_1=25
 
-Hand_1_2=5
+Hand_1_2=25
 
-Hand_1_3=5
+Hand_1_3=25
 
-Hand_2_1=5
+Hand_2_1=25
 
-Hand_2_2=5
+Hand_2_2=25
 
-Hand_2_3=5
+Hand_2_3=25
 
-Hand_3_1=5
+Hand_3_1=15
 
-Hand_3_2=5
+Hand_3_2=15
+Hand_3_3=15
 
-Hand_3_3=5
-
-Hand_tip_1=0
-
-Hand_tip_2=0
-
-Hand_tip_3=0
-
+Hand_tip_1=5
+Hand_tip_2=5
+Hand_tip_3=5
 # Joint Expanse factors
 lambda_1=1
+
 lambda_2=1
 
 lambda_3=1.0
@@ -148,12 +145,9 @@ final_acc_10=0.0
 final_acc_11=0.0
 
 # Tolerances with the target [mm]
-tar_xx_1=10
-
-tar_xx_2=10
-
-tar_xx_3=10
-
+tar_xx_1=0
+tar_xx_2=0
+tar_xx_3=0
 tar_yy_1=0
 
 tar_yy_2=0
@@ -238,10 +232,8 @@ pre_grasp_dist=120
 post_grasp_x=0
 
 post_grasp_y=1
-
 post_grasp_z=0
-
-post_grasp_dist=120
+post_grasp_dist=10
 
 # Place settings
 pre_place_x=0
@@ -262,7 +254,7 @@ post_place_dist=0
 
 w_red_app=2
 
-w_red_ret=5
+w_red_ret=10
 
 # Move settings
 target_x=-400

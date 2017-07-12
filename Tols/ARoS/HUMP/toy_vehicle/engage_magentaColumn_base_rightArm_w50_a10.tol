@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: MagentaColumn, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Engage, Arm: right, Object: MagentaColumn, Object Engaged: Base, Pose: , Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
@@ -8,24 +8,23 @@ Elbow_radius=70.0
 Wrist_radius=60
 
 Hand_radius=50
+Hand_1_1=5
 
-Hand_1_1=25
+Hand_1_2=5
 
-Hand_1_2=25
+Hand_1_3=5
 
-Hand_1_3=25
+Hand_2_1=5
 
-Hand_2_1=25
+Hand_2_2=5
 
-Hand_2_2=25
+Hand_2_3=5
 
-Hand_2_3=25
+Hand_3_1=5
 
-Hand_3_1=15
+Hand_3_2=5
 
-Hand_3_2=15
-
-Hand_3_3=15
+Hand_3_3=5
 
 Hand_tip_1=5
 
@@ -34,8 +33,7 @@ Hand_tip_2=5
 Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=1
-
+lambda_1=0.99
 lambda_2=1
 
 lambda_3=1.0
@@ -57,28 +55,17 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.215993
-
-init_vel_2=0.0430861
-
-init_vel_3=0.125184
-
-init_vel_4=-0.183145
-
-init_vel_5=-0.00743211
-
-init_vel_6=0.00562113
-
-init_vel_7=0.0126341
-
+init_vel_1=-0.0739666
+init_vel_2=0.0318288
+init_vel_3=0.0343939
+init_vel_4=-0.0680618
+init_vel_5=-0.00167607
+init_vel_6=-0.0107102
+init_vel_7=0.0094373
 init_vel_8=0
-
 init_vel_9=0
-
 init_vel_10=0
-
 init_vel_11=0
-
 # Final Velocity 
 final_vel_1=0
 
@@ -103,28 +90,17 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=-0.0729053
-
-init_acc_2=0.0145431
-
-init_acc_3=0.0422539
-
-init_acc_4=-0.0618178
-
-init_acc_5=-0.0025086
-
-init_acc_6=0.00189733
-
-init_acc_7=0.00426447
-
+init_acc_1=-0.134685
+init_acc_2=0.0579568
+init_acc_3=0.0626276
+init_acc_4=-0.123933
+init_acc_5=-0.00305194
+init_acc_6=-0.0195021
+init_acc_7=0.0171843
 init_acc_8=0
-
 init_acc_9=0
-
 init_acc_10=0
-
 init_acc_11=0
-
 # Final Acceleration 
 final_acc_1=0
 
@@ -225,8 +201,7 @@ obs_yz_3=0
 # Tolerances for the final posture
 tar_pos=1.0
 
-tar_or=0.001
-
+tar_or=0.01
 # Pick settings
 pre_grasp_x=0
 
@@ -251,8 +226,7 @@ pre_place_y=0
 
 pre_place_z=1
 
-pre_place_dist=120
-
+pre_place_dist=50
 post_place_x=0
 
 post_place_y=1
