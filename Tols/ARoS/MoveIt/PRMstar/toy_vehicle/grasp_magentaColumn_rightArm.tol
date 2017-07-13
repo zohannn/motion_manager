@@ -17,7 +17,7 @@ post_grasp_y=1
 
 post_grasp_z=0
 
-post_grasp_dist=120
+post_grasp_dist=10
 
 # Place settings
 pre_place_x=0

@@ -5,9 +5,10 @@ Shoulder_radius=80.0
 
 Elbow_radius=70.0
 
-Wrist_radius=60
+Wrist_radius=20
 
-Hand_radius=50
+Hand_radius=20
+
 Hand_1_1=5
 
 Hand_1_2=5
@@ -33,7 +34,8 @@ Hand_tip_2=5
 Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=0.99
+lambda_1=1
+
 lambda_2=1
 
 lambda_3=1.0
@@ -55,17 +57,28 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.0739666
-init_vel_2=0.0318288
-init_vel_3=0.0343939
-init_vel_4=-0.0680618
-init_vel_5=-0.00167607
-init_vel_6=-0.0107102
-init_vel_7=0.0094373
+init_vel_1=-0.0730275
+
+init_vel_2=0.0408571
+
+init_vel_3=0.02836
+
+init_vel_4=-0.0691055
+
+init_vel_5=0.00663333
+
+init_vel_6=-0.0120403
+
+init_vel_7=0.0104166
+
 init_vel_8=0
+
 init_vel_9=0
+
 init_vel_10=0
+
 init_vel_11=0
+
 # Final Velocity 
 final_vel_1=0
 
@@ -90,17 +103,28 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=-0.134685
-init_acc_2=0.0579568
-init_acc_3=0.0626276
-init_acc_4=-0.123933
-init_acc_5=-0.00305194
-init_acc_6=-0.0195021
-init_acc_7=0.0171843
+init_acc_1=-0.135395
+
+init_acc_2=0.0757501
+
+init_acc_3=0.0525801
+
+init_acc_4=-0.128123
+
+init_acc_5=0.0122983
+
+init_acc_6=-0.022323
+
+init_acc_7=0.0193126
+
 init_acc_8=0
+
 init_acc_9=0
+
 init_acc_10=0
+
 init_acc_11=0
+
 # Final Acceleration 
 final_acc_1=0
 
@@ -201,7 +225,8 @@ obs_yz_3=0
 # Tolerances for the final posture
 tar_pos=1.0
 
-tar_or=0.01
+tar_or=0.001
+
 # Pick settings
 pre_grasp_x=0
 
@@ -227,6 +252,7 @@ pre_place_y=0
 pre_place_z=1
 
 pre_place_dist=50
+
 post_place_x=0
 
 post_place_y=1
@@ -234,10 +260,9 @@ post_place_y=1
 post_place_z=0
 
 post_place_dist=100
-
 w_red_app=8
 
-w_red_ret=5
+w_red_ret=10
 
 # Move settings
 target_x=-400

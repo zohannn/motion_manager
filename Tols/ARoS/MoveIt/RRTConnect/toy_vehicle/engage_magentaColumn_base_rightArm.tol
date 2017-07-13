@@ -26,8 +26,7 @@ pre_place_y=0
 
 pre_place_z=1
 
-pre_place_dist=120
-
+pre_place_dist=50
 post_place_x=0
 
 post_place_y=1
