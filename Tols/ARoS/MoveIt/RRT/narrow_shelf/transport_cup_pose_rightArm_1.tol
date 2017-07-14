@@ -1,40 +1,39 @@
-### Parameters of the PRM planner in MoveIt! ###
-# 
+### Parameters of the RRT planner in MoveIt! ###
+# Planner: RRT ,Movement: Reach-to-grasp, Arm: right, Object: Cup, Object Engaged: , Pose: , Grip Type: Full Side thumb left
 # Configuration settings
 config=RRTkConfigDefault
 # Pick settings
 pre_grasp_x=0
 
-pre_grasp_y=1
+pre_grasp_y=0
 
 pre_grasp_z=0
 
-pre_grasp_dist=270
+pre_grasp_dist=0
 
 post_grasp_x=0
 
-post_grasp_y=0.99619
+post_grasp_y=0
 
-post_grasp_z=0.08715
+post_grasp_z=0
 
-post_grasp_dist=315
+post_grasp_dist=0
 
 # Place settings
 pre_place_x=0
 
-pre_place_y=0
+pre_place_y=0.99619
 
-pre_place_z=0
+pre_place_z=0.08715
 
-pre_place_dist=0
-
+pre_place_dist=150
 post_place_x=0
 
-post_place_y=0
+post_place_y=1
 
 post_place_z=0
 
-post_place_dist=0
+post_place_dist=200
 
 # Move settings
 target_x=0.0

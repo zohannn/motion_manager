@@ -26,7 +26,7 @@ pre_place_y=0.99619
 
 pre_place_z=0.08715
 
-pre_place_dist=320
+pre_place_dist=150
 
 post_place_x=0
 
@@ -34,7 +34,7 @@ post_place_y=1
 
 post_place_z=0
 
-post_place_dist=350
+post_place_dist=200
 
 # Move settings
 target_x=0.0

@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Transport, Arm: right, Object: Cup, Object Engaged: , Pose: Cup_pose, Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: Cup, Object Engaged: , Pose: , Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80
 
@@ -35,7 +35,6 @@ Hand_tip_3=5
 
 # Joint Expanse factors
 lambda_1=1
-
 lambda_2=1
 
 lambda_3=1.0
@@ -57,17 +56,17 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.053617
-init_vel_2=0.0747188
-init_vel_3=-0.0399304
-init_vel_4=-0.134067
-init_vel_5=0.091756
-init_vel_6=0.0818284
-init_vel_7=-0.079451
+init_vel_1=0
+init_vel_2=0
+init_vel_3=0
+init_vel_4=0
+init_vel_5=0
+init_vel_6=0
+init_vel_7=0
 init_vel_8=0
-init_vel_9=-0.0867563
-init_vel_10=-0.0867563
-init_vel_11=-0.0867563
+init_vel_9=0
+init_vel_10=0
+init_vel_11=0
 # Final Velocity 
 final_vel_1=0
 
@@ -212,7 +211,7 @@ pre_grasp_y=1
 
 pre_grasp_z=0
 
-pre_grasp_dist=290
+pre_grasp_dist=270
 
 post_grasp_x=0
 
@@ -220,8 +219,7 @@ post_grasp_y=0.996194698
 
 post_grasp_z=0.087155743
 
-post_grasp_dist=350
-
+post_grasp_dist=315
 # Place settings
 pre_place_x=0
 
@@ -239,9 +237,9 @@ post_place_z=0
 
 post_place_dist=0
 
-w_red_app=1
+w_red_app=5
 
-w_red_ret=1
+w_red_ret=5
 
 # Move settings
 target_x=-400

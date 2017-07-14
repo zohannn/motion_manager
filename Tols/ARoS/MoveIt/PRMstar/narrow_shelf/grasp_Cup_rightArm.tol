@@ -9,7 +9,7 @@ pre_grasp_y=1
 
 pre_grasp_z=0
 
-pre_grasp_dist=290
+pre_grasp_dist=270
 
 post_grasp_x=0
 
@@ -17,7 +17,8 @@ post_grasp_y=0.99619
 
 post_grasp_z=0.08715
 
-post_grasp_dist=340
+post_grasp_dist=315
+
 # Place settings
 pre_place_x=0
 
