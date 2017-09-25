@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUML ,Movement: Reaching, Arm: right, Object: 
+# Planner: HUMP ,Movement: Reaching, Arm: right, Object: , Object Engaged: , Pose: , Grip Type: 
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
@@ -34,8 +34,7 @@ Hand_tip_2=15.0
 Hand_tip_3=15.0
 
 # Joint Expanse factors
-lambda_1=1.0
-
+lambda_1=1
 lambda_2=1.0
 
 lambda_3=1.0
@@ -148,52 +147,6 @@ final_acc_10=0.0
 
 final_acc_11=0.0
 
-# Velocity Approach
-vel_approach_1=0.0
-
-vel_approach_2=0.0
-
-vel_approach_3=0.0
-
-vel_approach_4=0.0
-
-vel_approach_5=0.0
-
-vel_approach_6=0.0
-
-vel_approach_7=0.0
-
-vel_approach_8=0.0
-
-vel_approach_9=0.0
-
-vel_approach_10=0.0
-
-vel_approach_11=0.0
-
-# Acceleration Approach
-acc_approach_1=0.0
-
-acc_approach_2=0.0
-
-acc_approach_3=0.0
-
-acc_approach_4=0.0
-
-acc_approach_5=0.0
-
-acc_approach_6=0.0
-
-acc_approach_7=0.0
-
-acc_approach_8=0.0
-
-acc_approach_9=0.0
-
-acc_approach_10=0.0
-
-acc_approach_11=0.0
-
 # Tolerances with the target [mm]
 tar_xx_1=20
 
@@ -269,8 +222,7 @@ obs_yz_2=5.0
 obs_yz_3=5.0
 
 # Tolerances for the final posture
-tar_pos=1.0
-
+tar_pos=1
 tar_or=0.001
 
 # Pick settings
@@ -307,6 +259,8 @@ post_place_z=0
 
 post_place_dist=0
 
+w_red_app=5
+w_red_ret=5
 # Move settings
 target_x=-400
 
@@ -365,10 +319,11 @@ add_plane=true
 # Others
 max_velocity=50
 
-steps=20
-
+max_acceleration=10.0
 tar_av=true
 ob_av=true
 approach=false
 retreat=false
 rand_init=false
+coll=true
+straight_line=false
