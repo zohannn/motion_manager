@@ -943,6 +943,8 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
     this->solved = false;
     int arm_code =  this->mov->getArm();
     int mov_type = this->mov->getType();
+    int sceneID = this->scene->getID();
+    params.mov_specs.support_obj = "Table";
 #if HAND==0
     // Human Hand
     int hand_code = 0;
@@ -1033,7 +1035,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         // movement settings
         params.mov_specs.griptype = this->mov->getGrip();
         params.mov_specs.dHO = dHO;
-        params.mov_specs.obj = hump_obj;
+        params.mov_specs.obj = hump_obj;        
 
     }
 
@@ -1065,18 +1067,23 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         }
         break;
     case 2://transport
+        if (sceneID==6){
+            params.mov_specs.support_obj = "Shelf_2_a";
+        }
         params.mov_specs.target = tar_pose;
         curr_time = this->GetTimeMs64();
         res = this->h_planner->plan_place(params,initPosture);
         this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
     case 3://engage
+        params.mov_specs.support_obj = obj_eng->getName();
         params.mov_specs.target = place_location;
         curr_time = this->GetTimeMs64();
         res = this->h_planner->plan_place(params,initPosture);
         this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
-    case 4:// disengage // TO DO
+    case 4:// disengage
+        // TO DO
         //params.mov_specs.target = pose;
         //curr_time = this->GetTimeMs64();
         //res = this->h_planner->plan_place(params,initPosture);
@@ -1246,6 +1253,7 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
     case 4:// disengage
+        // TO DO
         break;
     case 5:// go-park
         curr_time = this->GetTimeMs64();

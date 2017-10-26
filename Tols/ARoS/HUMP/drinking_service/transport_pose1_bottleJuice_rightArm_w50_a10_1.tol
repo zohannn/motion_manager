@@ -1,37 +1,37 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Engage, Arm: right, Object: MagentaColumn, Object Engaged: Base, Pose: , Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: BottleJuice_home, Grip Type: Full Side thumb left
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
 Elbow_radius=70.0
 
-Wrist_radius=20
+Wrist_radius=60
 
-Hand_radius=0
+Hand_radius=50
 
-Hand_1_1=5
+Hand_1_1=25
 
-Hand_1_2=5
+Hand_1_2=25
 
-Hand_1_3=5
+Hand_1_3=25
 
-Hand_2_1=5
+Hand_2_1=25
 
-Hand_2_2=5
+Hand_2_2=25
 
-Hand_2_3=5
+Hand_2_3=25
 
-Hand_3_1=5
+Hand_3_1=15
 
-Hand_3_2=5
+Hand_3_2=15
 
-Hand_3_3=5
+Hand_3_3=15
 
-Hand_tip_1=0
+Hand_tip_1=5
 
-Hand_tip_2=0
+Hand_tip_2=5
 
-Hand_tip_3=0
+Hand_tip_3=5
 
 # Joint Expanse factors
 lambda_1=1
@@ -56,19 +56,19 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.0712758
+init_vel_1=0
 
-init_vel_2=0.0411134
+init_vel_2=0
 
-init_vel_3=0.0259959
+init_vel_3=0
 
-init_vel_4=-0.0703057
+init_vel_4=0
 
-init_vel_5=0.00389738
+init_vel_5=0
 
-init_vel_6=-0.00619424
+init_vel_6=0
 
-init_vel_7=0.0142691
+init_vel_7=0
 
 init_vel_8=0
 
@@ -102,19 +102,19 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=-0.130927
+init_acc_1=0
 
-init_acc_2=0.0755212
+init_acc_2=0
 
-init_acc_3=0.047752
+init_acc_3=0
 
-init_acc_4=-0.129145
+init_acc_4=0
 
-init_acc_5=0.00715911
+init_acc_5=0
 
-init_acc_6=-0.0113782
+init_acc_6=0
 
-init_acc_7=0.0262109
+init_acc_7=0
 
 init_acc_8=0
 
@@ -185,23 +185,23 @@ tar_yz_2=0
 tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
-obs_xx_1=0
+obs_xx_1=50
 
-obs_xx_2=0
+obs_xx_2=50
 
-obs_xx_3=0
+obs_xx_3=50
 
-obs_yy_1=0
+obs_yy_1=50
 
-obs_yy_2=0
+obs_yy_2=50
 
-obs_yy_3=0
+obs_yy_3=50
 
-obs_zz_1=0
+obs_zz_1=100
 
-obs_zz_2=0
+obs_zz_2=100
 
-obs_zz_3=0
+obs_zz_3=100
 
 obs_xy_1=0
 
@@ -250,7 +250,7 @@ pre_place_y=0
 
 pre_place_z=1
 
-pre_place_dist=60
+pre_place_dist=50
 
 post_place_x=0
 
@@ -259,10 +259,9 @@ post_place_y=1
 post_place_z=0
 
 post_place_dist=100
+w_red_app=3
 
-w_red_app=8
-
-w_red_ret=10
+w_red_ret=7
 
 # Move settings
 target_x=-400
