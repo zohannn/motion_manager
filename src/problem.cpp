@@ -352,12 +352,56 @@ bool Problem::finalPostureFingers(int hand_id)
     // get the object(s) involved in this movement
     objectPtr obj = this->mov->getObject();
     // get the type of grip for this movement
-    int grip_code = this->mov->getGrip();
+    //int grip_code = this->mov->getGrip();
+    bool prec = this->mov->getGrip();
 
     // compute the diameter (plus tolerance) of the object to be grasped
     double d_obj;
 
-    switch (grip_code) {
+    if(prec){
+        d_obj = obj->getRadius()*2.0+TOL_GRIP;
+#if HAND==0
+        if(d_obj > hh->getHumanHand().maxAperture){
+            success=false;
+            throw string("impossible to grasp the object ")+obj->getName()+
+                    string(" with the grip ")+this->mov->getGripStr()+
+                    string(". The object is too large");
+        }
+#elif HAND==1
+
+        if (d_obj > hh->getBarrettHand().maxAperture){
+            success=false;
+            throw string("impossible to grasp the object ")+obj->getName()+
+                    string(" with the grip ")+this->mov->getGripStr()+
+                    string(". The object is too large");
+        }
+#endif
+    }else{
+#if HAND==0
+
+        d_obj = min(hh->getHumanHand().maxAperture,double(1.2)*obj->getRadius()*2+TOL_GRIP);
+
+        if(obj->getRadius()*2+TOL_GRIP > hh->getHumanHand().maxAperture){
+            success=false;
+            throw string("impossible to grasp the object ")+obj->getName()+
+                    string(" with the grip ")+this->mov->getGripStr()+
+                    string(". The object is too large");
+
+        }
+
+#elif HAND==1
+        d_obj = min(hh->getBarrettHand().maxAperture,double(1.2)*obj->getRadius()*2+TOL_GRIP);
+
+        if (obj->getRadius()*2+TOL_GRIP > hh->getBarrettHand().maxAperture){
+            success=false;
+            throw string("impossible to grasp the object ")+obj->getName()+
+                    string(" with the grip ")+this->mov->getGripStr()+
+                    string(". The object is too large");
+        }
+#endif
+    }
+/*
+    switch (grip_code){
 
     case 111: case 112:
         // Precision Side thumb left and Precision Side thumb right
@@ -514,13 +558,10 @@ bool Problem::finalPostureFingers(int hand_id)
         }
 
 #endif
-
-
-
-
         break;
 
     }// switch grip code
+    */
 
     // compute the inverse kinematics of the hand
     std::vector<double> sols;
@@ -590,7 +631,13 @@ bool Problem::finalPostureFingers(int hand_id)
 
 #endif
 
+        if(prec){
+            this->dHOr = this->dFH;
+        }else{
+            this->dHOr = obj->getRadius()+TOL_GRIP;
+        }
 
+        /*
         switch (grip_code) {
         case 111: case 112: case 113: case 114: case 121: case 122:
             //Precision grip
@@ -610,8 +657,8 @@ bool Problem::finalPostureFingers(int hand_id)
             this->dHOr = obj->getSize().Zsize/2+TOL_GRIP;
 
             break;
-
         }
+        */
 
         break;
 
@@ -655,6 +702,12 @@ bool Problem::finalPostureFingers(int hand_id)
 
 #endif
 
+        if(prec){
+            this->dHOl = this->dFH;
+        }else{
+            this->dHOl = obj->getRadius()+TOL_GRIP;
+        }
+        /*
         switch (grip_code) {
         case 111: case 112: case 113: case 114: case 121: case 122:
             //Precision grip
@@ -676,6 +729,7 @@ bool Problem::finalPostureFingers(int hand_id)
             break;
 
         }
+        */
 
         break;
 
@@ -930,6 +984,27 @@ bool Problem::getRPY(std::vector<double>& rpy, Matrix3d& Rot)
     }
 }
 
+bool Problem::RPY_matrix(std::vector<double>& rpy, Matrix3d& Rot)
+{
+    Rot = Matrix3d::Zero();
+
+    if(!rpy.empty()){
+        double roll = rpy.at(0); // around z
+        double pitch = rpy.at(1); // around y
+        double yaw = rpy.at(2); // around x
+
+        // Rot = Rot_z * Rot_y * Rot_x
+
+        Rot(0,0) = cos(roll)*cos(pitch);  Rot(0,1) = cos(roll)*sin(pitch)*sin(yaw)-sin(roll)*cos(yaw); Rot(0,2) = sin(roll)*sin(yaw)+cos(roll)*sin(pitch)*cos(yaw);
+        Rot(1,0) = sin(roll)*cos(pitch);  Rot(1,1) = cos(roll)*cos(yaw)+sin(roll)*sin(pitch)*sin(yaw); Rot(1,2) = sin(roll)*sin(pitch)*cos(yaw)-cos(roll)*sin(yaw);
+        Rot(2,0) = -sin(pitch);           Rot(2,1) = cos(pitch)*sin(yaw);                              Rot(2,2) = cos(pitch)*cos(yaw);
+
+        return true;
+    }else{
+        return false;
+    }
+}
+
 
 
 movementPtr Problem::getMovement()
@@ -1010,18 +1085,33 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
     std::vector<double> place_location;
     if(mov_type!=1 && mov_type!=5){
         // compute the position of the target when the object will be engaged
-        pos eng1_pos = eng1->getPos(); // position of the engage point of the other object
+        pos eng1_pos = eng1->getPos(); // position related to the world of the engage point of the other object
+        orient eng1_or = eng1->getOr(); // orientation of the engage point of the other object
+        std::vector<double> rpy_eng1 = {eng1_or.roll,eng1_or.pitch,eng1_or.yaw};
+        Matrix3d Rot_eng1; this->RPY_matrix(rpy_eng1,Rot_eng1);
         pos new_tar;
-        new_tar.Xpos=eng1_pos.Xpos - eng_to_tar.at(0);
-        new_tar.Ypos=eng1_pos.Ypos - eng_to_tar.at(1);
-        new_tar.Zpos=eng1_pos.Zpos - eng_to_tar.at(2);
+        std::vector<double> rpy = {tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
+        Matrix3d Rot_tar; this->RPY_matrix(rpy,Rot_tar);
+        Vector3d v(eng_to_tar.at(0),eng_to_tar.at(1),eng_to_tar.at(2));
+        Vector3d eng_to_tar_w = Rot_tar*v;
+        new_tar.Xpos=eng1_pos.Xpos - eng_to_tar_w(0);
+        new_tar.Ypos=eng1_pos.Ypos - eng_to_tar_w(1);
+        new_tar.Zpos=eng1_pos.Zpos - eng_to_tar_w(2);
+
+        orient eng_or = eng->getOr(); // orientation of the engage point of the object to engage
+        std::vector<double> rpy_eng = {eng_or.roll,eng_or.pitch,eng_or.yaw};
+        Matrix3d Rot_eng; this->RPY_matrix(rpy_eng,Rot_eng);
+        Matrix3d Rot_eng_inv = Rot_eng.transpose();
+        Matrix3d Rot_eng_tar = Rot_eng_inv * Rot_tar;
+        Matrix3d Rot_new_tar = Rot_eng1 * Rot_eng_tar;
+        std::vector<double> rpy_new_tar; this->getRPY(rpy_new_tar,Rot_new_tar);
 
         place_location.push_back(new_tar.Xpos);
         place_location.push_back(new_tar.Ypos);
         place_location.push_back(new_tar.Zpos);
-        place_location.push_back(eng1->getOr().roll);
-        place_location.push_back(eng1->getOr().pitch);
-        place_location.push_back(eng1->getOr().yaw);
+        place_location.push_back(rpy_new_tar.at(0));
+        place_location.push_back(rpy_new_tar.at(1));
+        place_location.push_back(rpy_new_tar.at(2));
 
         HUMotion::objectPtr hump_obj;
         target = {tar->getPos().Xpos, tar->getPos().Ypos, tar->getPos().Zpos,tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
@@ -1033,7 +1123,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         hump_obj->setParams(position,orientation,dimension);
 
         // movement settings
-        params.mov_specs.griptype = this->mov->getGrip();
+        //params.mov_specs.griptype = this->mov->getGrip();
         params.mov_specs.dHO = dHO;
         params.mov_specs.obj = hump_obj;        
 
@@ -1139,11 +1229,15 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     std::vector<double> eng_to_obj;
     if(obj!=nullptr){obj->getEngObj(eng_to_obj);}
     std::vector<double> tar_to_obj;
+    Matrix3d Rot_tar_or;
     switch(arm_code){
     case 0: // both arms
         break;
     case 1://right arm
-        if(obj!=nullptr){obj->getTarRightObj(tar_to_obj);}
+        if(obj!=nullptr){
+            obj->getTarRightObj(tar_to_obj);
+            obj->getTar_right_RPY_matrix(Rot_tar_or);
+        }
         this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
         if(mov_type==5){
             this->scene->getHumanoid()->getRightHandHomePosture(finalHand);
@@ -1156,7 +1250,10 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
         }
         break;
     case 2:// left arm
-        if(obj!=nullptr){obj->getTarLeftObj(tar_to_obj);}
+        if(obj!=nullptr){
+            obj->getTarLeftObj(tar_to_obj);
+            obj->getTar_left_RPY_matrix(Rot_tar_or);
+        }
         this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
         if(mov_type==5){
             this->scene->getHumanoid()->getLeftHandHomePosture(finalHand);
@@ -1175,32 +1272,56 @@ moveit_planning::PlanningResultPtr Problem::solve(moveit_planning::moveit_params
     if(mov_type!=1 && mov_type!=5){
         // compute the position of the target when the object will be engaged
         pos eng1_pos = eng1->getPos(); // position of the engage point of the other object
+        orient eng1_or = eng1->getOr(); // orientation of the engage point of the other object
+        std::vector<double> rpy_eng1 = {eng1_or.roll,eng1_or.pitch,eng1_or.yaw};
+        Matrix3d Rot_eng1; this->RPY_matrix(rpy_eng1,Rot_eng1);
         pos new_obj_pos;
-        new_obj_pos.Xpos=eng1_pos.Xpos - eng_to_obj.at(0);
-        new_obj_pos.Ypos=eng1_pos.Ypos - eng_to_obj.at(1);
-        new_obj_pos.Zpos=eng1_pos.Zpos - eng_to_obj.at(2);
+        orient eng_or = eng->getOr(); // orientation of the engage point of the object to engage
+        std::vector<double> rpy_eng = {eng_or.roll,eng_or.pitch,eng_or.yaw};
+        Matrix3d Rot_eng; this->RPY_matrix(rpy_eng,Rot_eng);
+        Matrix3d Rot_eng_inv = Rot_eng.transpose();
+        orient obj_or = obj->getOr(); // orientation of the objetc to engage
+        std::vector<double> rpy_obj = {obj_or.roll,obj_or.pitch,obj_or.yaw};
+        Matrix3d Rot_obj; this->RPY_matrix(rpy_obj,Rot_obj);
+        Matrix3d Rot_eng_obj = Rot_eng_inv * Rot_obj;
+        Matrix3d Rot_obj1 = Rot_eng1 * Rot_eng_obj;
+        std::vector<double> rpy_obj1; this->getRPY(rpy_obj1,Rot_obj1);
+
+        Vector3d v(eng_to_obj.at(0),eng_to_obj.at(1),eng_to_obj.at(2));
+        Vector3d eng_to_obj_w = Rot_obj*v;
+        new_obj_pos.Xpos=eng1_pos.Xpos - eng_to_obj_w(0);
+        new_obj_pos.Ypos=eng1_pos.Ypos - eng_to_obj_w(1);
+        new_obj_pos.Zpos=eng1_pos.Zpos - eng_to_obj_w(2);
 
         place_location.push_back(new_obj_pos.Xpos/1000);
         place_location.push_back(new_obj_pos.Ypos/1000);
         place_location.push_back(new_obj_pos.Zpos/1000);
-        place_location.push_back(eng1->getOr().roll);
-        place_location.push_back(eng1->getOr().pitch);
-        place_location.push_back(eng1->getOr().yaw);
+        place_location.push_back(rpy_obj1.at(0));
+        place_location.push_back(rpy_obj1.at(1));
+        place_location.push_back(rpy_obj1.at(2));
 
         target = {tar->getPos().Xpos/1000, tar->getPos().Ypos/1000, tar->getPos().Zpos/1000,
                   tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
 
         pos new_tar_pose;
-        new_tar_pose.Xpos=pose->getPos().Xpos - tar_to_obj.at(0);
-        new_tar_pose.Ypos=pose->getPos().Ypos - tar_to_obj.at(1);
-        new_tar_pose.Zpos=pose->getPos().Zpos - tar_to_obj.at(2);
+        Vector3d vp(tar_to_obj.at(0),tar_to_obj.at(1),tar_to_obj.at(2));
+        Vector3d tar_to_obj_w = Rot_obj*vp;
+        new_tar_pose.Xpos=pose->getPos().Xpos - tar_to_obj_w(0);
+        new_tar_pose.Ypos=pose->getPos().Ypos - tar_to_obj_w(1);
+        new_tar_pose.Zpos=pose->getPos().Zpos - tar_to_obj_w(2);
+        Matrix3d Rot_tar_or_inv = Rot_tar_or.transpose();
+        Matrix3d Rot_tar_obj = Rot_tar_or_inv * Rot_obj;
+        std::vector<double> rpy_pose = {pose->getOr().roll,pose->getOr().pitch,pose->getOr().yaw};
+        Matrix3d Rot_pose; this->RPY_matrix(rpy_pose,Rot_pose);
+        Matrix3d Rot_new_obj_pose = Rot_pose * Rot_tar_obj;
+        std::vector<double> rpy_obj_pose; this->getRPY(rpy_obj_pose,Rot_new_obj_pose);
 
         tar_pose = {new_tar_pose.Xpos/1000, new_tar_pose.Ypos/1000, new_tar_pose.Zpos/1000,
-                    pose->getOr().roll, pose->getOr().pitch, pose->getOr().yaw};
+                    rpy_obj_pose.at(0),rpy_obj_pose.at(1),rpy_obj_pose.at(2)};
 
         // movement settings
         params.dHO = dHO/1000;
-        params.griptype = this->mov->getGrip();
+        //params.griptype = this->mov->getGrip();
         params.obj_name = this->mov->getObject()->getName();
     }
 

@@ -1,4 +1,4 @@
-# Planner: RRTConnect ,Movement: Reach-to-grasp, Arm: right, Object: Cup, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRTConnect ,Movement: Reach-to-grasp, Arm: right, Object: Cup, Object Engaged: , Pose: , Grip Type: Full
 njs=240946
 nmu=7
 prob_time=1734
@@ -107,7 +107,7 @@ step=19, time step=0.104979, Joint 1=-36.034683|-8.759734|-3.131088, Joint 2=-53
 step=20, time step=0.113848, Joint 1=-36.971427|-8.784357|2.536679, Joint 2=-54.196575|-2.523682|-7.078964, Joint 3=-9.663280|-9.004657|-1.138097, Joint 4=-129.901790|-16.593269|19.130252, Joint 5=-42.773196|-15.358976|-1.693222, Joint 6=97.835245|19.378903|-12.331541, Joint 7=93.003535|-8.997670|0.472473, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.495306|0.000000|0.000000, Joint 10=60.495306|0.000000|0.000000, Joint 11=60.495306|0.000000|0.000000
 step=21, time step=0.277341, Joint 1=-37.955711|-6.188093|25.128400, Joint 2=-54.527981|-2.255317|6.704001, Joint 3=-10.695532|-6.577152|25.458435, Joint 4=-131.671755|-10.807642|48.458094, Joint 5=-44.532333|-11.202984|43.443148, Joint 6=99.964693|13.232863|-55.946530, Joint 7=91.982109|-6.479624|25.483303, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.495306|0.000000|0.000000, Joint 10=60.495306|0.000000|0.000000, Joint 11=60.495306|0.000000|0.000000
 step=22, time step=0, Joint 1=-38.990361|0.000000|26.902635, Joint 2=-54.971639|0.000000|11.535856, Joint 3=-11.829132|0.000000|29.475516, Joint 4=-133.354819|0.000000|43.762505, Joint 5=-46.461063|0.000000|50.150238, Joint 6=102.117260|0.000000|-55.970377, Joint 7=90.876232|0.000000|28.754670, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.495306|0.000000|0.000000, Joint 10=60.495306|0.000000|0.000000, Joint 11=60.495306|0.000000|0.000000
-# Planner: RRTConnect ,Movement: Transport, Arm: right, Object: Cup, Object Engaged: , Pose: Cup_pose, Grip Type: Full Side thumb left
+# Planner: RRTConnect ,Movement: Transport, Arm: right, Object: Cup, Object Engaged: , Pose: Cup_pose, Grip Type: Full
 njs=97300.6
 nmu=4
 prob_time=1591

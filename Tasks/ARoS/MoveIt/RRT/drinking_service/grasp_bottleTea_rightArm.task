@@ -1,4 +1,4 @@
-# Planner: RRT ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRT ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full
 njs=3531.53
 nmu=3
 prob_time=1420

@@ -1,4 +1,4 @@
-# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: Cup, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: Cup, Object Engaged: , Pose: , Grip Type: Full
 njs=95154.5
 nmu=4
 prob_time=5123

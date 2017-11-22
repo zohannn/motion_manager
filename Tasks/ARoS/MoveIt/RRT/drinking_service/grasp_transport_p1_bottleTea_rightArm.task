@@ -1,4 +1,4 @@
-# Planner: RRT ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRT ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full
 njs=3531.53
 nmu=3
 prob_time=1420
@@ -50,7 +50,7 @@ step=7, time step=0.079541, Joint 1=-103.146182|-8.919015|24.302737, Joint 2=-45
 step=8, time step=0.103892, Joint 1=-103.784202|-6.923542|23.937346, Joint 2=-45.032710|3.366095|-11.874569, Joint 3=88.500966|12.916184|-36.768264, Joint 4=-85.630677|-16.878950|53.915609, Joint 5=37.272626|4.515101|-14.948067, Joint 6=-17.827280|14.457796|-41.528136, Joint 7=7.965663|-2.020169|9.177994, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=9, time step=0.229198, Joint 1=-104.389459|-4.159346|20.012249, Joint 2=-44.739573|2.014929|-9.686489, Joint 3=89.667681|8.167101|-36.782275, Joint 4=-87.127397|-10.378305|48.373293, Joint 5=37.670493|2.748287|-12.985331, Joint 6=-16.523081|9.129396|-41.117890, Joint 7=7.799510|-1.099211|6.005231, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=10, time step=0, Joint 1=-104.960821|0.000000|21.753036, Joint 2=-44.462631|0.000000|-10.543818, Joint 3=90.837541|0.000000|-44.539214, Joint 4=-88.582836|0.000000|55.411835, Joint 5=38.052558|0.000000|-14.546081, Joint 6=-15.215414|0.000000|-49.785837, Joint 7=7.662188|0.000000|5.228151, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
-# Planner: RRT ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full Side thumb left
+# Planner: RRT ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full
 njs=7408.13
 nmu=4
 prob_time=1441

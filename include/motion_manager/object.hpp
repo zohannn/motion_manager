@@ -211,7 +211,17 @@ public:
      */
     void getEngObj(std::vector<double>& eng_to_obj);
 
+    /**
+     * @brief getTar_right_RPY_matrix
+     * @param mat
+     */
+    void getTar_right_RPY_matrix(Matrix3d& mat);
 
+    /**
+     * @brief getTar_left_RPY_matrix
+     * @param mat
+     */
+    void getTar_left_RPY_matrix(Matrix3d& mat);
 
 private:
 
@@ -228,7 +238,9 @@ private:
     std::vector<double> eng_tar_left; /**< position of the engage point with respect to the target left in the target left frame. x=0, y=1, z=2*/
     std::vector<double> eng_obj; /**< position of the engage point with respect to the object center in the object frame. x=0, y=1, z=2*/
     std::vector<double> tar_right_obj; /**< position of the target right with respect to the object in the object frame. x=0, y=1, z=2 */
+    //Matrix3d Rot_tar_right_obj; /**< orientation RPY matrix of the target right with respect to the object. */
     std::vector<double> tar_left_obj; /**< position of the target left with respect to the object in the object frame. x=0, y=1, z=2 */
+    //Matrix3d Rot_tar_left_obj; /**< orientation RPY matrix of the target left with respect to the object. */
     bool setup_features; /**< true if it is necessary to set up the features, false otherwise (the object might be created with no features)*/
 
     /**

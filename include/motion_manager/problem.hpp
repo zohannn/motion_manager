@@ -279,6 +279,14 @@ private:
      */
     bool getRPY(std::vector<double>& rpy, Matrix3d& Rot);
 
+    /**
+     * @brief RPY_matrix
+     * @param rpy
+     * @param Rot
+     * @return
+     */
+    bool RPY_matrix(std::vector<double>& rpy, Matrix3d& Rot);
+
 };
 
 }// namespace motion_manager

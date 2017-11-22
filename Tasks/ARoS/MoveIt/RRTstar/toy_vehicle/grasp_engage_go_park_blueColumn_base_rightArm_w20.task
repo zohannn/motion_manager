@@ -1,4 +1,4 @@
-# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Pose: , Grip Type: Full
 njs=85205.2
 nmu=4
 prob_time=5229
@@ -75,7 +75,7 @@ step=7, time step=0.0912726, Joint 1=25.029554|7.250200|-0.061365, Joint 2=-47.7
 step=8, time step=0.104982, Joint 1=25.691040|6.698351|-11.189854, Joint 2=-46.904848|8.325473|-12.074882, Joint 3=-85.340718|-9.278441|8.863145, Joint 4=-104.562691|-18.536148|30.926706, Joint 5=142.440263|-6.962167|5.554542, Joint 6=-72.419626|-11.861699|17.730217, Joint 7=-14.153801|-6.154828|9.870224, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
 step=9, time step=0.2514, Joint 1=26.336608|4.328024|-20.442258, Joint 2=-46.093020|5.475551|-25.337824, Joint 3=-86.269133|-6.356158|27.918657, Joint 4=-106.349352|-11.977170|56.586522, Joint 5=141.737973|-4.826572|20.910936, Joint 6=-73.573563|-7.777942|36.071966, Joint 7=-14.749106|-3.998433|18.767808, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
 step=10, time step=0, Joint 1=26.966796|0.000000|-19.942011, Joint 2=-45.283998|0.000000|-25.601151, Joint 3=-87.241732|0.000000|30.777494, Joint 4=-108.092954|0.000000|55.175541, Joint 5=140.992948|0.000000|23.575986, Joint 6=-74.720977|0.000000|36.309402, Joint 7=-15.333940|0.000000|18.506806, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
-# Planner: RRTstar ,Movement: Engage, Arm: right, Object: BlueColumn, Object Engaged: Base, Pose: , Grip Type: Full Side thumb left
+# Planner: RRTstar ,Movement: Engage, Arm: right, Object: BlueColumn, Object Engaged: Base, Pose: , Grip Type: Full
 njs=122139
 nmu=2
 prob_time=5184

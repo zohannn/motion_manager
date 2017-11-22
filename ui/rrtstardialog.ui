@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="tab_general">
     <attribute name="title">
@@ -220,7 +220,7 @@ range = 0.0 goal_bias = 0.05 delay_collision_checking = 1 </string>
      </property>
      <property name="text">
       <string>The direction of approaching and retreating are taken 
- with respect to the frame of the target</string>
+ with respect to the frame of the TARGET</string>
      </property>
     </widget>
     <widget class="QGroupBox" name="groupBox_pre_grasp">
@@ -765,7 +765,7 @@ range = 0.0 goal_bias = 0.05 delay_collision_checking = 1 </string>
      </property>
      <property name="text">
       <string>The direction of approaching and retreating are taken 
- with respect to the frame of the target in the new location</string>
+ with respect to the frame of the OBJECT in the new location</string>
      </property>
     </widget>
    </widget>

@@ -1,4 +1,4 @@
-# Planner: PRMstar ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: PRMstar ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Pose: , Grip Type: Full
 njs=27171.6
 nmu=3
 prob_time=5633
@@ -54,7 +54,7 @@ step=7, time step=0.0913481, Joint 1=-82.701581|-19.283773|-6.917766, Joint 2=-6
 step=8, time step=0.104834, Joint 1=-84.492333|-18.438341|23.758522, Joint 2=-67.828431|-0.525429|2.400305, Joint 3=102.428596|9.194909|-14.241196, Joint 4=-104.332337|-18.554602|30.561821, Joint 5=-141.866001|3.602526|-0.525670, Joint 6=-24.268035|-2.245386|10.210296, Joint 7=165.000000|0.000000|0.000000, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
 step=9, time step=0.259119, Joint 1=-86.303140|-12.177128|56.006824, Joint 2=-67.871172|-0.254338|1.685560, Joint 3=103.319312|5.946284|-28.027332, Joint 4=-106.120352|-11.894657|56.721876, Joint 5=-141.491037|2.594226|-10.798306, Joint 6=-24.450931|-1.088730|7.208470, Joint 7=165.000000|0.000000|0.000000, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
 step=10, time step=0, Joint 1=-88.138004|0.000000|54.655697, Joint 2=-67.897336|0.000000|0.779348, Joint 3=104.199313|0.000000|-26.212868, Joint 4=-107.865165|0.000000|51.973279, Joint 5=-141.073413|0.000000|-12.439894, Joint 6=-24.563089|0.000000|3.340889, Joint 7=165.000000|0.000000|0.000000, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
-# Planner: PRMstar ,Movement: Engage, Arm: right, Object: BlueColumn, Object Engaged: Base, Pose: , Grip Type: Full Side thumb left
+# Planner: PRMstar ,Movement: Engage, Arm: right, Object: BlueColumn, Object Engaged: Base, Pose: , Grip Type: Full
 njs=71158.2
 nmu=2
 prob_time=5206

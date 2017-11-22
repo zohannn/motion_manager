@@ -1,4 +1,4 @@
-# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Pose: , Grip Type: Full
 njs=6122.14
 nmu=3
 prob_time=5193
@@ -67,7 +67,7 @@ step=7, time step=0.0832378, Joint 1=-53.645032|-15.688256|27.560362, Joint 2=-2
 step=8, time step=0.105497, Joint 1=-54.861588|-13.062949|32.902865, Joint 2=-18.876341|15.590908|-38.225677, Joint 3=30.253897|-0.112183|-4.858558, Joint 4=-104.580631|-19.481821|53.596006, Joint 5=133.514416|-7.728477|12.082679, Joint 6=-35.742794|-12.178848|27.240058, Joint 7=-59.680090|10.667968|-19.516063, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
 step=9, time step=0.252318, Joint 1=-56.075908|-8.149020|37.577487, Joint 2=-17.421824|9.789371|-44.692432, Joint 3=30.217877|-0.346108|-0.052325, Joint 4=-106.369119|-11.935362|56.091529, Joint 5=132.759229|-5.196008|21.937170, Joint 6=-36.892032|-7.788503|34.711310, Joint 7=-58.651797|7.025202|-30.428280, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
 step=10, time step=0, Joint 1=-57.283899|0.000000|37.948678, Joint 2=-15.960532|0.000000|-45.906022, Joint 3=30.129367|0.000000|2.780526, Joint 4=-108.114596|0.000000|54.833626, Joint 5=131.943321|0.000000|25.631481, Joint 6=-38.073750|0.000000|37.123312, Joint 7=-57.566002|0.000000|-34.109919, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
-# Planner: RRTstar ,Movement: Engage, Arm: right, Object: BlueColumn, Object Engaged: Base, Pose: , Grip Type: Full Side thumb left
+# Planner: RRTstar ,Movement: Engage, Arm: right, Object: BlueColumn, Object Engaged: Base, Pose: , Grip Type: Full
 njs=2478.96
 nmu=3
 prob_time=5115

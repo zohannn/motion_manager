@@ -1,4 +1,4 @@
-# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: BottleJuice, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: BottleJuice, Object Engaged: , Pose: , Grip Type: Full
 njs=20935
 nmu=3
 prob_time=5133

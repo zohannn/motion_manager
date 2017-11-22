@@ -42,48 +42,49 @@ public:
     Movement(int type, int arm, posePtr pose);
 
     /**
-     * @brief Movement, a constructor
+     * @brief Movement
      * @param type
      * @param arm
      * @param obj
-     * @param grip_id
      * @param prec
      */
-    Movement(int type, int arm, objectPtr obj, int grip_id, bool prec);
+    Movement(int type, int arm, objectPtr obj,bool prec);
+    //Movement(int type, int arm, objectPtr obj, int grip_id, bool prec);
 
     /**
-     * @brief Movement, a constructor
+     * @brief Movement
      * @param type
      * @param arm
      * @param obj
      * @param obj_eng
-     * @param grip_id
      * @param prec
      */
-    Movement(int type, int arm, objectPtr obj, objectPtr obj_eng, int grip_id, bool prec);
+    Movement(int type, int arm, objectPtr obj, objectPtr obj_eng, bool prec);
+    //Movement(int type, int arm, objectPtr obj, objectPtr obj_eng, int grip_id, bool prec);
 
     /**
-     * @brief Movement, a constructor
+     * @brief Movement
      * @param type
      * @param arm
      * @param obj
      * @param obj_eng
      * @param pose
-     * @param grip_id
      * @param prec
      */
-    Movement(int type, int arm, objectPtr obj, objectPtr obj_eng, posePtr pose,int grip_id, bool prec);
+    Movement(int type, int arm, objectPtr obj, objectPtr obj_eng, posePtr pose, bool prec);
+    //Movement(int type, int arm, objectPtr obj, objectPtr obj_eng, posePtr pose,int grip_id, bool prec);
 
     /**
-     * @brief Movement, a constructor
+     * @brief Movement
      * @param type
      * @param arm
      * @param obj
      * @param pose
-     * @param grip_id
      * @param prec
      */
-    Movement(int type, int arm, objectPtr obj, posePtr pose, int grip_id, bool prec);
+    Movement(int type, int arm, objectPtr obj, posePtr pose,bool prec);
+    //Movement(int type, int arm, objectPtr obj, posePtr pose, int grip_id, bool prec);
+
 
     /**
      * @brief Movement, a copy constructor
@@ -105,10 +106,9 @@ public:
 
     /**
      * @brief This method sets the type of grip related to the movement.
-     * @param index
      * @param prec
      */
-    void setGrip(int index, bool prec);
+    void setGrip(bool prec);
 
     /**
      * @brief This method sets the object that is manipulated during the movement
@@ -153,10 +153,10 @@ public:
     string getStrType();
 
     /**
-     * @brief This method gets the code of the grip
+     * @brief This method gets the type of the grip
      * @return
      */
-    int getGrip();
+    bool getGrip();
 
     /**
      * @brief This method gets the description of the grip
@@ -239,7 +239,8 @@ private:
      * <tr><td>No Grip <td>- <td>- <td>6
      * </table>
      */
-    int grip_code;
+    //int grip_code;
+    bool prec; // true for a precision grip, false otherwise
     string grip_str; /**< type of the grip (string) */
     objectPtr obj; /**< object being manipulated in the movement */
     objectPtr obj_init; /**< object being manipulated before the movement starts */

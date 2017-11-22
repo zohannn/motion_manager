@@ -50,8 +50,8 @@ Movement::Movement(int type, int arm)
     }
 
 
-    this->grip_code = 0;
-
+    //this->grip_code = 0;
+    this->prec=false;
     this->arm = arm;
     this->executed = false;
 
@@ -101,7 +101,8 @@ Movement::Movement(int type, int arm, objectPtr obj)
     this->obj_init = obj;
     this->obj_eng=objectPtr(new Object());
     this->pose=posePtr(new Pose());
-    this->grip_code = 0;
+    //this->grip_code = 0;
+    this->prec=false;
     this->grip_str=string("No Grip");
     this->arm=arm;
     this->executed = false;
@@ -152,7 +153,8 @@ Movement::Movement(int type, int arm, posePtr pose)
     this->obj_init = objectPtr(new Object());
     this->obj_eng=objectPtr(new Object());
     this->pose=pose;
-    this->grip_code = 0;
+    //this->grip_code = 0;
+    this->prec=false;
     this->grip_str=string("No Grip");
     this->arm=arm;
     this->executed = false;
@@ -161,43 +163,29 @@ Movement::Movement(int type, int arm, posePtr pose)
 }
 
 
-Movement::Movement(int type, int arm, objectPtr obj, int grip_id, bool prec)
+Movement::Movement(int type, int arm, objectPtr obj, bool prec)
 {
 
     this->type=type;
     switch (type){
-
     case 0:
-
         this->strType = string("Reach-to-grasp");
         break;
-
     case 1:
-
         this->strType = string("Reaching");
         break;
-
     case 2:
-
         this->strType = string("Transport");
         break;
-
     case 3:
-
         this->strType = string("Engage");
         break;
-
     case 4:
-
         this->strType = string("Disengage");
         break;
-
     case 5:
-
         this->strType = string("Go home");
         break;
-
-
     }
 
 
@@ -206,6 +194,13 @@ Movement::Movement(int type, int arm, objectPtr obj, int grip_id, bool prec)
     this->obj_eng=objectPtr(new Object());
     this->pose = posePtr(new Pose());
 
+    this->prec=prec;
+    if(prec){
+        this->grip_str=string("Precision");
+    }else{
+        this->grip_str=string("Full");
+    }
+    /**
     if (prec){
         // precision grip
         switch (grip_id) {
@@ -273,60 +268,50 @@ Movement::Movement(int type, int arm, objectPtr obj, int grip_id, bool prec)
             break;
 
         }
-
-
     }
+    */
 
     this->arm=arm;
     this->executed = false;
 }
 
 
-Movement::Movement(int type, int arm,objectPtr obj, objectPtr obj_eng,int grip_id, bool prec)
+Movement::Movement(int type, int arm,objectPtr obj, objectPtr obj_eng,bool prec)
 {
 
     this->type=type;
     switch (type){
-
     case 0:
-
         this->strType = string("Reach-to-grasp");
         break;
-
     case 1:
-
         this->strType = string("Reaching");
         break;
-
     case 2:
-
         this->strType = string("Transport");
         break;
-
     case 3:
-
         this->strType = string("Engage");
         break;
-
     case 4:
-
         this->strType = string("Disengage");
         break;
-
     case 5:
-
         this->strType = string("Go home");
         break;
-
-
     }
-
-
     this->obj = obj;
     this->obj_init = obj;
     this->obj_eng = obj_eng;
     this->pose = posePtr(new Pose());
 
+    this->prec=prec;
+    if(prec){
+        this->grip_str=string("Precision");
+    }else{
+        this->grip_str=string("Full");
+    }
+    /*
     if (prec){
         // precision grip
         switch (grip_id) {
@@ -394,52 +379,37 @@ Movement::Movement(int type, int arm,objectPtr obj, objectPtr obj_eng,int grip_i
             break;
 
         }
-
-
     }
+    */
 
     this->arm=arm;
     this->executed = false;
 
 }
 
-Movement::Movement(int type, int arm,objectPtr obj, objectPtr obj_eng, posePtr pose, int grip_id, bool prec)
+Movement::Movement(int type, int arm,objectPtr obj, objectPtr obj_eng, posePtr pose, bool prec)
 {
 
     this->type=type;
     switch (type){
-
     case 0:
-
         this->strType = string("Reach-to-grasp");
         break;
-
     case 1:
-
         this->strType = string("Reaching");
         break;
-
     case 2:
-
         this->strType = string("Transport");
         break;
-
     case 3:
-
         this->strType = string("Engage");
         break;
-
     case 4:
-
         this->strType = string("Disengage");
         break;
-
     case 5:
-
         this->strType = string("Go home");
         break;
-
-
     }
 
 
@@ -448,6 +418,13 @@ Movement::Movement(int type, int arm,objectPtr obj, objectPtr obj_eng, posePtr p
     this->obj_eng = obj_eng;
     this->pose = pose;
 
+    this->prec=prec;
+    if(prec){
+        this->grip_str=string("Precision");
+    }else{
+        this->grip_str=string("Full");
+    }
+    /*
     if (prec){
         // precision grip
         switch (grip_id) {
@@ -515,51 +492,36 @@ Movement::Movement(int type, int arm,objectPtr obj, objectPtr obj_eng, posePtr p
             break;
 
         }
-
-
     }
+    */
 
     this->arm=arm;
     this->executed = false;
 
 }
 
-Movement::Movement(int type, int arm, objectPtr obj, posePtr pose, int grip_id, bool prec)
+Movement::Movement(int type, int arm, objectPtr obj, posePtr pose,bool prec)
 {
     this->type=type;
     switch (type){
-
     case 0:
-
         this->strType = string("Reach-to-grasp");
         break;
-
     case 1:
-
         this->strType = string("Reaching");
         break;
-
     case 2:
-
         this->strType = string("Transport");
         break;
-
     case 3:
-
         this->strType = string("Engage");
         break;
-
     case 4:
-
         this->strType = string("Disengage");
         break;
-
     case 5:
-
         this->strType = string("Go home");
         break;
-
-
     }
 
 
@@ -568,6 +530,14 @@ Movement::Movement(int type, int arm, objectPtr obj, posePtr pose, int grip_id, 
     this->obj_eng = objectPtr(new Object());
     this->pose = pose;
 
+    this->prec=prec;
+    if(prec){
+        this->grip_str=string("Precision");
+    }else{
+        this->grip_str=string("Full");
+    }
+
+    /*
     if (prec){
         // precision grip
         switch (grip_id) {
@@ -635,9 +605,8 @@ Movement::Movement(int type, int arm, objectPtr obj, posePtr pose, int grip_id, 
             break;
 
         }
-
-
     }
+    */
 
     this->arm=arm;
     this->executed = false;
@@ -650,7 +619,8 @@ Movement::Movement(const Movement &mov)
     this->arm = mov.arm;
     this->type = mov.type;
     this->strType = mov.strType;
-    this->grip_code = mov.grip_code;
+    //this->grip_code = mov.grip_code;
+    this->prec=mov.prec;
     this->grip_str = mov.grip_str;
 
     this->obj = objectPtr(new Object(*mov.obj.get()));
@@ -710,11 +680,17 @@ void Movement::setType(int t)
 
 
 
-void Movement::setGrip(int index, bool prec)
+void Movement::setGrip(bool prec)
 {
 
+    this->prec=prec;
+    if(prec){
+        this->grip_str=string("Precision");
+    }else{
+        this->grip_str=string("Full");
+    }
+    /*
     this->grip_code=index;
-
     if (prec){
         // precision grip
         switch (index) {
@@ -782,9 +758,8 @@ void Movement::setGrip(int index, bool prec)
             break;
 
         }
-
-
     }
+    */
 }
 
 
@@ -832,10 +807,10 @@ int Movement::getType()
     return this->type;
 }
 
-int Movement::getGrip()
+bool Movement::getGrip()
 {
 
-    return this->grip_code;
+    return this->prec;
 }
 
 string Movement::getGripStr()

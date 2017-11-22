@@ -556,12 +556,22 @@ void Object::getTar_right_matrix(Matrix4d& mat)
     this->p_targetRight->Trans_matrix(mat);
 }
 
+void Object::getTar_right_RPY_matrix(Matrix3d &mat)
+{
+    this->p_targetRight->RPY_matrix(mat);
+}
+
 
 void Object::getTar_left_matrix(Matrix4d &mat)
 {
 
     this->p_targetLeft->Trans_matrix(mat);
 
+}
+
+void Object::getTar_left_RPY_matrix(Matrix3d &mat)
+{
+    this->p_targetLeft->RPY_matrix(mat);
 }
 
 

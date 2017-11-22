@@ -1,4 +1,4 @@
-# Planner: RRTConnect ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRTConnect ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full
 njs=9232.01
 nmu=3
 prob_time=263
@@ -46,7 +46,7 @@ step=7, time step=0.0827112, Joint 1=-98.550857|-7.878279|1.112129, Joint 2=-67.
 step=8, time step=0.0999387, Joint 1=-99.198679|-7.133015|15.314780, Joint 2=-65.841737|13.240472|-17.562607, Joint 3=110.687044|-6.725985|13.572755, Joint 4=-84.920157|-16.929945|40.139643, Joint 5=-51.294200|-1.470986|7.365635, Joint 6=-22.147972|16.173759|-30.882223, Joint 7=76.511347|18.326312|-37.825593, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=9, time step=0.242554, Joint 1=-99.841655|-4.535582|22.168288, Joint 2=-64.598647|8.953207|-40.705189, Joint 3=110.076796|-4.312636|20.947374, Joint 4=-86.428939|-10.572536|52.842309, Joint 5=-51.407595|-0.714856|4.902835, Joint 6=-20.672517|10.469435|-50.151830, Joint 7=78.170240|11.712203|-57.074398, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=10, time step=0, Joint 1=-100.481383|0.000000|21.747363, Joint 2=-63.272385|0.000000|-45.085906, Joint 3=109.465789|0.000000|20.771027, Joint 4=-87.895910|0.000000|49.869234, Joint 5=-51.479163|0.000000|2.432927, Joint 6=-19.174677|0.000000|-50.918619, Joint 7=79.825748|0.000000|-56.278526, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
-# Planner: RRTConnect ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full Side thumb left
+# Planner: RRTConnect ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full
 njs=8932.21
 nmu=4
 prob_time=871

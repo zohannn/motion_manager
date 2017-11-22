@@ -1,4 +1,4 @@
-# Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full
 njs=409.936
 nmu=1
 prob_time=721
@@ -34,7 +34,7 @@ step=3, time step=0.708285, Joint 1=-96.608338|-0.800645|-1.004800, Joint 2=-71.
 step=4, time step=0.708285, Joint 1=-97.460393|-1.686955|-1.488592, Joint 2=-70.541038|2.028540|1.790012, Joint 3=110.747318|-0.700579|-0.618201, Joint 4=-72.641539|-4.499929|-3.970798, Joint 5=-38.115047|0.286963|0.253220, Joint 6=-29.449922|2.674936|2.360400, Joint 7=56.122620|2.683288|2.367770, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=5, time step=0.708285, Joint 1=-99.047137|-2.882980|-1.860740, Joint 2=-68.633000|3.466744|2.237515, Joint 3=110.088356|-1.197279|-0.772751, Joint 4=-76.874156|-7.690308|-4.963498, Joint 5=-37.845131|0.490416|0.316526, Joint 6=-26.933887|4.571423|2.950500, Joint 7=58.646511|4.585697|2.959713, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=6, time step=0.708285, Joint 1=-101.548778|-4.270106|-2.009600, Joint 2=-65.624812|5.134743|2.416516, Joint 3=109.049444|-1.773342|-0.834571, Joint 4=-83.547245|-11.390444|-5.360578, Joint 5=-37.419583|0.726376|0.341848, Joint 6=-22.967139|6.770931|3.186540, Joint 7=62.625646|6.792073|3.196490, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
-# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full
 njs=119.727
 nmu=1
 prob_time=687

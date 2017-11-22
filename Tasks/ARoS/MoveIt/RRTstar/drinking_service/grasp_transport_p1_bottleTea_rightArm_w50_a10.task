@@ -1,4 +1,4 @@
-# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full
 njs=22664.6
 nmu=3
 prob_time=5092
@@ -46,7 +46,7 @@ step=7, time step=0.209529, Joint 1=-102.624812|-2.778847|3.424234, Joint 2=-52.
 step=8, time step=0.243421, Joint 1=-103.138478|-2.235575|1.907040, Joint 2=-51.997825|2.701967|-1.536612, Joint 3=95.921404|2.338589|-1.426506, Joint 4=-85.235517|-6.787043|5.320208, Joint 5=8.462091|1.310076|-0.722978, Joint 6=-15.457375|5.430893|-3.869899, Joint 7=30.328130|1.522981|-0.799854, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=9, time step=0.540762, Joint 1=-103.630098|-1.444995|2.931110, Joint 2=-51.382465|1.845492|-3.481192, Joint 3=96.451345|1.584548|-3.022292, Joint 4=-86.740979|-4.445836|8.869154, Joint 5=8.761063|0.898043|-1.684120, Joint 6=-14.242052|3.607258|-7.066806, Joint 7=30.676808|1.048359|-1.958977, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=10, time step=0, Joint 1=-104.100757|0.000000|3.219027, Joint 2=-50.753549|0.000000|-4.301411, Joint 3=96.987803|0.000000|-3.669049, Joint 4=-88.204862|0.000000|10.012090, Joint 5=9.068149|0.000000|-2.100291, Joint 6=-13.040565|0.000000|-8.217452, Joint 7=31.036042|0.000000|-2.456941, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
-# Planner: RRTstar ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full Side thumb left
+# Planner: RRTstar ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full
 njs=5398.12
 nmu=2
 prob_time=1408

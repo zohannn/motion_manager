@@ -1,4 +1,4 @@
-# Planner: PRMstar ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: PRMstar ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full
 njs=57090
 nmu=4
 prob_time=1127
@@ -65,7 +65,7 @@ step=7, time step=0.182943, Joint 1=-56.198098|2.544144|-0.927765, Joint 2=-19.2
 step=8, time step=0.227188, Joint 1=-55.747570|2.241876|-2.153390, Joint 2=-18.090337|5.625806|-6.268621, Joint 3=2.530391|1.363851|-1.201014, Joint 4=-85.474109|-7.570234|8.980274, Joint 5=99.416987|2.443988|-2.282481, Joint 6=-54.841571|3.187845|-2.951989, Joint 7=-16.751857|-3.099196|3.682681, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=9, time step=0.539475, Joint 1=-55.288404|1.444175|-3.009971, Joint 2=-16.958244|3.527648|-7.593525, Joint 3=2.812265|0.891455|-1.822196, Joint 4=-86.984787|-4.686479|10.241696, Joint 5=99.919063|1.582444|-3.274006, Joint 6=-54.186095|2.066320|-4.272278, Joint 7=-17.370172|-1.918843|4.188316, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=10, time step=0, Joint 1=-54.820536|0.000000|-3.215221, Joint 2=-15.840328|0.000000|-7.682388, Joint 3=3.104770|0.000000|-2.010112, Joint 4=-88.454045|0.000000|10.096836, Joint 5=100.434224|0.000000|-3.540215, Joint 6=-53.513116|0.000000|-4.624755, Joint 7=-17.972273|0.000000|4.137675, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
-# Planner: PRMstar ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full Side thumb left
+# Planner: PRMstar ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full
 njs=4948.36
 nmu=2
 prob_time=5413

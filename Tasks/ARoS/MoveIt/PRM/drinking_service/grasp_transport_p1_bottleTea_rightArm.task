@@ -1,4 +1,4 @@
-# Planner: PRM ,Movement: Reach-to-grasp, Arm: right, Object: BottleJuice, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: PRM ,Movement: Reach-to-grasp, Arm: right, Object: BottleJuice, Object Engaged: , Pose: , Grip Type: Full
 njs=50098.1
 nmu=3
 prob_time=672
@@ -60,7 +60,7 @@ step=7, time step=0.185256, Joint 1=-81.159121|-1.344390|1.216711, Joint 2=-24.6
 step=8, time step=0.235516, Joint 1=-81.387975|-1.053179|1.731651, Joint 2=-23.463074|5.805420|-6.643037, Joint 3=35.153862|2.158035|-2.763758, Joint 4=-81.703539|-7.978927|10.114927, Joint 5=86.393870|5.494677|-5.988825, Joint 6=-46.740887|1.805775|-2.547156, Joint 7=-14.536842|-3.950321|5.121584, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.423562|0.000000|0.000000, Joint 10=60.423562|0.000000|0.000000, Joint 11=60.423562|0.000000|0.000000
 step=9, time step=0.561771, Joint 1=-81.593114|-0.596329|1.378131, Joint 2=-22.260384|3.622890|-7.443887, Joint 3=35.593643|1.312579|-2.783079, Joint 4=-83.332110|-4.867024|10.274257, Joint 5=87.539583|3.460575|-7.044485, Joint 6=-46.378703|1.072806|-2.333038, Joint 7=-15.340321|-2.395230|5.098972, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.423562|0.000000|0.000000, Joint 10=60.423562|0.000000|0.000000, Joint 11=60.423562|0.000000|0.000000
 step=10, time step=0, Joint 1=-81.773801|0.000000|1.145085, Joint 2=-21.058664|0.000000|-7.615774, Joint 3=36.019382|0.000000|-2.698075, Joint 4=-84.915822|0.000000|10.036612, Joint 5=88.694840|0.000000|-7.321326, Joint 6=-46.037269|0.000000|-2.163803, Joint 7=-16.114943|0.000000|4.909092, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.423562|0.000000|0.000000, Joint 10=60.423562|0.000000|0.000000, Joint 11=60.423562|0.000000|0.000000
-# Planner: PRM ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: BottleJuice_pose1, Grip Type: Full Side thumb left
+# Planner: PRM ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: BottleJuice_pose1, Grip Type: Full
 njs=10469.3
 nmu=10
 prob_time=1980

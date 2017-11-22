@@ -1,4 +1,4 @@
-# Planner: RRTConnect ,Movement: Reach-to-grasp, Arm: right, Object: Cup, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRTConnect ,Movement: Reach-to-grasp, Arm: right, Object: Cup, Object Engaged: , Pose: , Grip Type: Full
 njs=20071.4
 nmu=4
 prob_time=2655
@@ -95,7 +95,7 @@ step=19, time step=0.0947169, Joint 1=-17.837521|-8.282837|0.769051, Joint 2=-58
 step=20, time step=0.124943, Joint 1=-18.618741|-7.495457|13.702868, Joint 2=-59.074153|-4.706251|0.358429, Joint 3=-27.501768|-7.027964|11.717004, Joint 4=-128.850073|-17.364121|50.046628, Joint 5=148.368862|-11.785008|19.692111, Joint 6=-106.627589|-24.164122|54.330278, Joint 7=-72.995991|-7.807929|14.346530, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.495306|0.000000|0.000000, Joint 10=60.495306|0.000000|0.000000, Joint 11=60.495306|0.000000|0.000000
 step=21, time step=0.314726, Joint 1=-19.461225|-4.808743|17.597092, Joint 2=-59.659705|-3.509774|10.706183, Joint 3=-28.299467|-4.586139|16.361303, Joint 4=-130.676211|-10.076498|41.297633, Joint 5=147.031524|-7.682903|27.481746, Joint 6=-109.273945|-14.924138|56.919625, Joint 7=-73.873099|-5.020585|18.191029, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.495306|0.000000|0.000000, Joint 10=60.495306|0.000000|0.000000, Joint 11=60.495306|0.000000|0.000000
 step=22, time step=0, Joint 1=-20.365911|0.000000|18.266810, Joint 2=-60.393955|0.000000|14.825468, Joint 3=-29.176844|0.000000|17.715408, Joint 4=-132.418906|0.000000|35.187292, Joint 5=145.564212|0.000000|29.626950, Joint 6=-112.001894|0.000000|55.080877, Joint 7=-74.823911|0.000000|19.198146, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.495306|0.000000|0.000000, Joint 10=60.495306|0.000000|0.000000, Joint 11=60.495306|0.000000|0.000000
-# Planner: RRTConnect ,Movement: Transport, Arm: right, Object: Cup, Object Engaged: , Pose: Cup_pose, Grip Type: Full Side thumb left
+# Planner: RRTConnect ,Movement: Transport, Arm: right, Object: Cup, Object Engaged: , Pose: Cup_pose, Grip Type: Full
 njs=16767.5
 nmu=5
 prob_time=776

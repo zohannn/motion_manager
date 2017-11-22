@@ -1,4 +1,4 @@
-# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full
 njs=21916.5
 nmu=3
 prob_time=5131
@@ -52,7 +52,7 @@ step=7, time step=0.178277, Joint 1=-102.132064|-4.711816|1.870457, Joint 2=-40.
 step=8, time step=0.226887, Joint 1=-102.942932|-3.999179|5.421749, Joint 2=-40.140774|1.295854|-2.757292, Joint 3=82.093017|7.501040|-8.096432, Joint 4=-85.356401|-7.643137|10.094618, Joint 5=53.546834|3.684038|-4.810322, Joint 6=-21.912037|6.542403|-7.080963, Joint 7=-3.662928|-3.375149|4.297458, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=9, time step=0.557113, Joint 1=-103.725694|-2.398109|5.366807, Joint 2=-39.910128|0.667937|-1.778711, Joint 3=83.608839|4.728324|-9.962342, Joint 4=-86.858541|-4.621236|10.201048, Joint 5=54.272147|2.229768|-4.933815, Joint 6=-20.590381|4.127575|-8.661165, Joint 7=-4.329943|-2.056370|4.507574, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=10, time step=0, Joint 1=-104.475688|0.000000|4.832829, Joint 2=-39.732237|0.000000|-1.146303, Joint 3=85.155219|0.000000|-9.964610, Joint 4=-88.319196|0.000000|9.412209, Joint 5=54.975635|0.000000|-4.533159, Joint 6=-19.236605|0.000000|-8.723503, Joint 7=-4.983372|0.000000|4.210585, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
-# Planner: RRTstar ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full Side thumb left
+# Planner: RRTstar ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full
 njs=10527.5
 nmu=1
 prob_time=5165

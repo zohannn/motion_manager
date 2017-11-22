@@ -1,4 +1,4 @@
-# Planner: RRTConnect ,Movement: Reach-to-grasp, Arm: right, Object: MagentaColumn, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRTConnect ,Movement: Reach-to-grasp, Arm: right, Object: MagentaColumn, Object Engaged: , Pose: , Grip Type: Full
 njs=16406.2
 nmu=3
 prob_time=494
@@ -50,7 +50,7 @@ step=2, time step=0.0867654, Joint 1=-70.488492|-2.689282|-6.970474, Joint 2=-79
 step=3, time step=0.108835, Joint 1=-70.751958|-2.728641|6.296234, Joint 2=-79.055566|-0.278388|0.700601, Joint 3=107.771669|1.049410|-2.473482, Joint 4=-90.456669|-3.677959|8.648840, Joint 5=46.494787|-0.165777|0.643581, Joint 6=28.545018|1.099485|-2.684496, Joint 7=-38.327407|0.822050|-2.031019, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
 step=4, time step=0.267076, Joint 1=-71.015420|-1.703631|7.630789, Joint 2=-79.082135|-0.170777|0.780526, Joint 3=107.872717|0.652513|-2.936268, Joint 4=-90.810929|-2.287850|10.291605, Joint 5=46.480169|-0.089903|0.472483, Joint 6=28.650393|0.678744|-3.080187, Joint 7=-38.248749|0.506253|-2.303529, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
 step=5, time step=0, Joint 1=-71.278893|0.000000|7.387468, Joint 2=-79.108155|0.000000|0.729567, Joint 3=107.973290|0.000000|-2.819943, Joint 4=-91.163648|0.000000|9.889833, Joint 5=46.468017|0.000000|0.340727, Joint 6=28.754360|0.000000|-2.915090, Joint 7=-38.171357|0.000000|-2.169966, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
-# Planner: RRTConnect ,Movement: Engage, Arm: right, Object: MagentaColumn, Object Engaged: Base, Pose: , Grip Type: Full Side thumb left
+# Planner: RRTConnect ,Movement: Engage, Arm: right, Object: MagentaColumn, Object Engaged: Base, Pose: , Grip Type: Full
 njs=5861.37
 nmu=3
 prob_time=256

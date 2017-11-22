@@ -1,4 +1,4 @@
-# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRTstar ,Movement: Reach-to-grasp, Arm: right, Object: BottleTea, Object Engaged: , Pose: , Grip Type: Full
 njs=9264.71
 nmu=3
 prob_time=5088
@@ -49,7 +49,7 @@ step=7, time step=0.0770527, Joint 1=-102.935274|-8.155534|2.151325, Joint 2=-46
 step=8, time step=0.0966441, Joint 1=-103.557201|-7.088587|22.634299, Joint 2=-45.724276|3.828336|-11.811150, Joint 3=89.100002|12.870224|-32.909741, Joint 4=-85.265639|-17.799409|51.909171, Joint 5=34.738282|4.486605|-13.437746, Joint 6=-17.711826|15.080646|-39.205096, Joint 7=10.268501|-1.496593|7.492947, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=9, time step=0.231894, Joint 1=-104.147283|-4.254926|22.533572, Joint 2=-45.403858|2.322064|-12.094575, Joint 3=90.205722|8.109301|-40.565669, Joint 4=-86.768000|-10.922386|56.284574, Joint 5=35.115491|2.736408|-14.204415, Joint 6=-16.418902|9.477705|-47.489036, Joint 7=10.155310|-0.769733|4.888144, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
 step=10, time step=0, Joint 1=-104.704789|0.000000|20.734823, Joint 2=-45.095744|0.000000|-11.459383, Joint 3=91.313586|0.000000|-41.203802, Joint 4=-88.228812|0.000000|54.330657, Joint 5=35.479504|0.000000|-13.538380, Joint 6=-15.125579|0.000000|-48.101401, Joint 7=10.069915|0.000000|3.175995, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.425029|0.000000|0.000000, Joint 10=60.425029|0.000000|0.000000, Joint 11=60.425029|0.000000|0.000000
-# Planner: RRTstar ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full Side thumb left
+# Planner: RRTstar ,Movement: Transport, Arm: right, Object: BottleTea, Object Engaged: , Pose: BottleTea_pose1, Grip Type: Full
 njs=22020.7
 nmu=2
 prob_time=5192

@@ -1,4 +1,4 @@
-# Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: BottleJuice, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: BottleJuice, Object Engaged: , Pose: , Grip Type: Full
 njs=6377.39
 nmu=1
 prob_time=1225
@@ -35,7 +35,7 @@ step=3, time step=0.847797, Joint 1=-96.605269|-0.669715|-0.702175, Joint 2=-71.
 step=4, time step=0.847797, Joint 1=-97.458372|-1.411086|-1.040260, Joint 2=-70.553751|1.701936|1.254676, Joint 3=110.757124|-0.591195|-0.435832, Joint 4=-72.646435|-3.757599|-2.770120, Joint 5=-38.129477|0.251580|0.185466, Joint 6=-29.446989|2.234382|1.647198, Joint 7=56.117658|2.239595|1.651040, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.423562|0.000000|0.000000, Joint 10=60.423562|0.000000|0.000000, Joint 11=60.423562|0.000000|0.000000
 step=5, time step=0.847797, Joint 1=-99.047068|-2.411524|-1.300325, Joint 2=-68.637596|2.908582|1.568345, Joint 3=110.091516|-1.010343|-0.544790, Joint 4=-76.876994|-6.421678|-3.462651, Joint 5=-37.846232|0.429946|0.231832, Joint 6=-26.931371|3.818525|2.058997, Joint 7=58.639145|3.827433|2.063800, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.423562|0.000000|0.000000, Joint 10=60.423562|0.000000|0.000000, Joint 11=60.423562|0.000000|0.000000
 step=6, time step=0, Joint 1=-101.551787|-3.571812|-1.404351, Joint 2=-65.616611|4.308026|1.693812, Joint 3=109.042128|-1.496463|-0.588373, Joint 4=-83.546839|-9.511423|-3.739663, Joint 5=-37.399671|0.636811|0.250379, Joint 6=-22.965279|5.655781|2.223717, Joint 7=62.614489|5.668975|2.228905, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.423562|0.000000|0.000000, Joint 10=60.423562|0.000000|0.000000, Joint 11=60.423562|0.000000|0.000000
-# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: BottleJuice_pose1, Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: BottleJuice_pose1, Grip Type: Full
 njs=933.522
 nmu=1
 prob_time=848
@@ -59,7 +59,7 @@ step=3, time step=0.407927, Joint 1=-104.187709|0.163242|-0.035571, Joint 2=-60.
 step=4, time step=0.407927, Joint 1=-104.125240|0.139730|-0.084316, Joint 2=-61.074546|-1.378677|0.831930, Joint 3=77.417625|-0.285507|0.172282, Joint 4=-99.096929|2.755413|-1.662688, Joint 5=-46.575735|-0.191726|0.115693, Joint 6=-30.689143|-1.136314|0.685681, Joint 7=68.142468|-1.485981|0.896680, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.423562|0.000000|0.000000, Joint 10=60.423562|0.000000|0.000000, Joint 11=60.423562|0.000000|0.000000
 step=5, time step=0.407927, Joint 1=-104.077240|0.090152|-0.164681, Joint 2=-61.548151|-0.889512|1.624863, Joint 3=77.319547|-0.184207|0.336489, Joint 4=-98.150385|1.777771|-3.247437, Joint 5=-46.641597|-0.123700|0.225962, Joint 6=-31.079491|-0.733141|1.339221, Joint 7=67.632001|-0.958744|1.751328, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.423562|0.000000|0.000000, Joint 10=60.423562|0.000000|0.000000, Joint 11=60.423562|0.000000|0.000000
 step=6, time step=0, Joint 1=-104.057192|0.000000|-0.284568, Joint 2=-61.745965|-0.000000|2.807763, Joint 3=77.278582|-0.000000|0.581453, Joint 4=-97.755037|0.000000|-5.611572, Joint 5=-46.669106|-0.000000|0.390463, Joint 6=-31.242530|-0.000000|2.314174, Joint 7=67.418792|-0.000000|3.026294, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.423562|0.000000|0.000000, Joint 10=60.423562|0.000000|0.000000, Joint 11=60.423562|0.000000|0.000000
-# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: BottleJuice_pose2, Grip Type: Full Side thumb left
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: BottleJuice_pose2, Grip Type: Full
 njs=5504.86
 nmu=2
 prob_time=1603

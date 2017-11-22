@@ -1,4 +1,4 @@
-# Planner: PRM ,Movement: Reach-to-grasp, Arm: right, Object: BottleJuice, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: PRM ,Movement: Reach-to-grasp, Arm: right, Object: BottleJuice, Object Engaged: , Pose: , Grip Type: Full
 njs=66073.4
 nmu=4
 prob_time=809
@@ -68,7 +68,7 @@ step=7, time step=0.194544, Joint 1=-36.253054|5.754132|-4.739716, Joint 2=-24.1
 step=8, time step=0.249611, Joint 1=-35.217286|4.724834|-5.396776, Joint 2=-22.847955|5.845424|-6.681109, Joint 3=-29.903906|0.453092|-0.008464, Joint 4=-81.515306|-7.601935|9.439684, Joint 5=106.478481|-0.767610|1.121975, Joint 6=-66.161746|3.906886|-3.412961, Joint 7=-12.051774|-3.106874|3.811243, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.423562|0.000000|0.000000, Joint 10=60.423562|0.000000|0.000000, Joint 11=60.423562|0.000000|0.000000
 step=9, time step=0.563487, Joint 1=-34.187496|2.970770|-5.681056, Joint 2=-21.574050|3.675726|-7.024180, Joint 3=-29.791044|0.349361|-0.505675, Joint 4=-83.151196|-4.688471|9.176233, Joint 5=106.317975|-0.450620|0.946539, Joint 6=-65.281140|2.586573|-4.630893, Joint 7=-12.721650|-1.922744|3.743384, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.423562|0.000000|0.000000, Joint 10=60.423562|0.000000|0.000000, Joint 11=60.423562|0.000000|0.000000
 step=10, time step=0, Joint 1=-33.164228|0.000000|-6.445424, Joint 2=-20.307394|0.000000|-7.978498, Joint 3=-29.652105|0.000000|-0.875158, Joint 4=-84.742020|0.000000|10.020383, Joint 5=106.172475|0.000000|0.916482, Joint 6=-64.354075|0.000000|-5.839462, Joint 7=-13.376314|0.000000|4.123643, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.423562|0.000000|0.000000, Joint 10=60.423562|0.000000|0.000000, Joint 11=60.423562|0.000000|0.000000
-# Planner: PRM ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: BottleJuice_pose1, Grip Type: Full Side thumb left
+# Planner: PRM ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: BottleJuice_pose1, Grip Type: Full
 njs=29301
 nmu=4
 prob_time=1685

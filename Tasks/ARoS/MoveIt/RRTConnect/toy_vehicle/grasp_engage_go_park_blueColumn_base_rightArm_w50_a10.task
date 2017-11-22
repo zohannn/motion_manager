@@ -1,4 +1,4 @@
-# Planner: RRTConnect ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: RRTConnect ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Pose: , Grip Type: Full
 njs=32990.1
 nmu=4
 prob_time=578
@@ -60,7 +60,7 @@ step=7, time step=0.1977, Joint 1=-70.440598|-8.239481|5.924516, Joint 2=-95.000
 step=8, time step=0.255232, Joint 1=-71.961002|-6.829628|7.602300, Joint 2=-95.000000|0.000000|0.000000, Joint 3=126.784231|0.679249|0.082356, Joint 4=-104.591197|-8.126676|9.967581, Joint 5=47.703399|2.606082|-1.855187, Joint 6=47.929419|1.962748|-2.697674, Joint 7=-54.308936|2.472709|-3.769009, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
 step=9, time step=0.584968, Joint 1=-73.484430|-4.291331|7.986024, Joint 2=-95.000000|0.000000|0.000000, Joint 3=126.959977|0.530458|-0.752755, Joint 4=-106.377315|-4.988893|9.564973, Joint 5=48.314938|1.768905|-2.985520, Joint 6=48.352411|1.167036|-2.333950, Joint 7=-53.786748|1.427131|-2.945971, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
 step=10, time step=0, Joint 1=-75.013459|0.000000|8.936782, Joint 2=-95.000000|0.000000|0.000000, Joint 3=127.177785|0.000000|-1.273032, Joint 4=-108.120386|0.000000|10.187801, Joint 5=48.982852|0.000000|-3.903788, Joint 6=48.748311|0.000000|-2.313938, Joint 7=-53.313901|0.000000|-2.763670, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
-# Planner: RRTConnect ,Movement: Engage, Arm: right, Object: BlueColumn, Object Engaged: Base, Pose: , Grip Type: Full Side thumb left
+# Planner: RRTConnect ,Movement: Engage, Arm: right, Object: BlueColumn, Object Engaged: Base, Pose: , Grip Type: Full
 njs=21477.1
 nmu=3
 prob_time=339

@@ -642,7 +642,7 @@ void MainWindow::on_pushButton_addMov_clicked()
                 objectPtr obj_eng = curr_scene->getObject(obj_eng_name);
 
                 if(obj!=NULL && obj_eng!=NULL){
-                    int grip_id = ui.comboBox_grip->currentIndex();
+                    //int grip_id = ui.comboBox_grip->currentIndex();
                     bool prec = ui.radioButton_prec->isChecked();
                     //bool full = ui.radioButton_full->isChecked();
                     switch (arm_sel){
@@ -658,10 +658,10 @@ void MainWindow::on_pushButton_addMov_clicked()
                         break;
                     }
                     if(planner_id==0){
-                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,prec),new Scenario(*(this->curr_scene.get()))));
                     }else{
 #if MOVEIT==1
-                       curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                       curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
 #endif
                     }
                     success=true;
@@ -676,7 +676,7 @@ void MainWindow::on_pushButton_addMov_clicked()
                 posePtr pose = curr_scene->getPose(pose_name);
 
                 if(obj!=NULL && obj_eng!=NULL && pose!=NULL){
-                    int grip_id = ui.comboBox_grip->currentIndex();
+                    //int grip_id = ui.comboBox_grip->currentIndex();
                     bool prec = ui.radioButton_prec->isChecked();
                     //bool full = ui.radioButton_full->isChecked();
                     switch (arm_sel){
@@ -692,10 +692,10 @@ void MainWindow::on_pushButton_addMov_clicked()
                         break;
                     }
                     if(planner_id==0){
-                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,pose,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,pose,prec),new Scenario(*(this->curr_scene.get()))));
                     }else{
 #if MOVEIT==1
-                       curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,pose,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                       curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,obj_eng,pose,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
 #endif
                     }
                     success=true;
@@ -705,7 +705,7 @@ void MainWindow::on_pushButton_addMov_clicked()
                  string obj_name = ui.comboBox_objects->currentText().toStdString();
                  objectPtr obj = curr_scene->getObject(obj_name);
                  if(obj!=NULL){
-                     int grip_id = ui.comboBox_grip->currentIndex();
+                     //int grip_id = ui.comboBox_grip->currentIndex();
                      bool prec = ui.radioButton_prec->isChecked();
                      //bool full = ui.radioButton_full->isChecked();
                      switch (arm_sel){
@@ -721,10 +721,10 @@ void MainWindow::on_pushButton_addMov_clicked()
                          break;
                      }
                      if(planner_id==0){
-                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,prec),new Scenario(*(this->curr_scene.get()))));
                      }else{
 #if MOVEIT==1
-                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
 #endif
                      }
                      success=true;
@@ -736,13 +736,13 @@ void MainWindow::on_pushButton_addMov_clicked()
                  string pose_name = ui.comboBox_poses->currentText().toStdString();
                  posePtr pose = curr_scene->getPose(pose_name);
                  if(obj!=NULL || pose!=NULL){
-                     int grip_id = ui.comboBox_grip->currentIndex();
+                     //int grip_id = ui.comboBox_grip->currentIndex();
                      bool prec = ui.radioButton_prec->isChecked();
                      if(planner_id==0){
-                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,pose,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,pose,prec),new Scenario(*(this->curr_scene.get()))));
                      }else{
 #if MOVEIT==1
-                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,pose,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                        curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,pose,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
 #endif
                      }
                      success=true;
@@ -1957,11 +1957,10 @@ void MainWindow::on_pushButton_load_task_clicked()
     int plan_id; QString plan_type;
     int mov_id; QString mov_type;
     int arm_code; QString arm_type;
-    int grip_id; QString grip_type;
     QString obj_str; objectPtr obj;
     QString obj_eng_str; objectPtr obj_eng;
     QString pose_str; posePtr pose;
-    bool prec;
+    bool prec; QString grip_type;
     int row=0;
     MatrixXd pos_stage;
     MatrixXd vel_stage;
@@ -2081,44 +2080,11 @@ void MainWindow::on_pushButton_load_task_clicked()
                 }
 
                 // get the grip type
-                if(QString::compare(grip_type,QString("Precision Side thumb left"),Qt::CaseInsensitive)==0){
-                    grip_id=0;
+                if(QString::compare(grip_type,QString("Precision"),Qt::CaseInsensitive)==0){
                     prec=true;
-                }else if(QString::compare(grip_type,QString("Precision Side thumb right"),Qt::CaseInsensitive)==0){
-                    grip_id=1;
-                    prec=true;
-                }else if(QString::compare(grip_type,QString("Precision Side thumb up"),Qt::CaseInsensitive)==0){
-                    grip_id=2;
-                    prec=true;
-                }else if(QString::compare(grip_type,QString("Precision Side thumb down"),Qt::CaseInsensitive)==0){
-                    grip_id=3;
-                    prec=true;
-                }else if(QString::compare(grip_type,QString("Precision Above"),Qt::CaseInsensitive)==0){
-                    grip_id=4;
-                    prec=true;
-                }else if(QString::compare(grip_type,QString("Precision Below"),Qt::CaseInsensitive)==0){
-                    grip_id=5;
-                    prec=true;
-                }else if(QString::compare(grip_type,QString("Full Side thumb left"),Qt::CaseInsensitive)==0){
-                    grip_id=0;
-                    prec=false;
-                }else if(QString::compare(grip_type,QString("Full Side thumb right"),Qt::CaseInsensitive)==0){
-                    grip_id=1;
-                    prec=false;
-                }else if(QString::compare(grip_type,QString("Full Side thumb up"),Qt::CaseInsensitive)==0){
-                    grip_id=2;
-                    prec=false;
-                }else if(QString::compare(grip_type,QString("Full Side thumb down"),Qt::CaseInsensitive)==0){
-                    grip_id=3;
-                    prec=false;
-                }else if(QString::compare(grip_type,QString("Full Above"),Qt::CaseInsensitive)==0){
-                    grip_id=4;
-                    prec=false;
-                }else if(QString::compare(grip_type,QString("Full Below"),Qt::CaseInsensitive)==0){
-                    grip_id=5;
+                }else{
                     prec=false;
                 }
-
                 //get the arm
                 if(QString::compare(arm_type,QString("both"),Qt::CaseInsensitive)==0){
                     arm_code=0;
@@ -2147,10 +2113,10 @@ void MainWindow::on_pushButton_load_task_clicked()
                     }
                     problemPtr prob;
                     if(plan_id==0){
-                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,prec),new Scenario(*(this->curr_scene.get()))));
                     }else{
 #if MOVEIT==1
-                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
 #endif
                     }
                     prob->setSolved(true);
@@ -2177,10 +2143,10 @@ void MainWindow::on_pushButton_load_task_clicked()
                     // get the pose
                     pose = this->curr_scene->getPose(pose_str.toStdString());
                     if(plan_id==0){
-                       prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,pose,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                       prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,pose,prec),new Scenario(*(this->curr_scene.get()))));
                     }else{
 #if MOVEIT==1
-                       prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,pose,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                       prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,pose,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
 #endif
                     }
                     prob->setSolved(true);
@@ -2206,10 +2172,10 @@ void MainWindow::on_pushButton_load_task_clicked()
                     }
                     problemPtr prob;
                     if(plan_id==0){
-                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get()))));
+                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,prec),new Scenario(*(this->curr_scene.get()))));
                     }else{
 #if MOVEIT==1
-                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,grip_id,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
+                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
 #endif
                     }
                     prob->setSolved(true);

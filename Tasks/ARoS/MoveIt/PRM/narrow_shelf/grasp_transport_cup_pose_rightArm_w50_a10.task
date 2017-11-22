@@ -1,4 +1,4 @@
-# Planner: PRM ,Movement: Reach-to-grasp, Arm: right, Object: Cup, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: PRM ,Movement: Reach-to-grasp, Arm: right, Object: Cup, Object Engaged: , Pose: , Grip Type: Full
 njs=92861.3
 nmu=4
 prob_time=628
@@ -91,7 +91,7 @@ step=17, time step=0.234442, Joint 1=-3.420212|-0.185543|-0.813456, Joint 2=-62.
 step=18, time step=0.298046, Joint 1=-3.484663|-0.323015|-0.361372, Joint 2=-62.130723|1.787575|-2.673679, Joint 3=-29.604886|-0.930574|0.654689, Joint 4=-106.336039|-9.993658|9.906555, Joint 5=163.529349|-1.191548|0.567571, Joint 6=-83.661891|-8.433641|7.255688, Joint 7=-60.817065|-1.748777|1.573550, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.495306|0.000000|0.000000, Joint 10=60.495306|0.000000|0.000000, Joint 11=60.495306|0.000000|0.000000
 step=19, time step=0.700582, Joint 1=-3.595274|-0.298696|0.290100, Joint 2=-61.704026|0.963879|-1.873652, Joint 3=-29.856264|-0.611110|0.930517, Joint 4=-108.921550|-6.136925|10.165762, Joint 5=163.196732|-0.822097|1.177195, Joint 6=-85.887623|-5.342458|8.512846, Joint 7=-61.275848|-1.098488|1.765682, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.495306|0.000000|0.000000, Joint 10=60.495306|0.000000|0.000000, Joint 11=60.495306|0.000000|0.000000
 step=20, time step=0, Joint 1=-3.753795|0.000000|0.645950, Joint 2=-61.356461|0.000000|-1.416276, Joint 3=-30.121644|0.000000|1.081387, Joint 4=-111.442925|0.000000|10.274235, Joint 5=162.826683|0.000000|1.507896, Joint 6=-88.141512|0.000000|9.184271, Joint 7=-61.736602|0.000000|1.877505, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.495306|0.000000|0.000000, Joint 10=60.495306|0.000000|0.000000, Joint 11=60.495306|0.000000|0.000000
-# Planner: PRM ,Movement: Transport, Arm: right, Object: Cup, Object Engaged: , Pose: Cup_pose, Grip Type: Full Side thumb left
+# Planner: PRM ,Movement: Transport, Arm: right, Object: Cup, Object Engaged: , Pose: Cup_pose, Grip Type: Full
 njs=54964.2
 nmu=3
 prob_time=647

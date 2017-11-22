@@ -1,4 +1,4 @@
-# Planner: PRMstar ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Pose: , Grip Type: Full Side thumb left
+# Planner: PRMstar ,Movement: Reach-to-grasp, Arm: right, Object: BlueColumn, Object Engaged: , Pose: , Grip Type: Full
 njs=5833.64
 nmu=3
 prob_time=5565
@@ -52,7 +52,7 @@ step=7, time step=0.0951779, Joint 1=-77.900754|-29.665760|50.984586, Joint 2=-3
 step=8, time step=0.126277, Joint 1=-80.513495|-24.527021|52.816289, Joint 2=-32.287440|7.735857|-22.607943, Joint 3=67.375860|14.532064|-28.848465, Joint 4=-104.535265|-16.683776|45.883084, Joint 5=-38.573575|-8.420632|14.493192, Joint 6=24.813561|5.301190|-14.964669, Joint 7=95.200749|9.784692|-19.264701, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
 step=9, time step=0.317189, Joint 1=-83.241437|-15.295169|56.895109, Joint 2=-31.468637|4.467786|-18.187793, Joint 3=69.009235|9.206911|-33.626055, Joint 4=-106.321259|-9.819184|39.004973, Joint 5=-39.535579|-5.457411|19.490365, Joint 6=25.378357|3.098602|-12.394116, Joint 7=96.301644|6.197387|-22.736769, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
 step=10, time step=0, Joint 1=-86.092145|0.000000|56.669201, Joint 2=-30.691090|0.000000|-15.456865, Joint 3=70.747086|0.000000|-34.546710, Joint 4=-108.064163|0.000000|34.647167, Joint 5=-40.581219|0.000000|20.786271, Joint 6=25.925353|0.000000|-10.873725, Joint 7=97.467835|0.000000|-23.182690, Joint 8=0.000000|0.000000|0.000000, Joint 9=60.493692|0.000000|0.000000, Joint 10=60.493692|0.000000|0.000000, Joint 11=60.493692|0.000000|0.000000
-# Planner: PRMstar ,Movement: Engage, Arm: right, Object: BlueColumn, Object Engaged: Base, Pose: , Grip Type: Full Side thumb left
+# Planner: PRMstar ,Movement: Engage, Arm: right, Object: BlueColumn, Object Engaged: Base, Pose: , Grip Type: Full
 njs=7883.84
 nmu=4
 prob_time=1165
