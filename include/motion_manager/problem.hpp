@@ -116,11 +116,34 @@ public:
     void setMoveSettings(std::vector<double> &tar, std::vector<double> &final_hand, std::vector<double> &final_arm, bool use_posture);
 
     /**
+     * @brief setMoveSettings
+     * @param tar_right
+     * @param tar_left
+     * @param final_hand_right
+     * @param final_hand_left
+     * @param final_arm_right
+     * @param final_arm_left
+     * @param use_posture_right
+     * @param use_posture_left
+     */
+    void setMoveSettings(std::vector<double> &tar_right, std::vector<double> &tar_left,
+                         std::vector<double> &final_hand_right, std::vector<double> &final_hand_left,
+                         std::vector<double> &final_arm_right, std::vector<double> &final_arm_left,
+                         bool use_posture_right,bool use_posture_left);
+
+    /**
      * @brief This method solves the problem given the tolerances and the parameters of the planner HUMP
      * @param tols
      * @return
      */
     HUMotion::planning_result_ptr solve(HUMotion::hump_params& params);
+
+    /**
+     * @brief solve dual-arm motion problems
+     * @param params
+     * @return
+     */
+    HUMotion::planning_result_ptr solve(HUMotion::hump_dual_params& params);
 
 #if MOVEIT==1
     /**
@@ -244,11 +267,22 @@ private:
     int planner_id; /**<  planner id of the selected planner */
     string planner_name; /**< name of the selected planner */
 
-    // move movements settings
+    // move movements settings (single-arm)
     std::vector<double> move_final_hand;/**< goal hand posture in move movements */
     std::vector<double> move_final_arm;/**< goal arm posture in move movements */
     std::vector<double> move_target;/**< goal target pose of the end-effector in move movements */
     bool use_posture;/**< true to use the move_final_arm, false to use move_target in move movements */
+
+    // move movements settings (dual-arm)
+    std::vector<double> move_final_hand_right;/**< goal right hand posture in move movements */
+    std::vector<double> move_final_hand_left;/**< goal left hand posture in move movements */
+    std::vector<double> move_final_arm_right;/**< goal right arm posture in move movements */
+    std::vector<double> move_final_arm_left;/**< goal left arm posture in move movements */
+    std::vector<double> move_target_right;/**< goal target pose of the right end-effector in move movements */
+    std::vector<double> move_target_left;/**< goal target pose of the left end-effector in move movements */
+    bool use_posture_right;/**< true to use the move_final_arm, false to use move_target in move movements (right) */
+    bool use_posture_left;/**< true to use the move_final_arm, false to use move_target in move movements (left) */
+
 #if MOVEIT==1
     moveit_plannerPtr m_planner; /**< MoveIt! Libraries planner */
 #endif

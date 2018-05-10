@@ -13,6 +13,14 @@ Movement::Movement(int type, int arm)
     this->obj_eng=objectPtr(new Object());
     this->pose = posePtr(new Pose());
 
+    this->obj_left=objectPtr(new Object());
+    this->obj_init_left=objectPtr(new Object());
+    this->obj_eng_left=objectPtr(new Object());
+    this->pose_left = posePtr(new Pose());
+    this->grip_str_left=string("No Grip");
+    this->prec_left=false;
+
+
     this->type=type;
     switch (type){
 
@@ -107,6 +115,13 @@ Movement::Movement(int type, int arm, objectPtr obj)
     this->arm=arm;
     this->executed = false;
 
+    this->obj_left=objectPtr(new Object());
+    this->obj_init_left=objectPtr(new Object());
+    this->obj_eng_left=objectPtr(new Object());
+    this->pose_left = posePtr(new Pose());
+    this->grip_str_left=string("No Grip");
+    this->prec_left=false;
+
 
 }
 
@@ -158,6 +173,14 @@ Movement::Movement(int type, int arm, posePtr pose)
     this->grip_str=string("No Grip");
     this->arm=arm;
     this->executed = false;
+
+    this->obj_left=objectPtr(new Object());
+    this->obj_init_left=objectPtr(new Object());
+    this->obj_eng_left=objectPtr(new Object());
+    this->pose_left = posePtr(new Pose());
+    this->grip_str_left=string("No Grip");
+    this->prec_left=false;
+
 
 
 }
@@ -273,6 +296,14 @@ Movement::Movement(int type, int arm, objectPtr obj, bool prec)
 
     this->arm=arm;
     this->executed = false;
+
+    this->obj_left=objectPtr(new Object());
+    this->obj_init_left=objectPtr(new Object());
+    this->obj_eng_left=objectPtr(new Object());
+    this->pose_left = posePtr(new Pose());
+    this->grip_str_left=string("No Grip");
+    this->prec_left=false;
+
 }
 
 
@@ -384,6 +415,14 @@ Movement::Movement(int type, int arm,objectPtr obj, objectPtr obj_eng,bool prec)
 
     this->arm=arm;
     this->executed = false;
+
+    this->obj_left=objectPtr(new Object());
+    this->obj_init_left=objectPtr(new Object());
+    this->obj_eng_left=objectPtr(new Object());
+    this->pose_left = posePtr(new Pose());
+    this->grip_str_left=string("No Grip");
+    this->prec_left=false;
+
 
 }
 
@@ -498,6 +537,14 @@ Movement::Movement(int type, int arm,objectPtr obj, objectPtr obj_eng, posePtr p
     this->arm=arm;
     this->executed = false;
 
+    this->obj_left=objectPtr(new Object());
+    this->obj_init_left=objectPtr(new Object());
+    this->obj_eng_left=objectPtr(new Object());
+    this->pose_left = posePtr(new Pose());
+    this->grip_str_left=string("No Grip");
+    this->prec_left=false;
+
+
 }
 
 Movement::Movement(int type, int arm, objectPtr obj, posePtr pose,bool prec)
@@ -610,6 +657,91 @@ Movement::Movement(int type, int arm, objectPtr obj, posePtr pose,bool prec)
 
     this->arm=arm;
     this->executed = false;
+
+    this->obj_left=objectPtr(new Object());
+    this->obj_init_left=objectPtr(new Object());
+    this->obj_eng_left=objectPtr(new Object());
+    this->pose_left = posePtr(new Pose());
+    this->grip_str_left=string("No Grip");
+    this->prec_left=false;
+
+}
+
+Movement::Movement(int type_r,int type_l,int arm, objectPtr obj_r,bool prec_r,objectPtr obj_l,bool prec_l)
+{
+    // dual arm reach to grasp
+    this->arm = arm;
+    this->executed = false;
+
+    this->obj = obj_r;
+    this->obj_init = obj_r;
+
+    this->obj_left = obj_l;
+    this->obj_init_left = obj_l;
+
+    this->prec=prec_r;
+    if(prec_r){
+        this->grip_str=string("Precision");
+    }else{
+        this->grip_str=string("Full");
+    }
+
+    this->prec_left=prec_l;
+    if(prec_l){
+        this->grip_str_left=string("Precision");
+    }else{
+        this->grip_str_left=string("Full");
+    }
+
+    this->type=type_r;
+    switch (type){
+    case 0:
+        this->strType = string("Reach-to-grasp");
+        break;
+    case 1:
+        this->strType = string("Reaching");
+        break;
+    case 2:
+        this->strType = string("Transport");
+        break;
+    case 3:
+        this->strType = string("Engage");
+        break;
+    case 4:
+        this->strType = string("Disengage");
+        break;
+    case 5:
+        this->strType = string("Go home");
+        break;
+    }
+
+    this->type_left=type_l;
+    switch (type_left){
+    case 0:
+        this->strType_left = string("Reach-to-grasp");
+        break;
+    case 1:
+        this->strType_left = string("Reaching");
+        break;
+    case 2:
+        this->strType_left = string("Transport");
+        break;
+    case 3:
+        this->strType_left = string("Engage");
+        break;
+    case 4:
+        this->strType_left = string("Disengage");
+        break;
+    case 5:
+        this->strType_left = string("Go home");
+        break;
+    }
+
+    this->obj_eng=objectPtr(new Object());
+    this->pose = posePtr(new Pose());
+    this->obj_eng_left=objectPtr(new Object());
+    this->pose_left = posePtr(new Pose());
+
 }
 
 
@@ -619,6 +751,8 @@ Movement::Movement(const Movement &mov)
     this->arm = mov.arm;
     this->type = mov.type;
     this->strType = mov.strType;
+    this->type_left = mov.type_left;
+    this->strType_left = mov.strType_left;
     //this->grip_code = mov.grip_code;
     this->prec=mov.prec;
     this->grip_str = mov.grip_str;
@@ -628,6 +762,14 @@ Movement::Movement(const Movement &mov)
     this->obj_eng = objectPtr(new Object(*mov.obj_eng.get()));
     this->pose = posePtr(new Pose(*mov.pose.get()));
     this->executed = mov.executed;
+
+    this->obj_left=objectPtr(new Object(*mov.obj_left.get()));
+    this->obj_init_left=objectPtr(new Object(*mov.obj_init_left.get()));
+    this->obj_eng_left=objectPtr(new Object(*mov.obj_eng_left.get()));
+    this->pose_left = posePtr(new Pose(*mov.pose_left.get()));
+    this->grip_str_left=mov.grip_str_left;
+    this->prec_left=mov.prec_left;
+
 }
 
 
@@ -913,9 +1055,19 @@ string Movement::getInfoLine()
     }
     */
 
-    return strType +", Arm: "+arm_info+", Object: "+obj->getName()+
-            ", Object Engaged: "+obj_eng->getName() + ", Pose: "+pose->getName()+
-            ", Grip Type: "+grip_str;
+    if(arm!=0)
+    {
+        // single arm
+        return strType +", Arm: "+arm_info+", Object: "+obj->getName()+
+                ", Object Engaged: "+obj_eng->getName() + ", Pose: "+pose->getName()+
+                ", Grip Type: "+grip_str;
+    }else{
+        // dual arm
+        return "Right: "+strType+", Left: "+strType_left+", Arm: "+arm_info+", Object right: "+obj->getName()+", Object left: "+obj_left->getName()+
+                ", Object right Engaged: "+obj_eng->getName() + ", Object left Engaged: "+obj_eng_left->getName()+
+                ", Pose right: "+pose->getName()+", Pose left: "+pose_left->getName()+
+                ", Grip Type right: "+grip_str+ ", Grip Type left: "+grip_str_left;
+    }
 }
 
 int Movement::getArm()

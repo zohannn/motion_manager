@@ -53,6 +53,18 @@ public:
 
     /**
      * @brief Movement
+     * @param type_r
+     * @param type_l
+     * @param arm
+     * @param obj_r
+     * @param prec_r
+     * @param obj_l
+     * @param prec_l
+     */
+    Movement(int type_r,int type_l,int arm, objectPtr obj_r,bool prec_r,objectPtr obj_l,bool prec_l);
+
+    /**
+     * @brief Movement
      * @param type
      * @param arm
      * @param obj
@@ -224,6 +236,9 @@ private:
      */
     int type;
     string strType; /**< type of the movement (string) */
+    int type_left;
+    string strType_left; /**< type of the movement (string) */
+    bool executed; /**< true if the movement has been executed, false otherwise */
 
     /**
      * @brief type of the grip (code)
@@ -246,7 +261,16 @@ private:
     objectPtr obj_init; /**< object being manipulated before the movement starts */
     objectPtr obj_eng; /**< object involved in engaging/disengaging movements */
     posePtr pose; /**< pose involved in transport/disengaging/reaching movements*/
-    bool executed; /**< true if the movement has been executed, false otherwise */
+
+
+    // dual arm members
+    bool prec_left; // true for a precision grip, false otherwise
+    string grip_str_left; /**< type of the grip (string) */
+    objectPtr obj_left; /**< object being manipulated in the movement */
+    objectPtr obj_init_left; /**< object being manipulated before the movement starts */
+    objectPtr obj_eng_left; /**< object involved in engaging/disengaging movements */
+    posePtr pose_left; /**< pose involved in transport/disengaging/reaching movements*/
+
 
     // Types of movements
     // ||||||||||||||||||||||||||

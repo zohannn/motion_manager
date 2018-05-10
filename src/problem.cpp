@@ -342,6 +342,22 @@ void Problem::setMoveSettings(std::vector<double> &tar, std::vector<double> &fin
     this->use_posture=use_posture;
 }
 
+void Problem::setMoveSettings(std::vector<double> &tar_right, std::vector<double> &tar_left,
+                     std::vector<double> &final_hand_right, std::vector<double> &final_hand_left,
+                     std::vector<double> &final_arm_right, std::vector<double> &final_arm_left,
+                     bool use_posture_right,bool use_posture_left)
+{
+    this->move_final_hand_right=final_hand_right;
+    this->move_final_hand_left=final_hand_left;
+    this->move_final_arm_right=final_arm_right;
+    this->move_final_arm_left=final_arm_left;
+    this->move_target_right=tar_right;
+    this->move_target_left=tar_left;
+    this->use_posture_right=use_posture_right;
+    this->use_posture_left=use_posture_left;
+
+}
+
 bool Problem::finalPostureFingers(int hand_id)
 {
 
@@ -1189,6 +1205,14 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
     if(res!=nullptr){if(res->status==0){this->solved=true;}}
 
     return res;
+}
+
+HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_dual_params &params)
+{
+    HUMotion::planning_result_ptr res;
+
+    return res;
+
 }
 
 #if MOVEIT==1

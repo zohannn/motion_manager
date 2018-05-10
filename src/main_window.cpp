@@ -52,6 +52,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mTolHumpdlg = new TolDialogHUMP(this);
     mTolHumpdlg->setModal(true);
 
+    //create HUMP Tuning dialog for bimanual motion
+    mTolHumpDualdlg = new TolDialogHUMPDual(this);
+    mTolHumpDualdlg->setModal(true);
+
     //create RRT Tuning dialog
     mRRTdlg = new RRTDialog(this);
     mRRTdlg->setModal(true);
@@ -151,6 +155,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     scenarios.push_back(QString("Empty scenario: empty scenario with ARoS and NO collisions"));
     scenarios.push_back(QString("Human assistance scenario: Serving a drink with ARoS"));
     scenarios.push_back(QString("Challenging scenario: picking a cup from a shelf with ARoS"));
+    scenarios.push_back(QString("Assembly scenario: swap two columns of the toy vehicle"));
 
 #endif
 
@@ -267,12 +272,16 @@ void MainWindow::addObject(string value)
 
    ui.comboBox_objects->addItem(QString(value.c_str()));
    ui.comboBox_objects_eng->addItem(QString(value.c_str()));
+
+   ui.comboBox_objects_left->addItem(QString(value.c_str()));
+   ui.comboBox_objects_eng_left->addItem(QString(value.c_str()));
 }
 
 void MainWindow::addPose(string value)
 {
 
    ui.comboBox_poses->addItem(QString(value.c_str()));
+   ui.comboBox_poses_left->addItem(QString(value.c_str()));
 }
 
 
@@ -324,11 +333,20 @@ void MainWindow::on_pushButton_tuning_clicked()
 
     problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
     int planner_id = prob->getPlannerID();
+    int arm_sel = prob->getMovement()->getArm();
     switch(planner_id){
     case 0: // HUMP
-        mTolHumpdlg->setInitJointsVel(this->jointsEndVelocity_mov);
-        mTolHumpdlg->setInitJointsAcc(this->jointsEndAcceleration_mov);
-        mTolHumpdlg->show();
+        if(arm_sel!=0){
+            // unimanual motion
+            mTolHumpdlg->setInitJointsVel(this->jointsEndVelocity_mov);
+            mTolHumpdlg->setInitJointsAcc(this->jointsEndAcceleration_mov);
+            mTolHumpdlg->show();
+        }else{
+            //bimanual motion
+            //mTolHumpDualdlg->setInitJointsVel(this->jointsEndVelocity_mov);
+            //mTolHumpDualdlg->setInitJointsAcc(this->jointsEndAcceleration_mov);
+            mTolHumpDualdlg->show();
+        }
         break;
     case 1: // RRT
         mRRTdlg->show();
@@ -374,6 +392,8 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              //string path_rviz_toyscene_jarde = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
              // Challengingscenario with ARoS
              string path_vrep_challenge_aros = PATH_SCENARIOS+string("/vrep/NarrowShelf_aros.ttt");
+             // Toy vehicle bi-manual manipulation
+             string path_vrep_toyscene_aros_dual_arm_cols = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros_dual_arm_cols.ttt");
 
              switch(i){
              case 0: // Assembly scenario
@@ -528,6 +548,32 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 #endif
                  break;
 
+             case 5: // Toy vehicle dual arm to swap columns
+#if HAND==0
+
+#elif HAND==1
+                this->scenario_id = 6;
+                 if (qnode.loadScenario(path_vrep_toyscene_aros_dual_arm_cols,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Assembly scenario: swap two columns of the toy vehicle HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Assembly scenario: swap two columns of the toy vehicle");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
+                     //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
+                 }else{
+                     qnode.log(QNode::Error,std::string("Assembly scenario: swap two columns of the toy vehicle HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+#endif
+
+                 break;
+
              }
 
 
@@ -633,6 +679,8 @@ void MainWindow::on_pushButton_addMov_clicked()
                 arm_sel=0;
             }
 
+            if(arm_sel!=0){
+             // single arm
              if (ui.comboBox_objects->isEnabled() && ui.comboBox_objects_eng->isEnabled() && ui.groupBox_grip->isEnabled() && !ui.comboBox_poses->isEnabled()){
                  // engage movements
                 string obj_name = ui.comboBox_objects->currentText().toStdString();
@@ -773,7 +821,89 @@ void MainWindow::on_pushButton_addMov_clicked()
                  ui.listWidget_movs->setCurrentRow(ui.listWidget_movs->count()-1);
 
              }
-        }
+
+        }else{
+            // dual arm
+            bool success=true;
+            int mov_id_r = ui.comboBox_mov->currentIndex();
+            int mov_id_l = ui.comboBox_mov_left->currentIndex();
+
+            objectPtr obj_right; bool prec_right;
+            if (ui.comboBox_objects->isEnabled() && ui.comboBox_objects_eng->isEnabled() && ui.groupBox_grip->isEnabled() && !ui.comboBox_poses->isEnabled()){
+                // right arm engage movements
+            }else if(ui.comboBox_objects->isEnabled() && ui.comboBox_objects_eng->isEnabled() && ui.groupBox_grip->isEnabled() && ui.comboBox_poses->isEnabled()){
+                // right arm disengage movements
+            }else if(ui.comboBox_objects->isEnabled() && ui.groupBox_grip->isEnabled() && !ui.comboBox_poses->isEnabled()){
+               // right arm reach-to-grasp movement
+                string obj_name = ui.comboBox_objects->currentText().toStdString();
+                obj_right = curr_scene->getObject(obj_name);
+                if(obj_right!=NULL){
+                    //int grip_id = ui.comboBox_grip->currentIndex();
+                    prec_right = ui.radioButton_prec->isChecked();
+                    obj_right->setTargetRightEnabled(true);
+                    obj_right->setTargetLeftEnabled(false);
+                }else{
+                    success = false;
+                }
+               // if(planner_id==0){
+                    // HUMP
+                   //curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,prec),new Scenario(*(this->curr_scene.get()))));
+                //}else{
+                    //TO DO
+                //}
+            }else if(ui.comboBox_objects->isEnabled() && ui.groupBox_grip->isEnabled() && ui.comboBox_poses->isEnabled()){
+                // right arm transport movements
+            }else{
+                // right arm go-park movement and reaching movements
+            }
+            objectPtr obj_left; bool prec_left;
+            if (ui.comboBox_objects_left->isEnabled() && ui.comboBox_objects_eng_left->isEnabled() && ui.groupBox_grip_left->isEnabled() && !ui.comboBox_poses_left->isEnabled()){
+                // left arm engage movements
+            }else if(ui.comboBox_objects_left->isEnabled() && ui.comboBox_objects_eng_left->isEnabled() && ui.groupBox_grip_left->isEnabled() && ui.comboBox_poses_left->isEnabled()){
+                // left arm disengage movements
+            }else if(ui.comboBox_objects_left->isEnabled() && ui.groupBox_grip_left->isEnabled() && !ui.comboBox_poses_left->isEnabled()){
+               // left arm reach-to-grasp movement
+                string obj_name = ui.comboBox_objects_left->currentText().toStdString();
+                obj_left = curr_scene->getObject(obj_name);
+                if(obj_left!=NULL){
+                    //int grip_id = ui.comboBox_grip->currentIndex();
+                    prec_left = ui.radioButton_prec_left->isChecked();
+                    obj_left->setTargetRightEnabled(false);
+                    obj_left->setTargetLeftEnabled(true);
+                }else{
+                    success = false;
+                }
+               // if(planner_id==0){
+                    // HUMP
+                   //curr_task->addProblem(new Problem(planner_id,new Movement(mov_id, arm_sel, obj,prec),new Scenario(*(this->curr_scene.get()))));
+                //}else{
+                    //TO DO
+                //}
+            }else if(ui.comboBox_objects_left->isEnabled() && ui.groupBox_grip_left->isEnabled() && ui.comboBox_poses_left->isEnabled()){
+                // left arm transport movements
+            }else{
+                // left arm go-park movement and reaching movements
+            }
+
+            if(success){
+
+                if(planner_id==0){
+                   // HUMP
+                   curr_task->addProblem(new Problem(planner_id,new Movement(mov_id_r,mov_id_l,0,obj_right,prec_right, obj_left,prec_left),new Scenario(*(this->curr_scene.get()))));
+                }
+
+                qnode.log(QNode::Info,std::string("The movement has been added to the current task"));
+                ui.groupBox_task->setEnabled(true);
+                ui.listWidget_movs->clear();
+                for (int i = 0; i < curr_task->getProblemNumber();i++ ){
+                   ui.listWidget_movs->addItem(QString(curr_task->getProblemInfo(i).c_str()));
+                }
+                ui.listWidget_movs->setCurrentRow(ui.listWidget_movs->count()-1);
+            }
+
+        } // if arm_sel
+        }// if add
+
 } // add movement
 
 
@@ -783,11 +913,23 @@ void MainWindow::on_pushButton_plan_clicked()
     ui.tabWidget_sol->setCurrentIndex(0);    
     problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
     int planner_id = prob->getPlannerID();
+    int arm_sel = prob->getMovement()->getArm();
     HUMotion::hump_params  tols;
+    HUMotion::hump_dual_params  dual_tols;
     std::vector<double> move_target;
     std::vector<double> move_final_hand;
     std::vector<double> move_final_arm;
+
+    std::vector<double> move_target_right;
+    std::vector<double> move_target_left;
+    std::vector<double> move_final_hand_right;
+    std::vector<double> move_final_hand_left;
+    std::vector<double> move_final_arm_right;
+    std::vector<double> move_final_arm_left;
+
     bool use_final;
+    bool use_final_right;
+    bool use_final_left;
 #if MOVEIT==1
     moveit_planning::moveit_params m_params;
 #endif
@@ -799,96 +941,193 @@ void MainWindow::on_pushButton_plan_clicked()
 
     case 0: // HUMP
         moveit_plan = false;
-        mTolHumpdlg->setInfo(prob->getInfoLine());
-        // --- Tolerances for the final posture selection ---- //
-        tols.tolTarPos = mTolHumpdlg->getTolTarPos(); // target position tolerances
-        tols.tolTarOr = mTolHumpdlg->getTolTarOr(); // target orientation tolerances
-        mTolHumpdlg->getTolsArm(tols.tolsArm);// tolerances of the arm : radius in [mm]
-        mTolHumpdlg->getTolsHand(tols.tolsHand);// tolerances of the hand: radius in [mm]
-        tols.target_avoidance = mTolHumpdlg->getTargetAvoidance();// target avoidance
-        tols.obstacle_avoidance = mTolHumpdlg->getObstacleAvoidance(); //obstacle avoidance
-        mTolHumpdlg->getLambda(tols.lambda_final); // joint expense factors
-        mTolHumpdlg->getLambda(tols.lambda_bounce); // joint expense factors
-        // --- Tolerances for the bounce posture selection ---- //
-        tols.w_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getWMax()*M_PI/180)); // max joint velocity
-        tols.alpha_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getAlphaMax()*M_PI/180)); // max joint acceleration
-        mTolHumpdlg->getInitVel(tols.bounds.vel_0); // initial velocity
-        mTolHumpdlg->getFinalVel(tols.bounds.vel_f); // final velocity
-        mTolHumpdlg->getInitAcc(tols.bounds.acc_0); // initial acceleration
-        mTolHumpdlg->getFinalAcc(tols.bounds.acc_f); // final acceleration
-        //mTolHumpdlg->getVelApproach(tols.vel_approach); // velocity approach
-        //mTolHumpdlg->getAccApproach(tols.acc_approach); // acceleration approach
-        // tolerances for the obstacles
-        mTolHumpdlg->getTolsObstacles(tols.final_tolsObstacles); // final posture tols
-        tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
-        tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1));
-        mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(0));
-        mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(1));
-        // tolerances for the target
-        tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
-        tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
-        tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
-        mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
-        tols.singleArm_tolsTarget.at(1) = tols.singleArm_tolsTarget.at(0)/100;
-        tols.singleArm_tolsTarget.at(2) = 0*tols.singleArm_tolsTarget.at(0);
-        //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
-        //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
-        // pick / place settings
-        tols.mov_specs.approach = mTolHumpdlg->getApproach();
-        tols.mov_specs.retreat = mTolHumpdlg->getRetreat();
-        mTolHumpdlg->getPreGraspApproach(tols.mov_specs.pre_grasp_approach); // pick approach
-        mTolHumpdlg->getPostGraspRetreat(tols.mov_specs.post_grasp_retreat); // pick retreat
-        mTolHumpdlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
-        mTolHumpdlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
-        tols.mov_specs.rand_init = mTolHumpdlg->getRandInit(); // random initialization for "plan" stages
-        tols.mov_specs.coll = mTolHumpdlg->getColl(); // collisions option
-        tols.mov_specs.straight_line = mTolHumpdlg->get_straight_line(); // hand straight line trajectory
-        tols.mov_specs.w_red_app_max = mTolHumpdlg->getW_red_app(); // set the max velocity reduction when approaching
-        tols.mov_specs.w_red_ret_max = mTolHumpdlg->getW_red_ret(); // set the max velocity reduction when retreating
-        // move settings
-        mTolHumpdlg->getTargetMove(move_target);
-        mTolHumpdlg->getFinalHand(move_final_hand);
-        mTolHumpdlg->getFinalArm(move_final_arm);
-        use_final = mTolHumpdlg->get_use_final_posture();
-        prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
-        tols.mov_specs.use_move_plane = mTolHumpdlg->get_add_plane();
-        mTolHumpdlg->getPlaneParameters(tols.mov_specs.plane_params);
+        if(arm_sel!=0)
+        { // single-arm movement
 
-        h_results = prob->solve(tols); // plan the movement
+            mTolHumpdlg->setInfo(prob->getInfoLine());
+            // --- Tolerances for the final posture selection ---- //
+            tols.tolTarPos = mTolHumpdlg->getTolTarPos(); // target position tolerances
+            tols.tolTarOr = mTolHumpdlg->getTolTarOr(); // target orientation tolerances
+            mTolHumpdlg->getTolsArm(tols.tolsArm);// tolerances of the arm : radius in [mm]
+            mTolHumpdlg->getTolsHand(tols.tolsHand);// tolerances of the hand: radius in [mm]
+            tols.target_avoidance = mTolHumpdlg->getTargetAvoidance();// target avoidance
+            tols.obstacle_avoidance = mTolHumpdlg->getObstacleAvoidance(); //obstacle avoidance
+            mTolHumpdlg->getLambda(tols.lambda_final); // joint expense factors
+            mTolHumpdlg->getLambda(tols.lambda_bounce); // joint expense factors
+            // --- Tolerances for the bounce posture selection ---- //
+            tols.w_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getWMax()*M_PI/180)); // max joint velocity
+            tols.alpha_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getAlphaMax()*M_PI/180)); // max joint acceleration
+            mTolHumpdlg->getInitVel(tols.bounds.vel_0); // initial velocity
+            mTolHumpdlg->getFinalVel(tols.bounds.vel_f); // final velocity
+            mTolHumpdlg->getInitAcc(tols.bounds.acc_0); // initial acceleration
+            mTolHumpdlg->getFinalAcc(tols.bounds.acc_f); // final acceleration
+            //mTolHumpdlg->getVelApproach(tols.vel_approach); // velocity approach
+            //mTolHumpdlg->getAccApproach(tols.acc_approach); // acceleration approach
+            // tolerances for the obstacles
+            mTolHumpdlg->getTolsObstacles(tols.final_tolsObstacles); // final posture tols
+            tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
+            tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1));
+            mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(0));
+            mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(1));
+            // tolerances for the target
+            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
+            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+            mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
+            tols.singleArm_tolsTarget.at(1) = tols.singleArm_tolsTarget.at(0)/100;
+            tols.singleArm_tolsTarget.at(2) = 0*tols.singleArm_tolsTarget.at(0);
+            //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
+            //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
+            // pick / place settings
+            tols.mov_specs.approach = mTolHumpdlg->getApproach();
+            tols.mov_specs.retreat = mTolHumpdlg->getRetreat();
+            mTolHumpdlg->getPreGraspApproach(tols.mov_specs.pre_grasp_approach); // pick approach
+            mTolHumpdlg->getPostGraspRetreat(tols.mov_specs.post_grasp_retreat); // pick retreat
+            mTolHumpdlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
+            mTolHumpdlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
+            tols.mov_specs.rand_init = mTolHumpdlg->getRandInit(); // random initialization for "plan" stages
+            tols.mov_specs.coll = mTolHumpdlg->getColl(); // collisions option
+            tols.mov_specs.straight_line = mTolHumpdlg->get_straight_line(); // hand straight line trajectory
+            tols.mov_specs.w_red_app_max = mTolHumpdlg->getW_red_app(); // set the max velocity reduction when approaching
+            tols.mov_specs.w_red_ret_max = mTolHumpdlg->getW_red_ret(); // set the max velocity reduction when retreating
+            // move settings
+            mTolHumpdlg->getTargetMove(move_target);
+            mTolHumpdlg->getFinalHand(move_final_hand);
+            mTolHumpdlg->getFinalArm(move_final_arm);
+            use_final = mTolHumpdlg->get_use_final_posture();
+            prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
+            tols.mov_specs.use_move_plane = mTolHumpdlg->get_add_plane();
+            mTolHumpdlg->getPlaneParameters(tols.mov_specs.plane_params);
 
-        ui.pushButton_plan->setCheckable(false);
-        if(h_results!=nullptr){
-            if(h_results->status==0){
-                qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
-                this->curr_mov = prob->getMovement();
-                this->timesteps_mov.clear();
-                this->jointsPosition_mov.clear(); this->jointsPosition_mov = h_results->trajectory_stages;
-                this->jointsVelocity_mov.clear(); this->jointsVelocity_mov = h_results->velocity_stages;
-                this->jointsAcceleration_mov.clear(); this->jointsAcceleration_mov = h_results->acceleration_stages;
-                this->traj_descr_mov.clear(); this->traj_descr_mov = h_results->trajectory_descriptions;
-                std::vector<double> timesteps_stage_aux;
-                for(size_t i=0; i<h_results->trajectory_stages.size();++i){
-                    timesteps_stage_aux.clear();
-                    double t_stage = h_results->time_steps.at(i);
-                    MatrixXd traj_stage = h_results->trajectory_stages.at(i);
-                    for(int j=0;j<traj_stage.rows();++j){
-                        if(j==traj_stage.rows()-1){
-                            timesteps_stage_aux.push_back(0.0);
-                        }else{
-                            timesteps_stage_aux.push_back(t_stage);
+            h_results = prob->solve(tols); // plan the movement
+
+            ui.pushButton_plan->setCheckable(false);
+            if(h_results!=nullptr){
+                if(h_results->status==0){
+                    qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
+                    this->curr_mov = prob->getMovement();
+                    this->timesteps_mov.clear();
+                    this->jointsPosition_mov.clear(); this->jointsPosition_mov = h_results->trajectory_stages;
+                    this->jointsVelocity_mov.clear(); this->jointsVelocity_mov = h_results->velocity_stages;
+                    this->jointsAcceleration_mov.clear(); this->jointsAcceleration_mov = h_results->acceleration_stages;
+                    this->traj_descr_mov.clear(); this->traj_descr_mov = h_results->trajectory_descriptions;
+                    std::vector<double> timesteps_stage_aux;
+                    for(size_t i=0; i<h_results->trajectory_stages.size();++i){
+                        timesteps_stage_aux.clear();
+                        double t_stage = h_results->time_steps.at(i);
+                        MatrixXd traj_stage = h_results->trajectory_stages.at(i);
+                        for(int j=0;j<traj_stage.rows();++j){
+                            if(j==traj_stage.rows()-1){
+                                timesteps_stage_aux.push_back(0.0);
+                            }else{
+                                timesteps_stage_aux.push_back(t_stage);
+                            }
                         }
+                        this->timesteps_mov.push_back(timesteps_stage_aux);
                     }
-                    this->timesteps_mov.push_back(timesteps_stage_aux);
+                    this->moveit_mov = false;
+                    solved=true;
+                }else{
+                    ui.tableWidget_sol_mov->clear();
+                    qnode.log(QNode::Error,std::string("The planning has failed: ")+h_results->status_msg);
                 }
-                this->moveit_mov = false;
-                solved=true;
             }else{
                 ui.tableWidget_sol_mov->clear();
-                qnode.log(QNode::Error,std::string("The planning has failed: ")+h_results->status_msg);
+                qnode.log(QNode::Error,std::string("The planning has failed: unknown status"));
             }
         }else{
-            ui.tableWidget_sol_mov->clear();
-            qnode.log(QNode::Error,std::string("The planning has failed: unknown status"));
+            // dual-arm movement
+
+            mTolHumpDualdlg->setInfo(prob->getInfoLine());
+            // --- Tolerances for the final posture selection ---- //
+            dual_tols.tolTarPos_right = mTolHumpDualdlg->getTolTarPosRight(); // right target position tolerances
+            dual_tols.tolTarPos_left = mTolHumpDualdlg->getTolTarPosLeft(); // left target position tolerances
+            dual_tols.tolTarOr_right = mTolHumpDualdlg->getTolTarOrRight(); // right target orientation tolerances
+            dual_tols.tolTarOr_left = mTolHumpDualdlg->getTolTarOrLeft(); // left target orientation tolerances
+            mTolHumpDualdlg->getTolsArmRight(dual_tols.tolsArm_right);// tolerances of the right arm : radius in [mm]
+            mTolHumpDualdlg->getTolsArmLeft(dual_tols.tolsArm_left);// tolerances of the left arm : radius in [mm]
+            mTolHumpDualdlg->getTolsHandRight(dual_tols.tolsHand_right);// tolerances of the right hand: radius in [mm]
+            mTolHumpDualdlg->getTolsHandLeft(dual_tols.tolsHand_left);// tolerances of the left hand: radius in [mm]
+            dual_tols.target_avoidance = mTolHumpDualdlg->getTargetAvoidance();// target avoidance
+            dual_tols.obstacle_avoidance = mTolHumpDualdlg->getObstacleAvoidance(); //obstacle avoidance
+            mTolHumpDualdlg->getLambdaRight(dual_tols.lambda_final_right); // joint expense factors (right)
+            mTolHumpDualdlg->getLambdaLeft(dual_tols.lambda_final_left); // joint expense factors (left)
+            mTolHumpDualdlg->getLambdaRight(dual_tols.lambda_bounce_right); // joint expense factors (right)
+            mTolHumpDualdlg->getLambdaLeft(dual_tols.lambda_bounce_left); // joint expense factors (left)
+            // --- Tolerances for the bounce posture selection ---- //
+            dual_tols.w_max = std::vector<double>(dual_tols.lambda_final_right.size()*2,(mTolHumpDualdlg->getWMax()*M_PI/180)); // max joint velocity
+            dual_tols.alpha_max = std::vector<double>(dual_tols.lambda_final_right.size()*2,(mTolHumpdlg->getAlphaMax()*M_PI/180)); // max joint acceleration
+            mTolHumpDualdlg->getInitVelRight(dual_tols.bounds_right.vel_0); // initial velocity (right)
+            mTolHumpDualdlg->getInitVelLeft(dual_tols.bounds_left.vel_0); // initial velocity (left)
+            mTolHumpDualdlg->getFinalVelRight(dual_tols.bounds_right.vel_f); // final velocity (right)
+            mTolHumpDualdlg->getFinalVelLeft(dual_tols.bounds_left.vel_f); // final velocity (left)
+            mTolHumpDualdlg->getInitAccRight(dual_tols.bounds_right.acc_0); // initial acceleration (right)
+            mTolHumpDualdlg->getInitAccLeft(dual_tols.bounds_left.acc_0); // initial acceleration (left)
+            mTolHumpDualdlg->getFinalAccRight(dual_tols.bounds_right.acc_f); // final acceleration (right)
+            mTolHumpDualdlg->getFinalAccLeft(dual_tols.bounds_left.acc_f); // final acceleration (left)
+            // tolerances for the obstacles
+            mTolHumpDualdlg->getTolsObstaclesRight(dual_tols.final_tolsObstacles_right); // final posture tols (right)
+            mTolHumpDualdlg->getTolsObstaclesLeft(dual_tols.final_tolsObstacles_left); // final posture tols (left)
+            dual_tols.singleArm_tolsObstacles_right.push_back(MatrixXd::Constant(3,6,1)); // bounce posture obstacles tols (right)
+            dual_tols.singleArm_tolsObstacles_right.push_back(MatrixXd::Constant(3,6,1));
+            mTolHumpDualdlg->getTolsObstaclesRight(dual_tols.singleArm_tolsObstacles_right.at(0));
+            mTolHumpDualdlg->getTolsObstaclesRight(dual_tols.singleArm_tolsObstacles_right.at(1));
+            dual_tols.singleArm_tolsObstacles_left.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols (left)
+            dual_tols.singleArm_tolsObstacles_left.push_back(MatrixXd::Constant(3,6,1));
+            mTolHumpDualdlg->getTolsObstaclesLeft(dual_tols.singleArm_tolsObstacles_left.at(0));
+            mTolHumpDualdlg->getTolsObstaclesLeft(dual_tols.singleArm_tolsObstacles_left.at(1));
+            // tolerances for the target
+            dual_tols.singleArm_tolsTarget_right.push_back(MatrixXd::Constant(3,6,1)); // bounce posture target tols (right)
+            dual_tols.singleArm_tolsTarget_right.push_back(MatrixXd::Constant(3,6,1));
+            dual_tols.singleArm_tolsTarget_right.push_back(MatrixXd::Constant(3,6,1));
+            mTolHumpDualdlg->getTolsTargetRight(dual_tols.singleArm_tolsTarget_right.at(0));
+            dual_tols.singleArm_tolsTarget_right.at(1) = dual_tols.singleArm_tolsTarget_right.at(0)/100;
+            dual_tols.singleArm_tolsTarget_right.at(2) = 0*dual_tols.singleArm_tolsTarget_right.at(0);
+            dual_tols.singleArm_tolsTarget_left.push_back(MatrixXd::Constant(3,6,1)); // bounce posture target tols (left)
+            dual_tols.singleArm_tolsTarget_left.push_back(MatrixXd::Constant(3,6,1));
+            dual_tols.singleArm_tolsTarget_left.push_back(MatrixXd::Constant(3,6,1));
+            mTolHumpDualdlg->getTolsTargetLeft(dual_tols.singleArm_tolsTarget_left.at(0));
+            dual_tols.singleArm_tolsTarget_left.at(1) = dual_tols.singleArm_tolsTarget_left.at(0)/100;
+            dual_tols.singleArm_tolsTarget_left.at(2) = 0*dual_tols.singleArm_tolsTarget_left.at(0);
+            // pick / place settings
+            dual_tols.mov_specs_right.approach = mTolHumpDualdlg->getApproach();
+            dual_tols.mov_specs_left.approach = mTolHumpDualdlg->getApproach();
+            dual_tols.mov_specs_right.retreat = mTolHumpDualdlg->getRetreat();
+            dual_tols.mov_specs_left.retreat = mTolHumpDualdlg->getRetreat();
+            mTolHumpDualdlg->getPreGraspApproachRight(dual_tols.mov_specs_right.pre_grasp_approach); // pick approach (right)
+            mTolHumpDualdlg->getPreGraspApproachLeft(dual_tols.mov_specs_left.pre_grasp_approach); // pick approach (left)
+            mTolHumpDualdlg->getPostGraspRetreatRight(dual_tols.mov_specs_right.post_grasp_retreat); // pick retreat (right)
+            mTolHumpDualdlg->getPostGraspRetreatLeft(dual_tols.mov_specs_left.post_grasp_retreat); // pick retreat (left)
+            mTolHumpDualdlg->getPrePlaceApproachRight(dual_tols.mov_specs_right.pre_place_approach); // place approach (right)
+            mTolHumpDualdlg->getPrePlaceApproachLeft(dual_tols.mov_specs_left.pre_place_approach); // place approach (left)
+            mTolHumpDualdlg->getPostPlaceRetreatRight(dual_tols.mov_specs_right.post_place_retreat); // place retreat (right)
+            mTolHumpDualdlg->getPostPlaceRetreatLeft(dual_tols.mov_specs_left.post_place_retreat); // place retreat (left)
+            dual_tols.mov_specs_right.rand_init = mTolHumpDualdlg->getRandInit(); // random initialization for "plan" stages (right)
+            dual_tols.mov_specs_left.rand_init = mTolHumpDualdlg->getRandInit(); // random initialization for "plan" stages (left)
+            dual_tols.mov_specs_right.coll = mTolHumpDualdlg->getColl(); // collisions option (right)
+            dual_tols.mov_specs_left.coll = mTolHumpDualdlg->getColl(); // collisions option (left)
+            dual_tols.mov_specs_right.straight_line = mTolHumpDualdlg->get_straight_line_right(); // right hand straight line trajectory
+            dual_tols.mov_specs_left.straight_line = mTolHumpDualdlg->get_straight_line_left(); // left hand straight line trajectory
+            dual_tols.mov_specs_right.w_red_app_max = mTolHumpDualdlg->getW_red_app_right(); // set the max velocity reduction when approaching (right)
+            dual_tols.mov_specs_left.w_red_app_max = mTolHumpDualdlg->getW_red_app_left(); // set the max velocity reduction when approaching (left)
+            dual_tols.mov_specs_right.w_red_ret_max = mTolHumpDualdlg->getW_red_ret_right(); // set the max velocity reduction when retreating (right)
+            dual_tols.mov_specs_left.w_red_ret_max = mTolHumpDualdlg->getW_red_ret_left(); // set the max velocity reduction when retreating (left)
+            // move settings
+            mTolHumpDualdlg->getTargetMoveRight(move_target_right);
+            mTolHumpDualdlg->getTargetMoveLeft(move_target_left);
+            mTolHumpDualdlg->getFinalHandRight(move_final_hand_right);
+            mTolHumpDualdlg->getFinalHandLeft(move_final_hand_left);
+            mTolHumpDualdlg->getFinalArmRight(move_final_arm_right);
+            mTolHumpDualdlg->getFinalArmLeft(move_final_arm_left);
+            use_final_right = mTolHumpDualdlg->get_use_final_posture_right();
+            use_final_left = mTolHumpDualdlg->get_use_final_posture_left();
+            prob->setMoveSettings(move_target_right,move_target_left,
+                                  move_final_hand_right,move_final_hand_left,
+                                  move_final_arm_right,move_final_arm_left,
+                                  use_final_right,use_final_left);
+
+            h_results = prob->solve(dual_tols); // plan the movement
+
         }
         break;
     case 1: // RRT
@@ -2797,18 +3036,52 @@ void MainWindow::on_comboBox_Task_currentIndexChanged(int i)
    switch (i){
 
        case 0:
-           // Single- arm task
-       ui.radioButton_right->setEnabled(true);
-       ui.radioButton_left->setEnabled(true);
+           // Single-arm task
+           ui.radioButton_right->setEnabled(true);
+           ui.radioButton_left->setEnabled(true);
+           ui.comboBox_mov_left->setEnabled(false);
+           ui.label_type_left->setEnabled(false);
+
+           ui.label_type->setText(QString("Type of Movement"));
+           ui.label_objects->setText(QString("Involved object"));
+           ui.label_poses->setText(QString("Involved pose"));
+           ui.label_objects_eng->setText(QString("Engaged object"));
+           ui.groupBox_grip->setTitle(QString("Type of grip"));
+
+           ui.label_objects_left->setEnabled(false);
+           ui.comboBox_objects_left->setEnabled(false);
+           ui.label_poses_left->setEnabled(false);
+           ui.comboBox_poses_left->setEnabled(false);
+           ui.groupBox_grip_left->setEnabled(false);
+           ui.radioButton_prec_left->setEnabled(false);
+           ui.radioButton_full_left->setEnabled(false);
+
+           ui.groupBox_power_law->setEnabled(true);
+           ui.pushButton_plan_3d_power_law->setEnabled(true);
 
        break;
 
        case 1:
            //Dual-arm task
+           ui.radioButton_right->setEnabled(false);
+           ui.radioButton_left->setEnabled(false);
 
-        ui.radioButton_right->setEnabled(false);
-        ui.radioButton_left->setEnabled(false);
+           ui.label_type->setText(QString("Type of Movement (right)"));
+           ui.label_objects->setText(QString("Involved object (right)"));
+           ui.label_poses->setText(QString("Involved pose (right)"));
+           ui.label_objects_eng->setText(QString("Engaged object (right)"));
+           ui.groupBox_grip->setTitle(QString("Type of grip (right)"));
 
+           ui.comboBox_mov_left->setEnabled(true);
+           ui.label_type_left->setEnabled(true);
+           ui.label_objects_left->setEnabled(true);
+           ui.comboBox_objects_left->setEnabled(true);
+
+           ui.groupBox_grip_left->setEnabled(true);
+           ui.radioButton_prec_left->setEnabled(true);
+           ui.radioButton_full_left->setEnabled(true);
+           ui.groupBox_power_law->setEnabled(false);
+           ui.pushButton_plan_3d_power_law->setEnabled(false);
 
        break;
 
@@ -2878,8 +3151,72 @@ void MainWindow::on_comboBox_mov_currentIndexChanged(int i)
 
     }
 
+}
+
+void MainWindow::on_comboBox_mov_left_currentIndexChanged(int i)
+{
+
+    switch (i){
+
+        case 0:
+        // Reach-to-grasp
+            ui.comboBox_objects_left->setEnabled(true);
+            ui.comboBox_objects_eng_left->setEnabled(false);
+            ui.label_objects_left->setEnabled(true);
+            ui.groupBox_grip_left->setEnabled(true);
+            ui.comboBox_poses_left->setEnabled(false);
+            ui.label_poses_left->setEnabled(false);
+            break;
+        case 1:
+        // Reaching
+            ui.comboBox_objects_left->setEnabled(false);
+            ui.comboBox_objects_eng_left->setEnabled(false);
+            ui.label_objects_left->setEnabled(false);
+            ui.groupBox_grip_left->setEnabled(false);
+            ui.comboBox_poses_left->setEnabled(true);
+            ui.label_poses_left->setEnabled(true);
+            break;
+        case 2:
+        // Transport
+            ui.comboBox_objects_left->setEnabled(true);
+            ui.comboBox_objects_eng_left->setEnabled(false);
+            ui.label_objects_left->setEnabled(true);
+            ui.groupBox_grip_left->setEnabled(true);
+            ui.comboBox_poses_left->setEnabled(true);
+            ui.label_poses_left->setEnabled(true);
+            break;
+        case 3:
+        //Engage
+            ui.comboBox_objects_left->setEnabled(true);
+            ui.comboBox_objects_eng_left->setEnabled(true);
+            ui.label_objects_left->setEnabled(true);
+            ui.groupBox_grip_left->setEnabled(true);
+            ui.comboBox_poses_left->setEnabled(false);
+            ui.label_poses_left->setEnabled(false);
+            break;
+        case 4:
+        //Disengage
+            ui.comboBox_objects_left->setEnabled(true);
+            ui.comboBox_objects_eng_left->setEnabled(true);
+            ui.label_objects_left->setEnabled(true);
+            ui.groupBox_grip_left->setEnabled(true);
+            ui.comboBox_poses_left->setEnabled(true);
+            ui.label_poses_left->setEnabled(true);
+            break;
+        case 5:
+        // Go park
+            ui.comboBox_objects_left->setEnabled(false);
+            ui.comboBox_objects_eng_left->setEnabled(false);
+            ui.label_objects_left->setEnabled(false);
+            ui.groupBox_grip_left->setEnabled(false);
+            ui.comboBox_poses_left->setEnabled(false);
+            ui.label_poses_left->setEnabled(false);
+            break;
+
+    }
 
 }
+
 
 void MainWindow::onListScenarioItemClicked(QListWidgetItem *item)
 {
@@ -2948,6 +3285,13 @@ void MainWindow::onListScenarioItemClicked(QListWidgetItem *item)
                 //Challenging scenario: picking a cup from a shelf with ARoS
                 ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
                                                          "ARoS picks and places a cup on a narrow shelf"));
+                break;
+
+            case 5:
+                // Assembly scenario: swap the two columns of the toy vehcile
+                ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
+                                                         "ARoS picks and swaps the two columns of the toy vehicle."));
+
                 break;
 
             }

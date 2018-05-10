@@ -20,6 +20,7 @@
 #include "vrepcommdialog.hpp"
 #include "rvizcommdialog.hpp"
 #include "toldialoghump.hpp"
+#include "toldialoghump_dual.hpp"
 #include "config.hpp"
 #include "rrtdialog.hpp"
 #include "rrtconnectdialog.hpp"
@@ -209,6 +210,22 @@ public Q_SLOTS:
          * </table>
          */
         void on_comboBox_mov_currentIndexChanged(int i);
+
+        /**
+         * @brief This method selects the type of task
+         * @param i
+         * <table>
+         * <caption id="multi_row">Types of the movement</caption>
+         * <tr><th>Type      <th>index
+         * <tr><td>Reach-to-grasp <td>0
+         * <tr><td>Reaching <td>1
+         * <tr><td>Transport <td>2
+         * <tr><td>Engage <td>3
+         * <tr><td>Disengage <td>4
+         * <tr><td>Go home <td>5
+         * </table>
+         */
+        void on_comboBox_mov_left_currentIndexChanged(int i);
 
         /**
          * @brief This method plans the selected movement
@@ -435,6 +452,7 @@ private:
         RVizCommDialog *mrvizCommdlg; /**< handle of the RViz communication dialog */
 #endif
         TolDialogHUMP *mTolHumpdlg; /**< handle of the HUMP tuning dialog */
+        TolDialogHUMPDual *mTolHumpDualdlg; /**< handle of the HUMP tuning dialog for bimanual motion*/
         RRTDialog *mRRTdlg; /**< handle of the RRT tuning dialog */
         RRTConnectDialog *mRRTConnectdlg; /**< handle of the RRT Connect tuning dialog */
         RRTstarDialog *mRRTstardlg; /**< handle of the RRT star tuning dialog */
