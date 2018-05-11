@@ -111,34 +111,72 @@ public:
 
 
     /**
-    * @brief This method sets the type of the movement.
+    * @brief This method sets the type of the movement (right).
     *  @param t
     */
     void setType(int t);
 
     /**
-     * @brief This method sets the type of grip related to the movement.
+    * @brief This method sets the type of the movement (left).
+    *  @param t
+    */
+    void setTypeLeft(int t);
+
+    /**
+     * @brief This method sets the type of grip
+     * related to the movement (right).
      * @param prec
      */
     void setGrip(bool prec);
 
     /**
-     * @brief This method sets the object that is manipulated during the movement
+     * @brief This method sets the type of grip
+     * related to the movement (left).
+     * @param prec
+     */
+    void setGripLeft(bool prec);
+
+    /**
+     * @brief This method sets the object that is manipulated
+     * during the movement (right)
      * @param obj
      */
     void setObject(objectPtr obj);
 
     /**
-     * @brief This method sets the object that is manipulated before the movement starts
+     * @brief This method sets the object that is manipulated
+     * during the movement (left)
+     * @param obj
+     */
+    void setObjectLeft(objectPtr obj);
+
+    /**
+     * @brief This method sets the object that is manipulated
+     * before the movement starts (right)
      * @param obj
      */
     void setObjectInit(objectPtr obj);
 
     /**
-     * @brief This method sets the object that is involved in engaging/disengaging movements
+     * @brief This method sets the object that is manipulated
+     * before the movement starts (left)
+     * @param obj
+     */
+    void setObjectInitLeft(objectPtr obj);
+
+    /**
+     * @brief This method sets the object that is involved
+     * in engaging/disengaging movements (right)
      * @param obj_eng
      */
     void setObjectEng(objectPtr obj_eng);
+
+    /**
+     * @brief This method sets the object that is involved
+     * in engaging/disengaging movements (left)
+     * @param obj_eng
+     */
+    void setObjectEngLeft(objectPtr obj_eng);
 
     /**
      * @brief This method sets the arm/s in movement
@@ -153,52 +191,108 @@ public:
     void setExecuted(bool exec);
 
     /**
-     * @brief This method gets the code of the movement
+     * @brief This method gets the code of the movement (right)
      * @return
      */
     int getType();
 
     /**
-     * @brief This method gets the description of the movement
+     * @brief This method gets the code of the movement (left)
+     * @return
+     */
+    int getTypeLeft();
+
+    /**
+     * @brief This method gets the description of the movement (right)
      * @return
      */
     string getStrType();
 
     /**
-     * @brief This method gets the type of the grip
+     * @brief This method gets the description of the movement (left)
+     * @return
+     */
+    string getStrTypeLeft();
+
+    /**
+     * @brief This method gets the type of the grip (right)
      * @return
      */
     bool getGrip();
 
     /**
-     * @brief This method gets the description of the grip
+     * @brief This method gets the type of the grip (left)
+     * @return
+     */
+    bool getGripLeft();
+
+    /**
+     * @brief This method gets the description of the grip (right)
      * @return
      */
     string getGripStr();
 
     /**
-     * @brief This method gets the object that is being manipulated during the movement
+     * @brief This method gets the description of the grip (left)
+     * @return
+     */
+    string getGripStrLeft();
+
+    /**
+     * @brief This method gets the object that is being manipulated
+     * during the movement (right)
      * @return
      */
     objectPtr getObject();
 
     /**
-     * @brief This method gets the object that is being manipulated during the movement
+     * @brief This method gets the object that is being manipulated
+     * during the dual-arm movement by the left hand
+     * @return
+     */
+    objectPtr getObjectLeft();
+
+    /**
+     * @brief This method gets the object that is being manipulated
+     * during the movement (right)
      * @return
      */
     posePtr getPose();
 
     /**
-     * @brief This method gets the object that is being manipulated before the movement starts
+     * @brief This method gets the object that is being manipulated
+     * during the movement (left)
+     * @return
+     */
+    posePtr getPoseLeft();
+
+    /**
+     * @brief This method gets the object that is being manipulated
+     * before the movement starts (right)
      * @return
      */
     objectPtr getObjectInit();
 
     /**
-     * @brief This method gets the object that is involved in engaging/disengaging movements
+     * @brief This method gets the object that is being manipulated
+     * before the movement starts (left)
+     * @return
+     */
+    objectPtr getObjectInitLeft();
+
+    /**
+     * @brief This method gets the object that is involved
+     * in engaging/disengaging movements (right)
      * @return
      */
     objectPtr getObjectEng();
+
+    /**
+     * @brief This method gets the object that is involved
+     * in engaging/disengaging movements (left)
+     * @return
+     */
+    objectPtr getObjectEngLeft();
 
     /**
      * @brief This method gets information about the movement

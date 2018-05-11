@@ -291,7 +291,7 @@ private:
     /**
      * @brief This method computes the final posture of the fingers.\n
      * It takes into account the type of grip and the size of the object
-     * @param hand_id: it is 1 for right hand and 2 for the left hand
+     * @param hand_id=1 for right hand, hand_id=2 for left hand
      * @return
      */
     bool finalPostureFingers(int hand_id);
@@ -299,11 +299,10 @@ private:
     /**
      * @brief This method computes the inverse kinematics of the hand.
      * @param d_obj: diameter of the object
-     * @param hand_id: it is 1 for right hand and 2 for the left hand
      * @param sols: solution
      * @return
      */
-    bool invKinHand(double d_obj,int hand_id,std::vector<double>& sols);
+    bool invKinHand(double d_obj,std::vector<double>& sols);
 
     /**
      * @brief getRPY

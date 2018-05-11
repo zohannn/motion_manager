@@ -821,6 +821,47 @@ void Movement::setType(int t)
 }
 
 
+void Movement::setTypeLeft(int t)
+{
+    this->type_left=t;
+
+    switch (t){
+
+    case 0:
+
+        this->strType_left = string("Reach-to-grasp");
+        break;
+
+    case 1:
+
+        this->strType_left = string("Reaching");
+        break;
+
+    case 2:
+
+        this->strType_left = string("Transport");
+        break;
+
+    case 3:
+
+        this->strType_left = string("Engage");
+        break;
+
+    case 4:
+
+        this->strType_left = string("Disengage");
+        break;
+
+    case 5:
+
+        this->strType_left = string("Go park");
+        break;
+
+
+    }
+}
+
+
 
 void Movement::setGrip(bool prec)
 {
@@ -904,29 +945,50 @@ void Movement::setGrip(bool prec)
     */
 }
 
+void Movement::setGripLeft(bool prec)
+{
+
+    this->prec_left=prec;
+    if(prec){
+        this->grip_str_left=string("Precision");
+    }else{
+        this->grip_str_left=string("Full");
+    }
+
+}
 
 
 void Movement::setObject(objectPtr obj)
 {
-
      this->obj=obj;
+}
+
+void Movement::setObjectLeft(objectPtr obj)
+{
+     this->obj_left=obj;
 }
 
 
 void Movement::setObjectInit(objectPtr obj)
 {
-
      this->obj_init=obj;
+}
+
+void Movement::setObjectInitLeft(objectPtr obj)
+{
+     this->obj_init_left=obj;
 }
 
 
 void Movement::setObjectEng(objectPtr obj_eng)
 {
-
    this->obj_eng = obj_eng;
 }
 
-
+void Movement::setObjectEngLeft(objectPtr obj_eng)
+{
+   this->obj_eng_left = obj_eng;
+}
 
 
 void Movement::setArm(int a)
@@ -949,22 +1011,39 @@ int Movement::getType()
     return this->type;
 }
 
+int Movement::getTypeLeft()
+{
+    return this->type_left;
+}
+
 bool Movement::getGrip()
 {
-
     return this->prec;
+}
+
+bool Movement::getGripLeft()
+{
+    return this->prec_left;
 }
 
 string Movement::getGripStr()
 {
-
     return this->grip_str;
+}
+
+string Movement::getGripStrLeft()
+{
+    return this->grip_str_left;
 }
 
 objectPtr Movement::getObject()
 {
-
     return obj;
+}
+
+objectPtr Movement::getObjectLeft()
+{
+    return obj_left;
 }
 
 posePtr Movement::getPose()
@@ -972,24 +1051,41 @@ posePtr Movement::getPose()
     return pose;
 }
 
+posePtr Movement::getPoseLeft()
+{
+    return pose_left;
+}
+
 
 objectPtr Movement::getObjectInit()
 {
-
     return obj_init;
+}
+
+objectPtr Movement::getObjectInitLeft()
+{
+    return obj_init_left;
 }
 
 objectPtr Movement::getObjectEng()
 {
-
     return obj_eng;
+}
+
+objectPtr Movement::getObjectEngLeft()
+{
+    return obj_eng_left;
 }
 
 
 string Movement::getStrType()
 {
-
     return this->strType;
+}
+
+string Movement::getStrTypeLeft()
+{
+    return this->strType_left;
 }
 
 
