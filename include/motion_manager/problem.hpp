@@ -143,7 +143,7 @@ public:
      * @param params
      * @return
      */
-    HUMotion::planning_result_ptr solve(HUMotion::hump_dual_params& params);
+    HUMotion::planning_dual_result_ptr solve(HUMotion::hump_dual_params& params);
 
 #if MOVEIT==1
     /**
@@ -256,7 +256,8 @@ private:
 #if MOVEIT==1
     moveit_planning::moveit_params m_params; /**< parameters of the moveit Humanoid planner */
 #endif
-    HUMotion::hump_params h_params; /**< parameters of the HUMP planner */
+    HUMotion::hump_params h_params; /**< single-arm parameters of the HUMP planner */
+    HUMotion::hump_dual_params h_dual_params; /**< dual-arm parameters of the HUMP planner */
     movementPtr mov; /**< movement to be planned */
     scenarioPtr scene; /**< current scene */
     int targetAxis; /**< approaching direction towards the target: 0 = none , 1 = x axis , 2 = y axis, 3 = z axis*/

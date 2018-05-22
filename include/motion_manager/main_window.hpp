@@ -513,7 +513,8 @@ private:
 
         bool moveit_mov; /**< true if the movement has been planned by the moveit planner, false otherwise */
         bool moveit_task; /**< true if at least one movement in the task has been planned by the moveit planner, false otherwise */
-        HUMotion::planning_result_ptr h_results; /**< results of the HUMP planner */
+        HUMotion::planning_result_ptr h_results; /**< single-arm results of the HUMP planner */
+        HUMotion::planning_dual_result_ptr h_dual_results; /**< dual-arm results of the HUMP planner */
 #if MOVEIT==1
         moveit_plannerPtr m_planner; /**< MoveIt! Libraries planner */
         moveit_planning::PlanningResultPtr m_results; /**< results of the moveit planner */

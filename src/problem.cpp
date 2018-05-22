@@ -1223,7 +1223,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
     return res;
 }
 
-HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_dual_params &params)
+HUMotion::planning_dual_result_ptr Problem::solve(HUMotion::hump_dual_params &params)
 {
     this->solved = false;
     int arm_code =  this->mov->getArm();
@@ -1415,8 +1415,18 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_dual_params &params)
     params.mov_specs_left.mov_infoline = this->mov->getInfoLine();
     params.mov_specs_left.finalHand = finalHand_left;
 
-    HUMotion::planning_result_ptr res;
+    HUMotion::planning_dual_result_ptr res;
     long long curr_time;
+
+    if (mov_type_right==0 && mov_type_left==0)
+    { // dual-arm reach-to-grasp right nd reach-to-grasp left
+
+        params.mov_specs_right.target = target_right;
+        params.mov_specs_left.target = target_left;
+        curr_time = this->GetTimeMs64();
+        res = this->h_planner->plan_dual_pick_pick(params,initPosture_right,initPosture_left);
+        this->exec_time = double(this->GetTimeMs64()-curr_time);
+    }
 
     /*
     switch(mov_type_right){
@@ -1467,10 +1477,11 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_dual_params &params)
         this->exec_time = double(this->GetTimeMs64()-curr_time);
         break;
     }
-    this->h_params = params;
+    */
+
+    this->h_dual_params = params;
     if(res!=nullptr){if(res->status==0){this->solved=true;}}
 
-    */
     return res;
 
 }

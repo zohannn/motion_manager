@@ -1126,7 +1126,7 @@ void MainWindow::on_pushButton_plan_clicked()
                                   move_final_arm_right,move_final_arm_left,
                                   use_final_right,use_final_left);
 
-            h_results = prob->solve(dual_tols); // plan the movement
+            h_dual_results = prob->solve(dual_tols); // plan the movement
 
         }
         break;
