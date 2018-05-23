@@ -41,7 +41,7 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
     this->part_of_task=false;
     this->err_log=0;
 
-    this->mov = movementPtr(mov);
+    this->mov = movementPtr(mov); int arm_sel = this->mov->getArm();
     this->scene = scenarioPtr(scene);
     this->planner_id=planner_id;
 
@@ -74,8 +74,20 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
                 std::vector<double> dimension = {obj->getSize().Xsize,obj->getSize().Ysize,obj->getSize().Zsize};
                 hump_obj.reset(new HUMotion::Object(obj->getName()));
                 hump_obj->setParams(position,orientation,dimension);
-                if(!obj->isTargetRightEnabled() && !obj->isTargetLeftEnabled()){
-                    this->h_planner->addObstacle(hump_obj); // the object is an obstacle for the planner
+                if(arm_sel!=0)
+                {
+                    // single-arm movement
+                    if(!obj->isTargetRightEnabled() && !obj->isTargetLeftEnabled()){
+                        this->h_planner->addObstacle(hump_obj); // the object is an obstacle for the planner
+                    }
+                }else{
+                    // dual-arm movement
+                    if(!obj->isTargetRightEnabled()){
+                        this->h_planner->addObstacleRight(hump_obj); // the object is an obstacle for the planner
+                    }
+                    if(!obj->isTargetLeftEnabled()){
+                        this->h_planner->addObstacleLeft(hump_obj); // the object is an obstacle for the planner
+                    }
                 }
             }
         }else{
