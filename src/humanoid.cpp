@@ -1579,17 +1579,21 @@ void Humanoid::computeLeftArmDHparams()
     for (int i = 0; i < JOINTS_ARM; ++i){
 
     // d [mm]
-    m_DH_leftArm.d.push_back(-m_arm_specs.arm_specs.d.at(i));
+    //m_DH_leftArm.d.push_back(-m_arm_specs.arm_specs.d.at(i));
+    m_DH_leftArm.d.push_back(m_arm_specs.arm_specs.d.at(i));
 
     //a [mm]
     m_DH_leftArm.a.push_back(m_arm_specs.arm_specs.a.at(i));
 
     //alpha [rad]
+    /*
     if ((i == 0)){
         m_DH_leftArm.alpha.push_back(m_arm_specs.arm_specs.alpha.at(i));
     }else{
         m_DH_leftArm.alpha.push_back(-m_arm_specs.arm_specs.alpha.at(i));
     }
+    */
+    m_DH_leftArm.alpha.push_back(m_arm_specs.arm_specs.alpha.at(i));
 
     //theta [rad]
     m_DH_leftArm.theta.push_back(leftPosture.at(i));

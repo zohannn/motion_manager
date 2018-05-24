@@ -645,6 +645,20 @@ bool QNode::getElements(scenarioPtr scene)
             ++rows;
         }
 
+        /*
+        // Hands
+        mat_r_hand(0,0) = 1; mat_r_hand(0,1) = 0; mat_r_hand(0,2) = 0; mat_r_hand(0,3) = 0;
+        mat_r_hand(1,0) = 0; mat_r_hand(1,1) = 1; mat_r_hand(1,2) = 0; mat_r_hand(1,3) = 0;
+        mat_r_hand(2,0) = 0; mat_r_hand(2,1) = 0; mat_r_hand(2,2) = 1; mat_r_hand(2,3) = 0;
+        mat_r_hand(3,0) = 0; mat_r_hand(3,1) = 0; mat_r_hand(3,2) = 0; mat_r_hand(3,3) = 1;
+
+        mat_l_hand(0,0) = 0; mat_l_hand(0,1) = 1; mat_l_hand(0,2) = 0; mat_l_hand(0,3) = 0;
+        mat_l_hand(1,0) = 1; mat_l_hand(1,1) = 0; mat_l_hand(1,2) = 0; mat_l_hand(1,3) = 0;
+        mat_l_hand(2,0) = 0; mat_l_hand(2,1) = 0; mat_l_hand(2,2) = -1; mat_l_hand(2,3) = 0;
+        mat_l_hand(3,0) = 0; mat_l_hand(3,1) = 0; mat_l_hand(3,2) = 0; mat_l_hand(3,3) = 1;
+        */
+
+
         // Arms
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
 
@@ -833,6 +847,7 @@ bool QNode::getElements(scenarioPtr scene)
                                           min_llimits,max_llimits);
             hptr->setMatRight(mat_right);
             hptr->setMatLeft(mat_left);
+            //hptr->setMatRightHand(mat_r_hand);  hptr->setMatLeftHand(mat_l_hand);
 
             // get the postures
             std::vector<double> rightp;
@@ -1561,6 +1576,19 @@ bool QNode::getElements(scenarioPtr scene)
             ++rows;
         }
 
+        /*
+        // Hands
+        mat_r_hand(0,0) = 1; mat_r_hand(0,1) = 0; mat_r_hand(0,2) = 0; mat_r_hand(0,3) = 0;
+        mat_r_hand(1,0) = 0; mat_r_hand(1,1) = 1; mat_r_hand(1,2) = 0; mat_r_hand(1,3) = 0;
+        mat_r_hand(2,0) = 0; mat_r_hand(2,1) = 0; mat_r_hand(2,2) = 1; mat_r_hand(2,3) = 0;
+        mat_r_hand(3,0) = 0; mat_r_hand(3,1) = 0; mat_r_hand(3,2) = 0; mat_r_hand(3,3) = 1;
+
+        mat_l_hand(0,0) = 0; mat_l_hand(0,1) = 1; mat_l_hand(0,2) = 0; mat_l_hand(0,3) = 0;
+        mat_l_hand(1,0) = 1; mat_l_hand(1,1) = 0; mat_l_hand(1,2) = 0; mat_l_hand(1,3) = 0;
+        mat_l_hand(2,0) = 0; mat_l_hand(2,1) = 0; mat_l_hand(2,2) = -1; mat_l_hand(2,3) = 0;
+        mat_l_hand(3,0) = 0; mat_l_hand(3,1) = 0; mat_l_hand(3,2) = 0; mat_l_hand(3,3) = 1;
+        */
+
         // Arms
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
 
@@ -1769,6 +1797,7 @@ bool QNode::getElements(scenarioPtr scene)
 
             hptr->setMatRight(mat_right);
             hptr->setMatLeft(mat_left);
+            //hptr->setMatRightHand(mat_r_hand); hptr->setMatLeftHand(mat_l_hand);
 
             // get the postures
             std::vector<double> rightp;
@@ -2025,6 +2054,19 @@ bool QNode::getElements(scenarioPtr scene)
             ++rows;
         }
 
+        /*
+        // Hands
+        mat_r_hand(0,0) = 1; mat_r_hand(0,1) = 0; mat_r_hand(0,2) = 0; mat_r_hand(0,3) = 0;
+        mat_r_hand(1,0) = 0; mat_r_hand(1,1) = 1; mat_r_hand(1,2) = 0; mat_r_hand(1,3) = 0;
+        mat_r_hand(2,0) = 0; mat_r_hand(2,1) = 0; mat_r_hand(2,2) = 1; mat_r_hand(2,3) = 0;
+        mat_r_hand(3,0) = 0; mat_r_hand(3,1) = 0; mat_r_hand(3,2) = 0; mat_r_hand(3,3) = 1;
+
+        mat_l_hand(0,0) = 0; mat_l_hand(0,1) = 1; mat_l_hand(0,2) = 0; mat_l_hand(0,3) = 0;
+        mat_l_hand(1,0) = 1; mat_l_hand(1,1) = 0; mat_l_hand(1,2) = 0; mat_l_hand(1,3) = 0;
+        mat_l_hand(2,0) = 0; mat_l_hand(2,1) = 0; mat_l_hand(2,2) = -1; mat_l_hand(2,3) = 0;
+        mat_l_hand(3,0) = 0; mat_l_hand(3,1) = 0; mat_l_hand(3,2) = 0; mat_l_hand(3,3) = 1;
+        */
+
         // Arms
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
         srvs.request.signalName = string("DH_params_arm");
@@ -2208,6 +2250,9 @@ bool QNode::getElements(scenarioPtr scene)
                                           min_llimits,max_llimits);
             hptr->setMatRight(mat_right);
             hptr->setMatLeft(mat_left);
+
+           // hptr->setMatRightHand(mat_r_hand); hptr->setMatLeftHand(mat_l_hand);
+
             // get the postures
             std::vector<double> rightp;
             std::vector<double> leftp;
@@ -2459,6 +2504,19 @@ bool QNode::getElements(scenarioPtr scene)
             ++rows;
         }
 
+        /*
+        // Hands
+        mat_r_hand(0,0) = 1; mat_r_hand(0,1) = 0; mat_r_hand(0,2) = 0; mat_r_hand(0,3) = 0;
+        mat_r_hand(1,0) = 0; mat_r_hand(1,1) = 1; mat_r_hand(1,2) = 0; mat_r_hand(1,3) = 0;
+        mat_r_hand(2,0) = 0; mat_r_hand(2,1) = 0; mat_r_hand(2,2) = 1; mat_r_hand(2,3) = 0;
+        mat_r_hand(3,0) = 0; mat_r_hand(3,1) = 0; mat_r_hand(3,2) = 0; mat_r_hand(3,3) = 1;
+
+        mat_l_hand(0,0) = 0; mat_l_hand(0,1) = 1; mat_l_hand(0,2) = 0; mat_l_hand(0,3) = 0;
+        mat_l_hand(1,0) = 1; mat_l_hand(1,1) = 0; mat_l_hand(1,2) = 0; mat_l_hand(1,3) = 0;
+        mat_l_hand(2,0) = 0; mat_l_hand(2,1) = 0; mat_l_hand(2,2) = -1; mat_l_hand(2,3) = 0;
+        mat_l_hand(3,0) = 0; mat_l_hand(3,1) = 0; mat_l_hand(3,2) = 0; mat_l_hand(3,3) = 1;
+        */
+
         // Arms
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
         srvs.request.signalName = string("DH_params_arm");
@@ -2642,6 +2700,8 @@ bool QNode::getElements(scenarioPtr scene)
                                           min_llimits,max_llimits);
             hptr->setMatRight(mat_right);
             hptr->setMatLeft(mat_left);
+            //hptr->setMatRightHand(mat_r_hand); hptr->setMatLeftHand(mat_l_hand);
+
             // get the postures
             std::vector<double> rightp;
             std::vector<double> leftp;
@@ -2851,6 +2911,19 @@ bool QNode::getElements(scenarioPtr scene)
             ++rows;
         }
 
+        /*
+        // Hands
+        mat_r_hand(0,0) = 1; mat_r_hand(0,1) = 0; mat_r_hand(0,2) = 0; mat_r_hand(0,3) = 0;
+        mat_r_hand(1,0) = 0; mat_r_hand(1,1) = 1; mat_r_hand(1,2) = 0; mat_r_hand(1,3) = 0;
+        mat_r_hand(2,0) = 0; mat_r_hand(2,1) = 0; mat_r_hand(2,2) = 1; mat_r_hand(2,3) = 0;
+        mat_r_hand(3,0) = 0; mat_r_hand(3,1) = 0; mat_r_hand(3,2) = 0; mat_r_hand(3,3) = 1;
+
+        mat_l_hand(0,0) = 0; mat_l_hand(0,1) = 1; mat_l_hand(0,2) = 0; mat_l_hand(0,3) = 0;
+        mat_l_hand(1,0) = 1; mat_l_hand(1,1) = 0; mat_l_hand(1,2) = 0; mat_l_hand(1,3) = 0;
+        mat_l_hand(2,0) = 0; mat_l_hand(2,1) = 0; mat_l_hand(2,2) = -1; mat_l_hand(2,3) = 0;
+        mat_l_hand(3,0) = 0; mat_l_hand(3,1) = 0; mat_l_hand(3,2) = 0; mat_l_hand(3,3) = 1;
+        */
+
         // Arms
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
 
@@ -3039,6 +3112,7 @@ bool QNode::getElements(scenarioPtr scene)
                                           min_llimits,max_llimits);
             hptr->setMatRight(mat_right);
             hptr->setMatLeft(mat_left);
+            //hptr->setMatRightHand(mat_r_hand); hptr->setMatLeftHand(mat_l_hand);
 
             // get the postures
             std::vector<double> rightp;
