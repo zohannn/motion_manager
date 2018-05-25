@@ -626,7 +626,7 @@ bool QNode::getElements(scenarioPtr scene)
             mat_left_arm_vec.push_back(static_cast<double>(((float*)mat_left_arm_str.c_str())[k]));
 
         rows=0;
-        for(int i=0;i<3;++i){
+        for(int i=0;i<4;++i){
             for(int j=0;j<4;++j){
                 if(i==3 && j<3){
                     mat_right(i,j) = 0;
@@ -1557,7 +1557,7 @@ bool QNode::getElements(scenarioPtr scene)
             mat_left_arm_vec.push_back(static_cast<double>(((float*)mat_left_arm_str.c_str())[k]));
 
         rows=0;
-        for(int i=0;i<3;++i){
+        for(int i=0;i<4;++i){
             for(int j=0;j<4;++j){
                 if(i==3 && j<3){
                     mat_right(i,j) = 0;
@@ -2035,7 +2035,7 @@ bool QNode::getElements(scenarioPtr scene)
             mat_left_arm_vec.push_back(static_cast<double>(((float*)mat_left_arm_str.c_str())[k]));
         }
         rows=0;
-        for(int i=0;i<3;++i){
+        for(int i=0;i<4;++i){
             for(int j=0;j<4;++j){
                 if(i==3 && j<3){
                     mat_right(i,j) = 0;
@@ -2485,7 +2485,7 @@ bool QNode::getElements(scenarioPtr scene)
             mat_left_arm_vec.push_back(static_cast<double>(((float*)mat_left_arm_str.c_str())[k]));
         }
         rows=0;
-        for(int i=0;i<3;++i){
+        for(int i=0;i<4;++i){
             for(int j=0;j<4;++j){
                 if(i==3 && j<3){
                     mat_right(i,j) = 0;
@@ -2892,7 +2892,7 @@ bool QNode::getElements(scenarioPtr scene)
             mat_left_arm_vec.push_back(static_cast<double>(((float*)mat_left_arm_str.c_str())[k]));
 
         rows=0;
-        for(int i=0;i<3;++i){
+        for(int i=0;i<4;++i){
             for(int j=0;j<4;++j){
                 if(i==3 && j<3){
                     mat_right(i,j) = 0;
