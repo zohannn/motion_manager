@@ -455,11 +455,13 @@ tar_pos_left=1.0
 tar_or_left=0.001
 
 # Pick settings (right)
-pre_grasp_x_right=0.866025404
+pre_grasp_x_right=0
+
 pre_grasp_y_right=0
 
-pre_grasp_z_right=-0.5
-pre_grasp_dist_right=30
+pre_grasp_z_right=-1
+
+pre_grasp_dist_right=50
 post_grasp_x_right=0
 
 post_grasp_y_right=0
@@ -470,10 +472,13 @@ post_grasp_dist_right=0
 
 # Pick settings (left)
 pre_grasp_x_left=0
+
 pre_grasp_y_left=0
 
 pre_grasp_z_left=-1
+
 pre_grasp_dist_left=50
+
 post_grasp_x_left=0
 
 post_grasp_y_left=0
