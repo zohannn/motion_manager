@@ -59,8 +59,23 @@ public:
      */
     void setupPlots(vector<vector<MatrixXd>> &pos, vector<vector<MatrixXd>> &vel,vector<vector<MatrixXd>> &acc,vector<vector<vector<double>>> &timesteps);
 
+    /**
+     * @brief setDual
+     * @param d
+     */
+    void setDual(bool d);
+
+    /**
+     * @brief setRight
+     * @param r
+     */
+    void setRight(bool r);
 private:
     Ui::ResultsJointsDialog *ui; /**< handle of the user interface */
+
+    bool dual;
+
+    bool right;
 
     /**
      * @brief plotJoint

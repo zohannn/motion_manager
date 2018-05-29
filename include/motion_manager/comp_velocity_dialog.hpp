@@ -44,6 +44,18 @@ public Q_SLOTS:
      */
     void on_pushButton_save_hand_clicked();
 
+    /**
+     * @brief setDual
+     * @param d
+     */
+    void setDual(bool d);
+
+    /**
+     * @brief setRight
+     * @param r
+     */
+    void setRight(bool r);
+
 public:
     /**
      * @brief CompVelocityDialog, a constructor
@@ -78,6 +90,9 @@ private:
      * @param lin
      */
     void plotComp(QCustomPlot* plot, QString title, QVector<double>& time, QVector<double>& var,bool lin);
+
+    bool dual;
+    bool right;
 };
 
 } // namespace motion_manager

@@ -7,6 +7,8 @@ CompVelocityDialog::CompVelocityDialog(QWidget *parent) :
     ui(new Ui::CompVelocityDialog)
 {
     ui->setupUi(this);
+    dual = false;
+    right = true;
 }
 
 CompVelocityDialog::~CompVelocityDialog()
@@ -14,6 +16,15 @@ CompVelocityDialog::~CompVelocityDialog()
     delete ui;
 }
 
+void CompVelocityDialog::setDual(bool d)
+{
+    this->dual = d;
+}
+
+void CompVelocityDialog::setRight(bool r)
+{
+    this->right = r;
+}
 
 void CompVelocityDialog::setupPlots(vector<vector<double>> &linear_velocity,vector<vector<double>> &angular_velocity,QVector<double> &time, int mod)
 {
@@ -132,17 +143,48 @@ void CompVelocityDialog::plotComp(QCustomPlot *plot, QString title, QVector<doub
 void CompVelocityDialog::on_pushButton_save_shoulder_clicked()
 {
 
-    struct stat st = {0};
-    if (stat("results", &st) == -1) {
-        mkdir("results", 0700);
+    QString path;
+
+    if(dual)
+    {
+        if(right){
+            struct stat st = {0};
+            if (stat("results", &st) == -1) {
+                mkdir("results", 0700);
+            }
+            if (stat("results/planning", &st) == -1) {
+                mkdir("results/planning", 0700);
+            }
+            if (stat("results/planning/shoulder_right", &st) == -1) {
+                mkdir("results/planning/shoulder_right", 0700);
+            }
+            path = QString("results/planning/shoulder_right/");
+        }else{
+            struct stat st = {0};
+            if (stat("results", &st) == -1) {
+                mkdir("results", 0700);
+            }
+            if (stat("results/planning", &st) == -1) {
+                mkdir("results/planning", 0700);
+            }
+            if (stat("results/planning/shoulder_left", &st) == -1) {
+                mkdir("results/planning/shoulder_left", 0700);
+            }
+            path = QString("results/planning/shoulder_left/");
+        }
+    }else{
+        struct stat st = {0};
+        if (stat("results", &st) == -1) {
+            mkdir("results", 0700);
+        }
+        if (stat("results/planning", &st) == -1) {
+            mkdir("results/planning", 0700);
+        }
+        if (stat("results/planning/shoulder", &st) == -1) {
+            mkdir("results/planning/shoulder", 0700);
+        }
+        path = QString("results/planning/shoulder/");
     }
-    if (stat("results/planning", &st) == -1) {
-        mkdir("results/planning", 0700);
-    }
-    if (stat("results/planning/shoulder", &st) == -1) {
-        mkdir("results/planning/shoulder", 0700);
-    }
-    QString path = QString("results/planning/shoulder/");
 
     ui->plot_shoulder_x->savePdf(path+QString("shoulder_vel_x.pdf"),true,0,0,QString(),QString("Shoulder Linear Velocity x"));
     ui->plot_shoulder_y->savePdf(path+QString("shoulder_vel_y.pdf"),true,0,0,QString(),QString("Shoulder Linear Velocity y"));
@@ -157,18 +199,48 @@ void CompVelocityDialog::on_pushButton_save_shoulder_clicked()
 
 void CompVelocityDialog::on_pushButton_save_elbow_clicked()
 {
+    QString path;
 
-    struct stat st = {0};
-    if (stat("results", &st) == -1) {
-        mkdir("results", 0700);
+    if(dual)
+    {
+        if(right){
+            struct stat st = {0};
+            if (stat("results", &st) == -1) {
+                mkdir("results", 0700);
+            }
+            if (stat("results/planning", &st) == -1) {
+                mkdir("results/planning", 0700);
+            }
+            if (stat("results/planning/elbow_right", &st) == -1) {
+                mkdir("results/planning/elbow_right", 0700);
+            }
+            path = QString("results/planning/elbow_right/");
+        }else{
+            struct stat st = {0};
+            if (stat("results", &st) == -1) {
+                mkdir("results", 0700);
+            }
+            if (stat("results/planning", &st) == -1) {
+                mkdir("results/planning", 0700);
+            }
+            if (stat("results/planning/elbow_left", &st) == -1) {
+                mkdir("results/planning/elbow_left", 0700);
+            }
+            path = QString("results/planning/elbow_left/");
+        }
+    }else{
+        struct stat st = {0};
+        if (stat("results", &st) == -1) {
+            mkdir("results", 0700);
+        }
+        if (stat("results/planning", &st) == -1) {
+            mkdir("results/planning", 0700);
+        }
+        if (stat("results/planning/elbow", &st) == -1) {
+            mkdir("results/planning/elbow", 0700);
+        }
+        path = QString("results/planning/elbow/");
     }
-    if (stat("results/planning", &st) == -1) {
-        mkdir("results/planning", 0700);
-    }
-    if (stat("results/planning/elbow", &st) == -1) {
-        mkdir("results/planning/elbow", 0700);
-    }
-    QString path = QString("results/planning/elbow/");
 
     ui->plot_elbow_x->savePdf(path+QString("elbow_vel_x.pdf"),true,0,0,QString(),QString("Elbow Linear Velocity x"));
     ui->plot_elbow_y->savePdf(path+QString("elbow_vel_y.pdf"),true,0,0,QString(),QString("Elbow Linear Velocity y"));
@@ -182,17 +254,48 @@ void CompVelocityDialog::on_pushButton_save_elbow_clicked()
 
 void CompVelocityDialog::on_pushButton_save_wrist_clicked()
 {
-    struct stat st = {0};
-    if (stat("results", &st) == -1) {
-        mkdir("results", 0700);
+    QString path;
+
+    if(dual)
+    {
+        if(right){
+            struct stat st = {0};
+            if (stat("results", &st) == -1) {
+                mkdir("results", 0700);
+            }
+            if (stat("results/planning", &st) == -1) {
+                mkdir("results/planning", 0700);
+            }
+            if (stat("results/planning/wrist_right", &st) == -1) {
+                mkdir("results/planning/wrist_right", 0700);
+            }
+            path = QString("results/planning/wrist_right/");
+        }else{
+            struct stat st = {0};
+            if (stat("results", &st) == -1) {
+                mkdir("results", 0700);
+            }
+            if (stat("results/planning", &st) == -1) {
+                mkdir("results/planning", 0700);
+            }
+            if (stat("results/planning/wrist_left", &st) == -1) {
+                mkdir("results/planning/wrist_left", 0700);
+            }
+            path = QString("results/planning/wrist_left/");
+        }
+    }else{
+        struct stat st = {0};
+        if (stat("results", &st) == -1) {
+            mkdir("results", 0700);
+        }
+        if (stat("results/planning", &st) == -1) {
+            mkdir("results/planning", 0700);
+        }
+        if (stat("results/planning/wrist", &st) == -1) {
+            mkdir("results/planning/wrist", 0700);
+        }
+        path = QString("results/planning/wrist/");
     }
-    if (stat("results/planning", &st) == -1) {
-        mkdir("results/planning", 0700);
-    }
-    if (stat("results/planning/wrist", &st) == -1) {
-        mkdir("results/planning/wrist", 0700);
-    }
-    QString path = QString("results/planning/wrist/");
 
     ui->plot_wrist_x->savePdf(path+QString("wrist_vel_x.pdf"),true,0,0,QString(),QString("Wrist Linear Velocity x"));
     ui->plot_wrist_y->savePdf(path+QString("wrist_vel_y.pdf"),true,0,0,QString(),QString("Wrist Linear Velocity y"));
@@ -207,17 +310,49 @@ void CompVelocityDialog::on_pushButton_save_wrist_clicked()
 void CompVelocityDialog::on_pushButton_save_hand_clicked()
 {
 
-    struct stat st = {0};
-    if (stat("results", &st) == -1) {
-        mkdir("results", 0700);
+    QString path;
+
+    if(dual)
+    {
+        if(right)
+        {
+            struct stat st = {0};
+            if (stat("results", &st) == -1) {
+                mkdir("results", 0700);
+            }
+            if (stat("results/planning", &st) == -1) {
+                mkdir("results/planning", 0700);
+            }
+            if (stat("results/planning/hand_right", &st) == -1) {
+                mkdir("results/planning/hand_right", 0700);
+            }
+            path = QString("results/planning/hand_right/");
+        }else{
+            struct stat st = {0};
+            if (stat("results", &st) == -1) {
+                mkdir("results", 0700);
+            }
+            if (stat("results/planning", &st) == -1) {
+                mkdir("results/planning", 0700);
+            }
+            if (stat("results/planning/hand_left", &st) == -1) {
+                mkdir("results/planning/hand_left", 0700);
+            }
+            path = QString("results/planning/hand_left/");
+        }
+    }else{
+        struct stat st = {0};
+        if (stat("results", &st) == -1) {
+            mkdir("results", 0700);
+        }
+        if (stat("results/planning", &st) == -1) {
+            mkdir("results/planning", 0700);
+        }
+        if (stat("results/planning/hand", &st) == -1) {
+            mkdir("results/planning/hand", 0700);
+        }
+        path = QString("results/planning/hand/");
     }
-    if (stat("results/planning", &st) == -1) {
-        mkdir("results/planning", 0700);
-    }
-    if (stat("results/planning/hand", &st) == -1) {
-        mkdir("results/planning/hand", 0700);
-    }
-    QString path = QString("results/planning/hand/");
 
     ui->plot_hand_x->savePdf(path+QString("hand_vel_x.pdf"),true,0,0,QString(),QString("Hand Linear Velocity x"));
     ui->plot_hand_y->savePdf(path+QString("hand_vel_y.pdf"),true,0,0,QString(),QString("Hand Linear Velocity y"));

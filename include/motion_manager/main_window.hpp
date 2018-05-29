@@ -400,6 +400,11 @@ public Q_SLOTS:
         void on_pushButton_plot_mov_clicked();
 
         /**
+         * @brief on_pushButton_plot_mov_dual_clicked
+         */
+        void on_pushButton_plot_mov_dual_clicked();
+
+        /**
          * @brief on_pushButton_plot_task_clicked
          */
         void on_pushButton_plot_task_clicked();
@@ -408,6 +413,16 @@ public Q_SLOTS:
          * @brief on_pushButton_joints_results_mov_clicked
          */
         void on_pushButton_joints_results_mov_clicked();
+
+        /**
+         * @brief on_pushButton_joints_results_mov_right_clicked
+         */
+        void on_pushButton_joints_results_mov_right_clicked();
+
+        /**
+         * @brief on_pushButton_joints_results_mov_left_clicked
+         */
+        void on_pushButton_joints_results_mov_left_clicked();
 
         /**
          * @brief on_pushButton_joints_results_task_clicked
@@ -432,9 +447,23 @@ public Q_SLOTS:
         void on_pushButton_comp_vel_mov_clicked();
 
         /**
+         * @brief on_pushButton_comp_vel_mov_right_clicked
+         */
+        void on_pushButton_comp_vel_mov_right_clicked();
+
+        /**
+         * @brief on_pushButton_comp_vel_mov_left_clicked
+         */
+        void on_pushButton_comp_vel_mov_left_clicked();
+        /**
          * @brief on_pushButton_save_res_mov_clicked
          */
         void on_pushButton_save_res_mov_clicked();
+
+        /**
+         * @brief on_pushButton_save_res_mov_dual_clicked
+         */
+        void on_pushButton_save_res_mov_dual_clicked();
 
         /**
          * @brief on_pushButton_save_res_task_clicked
@@ -483,6 +512,7 @@ private:
         QVector<double> qtime_task;/**< time of the current task for plotting */
         vector<vector<double>> tols_stop_task; /**< vector of the tolerances to stop each movement in the task */
         vector<string> vel_steps; /**< steps of the trajectory for saving/loading file */
+        double prob_time_mov;/**< time taken to solve the problem */
 
         vector<vector<double>> handPosition_mov; /**< hand position during the movement. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_mov; /**< hand orientation during the movement. */
@@ -498,9 +528,25 @@ private:
         vector<double> wristVelocityNorm_mov; /**< wrist velocity norm during the movement */
         vector<double> elbowVelocityNorm_mov; /**< elbow velocity norm during the movement */
         vector<double> shoulderVelocityNorm_mov; /**< shoulder velocity norm during the movement */
-        double prob_time_mov;/**< time taken to solve the problem */
         double njs_mov;/**< normalized jerk score of the movement */
         int nmu_mov;/**< number of the movement units */
+
+        vector<vector<double>> handPosition_mov_left; /**< hand position during the movement. 0=x,1=y,2=z */
+        vector<vector<double>> handOrientation_mov_left; /**< hand orientation during the movement. */
+        vector<vector<double>> handLinearVelocity_mov_left; /**< hand linear velocity during the movement */
+        vector<vector<double>> handAngularVelocity_mov_left;/**< hand angular velocity during the movement */
+        vector<vector<double>> wristLinearVelocity_mov_left; /**< wrist linear velocity during the movement */
+        vector<vector<double>> wristAngularVelocity_mov_left;/**< wrist angular velocity during the movement */
+        vector<vector<double>> elbowLinearVelocity_mov_left; /**< elbow linear velocity during the movement */
+        vector<vector<double>> elbowAngularVelocity_mov_left;/**< elbow angular velocity during the movement */
+        vector<vector<double>> shoulderLinearVelocity_mov_left; /**< shoulder linear velocity during the movement */
+        vector<vector<double>> shoulderAngularVelocity_mov_left;/**< shoulder angular velocity during the movement */
+        vector<double> handVelocityNorm_mov_left; /**< hand velocity norm during the movement */
+        vector<double> wristVelocityNorm_mov_left; /**< wrist velocity norm during the movement */
+        vector<double> elbowVelocityNorm_mov_left; /**< elbow velocity norm during the movement */
+        vector<double> shoulderVelocityNorm_mov_left; /**< shoulder velocity norm during the movement */
+        double njs_mov_left;/**< normalized jerk score of the movement */
+        int nmu_mov_left;/**< number of the movement units */
 
         vector<vector<double>> handPosition_task; /**< hand position during the task. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_task; /**< hand orientation during the task. */
@@ -527,6 +573,7 @@ private:
         scenarioPtr curr_scene; /**< current scenario */
 
         boost::shared_ptr<HandPosPlot> handPosPlot_mov_ptr; /**< pointer to the hand position plot of the movement */
+        boost::shared_ptr<HandPosPlot> handPosPlot_mov_left_ptr; /**< pointer to the hand position plot of the movement */
         boost::shared_ptr<HandPosPlot> handPosPlot_task_ptr;/**< pointer to the hand position plot of the task */
 
         // --- Park postures for ARoS --- //

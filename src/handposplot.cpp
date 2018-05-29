@@ -60,4 +60,9 @@ HandPosPlot::HandPosPlot(vector<vector<double>>& hand_pos)
 
 }
 
+void HandPosPlot::set_title(QString title)
+{
+    setTitle(title);
+}
+
 }// namespace motion_manager

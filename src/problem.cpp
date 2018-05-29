@@ -1431,7 +1431,7 @@ HUMotion::planning_dual_result_ptr Problem::solve(HUMotion::hump_dual_params &pa
     long long curr_time;
 
     if (mov_type_right==0 && mov_type_left==0)
-    { // dual-arm reach-to-grasp right nd reach-to-grasp left
+    { // dual-arm reach-to-grasp right and reach-to-grasp left
 
         params.mov_specs_right.target = target_right;
         params.mov_specs_left.target = target_left;

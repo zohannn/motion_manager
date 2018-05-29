@@ -11,6 +11,8 @@ class HandPosPlot : public SurfacePlot
 {
 public:
     HandPosPlot(vector<vector<double>>& hand_pos);
+
+    void set_title(QString title);
 };
 
 } // namespace motion_manager
