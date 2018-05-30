@@ -3687,9 +3687,21 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
     std::vector<int> handles;
     MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
     int h_attach; // handle of the attachment point of the hand
+    std::vector<int> r_handles;
+    MatrixXi r_hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
+    int r_h_attach; // handle of the attachment point of the hand
+    std::vector<int> l_handles;
+    MatrixXi l_hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
+    int l_h_attach; // handle of the attachment point of the hand
+
     switch (arm_code) {
     case 0: // dual arm
-        // TODO
+        r_handles = right_handles;
+        r_hand_handles = right_hand_handles;
+        r_h_attach = right_attach;
+        l_handles = left_handles;
+        l_hand_handles = left_hand_handles;
+        l_h_attach = left_attach;
         break;
     case 1: //right arm
         handles = right_handles;
@@ -3932,24 +3944,54 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 
                     double m;
                     if((tb-ta)==0){m=1;}else{m = (tx-ta)/(tb-ta);}
-                    std::vector<double> r_post;
-                    this->curr_scene->getHumanoid()->getRightPosture(r_post);
-                    double yx;
-                    double yxt;
-                     if(sqrt(pow((f_posture(0)-r_post.at(0)),2)+
-                           pow((f_posture(1)-r_post.at(1)),2)+
-                           pow((f_posture(2)-r_post.at(2)),2)+
-                           pow((f_posture(3)-r_post.at(3)),2)+
-                           pow((f_posture(4)-r_post.at(4)),2)+
-                           pow((f_posture(5)-r_post.at(5)),2)+
-                           pow((f_posture(6)-r_post.at(6)),2)) < tol_stop_stage){
+
+                    std::vector<double> r_post; std::vector<double> l_post; std::vector<double> curr_post;
+                    switch (arm_code) {
+                    case 0: // dual arm
+                        this->curr_scene->getHumanoid()->getRightPosture(r_post);
+                        this->curr_scene->getHumanoid()->getLeftPosture(l_post);
+                        break;
+                    case 1: // right arm
+                        this->curr_scene->getHumanoid()->getRightPosture(curr_post);
+                        break;
+                    case 2: //left arm
+                        this->curr_scene->getHumanoid()->getLeftPosture(curr_post);
+                        break;
+                    }
+                    double yx; double yxt; double thr = 0.0;
+                    if(arm_code!=0){
+                        thr = sqrt(pow((f_posture(0)-curr_post.at(0)),2)+
+                                   pow((f_posture(1)-curr_post.at(1)),2)+
+                                   pow((f_posture(2)-curr_post.at(2)),2)+
+                                   pow((f_posture(3)-curr_post.at(3)),2)+
+                                   pow((f_posture(4)-curr_post.at(4)),2)+
+                                   pow((f_posture(5)-curr_post.at(5)),2)+
+                                   pow((f_posture(6)-curr_post.at(6)),2);
+                    }else{
+                        thr = sqrt(pow((f_posture(0)-r_post.at(0)),2)+
+                                   pow((f_posture(1)-r_post.at(1)),2)+
+                                   pow((f_posture(2)-r_post.at(2)),2)+
+                                   pow((f_posture(3)-r_post.at(3)),2)+
+                                   pow((f_posture(4)-r_post.at(4)),2)+
+                                   pow((f_posture(5)-r_post.at(5)),2)+
+                                   pow((f_posture(6)-r_post.at(6)),2)+
+                                   pow((f_posture(11)-l_post.at(0)),2)+
+                                   pow((f_posture(12)-l_post.at(1)),2)+
+                                   pow((f_posture(13)-l_post.at(2)),2)+
+                                   pow((f_posture(14)-l_post.at(3)),2)+
+                                   pow((f_posture(15)-l_post.at(4)),2)+
+                                   pow((f_posture(16)-l_post.at(5)),2)+
+                                   pow((f_posture(17)-l_post.at(6)),2);
+
+                    }
+                    if(thr < tol_stop_stage){
                         f_reached=true;
                         //std::cout << "final posture reached" << std::endl;
                         //BOOST_LOG_SEV(lg, info) << "final posture reached" ;
                         break;
                     }else{f_reached=false;}
-
                     hand_closed = (closed[0] && closed[1] && closed[2]);
+
                     for (int k = 0; k< vel.cols(); ++k){// for loop joints
                         if(f_reached){
                             yx=0;
@@ -3959,9 +4001,23 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                             yxt = interpolate(yat(k),ybt(k),m);
                             yxt_prev=yxt;
                         }
-                        if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4)) || // joints of the arm
-                                (((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed)){
-                            dataTraj.handles.data.push_back(handles.at(k));
+                        if(arm_code!=0){
+                            // single-arm
+                            if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4)) || // joints of the arm
+                                    (((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed)){ // joints of the hand if the hand is open
+                                dataTraj.handles.data.push_back(handles.at(k));
+                            }
+                        }else{
+                            // dual-arm
+                            if((k < JOINTS_ARM) || // joints of the right arm OR
+                                ((k >= JOINTS_ARM) && (k < JOINTS_ARM + JOINTS_HAND) && !hand_closed)) // joints of the right hand if the hand is open
+                            {
+                                dataTraj.handles.data.push_back(r_handles.at(k));
+                            }else if (((k >= JOINTS_ARM + JOINTS_HAND) && ( k < JOINTS_ARM + JOINTS_HAND + JOINTS_ARM) )|| // joints of the left arm OR
+                                      ((k >= JOINTS_ARM + JOINTS_HAND + JOINTS_ARM) && !hand_closed)) // joints of the left hand if the hand is open
+                            {
+                                dataTraj.handles.data.push_back(l_handles.at(k));
+                            }
                         }
 
                         int exec_mode; double exec_value;
@@ -3972,6 +4028,36 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                         //velocity
                         exec_mode = 2; exec_value = yx;
 #endif
+                        if(arm_code!=0){
+                            // single-arm
+                            //ARoS
+                            if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed) // joints of the hand
+                            {
+                                dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                dataTraj.values.data.push_back(yxt);
+                            }else if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4))) // joints of the arm
+                            {
+                                dataTraj.setModes.data.push_back(exec_mode); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                dataTraj.values.data.push_back(exec_value);
+                            }
+                            // Jarde
+                            //dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                            //dataTraj.values.data.push_back(yxt);
+                        }else{
+                            //dual-arm
+                            if((k < JOINTS_ARM) || ((k >= JOINTS_ARM + JOINTS_HAND) && ( k < JOINTS_ARM + JOINTS_HAND + JOINTS_ARM)) )// joints of the right or left arm
+                            {
+                                dataTraj.setModes.data.push_back(exec_mode); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                dataTraj.values.data.push_back(exec_value);
+                            }else if (((k >= JOINTS_ARM) && (k < JOINTS_ARM + JOINTS_HAND)) || // joints of the right hand OR
+                                      (k >= JOINTS_ARM + JOINTS_HAND + JOINTS_ARM) && !hand_closed) // joints of the left hand if the hands are open
+                            {
+                                dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                dataTraj.values.data.push_back(yxt);
+                            }
+
+                        }
+                        /*
                         switch(scenarioID){
                         case 0: //error
                             // TO DO
@@ -3993,13 +4079,29 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                             dataTraj.values.data.push_back(yxt);
                             break;
                         }
+                        */
 #if HAND ==1
-                        if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3)) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
-                            // the fingers are being addressed
-                            data_hand.handles.data.push_back(hand_handles(k+3-vel.cols(),2));
-                            data_hand.setModes.data.push_back(1); // set the target position
-                            data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
-
+                        if(arm_code!=0){
+                            //single-arm
+                            if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3)) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
+                                // the fingers are being addressed
+                                data_hand.handles.data.push_back(hand_handles(k+3-vel.cols(),2));
+                                data_hand.setModes.data.push_back(1); // set the target position
+                                data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
+                            }
+                        }else{
+                            // dual-arm
+                            if(((k >= JOINTS_ARM) && (k < JOINTS_ARM + JOINTS_HAND)) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
+                                // the right fingers are being addressed
+                                data_hand.handles.data.push_back(r_hand_handles(k+3-JOINTS_ARM + JOINTS_HAND,2));
+                                data_hand.setModes.data.push_back(1); // set the target position
+                                data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
+                            }else if((k >= JOINTS_ARM + JOINTS_HAND + JOINTS_ARM) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
+                                // the left fingers are being addressed
+                                data_hand.handles.data.push_back(l_hand_handles(k+3-JOINTS_ARM + JOINTS_HAND,2));
+                                data_hand.setModes.data.push_back(1); // set the target position
+                                data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
+                            }
                         }
 #endif
 
@@ -4007,7 +4109,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                       //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
                                                   //", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
 
-                    }
+                    } // FOR LOOP JOINTS
                     //BOOST_LOG_SEV(lg, info) << "\n";
 
 
