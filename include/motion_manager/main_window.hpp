@@ -435,10 +435,19 @@ public Q_SLOTS:
         void on_pushButton_joints_results_task_clicked();
 
         /**
+         * @brief on_pushButton_joints_results_task_right_clicked
+         */
+        void on_pushButton_joints_results_task_right_clicked();
+
+        /**
+         * @brief on_pushButton_joints_results_task_left_clicked
+         */
+        void on_pushButton_joints_results_task_left_clicked();
+
+        /**
          * @brief on_pushButton_power_law_clicked
          */
         void on_pushButton_power_law_clicked();
-
 
         /**
          * @brief on_pushButton_power_law_3D_clicked

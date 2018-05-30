@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1053,6 +1053,16 @@ p, li { white-space: pre-wrap; }
       </widget>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_learn">
+     <attribute name="title">
+      <string>Learning</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="tab_control">
+     <attribute name="title">
+      <string>Controlling</string>
+     </attribute>
+    </widget>
     <widget class="QWidget" name="tab_results">
      <property name="enabled">
       <bool>false</bool>
@@ -1086,7 +1096,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tab_results_plan_mov">
          <attribute name="title">
@@ -1494,7 +1504,7 @@ p, li { white-space: pre-wrap; }
            </rect>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_task_single">
            <attribute name="title">
@@ -1883,6 +1893,11 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="tab_results_learn">
        <attribute name="title">
         <string>Learning</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_results_control">
+       <attribute name="title">
+        <string>Controlling</string>
        </attribute>
       </widget>
      </widget>

@@ -3766,144 +3766,150 @@ void MainWindow::on_pushButton_plot_mov_dual_clicked()
 
 void MainWindow::on_pushButton_plot_task_clicked()
 {
-    // plot the 3D hand position
-    this->handPosPlot_task_ptr.reset(new HandPosPlot(this->handPosition_task));
-    this->handPosPlot_task_ptr->setParent(this->ui.plot_hand_pos_task);
-    this->handPosPlot_task_ptr->resize(522,329);
-    this->handPosPlot_task_ptr->show();
+    if(!this->handPosition_task.empty() && !this->handVelocityNorm_task.empty())
+    {
+        // plot the 3D hand position
+        this->handPosPlot_task_ptr.reset(new HandPosPlot(this->handPosition_task));
+        this->handPosPlot_task_ptr->setParent(this->ui.plot_hand_pos_task);
+        this->handPosPlot_task_ptr->resize(522,329);
+        this->handPosPlot_task_ptr->show();
 
-    // plot the hand velocity norm
-    if(!this->handVelocityNorm_task.empty()){
-        QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_task);
-        ui.plot_hand_vel_task->plotLayout()->clear();
-        ui.plot_hand_vel_task->clearGraphs();
-        ui.plot_hand_vel_task->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
-        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_hand_vel_task);
-        wideAxisRect->setupFullAxesBox(true);
-        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_hand_vel_task);
-        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
-        // move newly created axes on "axes" layer and grids on "grid" layer:
-        for (QCPAxisRect *rect : ui.plot_hand_vel_task->axisRects())
-        {
-          for (QCPAxis *axis : rect->axes())
-          {
-            axis->setLayer("axes");
-            axis->grid()->setLayer("grid");
-          }
+        // plot the hand velocity norm
+        if(!this->handVelocityNorm_task.empty()){
+            QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_task);
+            ui.plot_hand_vel_task->plotLayout()->clear();
+            ui.plot_hand_vel_task->clearGraphs();
+            ui.plot_hand_vel_task->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+            QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_hand_vel_task);
+            wideAxisRect->setupFullAxesBox(true);
+            QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_hand_vel_task);
+            wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+            // move newly created axes on "axes" layer and grids on "grid" layer:
+            for (QCPAxisRect *rect : ui.plot_hand_vel_task->axisRects())
+            {
+              for (QCPAxis *axis : rect->axes())
+              {
+                axis->setLayer("axes");
+                axis->grid()->setLayer("grid");
+              }
+            }
+            QString title("Hand velocity");
+            ui.plot_hand_vel_task->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_hand_vel_task,title));
+            ui.plot_hand_vel_task->plotLayout()->addElement(1, 0, wideAxisRect);
+
+            ui.plot_hand_vel_task->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+            ui.plot_hand_vel_task->graph(0)->setPen(QPen(Qt::red));
+            ui.plot_hand_vel_task->graph(0)->setName(title);
+            ui.plot_hand_vel_task->graph(0)->valueAxis()->setLabel("hand velocity [mm/s]");
+            ui.plot_hand_vel_task->graph(0)->keyAxis()->setLabel("time [s]");
+            ui.plot_hand_vel_task->graph(0)->setData(this->qtime_task, qhand_vel);
+            ui.plot_hand_vel_task->graph(0)->valueAxis()->setRange(*std::min_element(qhand_vel.begin(), qhand_vel.end()),
+                                                              *std::max_element(qhand_vel.begin(), qhand_vel.end()));
+            ui.plot_hand_vel_task->graph(0)->rescaleAxes();
+            ui.plot_hand_vel_task->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+            ui.plot_hand_vel_task->replot();
+        }else{
+            ui.plot_hand_vel_task->plotLayout()->clear();
+            ui.plot_hand_vel_task->clearGraphs();
         }
-        QString title("Hand velocity");
-        ui.plot_hand_vel_task->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_hand_vel_task,title));
-        ui.plot_hand_vel_task->plotLayout()->addElement(1, 0, wideAxisRect);
-
-        ui.plot_hand_vel_task->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-        ui.plot_hand_vel_task->graph(0)->setPen(QPen(Qt::red));
-        ui.plot_hand_vel_task->graph(0)->setName(title);
-        ui.plot_hand_vel_task->graph(0)->valueAxis()->setLabel("hand velocity [mm/s]");
-        ui.plot_hand_vel_task->graph(0)->keyAxis()->setLabel("time [s]");
-        ui.plot_hand_vel_task->graph(0)->setData(this->qtime_task, qhand_vel);
-        ui.plot_hand_vel_task->graph(0)->valueAxis()->setRange(*std::min_element(qhand_vel.begin(), qhand_vel.end()),
-                                                          *std::max_element(qhand_vel.begin(), qhand_vel.end()));
-        ui.plot_hand_vel_task->graph(0)->rescaleAxes();
-        ui.plot_hand_vel_task->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-        ui.plot_hand_vel_task->replot();
-    }else{
-        ui.plot_hand_vel_task->plotLayout()->clear();
-        ui.plot_hand_vel_task->clearGraphs();
     }
 }
 
 void MainWindow::on_pushButton_plot_task_dual_clicked()
 {
-    // plot the 3D right hand position
-    this->handPosPlot_task_ptr.reset(new HandPosPlot(this->handPosition_task));
-    this->handPosPlot_task_ptr->setParent(this->ui.plot_hand_pos_task_right);
-    this->handPosPlot_task_ptr->resize(421,214);
-    this->handPosPlot_task_ptr->set_title("Right Hand position [mm]");
-    this->handPosPlot_task_ptr->show();
+    if(!this->handPosition_task.empty() && !this->handPosition_task_left.empty() && !this->handVelocityNorm_task.empty()&& !this->handVelocityNorm_task_left.empty())
+    {
+        // plot the 3D right hand position
+        this->handPosPlot_task_ptr.reset(new HandPosPlot(this->handPosition_task));
+        this->handPosPlot_task_ptr->setParent(this->ui.plot_hand_pos_task_right);
+        this->handPosPlot_task_ptr->resize(421,214);
+        this->handPosPlot_task_ptr->set_title("Right Hand position [mm]");
+        this->handPosPlot_task_ptr->show();
 
-    // plot the 3D left hand position
-    this->handPosPlot_task_left_ptr.reset(new HandPosPlot(this->handPosition_task_left));
-    this->handPosPlot_task_left_ptr->setParent(this->ui.plot_hand_pos_task_left);
-    this->handPosPlot_task_left_ptr->resize(421,214);
-    this->handPosPlot_task_left_ptr->set_title("Left Hand position [mm]");
-    this->handPosPlot_task_left_ptr->show();
+        // plot the 3D left hand position
+        this->handPosPlot_task_left_ptr.reset(new HandPosPlot(this->handPosition_task_left));
+        this->handPosPlot_task_left_ptr->setParent(this->ui.plot_hand_pos_task_left);
+        this->handPosPlot_task_left_ptr->resize(421,214);
+        this->handPosPlot_task_left_ptr->set_title("Left Hand position [mm]");
+        this->handPosPlot_task_left_ptr->show();
 
-    // plot the right hand velocity norm
-    if(!this->handVelocityNorm_task.empty()){
-        QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_task);
-        ui.plot_hand_vel_task_right->plotLayout()->clear();
-        ui.plot_hand_vel_task_right->clearGraphs();
-        ui.plot_hand_vel_task_right->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
-        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_hand_vel_task_right);
-        wideAxisRect->setupFullAxesBox(true);
-        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_hand_vel_task_right);
-        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
-        // move newly created axes on "axes" layer and grids on "grid" layer:
-        for (QCPAxisRect *rect : ui.plot_hand_vel_task_right->axisRects())
-        {
-          for (QCPAxis *axis : rect->axes())
-          {
-            axis->setLayer("axes");
-            axis->grid()->setLayer("grid");
-          }
+        // plot the right hand velocity norm
+        if(!this->handVelocityNorm_task.empty()){
+            QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_task);
+            ui.plot_hand_vel_task_right->plotLayout()->clear();
+            ui.plot_hand_vel_task_right->clearGraphs();
+            ui.plot_hand_vel_task_right->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+            QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_hand_vel_task_right);
+            wideAxisRect->setupFullAxesBox(true);
+            QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_hand_vel_task_right);
+            wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+            // move newly created axes on "axes" layer and grids on "grid" layer:
+            for (QCPAxisRect *rect : ui.plot_hand_vel_task_right->axisRects())
+            {
+              for (QCPAxis *axis : rect->axes())
+              {
+                axis->setLayer("axes");
+                axis->grid()->setLayer("grid");
+              }
+            }
+            QString title("Right Hand velocity");
+            ui.plot_hand_vel_task_right->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_hand_vel_task_right,title));
+            ui.plot_hand_vel_task_right->plotLayout()->addElement(1, 0, wideAxisRect);
+
+            ui.plot_hand_vel_task_right->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+            ui.plot_hand_vel_task_right->graph(0)->setPen(QPen(Qt::red));
+            ui.plot_hand_vel_task_right->graph(0)->setName(title);
+            ui.plot_hand_vel_task_right->graph(0)->valueAxis()->setLabel("hand velocity [mm/s]");
+            ui.plot_hand_vel_task_right->graph(0)->keyAxis()->setLabel("time [s]");
+            ui.plot_hand_vel_task_right->graph(0)->setData(this->qtime_task, qhand_vel);
+            ui.plot_hand_vel_task_right->graph(0)->valueAxis()->setRange(*std::min_element(qhand_vel.begin(), qhand_vel.end()),
+                                                              *std::max_element(qhand_vel.begin(), qhand_vel.end()));
+            ui.plot_hand_vel_task_right->graph(0)->rescaleAxes();
+            ui.plot_hand_vel_task_right->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+            ui.plot_hand_vel_task_right->replot();
+        }else{
+            ui.plot_hand_vel_task_right->plotLayout()->clear();
+            ui.plot_hand_vel_task_right->clearGraphs();
         }
-        QString title("Right Hand velocity");
-        ui.plot_hand_vel_task_right->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_hand_vel_task_right,title));
-        ui.plot_hand_vel_task_right->plotLayout()->addElement(1, 0, wideAxisRect);
 
-        ui.plot_hand_vel_task_right->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-        ui.plot_hand_vel_task_right->graph(0)->setPen(QPen(Qt::red));
-        ui.plot_hand_vel_task_right->graph(0)->setName(title);
-        ui.plot_hand_vel_task_right->graph(0)->valueAxis()->setLabel("hand velocity [mm/s]");
-        ui.plot_hand_vel_task_right->graph(0)->keyAxis()->setLabel("time [s]");
-        ui.plot_hand_vel_task_right->graph(0)->setData(this->qtime_task, qhand_vel);
-        ui.plot_hand_vel_task_right->graph(0)->valueAxis()->setRange(*std::min_element(qhand_vel.begin(), qhand_vel.end()),
-                                                          *std::max_element(qhand_vel.begin(), qhand_vel.end()));
-        ui.plot_hand_vel_task_right->graph(0)->rescaleAxes();
-        ui.plot_hand_vel_task_right->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-        ui.plot_hand_vel_task_right->replot();
-    }else{
-        ui.plot_hand_vel_task_right->plotLayout()->clear();
-        ui.plot_hand_vel_task_right->clearGraphs();
-    }
+        // plot the left hand velocity norm
+        if(!this->handVelocityNorm_task_left.empty()){
+            QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_task_left);
+            ui.plot_hand_vel_task_left->plotLayout()->clear();
+            ui.plot_hand_vel_task_left->clearGraphs();
+            ui.plot_hand_vel_task_left->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+            QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_hand_vel_task_left);
+            wideAxisRect->setupFullAxesBox(true);
+            QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_hand_vel_task_left);
+            wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+            // move newly created axes on "axes" layer and grids on "grid" layer:
+            for (QCPAxisRect *rect : ui.plot_hand_vel_task_left->axisRects())
+            {
+              for (QCPAxis *axis : rect->axes())
+              {
+                axis->setLayer("axes");
+                axis->grid()->setLayer("grid");
+              }
+            }
+            QString title("Left Hand velocity");
+            ui.plot_hand_vel_task_left->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_hand_vel_task_left,title));
+            ui.plot_hand_vel_task_left->plotLayout()->addElement(1, 0, wideAxisRect);
 
-    // plot the left hand velocity norm
-    if(!this->handVelocityNorm_task_left.empty()){
-        QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_task_left);
-        ui.plot_hand_vel_task_left->plotLayout()->clear();
-        ui.plot_hand_vel_task_left->clearGraphs();
-        ui.plot_hand_vel_task_left->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
-        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_hand_vel_task_left);
-        wideAxisRect->setupFullAxesBox(true);
-        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_hand_vel_task_left);
-        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
-        // move newly created axes on "axes" layer and grids on "grid" layer:
-        for (QCPAxisRect *rect : ui.plot_hand_vel_task_left->axisRects())
-        {
-          for (QCPAxis *axis : rect->axes())
-          {
-            axis->setLayer("axes");
-            axis->grid()->setLayer("grid");
-          }
+            ui.plot_hand_vel_task_left->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+            ui.plot_hand_vel_task_left->graph(0)->setPen(QPen(Qt::red));
+            ui.plot_hand_vel_task_left->graph(0)->setName(title);
+            ui.plot_hand_vel_task_left->graph(0)->valueAxis()->setLabel("hand velocity [mm/s]");
+            ui.plot_hand_vel_task_left->graph(0)->keyAxis()->setLabel("time [s]");
+            ui.plot_hand_vel_task_left->graph(0)->setData(this->qtime_task, qhand_vel);
+            ui.plot_hand_vel_task_left->graph(0)->valueAxis()->setRange(*std::min_element(qhand_vel.begin(), qhand_vel.end()),
+                                                              *std::max_element(qhand_vel.begin(), qhand_vel.end()));
+            ui.plot_hand_vel_task_left->graph(0)->rescaleAxes();
+            ui.plot_hand_vel_task_left->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+            ui.plot_hand_vel_task_left->replot();
+        }else{
+            ui.plot_hand_vel_task_left->plotLayout()->clear();
+            ui.plot_hand_vel_task_left->clearGraphs();
         }
-        QString title("Left Hand velocity");
-        ui.plot_hand_vel_task_left->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_hand_vel_task_left,title));
-        ui.plot_hand_vel_task_left->plotLayout()->addElement(1, 0, wideAxisRect);
-
-        ui.plot_hand_vel_task_left->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-        ui.plot_hand_vel_task_left->graph(0)->setPen(QPen(Qt::red));
-        ui.plot_hand_vel_task_left->graph(0)->setName(title);
-        ui.plot_hand_vel_task_left->graph(0)->valueAxis()->setLabel("hand velocity [mm/s]");
-        ui.plot_hand_vel_task_left->graph(0)->keyAxis()->setLabel("time [s]");
-        ui.plot_hand_vel_task_left->graph(0)->setData(this->qtime_task, qhand_vel);
-        ui.plot_hand_vel_task_left->graph(0)->valueAxis()->setRange(*std::min_element(qhand_vel.begin(), qhand_vel.end()),
-                                                          *std::max_element(qhand_vel.begin(), qhand_vel.end()));
-        ui.plot_hand_vel_task_left->graph(0)->rescaleAxes();
-        ui.plot_hand_vel_task_left->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
-        ui.plot_hand_vel_task_left->replot();
-    }else{
-        ui.plot_hand_vel_task_left->plotLayout()->clear();
-        ui.plot_hand_vel_task_left->clearGraphs();
     }
 }
 
@@ -3944,6 +3950,28 @@ void MainWindow::on_pushButton_joints_results_task_clicked()
 {
     if(!this->jointsPosition_task.empty())
         this->mResultsJointsdlg->setupPlots(this->jointsPosition_task,this->jointsVelocity_task,this->jointsAcceleration_task,this->timesteps_task);
+    this->mResultsJointsdlg->show();
+}
+
+void MainWindow::on_pushButton_joints_results_task_right_clicked()
+{
+    if(!this->jointsPosition_task.empty())
+    {
+        this->mResultsJointsdlg->setDual(true);this->mResultsJointsdlg->setRight(true);
+        this->mResultsJointsdlg->setupPlots(this->jointsPosition_task,this->jointsVelocity_task,this->jointsAcceleration_task,this->timesteps_task);
+    }
+
+    this->mResultsJointsdlg->show();
+}
+
+void MainWindow::on_pushButton_joints_results_task_left_clicked()
+{
+    if(!this->jointsPosition_task.empty())
+    {
+        this->mResultsJointsdlg->setDual(true);this->mResultsJointsdlg->setRight(false);
+        this->mResultsJointsdlg->setupPlots(this->jointsPosition_task,this->jointsVelocity_task,this->jointsAcceleration_task,this->timesteps_task);
+    }
+
     this->mResultsJointsdlg->show();
 }
 
@@ -4504,7 +4532,362 @@ void MainWindow::on_pushButton_save_res_task_clicked()
 
 void MainWindow::on_pushButton_save_res_task_dual_clicked()
 {
-    // TO DO
+    struct stat st = {0};
+    if (stat("results", &st) == -1) {
+        mkdir("results", 0700);
+    }
+    if (stat("results/planning", &st) == -1) {
+        mkdir("results/planning", 0700);
+    }
+    if (stat("results/planning/task", &st) == -1) {
+        mkdir("results/planning/task", 0700);
+    }
+    QString path("results/planning/task/");
+
+    // txt
+    string filename("results_task_dual.txt");
+    ofstream results;
+    results.open(path.toStdString()+filename);
+
+    results << string("# RIGHT NORMALIZED JERK SCORE \n");
+    results << string("njs_right = ");
+    for(size_t i=0;i<this->njs_task.size();++i){
+        string njs_str =  boost::str(boost::format("%.2f") % (this->njs_task.at(i)));
+        boost::replace_all(njs_str,",",".");
+        if(i==(this->njs_task.size()-1)){
+            results << njs_str+" \n";
+        }else{
+            results << njs_str+" ";
+        }
+    }
+    // mean
+    double sum_r_njs = std::accumulate(this->njs_task.begin(), this->njs_task.end(), 0.0);
+    double mean_r_njs = ((double)sum_r_njs) / this->njs_task.size();
+    string mean_r_njs_str =  boost::str(boost::format("%.2f") % (mean_r_njs));
+    boost::replace_all(mean_r_njs_str,",",".");
+    results << string("mean njs_right = ")+mean_r_njs_str+string(" \n");
+    // standard deviation
+    double sq_sum_r_njs = std::inner_product(this->njs_task.begin(), this->njs_task.end(), this->njs_task.begin(), 0.0);
+    double stdev_r_njs = std::sqrt(((double)sq_sum_r_njs) / this->njs_task.size() - mean_r_njs * mean_r_njs);
+    string stdev_r_njs_str =  boost::str(boost::format("%.2f") % (stdev_r_njs));
+    boost::replace_all(stdev_r_njs_str,",",".");
+    results << string("sd njs_right = ")+stdev_r_njs_str+string(" \n");
+    //median
+    double median_r_njs = this->getMedian(this->njs_task);
+    string median_r_njs_str =  boost::str(boost::format("%.2f") % (median_r_njs));
+    boost::replace_all(median_r_njs_str,",",".");
+    results << string("median njs_right = ")+median_r_njs_str+string(" \n");
+    // 1st quartile
+    double first_quartile_r_njs = this->getFirstQuartile(this->njs_task);
+    string first_quartile_r_njs_str =  boost::str(boost::format("%.2f") % (first_quartile_r_njs));
+    boost::replace_all(first_quartile_r_njs_str,",",".");
+    results << string("first quartile njs_right = ")+first_quartile_r_njs_str+string(" \n");
+    // 3rd quartile
+    double third_quartile_r_njs = this->getThirdQuartile(this->njs_task);
+    string third_quartile_r_njs_str =  boost::str(boost::format("%.2f") % (third_quartile_r_njs));
+    boost::replace_all(third_quartile_r_njs_str,",",".");
+    results << string("third quartile njs_right = ")+third_quartile_r_njs_str+string(" \n");
+
+    results << string("# LEFT NORMALIZED JERK SCORE \n");
+    results << string("njs_left = ");
+    for(size_t i=0;i<this->njs_task_left.size();++i){
+        string njs_str =  boost::str(boost::format("%.2f") % (this->njs_task_left.at(i)));
+        boost::replace_all(njs_str,",",".");
+        if(i==(this->njs_task_left.size()-1)){
+            results << njs_str+" \n";
+        }else{
+            results << njs_str+" ";
+        }
+    }
+    // mean
+    double sum_l_njs = std::accumulate(this->njs_task_left.begin(), this->njs_task_left.end(), 0.0);
+    double mean_l_njs = ((double)sum_l_njs) / this->njs_task_left.size();
+    string mean_l_njs_str =  boost::str(boost::format("%.2f") % (mean_l_njs));
+    boost::replace_all(mean_l_njs_str,",",".");
+    results << string("mean njs_left = ")+mean_l_njs_str+string(" \n");
+    // standard deviation
+    double sq_sum_l_njs = std::inner_product(this->njs_task_left.begin(), this->njs_task_left.end(), this->njs_task_left.begin(), 0.0);
+    double stdev_l_njs = std::sqrt(((double)sq_sum_l_njs) / this->njs_task_left.size() - mean_l_njs * mean_l_njs);
+    string stdev_l_njs_str =  boost::str(boost::format("%.2f") % (stdev_l_njs));
+    boost::replace_all(stdev_l_njs_str,",",".");
+    results << string("sd njs_left = ")+stdev_l_njs_str+string(" \n");
+    //median
+    double median_l_njs = this->getMedian(this->njs_task_left);
+    string median_l_njs_str =  boost::str(boost::format("%.2f") % (median_l_njs));
+    boost::replace_all(median_l_njs_str,",",".");
+    results << string("median njs_left = ")+median_l_njs_str+string(" \n");
+    // 1st quartile
+    double first_quartile_l_njs = this->getFirstQuartile(this->njs_task_left);
+    string first_quartile_l_njs_str =  boost::str(boost::format("%.2f") % (first_quartile_l_njs));
+    boost::replace_all(first_quartile_l_njs_str,",",".");
+    results << string("first quartile njs_left = ")+first_quartile_l_njs_str+string(" \n");
+    // 3rd quartile
+    double third_quartile_l_njs = this->getThirdQuartile(this->njs_task_left);
+    string third_quartile_l_njs_str =  boost::str(boost::format("%.2f") % (third_quartile_l_njs));
+    boost::replace_all(third_quartile_l_njs_str,",",".");
+    results << string("third quartile njs_left = ")+third_quartile_l_njs_str+string(" \n");
+
+    results << string("# RIGHT NUMBER OF MOVEMENT UNITS \n");
+    results << string("nmu_right = ");
+    for(size_t i=0;i<this->nmu_task.size();++i){
+        string nmu_str =  boost::str(boost::format("%.2f") % (this->nmu_task.at(i)));
+        boost::replace_all(nmu_str,",",".");
+        if(i==(this->nmu_task.size()-1)){
+            results << nmu_str+" \n";
+        }else{
+            results << nmu_str+" ";
+        }
+    }
+    // mean
+    double sum_r_nmu = std::accumulate(this->nmu_task.begin(), this->nmu_task.end(), 0.0);
+    double mean_r_nmu = ((double)sum_r_nmu) / this->nmu_task.size();
+    string mean_r_nmu_str =  boost::str(boost::format("%.2f") % (mean_r_nmu));
+    boost::replace_all(mean_r_nmu_str,",",".");
+    results << string("mean nmu_right = ")+mean_r_nmu_str+string(" \n");
+    // standard deviation
+    double sq_sum_r_nmu = std::inner_product(this->nmu_task.begin(), this->nmu_task.end(), this->nmu_task.begin(), 0.0);
+    double stdev_r_nmu = std::sqrt(((double)sq_sum_r_nmu) / this->nmu_task.size() - mean_r_nmu * mean_r_nmu);
+    string stdev_r_nmu_str =  boost::str(boost::format("%.2f") % (stdev_r_nmu));
+    boost::replace_all(stdev_r_nmu_str,",",".");
+    results << string("sd nmu_right = ")+stdev_r_nmu_str+string(" \n");
+    //median
+    double median_r_nmu = this->getMedian(this->nmu_task);
+    string median_r_nmu_str =  boost::str(boost::format("%.2f") % (median_r_nmu));
+    boost::replace_all(median_r_nmu_str,",",".");
+    results << string("median nmu_right = ")+median_r_nmu_str+string(" \n");
+    // 1st quartile
+    double first_quartile_r_nmu = this->getFirstQuartile(this->nmu_task);
+    string first_quartile_r_nmu_str =  boost::str(boost::format("%.2f") % (first_quartile_r_nmu));
+    boost::replace_all(first_quartile_r_nmu_str,",",".");
+    results << string("first quartile nmu_right = ")+first_quartile_r_nmu_str+string(" \n");
+    // 3rd quartile
+    double third_quartile_r_nmu = this->getThirdQuartile(this->nmu_task);
+    string third_quartile_r_nmu_str =  boost::str(boost::format("%.2f") % (third_quartile_r_nmu));
+    boost::replace_all(third_quartile_r_nmu_str,",",".");
+    results << string("third quartile nmu_right = ")+third_quartile_r_nmu_str+string(" \n");
+
+    results << string("# LEFT NUMBER OF MOVEMENT UNITS \n");
+    results << string("nmu_left = ");
+    for(size_t i=0;i<this->nmu_task_left.size();++i){
+        string nmu_str =  boost::str(boost::format("%.2f") % (this->nmu_task_left.at(i)));
+        boost::replace_all(nmu_str,",",".");
+        if(i==(this->nmu_task_left.size()-1)){
+            results << nmu_str+" \n";
+        }else{
+            results << nmu_str+" ";
+        }
+    }
+    // mean
+    double sum_l_nmu = std::accumulate(this->nmu_task_left.begin(), this->nmu_task_left.end(), 0.0);
+    double mean_l_nmu = ((double)sum_l_nmu) / this->nmu_task_left.size();
+    string mean_l_nmu_str =  boost::str(boost::format("%.2f") % (mean_l_nmu));
+    boost::replace_all(mean_l_nmu_str,",",".");
+    results << string("mean nmu_left = ")+mean_l_nmu_str+string(" \n");
+    // standard deviation
+    double sq_sum_l_nmu = std::inner_product(this->nmu_task_left.begin(), this->nmu_task_left.end(), this->nmu_task_left.begin(), 0.0);
+    double stdev_l_nmu = std::sqrt(((double)sq_sum_l_nmu) / this->nmu_task_left.size() - mean_l_nmu * mean_l_nmu);
+    string stdev_l_nmu_str =  boost::str(boost::format("%.2f") % (stdev_l_nmu));
+    boost::replace_all(stdev_l_nmu_str,",",".");
+    results << string("sd nmu_left = ")+stdev_l_nmu_str+string(" \n");
+    //median
+    double median_l_nmu = this->getMedian(this->nmu_task_left);
+    string median_l_nmu_str =  boost::str(boost::format("%.2f") % (median_l_nmu));
+    boost::replace_all(median_l_nmu_str,",",".");
+    results << string("median nmu_left = ")+median_l_nmu_str+string(" \n");
+    // 1st quartile
+    double first_quartile_l_nmu = this->getFirstQuartile(this->nmu_task_left);
+    string first_quartile_l_nmu_str =  boost::str(boost::format("%.2f") % (first_quartile_l_nmu));
+    boost::replace_all(first_quartile_l_nmu_str,",",".");
+    results << string("first quartile nmu_left = ")+first_quartile_l_nmu_str+string(" \n");
+    // 3rd quartile
+    double third_quartile_l_nmu = this->getThirdQuartile(this->nmu_task_left);
+    string third_quartile_l_nmu_str =  boost::str(boost::format("%.2f") % (third_quartile_l_nmu));
+    boost::replace_all(third_quartile_l_nmu_str,",",".");
+    results << string("third quartile nmu_left = ")+third_quartile_l_nmu_str+string(" \n");
+
+
+    results << string("# TIME TAKEN TO PLAN THE MOVEMENT [ms] \n");
+    results << string("prob_time = ");
+    for(size_t i=0;i<this->prob_time_task.size();++i){
+        string prob_str =  boost::str(boost::format("%.2f") % (this->prob_time_task.at(i)));
+        boost::replace_all(prob_str,",",".");
+        if(i==(this->prob_time_task.size()-1)){
+            results << prob_str+" \n";
+        }else{
+            results << prob_str+" ";
+        }
+    }
+    // mean
+    double sum_prob = std::accumulate(this->prob_time_task.begin(), this->prob_time_task.end(), 0.0);
+    double mean_prob = ((double)sum_prob) / this->prob_time_task.size();
+    string mean_prob_str =  boost::str(boost::format("%.2f") % (mean_prob));
+    boost::replace_all(mean_prob_str,",",".");
+    results << string("mean plan time = ")+mean_prob_str+string(" \n");
+    // standard deviation
+    double sq_sum_prob = std::inner_product(this->prob_time_task.begin(), this->prob_time_task.end(), this->prob_time_task.begin(), 0.0);
+    double stdev_prob = std::sqrt(((double)sq_sum_prob) / this->prob_time_task.size() - mean_prob * mean_prob);
+    string stdev_prob_str =  boost::str(boost::format("%.2f") % (stdev_prob));
+    boost::replace_all(stdev_prob_str,",",".");
+    results << string("sd plan time = ")+stdev_prob_str+string(" \n");
+    //median
+    double median_prob = this->getMedian(this->prob_time_task);
+    string median_prob_str =  boost::str(boost::format("%.2f") % (median_prob));
+    boost::replace_all(median_prob_str,",",".");
+    results << string("median prob = ")+median_prob_str+string(" \n");
+    // 1st quartile
+    double first_quartile_prob = this->getFirstQuartile(this->prob_time_task);
+    string first_quartile_prob_str =  boost::str(boost::format("%.2f") % (first_quartile_prob));
+    boost::replace_all(first_quartile_prob_str,",",".");
+    results << string("first quartile plan time = ")+first_quartile_prob_str+string(" \n");
+    // 3rd quartile
+    double third_quartile_prob = this->getThirdQuartile(this->prob_time_task);
+    string third_quartile_prob_str =  boost::str(boost::format("%.2f") % (third_quartile_prob));
+    boost::replace_all(third_quartile_prob_str,",",".");
+    results << string("third quartile plan time = ")+third_quartile_prob_str+string(" \n");
+
+    string rate_success = ui.label_rate_task->text().toStdString();
+    results << string("rate of success [%] = ")+rate_success+string(" \n");
+
+
+    results.close();
+
+    // right csv
+    string filename_csv_right("results_task_right.csv");
+    ofstream results_csv_right;
+    results_csv_right.open(path.toStdString()+filename_csv_right);
+    results_csv_right << "TRAJ,NJS,NMU,PLANNING TIME [ms] \n";
+    for(size_t i=0;i < this->njs_task.size();++i){
+        string njs_str =  boost::str(boost::format("%.8f") % (this->njs_task.at(i)));
+        string nmu_str =  boost::str(boost::format("%.8f") % (this->nmu_task.at(i)));
+        string prob_str =  boost::str(boost::format("%.8f") % (this->prob_time_task.at(i)));
+        boost::replace_all(njs_str,",","."); boost::replace_all(nmu_str,",","."); boost::replace_all(prob_str,",",".");
+        results_csv_right << QString::number(i+1).toStdString()+","+njs_str+","+nmu_str+","+prob_str+" \n";
+    }
+    results_csv_right.close();
+
+    // left csv
+    string filename_csv_left("results_task_left.csv");
+    ofstream results_csv_left;
+    results_csv_left.open(path.toStdString()+filename_csv_left);
+    results_csv_left << "TRAJ,NJS,NMU,PLANNING TIME [ms] \n";
+    for(size_t i=0;i<this->njs_task_left.size();++i){
+        string njs_str =  boost::str(boost::format("%.8f") % (this->njs_task_left.at(i)));
+        string nmu_str =  boost::str(boost::format("%.8f") % (this->nmu_task_left.at(i)));
+        string prob_str =  boost::str(boost::format("%.8f") % (this->prob_time_task.at(i)));
+        boost::replace_all(njs_str,",","."); boost::replace_all(nmu_str,",","."); boost::replace_all(prob_str,",",".");
+        results_csv_left << QString::number(i+1).toStdString()+","+njs_str+","+nmu_str+","+prob_str+" \n";
+    }
+    results_csv_left.close();
+
+    ui.plot_hand_vel_task_right->savePdf(path+QString("hand_vel_task_right.pdf"),true,0,0,QString(),QString("Module of the Right Hand velocity"));
+    ui.plot_hand_vel_task_left->savePdf(path+QString("hand_vel_task_left.pdf"),true,0,0,QString(),QString("Module of the Left Hand velocity"));
+
+
+    VectorWriter* r_handler = (VectorWriter*)IO::outputHandler("PDF");
+    r_handler->setTextMode(VectorWriter::NATIVE);
+    r_handler->setFormat("PDF");
+    string r_hand_pos_file = path.toStdString()+string("hand_pos_task_right.pdf");
+    if(this->handPosPlot_task_ptr!=nullptr){
+        IO::save(this->handPosPlot_task_ptr.get(), r_hand_pos_file.c_str(),  "PDF" );
+    }
+    VectorWriter* l_handler = (VectorWriter*)IO::outputHandler("PDF");
+    l_handler->setTextMode(VectorWriter::NATIVE);
+    l_handler->setFormat("PDF");
+    string l_hand_pos_file = path.toStdString()+string("hand_pos_task_left.pdf");
+    if(this->handPosPlot_task_left_ptr!=nullptr){
+        IO::save(this->handPosPlot_task_left_ptr.get(), l_hand_pos_file.c_str(),  "PDF" );
+    }
+
+    // right hand position
+    if(!this->handPosition_task.empty()){
+        string filename_hand_pos("hand_pos_task_right.txt");
+        ofstream hand_pos;
+        hand_pos.open(path.toStdString()+filename_hand_pos);
+
+        hand_pos << string("# RIGHT HAND POSITION \n");
+        hand_pos << string("# x [mm], y [mm], z [mm] \n");
+
+        for(size_t i=0;i<this->handPosition_task.size();++i){
+            vector<double> point = this->handPosition_task.at(i);
+            string x_str =  boost::str(boost::format("%.2f") % (point.at(0)));
+            boost::replace_all(x_str,",",".");
+            string y_str =  boost::str(boost::format("%.2f") % (point.at(1)));
+            boost::replace_all(y_str,",",".");
+            string z_str =  boost::str(boost::format("%.2f") % (point.at(2)));
+            boost::replace_all(z_str,",",".");
+            hand_pos << x_str+string(", ")+y_str+string(", ")+z_str+string("\n");
+        }
+        hand_pos.close();
+    }
+
+    // left hand position
+    if(!this->handPosition_task_left.empty()){
+        string filename_hand_pos("hand_pos_task_left.txt");
+        ofstream hand_pos;
+        hand_pos.open(path.toStdString()+filename_hand_pos);
+
+        hand_pos << string("# LEFT HAND POSITION \n");
+        hand_pos << string("# x [mm], y [mm], z [mm] \n");
+
+        for(size_t i=0;i<this->handPosition_task_left.size();++i){
+            vector<double> point = this->handPosition_task_left.at(i);
+            string x_str =  boost::str(boost::format("%.2f") % (point.at(0)));
+            boost::replace_all(x_str,",",".");
+            string y_str =  boost::str(boost::format("%.2f") % (point.at(1)));
+            boost::replace_all(y_str,",",".");
+            string z_str =  boost::str(boost::format("%.2f") % (point.at(2)));
+            boost::replace_all(z_str,",",".");
+            hand_pos << x_str+string(", ")+y_str+string(", ")+z_str+string("\n");
+        }
+        hand_pos.close();
+    }
+
+    // left hand velocity
+    if(!this->handVelocityNorm_task_left.empty()){
+        string filename_hand_vel("hand_vel_task_left.txt");
+        ofstream hand_vel;
+        hand_vel.open(path.toStdString()+filename_hand_vel);
+
+        hand_vel << string("# LEFT HAND VELOCITY NORM \n");
+        hand_vel << string("# velocity [mm/s], time [s] \n");
+
+        for(size_t i=0;i<this->handVelocityNorm_task_left.size();++i){
+            double vel = this->handVelocityNorm_task_left.at(i);
+            double time = this->qtime_task.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            hand_vel << vel_str+string(", ")+t_str+string("\n");
+        }
+        hand_vel.close();
+    }
+
+    QString pdf_qstr; string pdf_str;
+    QString svg_qstr; string svg_str;
+    string cmdLine;
+
+    pdf_qstr = path+QString("hand_pos_task_right.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("hand_pos_task_right.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("hand_pos_task_left.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("hand_pos_task_left.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("hand_vel_task_right.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("hand_vel_task_right.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("hand_vel_task_left.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("hand_vel_task_left.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+
 }
 
 
