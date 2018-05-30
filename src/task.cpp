@@ -5,7 +5,7 @@ namespace motion_manager {
 
 Task::Task()
 {
-
+    this->arm_code = 1;
 }
 
 
@@ -13,6 +13,7 @@ Task::Task(const Task &t)
 {
 
     this->prolem_list=t.prolem_list;
+    this->arm_code = t.arm_code;
 }
 
 
@@ -58,6 +59,16 @@ void Task::clearProblems()
     if(!this->prolem_list.empty()){
         this->prolem_list.clear();
     }
+}
+
+int Task::getArm()
+{
+    return this->arm_code;
+}
+
+void Task::setArm(int a)
+{
+    this->arm_code = a;
 }
 
 } // namespace motion_manager

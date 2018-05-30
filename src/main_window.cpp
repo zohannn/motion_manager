@@ -343,8 +343,18 @@ void MainWindow::on_pushButton_tuning_clicked()
             mTolHumpdlg->show();
         }else{
             //bimanual motion
-            //mTolHumpDualdlg->setInitJointsVel(this->jointsEndVelocity_mov);
-            //mTolHumpDualdlg->setInitJointsAcc(this->jointsEndAcceleration_mov);
+            if(!this->jointsEndVelocity_mov.empty() && !this->jointsEndAcceleration_mov.empty())
+            {
+                std::vector<double> end_vel_right(this->jointsEndVelocity_mov.begin(),this->jointsEndVelocity_mov.begin()+JOINTS_ARM+JOINTS_HAND);
+                std::vector<double> end_vel_left(this->jointsEndVelocity_mov.begin()+JOINTS_ARM+JOINTS_HAND,this->jointsEndVelocity_mov.end());
+                std::vector<double> end_acc_right(this->jointsEndAcceleration_mov.begin(),this->jointsEndAcceleration_mov.begin()+JOINTS_ARM+JOINTS_HAND);
+                std::vector<double> end_acc_left(this->jointsEndAcceleration_mov.begin()+JOINTS_ARM+JOINTS_HAND,this->jointsEndAcceleration_mov.end());
+
+                mTolHumpDualdlg->setInitJointsVelRight(end_vel_right);
+                mTolHumpDualdlg->setInitJointsVelLeft(end_vel_left);
+                mTolHumpDualdlg->setInitJointsAccRight(end_acc_right);
+                mTolHumpDualdlg->setInitJointsAccLeft(end_acc_left);
+            }
             mTolHumpDualdlg->show();
         }
         break;
@@ -3058,6 +3068,22 @@ void MainWindow::on_pushButton_append_mov_clicked()
 
     if(curr_task->getProblem(ui.listWidget_movs->currentRow())->getSolved()){
         if(curr_task->getProblem(ui.listWidget_movs->currentRow())->getPlannerID()!=0){this->moveit_task = true;}
+        int arm_code = curr_task->getProblem(ui.listWidget_movs->currentRow())->getMovement()->getArm();
+        if(curr_task->getProblemNumber()==1)
+        {
+            curr_task->setArm(arm_code);
+        }else{
+            if(arm_code!=curr_task->getArm()){
+                return;
+            }
+        }
+        if(arm_code!=0){
+            ui.tabWidget_plan_task->setTabEnabled(0,true);
+            ui.tabWidget_plan_task->setTabEnabled(1,false);
+        }else{
+            ui.tabWidget_plan_task->setTabEnabled(0,false);
+            ui.tabWidget_plan_task->setTabEnabled(1,true);
+        }
         this->jointsPosition_task.push_back(this->jointsPosition_mov);
         this->jointsVelocity_task.push_back(this->jointsVelocity_mov);
         this->jointsAcceleration_task.push_back(this->jointsAcceleration_mov);
@@ -3066,19 +3092,23 @@ void MainWindow::on_pushButton_append_mov_clicked()
         this->traj_descr_task.push_back(this->traj_descr_mov);
         this->njs_task.push_back(this->njs_mov);
         this->nmu_task.push_back(this->nmu_mov);
+        if(arm_code==0){
+            this->njs_task_left.push_back(this->njs_mov_left);
+            this->nmu_task_left.push_back(this->nmu_mov_left);
+        }
         this->prob_time_task.push_back(this->prob_time_mov);
          QStringList h_headers; bool h_head=false; QStringList v_headers;
          std::vector<std::vector<QString>> task_steps;
          vector<MatrixXd> pos_mov; vector<MatrixXd> vel_mov; vector<MatrixXd> acc_mov; vector<vector<double>> tstep_mov;
          double task_duration = 0.0; double mov_duration = 0.0; double stage_duration = 0.0;
          vector<double> time_task; uint tot_steps = 0;
-         for(size_t h=0; h< this->jointsPosition_task.size();++h){
+         for(size_t h=0; h< this->jointsPosition_task.size();++h){ // for loop movs
              pos_mov = this->jointsPosition_task.at(h);
              vel_mov = this->jointsVelocity_task.at(h);
              acc_mov = this->jointsAcceleration_task.at(h);
              tstep_mov = this->timesteps_task.at(h);
              mov_duration = 0.0;
-             for (size_t k=0; k< pos_mov.size();++k){
+             for (size_t k=0; k < pos_mov.size();++k){ // for loop stages
                  MatrixXd jointPosition_stage = pos_mov.at(k);
                  MatrixXd jointVelocity_stage = vel_mov.at(k);
                  MatrixXd jointAcceleration_stage = acc_mov.at(k);
@@ -3093,7 +3123,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
                  time_stage.at(0) = time_init;
                  stage_duration = 0.0;
                  std::vector<QString> stage_step;
-                 for(int i =0; i< jointPosition_stage.rows(); ++i){
+                 for(int i =0; i< jointPosition_stage.rows(); ++i){ // for loop steps
                      tot_steps++;
                      if(i>0){
                          time_stage.at(i) = time_stage.at(i-1) + tstep_stage.at(i-1);
@@ -3101,7 +3131,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
                      }
                      stage_step.clear();
                      v_headers.push_back(QString("Step ")+QString::number(i));
-                     for (int j=0; j<jointPosition_stage.cols();++j){
+                     for (int j=0; j<jointPosition_stage.cols();++j){ // for loop joints
                          stage_step.push_back(
                                  QString::number(jointPosition_stage(i,j)*180/M_PI,'g',3)+"|"+
                                  QString::number(jointVelocity_stage(i,j)*180/M_PI,'g',3)+"|"+
@@ -3138,51 +3168,128 @@ void MainWindow::on_pushButton_append_mov_clicked()
 
          // compute the hand values
          this->handPosition_task.resize(tot_steps); this->handVelocityNorm_task.resize(tot_steps);
+         if(arm_code==0){
+            this->handPosition_task_left.resize(tot_steps); this->handVelocityNorm_task_left.resize(tot_steps);
+         }
          int step = 0;
-         int arm_code = this->curr_task->getProblem(ui.listWidget_movs->currentRow())->getMovement()->getArm();
-         for(size_t j=0;j<this->jointsPosition_task.size();++j){
+         //int arm_code = this->curr_task->getProblem(ui.listWidget_movs->currentRow())->getMovement()->getArm();
+         for(size_t j=0;j<this->jointsPosition_task.size();++j){ // for loop movs
              vector<MatrixXd> pos_mov = this->jointsPosition_task.at(j);
              vector<MatrixXd> vel_mov = this->jointsVelocity_task.at(j);
-             for (size_t k=0; k< pos_mov.size();++k){
+             for (size_t k=0; k< pos_mov.size();++k){ // for loop stages
                  MatrixXd pos_stage = pos_mov.at(k);
                  MatrixXd vel_stage = vel_mov.at(k);
-                 for(int i=0;i<pos_stage.rows();++i){
-                     // position
-                     VectorXd pos_row = pos_stage.block<1,JOINTS_ARM>(i,0);
-                     vector<double> posture; posture.resize(pos_row.size());
-                     VectorXd::Map(&posture[0], pos_row.size()) = pos_row;
-                     this->curr_scene->getHumanoid()->getHandPos(arm_code,this->handPosition_task.at(step),posture);
-                     // velocity norm
-                     VectorXd vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
-                     vector<double> velocities; velocities.resize(vel_row.size());
-                     VectorXd::Map(&velocities[0], vel_row.size()) = vel_row;
-                     this->handVelocityNorm_task.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(arm_code,posture,velocities);
+                 for(int i=0;i<pos_stage.rows();++i){ // for loop steps
+                     if(arm_code!=0){
+                         //single-arm
+                         // position
+                         VectorXd pos_row = pos_stage.block<1,JOINTS_ARM>(i,0);
+                         vector<double> posture; posture.resize(pos_row.size());
+                         VectorXd::Map(&posture[0], pos_row.size()) = pos_row;
+                         this->curr_scene->getHumanoid()->getHandPos(arm_code,this->handPosition_task.at(step),posture);
+                         // velocity norm
+                         VectorXd vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
+                         vector<double> velocities; velocities.resize(vel_row.size());
+                         VectorXd::Map(&velocities[0], vel_row.size()) = vel_row;
+                         this->handVelocityNorm_task.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(arm_code,posture,velocities);
+                     }else{
+                         // dual-arm
+                         // right hand position
+                         VectorXd r_pos_row = pos_stage.block<1,JOINTS_ARM>(i,0);
+                         vector<double> r_posture; r_posture.resize(r_pos_row.size());
+                         VectorXd::Map(&r_posture[0], r_pos_row.size()) = r_pos_row;
+                         this->curr_scene->getHumanoid()->getHandPos(1,this->handPosition_task.at(step),r_posture);
+                         // left hand position
+                         VectorXd l_pos_row = pos_stage.block<1,JOINTS_ARM>(i,JOINTS_ARM+JOINTS_HAND);
+                         vector<double> l_posture; l_posture.resize(l_pos_row.size());
+                         VectorXd::Map(&l_posture[0], l_pos_row.size()) = l_pos_row;
+                         this->curr_scene->getHumanoid()->getHandPos(2,this->handPosition_task_left.at(step),l_posture);
+                         // right hand velocity norm
+                         VectorXd r_vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
+                         vector<double> r_velocities; r_velocities.resize(r_vel_row.size());
+                         VectorXd::Map(&r_velocities[0], r_vel_row.size()) = r_vel_row;
+                         this->handVelocityNorm_task.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(1,r_posture,r_velocities);
+                         // left hand velocity norm
+                         VectorXd l_vel_row = vel_stage.block<1,JOINTS_ARM>(i,JOINTS_ARM+JOINTS_HAND);
+                         vector<double> l_velocities; l_velocities.resize(l_vel_row.size());
+                         VectorXd::Map(&l_velocities[0], l_vel_row.size()) = l_vel_row;
+                         this->handVelocityNorm_task_left.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(2,l_posture,l_velocities);
+                     }
                      step++;
                  }
              }
          }
 
          // compute njs, nmu and planning time
-         // njs
-         double sum_njs = std::accumulate(this->njs_task.begin(), this->njs_task.end(), 0.0);
-         double mean_njs = ((double)sum_njs) / this->njs_task.size();
-         string mean_njs_str =  boost::str(boost::format("%.2f") % (mean_njs));
-         boost::replace_all(mean_njs_str,",",".");
-         double sq_sum_njs = std::inner_product(this->njs_task.begin(), this->njs_task.end(), this->njs_task.begin(), 0.0);
-         double stdev_njs = std::sqrt((((double)sq_sum_njs) / this->njs_task.size()) - pow(mean_njs,2));
-         string stdev_njs_str =  boost::str(boost::format("%.2f") % (stdev_njs));
-         boost::replace_all(stdev_njs_str,",",".");
-         ui.label_cost_hand_value_task->setText(QString::fromStdString(mean_njs_str)+QString("(")+QString::fromStdString(stdev_njs_str)+QString(")"));
-         // nmu
-         double sum_nmu = std::accumulate(this->nmu_task.begin(), this->nmu_task.end(), 0.0);
-         double mean_nmu = ((double)sum_nmu) / this->nmu_task.size();
-         string mean_nmu_str =  boost::str(boost::format("%.2f") % (mean_nmu));
-         boost::replace_all(mean_nmu_str,",",".");
-         double sq_sum_nmu = std::inner_product(this->nmu_task.begin(), this->nmu_task.end(), this->nmu_task.begin(), 0.0);
-         double stdev_nmu = std::sqrt((((double)sq_sum_nmu) / this->nmu_task.size()) - pow(mean_nmu,2));
-         string stdev_nmu_str =  boost::str(boost::format("%.2f") % (stdev_nmu));
-         boost::replace_all(stdev_nmu_str,",",".");
-         ui.label_nmu_task->setText(QString::fromStdString(mean_nmu_str)+QString("(")+QString::fromStdString(stdev_nmu_str)+QString(")"));
+         if(arm_code!=0){
+             //single-arm
+             // njs
+             double sum_njs = std::accumulate(this->njs_task.begin(), this->njs_task.end(), 0.0);
+             double mean_njs = ((double)sum_njs) / this->njs_task.size();
+             string mean_njs_str =  boost::str(boost::format("%.2f") % (mean_njs));
+             boost::replace_all(mean_njs_str,",",".");
+             double sq_sum_njs = std::inner_product(this->njs_task.begin(), this->njs_task.end(), this->njs_task.begin(), 0.0);
+             double stdev_njs = std::sqrt((((double)sq_sum_njs) / this->njs_task.size()) - pow(mean_njs,2));
+             string stdev_njs_str =  boost::str(boost::format("%.2f") % (stdev_njs));
+             boost::replace_all(stdev_njs_str,",",".");
+             ui.label_cost_hand_value_task->setText(QString::fromStdString(mean_njs_str)+QString("(")+QString::fromStdString(stdev_njs_str)+QString(")"));
+             // nmu
+             double sum_nmu = std::accumulate(this->nmu_task.begin(), this->nmu_task.end(), 0.0);
+             double mean_nmu = ((double)sum_nmu) / this->nmu_task.size();
+             string mean_nmu_str =  boost::str(boost::format("%.2f") % (mean_nmu));
+             boost::replace_all(mean_nmu_str,",",".");
+             double sq_sum_nmu = std::inner_product(this->nmu_task.begin(), this->nmu_task.end(), this->nmu_task.begin(), 0.0);
+             double stdev_nmu = std::sqrt((((double)sq_sum_nmu) / this->nmu_task.size()) - pow(mean_nmu,2));
+             string stdev_nmu_str =  boost::str(boost::format("%.2f") % (stdev_nmu));
+             boost::replace_all(stdev_nmu_str,",",".");
+             ui.label_nmu_task->setText(QString::fromStdString(mean_nmu_str)+QString("(")+QString::fromStdString(stdev_nmu_str)+QString(")"));
+         }else{
+             //dual-arm
+             // right njs
+             double sum_r_njs = std::accumulate(this->njs_task.begin(), this->njs_task.end(), 0.0);
+             double mean_r_njs = ((double)sum_r_njs) / this->njs_task.size();
+             string mean_r_njs_str =  boost::str(boost::format("%.2f") % (mean_r_njs));
+             boost::replace_all(mean_r_njs_str,",",".");
+             double sq_sum_r_njs = std::inner_product(this->njs_task.begin(), this->njs_task.end(), this->njs_task.begin(), 0.0);
+             double stdev_r_njs = std::sqrt((((double)sq_sum_r_njs) / this->njs_task.size()) - pow(mean_r_njs,2));
+             string stdev_r_njs_str =  boost::str(boost::format("%.2f") % (stdev_r_njs));
+             boost::replace_all(stdev_r_njs_str,",",".");
+             ui.label_cost_hand_right_value_task->setText(QString::fromStdString(mean_r_njs_str)+QString("(")+QString::fromStdString(stdev_r_njs_str)+QString(")"));
+
+             // left njs
+             double sum_l_njs = std::accumulate(this->njs_task_left.begin(), this->njs_task_left.end(), 0.0);
+             double mean_l_njs = ((double)sum_l_njs) / this->njs_task_left.size();
+             string mean_l_njs_str =  boost::str(boost::format("%.2f") % (mean_l_njs));
+             boost::replace_all(mean_l_njs_str,",",".");
+             double sq_sum_l_njs = std::inner_product(this->njs_task_left.begin(), this->njs_task_left.end(), this->njs_task_left.begin(), 0.0);
+             double stdev_l_njs = std::sqrt((((double)sq_sum_l_njs) / this->njs_task_left.size()) - pow(mean_l_njs,2));
+             string stdev_l_njs_str =  boost::str(boost::format("%.2f") % (stdev_l_njs));
+             boost::replace_all(stdev_l_njs_str,",",".");
+             ui.label_cost_hand_left_value_task->setText(QString::fromStdString(mean_l_njs_str)+QString("(")+QString::fromStdString(stdev_l_njs_str)+QString(")"));
+
+             // right nmu
+             double sum_r_nmu = std::accumulate(this->nmu_task.begin(), this->nmu_task.end(), 0.0);
+             double mean_r_nmu = ((double)sum_r_nmu) / this->nmu_task.size();
+             string mean_r_nmu_str =  boost::str(boost::format("%.2f") % (mean_r_nmu));
+             boost::replace_all(mean_r_nmu_str,",",".");
+             double sq_sum_r_nmu = std::inner_product(this->nmu_task.begin(), this->nmu_task.end(), this->nmu_task.begin(), 0.0);
+             double stdev_r_nmu = std::sqrt((((double)sq_sum_r_nmu) / this->nmu_task.size()) - pow(mean_r_nmu,2));
+             string stdev_r_nmu_str =  boost::str(boost::format("%.2f") % (stdev_r_nmu));
+             boost::replace_all(stdev_r_nmu_str,",",".");
+             ui.label_nmu_hand_right_value_task->setText(QString::fromStdString(mean_r_nmu_str)+QString("(")+QString::fromStdString(stdev_r_nmu_str)+QString(")"));
+
+             // left nmu
+             double sum_l_nmu = std::accumulate(this->nmu_task_left.begin(), this->nmu_task_left.end(), 0.0);
+             double mean_l_nmu = ((double)sum_l_nmu) / this->nmu_task_left.size();
+             string mean_l_nmu_str =  boost::str(boost::format("%.2f") % (mean_l_nmu));
+             boost::replace_all(mean_l_nmu_str,",",".");
+             double sq_sum_l_nmu = std::inner_product(this->nmu_task_left.begin(), this->nmu_task_left.end(), this->nmu_task_left.begin(), 0.0);
+             double stdev_l_nmu = std::sqrt((((double)sq_sum_l_nmu) / this->nmu_task_left.size()) - pow(mean_l_nmu,2));
+             string stdev_l_nmu_str =  boost::str(boost::format("%.2f") % (stdev_l_nmu));
+             boost::replace_all(stdev_l_nmu_str,",",".");
+             ui.label_nmu_hand_left_value_task->setText(QString::fromStdString(mean_l_nmu_str)+QString("(")+QString::fromStdString(stdev_l_nmu_str)+QString(")"));
+
+         }
          // planning time
          double sum_prob = std::accumulate(this->prob_time_task.begin(), this->prob_time_task.end(), 0.0);
          double mean_prob = ((double)sum_prob) / this->prob_time_task.size();
@@ -3192,15 +3299,12 @@ void MainWindow::on_pushButton_append_mov_clicked()
          double stdev_prob = std::sqrt((((double)sq_sum_prob) / this->prob_time_task.size()) - pow(mean_prob,2));
          string stdev_prob_str =  boost::str(boost::format("%.2f") % (stdev_prob));
          boost::replace_all(stdev_prob_str,",",".");
-         ui.label_solving_time_task->setText(QString::fromStdString(mean_prob_str)+QString("(")+QString::fromStdString(stdev_prob_str)+QString(")"));
-
-
-
-
+         if(arm_code!=0){
+            ui.label_solving_time_task->setText(QString::fromStdString(mean_prob_str)+QString("(")+QString::fromStdString(stdev_prob_str)+QString(")"));
+         }else{
+             ui.label_solv_time_task_dual_value->setText(QString::fromStdString(mean_prob_str)+QString("(")+QString::fromStdString(stdev_prob_str)+QString(")"));
+         }
     } // if the problem has been solved
-
-
-
 }
 
 
@@ -3706,7 +3810,101 @@ void MainWindow::on_pushButton_plot_task_clicked()
         ui.plot_hand_vel_task->plotLayout()->clear();
         ui.plot_hand_vel_task->clearGraphs();
     }
+}
 
+void MainWindow::on_pushButton_plot_task_dual_clicked()
+{
+    // plot the 3D right hand position
+    this->handPosPlot_task_ptr.reset(new HandPosPlot(this->handPosition_task));
+    this->handPosPlot_task_ptr->setParent(this->ui.plot_hand_pos_task_right);
+    this->handPosPlot_task_ptr->resize(421,214);
+    this->handPosPlot_task_ptr->set_title("Right Hand position [mm]");
+    this->handPosPlot_task_ptr->show();
+
+    // plot the 3D left hand position
+    this->handPosPlot_task_left_ptr.reset(new HandPosPlot(this->handPosition_task_left));
+    this->handPosPlot_task_left_ptr->setParent(this->ui.plot_hand_pos_task_left);
+    this->handPosPlot_task_left_ptr->resize(421,214);
+    this->handPosPlot_task_left_ptr->set_title("Left Hand position [mm]");
+    this->handPosPlot_task_left_ptr->show();
+
+    // plot the right hand velocity norm
+    if(!this->handVelocityNorm_task.empty()){
+        QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_task);
+        ui.plot_hand_vel_task_right->plotLayout()->clear();
+        ui.plot_hand_vel_task_right->clearGraphs();
+        ui.plot_hand_vel_task_right->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_hand_vel_task_right);
+        wideAxisRect->setupFullAxesBox(true);
+        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_hand_vel_task_right);
+        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+        // move newly created axes on "axes" layer and grids on "grid" layer:
+        for (QCPAxisRect *rect : ui.plot_hand_vel_task_right->axisRects())
+        {
+          for (QCPAxis *axis : rect->axes())
+          {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+          }
+        }
+        QString title("Right Hand velocity");
+        ui.plot_hand_vel_task_right->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_hand_vel_task_right,title));
+        ui.plot_hand_vel_task_right->plotLayout()->addElement(1, 0, wideAxisRect);
+
+        ui.plot_hand_vel_task_right->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+        ui.plot_hand_vel_task_right->graph(0)->setPen(QPen(Qt::red));
+        ui.plot_hand_vel_task_right->graph(0)->setName(title);
+        ui.plot_hand_vel_task_right->graph(0)->valueAxis()->setLabel("hand velocity [mm/s]");
+        ui.plot_hand_vel_task_right->graph(0)->keyAxis()->setLabel("time [s]");
+        ui.plot_hand_vel_task_right->graph(0)->setData(this->qtime_task, qhand_vel);
+        ui.plot_hand_vel_task_right->graph(0)->valueAxis()->setRange(*std::min_element(qhand_vel.begin(), qhand_vel.end()),
+                                                          *std::max_element(qhand_vel.begin(), qhand_vel.end()));
+        ui.plot_hand_vel_task_right->graph(0)->rescaleAxes();
+        ui.plot_hand_vel_task_right->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        ui.plot_hand_vel_task_right->replot();
+    }else{
+        ui.plot_hand_vel_task_right->plotLayout()->clear();
+        ui.plot_hand_vel_task_right->clearGraphs();
+    }
+
+    // plot the left hand velocity norm
+    if(!this->handVelocityNorm_task_left.empty()){
+        QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_task_left);
+        ui.plot_hand_vel_task_left->plotLayout()->clear();
+        ui.plot_hand_vel_task_left->clearGraphs();
+        ui.plot_hand_vel_task_left->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_hand_vel_task_left);
+        wideAxisRect->setupFullAxesBox(true);
+        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_hand_vel_task_left);
+        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+        // move newly created axes on "axes" layer and grids on "grid" layer:
+        for (QCPAxisRect *rect : ui.plot_hand_vel_task_left->axisRects())
+        {
+          for (QCPAxis *axis : rect->axes())
+          {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+          }
+        }
+        QString title("Left Hand velocity");
+        ui.plot_hand_vel_task_left->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_hand_vel_task_left,title));
+        ui.plot_hand_vel_task_left->plotLayout()->addElement(1, 0, wideAxisRect);
+
+        ui.plot_hand_vel_task_left->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+        ui.plot_hand_vel_task_left->graph(0)->setPen(QPen(Qt::red));
+        ui.plot_hand_vel_task_left->graph(0)->setName(title);
+        ui.plot_hand_vel_task_left->graph(0)->valueAxis()->setLabel("hand velocity [mm/s]");
+        ui.plot_hand_vel_task_left->graph(0)->keyAxis()->setLabel("time [s]");
+        ui.plot_hand_vel_task_left->graph(0)->setData(this->qtime_task, qhand_vel);
+        ui.plot_hand_vel_task_left->graph(0)->valueAxis()->setRange(*std::min_element(qhand_vel.begin(), qhand_vel.end()),
+                                                          *std::max_element(qhand_vel.begin(), qhand_vel.end()));
+        ui.plot_hand_vel_task_left->graph(0)->rescaleAxes();
+        ui.plot_hand_vel_task_left->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        ui.plot_hand_vel_task_left->replot();
+    }else{
+        ui.plot_hand_vel_task_left->plotLayout()->clear();
+        ui.plot_hand_vel_task_left->clearGraphs();
+    }
 }
 
 void MainWindow::on_pushButton_joints_results_mov_clicked()
@@ -4302,7 +4500,11 @@ void MainWindow::on_pushButton_save_res_task_clicked()
     cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
     system(cmdLine.c_str());
 
+}
 
+void MainWindow::on_pushButton_save_res_task_dual_clicked()
+{
+    // TO DO
 }
 
 

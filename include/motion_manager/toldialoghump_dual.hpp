@@ -225,10 +225,22 @@ public:
     void getInitVelRight(std::vector<double>& init_vel);
 
     /**
+     * @brief setInitVelRight
+     * @param init_vel
+     */
+    void setInitVelRight(std::vector<double>& init_vel);
+
+    /**
      * @brief getInitVelLeft
      * @param init_vel
      */
     void getInitVelLeft(std::vector<double>& init_vel);
+
+    /**
+     * @brief setInitVelLeft
+     * @param init_vel
+     */
+    void setInitVelLeft(std::vector<double>& init_vel);
 
     /**
      * @brief getFinalVelRight
@@ -249,10 +261,22 @@ public:
     void getInitAccRight(std::vector<double>& init_acc);
 
     /**
+     * @brief setInitAccRight
+     * @param init_acc
+     */
+    void setInitAccRight(std::vector<double>& init_acc);
+
+    /**
      * @brief getInitAccLeft
      * @param init_acc
      */
     void getInitAccLeft(std::vector<double>& init_acc);
+
+    /**
+     * @brief setInitAccLeft
+     * @param init_acc
+     */
+    void setInitAccLeft(std::vector<double>& init_acc);
 
     /**
      * @brief getFinalAccRight

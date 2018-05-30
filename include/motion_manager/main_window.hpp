@@ -410,6 +410,11 @@ public Q_SLOTS:
         void on_pushButton_plot_task_clicked();
 
         /**
+         * @brief on_pushButton_plot_task_dual_clicked
+         */
+        void on_pushButton_plot_task_dual_clicked();
+
+        /**
          * @brief on_pushButton_joints_results_mov_clicked
          */
         void on_pushButton_joints_results_mov_clicked();
@@ -469,6 +474,11 @@ public Q_SLOTS:
          * @brief on_pushButton_save_res_task_clicked
          */
         void on_pushButton_save_res_task_clicked();
+
+        /**
+         * @brief on_pushButton_save_res_task_dual_clicked
+         */
+        void on_pushButton_save_res_task_dual_clicked();
 
 
 
@@ -548,14 +558,23 @@ private:
         double njs_mov_left;/**< normalized jerk score of the movement */
         int nmu_mov_left;/**< number of the movement units */
 
+        vector<double> prob_time_task;/**< time taken to solve the problems in the task */
+
         vector<vector<double>> handPosition_task; /**< hand position during the task. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_task; /**< hand orientation during the task. */
         vector<vector<double>> handLinearVelocity_task; /**< hand linear velocity during the task */
         vector<vector<double>> handAngularVelocity_task;/**< hand angular velocity during the task */
-        vector<double> handVelocityNorm_task; /**< hand velocity norm during the task */
-        vector<double> prob_time_task;/**< time taken to solve the problems in the task */
+        vector<double> handVelocityNorm_task; /**< hand velocity norm during the task */        
         vector<double> njs_task;/**< normalized jerk scores of the movements in the task */
         vector<int> nmu_task;/**< number of the movement units in the task */
+
+        vector<vector<double>> handPosition_task_left; /**< hand position during the task. 0=x,1=y,2=z */
+        vector<vector<double>> handOrientation_task_left; /**< hand orientation during the task. */
+        vector<vector<double>> handLinearVelocity_task_left; /**< hand linear velocity during the task */
+        vector<vector<double>> handAngularVelocity_task_left;/**< hand angular velocity during the task */
+        vector<double> handVelocityNorm_task_left; /**< hand velocity norm during the task */
+        vector<double> njs_task_left;/**< normalized jerk scores of the movements in the task */
+        vector<int> nmu_task_left;/**< number of the movement units in the task */
 
         bool moveit_mov; /**< true if the movement has been planned by the moveit planner, false otherwise */
         bool moveit_task; /**< true if at least one movement in the task has been planned by the moveit planner, false otherwise */
@@ -575,6 +594,7 @@ private:
         boost::shared_ptr<HandPosPlot> handPosPlot_mov_ptr; /**< pointer to the hand position plot of the movement */
         boost::shared_ptr<HandPosPlot> handPosPlot_mov_left_ptr; /**< pointer to the hand position plot of the movement */
         boost::shared_ptr<HandPosPlot> handPosPlot_task_ptr;/**< pointer to the hand position plot of the task */
+        boost::shared_ptr<HandPosPlot> handPosPlot_task_left_ptr;/**< pointer to the hand position plot of the task */
 
         // --- Park postures for ARoS --- //
 

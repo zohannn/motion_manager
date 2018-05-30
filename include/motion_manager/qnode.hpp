@@ -316,10 +316,14 @@ private:
         int right_sensor; /**< handle of the right hand proximity sensor */
         int left_sensor; /**< handle of the left hand proximity sensor */
         int h_detobj; /**< handle of the object that is currently detected by the proximity sensor of the end effector */
+        int r_h_detobj; /**< handle of the object that is currently detected by the proximity sensor of the right end effector */
+        int l_h_detobj; /**< handle of the object that is currently detected by the proximity sensor of the left end effector */
         int right_attach; /**< right hand attach point */
         int left_attach; /**< left hand attach point */
         bool got_scene; /**< true if we got all the elements of the scenario */
         bool obj_in_hand; /**< true if the object is in the hand */
+        bool obj_in_r_hand; /**< true if the object is in the right hand */
+        bool obj_in_l_hand; /**< true if the object is in the left hand */
         std::vector<int> right_handles; /**< right arm and right hand joints handles */
         std::vector<int> left_handles; /**< left arm and left hand joints handles */
         MatrixXi right_hand_handles; /**< matrix of the handles of the right hand joints */

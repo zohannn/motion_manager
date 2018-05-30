@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1086,7 +1086,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab_results_plan_mov">
          <attribute name="title">
@@ -1102,7 +1102,7 @@ p, li { white-space: pre-wrap; }
            </rect>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_mov_single">
            <attribute name="title">
@@ -1484,169 +1484,398 @@ p, li { white-space: pre-wrap; }
          <attribute name="title">
           <string>Task</string>
          </attribute>
-         <widget class="QWidget" name="layoutWidget">
+         <widget class="QTabWidget" name="tabWidget_plan_task">
           <property name="geometry">
            <rect>
-            <x>10</x>
-            <y>350</y>
-            <width>1181</width>
-            <height>20</height>
+            <x>0</x>
+            <y>0</y>
+            <width>1251</width>
+            <height>491</height>
            </rect>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_12">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <widget class="QWidget" name="tab_task_single">
+           <attribute name="title">
+            <string>Single-arm</string>
+           </attribute>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>20</x>
+              <y>10</y>
+              <width>1191</width>
+              <height>361</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_13">
              <item>
-              <widget class="QLabel" name="label_cost_hand_4">
+              <widget class="QWidget" name="plot_hand_pos_task" native="true"/>
+             </item>
+             <item>
+              <widget class="QCustomPlot" name="plot_hand_vel_task" native="true"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>380</y>
+              <width>1181</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_12">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <item>
+                <widget class="QLabel" name="label_cost_hand_4">
+                 <property name="text">
+                  <string>NJS of the hand. Mean(SD): </string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_cost_hand_value_task">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_8">
+               <item>
+                <widget class="QLabel" name="label_cost_hand_5">
+                 <property name="text">
+                  <string>NMU. Mean(SD): </string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_nmu_task">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_9">
+               <item>
+                <widget class="QLabel" name="label_cost_hand_6">
+                 <property name="text">
+                  <string>Solving time [ms]. Mean(SD):</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_solving_time_task">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <item>
+                <widget class="QLabel" name="label_cost_hand_7">
+                 <property name="text">
+                  <string>Rate of success [%]:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_rate_task">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>420</y>
+              <width>168</width>
+              <height>25</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_23">
+             <item>
+              <widget class="QPushButton" name="pushButton_plot_task">
                <property name="text">
-                <string>NJS of the hand. Mean(SD): </string>
+                <string>Plot</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_cost_hand_value_task">
+              <widget class="QPushButton" name="pushButton_save_res_task">
                <property name="text">
-                <string/>
+                <string>Save</string>
                </property>
               </widget>
              </item>
             </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_8">
+           </widget>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>720</x>
+              <y>420</y>
+              <width>517</width>
+              <height>25</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_22">
              <item>
-              <widget class="QLabel" name="label_cost_hand_5">
+              <widget class="QPushButton" name="pushButton_joints_results_task">
                <property name="text">
-                <string>NMU. Mean(SD): </string>
+                <string>show results of the joints</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_nmu_task">
+              <widget class="QPushButton" name="pushButton_power_law_3D">
                <property name="text">
-                <string/>
+                <string>show 1/6 power law results</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_power_law">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>show 2/3 power law results</string>
                </property>
               </widget>
              </item>
             </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_9">
+           </widget>
+          </widget>
+          <widget class="QWidget" name="tab_task_dual">
+           <attribute name="title">
+            <string>Dual-arm</string>
+           </attribute>
+           <widget class="QWidget" name="layoutWidget_4">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>10</y>
+              <width>851</width>
+              <height>441</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_15">
              <item>
-              <widget class="QLabel" name="label_cost_hand_6">
+              <layout class="QHBoxLayout" name="horizontalLayout_36">
+               <item>
+                <widget class="QWidget" name="plot_hand_pos_task_right" native="true"/>
+               </item>
+               <item>
+                <widget class="QCustomPlot" name="plot_hand_vel_task_right" native="true"/>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_37">
+               <item>
+                <widget class="QWidget" name="plot_hand_pos_task_left" native="true"/>
+               </item>
+               <item>
+                <widget class="QCustomPlot" name="plot_hand_vel_task_left" native="true"/>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="layoutWidget_5">
+            <property name="geometry">
+             <rect>
+              <x>950</x>
+              <y>300</y>
+              <width>281</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_38">
+             <item>
+              <widget class="QLabel" name="label_solv_time_task_dual">
                <property name="text">
                 <string>Solving time [ms]. Mean(SD):</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_solving_time_task">
+              <widget class="QLabel" name="label_solv_time_task_dual_value">
                <property name="text">
                 <string/>
                </property>
               </widget>
              </item>
             </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_10">
+           </widget>
+           <widget class="QWidget" name="layoutWidget_6">
+            <property name="geometry">
+             <rect>
+              <x>1060</x>
+              <y>70</y>
+              <width>168</width>
+              <height>25</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_39">
              <item>
-              <widget class="QLabel" name="label_cost_hand_7">
+              <widget class="QPushButton" name="pushButton_plot_task_dual">
                <property name="text">
-                <string>Rate of success [%]:</string>
+                <string>Plot</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_rate_task">
+              <widget class="QPushButton" name="pushButton_save_res_task_dual">
                <property name="text">
-                <string/>
+                <string>Save</string>
                </property>
               </widget>
              </item>
             </layout>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="layoutWidget">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>10</y>
-            <width>1181</width>
-            <height>331</height>
-           </rect>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_13">
-           <item>
-            <widget class="QWidget" name="plot_hand_pos_task" native="true"/>
-           </item>
-           <item>
-            <widget class="QCustomPlot" name="plot_hand_vel_task" native="true"/>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="layoutWidget">
-          <property name="geometry">
-           <rect>
-            <x>680</x>
-            <y>380</y>
-            <width>517</width>
-            <height>25</height>
-           </rect>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_22">
-           <item>
-            <widget class="QPushButton" name="pushButton_joints_results_task">
-             <property name="text">
-              <string>show results of the joints</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_power_law_3D">
-             <property name="text">
-              <string>show 1/6 power law results</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_power_law">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>show 2/3 power law results</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="layoutWidget">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>380</y>
-            <width>168</width>
-            <height>25</height>
-           </rect>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_23">
-           <item>
-            <widget class="QPushButton" name="pushButton_plot_task">
-             <property name="text">
-              <string>Plot</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_save_res_task">
-             <property name="text">
-              <string>Save</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+           </widget>
+           <widget class="QPushButton" name="pushButton_joints_results_task_right">
+            <property name="geometry">
+             <rect>
+              <x>1020</x>
+              <y>10</y>
+              <width>211</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>show results of the right joints</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_joints_results_task_left">
+            <property name="geometry">
+             <rect>
+              <x>1020</x>
+              <y>40</y>
+              <width>211</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>show results of the left joints</string>
+            </property>
+           </widget>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>880</x>
+              <y>340</y>
+              <width>351</width>
+              <height>42</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_16">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_41">
+               <item>
+                <widget class="QLabel" name="label_cost_hand_right_task">
+                 <property name="text">
+                  <string>NJS of the right hand. Mean(SD): </string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_cost_hand_right_value_task">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_42">
+               <item>
+                <widget class="QLabel" name="label_cost_hand_left_task">
+                 <property name="text">
+                  <string>NJS of the left hand. Mean(SD): </string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_cost_hand_left_value_task">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>920</x>
+              <y>400</y>
+              <width>311</width>
+              <height>42</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_17">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_44">
+               <item>
+                <widget class="QLabel" name="label_nmu_hand_right_task">
+                 <property name="text">
+                  <string>NMU (right). Mean(SD): </string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_nmu_hand_right_value_task">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_45">
+               <item>
+                <widget class="QLabel" name="label_nmu_hand_left_task">
+                 <property name="text">
+                  <string>NMU (left). Mean(SD): </string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_nmu_hand_left_value_task">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </widget>
          </widget>
         </widget>
        </widget>

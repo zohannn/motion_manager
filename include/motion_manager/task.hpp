@@ -64,9 +64,23 @@ public:
      */
     void clearProblems();
 
+    /**
+     * @brief getArm
+     * @return
+     */
+    int getArm();
+
+    /**
+     * @brief setArm
+     * @param a
+     */
+    void setArm(int a);
+
 private:
 
     vector<problemPtr> prolem_list; /**< problems of the task */
+
+    int arm_code; /**< dual-arm: 0, right arm: 1, left arm: 2*/
 
 };
 

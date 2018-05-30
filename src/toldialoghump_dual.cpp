@@ -265,6 +265,24 @@ void TolDialogHUMPDual::getInitVelRight(std::vector<double> &init_vel)
     init_vel.push_back(ui->lineEdit_init_vel_11_right->text().toDouble());
 }
 
+void TolDialogHUMPDual::setInitVelRight(std::vector<double>& init_vel)
+{
+    if(!init_vel.empty())
+    {
+        ui->lineEdit_init_vel_1_right->setText(QString::number(init_vel.at(0)));
+        ui->lineEdit_init_vel_2_right->setText(QString::number(init_vel.at(1)));
+        ui->lineEdit_init_vel_3_right->setText(QString::number(init_vel.at(2)));
+        ui->lineEdit_init_vel_4_right->setText(QString::number(init_vel.at(3)));
+        ui->lineEdit_init_vel_5_right->setText(QString::number(init_vel.at(4)));
+        ui->lineEdit_init_vel_6_right->setText(QString::number(init_vel.at(5)));
+        ui->lineEdit_init_vel_7_right->setText(QString::number(init_vel.at(6)));
+        ui->lineEdit_init_vel_8_right->setText(QString::number(init_vel.at(7)));
+        ui->lineEdit_init_vel_9_right->setText(QString::number(init_vel.at(8)));
+        ui->lineEdit_init_vel_10_right->setText(QString::number(init_vel.at(9)));
+        ui->lineEdit_init_vel_11_right->setText(QString::number(init_vel.at(10)));
+    }
+}
+
 void TolDialogHUMPDual::getInitVelLeft(std::vector<double> &init_vel)
 {
     init_vel.clear();
@@ -279,6 +297,24 @@ void TolDialogHUMPDual::getInitVelLeft(std::vector<double> &init_vel)
     init_vel.push_back(ui->lineEdit_init_vel_9_left->text().toDouble());
     init_vel.push_back(ui->lineEdit_init_vel_10_left->text().toDouble());
     init_vel.push_back(ui->lineEdit_init_vel_11_left->text().toDouble());
+}
+
+void TolDialogHUMPDual::setInitVelLeft(std::vector<double>& init_vel)
+{
+    if(!init_vel.empty())
+    {
+        ui->lineEdit_init_vel_1_left->setText(QString::number(init_vel.at(0)));
+        ui->lineEdit_init_vel_2_left->setText(QString::number(init_vel.at(1)));
+        ui->lineEdit_init_vel_3_left->setText(QString::number(init_vel.at(2)));
+        ui->lineEdit_init_vel_4_left->setText(QString::number(init_vel.at(3)));
+        ui->lineEdit_init_vel_5_left->setText(QString::number(init_vel.at(4)));
+        ui->lineEdit_init_vel_6_left->setText(QString::number(init_vel.at(5)));
+        ui->lineEdit_init_vel_7_left->setText(QString::number(init_vel.at(6)));
+        ui->lineEdit_init_vel_8_left->setText(QString::number(init_vel.at(7)));
+        ui->lineEdit_init_vel_9_left->setText(QString::number(init_vel.at(8)));
+        ui->lineEdit_init_vel_10_left->setText(QString::number(init_vel.at(9)));
+        ui->lineEdit_init_vel_11_left->setText(QString::number(init_vel.at(10)));
+    }
 }
 
 void TolDialogHUMPDual::getFinalVelRight(std::vector<double> &final_vel)
@@ -329,6 +365,24 @@ void TolDialogHUMPDual::getInitAccRight(std::vector<double> &init_acc)
     init_acc.push_back(ui->lineEdit_init_acc_11_right->text().toDouble());
 }
 
+void TolDialogHUMPDual::setInitAccRight(std::vector<double>& init_acc)
+{
+    if(!init_acc.empty())
+    {
+        ui->lineEdit_init_acc_1_right->setText(QString::number(init_acc.at(0)));
+        ui->lineEdit_init_acc_2_right->setText(QString::number(init_acc.at(1)));
+        ui->lineEdit_init_acc_3_right->setText(QString::number(init_acc.at(2)));
+        ui->lineEdit_init_acc_4_right->setText(QString::number(init_acc.at(3)));
+        ui->lineEdit_init_acc_5_right->setText(QString::number(init_acc.at(4)));
+        ui->lineEdit_init_acc_6_right->setText(QString::number(init_acc.at(5)));
+        ui->lineEdit_init_acc_7_right->setText(QString::number(init_acc.at(6)));
+        ui->lineEdit_init_acc_8_right->setText(QString::number(init_acc.at(7)));
+        ui->lineEdit_init_acc_9_right->setText(QString::number(init_acc.at(8)));
+        ui->lineEdit_init_acc_10_right->setText(QString::number(init_acc.at(9)));
+        ui->lineEdit_init_acc_11_right->setText(QString::number(init_acc.at(10)));
+    }
+}
+
 void TolDialogHUMPDual::getInitAccLeft(std::vector<double> &init_acc)
 {
     init_acc.clear();
@@ -343,6 +397,24 @@ void TolDialogHUMPDual::getInitAccLeft(std::vector<double> &init_acc)
     init_acc.push_back(ui->lineEdit_init_acc_9_left->text().toDouble());
     init_acc.push_back(ui->lineEdit_init_acc_10_left->text().toDouble());
     init_acc.push_back(ui->lineEdit_init_acc_11_left->text().toDouble());
+}
+
+void TolDialogHUMPDual::setInitAccLeft(std::vector<double>& init_acc)
+{
+    if(!init_acc.empty())
+    {
+        ui->lineEdit_init_acc_1_left->setText(QString::number(init_acc.at(0)));
+        ui->lineEdit_init_acc_2_left->setText(QString::number(init_acc.at(1)));
+        ui->lineEdit_init_acc_3_left->setText(QString::number(init_acc.at(2)));
+        ui->lineEdit_init_acc_4_left->setText(QString::number(init_acc.at(3)));
+        ui->lineEdit_init_acc_5_left->setText(QString::number(init_acc.at(4)));
+        ui->lineEdit_init_acc_6_left->setText(QString::number(init_acc.at(5)));
+        ui->lineEdit_init_acc_7_left->setText(QString::number(init_acc.at(6)));
+        ui->lineEdit_init_acc_8_left->setText(QString::number(init_acc.at(7)));
+        ui->lineEdit_init_acc_9_left->setText(QString::number(init_acc.at(8)));
+        ui->lineEdit_init_acc_10_left->setText(QString::number(init_acc.at(9)));
+        ui->lineEdit_init_acc_11_right->setText(QString::number(init_acc.at(10)));
+    }
 }
 
 void TolDialogHUMPDual::getFinalAccRight(std::vector<double> &final_acc)
