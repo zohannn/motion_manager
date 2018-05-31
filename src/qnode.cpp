@@ -3942,7 +3942,6 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
                             if (srvset_parent.response.result != 1){
                                 log(QNode::Error,string("Error in releasing the object "));
                             }
-                        //}
                     }
 #if HAND ==1 && OPEN_CLOSE_HAND ==1
                   //this->openBarrettHand(arm_code);
@@ -3969,7 +3968,6 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
                             if (srvset_parent.response.result != 1){
                                 log(QNode::Error,string("Error in releasing the object "));
                             }
-                        //}
                     }
 #if HAND ==1 && OPEN_CLOSE_HAND ==1
                   //this->openBarrettHand(1);
@@ -3993,8 +3991,7 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
                         add_client.call(srvset_parent);
                         if (srvset_parent.response.result != 1){
                             log(QNode::Error,string("Error in releasing the object "));
-                        }
-                    //}
+                        }                    
                 }
 #if HAND ==1 && OPEN_CLOSE_HAND ==1
               //this->openBarrettHand(2);
@@ -4133,7 +4130,6 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                                    pow((f_posture(15)-l_post.at(4)),2)+
                                    pow((f_posture(16)-l_post.at(5)),2)+
                                    pow((f_posture(17)-l_post.at(6)),2));
-
                     }
                     if(thr < tol_stop_stage){
                         f_reached=true;
@@ -4206,7 +4202,6 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                                 dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
                                 dataTraj.values.data.push_back(yxt);
                             }
-
                         }
                         /*
                         switch(scenarioID){
@@ -4398,10 +4393,16 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
     int mov_type;
     double timeTot = 0.0;
     this->curr_scene = scene;
-    int scenarioID = scene->getID();
+    //int scenarioID = scene->getID();
     std::vector<int> handles;
     MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
     int h_attach; // handle of the attachment point of the hand
+    std::vector<int> r_handles;
+    MatrixXi r_hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
+    int r_h_attach; // handle of the attachment point of the hand
+    std::vector<int> l_handles;
+    MatrixXi l_hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
+    int l_h_attach; // handle of the attachment point of the hand
     bool f_reached;
     VectorXd f_posture; // the final posture of the movement
     bool plan; bool approach; bool retreat;
@@ -4409,8 +4410,6 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
 
 
     //BOOST_LOG_SEV(lg, info) << "TotalTime = " << TotalTime;
-
-
 
     // set joints position or velocity (it depends on the scenario)
     ros::ServiceClient client_enableSubscriber=node.serviceClient<vrep_common::simRosEnableSubscriber>("/vrep/simRosEnableSubscriber");
@@ -4464,19 +4463,20 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
               closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
               break;
           }
-
-
           switch (arm_code) {
           case 0: // dual arm
-              // TODO
+              r_handles = right_handles;
+              r_hand_handles = right_hand_handles;
+              r_h_attach = right_attach;
+              l_handles = left_handles;
+              l_hand_handles = left_hand_handles;
+              l_h_attach = left_attach;
               break;
-
           case 1: //right arm
               handles = right_handles;
               hand_handles = right_hand_handles;
               h_attach = right_attach;
               break;
-
           case 2: // left arm
               handles = left_handles;
               hand_handles = left_hand_handles;
@@ -4484,10 +4484,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
               break;
           }
 
-
-
-          for(size_t j=0; j <traj_mov.size();++j){ //for loop stages
-
+          for(size_t j=0; j < traj_mov.size();++j){ //for loop stages
               string mov_descr = traj_descr_mov.at(j);
               if(strcmp(mov_descr.c_str(),"plan")==0){
                   plan=true; approach=false; retreat=false;
@@ -4500,26 +4497,74 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
               switch (mov_type){
               case 0: // reach-to-grasp
                   if(retreat){
-                      if(obj_in_hand){
-                          add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
-                          vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
-                          //srvset_parent.request.handle = h_detobj;
-                          srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
-                          srvset_parent.request.parentHandle = h_attach;
-                          srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
-                          add_client.call(srvset_parent);
-                          if (srvset_parent.response.result != 1){
-                              log(QNode::Error,string("Error in grasping the object "));
-                          }
+                      if(arm_code!=0){
+                          //single-arm
+                          if(obj_in_hand){
+                              add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                              vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                              //srvset_parent.request.handle = h_detobj;
+                              srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                              srvset_parent.request.parentHandle = h_attach;
+                              srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                              add_client.call(srvset_parent);
+                              if (srvset_parent.response.result != 1){
+                                  log(QNode::Error,string("Error in grasping the object "));
+                              }
 #if HAND == 1 && OPEN_CLOSE_HAND ==1
-                      this->closeBarrettHand(arm_code);
+                          this->closeBarrettHand(arm_code);
 #else
-                      MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
-                      std::vector<double> hand_init_pos;
-                      hand_init_pos.resize(init_h_posture.size());
-                      VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
-                      this->closeBarrettHand_to_pos(arm_code,hand_init_pos);
+                          MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
+                          std::vector<double> hand_init_pos;
+                          hand_init_pos.resize(init_h_posture.size());
+                          VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                          this->closeBarrettHand_to_pos(arm_code,hand_init_pos);
 #endif
+                          }
+                      }else{
+                          // dual-arm
+                          if(obj_in_r_hand){ // right arm
+                              add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                              vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                              //srvset_parent.request.handle = h_detobj;
+                              srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                              srvset_parent.request.parentHandle = r_h_attach;
+                              srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                              add_client.call(srvset_parent);
+                              if (srvset_parent.response.result != 1){
+                                  log(QNode::Error,string("Error in grasping the object "));
+                              }
+#if HAND == 1 && OPEN_CLOSE_HAND ==1
+                          this->closeBarrettHand(1);
+#else
+                          MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
+                          std::vector<double> hand_init_pos;
+                          hand_init_pos.resize(init_h_posture.size());
+                          VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                          this->closeBarrettHand_to_pos(1,hand_init_pos);
+#endif
+                          }
+
+                          if(obj_in_l_hand){ // left arm
+                              add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                              vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                              //srvset_parent.request.handle = h_detobj;
+                              srvset_parent.request.handle = this->curr_mov->getObjectLeft()->getHandle();
+                              srvset_parent.request.parentHandle = l_h_attach;
+                              srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                              add_client.call(srvset_parent);
+                              if (srvset_parent.response.result != 1){
+                                  log(QNode::Error,string("Error in grasping the object "));
+                              }
+#if HAND == 1 && OPEN_CLOSE_HAND ==1
+                          this->closeBarrettHand(2);
+#else
+                          MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM+JOINTS_HAND+JOINTS_ARM);
+                          std::vector<double> hand_init_pos;
+                          hand_init_pos.resize(init_h_posture.size());
+                          VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                          this->closeBarrettHand_to_pos(2,hand_init_pos);
+#endif
+                          }
                       }
                   }
                   break;
@@ -4527,31 +4572,82 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                   break;
               case 2: case 3: // transport, engage
                   if(retreat){
-                      //
+                      if(arm_code!=0){
+                          // single-arm
+                          //ros::spinOnce();// handle ROS messages
+                          if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
+                              add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                              vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                              //if(obj_in_hand){
+                                  srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                                  srvset_parent.request.parentHandle = -1; // parentless object
+                                  srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                                  add_client.call(srvset_parent);
+                                  if (srvset_parent.response.result != 1){
+                                      log(QNode::Error,string("Error in releasing the object "));
+                                  }
+                          }
+#if HAND ==1 && OPEN_CLOSE_HAND ==1
+                      //this->openBarrettHand(arm_code);
+                      MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
+                      std::vector<double> hand_init_pos;
+                      hand_init_pos.resize(init_h_posture.size());
+                      VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                      this->openBarrettHand_to_pos(arm_code,hand_init_pos);
+#else
+                      closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
+#endif
+                      }else{
+                          //dual-arm
+                          // right arm
+                          //ros::spinOnce();// handle ROS messages
+                          if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
+                              add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                              vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                              //if(obj_in_hand){
+                                  srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                                  srvset_parent.request.parentHandle = -1; // parentless object
+                                  srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                                  add_client.call(srvset_parent);
+                                  if (srvset_parent.response.result != 1){
+                                      log(QNode::Error,string("Error in releasing the object "));
+                                  }
+                          }
+#if HAND ==1 && OPEN_CLOSE_HAND ==1
+                        //this->openBarrettHand(1);
+                        MatrixXd tt = traj_mov.at(k); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM+JOINTS_HAND+JOINTS_ARM);
+                        std::vector<double> hand_init_pos;
+                        hand_init_pos.resize(init_h_posture.size());
+                        VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                        this->openBarrettHand_to_pos(1,hand_init_pos);
+#else
+                      closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
+#endif
+                      // left arm
                       //ros::spinOnce();// handle ROS messages
-                      if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
+                      if(std::strcmp(mov->getObjectLeft()->getName().c_str(),"")!=0){
                           add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
                           vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
                           //if(obj_in_hand){
-                              srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                              srvset_parent.request.handle = this->curr_mov->getObjectLeft()->getHandle();
                               srvset_parent.request.parentHandle = -1; // parentless object
                               srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
                               add_client.call(srvset_parent);
                               if (srvset_parent.response.result != 1){
                                   log(QNode::Error,string("Error in releasing the object "));
                               }
-                          //}
                       }
 #if HAND ==1 && OPEN_CLOSE_HAND ==1
-                  //this->openBarrettHand(arm_code);
-                  MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
-                  std::vector<double> hand_init_pos;
-                  hand_init_pos.resize(init_h_posture.size());
-                  VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
-                  this->openBarrettHand_to_pos(arm_code,hand_init_pos);
+                    //this->openBarrettHand(2);
+                    MatrixXd tt = traj_mov.at(k); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM+JOINTS_HAND+JOINTS_ARM);
+                    std::vector<double> hand_init_pos;
+                    hand_init_pos.resize(init_h_posture.size());
+                    VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                    this->openBarrettHand_to_pos(2,hand_init_pos);
 #else
                   closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
 #endif
+                      }
                   }
                   break;
               case 4:// disengage
@@ -4559,7 +4655,6 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
               case 5: // go-park
                   break;
               }
-
               traj = traj_mov.at(j);
               vel = vel_mov.at(j);
               timesteps_stage = timesteps_mov.at(j);
@@ -4622,31 +4717,58 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                                 // go to the next interval
                                 interval = false;
                             }else{
-
                                 //BOOST_LOG_SEV(lg, info) << "tx = " << tx ;
                                 //BOOST_LOG_SEV(lg, info) << "tx_prev = " << tx_prev;
-
                                 double m;
                                 if((tb-ta)==0){m=1;}else{m = (tx-ta)/(tb-ta);}
-                                std::vector<double> r_post;
-                                this->curr_scene->getHumanoid()->getRightPosture(r_post);
-                                double yx;
-                                double yxt;
-                                if(sqrt(pow((f_posture(0)-r_post.at(0)),2)+
-                                       pow((f_posture(1)-r_post.at(1)),2)+
-                                       pow((f_posture(2)-r_post.at(2)),2)+
-                                       pow((f_posture(3)-r_post.at(3)),2)+
-                                       pow((f_posture(4)-r_post.at(4)),2)+
-                                       pow((f_posture(5)-r_post.at(5)),2)+
-                                       pow((f_posture(6)-r_post.at(6)),2)) < tol_stop_stage){
+                                //std::vector<double> r_post;
+                                //this->curr_scene->getHumanoid()->getRightPosture(r_post);
+                                std::vector<double> r_post; std::vector<double> l_post; std::vector<double> curr_post;
+                                switch (arm_code) {
+                                case 0: // dual arm
+                                    this->curr_scene->getHumanoid()->getRightPosture(r_post);
+                                    this->curr_scene->getHumanoid()->getLeftPosture(l_post);
+                                    break;
+                                case 1: // right arm
+                                    this->curr_scene->getHumanoid()->getRightPosture(curr_post);
+                                    break;
+                                case 2: //left arm
+                                    this->curr_scene->getHumanoid()->getLeftPosture(curr_post);
+                                    break;
+                                }
+                                double yx; double yxt; double thr = 0.0;
+                                if(arm_code!=0){
+                                    thr = sqrt(pow((f_posture(0)-curr_post.at(0)),2)+
+                                               pow((f_posture(1)-curr_post.at(1)),2)+
+                                               pow((f_posture(2)-curr_post.at(2)),2)+
+                                               pow((f_posture(3)-curr_post.at(3)),2)+
+                                               pow((f_posture(4)-curr_post.at(4)),2)+
+                                               pow((f_posture(5)-curr_post.at(5)),2)+
+                                               pow((f_posture(6)-curr_post.at(6)),2));
+                                }else{
+                                    thr = sqrt(pow((f_posture(0)-r_post.at(0)),2)+
+                                               pow((f_posture(1)-r_post.at(1)),2)+
+                                               pow((f_posture(2)-r_post.at(2)),2)+
+                                               pow((f_posture(3)-r_post.at(3)),2)+
+                                               pow((f_posture(4)-r_post.at(4)),2)+
+                                               pow((f_posture(5)-r_post.at(5)),2)+
+                                               pow((f_posture(6)-r_post.at(6)),2)+
+                                               pow((f_posture(11)-l_post.at(0)),2)+
+                                               pow((f_posture(12)-l_post.at(1)),2)+
+                                               pow((f_posture(13)-l_post.at(2)),2)+
+                                               pow((f_posture(14)-l_post.at(3)),2)+
+                                               pow((f_posture(15)-l_post.at(4)),2)+
+                                               pow((f_posture(16)-l_post.at(5)),2)+
+                                               pow((f_posture(17)-l_post.at(6)),2));
+                                }
+                                if(thr < tol_stop_stage){
                                     f_reached=true;
                                     log(QNode::Info,string("Final posture reached, movement: ")+mov->getStrType());
                                     //std::cout << "final posture reached, movement: " << mov->getStrType() << std::endl;
                                     break;
                                 }else{f_reached=false;}
-
                                 hand_closed = (closed[0] && closed[1] && closed[2]);
-                                for (int k = 0; k< vel.cols(); ++k){
+                                for (int k = 0; k< vel.cols(); ++k){ // for loop joints
                                     if(f_reached){
                                         yx=0;
                                         yxt=yxt_prev;
@@ -4655,12 +4777,24 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                                         yxt = interpolate(yat(k),ybt(k),m);
                                         yxt_prev=yxt;
                                     }
-
-                                    if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4)) || // joints of the arm
-                                            (((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed)){
-                                        dataTraj.handles.data.push_back(handles.at(k));
+                                    if(arm_code!=0){
+                                        // single-arm
+                                        if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4)) || // joints of the arm
+                                                (((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed)){
+                                            dataTraj.handles.data.push_back(handles.at(k));
+                                        }
+                                    }else{
+                                        // dual-arm
+                                        if((k < JOINTS_ARM) || // joints of the right arm OR
+                                            ((k >= JOINTS_ARM) && (k < JOINTS_ARM + JOINTS_HAND) && !hand_closed)) // joints of the right hand if the hand is open
+                                        {
+                                            dataTraj.handles.data.push_back(r_handles.at(k));
+                                        }else if (((k >= JOINTS_ARM + JOINTS_HAND) && ( k < JOINTS_ARM + JOINTS_HAND + JOINTS_ARM) )|| // joints of the left arm OR
+                                                  ((k >= JOINTS_ARM + JOINTS_HAND + JOINTS_ARM) && !hand_closed)) // joints of the left hand if the hand is open
+                                        {
+                                            dataTraj.handles.data.push_back(l_handles.at(k-(JOINTS_ARM + JOINTS_HAND)));
+                                        }
                                     }
-
                                     int exec_mode; double exec_value;
 #if VEL==0
                         // position
@@ -4669,88 +4803,177 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                         //velocity
                         exec_mode = 2; exec_value = yx;
 #endif
-                                    switch(scenarioID){
-                                    case 0: //error
-                                        break;
-                                    case 1: case 3: case 4: case 5: case 6: // Toy vehicle scenario with AROS, empty scenario with ARoS, human assistance with ARoS, Challenging scenario with ARoS
-                                        if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed){
-                                            dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
-                                        }else if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4))){
-                                            dataTraj.setModes.data.push_back(exec_mode); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
-                                        }
-                                        if((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4)){ // joints of the arm
-                                            dataTraj.values.data.push_back(exec_value);
-                                        }else if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed){ // joints of the hand
-                                            dataTraj.values.data.push_back(yxt);
-                                        }
-                                        break;
-                                    case 2: // Toy vehicle scenario with Jarde
-                                        dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
-                                        dataTraj.values.data.push_back(yxt);
-                                        break;
-                                    }
-
-                                    //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", ya = " << ya(k)*180/static_cast<double>(M_PI) << ", yb = "<< yb(k)*180/static_cast<double>(M_PI);
-                                    //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
-                                                              // ", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
-#if HAND==1
-
-                                    if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3)) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
-                                        // the fingers are being addressed
-                                        data_hand.handles.data.push_back(hand_handles(k+3-vel.cols(),2));
-                                        data_hand.setModes.data.push_back(1); // set the target position
-                                        data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
-                                    }
-#endif
-                                }
-
-                                //BOOST_LOG_SEV(lg, info) << "\n";
-
-                                pub.publish(dataTraj);
-
-#if HAND==1
-                                pub_hand.publish(data_hand);
-#endif
-
-                                interval = true;
-                                tx_prev = tx;
+                        if(arm_code!=0){
+                            // single-arm
+                            //ARoS
+                            if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed) // joints of the hand
+                            {
+                                dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                dataTraj.values.data.push_back(yxt);
+                            }else if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4))) // joints of the arm
+                            {
+                                dataTraj.setModes.data.push_back(exec_mode); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                dataTraj.values.data.push_back(exec_value);
                             }
+                            // Jarde
+                            //dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                            //dataTraj.values.data.push_back(yxt);
+                        }else{
+                            //dual-arm
+                            if((k < JOINTS_ARM) || ((k >= JOINTS_ARM + JOINTS_HAND) && ( k < JOINTS_ARM + JOINTS_HAND + JOINTS_ARM)) )// joints of the right or left arm
+                            {
+                                dataTraj.setModes.data.push_back(exec_mode); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                dataTraj.values.data.push_back(exec_value);
+                            }else if ((((k >= JOINTS_ARM) && (k < JOINTS_ARM + JOINTS_HAND)) || // joints of the right hand OR
+                                      (k >= JOINTS_ARM + JOINTS_HAND + JOINTS_ARM)) && !hand_closed) // joints of the left hand if the hands are open
+                            {
+                                dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                dataTraj.values.data.push_back(yxt);
+                            }
+                        }
 
-                            // handle ROS messages:
-                            ros::spinOnce();
+                        /*
+                        switch(scenarioID){
+                        case 0: //error
+                            break;
+                        case 1: case 3: case 4: case 5: case 6: // Toy vehicle scenario with AROS, empty scenario with ARoS, human assistance with ARoS, Challenging scenario with ARoS
+                            if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed){
+                                dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                            }else if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4))){
+                                dataTraj.setModes.data.push_back(exec_mode); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                            }
+                            if((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4)){ // joints of the arm
+                                dataTraj.values.data.push_back(exec_value);
+                            }else if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed){ // joints of the hand
+                                dataTraj.values.data.push_back(yxt);
+                            }
+                            break;
+                        case 2: // Toy vehicle scenario with Jarde
+                            dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                            dataTraj.values.data.push_back(yxt);
+                            break;
+                        }
+                        */
+                        //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", ya = " << ya(k)*180/static_cast<double>(M_PI) << ", yb = "<< yb(k)*180/static_cast<double>(M_PI);
+                        //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
+                                                  // ", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
+#if HAND==1
 
-                        } // while
+                        if(arm_code!=0){
+                            //single-arm
+                            if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3)) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
+                                // the fingers are being addressed
+                                data_hand.handles.data.push_back(hand_handles(k+3-vel.cols(),2));
+                                data_hand.setModes.data.push_back(1); // set the target position
+                                data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
+                            }
+                        }else{
+                            // dual-arm
+                            if(((k > JOINTS_ARM) && (k < JOINTS_ARM + JOINTS_HAND)) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
+                                // the right fingers are being addressed
+                                data_hand.handles.data.push_back(r_hand_handles(k+3-(JOINTS_ARM + JOINTS_HAND),2));
+                                data_hand.setModes.data.push_back(1); // set the target position
+                                data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
+                            }else if((k > JOINTS_ARM + JOINTS_HAND + JOINTS_ARM) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
+                                // the left fingers are being addressed
+                                data_hand.handles.data.push_back(l_hand_handles(k-8-(JOINTS_ARM + JOINTS_HAND),2));
+                                data_hand.setModes.data.push_back(1); // set the target position
+                                data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
+                            }
+                        }
+#endif
+                     /*
+                      BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yxt *180/static_cast<double>(M_PI) << ", yat = " << yat(k)*180/static_cast<double>(M_PI) << ", ybt = "<< ybt(k)*180/static_cast<double>(M_PI);
+                      if(arm_code!=0){
+                        BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  curr_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
+                                                  ", error " << k << "=" << (curr_post.at(k)-yxt)*180/static_cast<double>(M_PI);
+                      }else{
+                          if(k < JOINTS_ARM){
+                            BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
+                                                        ", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
 
-                        if(f_reached){
-                            log(QNode::Info,string("Final Posture reached."));
-                            break;}
+                          }else if(k >= (JOINTS_ARM + JOINTS_HAND)){
+                            BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  l_post.at(k-(JOINTS_ARM+JOINTS_HAND))*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
+                                                        ", error " << k << "=" << (l_post.at(k-(JOINTS_ARM+JOINTS_HAND))-yxt)*180/static_cast<double>(M_PI);
+                          }
+                      }
+                      */
 
-                    } // for loop step
+                    } // FOR LOOP JOINTS
+                    //BOOST_LOG_SEV(lg, info) << "\n";
+
+                    pub.publish(dataTraj);
+
+#if HAND==1
+                    pub_hand.publish(data_hand);
+#endif
+
+                        interval = true;
+                        tx_prev = tx;
+                    }
+
+                    // handle ROS messages:
+                    ros::spinOnce();
+
+                } // while
+
+                if(f_reached){
+                    log(QNode::Info,string("Final Posture reached."));
+                    break;}
+
+            } // for loop step
 
                     // ---- post-movement operations ---- //
-
                     // set the detected object child of the attach point
                     add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
                     vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
-
                     switch (mov_type) {
                     case 0: // reach-to grasp
                         // grasp the object
                         if(approach ||(plan && (traj_mov.size()==1))){
-                            if(obj_in_hand){
-                                //srvset_parent.request.handle = h_detobj;
-                                srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
-                                srvset_parent.request.parentHandle = h_attach;
-                                srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
-                                add_client.call(srvset_parent);
-                                if (srvset_parent.response.result != 1){
-                                    log(QNode::Error,string("Error in grasping the object "));
-                                }
+                            if(arm_code!=0){
+                                // single-arm
+                                if(obj_in_hand){
+                                    //srvset_parent.request.handle = h_detobj;
+                                    srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                                    srvset_parent.request.parentHandle = h_attach;
+                                    srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                                    add_client.call(srvset_parent);
+                                    if (srvset_parent.response.result != 1){
+                                        log(QNode::Error,string("Error in grasping the object "));
+                                    }
 //#if HAND == 1
   //                      this->closeBarrettHand(arm_code);
 //#else
   //                      closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
 //#endif
+                                }
+                            }else{
+                                // dual-arm
+                                if(obj_in_r_hand){
+                                    add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                                    vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                                    //srvset_parent.request.handle = h_detobj;
+                                    srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                                    srvset_parent.request.parentHandle = r_h_attach;
+                                    srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                                    add_client.call(srvset_parent);
+                                    if (srvset_parent.response.result != 1){
+                                        log(QNode::Error,string("Error in grasping the object "));
+                                    }
+                                }
+                                if(obj_in_l_hand){
+                                    add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                                    vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                                    //srvset_parent.request.handle = h_detobj;
+                                    srvset_parent.request.handle = this->curr_mov->getObjectLeft()->getHandle();
+                                    srvset_parent.request.parentHandle = l_h_attach;
+                                    srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                                    add_client.call(srvset_parent);
+                                    if (srvset_parent.response.result != 1){
+                                        log(QNode::Error,string("Error in grasping the object "));
+                                    }
+                                }
                             }
                         }
                         break;
@@ -4776,7 +4999,6 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
           // movement complete
           log(QNode::Info,string("Movement completed"));
           task->getProblem(kk)->getMovement()->setExecuted(true);
-
         }else{
             hh++;
         }// if prob is part of the task
@@ -4812,10 +5034,16 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
     int mov_type;
     double timeTot = 0.0;
     this->curr_scene = scene;
-    int scenarioID = scene->getID();
+    //int scenarioID = scene->getID();
     std::vector<int> handles;
     MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
     int h_attach; // handle of the attachment point of the hand
+    std::vector<int> r_handles;
+    MatrixXi r_hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
+    int r_h_attach; // handle of the attachment point of the hand
+    std::vector<int> l_handles;
+    MatrixXi l_hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
+    int l_h_attach; // handle of the attachment point of the hand
     bool f_reached;
     VectorXd f_posture; // the final posture of the movement
     bool plan; bool approach; bool retreat;
@@ -4887,22 +5115,24 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
 
           switch (arm_code) {
           case 0: // dual arm
-              // TODO
+              r_handles = right_handles;
+              r_hand_handles = right_hand_handles;
+              r_h_attach = right_attach;
+              l_handles = left_handles;
+              l_hand_handles = left_hand_handles;
+              l_h_attach = left_attach;
               break;
-
           case 1: //right arm
               handles = right_handles;
               hand_handles = right_hand_handles;
               h_attach = right_attach;
               break;
-
           case 2: // left arm
               handles = left_handles;
               hand_handles = left_hand_handles;
               h_attach = left_attach;
               break;
           }
-
 
 
           MatrixXd traj_ret_plan_app;
@@ -5031,59 +5261,159 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
               switch (mov_type){
               case 0: // reach-to-grasp
                   if(retreat){
-                      if(obj_in_hand){
-                          add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
-                          vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
-                          //srvset_parent.request.handle = h_detobj;
-                          srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
-                          srvset_parent.request.parentHandle = h_attach;
-                          srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
-                          add_client.call(srvset_parent);
-                          if (srvset_parent.response.result != 1){
-                              log(QNode::Error,string("Error in grasping the object "));
-                          }
+                      if(arm_code!=0){
+                          // single-arm
+                          if(obj_in_hand){
+                              add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                              vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                              //srvset_parent.request.handle = h_detobj;
+                              srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                              srvset_parent.request.parentHandle = h_attach;
+                              srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                              add_client.call(srvset_parent);
+                              if (srvset_parent.response.result != 1){
+                                  log(QNode::Error,string("Error in grasping the object "));
+                              }
 #if HAND == 1 && OPEN_CLOSE_HAND ==1
-                      this->closeBarrettHand(arm_code);
+                          this->closeBarrettHand(arm_code);
 #else
-                      MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
-                      std::vector<double> hand_init_pos;
-                      hand_init_pos.resize(init_h_posture.size());
-                      VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
-                      this->closeBarrettHand_to_pos(arm_code,hand_init_pos);
+                          MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
+                          std::vector<double> hand_init_pos;
+                          hand_init_pos.resize(init_h_posture.size());
+                          VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                          this->closeBarrettHand_to_pos(arm_code,hand_init_pos);
 #endif
+                          }
+                          continue;
+                      }else{
+                          // dual-arm
+                          if(obj_in_r_hand){ // right arm
+                              add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                              vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                              //srvset_parent.request.handle = h_detobj;
+                              srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                              srvset_parent.request.parentHandle = r_h_attach;
+                              srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                              add_client.call(srvset_parent);
+                              if (srvset_parent.response.result != 1){
+                                  log(QNode::Error,string("Error in grasping the object "));
+                              }
+#if HAND == 1 && OPEN_CLOSE_HAND ==1
+                          this->closeBarrettHand(1);
+#else
+                          MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
+                          std::vector<double> hand_init_pos;
+                          hand_init_pos.resize(init_h_posture.size());
+                          VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                          this->closeBarrettHand_to_pos(1,hand_init_pos);
+#endif
+                          }
+                          if(obj_in_l_hand){ // left arm
+                              add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                              vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                              //srvset_parent.request.handle = h_detobj;
+                              srvset_parent.request.handle = this->curr_mov->getObjectLeft()->getHandle();
+                              srvset_parent.request.parentHandle = l_h_attach;
+                              srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                              add_client.call(srvset_parent);
+                              if (srvset_parent.response.result != 1){
+                                  log(QNode::Error,string("Error in grasping the object "));
+                              }
+#if HAND == 1 && OPEN_CLOSE_HAND ==1
+                          this->closeBarrettHand(2);
+#else
+                          MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM+JOINTS_HAND+JOINTS_ARM);
+                          std::vector<double> hand_init_pos;
+                          hand_init_pos.resize(init_h_posture.size());
+                          VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                          this->closeBarrettHand_to_pos(2,hand_init_pos);
+#endif
+                          }
+                          continue;
                       }
-                      continue;
                   }
                   break;
               case 1: // reaching
                   break;
               case 2: case 3: // transport, engage
                   if(retreat){
-                      //
+                      if(arm_code!=0){
+                      // single-arm
+                          //ros::spinOnce();// handle ROS messages
+                          if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
+                              add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                              vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                              //if(obj_in_hand){
+                                  srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                                  srvset_parent.request.parentHandle = -1; // parentless object
+                                  srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                                  add_client.call(srvset_parent);
+                                  if (srvset_parent.response.result != 1){
+                                      log(QNode::Error,string("Error in releasing the object "));
+                                  }
+                          }
+#if HAND ==1 && OPEN_CLOSE_HAND ==1
+                      //this->openBarrettHand(arm_code);
+                      MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
+                      std::vector<double> hand_init_pos;
+                      hand_init_pos.resize(init_h_posture.size());
+                      VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                      this->openBarrettHand_to_pos(arm_code,hand_init_pos);
+#else
+                      closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
+#endif
+                          continue;
+                      }else{
+                          //dual-arm
+                          // right arm
+                          //ros::spinOnce();// handle ROS messages
+                          if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
+                              add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                              vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                              //if(obj_in_hand){
+                                  srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                                  srvset_parent.request.parentHandle = -1; // parentless object
+                                  srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                                  add_client.call(srvset_parent);
+                                  if (srvset_parent.response.result != 1){
+                                      log(QNode::Error,string("Error in releasing the object "));
+                                  }
+                          }
+      #if HAND ==1 && OPEN_CLOSE_HAND ==1
+                        //this->openBarrettHand(1);
+                        MatrixXd tt = traj_mov.at(k); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM+JOINTS_HAND+JOINTS_ARM);
+                        std::vector<double> hand_init_pos;
+                        hand_init_pos.resize(init_h_posture.size());
+                        VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                        this->openBarrettHand_to_pos(1,hand_init_pos);
+      #else
+                      closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
+      #endif
+                      // left arm
                       //ros::spinOnce();// handle ROS messages
-                      if(std::strcmp(mov->getObject()->getName().c_str(),"")!=0){
+                      if(std::strcmp(mov->getObjectLeft()->getName().c_str(),"")!=0){
                           add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
                           vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
                           //if(obj_in_hand){
-                              srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                              srvset_parent.request.handle = this->curr_mov->getObjectLeft()->getHandle();
                               srvset_parent.request.parentHandle = -1; // parentless object
                               srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
                               add_client.call(srvset_parent);
                               if (srvset_parent.response.result != 1){
                                   log(QNode::Error,string("Error in releasing the object "));
                               }
-                          //}
                       }
-#if HAND ==1 && OPEN_CLOSE_HAND ==1
-                  //this->openBarrettHand(arm_code);
-                  MatrixXd tt = traj_mov.at(j); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
-                  std::vector<double> hand_init_pos;
-                  hand_init_pos.resize(init_h_posture.size());
-                  VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
-                  this->openBarrettHand_to_pos(arm_code,hand_init_pos);
-#else
+      #if HAND ==1 && OPEN_CLOSE_HAND ==1
+                    //this->openBarrettHand(2);
+                    MatrixXd tt = traj_mov.at(k); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM+JOINTS_HAND+JOINTS_ARM);
+                    std::vector<double> hand_init_pos;
+                    hand_init_pos.resize(init_h_posture.size());
+                    VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+                    this->openBarrettHand_to_pos(2,hand_init_pos);
+      #else
                   closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
-#endif
+      #endif
+                      }
                       continue;
                   }
                   break;
@@ -5171,24 +5501,53 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
 
                                 double m;
                                 if((tb-ta)==0){m=1;}else{m = (tx-ta)/(tb-ta);}
-                                std::vector<double> r_post;
-                                this->curr_scene->getHumanoid()->getRightPosture(r_post);
-                                double yx;
-                                double yxt;
-                                if(sqrt(pow((f_posture(0)-r_post.at(0)),2)+
-                                       pow((f_posture(1)-r_post.at(1)),2)+
-                                       pow((f_posture(2)-r_post.at(2)),2)+
-                                       pow((f_posture(3)-r_post.at(3)),2)+
-                                       pow((f_posture(4)-r_post.at(4)),2)+
-                                       pow((f_posture(5)-r_post.at(5)),2)+
-                                       pow((f_posture(6)-r_post.at(6)),2)) < tol_stop_stage){
+
+                                std::vector<double> r_post; std::vector<double> l_post; std::vector<double> curr_post;
+                                switch (arm_code) {
+                                case 0: // dual arm
+                                    this->curr_scene->getHumanoid()->getRightPosture(r_post);
+                                    this->curr_scene->getHumanoid()->getLeftPosture(l_post);
+                                    break;
+                                case 1: // right arm
+                                    this->curr_scene->getHumanoid()->getRightPosture(curr_post);
+                                    break;
+                                case 2: //left arm
+                                    this->curr_scene->getHumanoid()->getLeftPosture(curr_post);
+                                    break;
+                                }
+                                double yx; double yxt; double thr = 0.0;
+                                if(arm_code!=0){
+                                    thr = sqrt(pow((f_posture(0)-curr_post.at(0)),2)+
+                                               pow((f_posture(1)-curr_post.at(1)),2)+
+                                               pow((f_posture(2)-curr_post.at(2)),2)+
+                                               pow((f_posture(3)-curr_post.at(3)),2)+
+                                               pow((f_posture(4)-curr_post.at(4)),2)+
+                                               pow((f_posture(5)-curr_post.at(5)),2)+
+                                               pow((f_posture(6)-curr_post.at(6)),2));
+                                }else{
+                                    thr = sqrt(pow((f_posture(0)-r_post.at(0)),2)+
+                                               pow((f_posture(1)-r_post.at(1)),2)+
+                                               pow((f_posture(2)-r_post.at(2)),2)+
+                                               pow((f_posture(3)-r_post.at(3)),2)+
+                                               pow((f_posture(4)-r_post.at(4)),2)+
+                                               pow((f_posture(5)-r_post.at(5)),2)+
+                                               pow((f_posture(6)-r_post.at(6)),2)+
+                                               pow((f_posture(11)-l_post.at(0)),2)+
+                                               pow((f_posture(12)-l_post.at(1)),2)+
+                                               pow((f_posture(13)-l_post.at(2)),2)+
+                                               pow((f_posture(14)-l_post.at(3)),2)+
+                                               pow((f_posture(15)-l_post.at(4)),2)+
+                                               pow((f_posture(16)-l_post.at(5)),2)+
+                                               pow((f_posture(17)-l_post.at(6)),2));
+                                }
+                                if(thr < tol_stop_stage){
                                     f_reached=true;
                                     log(QNode::Info,string("Final posture reached, movement: ")+mov->getStrType());
                                     //std::cout << "final posture reached, movement: " << mov->getStrType() << std::endl;
                                     break;
                                 }else{f_reached=false;}
-
                                 hand_closed = (closed[0] && closed[1] && closed[2]);
+
                                 for (int k = 0; k< vel.cols(); ++k){
                                     if(f_reached){
                                         yx=0;
@@ -5198,12 +5557,24 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
                                         yxt = interpolate(yat(k),ybt(k),m);
                                         yxt_prev=yxt;
                                     }
-
-                                    if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4)) || // joints of the arm
-                                            (((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed)){
-                                        dataTraj.handles.data.push_back(handles.at(k));
+                                    if(arm_code!=0){
+                                        // single-arm
+                                        if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4)) || // joints of the arm
+                                                (((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed)){ // joints of the hand if the hand is open
+                                            dataTraj.handles.data.push_back(handles.at(k));
+                                        }
+                                    }else{
+                                        // dual-arm
+                                        if((k < JOINTS_ARM) || // joints of the right arm OR
+                                            ((k >= JOINTS_ARM) && (k < JOINTS_ARM + JOINTS_HAND) && !hand_closed)) // joints of the right hand if the hand is open
+                                        {
+                                            dataTraj.handles.data.push_back(r_handles.at(k));
+                                        }else if (((k >= JOINTS_ARM + JOINTS_HAND) && ( k < JOINTS_ARM + JOINTS_HAND + JOINTS_ARM) )|| // joints of the left arm OR
+                                                  ((k >= JOINTS_ARM + JOINTS_HAND + JOINTS_ARM) && !hand_closed)) // joints of the left hand if the hand is open
+                                        {
+                                            dataTraj.handles.data.push_back(l_handles.at(k-(JOINTS_ARM + JOINTS_HAND)));
+                                        }
                                     }
-
                                     int exec_mode; double exec_value;
 #if VEL==0
                         // position
@@ -5212,134 +5583,219 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
                         //velocity
                         exec_mode = 2; exec_value = yx;
 #endif
-                                    switch(scenarioID){
-                                    case 0: //error
-                                        break;
-                                    case 1: case 3: case 4: case 5: case 6: // Toy vehicle scenario with AROS, empty scenario with ARoS, human assistance with ARoS, Challenging scenario with ARoS
-                                        if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed){
-                                            dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
-                                        }else if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4))){
-                                            dataTraj.setModes.data.push_back(exec_mode); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
-                                        }
-                                        if((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4)){ // joints of the arm
-                                            dataTraj.values.data.push_back(exec_value);
-                                        }else if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed){ // joints of the hand
-                                            dataTraj.values.data.push_back(yxt);
-                                        }
-                                        break;
-                                    case 2: // Toy vehicle scenario with Jarde
-                                        dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
-                                        dataTraj.values.data.push_back(yxt);
-                                        break;
-                                    }
-
-                                    //BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yx *180/static_cast<double>(M_PI) << ", ya = " << ya(k)*180/static_cast<double>(M_PI) << ", yb = "<< yb(k)*180/static_cast<double>(M_PI);
-                                    //BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
-                                                              // ", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
-#if HAND==1
-
-                                    if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3)) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
-                                        // the fingers are being addressed
-                                        data_hand.handles.data.push_back(hand_handles(k+3-vel.cols(),2));
-                                        data_hand.setModes.data.push_back(1); // set the target position
-                                        data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
-                                    }
-#endif
-                                }
-
-                                //BOOST_LOG_SEV(lg, info) << "\n";
-
-                                pub.publish(dataTraj);
-
-#if HAND==1
-                                pub_hand.publish(data_hand);
-#endif
-
-                                interval = true;
-                                tx_prev = tx;
+                        if(arm_code!=0){
+                            // single-arm
+                            //ARoS
+                            if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed) // joints of the hand
+                            {
+                                dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                dataTraj.values.data.push_back(yxt);
+                            }else if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4))) // joints of the arm
+                            {
+                                dataTraj.setModes.data.push_back(exec_mode); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                dataTraj.values.data.push_back(exec_value);
                             }
-
-                            // handle ROS messages:
-                            ros::spinOnce();
-
-                        } // while
-
-                        if(f_reached){
-                            log(QNode::Info,string("Final Posture reached."));
-                            break;}
-
-                    } // for loop step
-
-                    // ---- post-movement operations ---- //
-
-                    // set the detected object child of the attach point
-                    add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
-                    vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
-
-                    switch (mov_type) {
-                    case 0: // reach-to grasp
-                        // grasp the object
-                        if(approach ||(plan && (traj_mov.size()==1))){
-                            if(obj_in_hand){
-                                //srvset_parent.request.handle = h_detobj;
-                                srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
-                                srvset_parent.request.parentHandle = h_attach;
-                                srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
-                                add_client.call(srvset_parent);
-                                if (srvset_parent.response.result != 1){
-                                    log(QNode::Error,string("Error in grasping the object "));
-                                }
-//#if HAND == 1
-  //                      this->closeBarrettHand(arm_code);
-//#else
-  //                      closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
-//#endif
+                            // Jarde
+                            //dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                            //dataTraj.values.data.push_back(yxt);
+                        }else{
+                            //dual-arm
+                            if((k < JOINTS_ARM) || ((k >= JOINTS_ARM + JOINTS_HAND) && ( k < JOINTS_ARM + JOINTS_HAND + JOINTS_ARM)) )// joints of the right or left arm
+                            {
+                                dataTraj.setModes.data.push_back(exec_mode); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                dataTraj.values.data.push_back(exec_value);
+                            }else if ((((k >= JOINTS_ARM) && (k < JOINTS_ARM + JOINTS_HAND)) || // joints of the right hand OR
+                                      (k >= JOINTS_ARM + JOINTS_HAND + JOINTS_ARM)) && !hand_closed) // joints of the left hand if the hands are open
+                            {
+                                dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                                dataTraj.values.data.push_back(yxt);
                             }
                         }
-                        break;
-                    case 1: // reaching
-                        break;
-                    case 2: // transport
-                        break;
-                    case 3: // engage
-                        break;
-                    case 4: // disengage
-                        break;
-                    case 5: // go-park
-                        break;
+
+                        /*
+                        switch(scenarioID){
+                        case 0: //error
+                            break;
+                        case 1: case 3: case 4: case 5: case 6: // Toy vehicle scenario with AROS, empty scenario with ARoS, human assistance with ARoS, Challenging scenario with ARoS
+                            if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed){
+                                dataTraj.setModes.data.push_back(1); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                            }else if(((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4))){
+                                dataTraj.setModes.data.push_back(exec_mode); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                            }
+                            if((k!=vel.cols()-1) && (k!=vel.cols()-2) && (k!=vel.cols()-3) && (k!=vel.cols()-4)){ // joints of the arm
+                                dataTraj.values.data.push_back(exec_value);
+                            }else if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3) || (k==vel.cols()-4)) && !hand_closed){ // joints of the hand
+                                dataTraj.values.data.push_back(yxt);
+                            }
+                            break;
+                        case 2: // Toy vehicle scenario with Jarde
+                            dataTraj.setModes.data.push_back(0); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                            dataTraj.values.data.push_back(yxt);
+                            break;
+                        }
+                        */
+
+#if HAND==1
+
+                        if(arm_code!=0){
+                            //single-arm
+                            if(((k==vel.cols()-1) || (k==vel.cols()-2) || (k==vel.cols()-3)) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
+                                // the fingers are being addressed
+                                data_hand.handles.data.push_back(hand_handles(k+3-vel.cols(),2));
+                                data_hand.setModes.data.push_back(1); // set the target position
+                                data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
+                            }
+                        }else{
+                            // dual-arm
+                            if(((k > JOINTS_ARM) && (k < JOINTS_ARM + JOINTS_HAND)) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
+                                // the right fingers are being addressed
+                                data_hand.handles.data.push_back(r_hand_handles(k+3-(JOINTS_ARM + JOINTS_HAND),2));
+                                data_hand.setModes.data.push_back(1); // set the target position
+                                data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
+                            }else if((k > JOINTS_ARM + JOINTS_HAND + JOINTS_ARM) && ((!closed.at(0)) && (!closed.at(1)) && (!closed.at(2)))){
+                                // the left fingers are being addressed
+                                data_hand.handles.data.push_back(l_hand_handles(k-8-(JOINTS_ARM + JOINTS_HAND),2));
+                                data_hand.setModes.data.push_back(1); // set the target position
+                                data_hand.values.data.push_back(yxt/3.0 + 45.0f*static_cast<double>(M_PI) / 180.0f);
+                            }
+                        }
+#endif
+                        /*
+                          BOOST_LOG_SEV(lg, info) << "joint " << k << " = " << yxt *180/static_cast<double>(M_PI) << ", yat = " << yat(k)*180/static_cast<double>(M_PI) << ", ybt = "<< ybt(k)*180/static_cast<double>(M_PI);
+                          if(arm_code!=0){
+                            BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  curr_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
+                                                      ", error " << k << "=" << (curr_post.at(k)-yxt)*180/static_cast<double>(M_PI);
+                          }else{
+                              if(k < JOINTS_ARM){
+                                BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  r_post.at(k)*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
+                                                            ", error " << k << "=" << (r_post.at(k)-yxt)*180/static_cast<double>(M_PI);
+
+                              }else if(k >= (JOINTS_ARM + JOINTS_HAND)){
+                                BOOST_LOG_SEV(lg, info) << "real joint " << k << " = " <<  l_post.at(k-(JOINTS_ARM+JOINTS_HAND))*180/static_cast<double>(M_PI) << ",  traj joint " << k << " = " << yxt *180/static_cast<double>(M_PI) <<
+                                                            ", error " << k << "=" << (l_post.at(k-(JOINTS_ARM+JOINTS_HAND))-yxt)*180/static_cast<double>(M_PI);
+                              }
+                          }
+                          */
+
+                        } // FOR LOOP JOINTS
+                        //BOOST_LOG_SEV(lg, info) << "\n";
+
+                        pub.publish(dataTraj);
+
+#if HAND==1
+                        pub_hand.publish(data_hand);
+#endif
+
+                        interval = true;
+                        tx_prev = tx;
                     }
 
                     // handle ROS messages:
                     ros::spinOnce();
-                    timeTot = simulationTime; // update the total time of the movement
 
-                } // if
+                } // while
 
-          }//for loop stages
-          // movement complete          
-          log(QNode::Info,string("Movement completed"));
-          task->getProblem(kk)->getMovement()->setExecuted(true);
+                if(f_reached){
+                    log(QNode::Info,string("Final Posture reached."));
+                    break;}
 
-        }else{
-            hh++;
-        }// if prob is part of the task
+            } // for loop step
 
-      }// for loop movements
-      log(QNode::Info,string("Task completed"));
+            // ---- post-movement operations ---- //
+            // set the detected object child of the attach point
+            add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+            vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+            switch (mov_type) {
+            case 0: // reach-to grasp
+                // grasp the object
+                if(approach ||(plan && (traj_mov.size()==1))){
+                    if(arm_code!=0){
+                    //single-arm
+                        if(obj_in_hand){
+                            //srvset_parent.request.handle = h_detobj;
+                            srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                            srvset_parent.request.parentHandle = h_attach;
+                            srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                            add_client.call(srvset_parent);
+                            if (srvset_parent.response.result != 1){
+                                log(QNode::Error,string("Error in grasping the object "));
+                            }
+//#if HAND == 1
+//                      this->closeBarrettHand(arm_code);
+//#else
+//                      closed.at(0)=true; closed.at(1)=true; closed.at(2)=true;
+//#endif
+                        }
+                    }else{
+                        //dual-arm
+                        if(obj_in_r_hand){
+                            add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                            vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                            //srvset_parent.request.handle = h_detobj;
+                            srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                            srvset_parent.request.parentHandle = r_h_attach;
+                            srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                            add_client.call(srvset_parent);
+                            if (srvset_parent.response.result != 1){
+                                log(QNode::Error,string("Error in grasping the object "));
+                            }
+                        }
+                        if(obj_in_l_hand){
+                            add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                            vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                            //srvset_parent.request.handle = h_detobj;
+                            srvset_parent.request.handle = this->curr_mov->getObjectLeft()->getHandle();
+                            srvset_parent.request.parentHandle = l_h_attach;
+                            srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                            add_client.call(srvset_parent);
+                            if (srvset_parent.response.result != 1){
+                                log(QNode::Error,string("Error in grasping the object "));
+                            }
+                        }
+                    }
+                }
+                break;
+            case 1: // reaching
+                break;
+            case 2: // transport
+                break;
+            case 3: // engage
+                break;
+            case 4: // disengage
+                break;
+            case 5: // go-park
+                break;
+            }
 
-      // pause the simulation
-      add_client = node.serviceClient<vrep_common::simRosPauseSimulation>("/vrep/simRosPauseSimulation");
-      vrep_common::simRosPauseSimulation srvpause;
-      add_client.call(srvpause);
+            // handle ROS messages:
+            ros::spinOnce();
+            timeTot = simulationTime; // update the total time of the movement
 
-      // handle ROS messages:
-      ros::spinOnce();
+        } // if
 
-      TotalTime=simulationTime;
+      }//for loop stages
+      // movement complete
+      log(QNode::Info,string("Movement completed"));
+      task->getProblem(kk)->getMovement()->setExecuted(true);
 
-      return true;
+    }else{
+        hh++;
+    }// if prob is part of the task
 
+  }// for loop movements
+  log(QNode::Info,string("Task completed"));
 
+  // pause the simulation
+  add_client = node.serviceClient<vrep_common::simRosPauseSimulation>("/vrep/simRosPauseSimulation");
+  vrep_common::simRosPauseSimulation srvpause;
+  add_client.call(srvpause);
+
+  // handle ROS messages:
+  ros::spinOnce();
+
+  TotalTime=simulationTime;
+
+  return true;
 
 
 }

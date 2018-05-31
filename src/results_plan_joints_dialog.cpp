@@ -283,7 +283,7 @@ void ResultsJointsDialog::setupPlots(vector<vector<MatrixXd> > &pos, vector<vect
             plotJoint(ui->plot_joint_1,QString("Right Joint 1"),qtime,pos_joint1,vel_joint1,acc_joint1); // plot joint 1
             plotJoint(ui->plot_joint_2,QString("Right Joint 2"),qtime,pos_joint2,vel_joint2,acc_joint2); // plot joint 2
             plotJoint(ui->plot_joint_3,QString("Right Joint 3"),qtime,pos_joint3,vel_joint3,acc_joint3); // plot joint 3
-            plotJoint(ui->plot_joint_4,QString("RightJoint 4"),qtime,pos_joint4,vel_joint4,acc_joint4); // plot joint 4
+            plotJoint(ui->plot_joint_4,QString("Right Joint 4"),qtime,pos_joint4,vel_joint4,acc_joint4); // plot joint 4
             plotJoint(ui->plot_joint_5,QString("Right Joint 5"),qtime,pos_joint5,vel_joint5,acc_joint5); // plot joint 5
             plotJoint(ui->plot_joint_6,QString("Right Joint 6"),qtime,pos_joint6,vel_joint6,acc_joint6); // plot joint 6
             plotJoint(ui->plot_joint_7,QString("Right Joint 7"),qtime,pos_joint7,vel_joint7,acc_joint7); // plot joint 7

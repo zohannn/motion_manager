@@ -1159,7 +1159,11 @@ string Movement::getInfoLine()
                 ", Grip Type: "+grip_str;
     }else{
         // dual arm
-        return "Right: "+strType+", Left: "+strType_left+", Arm: "+arm_info+", Object right: "+obj->getName()+", Object left: "+obj_left->getName()+
+        string str_type = " ";
+        if(this->type==this->type_left){
+            str_type = strType;
+        }
+        return strType+", Arm: "+arm_info+", Object right: "+obj->getName()+", Object left: "+obj_left->getName()+
                 ", Object right Engaged: "+obj_eng->getName() + ", Object left Engaged: "+obj_eng_left->getName()+
                 ", Pose right: "+pose->getName()+", Pose left: "+pose_left->getName()+
                 ", Grip Type right: "+grip_str+ ", Grip Type left: "+grip_str_left;

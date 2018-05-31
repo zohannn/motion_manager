@@ -2419,9 +2419,13 @@ void MainWindow::on_pushButton_load_task_clicked()
     int mov_id; QString mov_type;
     int arm_code; QString arm_type;
     QString obj_str; objectPtr obj;
+    QString obj_left_str; objectPtr obj_left;
     QString obj_eng_str; objectPtr obj_eng;
+    QString obj_eng_left_str; objectPtr obj_eng_left;
     QString pose_str; posePtr pose;
+    QString pose_left_str; posePtr pose_left;
     bool prec; QString grip_type;
+    bool prec_left; QString grip_type_left;
     int row=0;
     MatrixXd pos_stage;
     MatrixXd vel_stage;
@@ -2434,8 +2438,8 @@ void MainWindow::on_pushButton_load_task_clicked()
     this->traj_descr_task.clear();
     this->timesteps_task.clear();
     this->tols_stop_task.clear();
-    this->njs_task.clear();
-    this->nmu_task.clear();
+    this->njs_task.clear(); this->njs_task_left.clear();
+    this->nmu_task.clear(); this->nmu_task_left.clear();
     this->prob_time_task.clear();
     this->jointsPosition_mov.clear();
     this->jointsVelocity_mov.clear();
@@ -2515,12 +2519,28 @@ void MainWindow::on_pushButton_load_task_clicked()
                         arm_type=fields1.at(1).simplified();
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Object"),Qt::CaseInsensitive)==0){
                         obj_str=fields1.at(1).simplified();
+                    }else if(QString::compare(fields1.at(0).simplified(),QString("Object right"),Qt::CaseInsensitive)==0){
+                        obj_str=fields1.at(1).simplified();
+                    }else if(QString::compare(fields1.at(0).simplified(),QString("Object left"),Qt::CaseInsensitive)==0){
+                        obj_left_str=fields1.at(1).simplified();
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Object Engaged"),Qt::CaseInsensitive)==0){
                         obj_eng_str=fields1.at(1).simplified();
+                    }else if(QString::compare(fields1.at(0).simplified(),QString("Object right Engaged"),Qt::CaseInsensitive)==0){
+                        obj_eng_str=fields1.at(1).simplified();
+                    }else if(QString::compare(fields1.at(0).simplified(),QString("Object left Engaged"),Qt::CaseInsensitive)==0){
+                        obj_eng_left_str=fields1.at(1).simplified();
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Pose"),Qt::CaseInsensitive)==0){
                         pose_str=fields1.at(1).simplified();
+                    }else if(QString::compare(fields1.at(0).simplified(),QString("Pose right"),Qt::CaseInsensitive)==0){
+                        pose_str=fields1.at(1).simplified();
+                    }else if(QString::compare(fields1.at(0).simplified(),QString("Pose left"),Qt::CaseInsensitive)==0){
+                        pose_left_str=fields1.at(1).simplified();
                     }else if(QString::compare(fields1.at(0).simplified(),QString("Grip Type"),Qt::CaseInsensitive)==0){
                         grip_type=fields1.at(1).simplified();
+                    }else if(QString::compare(fields1.at(0).simplified(),QString("Grip Type right"),Qt::CaseInsensitive)==0){
+                        grip_type=fields1.at(1).simplified();
+                    }else if(QString::compare(fields1.at(0).simplified(),QString("Grip Type left"),Qt::CaseInsensitive)==0){
+                        grip_type_left=fields1.at(1).simplified();
                     }
                 }
 
@@ -2546,27 +2566,46 @@ void MainWindow::on_pushButton_load_task_clicked()
                 }else{
                     prec=false;
                 }
+                if(QString::compare(grip_type_left,QString("Precision"),Qt::CaseInsensitive)==0){
+                    prec_left=true;
+                }else{
+                    prec_left=false;
+                }
+
                 //get the arm
                 if(QString::compare(arm_type,QString("both"),Qt::CaseInsensitive)==0){
                     arm_code=0;
+                    ui.tabWidget_plan_task->setTabEnabled(0,false);
+                    ui.tabWidget_plan_task->setTabEnabled(1,true);
+                    obj = this->curr_scene->getObject(obj_str.toStdString());
+                    obj_left = this->curr_scene->getObject(obj_left_str.toStdString());
                 }else if(QString::compare(arm_type,QString("right"),Qt::CaseInsensitive)==0){
                     arm_code=1;
+                    ui.tabWidget_plan_task->setTabEnabled(0,true);
+                    ui.tabWidget_plan_task->setTabEnabled(1,false);
+                    obj = this->curr_scene->getObject(obj_str.toStdString());
                 }else if(QString::compare(arm_type,QString("left"),Qt::CaseInsensitive)==0){
                     arm_code=2;
+                    ui.tabWidget_plan_task->setTabEnabled(0,true);
+                    ui.tabWidget_plan_task->setTabEnabled(1,false);
+                    obj = this->curr_scene->getObject(obj_str.toStdString());
                 }
 
                 // get the movement type
                 if(QString::compare(mov_type,QString("Reach-to-grasp"),Qt::CaseInsensitive)==0){
                     mov_id=0;
                     //get the object
-                    obj = this->curr_scene->getObject(obj_str.toStdString());
+                    //obj = this->curr_scene->getObject(obj_str.toStdString());
+                    //obj_left = this->curr_scene->getObject(obj_left_str.toStdString());
                     switch (arm_code){
                     case 0: // dual arm
-                        // TO DO
+                        obj->setTargetRightEnabled(true); obj->setTargetLeftEnabled(false);
+                        obj_left->setTargetRightEnabled(false); obj_left->setTargetLeftEnabled(true);
+                        break;
                     case 1: // right arm
                          obj->setTargetRightEnabled(true);
-                         obj->setTargetLeftEnabled(false);
-                        break;
+                         obj->setTargetLeftEnabled(false);                        
+                         break;
                     case 2: // left arm
                         obj->setTargetLeftEnabled(true);
                         obj->setTargetRightEnabled(false);
@@ -2574,7 +2613,11 @@ void MainWindow::on_pushButton_load_task_clicked()
                     }
                     problemPtr prob;
                     if(plan_id==0){
-                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,prec),new Scenario(*(this->curr_scene.get()))));
+                        if(arm_code!=0){//single-arm
+                            prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,prec),new Scenario(*(this->curr_scene.get()))));
+                        }else{//dual-arm
+                            prob = problemPtr(new Problem(plan_id,new Movement(mov_id,mov_id,0,obj,prec,obj_left,prec_left),new Scenario(*(this->curr_scene.get()))));
+                        }
                     }else{
 #if MOVEIT==1
                         prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
@@ -2587,7 +2630,11 @@ void MainWindow::on_pushButton_load_task_clicked()
                     mov_id=1;
                     problemPtr prob;
                     if(plan_id==0){
-                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get()))));
+                        if(arm_code!=0){//single-arm
+                            prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get()))));
+                        }else{ // dual-arm
+                            //TO DO
+                        }
                     }else{
 #if MOVEIT==1
                         prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get())),this->m_planner));
@@ -2604,7 +2651,11 @@ void MainWindow::on_pushButton_load_task_clicked()
                     // get the pose
                     pose = this->curr_scene->getPose(pose_str.toStdString());
                     if(plan_id==0){
-                       prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,pose,prec),new Scenario(*(this->curr_scene.get()))));
+                        if(arm_code!=0){//single-arm
+                            prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,pose,prec),new Scenario(*(this->curr_scene.get()))));
+                        }else{// dual-arm
+                            // TO DO
+                        }
                     }else{
 #if MOVEIT==1
                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,pose,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
@@ -2633,7 +2684,11 @@ void MainWindow::on_pushButton_load_task_clicked()
                     }
                     problemPtr prob;
                     if(plan_id==0){
-                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,prec),new Scenario(*(this->curr_scene.get()))));
+                        if(arm_code!=0){//single-arm
+                            prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,prec),new Scenario(*(this->curr_scene.get()))));
+                        }else{ // dual-arm
+                            // TO DO
+                        }
                     }else{
 #if MOVEIT==1
                         prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,prec),new Scenario(*(this->curr_scene.get())),this->m_planner));
@@ -2648,7 +2703,11 @@ void MainWindow::on_pushButton_load_task_clicked()
                     mov_id=5;
                     problemPtr prob;
                     if(plan_id==0){
-                        prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get()))));
+                        if(arm_code!=0){//single-arm
+                            prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get()))));
+                        }else{//dual-arm
+                            // TO DO
+                        }
                     }else{
 #if MOVEIT==1
                         prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get())),this->m_planner));
@@ -2698,12 +2757,20 @@ void MainWindow::on_pushButton_load_task_clicked()
                 QStringList fields = line.split("=");
                 if(QString::compare(fields.at(0).simplified(),QString("njs"),Qt::CaseInsensitive)==0){
                     this->njs_task.push_back(fields.at(1).toDouble());
+                }else if(QString::compare(fields.at(0).simplified(),QString("njs_right"),Qt::CaseInsensitive)==0){
+                    this->njs_task.push_back(fields.at(1).toDouble());
+                }else if(QString::compare(fields.at(0).simplified(),QString("njs_left"),Qt::CaseInsensitive)==0){
+                    this->njs_task_left.push_back(fields.at(1).toDouble());
                 }
             }else if((line.at(0)==QChar('n')) && (line.at(1)==QChar('m'))){
 
                 QStringList fields = line.split("=");
                 if(QString::compare(fields.at(0).simplified(),QString("nmu"),Qt::CaseInsensitive)==0){
                     this->nmu_task.push_back(fields.at(1).toDouble());
+                }else if(QString::compare(fields.at(0).simplified(),QString("nmu_right"),Qt::CaseInsensitive)==0){
+                    this->nmu_task.push_back(fields.at(1).toDouble());
+                }else if(QString::compare(fields.at(0).simplified(),QString("nmu_left"),Qt::CaseInsensitive)==0){
+                    this->nmu_task_left.push_back(fields.at(1).toDouble());
                 }
             }else if(line.at(0)==QChar('p')){
 
@@ -2712,9 +2779,18 @@ void MainWindow::on_pushButton_load_task_clicked()
                     this->prob_time_task.push_back(fields.at(1).toDouble());
                 }
             }else{
-                pos_stage.conservativeResize(pos_stage.rows()+1,JOINTS_ARM+JOINTS_HAND);
-                vel_stage.conservativeResize(vel_stage.rows()+1,JOINTS_ARM+JOINTS_HAND);
-                acc_stage.conservativeResize(acc_stage.rows()+1,JOINTS_ARM+JOINTS_HAND);
+                int n_joints;
+                if(arm_code!=0){
+                    //single-arm
+                    n_joints = JOINTS_ARM+JOINTS_HAND;
+
+                }else{
+                    //dual-arm
+                    n_joints = JOINTS_ARM+JOINTS_HAND+JOINTS_ARM+JOINTS_HAND;
+                }
+                pos_stage.conservativeResize(pos_stage.rows()+1,n_joints);
+                vel_stage.conservativeResize(vel_stage.rows()+1,n_joints);
+                acc_stage.conservativeResize(acc_stage.rows()+1,n_joints);
 
                 QStringList fields = line.split(",");                               
                 for(int i=0; i <fields.size();++i){
@@ -2722,7 +2798,7 @@ void MainWindow::on_pushButton_load_task_clicked()
                     if(QString::compare(fields1.at(0).simplified(),QString("time step"),Qt::CaseInsensitive)==0){
                         timesteps_stage.push_back(fields1.at(1).toDouble());
                     }
-                    for(int k=0; k < JOINTS_ARM+JOINTS_HAND; ++k){
+                    for(int k=0; k < n_joints; ++k){
                         if(QString::compare(fields1.at(0).simplified(),QString("Joint ")+QString::number(k+1),Qt::CaseInsensitive)==0){
                             QStringList fields2 = fields1.at(1).split("|");
                             pos_stage(row,k) = ((double)fields2.at(0).toDouble()*M_PI)/180;
@@ -2743,14 +2819,14 @@ void MainWindow::on_pushButton_load_task_clicked()
         vector<MatrixXd> pos_mov; vector<MatrixXd> vel_mov; vector<MatrixXd> acc_mov; vector<vector<double>> tstep_mov; vector<double> tstep_stage;
         double task_duration = 0.0; double mov_duration = 0.0; double stage_duration = 0.0;
         vector<double> time_task; uint tot_steps = 0;
-        for(size_t h=0; h< this->jointsPosition_task.size();++h){
+        for(size_t h=0; h< this->jointsPosition_task.size();++h){ // for loop movements
             pos_mov = this->jointsPosition_task.at(h);
             vel_mov = this->jointsVelocity_task.at(h);
             acc_mov = this->jointsAcceleration_task.at(h);
             tstep_mov = this->timesteps_task.at(h);
             mov_duration = 0.0;
 
-            for (size_t k=0; k< pos_mov.size();++k){
+            for (size_t k=0; k< pos_mov.size();++k){ // for loop stages
                 MatrixXd jointPosition_stage = pos_mov.at(k);
                 MatrixXd jointVelocity_stage = vel_mov.at(k);
                 MatrixXd jointAcceleration_stage = acc_mov.at(k);
@@ -2766,7 +2842,7 @@ void MainWindow::on_pushButton_load_task_clicked()
                 stage_duration = 0.0;
                 std::vector<QString> stage_step;
                 stage_duration = 0.0;
-                for(int i =0; i< jointPosition_stage.rows(); ++i){
+                for(int i =0; i< jointPosition_stage.rows(); ++i){ // for loop steps
                     tot_steps++;
                     if(i>0){
                         time_stage.at(i) = time_stage.at(i-1) + tstep_stage.at(i-1);
@@ -2774,7 +2850,7 @@ void MainWindow::on_pushButton_load_task_clicked()
                     }
                     stage_step.clear();
                     v_headers.push_back(QString("Step ")+QString::number(i));
-                    for (int j=0; j<jointPosition_stage.cols();++j){
+                    for (int j=0; j<jointPosition_stage.cols();++j){ // for loop joints
                         stage_step.push_back(
                                 QString::number(jointPosition_stage(i,j)*180/M_PI,'g',3)+"|"+
                                 QString::number(jointVelocity_stage(i,j)*180/M_PI,'g',3)+"|"+
@@ -2809,50 +2885,127 @@ void MainWindow::on_pushButton_load_task_clicked()
 
         // compute the hand values
         this->handPosition_task.resize(tot_steps); this->handVelocityNorm_task.resize(tot_steps);
+        if(arm_code==0){
+            this->handPosition_task_left.resize(tot_steps); this->handVelocityNorm_task_left.resize(tot_steps);
+        }
         int step = 0;
-        for(size_t j=0;j<this->jointsPosition_task.size();++j){
+        for(size_t j=0;j<this->jointsPosition_task.size();++j){ // for loop movs
             vector<MatrixXd> pos_mov = this->jointsPosition_task.at(j);
             vector<MatrixXd> vel_mov = this->jointsVelocity_task.at(j);
-            for (size_t k=0; k< pos_mov.size();++k){
+            for (size_t k=0; k< pos_mov.size();++k){// for loop stages
                 MatrixXd pos_stage = pos_mov.at(k);
                 MatrixXd vel_stage = vel_mov.at(k);
-                for(int i=0;i<pos_stage.rows();++i){
-                    // position
-                    VectorXd pos_row = pos_stage.block<1,JOINTS_ARM>(i,0);
-                    vector<double> posture; posture.resize(pos_row.size());
-                    VectorXd::Map(&posture[0], pos_row.size()) = pos_row;
-                    this->curr_scene->getHumanoid()->getHandPos(arm_code,this->handPosition_task.at(step),posture);
-                    // velocity norm
-                    VectorXd vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
-                    vector<double> velocities; velocities.resize(vel_row.size());
-                    VectorXd::Map(&velocities[0], vel_row.size()) = vel_row;
-                    this->handVelocityNorm_task.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(arm_code,posture,velocities);
+                for(int i=0;i<pos_stage.rows();++i){ // for loop steps
+                    if(arm_code!=0){
+                        //single-arm
+                        // position
+                        VectorXd pos_row = pos_stage.block<1,JOINTS_ARM>(i,0);
+                        vector<double> posture; posture.resize(pos_row.size());
+                        VectorXd::Map(&posture[0], pos_row.size()) = pos_row;
+                        this->curr_scene->getHumanoid()->getHandPos(arm_code,this->handPosition_task.at(step),posture);
+                        // velocity norm
+                        VectorXd vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
+                        vector<double> velocities; velocities.resize(vel_row.size());
+                        VectorXd::Map(&velocities[0], vel_row.size()) = vel_row;
+                        this->handVelocityNorm_task.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(arm_code,posture,velocities);
+                    }else{
+                        // dual-arm
+                        // right hand position
+                        VectorXd r_pos_row = pos_stage.block<1,JOINTS_ARM>(i,0);
+                        vector<double> r_posture; r_posture.resize(r_pos_row.size());
+                        VectorXd::Map(&r_posture[0], r_pos_row.size()) = r_pos_row;
+                        this->curr_scene->getHumanoid()->getHandPos(1,this->handPosition_task.at(step),r_posture);
+                        // left hand position
+                        VectorXd l_pos_row = pos_stage.block<1,JOINTS_ARM>(i,JOINTS_ARM+JOINTS_HAND);
+                        vector<double> l_posture; l_posture.resize(l_pos_row.size());
+                        VectorXd::Map(&l_posture[0], l_pos_row.size()) = l_pos_row;
+                        this->curr_scene->getHumanoid()->getHandPos(2,this->handPosition_task_left.at(step),l_posture);
+                        // right hand velocity norm
+                        VectorXd r_vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
+                        vector<double> r_velocities; r_velocities.resize(r_vel_row.size());
+                        VectorXd::Map(&r_velocities[0], r_vel_row.size()) = r_vel_row;
+                        this->handVelocityNorm_task.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(1,r_posture,r_velocities);
+                        // left hand velocity norm
+                        VectorXd l_vel_row = vel_stage.block<1,JOINTS_ARM>(i,JOINTS_ARM+JOINTS_HAND);
+                        vector<double> l_velocities; l_velocities.resize(l_vel_row.size());
+                        VectorXd::Map(&l_velocities[0], l_vel_row.size()) = l_vel_row;
+                        this->handVelocityNorm_task_left.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(2,l_posture,l_velocities);
+                    }
                     step++;
                 }
             }
         }
 
         // compute njs, nmu and planning time
-        // njs
-        double sum_njs = std::accumulate(this->njs_task.begin(), this->njs_task.end(), 0.0);
-        double mean_njs = ((double)sum_njs) / this->njs_task.size();
-        string mean_njs_str =  boost::str(boost::format("%.2f") % (mean_njs));
-        boost::replace_all(mean_njs_str,",",".");
-        double sq_sum_njs = std::inner_product(this->njs_task.begin(), this->njs_task.end(), this->njs_task.begin(), 0.0);
-        double stdev_njs = std::sqrt((((double)sq_sum_njs) / this->njs_task.size()) - pow(mean_njs,2));
-        string stdev_njs_str =  boost::str(boost::format("%.2f") % (stdev_njs));
-        boost::replace_all(stdev_njs_str,",",".");
-        ui.label_cost_hand_value_task->setText(QString::fromStdString(mean_njs_str)+QString("(")+QString::fromStdString(stdev_njs_str)+QString(")"));
-        // nmu
-        double sum_nmu = std::accumulate(this->nmu_task.begin(), this->nmu_task.end(), 0.0);
-        double mean_nmu = ((double)sum_nmu) / this->nmu_task.size();
-        string mean_nmu_str =  boost::str(boost::format("%.2f") % (mean_nmu));
-        boost::replace_all(mean_nmu_str,",",".");
-        double sq_sum_nmu = std::inner_product(this->nmu_task.begin(), this->nmu_task.end(), this->nmu_task.begin(), 0.0);
-        double stdev_nmu = std::sqrt((((double)sq_sum_nmu) / this->nmu_task.size()) - pow(mean_nmu,2));
-        string stdev_nmu_str =  boost::str(boost::format("%.2f") % (stdev_nmu));
-        boost::replace_all(stdev_nmu_str,",",".");
-        ui.label_nmu_task->setText(QString::fromStdString(mean_nmu_str)+QString("(")+QString::fromStdString(stdev_nmu_str)+QString(")"));
+        if(arm_code!=0){
+            //single-arm
+            // njs
+            double sum_njs = std::accumulate(this->njs_task.begin(), this->njs_task.end(), 0.0);
+            double mean_njs = ((double)sum_njs) / this->njs_task.size();
+            string mean_njs_str =  boost::str(boost::format("%.2f") % (mean_njs));
+            boost::replace_all(mean_njs_str,",",".");
+            double sq_sum_njs = std::inner_product(this->njs_task.begin(), this->njs_task.end(), this->njs_task.begin(), 0.0);
+            double stdev_njs = std::sqrt((((double)sq_sum_njs) / this->njs_task.size()) - pow(mean_njs,2));
+            string stdev_njs_str =  boost::str(boost::format("%.2f") % (stdev_njs));
+            boost::replace_all(stdev_njs_str,",",".");
+            ui.label_cost_hand_value_task->setText(QString::fromStdString(mean_njs_str)+QString("(")+QString::fromStdString(stdev_njs_str)+QString(")"));
+            // nmu
+            double sum_nmu = std::accumulate(this->nmu_task.begin(), this->nmu_task.end(), 0.0);
+            double mean_nmu = ((double)sum_nmu) / this->nmu_task.size();
+            string mean_nmu_str =  boost::str(boost::format("%.2f") % (mean_nmu));
+            boost::replace_all(mean_nmu_str,",",".");
+            double sq_sum_nmu = std::inner_product(this->nmu_task.begin(), this->nmu_task.end(), this->nmu_task.begin(), 0.0);
+            double stdev_nmu = std::sqrt((((double)sq_sum_nmu) / this->nmu_task.size()) - pow(mean_nmu,2));
+            string stdev_nmu_str =  boost::str(boost::format("%.2f") % (stdev_nmu));
+            boost::replace_all(stdev_nmu_str,",",".");
+            ui.label_nmu_task->setText(QString::fromStdString(mean_nmu_str)+QString("(")+QString::fromStdString(stdev_nmu_str)+QString(")"));
+        }else{
+            //dual-arm
+            // right njs
+            double sum_r_njs = std::accumulate(this->njs_task.begin(), this->njs_task.end(), 0.0);
+            double mean_r_njs = ((double)sum_r_njs) / this->njs_task.size();
+            string mean_r_njs_str =  boost::str(boost::format("%.2f") % (mean_r_njs));
+            boost::replace_all(mean_r_njs_str,",",".");
+            double sq_sum_r_njs = std::inner_product(this->njs_task.begin(), this->njs_task.end(), this->njs_task.begin(), 0.0);
+            double stdev_r_njs = std::sqrt((((double)sq_sum_r_njs) / this->njs_task.size()) - pow(mean_r_njs,2));
+            string stdev_r_njs_str =  boost::str(boost::format("%.2f") % (stdev_r_njs));
+            boost::replace_all(stdev_r_njs_str,",",".");
+            ui.label_cost_hand_right_value_task->setText(QString::fromStdString(mean_r_njs_str)+QString("(")+QString::fromStdString(stdev_r_njs_str)+QString(")"));
+
+            // left njs
+            double sum_l_njs = std::accumulate(this->njs_task_left.begin(), this->njs_task_left.end(), 0.0);
+            double mean_l_njs = ((double)sum_l_njs) / this->njs_task_left.size();
+            string mean_l_njs_str =  boost::str(boost::format("%.2f") % (mean_l_njs));
+            boost::replace_all(mean_l_njs_str,",",".");
+            double sq_sum_l_njs = std::inner_product(this->njs_task_left.begin(), this->njs_task_left.end(), this->njs_task_left.begin(), 0.0);
+            double stdev_l_njs = std::sqrt((((double)sq_sum_l_njs) / this->njs_task_left.size()) - pow(mean_l_njs,2));
+            string stdev_l_njs_str =  boost::str(boost::format("%.2f") % (stdev_l_njs));
+            boost::replace_all(stdev_l_njs_str,",",".");
+            ui.label_cost_hand_left_value_task->setText(QString::fromStdString(mean_l_njs_str)+QString("(")+QString::fromStdString(stdev_l_njs_str)+QString(")"));
+
+            // right nmu
+            double sum_r_nmu = std::accumulate(this->nmu_task.begin(), this->nmu_task.end(), 0.0);
+            double mean_r_nmu = ((double)sum_r_nmu) / this->nmu_task.size();
+            string mean_r_nmu_str =  boost::str(boost::format("%.2f") % (mean_r_nmu));
+            boost::replace_all(mean_r_nmu_str,",",".");
+            double sq_sum_r_nmu = std::inner_product(this->nmu_task.begin(), this->nmu_task.end(), this->nmu_task.begin(), 0.0);
+            double stdev_r_nmu = std::sqrt((((double)sq_sum_r_nmu) / this->nmu_task.size()) - pow(mean_r_nmu,2));
+            string stdev_r_nmu_str =  boost::str(boost::format("%.2f") % (stdev_r_nmu));
+            boost::replace_all(stdev_r_nmu_str,",",".");
+            ui.label_nmu_hand_right_value_task->setText(QString::fromStdString(mean_r_nmu_str)+QString("(")+QString::fromStdString(stdev_r_nmu_str)+QString(")"));
+
+            // left nmu
+            double sum_l_nmu = std::accumulate(this->nmu_task_left.begin(), this->nmu_task_left.end(), 0.0);
+            double mean_l_nmu = ((double)sum_l_nmu) / this->nmu_task_left.size();
+            string mean_l_nmu_str =  boost::str(boost::format("%.2f") % (mean_l_nmu));
+            boost::replace_all(mean_l_nmu_str,",",".");
+            double sq_sum_l_nmu = std::inner_product(this->nmu_task_left.begin(), this->nmu_task_left.end(), this->nmu_task_left.begin(), 0.0);
+            double stdev_l_nmu = std::sqrt((((double)sq_sum_l_nmu) / this->nmu_task_left.size()) - pow(mean_l_nmu,2));
+            string stdev_l_nmu_str =  boost::str(boost::format("%.2f") % (stdev_l_nmu));
+            boost::replace_all(stdev_l_nmu_str,",",".");
+            ui.label_nmu_hand_left_value_task->setText(QString::fromStdString(mean_l_nmu_str)+QString("(")+QString::fromStdString(stdev_l_nmu_str)+QString(")"));
+
+        }
         // planning time
         double sum_prob = std::accumulate(this->prob_time_task.begin(), this->prob_time_task.end(), 0.0);
         double mean_prob = ((double)sum_prob) / this->prob_time_task.size();
@@ -2862,9 +3015,11 @@ void MainWindow::on_pushButton_load_task_clicked()
         double stdev_prob = std::sqrt((((double)sq_sum_prob) / this->prob_time_task.size()) - pow(mean_prob,2));
         string stdev_prob_str =  boost::str(boost::format("%.2f") % (stdev_prob));
         boost::replace_all(stdev_prob_str,",",".");
-        ui.label_solving_time_task->setText(QString::fromStdString(mean_prob_str)+QString("(")+QString::fromStdString(stdev_prob_str)+QString(")"));
-
-
+        if(arm_code!=0){
+           ui.label_solving_time_task->setText(QString::fromStdString(mean_prob_str)+QString("(")+QString::fromStdString(stdev_prob_str)+QString(")"));
+        }else{
+            ui.label_solv_time_task_dual_value->setText(QString::fromStdString(mean_prob_str)+QString("(")+QString::fromStdString(stdev_prob_str)+QString(")"));
+        }
     }
     f.close();
 
@@ -2886,6 +3041,7 @@ void MainWindow::on_pushButton_save_task_clicked()
     if(f.open( QIODevice::WriteOnly )){
         QTextStream stream( &f );
         int h=0; // numbers of problems that are not in the current task
+        int arm_code = curr_task->getArm();
         for(int i=0; i <ui.listWidget_movs->count(); ++i){
             if((curr_task->getProblem(i)->getSolved()) && curr_task->getProblem(i)->getPartOfTask()){
                 stream << "# " << ui.listWidget_movs->item(i)->text().toStdString().c_str()<< endl;
@@ -2895,11 +3051,23 @@ void MainWindow::on_pushButton_save_task_clicked()
                 vector< vector< double > > timesteps_mov = this->timesteps_task.at(i-h);
                 vector< double > tols_stop_mov = this->tols_stop_task.at(i-h);
                 vector< string > traj_descr_mov = this->traj_descr_task.at(i-h);
-                double njs = this->njs_task.at(i-h);
-                int nmu = this->nmu_task.at(i-h);
+                //stream << "arm_code="<< QString::number(arm_code).toStdString().c_str()<< endl;
+                if(arm_code!=0){
+                    double njs = this->njs_task.at(i-h);
+                    int nmu = this->nmu_task.at(i-h);
+                    stream << "njs="<< QString::number(njs).toStdString().c_str()<< endl;
+                    stream << "nmu="<< QString::number(nmu).toStdString().c_str()<< endl;
+                }else{
+                    double r_njs = this->njs_task.at(i-h);
+                    int r_nmu = this->nmu_task.at(i-h);
+                    stream << "njs_right="<< QString::number(r_njs).toStdString().c_str()<< endl;
+                    stream << "nmu_right="<< QString::number(r_nmu).toStdString().c_str()<< endl;
+                    double l_njs = this->njs_task_left.at(i-h);
+                    int l_nmu = this->nmu_task_left.at(i-h);
+                    stream << "njs_left="<< QString::number(l_njs).toStdString().c_str()<< endl;
+                    stream << "nmu_left="<< QString::number(l_nmu).toStdString().c_str()<< endl;
+                }
                 double prob_time = this->prob_time_task.at(i-h);
-                stream << "njs="<< QString::number(njs).toStdString().c_str()<< endl;
-                stream << "nmu="<< QString::number(nmu).toStdString().c_str()<< endl;
                 stream << "prob_time="<< QString::number(prob_time).toStdString().c_str()<< endl;
 
                 for(size_t j=0;j < traj_mov.size(); ++j){
@@ -2988,6 +3156,9 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     // Challengingscenario with ARoS
     string path_vrep_challenge_aros = PATH_SCENARIOS+string("/vrep/NarrowShelf_aros.ttt");
 
+    // Toy vehicle scenario with ARoS swaps two columns
+    string path_vrep_touscene_aros_dual = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros_dual_arm_cols.ttt");
+
     switch(scene_id){
 
     case 0:
@@ -3033,7 +3204,11 @@ void MainWindow::on_pushButton_scene_reset_clicked()
         failure = string("Challenging scenario: picking a cup from a shelf with ARoS HAS NOT BEEN LOADED");
         break;
     case 6:
-        // TO DO
+        // Toy vehicle scenario with ARoS swaps two columns
+        path = path_vrep_touscene_aros_dual;
+        title = string("Assembly scenario: the Toy vehicle with ARoS swaps columns");
+        success = string("Assembly scenario: the Toy vehicle with ARoS swaps columns HAS BEEN LOADED");
+        failure = string("Assembly scenario: the Toy vehicle with ARoS swaps columns HAS NOT BEEN LOADED");
         break;
     case 7:
         //TO DO
@@ -3321,18 +3496,20 @@ void MainWindow::on_pushButton_clear_task_clicked()
     this->timesteps_mov.clear();
     this->tols_stop_task.clear();
     this->tols_stop_mov.clear();
-    this->handPosition_mov.clear();
-    this->handOrientation_mov.clear();
-    this->handLinearVelocity_mov.clear();
-    this->handAngularVelocity_mov.clear();
-    this->handVelocityNorm_mov.clear();
-    this->handPosition_task.clear();
-    this->handOrientation_task.clear();
-    this->handLinearVelocity_task.clear();
-    this->handAngularVelocity_task.clear();
-    this->handVelocityNorm_task.clear();
-    this->nmu_task.clear();
-    this->njs_task.clear();
+
+    this->handPosition_mov.clear(); this->handPosition_mov_left.clear();
+    this->handOrientation_mov.clear(); this->handOrientation_mov_left.clear();
+    this->handLinearVelocity_mov.clear(); this->handLinearVelocity_mov_left.clear();
+    this->handAngularVelocity_mov.clear(); this->handAngularVelocity_mov_left.clear();
+    this->handVelocityNorm_mov.clear(); this->handVelocityNorm_mov_left.clear();
+    this->handPosition_task.clear(); this->handPosition_task_left.clear();
+    this->handOrientation_task.clear(); this->handOrientation_task_left.clear();
+    this->handLinearVelocity_task.clear(); this->handLinearVelocity_task_left.clear();
+    this->handAngularVelocity_task.clear(); this->handAngularVelocity_task_left.clear();
+    this->handVelocityNorm_task.clear(); this->handVelocityNorm_task_left.clear();
+    this->nmu_task.clear(); this->nmu_task_left.clear();
+    this->njs_task.clear(); this->njs_task_left.clear();
+
     this->prob_time_task.clear();
 
     ui.tableWidget_sol_task->clear();
