@@ -2595,8 +2595,6 @@ void MainWindow::on_pushButton_load_task_clicked()
                 if(QString::compare(mov_type,QString("Reach-to-grasp"),Qt::CaseInsensitive)==0){
                     mov_id=0;
                     //get the object
-                    //obj = this->curr_scene->getObject(obj_str.toStdString());
-                    //obj_left = this->curr_scene->getObject(obj_left_str.toStdString());
                     switch (arm_code){
                     case 0: // dual arm
                         obj->setTargetRightEnabled(true); obj->setTargetLeftEnabled(false);
@@ -2633,7 +2631,7 @@ void MainWindow::on_pushButton_load_task_clicked()
                         if(arm_code!=0){//single-arm
                             prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get()))));
                         }else{ // dual-arm
-                            //TO DO
+                            prob = problemPtr(new Problem(plan_id,new Movement(mov_id,mov_id,0),new Scenario(*(this->curr_scene.get()))));
                         }
                     }else{
 #if MOVEIT==1
@@ -2646,15 +2644,30 @@ void MainWindow::on_pushButton_load_task_clicked()
                 }else if(QString::compare(mov_type,QString("Transport"),Qt::CaseInsensitive)==0){
                     mov_id=2;
                     problemPtr prob;
-                    //get the object
-                    obj = this->curr_scene->getObject(obj_str.toStdString());
-                    // get the pose
-                    pose = this->curr_scene->getPose(pose_str.toStdString());
+                    //get the object and the pose
+                    switch (arm_code){
+                    case 0: // dual arm
+                        obj->setTargetRightEnabled(true); obj->setTargetLeftEnabled(false);
+                        obj_left->setTargetRightEnabled(false); obj_left->setTargetLeftEnabled(true);
+                        pose = this->curr_scene->getPose(pose_str.toStdString());
+                        pose_left = this->curr_scene->getPose(pose_left_str.toStdString());
+                        break;
+                    case 1: // right arm
+                         obj->setTargetRightEnabled(true);
+                         obj->setTargetLeftEnabled(false);
+                         pose = this->curr_scene->getPose(pose_str.toStdString());
+                         break;
+                    case 2: // left arm
+                        obj->setTargetLeftEnabled(true);
+                        obj->setTargetRightEnabled(false);
+                        pose = this->curr_scene->getPose(pose_str.toStdString());
+                        break;
+                    }
                     if(plan_id==0){
                         if(arm_code!=0){//single-arm
                             prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,pose,prec),new Scenario(*(this->curr_scene.get()))));
                         }else{// dual-arm
-                            // TO DO
+                            prob = problemPtr(new Problem(plan_id,new Movement(mov_id,mov_id,0,obj,pose,prec,obj_left,pose_left,prec_left),new Scenario(*(this->curr_scene.get()))));
                         }
                     }else{
 #if MOVEIT==1
@@ -2669,17 +2682,23 @@ void MainWindow::on_pushButton_load_task_clicked()
                     //get the object
                     obj = this->curr_scene->getObject(obj_str.toStdString());
                     // get the object engaged
-                    obj_eng = this->curr_scene->getObject(obj_eng_str.toStdString());
+
                     switch (arm_code){
                     case 0: // dual arm
-                        // TO DO
+                        obj->setTargetRightEnabled(true); obj->setTargetLeftEnabled(false);
+                        obj_left->setTargetRightEnabled(false); obj_left->setTargetLeftEnabled(true);
+                        obj_eng = this->curr_scene->getObject(obj_eng_str.toStdString());
+                        obj_eng_left = this->curr_scene->getObject(obj_eng_left_str.toStdString());
+                        break;
                     case 1: // right arm
                          obj->setTargetRightEnabled(true);
                          obj->setTargetLeftEnabled(false);
-                        break;
+                         obj_eng = this->curr_scene->getObject(obj_eng_str.toStdString());
+                         break;
                     case 2: // left arm
                         obj->setTargetLeftEnabled(true);
                         obj->setTargetRightEnabled(false);
+                        obj_eng = this->curr_scene->getObject(obj_eng_str.toStdString());
                         break;
                     }
                     problemPtr prob;
@@ -2687,7 +2706,7 @@ void MainWindow::on_pushButton_load_task_clicked()
                         if(arm_code!=0){//single-arm
                             prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code, obj,obj_eng,prec),new Scenario(*(this->curr_scene.get()))));
                         }else{ // dual-arm
-                            // TO DO
+                            prob = problemPtr(new Problem(plan_id,new Movement(mov_id,mov_id,0,obj,obj_eng,prec,obj_left,obj_eng_left,prec_left),new Scenario(*(this->curr_scene.get()))));
                         }
                     }else{
 #if MOVEIT==1
@@ -2699,6 +2718,7 @@ void MainWindow::on_pushButton_load_task_clicked()
                     this->curr_task->addProblem(prob.get());
                 }else if(QString::compare(mov_type,QString("Disengage"),Qt::CaseInsensitive)==0){
                     mov_id=4;
+                    // TO DO
                 }else if(QString::compare(mov_type,QString("Go park"),Qt::CaseInsensitive)==0){
                     mov_id=5;
                     problemPtr prob;
@@ -2706,7 +2726,7 @@ void MainWindow::on_pushButton_load_task_clicked()
                         if(arm_code!=0){//single-arm
                             prob = problemPtr(new Problem(plan_id,new Movement(mov_id, arm_code),new Scenario(*(this->curr_scene.get()))));
                         }else{//dual-arm
-                            // TO DO
+                            prob = problemPtr(new Problem(plan_id,new Movement(mov_id,mov_id,0),new Scenario(*(this->curr_scene.get()))));
                         }
                     }else{
 #if MOVEIT==1

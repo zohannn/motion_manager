@@ -744,6 +744,222 @@ Movement::Movement(int type_r,int type_l,int arm, objectPtr obj_r,bool prec_r,ob
 
 }
 
+Movement::Movement(int type_r,int type_l,int arm)
+{
+    // dual arm reaching
+    this->arm = arm;
+    this->executed = false;
+
+    this->type=type_r;
+    switch (type){
+    case 0:
+        this->strType = string("Reach-to-grasp");
+        break;
+    case 1:
+        this->strType = string("Reaching");
+        break;
+    case 2:
+        this->strType = string("Transport");
+        break;
+    case 3:
+        this->strType = string("Engage");
+        break;
+    case 4:
+        this->strType = string("Disengage");
+        break;
+    case 5:
+        this->strType = string("Go home");
+        break;
+    }
+    this->type_left=type_l;
+    switch (type_left){
+    case 0:
+        this->strType_left = string("Reach-to-grasp");
+        break;
+    case 1:
+        this->strType_left = string("Reaching");
+        break;
+    case 2:
+        this->strType_left = string("Transport");
+        break;
+    case 3:
+        this->strType_left = string("Engage");
+        break;
+    case 4:
+        this->strType_left = string("Disengage");
+        break;
+    case 5:
+        this->strType_left = string("Go home");
+        break;
+    }
+
+    this->prec=false;
+    this->grip_str=string("No Grip");
+    this->prec_left=false;
+    this->grip_str_left=string("No Grip");
+
+    this->obj = objectPtr(new Object());
+    this->obj_init = objectPtr(new Object());
+    this->obj_left = objectPtr(new Object());
+    this->obj_init_left = objectPtr(new Object());
+    this->obj_eng=objectPtr(new Object());
+    this->pose = posePtr(new Pose());
+    this->obj_eng_left=objectPtr(new Object());
+    this->pose_left = posePtr(new Pose());
+}
+
+Movement::Movement(int type_r,int type_l,int arm, objectPtr obj_r,posePtr pose_r,bool prec_r,objectPtr obj_l,posePtr pose_l,bool prec_l)
+{
+
+    // dual arm transport
+    this->arm = arm;
+    this->executed = false;
+
+    this->type=type_r;
+    switch (type){
+    case 0:
+        this->strType = string("Reach-to-grasp");
+        break;
+    case 1:
+        this->strType = string("Reaching");
+        break;
+    case 2:
+        this->strType = string("Transport");
+        break;
+    case 3:
+        this->strType = string("Engage");
+        break;
+    case 4:
+        this->strType = string("Disengage");
+        break;
+    case 5:
+        this->strType = string("Go home");
+        break;
+    }
+    this->type_left=type_l;
+    switch (type_left){
+    case 0:
+        this->strType_left = string("Reach-to-grasp");
+        break;
+    case 1:
+        this->strType_left = string("Reaching");
+        break;
+    case 2:
+        this->strType_left = string("Transport");
+        break;
+    case 3:
+        this->strType_left = string("Engage");
+        break;
+    case 4:
+        this->strType_left = string("Disengage");
+        break;
+    case 5:
+        this->strType_left = string("Go home");
+        break;
+    }
+
+    this->obj = obj_r;
+    this->obj_init = obj_r;
+    this->pose = pose_r;
+
+    this->obj_left = obj_l;
+    this->obj_init_left = obj_l;
+    this->pose_left = pose_l;
+
+    this->prec=prec_r;
+    if(prec_r){
+        this->grip_str=string("Precision");
+    }else{
+        this->grip_str=string("Full");
+    }
+
+    this->prec_left=prec_l;
+    if(prec_l){
+        this->grip_str_left=string("Precision");
+    }else{
+        this->grip_str_left=string("Full");
+    }
+
+    this->obj_eng=objectPtr(new Object());
+    this->obj_eng_left=objectPtr(new Object());
+
+}
+
+Movement::Movement(int type_r,int type_l,int arm, objectPtr obj_r,objectPtr obj_eng_r,bool prec_r,objectPtr obj_l,objectPtr obj_eng_l,bool prec_l)
+{
+    // dual arm engage
+    this->arm = arm;
+    this->executed = false;
+
+    this->type=type_r;
+    switch (type){
+    case 0:
+        this->strType = string("Reach-to-grasp");
+        break;
+    case 1:
+        this->strType = string("Reaching");
+        break;
+    case 2:
+        this->strType = string("Transport");
+        break;
+    case 3:
+        this->strType = string("Engage");
+        break;
+    case 4:
+        this->strType = string("Disengage");
+        break;
+    case 5:
+        this->strType = string("Go home");
+        break;
+    }
+    this->type_left=type_l;
+    switch (type_left){
+    case 0:
+        this->strType_left = string("Reach-to-grasp");
+        break;
+    case 1:
+        this->strType_left = string("Reaching");
+        break;
+    case 2:
+        this->strType_left = string("Transport");
+        break;
+    case 3:
+        this->strType_left = string("Engage");
+        break;
+    case 4:
+        this->strType_left = string("Disengage");
+        break;
+    case 5:
+        this->strType_left = string("Go home");
+        break;
+    }
+
+    this->obj = obj_r;
+    this->obj_init = obj_r;
+    this->obj_eng = obj_eng_r;
+
+    this->obj_left = obj_l;
+    this->obj_init_left = obj_l;
+    this->obj_eng_left = obj_eng_l;
+
+    this->prec=prec_r;
+    if(prec_r){
+        this->grip_str=string("Precision");
+    }else{
+        this->grip_str=string("Full");
+    }
+
+    this->prec_left=prec_l;
+    if(prec_l){
+        this->grip_str_left=string("Precision");
+    }else{
+        this->grip_str_left=string("Full");
+    }
+
+    this->pose=posePtr(new Pose());
+    this->pose_left=posePtr(new Pose());
+}
+
 
 Movement::Movement(const Movement &mov)
 {

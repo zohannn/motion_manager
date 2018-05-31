@@ -65,6 +65,42 @@ public:
 
     /**
      * @brief Movement
+     * @param type_r
+     * @param type_l
+     * @param arm
+     */
+    Movement(int type_r,int type_l,int arm);
+
+    /**
+     * @brief Movement
+     * @param type_r
+     * @param type_l
+     * @param arm
+     * @param obj_r
+     * @param pose_r
+     * @param prec_r
+     * @param obj_l
+     * @param pose_l
+     * @param prec_l
+     */
+    Movement(int type_r,int type_l,int arm, objectPtr obj_r,posePtr pose_r,bool prec_r,objectPtr obj_l,posePtr pose_l,bool prec_l);
+
+    /**
+     * @brief Movement
+     * @param type_r
+     * @param type_l
+     * @param arm
+     * @param obj_r
+     * @param obj_eng_r
+     * @param prec_r
+     * @param obj_l
+     * @param obj_eng_l
+     * @param prec_l
+     */
+    Movement(int type_r, int type_l, int arm, objectPtr obj_r, objectPtr obj_eng_r, bool prec_r, objectPtr obj_l, objectPtr obj_eng_l, bool prec_l);
+
+    /**
+     * @brief Movement
      * @param type
      * @param arm
      * @param obj
