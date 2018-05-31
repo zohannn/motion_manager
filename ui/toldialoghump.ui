@@ -3324,38 +3324,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>501</x>
-     <y>621</y>
-     <width>271</width>
-     <height>50</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_27">
-    <item>
-     <widget class="QCheckBox" name="checkBox_coll">
-      <property name="text">
-       <string>disable collisions</string>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QCheckBox" name="checkBox_rand_init">
-      <property name="text">
-       <string>enable random initialization</string>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QWidget" name="layoutWidget_max_vel_2">
    <property name="geometry">
     <rect>
@@ -3382,6 +3350,52 @@
     </item>
    </layout>
   </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>490</x>
+     <y>622</y>
+     <width>467</width>
+     <height>52</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_23">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_27">
+      <item>
+       <widget class="QCheckBox" name="checkBox_coll">
+        <property name="text">
+         <string>disable collisions with the environment </string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_coll_body">
+        <property name="text">
+         <string>disable collisions with the body</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="checkBox_rand_init">
+      <property name="text">
+       <string>enable random initialization</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
   <zorder>layoutWidget</zorder>
   <zorder>layoutWidget</zorder>
   <zorder>layoutWidget_max_vel</zorder>
@@ -3389,6 +3403,7 @@
   <zorder>tabWidget</zorder>
   <zorder>groupBox_constraints_2</zorder>
   <zorder>layoutWidget_max_vel_2</zorder>
+  <zorder>checkBox_coll_body</zorder>
  </widget>
  <resources/>
  <connections>

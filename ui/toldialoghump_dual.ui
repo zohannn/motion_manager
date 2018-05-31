@@ -6199,38 +6199,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>501</x>
-     <y>621</y>
-     <width>271</width>
-     <height>50</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_27">
-    <item>
-     <widget class="QCheckBox" name="checkBox_coll">
-      <property name="text">
-       <string>disable collisions</string>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QCheckBox" name="checkBox_rand_init">
-      <property name="text">
-       <string>enable random initialization</string>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QWidget" name="layoutWidget_max_vel_2">
    <property name="geometry">
     <rect>
@@ -6257,6 +6225,66 @@
     </item>
    </layout>
   </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>503</x>
+     <y>623</y>
+     <width>491</width>
+     <height>54</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_27">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_23">
+      <item>
+       <widget class="QCheckBox" name="checkBox_coll">
+        <property name="text">
+         <string>disable collisions with the environment</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_rand_init">
+        <property name="text">
+         <string>enable random initialization</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_24">
+      <item>
+       <widget class="QCheckBox" name="checkBox_coll_arms">
+        <property name="text">
+         <string>disable collisions between the arms</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBox_coll_body">
+        <property name="text">
+         <string>disable collisions with the body</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
   <zorder>layoutWidget</zorder>
   <zorder>layoutWidget</zorder>
   <zorder>layoutWidget_max_vel</zorder>
@@ -6264,6 +6292,7 @@
   <zorder>tabWidget</zorder>
   <zorder>groupBox_constraints_2</zorder>
   <zorder>layoutWidget_max_vel_2</zorder>
+  <zorder>checkBox_coll_body</zorder>
  </widget>
  <resources/>
  <connections>

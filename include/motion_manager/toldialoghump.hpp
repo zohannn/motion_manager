@@ -280,6 +280,12 @@ public:
     bool getColl();
 
     /**
+     * @brief getCollBody
+     * @return
+     */
+    bool getCollBody();
+
+    /**
      * @brief setColl
      * @param coll, true to enable them
      */

@@ -423,6 +423,18 @@ public:
     bool getColl();
 
     /**
+     * @brief getCollBody
+     * @return
+     */
+    bool getCollBody();
+
+    /**
+     * @brief getCollArms
+     * @return
+     */
+    bool getCollArms();
+
+    /**
      * @brief setColl
      * @param coll, true to enable them
      */

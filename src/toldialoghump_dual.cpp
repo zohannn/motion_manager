@@ -1182,6 +1182,8 @@ void TolDialogHUMPDual::on_pushButton_save_clicked()
        if(ui->checkBox_retreat->isChecked()){stream << "retreat=false"<<endl;}else{stream << "retreat=true"<<endl;}
        if(ui->checkBox_rand_init->isChecked()){stream << "rand_init=true"<<endl;}else{stream << "rand_init=false"<<endl;}
        if(ui->checkBox_coll->isChecked()){stream << "coll=false"<<endl;}else{stream << "coll=true"<<endl;}
+       if(ui->checkBox_coll_body->isChecked()){stream << "coll_body=false"<<endl;}else{stream << "coll_body=true"<<endl;}
+       if(ui->checkBox_coll_arms->isChecked()){stream << "coll_arms=false"<<endl;}else{stream << "coll_arms=true"<<endl;}
 
        if(ui->checkBox_straight_line_right->isChecked()){stream << "straight_line_right=true"<<endl;}else{stream << "straight_line_right=false"<<endl;}
        if(ui->checkBox_straight_line_left->isChecked()){stream << "straight_line_left=true"<<endl;}else{stream << "straight_line_left=false"<<endl;}
@@ -1907,7 +1909,18 @@ void TolDialogHUMPDual::on_pushButton_load_clicked()
                     }else{
                         ui->checkBox_coll->setChecked(false);
                     }
-
+                }else if(QString::compare(fields.at(0),QString("coll_body"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_coll_body->setChecked(true);
+                    }else{
+                        ui->checkBox_coll_body->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("coll_arms"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_coll_arms->setChecked(true);
+                    }else{
+                        ui->checkBox_coll_arms->setChecked(false);
+                    }
                 }else if(QString::compare(fields.at(0),QString("straight_line_right"),Qt::CaseInsensitive)==0){
                     if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
                         ui->checkBox_straight_line_right->setChecked(false);
@@ -2088,6 +2101,15 @@ void TolDialogHUMPDual::setRandInit(bool rand)
 bool TolDialogHUMPDual::getColl()
 {
     return !ui->checkBox_coll->isChecked();
+}
+bool TolDialogHUMPDual::getCollBody()
+{
+    return !ui->checkBox_coll_body->isChecked();
+}
+
+bool TolDialogHUMPDual::getCollArms()
+{
+    return !ui->checkBox_coll_arms->isChecked();
 }
 
 void TolDialogHUMPDual::setColl(bool coll)

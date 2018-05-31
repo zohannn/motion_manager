@@ -997,6 +997,7 @@ void MainWindow::on_pushButton_plan_clicked()
             mTolHumpdlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
             tols.mov_specs.rand_init = mTolHumpdlg->getRandInit(); // random initialization for "plan" stages
             tols.mov_specs.coll = mTolHumpdlg->getColl(); // collisions option
+            tols.coll_body = mTolHumpdlg->getCollBody(); // collisions with the body
             tols.mov_specs.straight_line = mTolHumpdlg->get_straight_line(); // hand straight line trajectory
             tols.mov_specs.w_red_app_max = mTolHumpdlg->getW_red_app(); // set the max velocity reduction when approaching
             tols.mov_specs.w_red_ret_max = mTolHumpdlg->getW_red_ret(); // set the max velocity reduction when retreating
@@ -1116,6 +1117,8 @@ void MainWindow::on_pushButton_plan_clicked()
             dual_tols.mov_specs_left.rand_init = mTolHumpDualdlg->getRandInit(); // random initialization for "plan" stages (left)
             dual_tols.mov_specs_right.coll = mTolHumpDualdlg->getColl(); // collisions option (right)
             dual_tols.mov_specs_left.coll = mTolHumpDualdlg->getColl(); // collisions option (left)
+            dual_tols.coll_body = mTolHumpDualdlg->getCollBody(); // collisions with the body
+            dual_tols.coll_arms = mTolHumpDualdlg->getCollArms(); // collisions between arms
             dual_tols.mov_specs_right.straight_line = mTolHumpDualdlg->get_straight_line_right(); // right hand straight line trajectory
             dual_tols.mov_specs_left.straight_line = mTolHumpDualdlg->get_straight_line_left(); // left hand straight line trajectory
             dual_tols.mov_specs_right.w_red_app_max = mTolHumpDualdlg->getW_red_app_right(); // set the max velocity reduction when approaching (right)
