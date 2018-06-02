@@ -63,6 +63,9 @@
     <layout class="QVBoxLayout" name="verticalLayout_16">
      <item>
       <widget class="QCheckBox" name="checkBox_tar_av">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>skip target avoidance</string>
        </property>
@@ -6225,7 +6228,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>503</x>
@@ -6263,6 +6266,9 @@
      <layout class="QHBoxLayout" name="horizontalLayout_24">
       <item>
        <widget class="QCheckBox" name="checkBox_coll_arms">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>disable collisions between the arms</string>
         </property>
@@ -6273,6 +6279,9 @@
       </item>
       <item>
        <widget class="QCheckBox" name="checkBox_coll_body">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>disable collisions with the body</string>
         </property>
@@ -6292,7 +6301,6 @@
   <zorder>tabWidget</zorder>
   <zorder>groupBox_constraints_2</zorder>
   <zorder>layoutWidget_max_vel_2</zorder>
-  <zorder>checkBox_coll_body</zorder>
  </widget>
  <resources/>
  <connections>
