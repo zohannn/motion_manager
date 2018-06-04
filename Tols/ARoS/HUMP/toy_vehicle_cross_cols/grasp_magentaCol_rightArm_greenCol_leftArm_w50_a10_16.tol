@@ -34,14 +34,10 @@ Hand_tip_2_right=0
 Hand_tip_3_right=0
 
 # Geometric Dimensions of the arms and of the fingers (left)
-Shoulder_radius_left=5
-
-Elbow_radius_left=5
-
-Wrist_radius_left=5
-
-Hand_radius_left=5
-
+Shoulder_radius_left=0
+Elbow_radius_left=0
+Wrist_radius_left=0
+Hand_radius_left=0
 Hand_1_1_left=0
 
 Hand_1_2_left=0
@@ -461,7 +457,7 @@ pre_grasp_y_right=0
 
 pre_grasp_z_right=-0.5
 
-pre_grasp_dist_right=70
+pre_grasp_dist_right=150
 post_grasp_x_right=0.866025404
 
 post_grasp_y_right=0
@@ -626,7 +622,7 @@ max_velocity=50
 max_acceleration=10.0
 
 tar_av=true
-ob_av=false
+ob_av=true
 approach=true
 retreat=false
 rand_init=false

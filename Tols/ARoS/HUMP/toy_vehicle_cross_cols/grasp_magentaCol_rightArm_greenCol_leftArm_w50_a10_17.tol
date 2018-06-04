@@ -1,74 +1,73 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
 # Planner: HUMP ,Movement: Reach-to-grasp, Arm: both, Object right: MagentaColumn, Object left: GreenColumn, Object right Engaged: , Object left Engaged: , Pose right: , Pose left: , Grip Type right: Precision, Grip Type left: Precision
 # Geometric Dimensions of the arms and of the fingers (right)
-Shoulder_radius_right=0
+Shoulder_radius_right=1
 
-Elbow_radius_right=0
+Elbow_radius_right=1
 
-Wrist_radius_right=0
+Wrist_radius_right=1
 
-Hand_radius_right=0
+Hand_radius_right=1
 
-Hand_1_1_right=0
+Hand_1_1_right=1
 
-Hand_1_2_right=0
+Hand_1_2_right=1
 
-Hand_1_3_right=0
+Hand_1_3_right=1
 
-Hand_2_1_right=0
+Hand_2_1_right=1
 
-Hand_2_2_right=0
+Hand_2_2_right=1
 
-Hand_2_3_right=0
+Hand_2_3_right=1
 
-Hand_3_1_right=0
+Hand_3_1_right=1
 
-Hand_3_2_right=0
+Hand_3_2_right=1
 
-Hand_3_3_right=0
+Hand_3_3_right=1
 
-Hand_tip_1_right=0
+Hand_tip_1_right=1
 
-Hand_tip_2_right=0
+Hand_tip_2_right=1
 
-Hand_tip_3_right=0
+Hand_tip_3_right=1
 
 # Geometric Dimensions of the arms and of the fingers (left)
-Shoulder_radius_left=5
+Shoulder_radius_left=1
 
-Elbow_radius_left=5
+Elbow_radius_left=1
 
-Wrist_radius_left=5
+Wrist_radius_left=1
 
-Hand_radius_left=5
+Hand_radius_left=1
 
-Hand_1_1_left=0
+Hand_1_1_left=1
 
-Hand_1_2_left=0
+Hand_1_2_left=1
 
-Hand_1_3_left=0
+Hand_1_3_left=1
 
-Hand_2_1_left=0
+Hand_2_1_left=1
 
-Hand_2_2_left=0
+Hand_2_2_left=1
 
-Hand_2_3_left=0
+Hand_2_3_left=1
 
-Hand_3_1_left=0
+Hand_3_1_left=1
 
-Hand_3_2_left=0
+Hand_3_2_left=1
 
-Hand_3_3_left=0
+Hand_3_3_left=1
 
-Hand_tip_1_left=0
+Hand_tip_1_left=1
 
-Hand_tip_2_left=0
+Hand_tip_2_left=1
 
-Hand_tip_3_left=0
+Hand_tip_3_left=1
 
 # Joint Expanse factors (right)
-lambda_1_right=1.0
-
+lambda_1_right=0.99
 lambda_2_right=1.0
 
 lambda_3_right=1.0
@@ -90,8 +89,7 @@ lambda_10_right=1.0
 lambda_11_right=1.0
 
 # Joint Expanse factors (left)
-lambda_1_left=1.0
-
+lambda_1_left=0.99
 lambda_2_left=1.0
 
 lambda_3_left=1.0
@@ -455,13 +453,10 @@ tar_pos_left=1.0
 tar_or_left=0.001
 
 # Pick settings (right)
-pre_grasp_x_right=0.866025
-
+pre_grasp_x_right=0.707
 pre_grasp_y_right=0
-
-pre_grasp_z_right=-0.5
-
-pre_grasp_dist_right=70
+pre_grasp_z_right=-0.707
+pre_grasp_dist_right=200
 post_grasp_x_right=0.866025404
 
 post_grasp_y_right=0
