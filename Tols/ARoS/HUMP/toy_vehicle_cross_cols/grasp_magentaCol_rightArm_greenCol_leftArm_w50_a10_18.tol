@@ -519,8 +519,7 @@ post_place_z_left=0
 
 post_place_dist_left=0
 
-w_red_app_left=5
-
+w_red_app_left=10
 w_red_ret_left=5
 
 # Move settings (right)
@@ -622,7 +621,7 @@ max_acceleration=10.0
 tar_av=true
 ob_av=true
 approach=true
-retreat=false
+retreat=true
 rand_init=false
 coll=true
 coll_body=true
