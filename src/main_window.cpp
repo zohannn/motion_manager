@@ -838,7 +838,7 @@ void MainWindow::on_pushButton_addMov_clicked()
             int mov_id_r = ui.comboBox_mov->currentIndex();
             int mov_id_l = ui.comboBox_mov_left->currentIndex();
 
-            objectPtr obj_right; bool prec_right;
+            objectPtr obj_right; posePtr pose_right; bool prec_right;
             if (ui.comboBox_objects->isEnabled() && ui.comboBox_objects_eng->isEnabled() && ui.groupBox_grip->isEnabled() && !ui.comboBox_poses->isEnabled()){
                 // right arm engage movements
             }else if(ui.comboBox_objects->isEnabled() && ui.comboBox_objects_eng->isEnabled() && ui.groupBox_grip->isEnabled() && ui.comboBox_poses->isEnabled()){
@@ -863,10 +863,19 @@ void MainWindow::on_pushButton_addMov_clicked()
                 //}
             }else if(ui.comboBox_objects->isEnabled() && ui.groupBox_grip->isEnabled() && ui.comboBox_poses->isEnabled()){
                 // right arm transport movements
+                string obj_name = ui.comboBox_objects->currentText().toStdString();
+                obj_right = curr_scene->getObject(obj_name);
+                string pose_name = ui.comboBox_poses->currentText().toStdString();
+                pose_right = curr_scene->getPose(pose_name);
+                if(obj_right!=NULL || pose_right!=NULL){
+                    prec_right = ui.radioButton_prec->isChecked();
+                }else{
+                    success = false;
+                }
             }else{
                 // right arm go-park movement and reaching movements
             }
-            objectPtr obj_left; bool prec_left;
+            objectPtr obj_left; posePtr pose_left; bool prec_left;
             if (ui.comboBox_objects_left->isEnabled() && ui.comboBox_objects_eng_left->isEnabled() && ui.groupBox_grip_left->isEnabled() && !ui.comboBox_poses_left->isEnabled()){
                 // left arm engage movements
             }else if(ui.comboBox_objects_left->isEnabled() && ui.comboBox_objects_eng_left->isEnabled() && ui.groupBox_grip_left->isEnabled() && ui.comboBox_poses_left->isEnabled()){
@@ -891,17 +900,28 @@ void MainWindow::on_pushButton_addMov_clicked()
                 //}
             }else if(ui.comboBox_objects_left->isEnabled() && ui.groupBox_grip_left->isEnabled() && ui.comboBox_poses_left->isEnabled()){
                 // left arm transport movements
+                string obj_name = ui.comboBox_objects->currentText().toStdString();
+                obj_left = curr_scene->getObject(obj_name);
+                string pose_name = ui.comboBox_poses->currentText().toStdString();
+                pose_left = curr_scene->getPose(pose_name);
+                if(obj_left!=NULL || pose_left!=NULL){
+                    prec_left = ui.radioButton_prec->isChecked();
+                }else{
+                    success = false;
+                }
             }else{
                 // left arm go-park movement and reaching movements
             }
 
             if(success){
-
                 if(planner_id==0){
                    // HUMP
-                   curr_task->addProblem(new Problem(planner_id,new Movement(mov_id_r,mov_id_l,0,obj_right,prec_right, obj_left,prec_left),new Scenario(*(this->curr_scene.get()))));
+                   if(pose_right==NULL || pose_left==NULL){
+                      curr_task->addProblem(new Problem(planner_id,new Movement(mov_id_r,mov_id_l,0,obj_right,prec_right, obj_left,prec_left),new Scenario(*(this->curr_scene.get()))));
+                   }else{
+                      curr_task->addProblem(new Problem(planner_id,new Movement(mov_id_r,mov_id_l,0,obj_right,pose_right,prec_right,obj_left,pose_left,prec_left),new Scenario(*(this->curr_scene.get()))));
+                   }
                 }
-
                 qnode.log(QNode::Info,std::string("The movement has been added to the current task"));
                 ui.groupBox_task->setEnabled(true);
                 ui.listWidget_movs->clear();

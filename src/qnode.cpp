@@ -645,20 +645,6 @@ bool QNode::getElements(scenarioPtr scene)
             ++rows;
         }
 
-        /*
-        // Hands
-        mat_r_hand(0,0) = 1; mat_r_hand(0,1) = 0; mat_r_hand(0,2) = 0; mat_r_hand(0,3) = 0;
-        mat_r_hand(1,0) = 0; mat_r_hand(1,1) = 1; mat_r_hand(1,2) = 0; mat_r_hand(1,3) = 0;
-        mat_r_hand(2,0) = 0; mat_r_hand(2,1) = 0; mat_r_hand(2,2) = 1; mat_r_hand(2,3) = 0;
-        mat_r_hand(3,0) = 0; mat_r_hand(3,1) = 0; mat_r_hand(3,2) = 0; mat_r_hand(3,3) = 1;
-
-        mat_l_hand(0,0) = 0; mat_l_hand(0,1) = 1; mat_l_hand(0,2) = 0; mat_l_hand(0,3) = 0;
-        mat_l_hand(1,0) = 1; mat_l_hand(1,1) = 0; mat_l_hand(1,2) = 0; mat_l_hand(1,3) = 0;
-        mat_l_hand(2,0) = 0; mat_l_hand(2,1) = 0; mat_l_hand(2,2) = -1; mat_l_hand(2,3) = 0;
-        mat_l_hand(3,0) = 0; mat_l_hand(3,1) = 0; mat_l_hand(3,2) = 0; mat_l_hand(3,3) = 1;
-        */
-
-
         // Arms
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
 
@@ -1576,19 +1562,6 @@ bool QNode::getElements(scenarioPtr scene)
             ++rows;
         }
 
-        /*
-        // Hands
-        mat_r_hand(0,0) = 1; mat_r_hand(0,1) = 0; mat_r_hand(0,2) = 0; mat_r_hand(0,3) = 0;
-        mat_r_hand(1,0) = 0; mat_r_hand(1,1) = 1; mat_r_hand(1,2) = 0; mat_r_hand(1,3) = 0;
-        mat_r_hand(2,0) = 0; mat_r_hand(2,1) = 0; mat_r_hand(2,2) = 1; mat_r_hand(2,3) = 0;
-        mat_r_hand(3,0) = 0; mat_r_hand(3,1) = 0; mat_r_hand(3,2) = 0; mat_r_hand(3,3) = 1;
-
-        mat_l_hand(0,0) = 0; mat_l_hand(0,1) = 1; mat_l_hand(0,2) = 0; mat_l_hand(0,3) = 0;
-        mat_l_hand(1,0) = 1; mat_l_hand(1,1) = 0; mat_l_hand(1,2) = 0; mat_l_hand(1,3) = 0;
-        mat_l_hand(2,0) = 0; mat_l_hand(2,1) = 0; mat_l_hand(2,2) = -1; mat_l_hand(2,3) = 0;
-        mat_l_hand(3,0) = 0; mat_l_hand(3,1) = 0; mat_l_hand(3,2) = 0; mat_l_hand(3,3) = 1;
-        */
-
         // Arms
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
 
@@ -1999,7 +1972,6 @@ bool QNode::getElements(scenarioPtr scene)
             }else{
                 throw string("Error while retrieving the poses of the scenario");
             }
-
         }// while loop poses
 
         // get the info of the Humanoid
@@ -2053,19 +2025,6 @@ bool QNode::getElements(scenarioPtr scene)
             }
             ++rows;
         }
-
-        /*
-        // Hands
-        mat_r_hand(0,0) = 1; mat_r_hand(0,1) = 0; mat_r_hand(0,2) = 0; mat_r_hand(0,3) = 0;
-        mat_r_hand(1,0) = 0; mat_r_hand(1,1) = 1; mat_r_hand(1,2) = 0; mat_r_hand(1,3) = 0;
-        mat_r_hand(2,0) = 0; mat_r_hand(2,1) = 0; mat_r_hand(2,2) = 1; mat_r_hand(2,3) = 0;
-        mat_r_hand(3,0) = 0; mat_r_hand(3,1) = 0; mat_r_hand(3,2) = 0; mat_r_hand(3,3) = 1;
-
-        mat_l_hand(0,0) = 0; mat_l_hand(0,1) = 1; mat_l_hand(0,2) = 0; mat_l_hand(0,3) = 0;
-        mat_l_hand(1,0) = 1; mat_l_hand(1,1) = 0; mat_l_hand(1,2) = 0; mat_l_hand(1,3) = 0;
-        mat_l_hand(2,0) = 0; mat_l_hand(2,1) = 0; mat_l_hand(2,2) = -1; mat_l_hand(2,3) = 0;
-        mat_l_hand(3,0) = 0; mat_l_hand(3,1) = 0; mat_l_hand(3,2) = 0; mat_l_hand(3,3) = 1;
-        */
 
         // Arms
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
@@ -2504,19 +2463,6 @@ bool QNode::getElements(scenarioPtr scene)
             ++rows;
         }
 
-        /*
-        // Hands
-        mat_r_hand(0,0) = 1; mat_r_hand(0,1) = 0; mat_r_hand(0,2) = 0; mat_r_hand(0,3) = 0;
-        mat_r_hand(1,0) = 0; mat_r_hand(1,1) = 1; mat_r_hand(1,2) = 0; mat_r_hand(1,3) = 0;
-        mat_r_hand(2,0) = 0; mat_r_hand(2,1) = 0; mat_r_hand(2,2) = 1; mat_r_hand(2,3) = 0;
-        mat_r_hand(3,0) = 0; mat_r_hand(3,1) = 0; mat_r_hand(3,2) = 0; mat_r_hand(3,3) = 1;
-
-        mat_l_hand(0,0) = 0; mat_l_hand(0,1) = 1; mat_l_hand(0,2) = 0; mat_l_hand(0,3) = 0;
-        mat_l_hand(1,0) = 1; mat_l_hand(1,1) = 0; mat_l_hand(1,2) = 0; mat_l_hand(1,3) = 0;
-        mat_l_hand(2,0) = 0; mat_l_hand(2,1) = 0; mat_l_hand(2,2) = -1; mat_l_hand(2,3) = 0;
-        mat_l_hand(3,0) = 0; mat_l_hand(3,1) = 0; mat_l_hand(3,2) = 0; mat_l_hand(3,3) = 1;
-        */
-
         // Arms
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
         srvs.request.signalName = string("DH_params_arm");
@@ -2745,6 +2691,11 @@ bool QNode::getElements(scenarioPtr scene)
         if (srvi.response.result == 1){
              n_objs= srvi.response.signalValue;
         }else{succ = false; throw string("Communication error");}
+        srvi.request.signalName = NPOSES;
+        add_client.call(srvi);
+        if (srvi.response.result == 1){
+             n_poses= srvi.response.signalValue;
+        }else{succ = false; throw string("Communication error");}
 
         // get the info of the scenario
 
@@ -2855,6 +2806,53 @@ bool QNode::getElements(scenarioPtr scene)
             }
         } // while loop objects
 
+        // this is the order of the poses in this scenario
+        // pose_id = 0
+        poses_prefix.push_back("GreenColumn_pose1");
+        poses_rel.push_back(true);
+        poses_obj_id.push_back(2);
+        // pose_id = 1
+        poses_prefix.push_back("MagentaColumn_pose1");
+        poses_rel.push_back(true);
+        poses_obj_id.push_back(2);
+
+        while(cnt_pose < n_poses){
+            signPrefix = poses_prefix[cnt_pose];
+
+            add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
+            srvs.request.signalName = signPrefix + string("Info");
+            add_client.call(srvs);
+            if (srvs.response.result == 1){
+                 pose_info_str = srvs.response.signalValue;
+            }else{succ = false;}
+
+            if (succ){
+                floatCount = pose_info_str.size()/sizeof(float);
+                if(!pose_info_vec.empty()){pose_info_vec.clear();}
+                for (int k=0;k<floatCount;++k)
+                    pose_info_vec.push_back(static_cast<double>(((float*)pose_info_str.c_str())[k]));
+
+                // position of the pose
+                pose_pos.Xpos = pose_info_vec.at(0)*1000; //[mm]
+                pose_pos.Ypos = pose_info_vec.at(1)*1000; //[mm]
+                pose_pos.Zpos = pose_info_vec.at(2)*1000; //[mm]
+                // orientation of the pose
+                pose_or.roll = pose_info_vec.at(3)*static_cast<double>(M_PI)/180; //[rad]
+                pose_or.pitch = pose_info_vec.at(4)*static_cast<double>(M_PI)/180; //[rad]
+                pose_or.yaw = pose_info_vec.at(5)*static_cast<double>(M_PI)/180;//[rad]
+
+                Pose* ps = new Pose(signPrefix,pose_pos,pose_or,poses_rel[cnt_pose],poses_obj_id[cnt_pose]);
+
+                Q_EMIT newPose(ps->getName());
+                // add the pose to the scenario
+                scene->addPose(posePtr(ps));
+
+                cnt_pose++;
+            }else{
+                throw string("Error while retrieving the poses of the scenario");
+            }
+        }// while loop poses
+
         // get the info of the Humanoid
 
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
@@ -2910,19 +2908,6 @@ bool QNode::getElements(scenarioPtr scene)
             }
             ++rows;
         }
-
-        /*
-        // Hands
-        mat_r_hand(0,0) = 1; mat_r_hand(0,1) = 0; mat_r_hand(0,2) = 0; mat_r_hand(0,3) = 0;
-        mat_r_hand(1,0) = 0; mat_r_hand(1,1) = 1; mat_r_hand(1,2) = 0; mat_r_hand(1,3) = 0;
-        mat_r_hand(2,0) = 0; mat_r_hand(2,1) = 0; mat_r_hand(2,2) = 1; mat_r_hand(2,3) = 0;
-        mat_r_hand(3,0) = 0; mat_r_hand(3,1) = 0; mat_r_hand(3,2) = 0; mat_r_hand(3,3) = 1;
-
-        mat_l_hand(0,0) = 0; mat_l_hand(0,1) = 1; mat_l_hand(0,2) = 0; mat_l_hand(0,3) = 0;
-        mat_l_hand(1,0) = 1; mat_l_hand(1,1) = 0; mat_l_hand(1,2) = 0; mat_l_hand(1,3) = 0;
-        mat_l_hand(2,0) = 0; mat_l_hand(2,1) = 0; mat_l_hand(2,2) = -1; mat_l_hand(2,3) = 0;
-        mat_l_hand(3,0) = 0; mat_l_hand(3,1) = 0; mat_l_hand(3,2) = 0; mat_l_hand(3,3) = 1;
-        */
 
         // Arms
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
