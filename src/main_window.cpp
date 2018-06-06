@@ -900,12 +900,12 @@ void MainWindow::on_pushButton_addMov_clicked()
                 //}
             }else if(ui.comboBox_objects_left->isEnabled() && ui.groupBox_grip_left->isEnabled() && ui.comboBox_poses_left->isEnabled()){
                 // left arm transport movements
-                string obj_name = ui.comboBox_objects->currentText().toStdString();
+                string obj_name = ui.comboBox_objects_left->currentText().toStdString();
                 obj_left = curr_scene->getObject(obj_name);
-                string pose_name = ui.comboBox_poses->currentText().toStdString();
+                string pose_name = ui.comboBox_poses_left->currentText().toStdString();
                 pose_left = curr_scene->getPose(pose_name);
                 if(obj_left!=NULL || pose_left!=NULL){
-                    prec_left = ui.radioButton_prec->isChecked();
+                    prec_left = ui.radioButton_prec_left->isChecked();
                 }else{
                     success = false;
                 }

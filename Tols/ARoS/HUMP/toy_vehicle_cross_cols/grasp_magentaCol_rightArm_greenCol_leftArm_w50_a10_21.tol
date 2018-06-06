@@ -469,8 +469,7 @@ post_grasp_y_right=0
 
 post_grasp_z_right=-0.5
 
-post_grasp_dist_right=110
-
+post_grasp_dist_right=115
 # Pick settings (left)
 pre_grasp_x_left=-0.342020143
 
@@ -479,14 +478,14 @@ pre_grasp_y_left=0
 pre_grasp_z_left=-0.939692621
 
 pre_grasp_dist_left=245
+
 post_grasp_x_left=-1
 
 post_grasp_y_left=0
 
 post_grasp_z_left=0
 
-post_grasp_dist_left=110
-
+post_grasp_dist_left=115
 # Place settings (right)
 pre_place_x_right=0
 

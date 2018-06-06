@@ -1240,7 +1240,7 @@ HUMotion::planning_dual_result_ptr Problem::solve(HUMotion::hump_dual_params &pa
     this->solved = false;
     int arm_code =  this->mov->getArm();
     int mov_type_right = this->mov->getType(); int mov_type_left = this->mov->getTypeLeft();
-    int sceneID = this->scene->getID();
+    //int sceneID = this->scene->getID();
 #if HAND==0
     // Human Hand
     int hand_code = 0;
@@ -1432,11 +1432,19 @@ HUMotion::planning_dual_result_ptr Problem::solve(HUMotion::hump_dual_params &pa
 
     if (mov_type_right==0 && mov_type_left==0)
     { // dual-arm reach-to-grasp right and reach-to-grasp left
-
         params.mov_specs_right.target = target_right;
         params.mov_specs_left.target = target_left;
         curr_time = this->GetTimeMs64();
         res = this->h_planner->plan_dual_pick_pick(params,initPosture_right,initPosture_left);
+        this->exec_time = double(this->GetTimeMs64()-curr_time);
+    }
+
+    if (mov_type_right==2 && mov_type_left==2)
+    { // dual-arm transport right and transport left
+        params.mov_specs_right.target = tar_pose_right;
+        params.mov_specs_left.target = tar_pose_left;
+        curr_time = this->GetTimeMs64();
+        res = this->h_planner->plan_dual_place_place(params,initPosture_right,initPosture_left);
         this->exec_time = double(this->GetTimeMs64()-curr_time);
     }
 
