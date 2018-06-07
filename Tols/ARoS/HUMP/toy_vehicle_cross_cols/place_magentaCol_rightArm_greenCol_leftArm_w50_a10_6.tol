@@ -459,13 +459,11 @@ w_red_app_right=5
 w_red_ret_right=5
 
 # Place settings (left)
-pre_place_x_left=-1
+pre_place_x_left=-0.866025404
 
-pre_place_y_left=0
-
+pre_place_y_left=-0.5
 pre_place_z_left=0
-pre_place_dist_left=125
-
+pre_place_dist_left=100
 post_place_x_left=0
 
 post_place_y_left=0

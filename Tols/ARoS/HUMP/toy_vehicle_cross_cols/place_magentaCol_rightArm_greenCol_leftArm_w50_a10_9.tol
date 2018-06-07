@@ -5,8 +5,7 @@ Shoulder_radius_right=1
 
 Elbow_radius_right=1
 Wrist_radius_right=1
-Hand_radius_right=1
-
+Hand_radius_right=10
 Hand_1_1_right=1
 
 Hand_1_2_right=1
@@ -35,7 +34,7 @@ Hand_tip_3_right=1
 Shoulder_radius_left=1
 Elbow_radius_left=1
 Wrist_radius_left=1
-Hand_radius_left=1
+Hand_radius_left=10
 Hand_1_1_left=1
 
 Hand_1_2_left=1
@@ -439,13 +438,10 @@ post_grasp_z_left=0
 post_grasp_dist_left=0
 
 # Place settings (right)
-pre_place_x_right=0.866025404
-
+pre_place_x_right=1
 pre_place_y_right=0
-
-pre_place_z_right=-0.5
-
-pre_place_dist_right=125
+pre_place_z_right=0
+pre_place_dist_right=140
 post_place_x_right=0
 
 post_place_y_right=0
@@ -462,10 +458,8 @@ w_red_ret_right=5
 pre_place_x_left=-1
 
 pre_place_y_left=0
-
 pre_place_z_left=0
-pre_place_dist_left=125
-
+pre_place_dist_left=115
 post_place_x_left=0
 
 post_place_y_left=0
@@ -577,7 +571,7 @@ max_acceleration=10.0
 tar_av=true
 ob_av=true
 approach=true
-retreat=true
+retreat=false
 rand_init=false
 coll=true
 coll_body=true
