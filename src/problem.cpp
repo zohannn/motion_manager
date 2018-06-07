@@ -82,12 +82,15 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
                     }
                 }else{
                     // dual-arm movement
-                    if(!obj->isTargetRightEnabled()){
+                    if(!obj->isTargetRightEnabled() && !obj->isTargetLeftEnabled()){
                         this->h_planner->addObstacleRight(hump_obj); // the object is an obstacle for the planner
+                        this->h_planner->addObstacleLeft(hump_obj); // the object is an obstacle for the planner
                     }
+                    /*
                     if(!obj->isTargetLeftEnabled()){
                         this->h_planner->addObstacleLeft(hump_obj); // the object is an obstacle for the planner
                     }
+                    */
                 }
             }
         }else{
@@ -1311,6 +1314,7 @@ HUMotion::planning_dual_result_ptr Problem::solve(HUMotion::hump_dual_params &pa
     std::vector<double> target_right; std::vector<double> target_left;
     std::vector<double> tar_pose_right; std::vector<double> tar_pose_left;
     std::vector<double> place_location_right; std::vector<double> place_location_left;
+    Matrix4d T_tar_to_obj_right; Matrix4d T_tar_to_obj_left;
     if(mov_type_right!=1 && mov_type_right!=5){
         // compute the position of the target when the object will be engaged
 
@@ -1323,6 +1327,16 @@ HUMotion::planning_dual_result_ptr Problem::solve(HUMotion::hump_dual_params &pa
 
         std::vector<double> rpy_right = {tar_right->getOr().roll,tar_right->getOr().pitch,tar_right->getOr().yaw};
         Matrix3d Rot_tar_right; this->RPY_matrix(rpy_right,Rot_tar_right);
+        Matrix3d Rot_tar_right_inv = Rot_tar_right.transpose();
+        std::vector<double> rpy_obj_right = {obj_right->getOr().roll,obj_right->getOr().pitch,obj_right->getOr().yaw};
+        Matrix3d Rot_obj_right; this->RPY_matrix(rpy_obj_right,Rot_obj_right);
+        Matrix3d Rot_tar_to_obj_right = Rot_tar_right_inv * Rot_obj_right;
+        pos obj_right_pos = obj_right->getPos(); pos tar_right_pos = tar_right->getPos();
+        Vector3d tar_to_obj_right(obj_right_pos.Xpos-tar_right_pos.Xpos,obj_right_pos.Ypos-tar_right_pos.Ypos,obj_right_pos.Zpos-tar_right_pos.Zpos);
+        T_tar_to_obj_right(0,0) = Rot_tar_to_obj_right(0,0); T_tar_to_obj_right(0,1) = Rot_tar_to_obj_right(0,1); T_tar_to_obj_right(0,2) = Rot_tar_to_obj_right(0,2); T_tar_to_obj_right(0,3) = tar_to_obj_right(0);
+        T_tar_to_obj_right(1,0) = Rot_tar_to_obj_right(1,0); T_tar_to_obj_right(1,1) = Rot_tar_to_obj_right(1,1); T_tar_to_obj_right(1,2) = Rot_tar_to_obj_right(1,2); T_tar_to_obj_right(1,3) = tar_to_obj_right(1);
+        T_tar_to_obj_right(2,0) = Rot_tar_to_obj_right(2,0); T_tar_to_obj_right(2,1) = Rot_tar_to_obj_right(2,1); T_tar_to_obj_right(2,2) = Rot_tar_to_obj_right(2,2); T_tar_to_obj_right(2,3) = tar_to_obj_right(2);
+        T_tar_to_obj_right(3,0) = 0; T_tar_to_obj_right(3,1) = 0; T_tar_to_obj_right(3,2) = 0; T_tar_to_obj_right(3,3) = 1;
 
         pos new_tar_right;
         Vector3d v_right(eng_to_tar_right.at(0),eng_to_tar_right.at(1),eng_to_tar_right.at(2));
@@ -1360,6 +1374,7 @@ HUMotion::planning_dual_result_ptr Problem::solve(HUMotion::hump_dual_params &pa
         //params.mov_specs.griptype = this->mov->getGrip();
         params.mov_specs_right.dHO = dHO_right;
         params.mov_specs_right.obj = hump_obj_right;
+        params.mov_specs_right.T_tar_to_obj = T_tar_to_obj_right;
 
     }
 
@@ -1375,6 +1390,16 @@ HUMotion::planning_dual_result_ptr Problem::solve(HUMotion::hump_dual_params &pa
 
         std::vector<double> rpy_left = {tar_left->getOr().roll,tar_left->getOr().pitch,tar_left->getOr().yaw};
         Matrix3d Rot_tar_left; this->RPY_matrix(rpy_left,Rot_tar_left);
+        Matrix3d Rot_tar_left_inv = Rot_tar_left.transpose();
+        std::vector<double> rpy_obj_left = {obj_left->getOr().roll,obj_left->getOr().pitch,obj_left->getOr().yaw};
+        Matrix3d Rot_obj_left; this->RPY_matrix(rpy_obj_left,Rot_obj_left);
+        Matrix3d Rot_tar_to_obj_left = Rot_tar_left_inv * Rot_obj_left;
+        pos obj_left_pos = obj_left->getPos(); pos tar_left_pos = tar_left->getPos();
+        Vector3d tar_to_obj_left(obj_left_pos.Xpos-tar_left_pos.Xpos,obj_left_pos.Ypos-tar_left_pos.Ypos,obj_left_pos.Zpos-tar_left_pos.Zpos);
+        T_tar_to_obj_left(0,0) = Rot_tar_to_obj_left(0,0); T_tar_to_obj_left(0,1) = Rot_tar_to_obj_left(0,1); T_tar_to_obj_left(0,2) = Rot_tar_to_obj_left(0,2); T_tar_to_obj_left(0,3) = tar_to_obj_left(0);
+        T_tar_to_obj_left(1,0) = Rot_tar_to_obj_left(1,0); T_tar_to_obj_left(1,1) = Rot_tar_to_obj_left(1,1); T_tar_to_obj_left(1,2) = Rot_tar_to_obj_left(1,2); T_tar_to_obj_left(1,3) = tar_to_obj_left(1);
+        T_tar_to_obj_left(2,0) = Rot_tar_to_obj_left(2,0); T_tar_to_obj_left(2,1) = Rot_tar_to_obj_left(2,1); T_tar_to_obj_left(2,2) = Rot_tar_to_obj_left(2,2); T_tar_to_obj_left(2,3) = tar_to_obj_left(2);
+        T_tar_to_obj_left(3,0) = 0; T_tar_to_obj_left(3,1) = 0; T_tar_to_obj_left(3,2) = 0; T_tar_to_obj_left(3,3) = 1;
 
         pos new_tar_left;
         Vector3d v_left(eng_to_tar_left.at(0),eng_to_tar_left.at(1),eng_to_tar_left.at(2));
@@ -1412,6 +1437,7 @@ HUMotion::planning_dual_result_ptr Problem::solve(HUMotion::hump_dual_params &pa
         //params.mov_specs.griptype = this->mov->getGrip();
         params.mov_specs_left.dHO = dHO_left;
         params.mov_specs_left.obj = hump_obj_left;
+        params.mov_specs_left.T_tar_to_obj = T_tar_to_obj_left;
 
     }
 
