@@ -99,7 +99,7 @@ Movement::Movement(int type, int arm, objectPtr obj)
 
     case 5:
 
-        this->strType = string("Go home");
+        this->strType = string("Go park");
         break;
 
 
@@ -158,7 +158,7 @@ Movement::Movement(int type, int arm, posePtr pose)
 
     case 5:
 
-        this->strType = string("Go home");
+        this->strType = string("Go park");
         break;
 
 
@@ -207,7 +207,7 @@ Movement::Movement(int type, int arm, objectPtr obj, bool prec)
         this->strType = string("Disengage");
         break;
     case 5:
-        this->strType = string("Go home");
+        this->strType = string("Go park");
         break;
     }
 
@@ -328,7 +328,7 @@ Movement::Movement(int type, int arm,objectPtr obj, objectPtr obj_eng,bool prec)
         this->strType = string("Disengage");
         break;
     case 5:
-        this->strType = string("Go home");
+        this->strType = string("Go park");
         break;
     }
     this->obj = obj;
@@ -447,7 +447,7 @@ Movement::Movement(int type, int arm,objectPtr obj, objectPtr obj_eng, posePtr p
         this->strType = string("Disengage");
         break;
     case 5:
-        this->strType = string("Go home");
+        this->strType = string("Go park");
         break;
     }
 
@@ -567,7 +567,7 @@ Movement::Movement(int type, int arm, objectPtr obj, posePtr pose,bool prec)
         this->strType = string("Disengage");
         break;
     case 5:
-        this->strType = string("Go home");
+        this->strType = string("Go park");
         break;
     }
 
@@ -711,7 +711,7 @@ Movement::Movement(int type_r,int type_l,int arm, objectPtr obj_r,bool prec_r,ob
         this->strType = string("Disengage");
         break;
     case 5:
-        this->strType = string("Go home");
+        this->strType = string("Go park");
         break;
     }
 
@@ -733,7 +733,7 @@ Movement::Movement(int type_r,int type_l,int arm, objectPtr obj_r,bool prec_r,ob
         this->strType_left = string("Disengage");
         break;
     case 5:
-        this->strType_left = string("Go home");
+        this->strType_left = string("Go park");
         break;
     }
 
@@ -768,7 +768,7 @@ Movement::Movement(int type_r,int type_l,int arm)
         this->strType = string("Disengage");
         break;
     case 5:
-        this->strType = string("Go home");
+        this->strType = string("Go park");
         break;
     }
     this->type_left=type_l;
@@ -789,7 +789,7 @@ Movement::Movement(int type_r,int type_l,int arm)
         this->strType_left = string("Disengage");
         break;
     case 5:
-        this->strType_left = string("Go home");
+        this->strType_left = string("Go park");
         break;
     }
 
@@ -833,7 +833,7 @@ Movement::Movement(int type_r,int type_l,int arm, objectPtr obj_r,posePtr pose_r
         this->strType = string("Disengage");
         break;
     case 5:
-        this->strType = string("Go home");
+        this->strType = string("Go park");
         break;
     }
     this->type_left=type_l;
@@ -854,7 +854,7 @@ Movement::Movement(int type_r,int type_l,int arm, objectPtr obj_r,posePtr pose_r
         this->strType_left = string("Disengage");
         break;
     case 5:
-        this->strType_left = string("Go home");
+        this->strType_left = string("Go park");
         break;
     }
 
@@ -909,7 +909,7 @@ Movement::Movement(int type_r,int type_l,int arm, objectPtr obj_r,objectPtr obj_
         this->strType = string("Disengage");
         break;
     case 5:
-        this->strType = string("Go home");
+        this->strType = string("Go park");
         break;
     }
     this->type_left=type_l;
@@ -930,7 +930,7 @@ Movement::Movement(int type_r,int type_l,int arm, objectPtr obj_r,objectPtr obj_
         this->strType_left = string("Disengage");
         break;
     case 5:
-        this->strType_left = string("Go home");
+        this->strType_left = string("Go park");
         break;
     }
 

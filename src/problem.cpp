@@ -1474,56 +1474,14 @@ HUMotion::planning_dual_result_ptr Problem::solve(HUMotion::hump_dual_params &pa
         this->exec_time = double(this->GetTimeMs64()-curr_time);
     }
 
-    /*
-    switch(mov_type_right){
-    case 0:// reach-to-grasp
-        params.mov_specs_right.target = target_right;
+    if(mov_type_right==5 && mov_type_left==5)
+    { // dual-arm go-park right and go-park left
         curr_time = this->GetTimeMs64();
-        res =  this->h_planner->plan_pick(params,initPosture);
+        res = this->h_planner->plan_dual_move_move(params,initPosture_right,homePosture_right,initPosture_left,homePosture_left);
         this->exec_time = double(this->GetTimeMs64()-curr_time);
-        break;
-    case 1:// reaching
-        if(this->use_posture){
-          curr_time = this->GetTimeMs64();
-          res = this->h_planner->plan_move(params,initPosture,this->move_final_arm);
-          this->exec_time = double(this->GetTimeMs64()-curr_time);
-        }else{
-         params.mov_specs.target=this->move_target;
-         curr_time = this->GetTimeMs64();
-         res = this->h_planner->plan_move(params,initPosture);
-         this->exec_time = double(this->GetTimeMs64()-curr_time);
-        }
-        break;
-    case 2://transport
-        if (sceneID==6){
-            params.mov_specs.support_obj = "Shelf_2_a";
-        }
-        params.mov_specs.target = tar_pose;
-        curr_time = this->GetTimeMs64();
-        res = this->h_planner->plan_place(params,initPosture);
-        this->exec_time = double(this->GetTimeMs64()-curr_time);
-        break;
-    case 3://engage
-        params.mov_specs.support_obj = obj_eng->getName();
-        params.mov_specs.target = place_location;
-        curr_time = this->GetTimeMs64();
-        res = this->h_planner->plan_place(params,initPosture);
-        this->exec_time = double(this->GetTimeMs64()-curr_time);
-        break;
-    case 4:// disengage
-        // TO DO
-        //params.mov_specs.target = pose;
-        //curr_time = this->GetTimeMs64();
-        //res = this->h_planner->plan_place(params,initPosture);
-        //this->exec_time = double(this->GetTimeMs64()-curr_time);
-        break;
-    case 5:// go-park
-        curr_time = this->GetTimeMs64();
-        res = this->h_planner->plan_move(params,initPosture,homePosture);
-        this->exec_time = double(this->GetTimeMs64()-curr_time);
-        break;
     }
-    */
+
+
 
     this->h_dual_params = params;
     if(res!=nullptr){if(res->status==0){this->solved=true;}}

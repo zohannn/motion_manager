@@ -874,6 +874,10 @@ void MainWindow::on_pushButton_addMov_clicked()
                 }
             }else{
                 // right arm go-park movement and reaching movements
+                std::vector<objectPtr> objects; this->curr_scene->getObjects(objects);
+                for(size_t i=0;i<objects.size();++i){
+                    this->curr_scene->getObject(i)->setTargetRightEnabled(false);
+                }
             }
             objectPtr obj_left; posePtr pose_left; bool prec_left;
             if (ui.comboBox_objects_left->isEnabled() && ui.comboBox_objects_eng_left->isEnabled() && ui.groupBox_grip_left->isEnabled() && !ui.comboBox_poses_left->isEnabled()){
@@ -911,15 +915,23 @@ void MainWindow::on_pushButton_addMov_clicked()
                 }
             }else{
                 // left arm go-park movement and reaching movements
+                std::vector<objectPtr> objects; this->curr_scene->getObjects(objects);
+                for(size_t i=0;i<objects.size();++i){
+                    this->curr_scene->getObject(i)->setTargetLeftEnabled(false);
+                }
             }
 
             if(success){
                 if(planner_id==0){
                    // HUMP
-                   if(pose_right==NULL || pose_left==NULL){
-                      curr_task->addProblem(new Problem(planner_id,new Movement(mov_id_r,mov_id_l,0,obj_right,prec_right, obj_left,prec_left),new Scenario(*(this->curr_scene.get()))));
+                   if(obj_right==NULL || obj_left==NULL){
+                       curr_task->addProblem(new Problem(planner_id,new Movement(mov_id_r,mov_id_l,0),new Scenario(*(this->curr_scene.get()))));
                    }else{
-                      curr_task->addProblem(new Problem(planner_id,new Movement(mov_id_r,mov_id_l,0,obj_right,pose_right,prec_right,obj_left,pose_left,prec_left),new Scenario(*(this->curr_scene.get()))));
+                       if(pose_right==NULL || pose_left==NULL){
+                          curr_task->addProblem(new Problem(planner_id,new Movement(mov_id_r,mov_id_l,0,obj_right,prec_right, obj_left,prec_left),new Scenario(*(this->curr_scene.get()))));
+                       }else{
+                          curr_task->addProblem(new Problem(planner_id,new Movement(mov_id_r,mov_id_l,0,obj_right,pose_right,prec_right,obj_left,pose_left,prec_left),new Scenario(*(this->curr_scene.get()))));
+                       }
                    }
                 }
                 qnode.log(QNode::Info,std::string("The movement has been added to the current task"));
