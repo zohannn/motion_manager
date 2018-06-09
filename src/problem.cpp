@@ -1130,15 +1130,30 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
     std::vector<double> target;
     std::vector<double> tar_pose;
     std::vector<double> place_location;
+    Matrix4d T_tar_to_obj;
     if(mov_type!=1 && mov_type!=5){
         // compute the position of the target when the object will be engaged
         pos eng1_pos = eng1->getPos(); // position related to the world of the engage point of the other object
         orient eng1_or = eng1->getOr(); // orientation of the engage point of the other object
         std::vector<double> rpy_eng1 = {eng1_or.roll,eng1_or.pitch,eng1_or.yaw};
         Matrix3d Rot_eng1; this->RPY_matrix(rpy_eng1,Rot_eng1);
-        pos new_tar;
+
         std::vector<double> rpy = {tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
         Matrix3d Rot_tar; this->RPY_matrix(rpy,Rot_tar);
+        Matrix3d Rot_tar_inv = Rot_tar.transpose();
+        std::vector<double> rpy_obj = {obj->getOr().roll,obj->getOr().pitch,obj->getOr().yaw};
+        Matrix3d Rot_obj; this->RPY_matrix(rpy_obj,Rot_obj);
+        Matrix3d Rot_tar_to_obj = Rot_tar_inv * Rot_obj;
+        pos obj_pos = obj->getPos(); pos tar_pos = tar->getPos();
+        Vector3d tar_to_obj(obj_pos.Xpos-tar_pos.Xpos,obj_pos.Ypos-tar_pos.Ypos,obj_pos.Zpos-tar_pos.Zpos);
+        T_tar_to_obj(0,0) = Rot_tar_to_obj(0,0); T_tar_to_obj(0,1) = Rot_tar_to_obj(0,1); T_tar_to_obj(0,2) = Rot_tar_to_obj(0,2); T_tar_to_obj(0,3) = tar_to_obj(0);
+        T_tar_to_obj(1,0) = Rot_tar_to_obj(1,0); T_tar_to_obj(1,1) = Rot_tar_to_obj(1,1); T_tar_to_obj(1,2) = Rot_tar_to_obj(1,2); T_tar_to_obj(1,3) = tar_to_obj(1);
+        T_tar_to_obj(2,0) = Rot_tar_to_obj(2,0); T_tar_to_obj(2,1) = Rot_tar_to_obj(2,1); T_tar_to_obj(2,2) = Rot_tar_to_obj(2,2); T_tar_to_obj(2,3) = tar_to_obj(2);
+        T_tar_to_obj(3,0) = 0; T_tar_to_obj(3,1) = 0; T_tar_to_obj(3,2) = 0; T_tar_to_obj(3,3) = 1;
+
+        pos new_tar;
+        //std::vector<double> rpy = {tar->getOr().roll,tar->getOr().pitch,tar->getOr().yaw};
+        //Matrix3d Rot_tar; this->RPY_matrix(rpy,Rot_tar);
         Vector3d v(eng_to_tar.at(0),eng_to_tar.at(1),eng_to_tar.at(2));
         Vector3d eng_to_tar_w = Rot_tar*v;
         new_tar.Xpos=eng1_pos.Xpos - eng_to_tar_w(0);
@@ -1172,7 +1187,8 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         // movement settings
         //params.mov_specs.griptype = this->mov->getGrip();
         params.mov_specs.dHO = dHO;
-        params.mov_specs.obj = hump_obj;        
+        params.mov_specs.obj = hump_obj;
+        params.mov_specs.T_tar_to_obj = T_tar_to_obj;
 
     }
 
