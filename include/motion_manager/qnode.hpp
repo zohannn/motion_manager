@@ -281,6 +281,7 @@ private:
         ros::Subscriber subWheel1; /**< ROS sunscriber to the topic /vrep/Wheel1_pose (obj_id=6 in the toy vehicle scenario) */
         ros::Subscriber subWheel2; /**< ROS sunscriber to the topic /vrep/Wheel2_pose (obj_id=7 in the toy vehicle scenario) */
         ros::Subscriber subBase; /**< ROS sunscriber to the topic /vrep/Base_pose (obj_id=8 in the toy vehicle scenario) */
+        ros::Subscriber subTop; /**< ROS sunscriber to the topic /vrep/Top_pose (obj_id=8 in the toy vehicle scenario) */
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Human Assistance scenario ----------------------------------------------------------------------------------------------------------
         ros::Subscriber subBottleTea; /**< ROS sunscriber to the topic /vrep/BottleTea_pose (obj_id=0 in the Human Assistance scenario) */
@@ -428,6 +429,12 @@ private:
          * @param data
          */
         void BaseCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the top (toy vehicle scenario)
+         * @param data
+         */
+        void TopCallback(const geometry_msgs::PoseStamped& data);
 
         //void TableCallback(const geometry_msgs::PoseStamped& data);
 

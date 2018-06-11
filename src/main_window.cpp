@@ -156,6 +156,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     scenarios.push_back(QString("Human assistance scenario: Serving a drink with ARoS"));
     scenarios.push_back(QString("Challenging scenario: picking a cup from a shelf with ARoS"));
     scenarios.push_back(QString("Assembly scenario: swap two columns of the toy vehicle"));
+    scenarios.push_back(QString("Assembly scenario: place the top of the toy vehicle"));
 
 #endif
 
@@ -402,8 +403,10 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              //string path_rviz_toyscene_jarde = PATH_SCENARIOS+string("/rviz/toy_vehicle_jarde.scene");
              // Challengingscenario with ARoS
              string path_vrep_challenge_aros = PATH_SCENARIOS+string("/vrep/NarrowShelf_aros.ttt");
-             // Toy vehicle bi-manual manipulation
+             // Toy vehicle bi-manual manipulation to swap the columns
              string path_vrep_toyscene_aros_dual_arm_cols = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros_dual_arm_cols.ttt");
+             // Toy vehicle bi-manual manipulation of the top
+             string path_vrep_toyscene_aros_dual_arm_top = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros_dual_arm_top.ttt");
 
              switch(i){
              case 0: // Assembly scenario
@@ -582,6 +585,30 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                  }
 #endif
 
+                 break;                 
+             case 6: // Toy vehicle dual arm to manipulate the top
+#if HAND==0
+
+#elif HAND==1
+                this->scenario_id = 7;
+                 if (qnode.loadScenario(path_vrep_toyscene_aros_dual_arm_top,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Assembly scenario: place the top of the toy vehicle HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Assembly scenario: place the top of the toy vehicle");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
+                     //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
+                 }else{
+                     qnode.log(QNode::Error,std::string("Assembly scenario: place the top of the toy vehicle HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+#endif
                  break;
 
              }

@@ -516,7 +516,8 @@ engagePtr Object::getEngagePoint()
 double Object::getRadius()
 {
 
-    return (max(this->m_size.Xsize,this->m_size.Ysize)/2.0);
+    //return (max(this->m_size.Xsize,this->m_size.Ysize)/2.0);
+    return (min(this->m_size.Xsize,this->m_size.Ysize)/2.0);
 }
 
 bool Object::isTargetRightEnabled()

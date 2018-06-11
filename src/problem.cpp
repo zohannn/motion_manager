@@ -415,12 +415,8 @@ bool Problem::finalPostureFingers(int hand_id)
         }
 #elif HAND==1
 
-        if (d_obj > hh->getBarrettHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-        }
+
+
 #endif
     }else{
 #if HAND==0
@@ -438,176 +434,17 @@ bool Problem::finalPostureFingers(int hand_id)
 #elif HAND==1
         d_obj = min(hh->getBarrettHand().maxAperture,double(1.2)*obj->getRadius()*2+TOL_GRIP);
 
-        if (obj->getRadius()*2+TOL_GRIP > hh->getBarrettHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-        }
 #endif
     }
-/*
-    switch (grip_code){
 
-    case 111: case 112:
-        // Precision Side thumb left and Precision Side thumb right
-
-        d_obj = obj->getRadius()*2.0+TOL_GRIP;
-#if HAND==0
-        if(d_obj > hh->getHumanHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-        }
-#elif HAND==1
-
-        if (d_obj > hh->getBarrettHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-        }
-#endif
+if (d_obj > hh->getBarrettHand().maxAperture){
+    success=false;
+    throw string("impossible to grasp the object ")+obj->getName()+
+            string(" with the grip ")+this->mov->getGripStr()+
+            string(". The object is too large");
+}
 
 
-        break;
-
-    case 113: case 114:
-        // Precision Side thumb up and Precision Side thumb down
-        d_obj=obj->getSize().Zsize+TOL_GRIP;
-#if HAND==0
-
-        if(d_obj > hh->getHumanHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-        }
-#elif HAND==1
-        if (d_obj > hh->getBarrettHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-        }
-
-#endif
-
-
-
-        break;
-
-    case 121: case 122:
-        // Precision Above and Precision Below
-        d_obj = obj->getRadius()*2+TOL_GRIP;
-#if HAND==0
-
-        if(d_obj > hh->getHumanHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-
-        }
-#elif HAND==1
-
-        if (d_obj > hh->getBarrettHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-        }
-
-#endif
-
-        break;
-
-    case 211: case 212:
-        // Full Side thumb left and Full Side thumb right
-
-#if HAND==0
-
-        d_obj = min(hh->getHumanHand().maxAperture,double(1.2)*obj->getRadius()*2+TOL_GRIP);
-
-        if(obj->getRadius()*2+TOL_GRIP > hh->getHumanHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-
-        }
-
-#elif HAND==1
-        d_obj = min(hh->getBarrettHand().maxAperture,double(1.2)*obj->getRadius()*2+TOL_GRIP);
-
-        if (obj->getRadius()*2+TOL_GRIP > hh->getBarrettHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-        }
-#endif
-        break;
-
-    case 213: case 214:
-        // Full Side thumb up and Full Side thumb down
-
-#if HAND==0
-        d_obj = min(hh->getHumanHand().maxAperture,double(1.2)*(obj->getSize().Zsize+TOL_GRIP));
-
-        if(obj->getSize().Zsize+TOL_GRIP > hh->getHumanHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-        }
-#elif HAND==1
-        d_obj = min(hh->getBarrettHand().maxAperture,double(1.2)*(obj->getSize().Zsize+TOL_GRIP));
-
-        if (obj->getSize().Zsize+TOL_GRIP > hh->getBarrettHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-        }
-
-#endif
-
-
-
-
-        break;
-
-    case 221: case 222:
-        // Full Above and Full Below
-
-#if HAND==0
-
-        d_obj = min(hh->getHumanHand().maxAperture,double(1.2)*(obj->getRadius()*2+TOL_GRIP));
-
-        if(obj->getRadius()*2+TOL_GRIP > hh->getHumanHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-        }
-#elif HAND==1
-
-        d_obj = min(hh->getBarrettHand().maxAperture,double(1.2)*(obj->getRadius()*2+TOL_GRIP));
-
-        if (obj->getRadius()*2+TOL_GRIP > hh->getBarrettHand().maxAperture){
-            success=false;
-            throw string("impossible to grasp the object ")+obj->getName()+
-                    string(" with the grip ")+this->mov->getGripStr()+
-                    string(". The object is too large");
-        }
-
-#endif
-        break;
-
-    }// switch grip code
-    */
 
     // compute the inverse kinematics of the hand
     std::vector<double> sols;
