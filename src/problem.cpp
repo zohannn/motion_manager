@@ -405,7 +405,11 @@ bool Problem::finalPostureFingers(int hand_id)
     double d_obj;
 
     if(prec){
-        d_obj = obj->getRadius()*2.0+TOL_GRIP;
+        if(obj->getGripParams()){
+            d_obj = obj->get_dFF()+TOL_GRIP;
+        }else{
+            d_obj = obj->getRadius()*2.0+TOL_GRIP;
+        }
 #if HAND==0
         if(d_obj > hh->getHumanHand().maxAperture){
             success=false;
@@ -432,8 +436,11 @@ bool Problem::finalPostureFingers(int hand_id)
         }
 
 #elif HAND==1
-        d_obj = min(hh->getBarrettHand().maxAperture,double(1.2)*obj->getRadius()*2+TOL_GRIP);
-
+        if(obj->getGripParams()){
+            d_obj = obj->get_dFF()+TOL_GRIP;
+        }else{
+            d_obj = min(hh->getBarrettHand().maxAperture,double(1.2)*obj->getRadius()*2+TOL_GRIP);
+        }
 #endif
     }
 
@@ -518,31 +525,12 @@ if (d_obj > hh->getBarrettHand().maxAperture){
         if(prec){
             this->dHOr = this->dFH;
         }else{
-            this->dHOr = obj->getRadius()+TOL_GRIP;
+            if(obj->getGripParams()){
+                this->dHOr = obj->get_dFH()+TOL_GRIP;
+            }else{
+                this->dHOr = obj->getRadius()+TOL_GRIP;
+            }
         }
-
-        /*
-        switch (grip_code) {
-        case 111: case 112: case 113: case 114: case 121: case 122:
-            //Precision grip
-
-             this->dHOr = this->dFH;
-
-            break;
-        case 211: case 212: case 213: case 214:
-            // Full Side grip
-
-            this->dHOr = obj->getRadius()+TOL_GRIP;
-
-            break;
-        case 221: case 222:
-            // Full Above and Full Below
-
-            this->dHOr = obj->getSize().Zsize/2+TOL_GRIP;
-
-            break;
-        }
-        */
 
         break;
 
@@ -589,32 +577,12 @@ if (d_obj > hh->getBarrettHand().maxAperture){
         if(prec){
             this->dHOl = this->dFH;
         }else{
-            this->dHOl = obj->getRadius()+TOL_GRIP;
+            if(obj->getGripParams()){
+                this->dHOl = obj->get_dFH()+TOL_GRIP;
+            }else{
+                this->dHOl = obj->getRadius()+TOL_GRIP;
+            }
         }
-        /*
-        switch (grip_code) {
-        case 111: case 112: case 113: case 114: case 121: case 122:
-            //Precision grip
-
-             this->dHOl = this->dFH;
-
-            break;
-        case 211: case 212: case 213: case 214:
-            // Full Side grip
-
-            this->dHOl = obj->getRadius()+TOL_GRIP;
-
-            break;
-        case 221: case 222:
-            // Full Above and Full Below
-
-            this->dHOl = obj->getSize().Zsize/2+TOL_GRIP;
-
-            break;
-
-        }
-        */
-
         break;
 
     }

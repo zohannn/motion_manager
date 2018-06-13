@@ -2,40 +2,73 @@
 # 
 # Geometric Dimensions of the arms and of the fingers (right)
 Shoulder_radius_right=60
+
 Elbow_radius_right=50
+
 Wrist_radius_right=40
+
 Hand_radius_right=30
+
 Hand_1_1_right=25
+
 Hand_1_2_right=25
+
 Hand_1_3_right=25
+
 Hand_2_1_right=20
+
 Hand_2_2_right=20
+
 Hand_2_3_right=20
+
 Hand_3_1_right=15
+
 Hand_3_2_right=15
+
 Hand_3_3_right=15
+
 Hand_tip_1_right=5
+
 Hand_tip_2_right=5
+
 Hand_tip_3_right=5
+
 # Geometric Dimensions of the arms and of the fingers (left)
 Shoulder_radius_left=60
+
 Elbow_radius_left=50
+
 Wrist_radius_left=40
+
 Hand_radius_left=30
+
 Hand_1_1_left=25
+
 Hand_1_2_left=25
+
 Hand_1_3_left=25
+
 Hand_2_1_left=20
+
 Hand_2_2_left=20
+
 Hand_2_3_left=20
+
 Hand_3_1_left=15
+
 Hand_3_2_left=15
+
 Hand_3_3_left=15
+
 Hand_tip_1_left=5
+
 Hand_tip_2_left=5
+
 Hand_tip_3_left=5
+
 # Joint Expanse factors (right)
 lambda_1_right=1
+
 lambda_2_right=1.0
 
 lambda_3_right=1.0
@@ -58,6 +91,7 @@ lambda_11_right=1.0
 
 # Joint Expanse factors (left)
 lambda_1_left=1
+
 lambda_2_left=1.0
 
 lambda_3_left=1.0
@@ -593,11 +627,11 @@ max_velocity=50
 max_acceleration=10.0
 
 tar_av=true
-ob_av=true
+ob_av=false
 approach=true
 retreat=false
 rand_init=false
-coll=true
+coll=false
 coll_body=true
 coll_arms=true
 straight_line_right=false

@@ -223,6 +223,36 @@ public:
      */
     void getTar_left_RPY_matrix(Matrix3d& mat);
 
+    /**
+     * @brief getGripParams
+     * @return
+     */
+    bool getGripParams();
+
+    /**
+     * @brief set_dFF
+     * @param dFF
+     */
+    void set_dFF(double dFF);
+
+    /**
+     * @brief set_dFH
+     * @param dFH
+     */
+    void set_dFH(double dFH);
+
+    /**
+     * @brief get_dFF
+     * @return
+     */
+    double get_dFF();
+
+    /**
+     * @brief get_dFH
+     * @return
+     */
+    double get_dFH();
+
 private:
 
 
@@ -242,6 +272,10 @@ private:
     std::vector<double> tar_left_obj; /**< position of the target left with respect to the object in the object frame. x=0, y=1, z=2 */
     //Matrix3d Rot_tar_left_obj; /**< orientation RPY matrix of the target left with respect to the object. */
     bool setup_features; /**< true if it is necessary to set up the features, false otherwise (the object might be created with no features)*/
+    // grip types
+    bool grip_params; /**< true to use dFH and dFF, false to use the radius of the object */
+    double dFH; /**< distance between the hand and the finger tips in the grip */
+    double dFF; /**< distance between the finger tips in the grip */
 
     /**
      * @brief This method gets the transformation matrix of the target of the right arm

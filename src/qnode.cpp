@@ -169,25 +169,19 @@ bool  QNode::loadScenario(const std::string& path,int id)
 
             break;
 
-        case 8: // Assembly scenario: the Toy vehicle with ARoS place the top (dual-arm)
-            // Blue Column (obj_id = 0)
-            subBlueColumn = n.subscribe("/vrep/BlueColumn_pose",1,&QNode::BlueColumnCallback,this);
-            // Green Column (obj_id = 1)
-            subGreenColumn = n.subscribe("/vrep/GreenColumn_pose",1,&QNode::GreenColumnCallback,this);
-            // RedColumn (obj_id = 2)
-            subRedColumn = n.subscribe("/vrep/RedColumn_pose",1,&QNode::RedColumnCallback,this);
-            // MagentaColumn (obj_id = 3)
-            subMagentaColumn = n.subscribe("/vrep/MagentaColumn_pose",1,&QNode::MagentaColumnCallback,this);
-            // Nut 1 (obj_id = 4)
-            subNut1 = n.subscribe("/vrep/Nut1_pose",1,&QNode::Nut1Callback,this);
-            // Nut 2 (obj_id = 5)
-            subNut2 = n.subscribe("/vrep/Nut2_pose",1,&QNode::Nut2Callback,this);
-            // Wheel 1 (obj_id = 6)
-            subWheel1 = n.subscribe("/vrep/Wheel1_pose",1,&QNode::Wheel1Callback,this);
-            // Wheel 2 (obj_id = 7)
-            subWheel2 = n.subscribe("/vrep/Wheel2_pose",1,&QNode::Wheel2Callback,this);
-            // Top (obj_id = 8)
-            subTop = n.subscribe("/vrep/Top_pose",1,&QNode::TopCallback,this);
+        case 8: // Human assistance scenario: Moving a tray with ARoS (dual-arm)
+            // Bottle Tea (obj_id = 0)
+            subBottleTea = n.subscribe("/vrep/BottleTea_pose",1,&QNode::BottleTeaCallback,this);
+            // Bottle Coffee (obj_id = 1)
+            subBottleCoffee = n.subscribe("/vrep/BottleCoffee_pose",1,&QNode::BottleCoffeeCallback,this);
+            // Bottle Juice (obj_id = 2)
+            subBottleJuice = n.subscribe("/vrep/BottleJuice_pose",1,&QNode::BottleJuiceCallback,this);
+            // Cup (obj_id = 3)
+            //subCup = n.subscribe("/vrep/Cup_pose",1,&QNode::CupCallback,this);
+            // Tray (obj_id = 3)
+            subTray = n.subscribe("/vrep/Tray_pose",1,&QNode::TrayCallback,this);
+            // Cup 1 (obj_id = 4)
+            subCup1 = n.subscribe("/vrep/Cup1_pose",1,&QNode::Cup1Callback,this);
             break;
         case 4:
             // Human assistance scenario: Serving a drink with ARoS
@@ -3151,8 +3145,7 @@ bool QNode::getElements(scenarioPtr scene)
 
         break;
     case 8:
-        // Toy vehicle scenario: place the top of the toy vehicle
-        // Assembly scenario: the Toy vehicle with ARoS
+        // Human assistance scenario: Moving a tray with ARoS
 
         // get the number of objects in the scenario
         add_client = n.serviceClient<vrep_common::simRosGetIntegerSignal>("/vrep/simRosGetIntegerSignal");
@@ -3176,16 +3169,12 @@ bool QNode::getElements(scenarioPtr scene)
         // get the object handle
         client_getHandle = n.serviceClient<vrep_common::simRosGetObjectHandle>("/vrep/simRosGetObjectHandle");
         // this is the order of the object in this scenario
-        objs_prefix.push_back("BlueColumn");     // obj_id = 0
-        objs_prefix.push_back("GreenColumn");    // obj_id = 1
-        objs_prefix.push_back("RedColumn");      // obj_id = 2
-        objs_prefix.push_back("MagentaColumn");  // obj_id = 3
-        objs_prefix.push_back("Nut1");           // obj_id = 4
-        objs_prefix.push_back("Nut2");           // obj_id = 5
-        objs_prefix.push_back("Wheel1");         // obj_id = 6
-        objs_prefix.push_back("Wheel2");         // obj_id = 7
-        objs_prefix.push_back("Top");           // obj_id = 8
-        objs_prefix.push_back("Table");          // obj_id = 9
+        objs_prefix.push_back("BottleTea");      // obj_id = 0
+        objs_prefix.push_back("BottleCoffee");   // obj_id = 1
+        objs_prefix.push_back("BottleJuice");    // obj_id = 2
+        objs_prefix.push_back("Tray");           // obj_id = 3
+        objs_prefix.push_back("Cup1");           // obj_id = 4
+        objs_prefix.push_back("Table");          // obj_id = 5
 
 
         while(cnt_obj < n_objs){
@@ -3248,6 +3237,11 @@ bool QNode::getElements(scenarioPtr scene)
                                     new Target(signPrefix + signTarLeft,tarLeft_pos,tarLeft_or),
                                     new EngagePoint(signPrefix + signEngage, engage_pos, engage_or));
 
+                if(signPrefix.compare("Tray")==0)
+                {
+                    ob->set_dFF(40);
+                    ob->set_dFH(40);
+                }
                 //Pose* ps = new Pose(signPrefix+string("_home"),obj_pos,obj_or,true,cnt_obj);
                 Pose* ps = new Pose(signPrefix+string("_home"),tarRight_pos,tarRight_or,true,cnt_obj);
 
@@ -3329,7 +3323,6 @@ bool QNode::getElements(scenarioPtr scene)
         */
 
         // get the info of the Humanoid
-
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");
 
         srvs.request.signalName = string("HumanoidName");
@@ -3814,11 +3807,21 @@ void QNode::Cup1Callback(const geometry_msgs::PoseStamped &data)
     this->updateObjectInfo(obj_id,name,data);
 }
 
+void QNode::TrayCallback(const geometry_msgs::PoseStamped& data)
+{
+    //BOOST_LOG_SEV(lg, info) << "cup_1_callback"  ;
+
+    int obj_id = 3;
+    string name = string("Tray");
+
+    this->updateObjectInfo(obj_id,name,data);
+}
+
 void QNode::Cup_shelfCallback(const geometry_msgs::PoseStamped& data)
 {
     //BOOST_LOG_SEV(lg, info) << "cup_shelf_callback"  ;
 
-    int obj_id = 0;
+    int obj_id = 3;
     string name = string("Cup");
 
     this->updateObjectInfo(obj_id,name,data);

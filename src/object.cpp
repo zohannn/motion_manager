@@ -15,6 +15,7 @@ Object::Object()
     this->p_targetRight = targetPtr(new Target());
     this->p_targetLeft = targetPtr(new Target());
     this->p_engage = engagePtr(new EngagePoint());
+    this->grip_params = false;
 
     pos tar_right_pos = this->p_targetRight->getPos();
     pos tar_left_pos = this->p_targetLeft->getPos();
@@ -93,6 +94,7 @@ Object::Object(string name)
     this->p_targetRight = targetPtr(new Target());
     this->p_targetLeft = targetPtr(new Target());
     this->p_engage = engagePtr(new EngagePoint());
+    this->grip_params = false;
 
     pos tar_right_pos = this->p_targetRight->getPos();
     pos tar_left_pos = this->p_targetLeft->getPos();
@@ -168,6 +170,7 @@ Object::Object(string name, pos ppos, orient oor, dim ssize,
     this->p_targetRight = targetPtr(pTR);
     this->p_targetLeft = targetPtr(pTL);
     this->p_engage = engagePtr(pEng);
+    this->grip_params = false;
 
     pos tar_right_pos = this->p_targetRight->getPos();
     pos tar_left_pos = this->p_targetLeft->getPos();
@@ -258,6 +261,9 @@ Object::Object(const Object &obj)
 
     this->setup_features = obj.setup_features;
 
+    this->grip_params = obj.grip_params;
+    this->dFF = obj.dFF;
+    this->dFH = obj.dFH;
 
 }
 
@@ -631,6 +637,33 @@ void Object::getTarLeftObj(std::vector<double> &tar_to_obj)
 void Object::getEngObj(std::vector<double> &eng_to_obj)
 {
     eng_to_obj = this->eng_obj;
+}
+
+bool Object::getGripParams()
+{
+    return this->grip_params;
+}
+
+void Object::set_dFF(double dFF)
+{
+    this->grip_params = true;
+    this->dFF = dFF;
+}
+
+void Object::set_dFH(double dFH)
+{
+    this->grip_params = true;
+    this->dFH = dFH;
+}
+
+double Object::get_dFF()
+{
+    return this->dFF;
+}
+
+double Object::get_dFH()
+{
+    return this->dFH;
 }
 
 
