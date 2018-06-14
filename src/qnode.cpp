@@ -3239,8 +3239,8 @@ bool QNode::getElements(scenarioPtr scene)
 
                 if(signPrefix.compare("Tray")==0)
                 {
-                    ob->set_dFF(40);
-                    ob->set_dFH(40);
+                    ob->set_dFF(20);
+                    ob->set_dFH(10);
                 }
                 //Pose* ps = new Pose(signPrefix+string("_home"),obj_pos,obj_or,true,cnt_obj);
                 Pose* ps = new Pose(signPrefix+string("_home"),tarRight_pos,tarRight_or,true,cnt_obj);

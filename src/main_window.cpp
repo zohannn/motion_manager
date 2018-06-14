@@ -3239,7 +3239,10 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     string path_vrep_challenge_aros = PATH_SCENARIOS+string("/vrep/NarrowShelf_aros.ttt");
 
     // Toy vehicle scenario with ARoS swaps two columns
-    string path_vrep_touscene_aros_dual = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros_dual_arm_cols.ttt");
+    string path_vrep_toyscene_aros_dual = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros_dual_arm_cols.ttt");
+
+    // Drinking service scenario with ARoS holding a tray
+    string path_vrep_drinkscene_aros_dual = PATH_SCENARIOS+string("/vrep/DrinkingTask_aros_dual_arm_tray.ttt");
 
     switch(scene_id){
 
@@ -3287,13 +3290,17 @@ void MainWindow::on_pushButton_scene_reset_clicked()
         break;
     case 6:
         // Toy vehicle scenario with ARoS swaps two columns
-        path = path_vrep_touscene_aros_dual;
+        path = path_vrep_toyscene_aros_dual;
         title = string("Assembly scenario: the Toy vehicle with ARoS swaps columns");
         success = string("Assembly scenario: the Toy vehicle with ARoS swaps columns HAS BEEN LOADED");
         failure = string("Assembly scenario: the Toy vehicle with ARoS swaps columns HAS NOT BEEN LOADED");
         break;
     case 7:
-        //TO DO
+        // Drinking service scenario with ARoS holding a tray
+        path = path_vrep_drinkscene_aros_dual;
+        title = string("Human assistance scenario: Moving a tray with ARoS");
+        success = string("Human assistance scenario: Moving a tray with ARoS HAS BEEN LOADED");
+        failure = string("Human assistance scenario: Moving a tray with ARoS HAS NOT BEEN LOADED");
         break;
     }
 

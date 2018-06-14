@@ -461,8 +461,7 @@ pre_grasp_y_right=0
 
 pre_grasp_z_right=-1
 
-pre_grasp_dist_right=50
-
+pre_grasp_dist_right=100
 post_grasp_x_right=0.866025404
 
 post_grasp_y_right=0
@@ -478,8 +477,7 @@ pre_grasp_y_left=0
 
 pre_grasp_z_left=-1
 
-pre_grasp_dist_left=50
-
+pre_grasp_dist_left=100
 post_grasp_x_left=-1
 
 post_grasp_y_left=0
