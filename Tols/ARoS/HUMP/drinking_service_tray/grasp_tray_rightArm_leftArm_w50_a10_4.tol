@@ -1,29 +1,31 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
 # Planner: HUMP ,Movement: Reach-to-grasp, Arm: both, Object right: Tray, Object left: Tray, Object right Engaged: , Object left Engaged: , Pose right: , Pose left: , Grip Type right: Full, Grip Type left: Full
 # Geometric Dimensions of the arms and of the fingers (right)
-Shoulder_radius_right=60
+Shoulder_radius_right=10
 
 Elbow_radius_right=10
-Wrist_radius_right=40
-Hand_radius_right=30
 
-Hand_1_1_right=25
+Wrist_radius_right=10
 
-Hand_1_2_right=25
+Hand_radius_right=10
 
-Hand_1_3_right=25
+Hand_1_1_right=5
 
-Hand_2_1_right=20
+Hand_1_2_right=5
 
-Hand_2_2_right=20
+Hand_1_3_right=5
 
-Hand_2_3_right=20
+Hand_2_1_right=5
 
-Hand_3_1_right=15
+Hand_2_2_right=5
 
-Hand_3_2_right=15
+Hand_2_3_right=5
 
-Hand_3_3_right=15
+Hand_3_1_right=5
+
+Hand_3_2_right=5
+
+Hand_3_3_right=5
 
 Hand_tip_1_right=5
 
@@ -32,28 +34,32 @@ Hand_tip_2_right=5
 Hand_tip_3_right=5
 
 # Geometric Dimensions of the arms and of the fingers (left)
-Shoulder_radius_left=60
+Shoulder_radius_left=10
 
-Elbow_radius_left=50
-Wrist_radius_left=40
-Hand_radius_left=30
+Elbow_radius_left=10
 
-Hand_1_1_left=25
+Wrist_radius_left=10
 
-Hand_1_2_left=25
+Hand_radius_left=10
 
-Hand_1_3_left=25
+Hand_1_1_left=5
 
-Hand_2_1_left=20
+Hand_1_2_left=5
 
-Hand_2_2_left=20
+Hand_1_3_left=5
 
-Hand_2_3_left=20
+Hand_2_1_left=5
 
-Hand_3_1_left=15
+Hand_2_2_left=5
 
-Hand_3_2_left=15
-Hand_3_3_left=15
+Hand_2_3_left=5
+
+Hand_3_1_left=5
+
+Hand_3_2_left=5
+
+Hand_3_3_left=5
+
 Hand_tip_1_left=5
 
 Hand_tip_2_left=5
@@ -62,9 +68,11 @@ Hand_tip_3_left=5
 
 # Joint Expanse factors (right)
 lambda_1_right=1
+
 lambda_2_right=1.0
 
 lambda_3_right=1
+
 lambda_4_right=1.0
 
 lambda_5_right=1.0
@@ -83,9 +91,11 @@ lambda_11_right=1.0
 
 # Joint Expanse factors (left)
 lambda_1_left=1
+
 lambda_2_left=1.0
 
 lambda_3_left=1
+
 lambda_4_left=1.0
 
 lambda_5_left=1.0
@@ -451,7 +461,7 @@ pre_grasp_y_right=0
 
 pre_grasp_z_right=-1
 
-pre_grasp_dist_right=120
+pre_grasp_dist_right=200
 post_grasp_x_right=0.866025404
 
 post_grasp_y_right=0
@@ -467,7 +477,7 @@ pre_grasp_y_left=0
 
 pre_grasp_z_left=-1
 
-pre_grasp_dist_left=120
+pre_grasp_dist_left=160
 post_grasp_x_left=-1
 
 post_grasp_y_left=0
@@ -615,7 +625,7 @@ max_velocity=50
 max_acceleration=10.0
 
 tar_av=true
-ob_av=false
+ob_av=true
 approach=true
 retreat=false
 rand_init=false

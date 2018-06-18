@@ -3156,13 +3156,13 @@ bool QNode::getElements(scenarioPtr scene)
              n_objs= srvi.response.signalValue;
         }else{succ = false; throw string("Communication error");}
 
-        /*
+
         srvi.request.signalName = NPOSES;
         add_client.call(srvi);
         if (srvi.response.result == 1){
              n_poses= srvi.response.signalValue;
         }else{succ = false; throw string("Communication error");}
-        */
+
 
         // get the info of the scenario
 
@@ -3273,16 +3273,16 @@ bool QNode::getElements(scenarioPtr scene)
             }
         } // while loop objects
 
-        /*
+
         // this is the order of the poses in this scenario
         // pose_id = 0
-        poses_prefix.push_back("GreenColumn_pose1");
+        poses_prefix.push_back("Tray_poseLeft");
         poses_rel.push_back(true);
-        poses_obj_id.push_back(2);
+        poses_obj_id.push_back(3);
         // pose_id = 1
-        poses_prefix.push_back("MagentaColumn_pose1");
+        poses_prefix.push_back("Tray_poseRight");
         poses_rel.push_back(true);
-        poses_obj_id.push_back(2);
+        poses_obj_id.push_back(3);
 
         while(cnt_pose < n_poses){
             signPrefix = poses_prefix[cnt_pose];
@@ -3320,7 +3320,7 @@ bool QNode::getElements(scenarioPtr scene)
                 throw string("Error while retrieving the poses of the scenario");
             }
         }// while loop poses
-        */
+
 
         // get the info of the Humanoid
         add_client = n.serviceClient<vrep_common::simRosGetStringSignal>("/vrep/simRosGetStringSignal");

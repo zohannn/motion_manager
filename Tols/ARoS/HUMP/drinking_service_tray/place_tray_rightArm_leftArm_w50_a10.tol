@@ -1,29 +1,31 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
 # Planner: HUMP ,Movement: Reach-to-grasp, Arm: both, Object right: Tray, Object left: Tray, Object right Engaged: , Object left Engaged: , Pose right: , Pose left: , Grip Type right: Full, Grip Type left: Full
 # Geometric Dimensions of the arms and of the fingers (right)
-Shoulder_radius_right=60
+Shoulder_radius_right=10
 
-Elbow_radius_right=10
-Wrist_radius_right=40
-Hand_radius_right=30
+Elbow_radius_right=5
 
-Hand_1_1_right=25
+Wrist_radius_right=5
 
-Hand_1_2_right=25
+Hand_radius_right=5
 
-Hand_1_3_right=25
+Hand_1_1_right=5
 
-Hand_2_1_right=20
+Hand_1_2_right=5
 
-Hand_2_2_right=20
+Hand_1_3_right=5
 
-Hand_2_3_right=20
+Hand_2_1_right=5
 
-Hand_3_1_right=15
+Hand_2_2_right=5
 
-Hand_3_2_right=15
+Hand_2_3_right=5
 
-Hand_3_3_right=15
+Hand_3_1_right=5
+
+Hand_3_2_right=5
+
+Hand_3_3_right=5
 
 Hand_tip_1_right=5
 
@@ -32,28 +34,32 @@ Hand_tip_2_right=5
 Hand_tip_3_right=5
 
 # Geometric Dimensions of the arms and of the fingers (left)
-Shoulder_radius_left=60
+Shoulder_radius_left=10
 
-Elbow_radius_left=50
-Wrist_radius_left=40
-Hand_radius_left=30
+Elbow_radius_left=5
 
-Hand_1_1_left=25
+Wrist_radius_left=5
 
-Hand_1_2_left=25
+Hand_radius_left=5
 
-Hand_1_3_left=25
+Hand_1_1_left=5
 
-Hand_2_1_left=20
+Hand_1_2_left=5
 
-Hand_2_2_left=20
+Hand_1_3_left=5
 
-Hand_2_3_left=20
+Hand_2_1_left=5
 
-Hand_3_1_left=15
+Hand_2_2_left=5
 
-Hand_3_2_left=15
-Hand_3_3_left=15
+Hand_2_3_left=5
+
+Hand_3_1_left=5
+
+Hand_3_2_left=5
+
+Hand_3_3_left=5
+
 Hand_tip_1_left=5
 
 Hand_tip_2_left=5
@@ -61,10 +67,12 @@ Hand_tip_2_left=5
 Hand_tip_3_left=5
 
 # Joint Expanse factors (right)
-lambda_1_right=1
+lambda_1_right=0.99
+
 lambda_2_right=1.0
 
 lambda_3_right=1
+
 lambda_4_right=1.0
 
 lambda_5_right=1.0
@@ -82,10 +90,12 @@ lambda_10_right=1.0
 lambda_11_right=1.0
 
 # Joint Expanse factors (left)
-lambda_1_left=1
+lambda_1_left=0.99
+
 lambda_2_left=1.0
 
 lambda_3_left=1
+
 lambda_4_left=1.0
 
 lambda_5_left=1.0
@@ -103,51 +113,29 @@ lambda_10_left=1.0
 lambda_11_left=1.0
 
 # Initial Velocity (right)
-init_vel_1_right=0.0
-
-init_vel_2_right=0.0
-
-init_vel_3_right=0.0
-
-init_vel_4_right=0.0
-
-init_vel_5_right=0.0
-
-init_vel_6_right=0.0
-
-init_vel_7_right=0.0
-
-init_vel_8_right=0.0
-
-init_vel_9_right=0.0
-
-init_vel_10_right=0.0
-
-init_vel_11_right=0.0
-
+init_vel_1_right=0.125278
+init_vel_2_right=0.0860243
+init_vel_3_right=-0.281283
+init_vel_4_right=-0.114603
+init_vel_5_right=0.258886
+init_vel_6_right=0.0970358
+init_vel_7_right=0
+init_vel_8_right=0
+init_vel_9_right=0
+init_vel_10_right=0
+init_vel_11_right=0
 # Initial Velocity (left)
-init_vel_1_left=0.0
-
-init_vel_2_left=0.0
-
-init_vel_3_left=0.0
-
-init_vel_4_left=0.0
-
-init_vel_5_left=0.0
-
-init_vel_6_left=0.0
-
-init_vel_7_left=0.0
-
-init_vel_8_left=0.0
-
-init_vel_9_left=0.0
-
-init_vel_10_left=0.0
-
-init_vel_11_left=0.0
-
+init_vel_1_left=-0.0261332
+init_vel_2_left=0.0143129
+init_vel_3_left=-0.00503551
+init_vel_4_left=-0.0666745
+init_vel_5_left=-0.00347904
+init_vel_6_left=-0.0284537
+init_vel_7_left=-0.0752906
+init_vel_8_left=0
+init_vel_9_left=0
+init_vel_10_left=0
+init_vel_11_left=0
 # Final Velocity (right)
 final_vel_1_right=0.0
 
@@ -195,51 +183,29 @@ final_vel_10_left=0.0
 final_vel_11_left=0.0
 
 # Initial Acceleration (right)
-init_acc_1_right=0.0
-
-init_acc_2_right=0.0
-
-init_acc_3_right=0.0
-
-init_acc_4_right=0.0
-
-init_acc_5_right=0.0
-
-init_acc_6_right=0.0
-
-init_acc_7_right=0.0
-
-init_acc_8_right=0.0
-
-init_acc_9_right=0.0
-
-init_acc_10_right=0.0
-
-init_acc_11_right=0.0
-
+init_acc_1_right=0.0196436
+init_acc_2_right=0.0134886
+init_acc_3_right=-0.0441053
+init_acc_4_right=-0.0179698
+init_acc_5_right=0.0405934
+init_acc_6_right=0.0152152
+init_acc_7_right=0
+init_acc_8_right=0
+init_acc_9_right=0
+init_acc_10_right=0
+init_acc_11_right=0
 # Initial Acceleration (left)
-init_acc_1_left=0.0
-
-init_acc_2_left=0.0
-
-init_acc_3_left=0.0
-
-init_acc_4_left=0.0
-
-init_acc_5_left=0.0
-
-init_acc_6_left=0.0
-
-init_acc_7_left=0.0
-
-init_acc_8_left=0.0
-
-init_acc_9_left=0.0
-
-init_acc_10_left=0.0
-
-init_acc_11_left=0.0
-
+init_acc_1_left=-0.0040977
+init_acc_2_left=0.00224426
+init_acc_3_left=-0.000789569
+init_acc_4_left=-0.0104546
+init_acc_5_left=-0.000545514
+init_acc_6_left=-0.00446154
+init_acc_7_left=-0.0118056
+init_acc_8_left=0
+init_acc_9_left=0
+init_acc_10_left=0
+init_acc_11_left=0
 # Final Acceleration (right)
 final_acc_1_right=0.0
 
@@ -449,42 +415,32 @@ pre_grasp_x_right=0
 
 pre_grasp_y_right=0
 
-pre_grasp_z_right=-1
-
-pre_grasp_dist_right=120
-post_grasp_x_right=0.866025404
+pre_grasp_z_right=0
+pre_grasp_dist_right=0
+post_grasp_x_right=0
 
 post_grasp_y_right=0
-
-post_grasp_z_right=-0.5
-
-post_grasp_dist_right=125
-
+post_grasp_z_right=0
+post_grasp_dist_right=0
 # Pick settings (left)
 pre_grasp_x_left=0
 
 pre_grasp_y_left=0
 
-pre_grasp_z_left=-1
-
-pre_grasp_dist_left=120
-post_grasp_x_left=-1
+pre_grasp_z_left=0
+pre_grasp_dist_left=0
+post_grasp_x_left=0
 
 post_grasp_y_left=0
-
 post_grasp_z_left=0
-
-post_grasp_dist_left=125
-
+post_grasp_dist_left=0
 # Place settings (right)
 pre_place_x_right=0
 
-pre_place_y_right=0
+pre_place_y_right=-0.984807753
+pre_place_z_right=-0.173648178
 
-pre_place_z_right=0
-
-pre_place_dist_right=0
-
+pre_place_dist_right=150
 post_place_x_right=0
 
 post_place_y_right=0
@@ -500,12 +456,9 @@ w_red_ret_right=5
 # Place settings (left)
 pre_place_x_left=0
 
-pre_place_y_left=0
-
-pre_place_z_left=0
-
-pre_place_dist_left=0
-
+pre_place_y_left=-0.866025404
+pre_place_z_left=-0.5
+pre_place_dist_left=150
 post_place_x_left=0
 
 post_place_y_left=0
@@ -615,7 +568,7 @@ max_velocity=50
 max_acceleration=10.0
 
 tar_av=true
-ob_av=false
+ob_av=true
 approach=true
 retreat=false
 rand_init=false

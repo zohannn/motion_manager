@@ -3242,7 +3242,7 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     string path_vrep_toyscene_aros_dual = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros_dual_arm_cols.ttt");
 
     // Drinking service scenario with ARoS holding a tray
-    string path_vrep_drinkscene_aros_dual = PATH_SCENARIOS+string("/vrep/DrinkingTask_aros_dual_arm_tray.ttt");
+    string path_vrep_drinkscene_aros_dual = PATH_SCENARIOS+string("/vrep/DrinkingServiceTask_aros_dual_arm_tray.ttt");
 
     switch(scene_id){
 
