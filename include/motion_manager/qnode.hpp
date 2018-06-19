@@ -290,6 +290,7 @@ private:
         ros::Subscriber subCup; /**< ROS sunscriber to the topic /vrep/Cup_pose (obj_id=3 in the Human Assistance scenario) */
         ros::Subscriber subCup1; /**< ROS sunscriber to the topic /vrep/Cup1_pose (obj_id=4 in the Human Assistance scenario) */
         ros::Subscriber subTray; /**< ROS sunscriber to the topic /vrep/Tray_pose (obj_id=3 in the Human Assistance scenario dual-arm) */
+        ros::Subscriber subBox; /**< ROS sunscriber to the topic /vrep/Box_pose (obj_id=6 in the Human Assistance scenario dual-arm) */
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Challenging scenario ----------------------------------------------------------------------------------------------------------
         ros::Subscriber subCup_shelf; /**< ROS sunscriber to the topic /vrep/Cup_pose (obj_id=0 in the Human Challenging scenario) */
@@ -475,6 +476,12 @@ private:
          * @param data
          */
         void TrayCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief BoxCallback
+         * @param data
+         */
+        void BoxCallback(const geometry_msgs::PoseStamped& data);
 
         // Challenging scenario ----------------------------------------------------------------------------------
 

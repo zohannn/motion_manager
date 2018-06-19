@@ -43,8 +43,11 @@ Wrist_radius_left=5
 Hand_radius_left=5
 
 Hand_1_1_left=5
+
 Hand_1_2_left=5
+
 Hand_1_3_left=5
+
 Hand_2_1_left=5
 
 Hand_2_2_left=5
@@ -72,11 +75,11 @@ lambda_3_right=1
 
 lambda_4_right=1.0
 
-lambda_5_right=1.0
+lambda_5_right=2
 
-lambda_6_right=1.0
+lambda_6_right=1
 
-lambda_7_right=1.0
+lambda_7_right=1
 
 lambda_8_right=1.0
 
@@ -87,7 +90,8 @@ lambda_10_right=1.0
 lambda_11_right=1.0
 
 # Joint Expanse factors (left)
-lambda_1_left=1
+lambda_1_left=0.99
+
 lambda_2_left=1.0
 
 lambda_3_left=1
@@ -109,51 +113,29 @@ lambda_10_left=1.0
 lambda_11_left=1.0
 
 # Initial Velocity (right)
-init_vel_1_right=0.0
-
-init_vel_2_right=0.0
-
-init_vel_3_right=0.0
-
-init_vel_4_right=0.0
-
-init_vel_5_right=0.0
-
-init_vel_6_right=0.0
-
-init_vel_7_right=0.0
-
-init_vel_8_right=0.0
-
-init_vel_9_right=0.0
-
-init_vel_10_right=0.0
-
-init_vel_11_right=0.0
-
+init_vel_1_right=0.107877
+init_vel_2_right=0.0913539
+init_vel_3_right=-0.294225
+init_vel_4_right=-0.112813
+init_vel_5_right=0.270081
+init_vel_6_right=0.0992604
+init_vel_7_right=0.00242286
+init_vel_8_right=0
+init_vel_9_right=0
+init_vel_10_right=0
+init_vel_11_right=0
 # Initial Velocity (left)
-init_vel_1_left=0.0
-
-init_vel_2_left=0.0
-
-init_vel_3_left=0.0
-
-init_vel_4_left=0.0
-
-init_vel_5_left=0.0
-
-init_vel_6_left=0.0
-
-init_vel_7_left=0.0
-
-init_vel_8_left=0.0
-
-init_vel_9_left=0.0
-
-init_vel_10_left=0.0
-
-init_vel_11_left=0.0
-
+init_vel_1_left=-0.0242398
+init_vel_2_left=0.0144067
+init_vel_3_left=-0.00180016
+init_vel_4_left=-0.0605435
+init_vel_5_left=-0.00553611
+init_vel_6_left=-0.0240875
+init_vel_7_left=-0.0687668
+init_vel_8_left=0
+init_vel_9_left=0
+init_vel_10_left=0
+init_vel_11_left=0
 # Final Velocity (right)
 final_vel_1_right=0.0
 
@@ -201,51 +183,29 @@ final_vel_10_left=0.0
 final_vel_11_left=0.0
 
 # Initial Acceleration (right)
-init_acc_1_right=0.0
-
-init_acc_2_right=0.0
-
-init_acc_3_right=0.0
-
-init_acc_4_right=0.0
-
-init_acc_5_right=0.0
-
-init_acc_6_right=0.0
-
-init_acc_7_right=0.0
-
-init_acc_8_right=0.0
-
-init_acc_9_right=0.0
-
-init_acc_10_right=0.0
-
-init_acc_11_right=0.0
-
+init_acc_1_right=0.0153125
+init_acc_2_right=0.0129672
+init_acc_3_right=-0.0417638
+init_acc_4_right=-0.0160132
+init_acc_5_right=0.0383366
+init_acc_6_right=0.0140895
+init_acc_7_right=0.000343913
+init_acc_8_right=0
+init_acc_9_right=0
+init_acc_10_right=0
+init_acc_11_right=0
 # Initial Acceleration (left)
-init_acc_1_left=0.0
-
-init_acc_2_left=0.0
-
-init_acc_3_left=0.0
-
-init_acc_4_left=0.0
-
-init_acc_5_left=0.0
-
-init_acc_6_left=0.0
-
-init_acc_7_left=0.0
-
-init_acc_8_left=0.0
-
-init_acc_9_left=0.0
-
-init_acc_10_left=0.0
-
-init_acc_11_left=0.0
-
+init_acc_1_left=-0.00344072
+init_acc_2_left=0.00204497
+init_acc_3_left=-0.000255524
+init_acc_4_left=-0.00859385
+init_acc_5_left=-0.000785823
+init_acc_6_left=-0.0034191
+init_acc_7_left=-0.0097611
+init_acc_8_left=0
+init_acc_9_left=0
+init_acc_10_left=0
+init_acc_11_left=0
 # Final Acceleration (right)
 final_acc_1_right=0.0
 
@@ -455,43 +415,43 @@ pre_grasp_x_right=0
 
 pre_grasp_y_right=0
 
-pre_grasp_z_right=-1
+pre_grasp_z_right=0
 
-pre_grasp_dist_right=125
+pre_grasp_dist_right=0
 
 post_grasp_x_right=0
 
-post_grasp_y_right=-0.984807753
+post_grasp_y_right=0
 
-post_grasp_z_right=-0.173648178
+post_grasp_z_right=0
 
-post_grasp_dist_right=150
+post_grasp_dist_right=0
 
 # Pick settings (left)
 pre_grasp_x_left=0
 
 pre_grasp_y_left=0
 
-pre_grasp_z_left=-1
+pre_grasp_z_left=0
 
-pre_grasp_dist_left=150
+pre_grasp_dist_left=0
 
 post_grasp_x_left=0
 
-post_grasp_y_left=-0.866025404
+post_grasp_y_left=0
 
-post_grasp_z_left=-0.5
+post_grasp_z_left=0
 
-post_grasp_dist_left=150
+post_grasp_dist_left=0
 
 # Place settings (right)
-pre_place_x_right=0
+pre_place_x_right=-1
 
 pre_place_y_right=0
 
 pre_place_z_right=0
 
-pre_place_dist_right=0
+pre_place_dist_right=50
 
 post_place_x_right=0
 
@@ -506,13 +466,13 @@ w_red_app_right=5
 w_red_ret_right=5
 
 # Place settings (left)
-pre_place_x_left=0
+pre_place_x_left=1
 
 pre_place_y_left=0
 
 pre_place_z_left=0
 
-pre_place_dist_left=0
+pre_place_dist_left=50
 
 post_place_x_left=0
 
@@ -623,11 +583,11 @@ max_velocity=50
 max_acceleration=10.0
 
 tar_av=true
-ob_av=true
+ob_av=false
 approach=true
-retreat=true
+retreat=false
 rand_init=false
-coll=true
+coll=false
 coll_body=true
 coll_arms=true
 straight_line_right=false

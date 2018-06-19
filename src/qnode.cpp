@@ -182,6 +182,9 @@ bool  QNode::loadScenario(const std::string& path,int id)
             subTray = n.subscribe("/vrep/Tray_pose",1,&QNode::TrayCallback,this);
             // Cup 1 (obj_id = 4)
             subCup1 = n.subscribe("/vrep/Cup1_pose",1,&QNode::Cup1Callback,this);
+            // Box (obj_id = 6)
+            subBox = n.subscribe("/vrep/Box_pose",1,&QNode::BoxCallback,this);
+            break;
             break;
         case 4:
             // Human assistance scenario: Serving a drink with ARoS
@@ -3175,6 +3178,7 @@ bool QNode::getElements(scenarioPtr scene)
         objs_prefix.push_back("Tray");           // obj_id = 3
         objs_prefix.push_back("Cup1");           // obj_id = 4
         objs_prefix.push_back("Table");          // obj_id = 5
+        objs_prefix.push_back("Box");          // obj_id = 6
 
 
         while(cnt_obj < n_objs){
@@ -3813,6 +3817,16 @@ void QNode::TrayCallback(const geometry_msgs::PoseStamped& data)
 
     int obj_id = 3;
     string name = string("Tray");
+
+    this->updateObjectInfo(obj_id,name,data);
+}
+
+void QNode::BoxCallback(const geometry_msgs::PoseStamped& data)
+{
+    //BOOST_LOG_SEV(lg, info) << "cup_1_callback"  ;
+
+    int obj_id = 6;
+    string name = string("Box");
 
     this->updateObjectInfo(obj_id,name,data);
 }

@@ -1064,7 +1064,11 @@ HUMotion::planning_dual_result_ptr Problem::solve(HUMotion::hump_dual_params &pa
     this->solved = false;
     int arm_code =  this->mov->getArm();
     int mov_type_right = this->mov->getType(); int mov_type_left = this->mov->getTypeLeft();
-    //int sceneID = this->scene->getID();
+    int sceneID = this->scene->getID();
+    if(sceneID==8){
+        params.mov_specs_right.support_obj = "Box";
+        params.mov_specs_left.support_obj = "Box";
+    }
 #if HAND==0
     // Human Hand
     int hand_code = 0;

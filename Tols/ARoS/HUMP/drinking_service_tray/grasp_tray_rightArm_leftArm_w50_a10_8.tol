@@ -35,16 +35,15 @@ Hand_tip_3_right=5
 
 # Geometric Dimensions of the arms and of the fingers (left)
 Shoulder_radius_left=10
-
 Elbow_radius_left=5
-
 Wrist_radius_left=5
-
 Hand_radius_left=5
-
 Hand_1_1_left=5
+
 Hand_1_2_left=5
+
 Hand_1_3_left=5
+
 Hand_2_1_left=5
 
 Hand_2_2_left=5
@@ -87,18 +86,19 @@ lambda_10_right=1.0
 lambda_11_right=1.0
 
 # Joint Expanse factors (left)
-lambda_1_left=1
+lambda_1_left=0.99
+
 lambda_2_left=1.0
 
 lambda_3_left=1
 
 lambda_4_left=1.0
 
-lambda_5_left=1.0
+lambda_5_left=1
 
-lambda_6_left=1.0
+lambda_6_left=1
 
-lambda_7_left=1.0
+lambda_7_left=1
 
 lambda_8_left=1.0
 
@@ -465,7 +465,7 @@ post_grasp_y_right=-0.984807753
 
 post_grasp_z_right=-0.173648178
 
-post_grasp_dist_right=150
+post_grasp_dist_right=155
 
 # Pick settings (left)
 pre_grasp_x_left=0
@@ -474,15 +474,14 @@ pre_grasp_y_left=0
 
 pre_grasp_z_left=-1
 
-pre_grasp_dist_left=150
-
+pre_grasp_dist_left=275
 post_grasp_x_left=0
 
-post_grasp_y_left=-0.866025404
+post_grasp_y_left=-0.5
 
-post_grasp_z_left=-0.5
+post_grasp_z_left=-0.866025404
 
-post_grasp_dist_left=150
+post_grasp_dist_left=155
 
 # Place settings (right)
 pre_place_x_right=0
