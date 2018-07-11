@@ -34,6 +34,8 @@ void CompVelocityDialog::setupPlots(vector<vector<double>> &linear_velocity,vect
     QVector<double> angular_vel_x; QVector<double> angular_vel_y; QVector<double> angular_vel_z;
     QVector<double> linear_vel_norm; QVector<double> angular_vel_norm;
 
+
+
     for(size_t i=0;i<linear_velocity.size();++i){
         vector<double> linear = linear_velocity.at(i);
         vector<double> angular = angular_velocity.at(i);
@@ -87,7 +89,7 @@ void CompVelocityDialog::setupPlots(vector<vector<double>> &linear_velocity,vect
         plotComp(ui->plot_hand_wy,QString("Hand angular velocity y"),time,angular_vel_y,false); // plot vel wy
         plotComp(ui->plot_hand_wz,QString("Hand angular velocity z"),time,angular_vel_z,false); // plot vel wz
         plotComp(ui->plot_hand_ang_vel,QString("Hand angular velocity norm"),time,angular_vel_norm,false); // plot angular vel norm
-        break;
+        break;        
     }
 }
 

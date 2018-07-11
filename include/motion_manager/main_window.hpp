@@ -31,6 +31,7 @@
 #include "power_law_dialog.hpp"
 #include "powerlaw3ddialog.hpp"
 #include "comp_velocity_dialog.hpp"
+#include "nat_coll_av_dialog.hpp"
 #include "handposplot.hpp"
 
 using namespace std;
@@ -454,6 +455,11 @@ public Q_SLOTS:
          */
         void on_pushButton_power_law_3D_clicked();
 
+        /**
+         * @brief on_pushButton_nat_coll_av_clicked
+         */
+        void on_pushButton_nat_coll_av_clicked();
+
 
         /**
          * @brief on_pushButton_comp_vel_mov_clicked
@@ -510,6 +516,7 @@ private:
         PowerLawDialog *mPowerLawdlg; /**< handle of the 2/3 power law dialog*/
         PowerLaw3DDialog *mPowerLaw3Ddlg; /**< handle of the 1/6 power law dialog*/
         CompVelocityDialog *mCompVeldlg; /**< handle of the velocity components dlg */
+        NatCollAvDialog *mNatCollAvdlg; /**< handle of the natural collision avoidance dlg */
         int scenario_id; /**< id of the current scenario */
         QVector<QString> scenarios;  /**< list of scenarios */
 

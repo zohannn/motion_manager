@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1096,7 +1096,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab_results_plan_mov">
          <attribute name="title">
@@ -1638,16 +1638,23 @@ p, li { white-space: pre-wrap; }
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="layoutWidget">
+           <widget class="QWidget" name="">
             <property name="geometry">
              <rect>
-              <x>720</x>
+              <x>368</x>
               <y>420</y>
-              <width>517</width>
+              <width>851</width>
               <height>25</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_22">
+             <item>
+              <widget class="QPushButton" name="pushButton_nat_coll_av">
+               <property name="text">
+                <string>show obstacle avoidance info</string>
+               </property>
+              </widget>
+             </item>
              <item>
               <widget class="QPushButton" name="pushButton_joints_results_task">
                <property name="text">

@@ -92,6 +92,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mCompVeldlg = new CompVelocityDialog(this);
     mCompVeldlg->setModal(false);
 
+    // create the natural collision avoidance dialog
+    mNatCollAvdlg = new NatCollAvDialog(this);
+    mNatCollAvdlg->setModal(false);
+
+
 
     ReadSettings();
     setWindowIcon(QIcon(":/images/motion_managerIcon.png"));
@@ -157,6 +162,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     scenarios.push_back(QString("Challenging scenario: picking a cup from a shelf with ARoS"));
     scenarios.push_back(QString("Assembly scenario: swap two columns of the toy vehicle"));
     scenarios.push_back(QString("Human assistance scenario: Moving a tray with ARoS"));
+    scenarios.push_back(QString("Natural obstacle avoidance with ARoS"));
 
 #endif
 
@@ -407,6 +413,8 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              string path_vrep_toyscene_aros_dual_arm_cols = PATH_SCENARIOS+string("/vrep/ToyVehicleTask_aros_dual_arm_cols.ttt");
              // Human assistance scenario: Moving a tray with ARoS (bi-manual manipulation)
              string path_vrep_drinking_aros_dual_arm_tray = PATH_SCENARIOS+string("/vrep/DrinkingServiceTask_aros_dual_arm_tray.ttt");
+             // Natural obstacle avoidance with ARoS
+             string path_vrep_natural_obst_av = PATH_SCENARIOS+string("/vrep/Natural_obst_avoidance_aros_1.ttt");
 
              switch(i){
              case 0: // Assembly scenario
@@ -611,8 +619,33 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 #endif
                  break;
 
-             }
+             case 7: // Natural obstacle avoidance with ARoS
+#if HAND==0
 
+#elif HAND==1
+                this->scenario_id = 8;
+                 if (qnode.loadScenario(path_vrep_natural_obst_av,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Natural obstacle avoidance with ARoS HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Natural obstacle avoidance with ARoS");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
+                     //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
+                 }else{
+                     qnode.log(QNode::Error,std::string("Natural obstacle avoidance with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+#endif
+
+                 break;
+
+             }
 
          }
     }
@@ -3244,6 +3277,9 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     // Drinking service scenario with ARoS holding a tray
     string path_vrep_drinkscene_aros_dual = PATH_SCENARIOS+string("/vrep/DrinkingServiceTask_aros_dual_arm_tray.ttt");
 
+    // Natural obstacle avoidance with ARoS
+    string path_vrep_natural_obst_av = PATH_SCENARIOS+string("/vrep/Natural_obst_avoidance_aros_1.ttt");
+
     switch(scene_id){
 
     case 0:
@@ -3302,6 +3338,15 @@ void MainWindow::on_pushButton_scene_reset_clicked()
         success = string("Human assistance scenario: Moving a tray with ARoS HAS BEEN LOADED");
         failure = string("Human assistance scenario: Moving a tray with ARoS HAS NOT BEEN LOADED");
         break;
+
+    case 8:
+        // Natural obstacle avoidance with ARoS
+        path = path_vrep_natural_obst_av;
+        title = string("Natural obstacle avoidance with ARoS");
+        success = string("Natural obstacle avoidance with ARoS HAS BEEN LOADED");
+        failure = string("Natural obstacle avoidance with ARoS HAS NOT BEEN LOADED");
+        break;
+
     }
 
     if (qnode.loadScenario(path,1)){
@@ -3432,6 +3477,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
 
          // compute the hand values
          this->handPosition_task.resize(tot_steps); this->handVelocityNorm_task.resize(tot_steps);
+         this->handLinearVelocity_task.resize(tot_steps);
          if(arm_code==0){
             this->handPosition_task_left.resize(tot_steps); this->handVelocityNorm_task_left.resize(tot_steps);
          }
@@ -3456,6 +3502,7 @@ void MainWindow::on_pushButton_append_mov_clicked()
                          vector<double> velocities; velocities.resize(vel_row.size());
                          VectorXd::Map(&velocities[0], vel_row.size()) = vel_row;
                          this->handVelocityNorm_task.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(arm_code,posture,velocities);
+                         this->curr_scene->getHumanoid()->getHandVel(arm_code,this->handLinearVelocity_task.at(step),posture,velocities);
                      }else{
                          // dual-arm
                          // right hand position
@@ -4253,6 +4300,13 @@ void MainWindow::on_pushButton_power_law_3D_clicked()
     if(!this->handPosition_task.empty())
         this->mPowerLaw3Ddlg->setupPlots(this->handPosition_task,this->timesteps_task);
     this->mPowerLaw3Ddlg->show();
+}
+
+void MainWindow::on_pushButton_nat_coll_av_clicked()
+{
+    if(!this->handPosition_task.empty())
+        this->mNatCollAvdlg->setupPlots(this->handLinearVelocity_task,this->handPosition_task,this->timesteps_task);
+    this->mNatCollAvdlg->show();
 }
 
 void MainWindow::on_pushButton_comp_vel_mov_clicked()

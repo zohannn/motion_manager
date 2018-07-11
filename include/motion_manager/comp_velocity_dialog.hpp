@@ -91,6 +91,7 @@ private:
      */
     void plotComp(QCustomPlot* plot, QString title, QVector<double>& time, QVector<double>& var,bool lin);
 
+
     bool dual;
     bool right;
 };

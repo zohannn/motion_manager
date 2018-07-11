@@ -304,6 +304,10 @@ private:
         ros::Subscriber subShelf_4_c; /**< ROS sunscriber to the topic /vrep/Shelf_4_c_pose (obj_id=8 in the Challenging scenario) */
         ros::Subscriber subShelf_4_d; /**< ROS sunscriber to the topic /vrep/Shelf_4_d_pose (obj_id=9 in the Challenging scenario) */
         // -----------------------------------------------------------------------------------------------------------------------------------
+        // Natural obstacle avoidance with ARoS scenario -------------------------------------------------------------------------------------
+        ros::Subscriber subCylinderSmall; /**< ROS sunscriber to the topic /vrep/Cylinder_small  */
+        ros::Subscriber subCylinderTall; /**< ROS sunscriber to the topic /vrep/Cylinder_tall  */
+
 #if MOVEIT==1
         boost::shared_ptr<moveit::planning_interface::PlanningSceneInterface> planning_scene_interface_ptr;/**< scene interface */
 #endif()
@@ -544,6 +548,19 @@ private:
          * @param data
          */
         void Shelf_4_dCallback(const geometry_msgs::PoseStamped& data);
+
+        // Natural obstacle avoidance with ARoS scenario -------------------------------------------------------------------------------------
+        /**
+         * @brief This is the callback to retrieve the state of the Cylinder_small
+         * @param data
+         */
+        void Cylinder_small_Callback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief This is the callback to retrieve the state of the Cylinder_small
+         * @param data
+         */
+        void Cylinder_tall_Callback(const geometry_msgs::PoseStamped& data);
 
         /**
          * @brief This method returns the linear interpolation
