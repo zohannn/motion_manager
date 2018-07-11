@@ -67,17 +67,21 @@ void NatCollAvDialog::setupPlots(vector<vector<double>> &hand_linear_velocity,ve
         std::copy (time_mov.begin(), time_mov.end(), std::back_inserter(time_task));
         hand_position_task.push_back(hand_position_mov);
     }// task
-    QVector<double> qtime = QVector<double>::fromStdVector(time_task);
+    this->qtime = QVector<double>::fromStdVector(time_task);
 
 
-    QVector<double> linear_vel_x; QVector<double> linear_vel_y; QVector<double> linear_vel_z;
-    QVector<double> lift_vel_norm;
+    QVector<double> linear_vel_x;
+    QVector<double> linear_vel_y;
+    QVector<double> linear_vel_z;
+
+
     for(size_t i=0;i<hand_linear_velocity.size();++i){
         vector<double> linear = hand_linear_velocity.at(i);
-        linear_vel_x.push_back(linear.at(0));
+        linear_vel_x.push_back(linear.at(0)); linear_vel_x_squared.push_back(pow(linear.at(0),2));
         linear_vel_y.push_back(linear.at(1));
         linear_vel_z.push_back(linear.at(2));
-        lift_vel_norm.push_back(sqrt(pow(linear.at(1),2)+pow(linear.at(2),2)));
+        lift_vel_squared.push_back(pow(linear.at(1),2)+pow(linear.at(2),2));
+        linear_vel_squared.push_back(pow(linear.at(0),2)+pow(linear.at(1),2)+pow(linear.at(2),2));
     }
 
     //QVector<double> tsteps_mov;
@@ -114,7 +118,6 @@ void NatCollAvDialog::setupPlots(vector<vector<double>> &hand_linear_velocity,ve
     this->getDerivative(der_pos_z_2,tot_timesteps,der_pos_z_3);
 
     // --- Torsion --- //
-    QVector<double> T_mov; // torsion of the movement
     for(int i=0; i<der_pos_x_1.size();++i){
         Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
         Vector3d der_2(der_pos_x_2.at(i),der_pos_y_2.at(i),der_pos_z_2.at(i));
@@ -129,8 +132,8 @@ void NatCollAvDialog::setupPlots(vector<vector<double>> &hand_linear_velocity,ve
     }
 
     // plots natural obstacle avoidance
-    plotComp(ui->plot_transp_vel,QString("Hand transport linear velocity "),qtime,linear_vel_x,true); // plot transport component (x)
-    plotComp(ui->plot_lift_vel,QString("Hand lift linear velocity"),qtime,lift_vel_norm,true); // plot lift component (y and z)
+    plotComp(ui->plot_transp_vel,QString("Squared hand transport linear velocity "),qtime,linear_vel_x_squared,true); // plot transport component (x)
+    plotComp(ui->plot_lift_vel,QString("Squared hand lift linear velocity"),qtime,lift_vel_squared,true); // plot lift component (y and z)
 
     // plot the torsion
     ui->plot_torsion->plotLayout()->clear();
@@ -165,7 +168,76 @@ void NatCollAvDialog::setupPlots(vector<vector<double>> &hand_linear_velocity,ve
     ui->plot_torsion->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
     ui->plot_torsion->replot();
 
-    //plot the hand linear velocity norm, the lift and the transport components
+    //plot the hand linear velocity squared, the lift and the transport squared components
+    ui->plot_hand_tot_vel->plotLayout()->clear();
+    ui->plot_hand_tot_vel->clearGraphs();
+    ui->plot_hand_tot_vel->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+    //QCPAxisRect *wideAxisRect = new QCPAxisRect(ui->plot_16);
+    wideAxisRect = new QCPAxisRect(ui->plot_hand_tot_vel);
+    wideAxisRect->setupFullAxesBox(true);
+    //QCPMarginGroup *marginGroup = new QCPMarginGroup(ui->plot_16);
+    marginGroup = new QCPMarginGroup(ui->plot_hand_tot_vel);
+    wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+    // move newly created axes on "axes" layer and grids on "grid" layer:
+    for (QCPAxisRect *rect : ui->plot_hand_tot_vel->axisRects())
+    {
+      for (QCPAxis *axis : rect->axes())
+      {
+        axis->setLayer("axes");
+        axis->grid()->setLayer("grid");
+      }
+    }
+
+    title = "Hand velocity composition";
+    ui->plot_hand_tot_vel->plotLayout()->addElement(0,0, new QCPPlotTitle(ui->plot_hand_tot_vel,title));
+    ui->plot_hand_tot_vel->plotLayout()->addElement(1, 0, wideAxisRect);
+
+    ui->plot_hand_tot_vel->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+    ui->plot_hand_tot_vel->graph(0)->setPen(QPen(Qt::black));
+
+    ui->plot_hand_tot_vel->graph(0)->setName("hand vel ^2");
+    ui->plot_hand_tot_vel->graph(0)->valueAxis()->setLabel("[mm^2/s^2]");
+    ui->plot_hand_tot_vel->graph(0)->keyAxis()->setLabel("time [s]");
+    ui->plot_hand_tot_vel->graph(0)->setData(qtime, linear_vel_squared);
+    ui->plot_hand_tot_vel->graph(0)->valueAxis()->setRange(*std::min_element(linear_vel_squared.begin(), linear_vel_squared.end()),
+                                                            *std::max_element(linear_vel_squared.begin(), linear_vel_squared.end()));
+    ui->plot_hand_tot_vel->graph(0)->rescaleAxes();
+
+    ui->plot_hand_tot_vel->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+    ui->plot_hand_tot_vel->graph(1)->setPen(QPen(Qt::red,1.0,Qt::DashDotLine));
+
+    ui->plot_hand_tot_vel->graph(1)->setName("hand lift vel ^2");
+
+    ui->plot_hand_tot_vel->graph(1)->setData(qtime, lift_vel_squared);
+
+    //ui->plot_hand_tot_vel->graph(1)->rescaleAxes();
+
+    ui->plot_hand_tot_vel->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+    ui->plot_hand_tot_vel->graph(2)->setPen(QPen(Qt::blue,1.0,Qt::DashLine));
+    ui->plot_hand_tot_vel->graph(2)->setName("hand transport vel ^2");
+
+    ui->plot_hand_tot_vel->graph(2)->setData(qtime, linear_vel_x_squared);
+    //ui->plot_hand_tot_vel->graph(2)->rescaleAxes();
+
+    // legend
+    QCPLegend *legend = new QCPLegend();
+    QCPLayoutGrid *subLayout = new QCPLayoutGrid;
+    ui->plot_hand_tot_vel->plotLayout()->addElement(2, 0, subLayout);
+    subLayout->setMargins(QMargins(5, 0, 5, 5));
+    subLayout->addElement(0, 0, legend);
+    // set legend's row stretch factor very small so it ends up with minimum height:
+    ui->plot_hand_tot_vel->plotLayout()->setRowStretchFactor(2, 0.001);
+    legend->setLayer("legend");
+    QFont legendFont = font();  // start out with MainWindow's font..
+    legendFont.setPointSize(9); // and make a bit smaller for legend
+    legend->setFont(legendFont);
+    legend->addElement(0,0,new QCPPlottableLegendItem(legend,ui->plot_hand_tot_vel->graph(0)));
+    legend->addElement(0,1,new QCPPlottableLegendItem(legend,ui->plot_hand_tot_vel->graph(1)));
+    legend->addElement(0,2,new QCPPlottableLegendItem(legend,ui->plot_hand_tot_vel->graph(2)));
+
+
+    ui->plot_hand_tot_vel->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+    ui->plot_hand_tot_vel->replot();
 
 
 }
@@ -197,7 +269,7 @@ void NatCollAvDialog::plotComp(QCustomPlot *plot, QString title, QVector<double>
 
     QString name;
     if(lin){
-        name="[mm/s]";
+        name="[mm^2/s^2]";
     }else{
         name="[rad/s]";
     }
@@ -329,62 +401,145 @@ void NatCollAvDialog::getDerivative(QVector<double> &function, QVector<double> &
 
 void NatCollAvDialog::on_pushButton_save_nat_coll_av_clicked()
 {
-/*
+
     QString path;
 
-    if(dual)
-    {
-        if(right)
-        {
-            struct stat st = {0};
-            if (stat("results", &st) == -1) {
-                mkdir("results", 0700);
-            }
-            if (stat("results/planning", &st) == -1) {
-                mkdir("results/planning", 0700);
-            }
-            if (stat("results/planning/hand_right", &st) == -1) {
-                mkdir("results/planning/hand_right", 0700);
-            }
-            path = QString("results/planning/hand_right/");
-        }else{
-            struct stat st = {0};
-            if (stat("results", &st) == -1) {
-                mkdir("results", 0700);
-            }
-            if (stat("results/planning", &st) == -1) {
-                mkdir("results/planning", 0700);
-            }
-            if (stat("results/planning/hand_left", &st) == -1) {
-                mkdir("results/planning/hand_left", 0700);
-            }
-            path = QString("results/planning/hand_left/");
+    struct stat st = {0};
+    if (stat("results", &st) == -1) {
+        mkdir("results", 0700);
+    }
+    if (stat("results/planning", &st) == -1) {
+        mkdir("results/planning", 0700);
+    }
+    if (stat("results/planning/nat_coll_av", &st) == -1) {
+        mkdir("results/planning/nat_coll_av", 0700);
+    }
+    path = QString("results/planning/nat_coll_av/");
+
+
+    // save plots
+    ui->plot_lift_vel->savePdf(path+QString("hand_lift_vel.pdf"),true,0,0,QString(),QString("Squared Hand Lift Velocity"));
+    ui->plot_transp_vel->savePdf(path+QString("hand_transp_vel.pdf"),true,0,0,QString(),QString("Squared Hand Transport Velocity"));
+    ui->plot_torsion->savePdf(path+QString("hand_torsion.pdf"),true,0,0,QString(),QString("Hand Torsion"));
+    ui->plot_hand_tot_vel->savePdf(path+QString("hand_tot_vel.pdf"),true,0,0,QString(),QString("Squared Hand Velocity Composition"));
+
+
+    QString pdf_qstr; string pdf_str;
+    QString svg_qstr; string svg_str;
+    string cmdLine;
+
+    pdf_qstr = path+QString("hand_lift_vel.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("hand_lift_vel.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("hand_transp_vel.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("hand_transp_vel.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("hand_torsion.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("hand_torsion.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+    pdf_qstr = path+QString("hand_tot_vel.pdf"); pdf_str = pdf_qstr.toStdString();
+    svg_qstr = path+QString("hand_tot_vel.svg"); svg_str = svg_qstr.toStdString();
+    cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
+    system(cmdLine.c_str());
+
+
+    // save text data files
+
+    // hand lift velocity
+    if(!this->lift_vel_squared.empty()){
+        string filename_hand_vel("hand_lift_vel.csv");
+        ofstream hand_vel;
+        hand_vel.open(path.toStdString()+filename_hand_vel);
+
+        hand_vel << string("# HAND LIFT VELOCITY SQUARED \n");
+        hand_vel << string("# velocity [mm^2/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->lift_vel_squared.size();++i){
+            double vel = this->lift_vel_squared.at(i);
+            double time = this->qtime.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            hand_vel << vel_str+string(", ")+t_str+string("\n");
         }
-    }else{
-        struct stat st = {0};
-        if (stat("results", &st) == -1) {
-            mkdir("results", 0700);
-        }
-        if (stat("results/planning", &st) == -1) {
-            mkdir("results/planning", 0700);
-        }
-        if (stat("results/planning/hand", &st) == -1) {
-            mkdir("results/planning/hand", 0700);
-        }
-        path = QString("results/planning/hand/");
+        hand_vel.close();
     }
 
-    ui->plot_hand_x->savePdf(path+QString("hand_vel_x.pdf"),true,0,0,QString(),QString("Hand Linear Velocity x"));
-    ui->plot_hand_y->savePdf(path+QString("hand_vel_y.pdf"),true,0,0,QString(),QString("Hand Linear Velocity y"));
-    ui->plot_hand_z->savePdf(path+QString("hand_vel_z.pdf"),true,0,0,QString(),QString("Hand Linear Velocity z"));
-    ui->plot_hand_lin_vel->savePdf(path+QString("hand_lin_vel.pdf"),true,0,0,QString(),QString("Hand Linear Velocity Norm"));
+    // hand transport velocity
+    if(!this->linear_vel_x_squared.empty()){
+        string filename_hand_vel("hand_transp_vel.csv");
+        ofstream hand_vel;
+        hand_vel.open(path.toStdString()+filename_hand_vel);
 
-    ui->plot_hand_wx->savePdf(path+QString("hand_vel_wx.pdf"),true,0,0,QString(),QString("Hand Angular Velocity x"));
-    ui->plot_hand_wy->savePdf(path+QString("hand_vel_wy.pdf"),true,0,0,QString(),QString("Hand Angular Velocity x"));
-    ui->plot_hand_wz->savePdf(path+QString("hand_vel_wz.pdf"),true,0,0,QString(),QString("Hand Angular Velocity x"));
-    ui->plot_hand_ang_vel->savePdf(path+QString("hand_ang_vel.pdf"),true,0,0,QString(),QString("Hand Angular Velocity Norm"));
+        hand_vel << string("# HAND TRANSPORT VELOCITY SQUARED \n");
+        hand_vel << string("# velocity [mm^2/s^2], time [s] \n");
 
-*/
+        for(size_t i=0;i<this->linear_vel_x_squared.size();++i){
+            double vel = this->linear_vel_x_squared.at(i);
+            double time = this->qtime.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            hand_vel << vel_str+string(", ")+t_str+string("\n");
+        }
+        hand_vel.close();
+    }
+
+
+    // hand total velocity
+    if(!this->linear_vel_squared.empty()){
+        string filename_hand_vel("hand_tot_vel.csv");
+        ofstream hand_vel;
+        hand_vel.open(path.toStdString()+filename_hand_vel);
+
+        hand_vel << string("# HAND TOTAL VELOCITY SQUARED \n");
+        hand_vel << string("# velocity [mm^2/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->linear_vel_squared.size();++i){
+            double vel = this->linear_vel_squared.at(i);
+            double time = this->qtime.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            hand_vel << vel_str+string(", ")+t_str+string("\n");
+        }
+        hand_vel.close();
+    }
+
+
+    // TORSION OF THE HAND
+    if(!this->T_mov.empty()){
+        string filename_hand_vel("hand_torsion.csv");
+        ofstream hand_vel;
+        hand_vel.open(path.toStdString()+filename_hand_vel);
+
+        hand_vel << string("# TORSION OF THE HAND \n");
+        hand_vel << string("# torsion [1/m], time [s] \n");
+
+        for(size_t i=0;i<this->T_mov.size();++i){
+            double vel = this->T_mov.at(i);
+            double time = this->qtime.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            hand_vel << vel_str+string(", ")+t_str+string("\n");
+        }
+        hand_vel.close();
+    }
+
+
+
+
 }
 
 

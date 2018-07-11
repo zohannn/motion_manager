@@ -429,6 +429,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_16->graph(2)->setData(ln_x_tot, best_line);
     ui->plot_16->graph(2)->rescaleAxes();
 
+
     // legend
     QCPLegend *legend = new QCPLegend();
     QCPLayoutGrid *subLayout = new QCPLayoutGrid;

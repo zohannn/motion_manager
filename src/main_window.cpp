@@ -4812,6 +4812,7 @@ void MainWindow::on_pushButton_save_res_task_clicked()
         }
         hand_pos.close();
     }
+
     // hand velocity
     if(!this->handVelocityNorm_task.empty()){
         string filename_hand_vel("hand_vel_task.txt");
@@ -4847,6 +4848,7 @@ void MainWindow::on_pushButton_save_res_task_clicked()
     svg_qstr = path+QString("hand_vel_task.svg"); svg_str = svg_qstr.toStdString();
     cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
     system(cmdLine.c_str());
+
 
 }
 

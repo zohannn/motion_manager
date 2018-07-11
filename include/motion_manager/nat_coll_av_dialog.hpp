@@ -6,11 +6,15 @@
 #include <QFile>
 #include <QTextStream>
 #include <cstring>
+#include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <ui_nat_coll_avdialog.h>
 #include <eigen3/Eigen/Dense>
+#include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include "config.hpp"
 
 namespace motion_manager {
@@ -72,6 +76,12 @@ private:
      */
     void getDerivative(QVector<double> &function, QVector<double> &step_values, QVector<double> &derFunction);
 
+
+    QVector<double> qtime; // time
+    QVector<double> linear_vel_x_squared; // transport component
+    QVector<double> lift_vel_squared; // lift component
+    QVector<double> linear_vel_squared; // hand tot velocity
+    QVector<double> T_mov; // torsion of the movement
 };
 
 } // namespace motion_manager
