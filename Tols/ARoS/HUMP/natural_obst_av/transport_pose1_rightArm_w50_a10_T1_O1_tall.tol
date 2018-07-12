@@ -1,31 +1,30 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# 
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: Target_pose_1, Grip Type: Full
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
 Elbow_radius=70.0
 
-Wrist_radius=60.0
+Wrist_radius=60
 
 Hand_radius=50
+Hand_1_1=25
 
-Hand_1_1=5
+Hand_1_2=25
 
-Hand_1_2=5
+Hand_1_3=25
 
-Hand_1_3=5
+Hand_2_1=25
 
-Hand_2_1=5
+Hand_2_2=25
 
-Hand_2_2=5
+Hand_2_3=25
 
-Hand_2_3=5
+Hand_3_1=15
 
-Hand_3_1=5
+Hand_3_2=15
 
-Hand_3_2=5
-
-Hand_3_3=5
+Hand_3_3=15
 
 Hand_tip_1=5
 
@@ -57,28 +56,17 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=0
-
-init_vel_2=0
-
-init_vel_3=0
-
-init_vel_4=0
-
-init_vel_5=0
-
-init_vel_6=0
-
-init_vel_7=0
-
+init_vel_1=-0.0102332
+init_vel_2=0.0357822
+init_vel_3=0.0232005
+init_vel_4=-0.0355198
+init_vel_5=0.00949095
+init_vel_6=-0.0250707
+init_vel_7=0.0105216
 init_vel_8=0
-
 init_vel_9=0
-
 init_vel_10=0
-
 init_vel_11=0
-
 # Final Velocity 
 final_vel_1=0
 
@@ -103,28 +91,17 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=0
-
-init_acc_2=0
-
-init_acc_3=0
-
-init_acc_4=0
-
-init_acc_5=0
-
-init_acc_6=0
-
-init_acc_7=0
-
+init_acc_1=-0.0154176
+init_acc_2=0.0539101
+init_acc_3=0.0349543
+init_acc_4=-0.0535148
+init_acc_5=0.0142992
+init_acc_6=-0.037772
+init_acc_7=0.0158521
 init_acc_8=0
-
 init_acc_9=0
-
 init_acc_10=0
-
 init_acc_11=0
-
 # Final Acceleration 
 final_acc_1=0
 
@@ -192,18 +169,15 @@ obs_xx_2=0
 
 obs_xx_3=0
 
-obs_yy_1=0
+obs_yy_1=50
 
-obs_yy_2=0
+obs_yy_2=50
 
-obs_yy_3=0
+obs_yy_3=50
 
-obs_zz_1=0
-
-obs_zz_2=0
-
-obs_zz_3=0
-
+obs_zz_1=60
+obs_zz_2=60
+obs_zz_3=60
 obs_xy_1=0
 
 obs_xy_2=0
@@ -232,9 +206,9 @@ pre_grasp_x=0
 
 pre_grasp_y=0
 
-pre_grasp_z=-1
+pre_grasp_z=0
 
-pre_grasp_dist=50
+pre_grasp_dist=0
 
 post_grasp_x=1
 
@@ -245,13 +219,13 @@ post_grasp_z=0
 post_grasp_dist=10
 
 # Place settings
-pre_place_x=0
+pre_place_x=1
 
 pre_place_y=0
 
 pre_place_z=0
 
-pre_place_dist=0
+pre_place_dist=10
 
 post_place_x=0
 
@@ -261,9 +235,10 @@ post_place_z=0
 
 post_place_dist=0
 
-w_red_app=2
+w_red_app=10
 
-w_red_ret=20
+w_red_ret=10
+
 # Move settings
 target_x=-400
 
@@ -327,7 +302,7 @@ max_acceleration=10.0
 tar_av=true
 ob_av=true
 approach=true
-retreat=true
+retreat=false
 rand_init=false
 coll=true
 coll_body=true

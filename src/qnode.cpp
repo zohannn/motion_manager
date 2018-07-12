@@ -231,6 +231,8 @@ bool  QNode::loadScenario(const std::string& path,int id)
             subCylinderSmall= n.subscribe("/vrep/Cylinder_small_pose",1,&QNode::Cylinder_small_Callback,this);
             // Cylinder tall  (obj_id = 1)
             subCylinderTall = n.subscribe("/vrep/Cylinder_tall_pose",1,&QNode::Cylinder_tall_Callback,this);
+            // Bottle Juice (obj_id = 2)
+            subBottleJuice = n.subscribe("/vrep/BottleJuice_pose",1,&QNode::BottleJuiceCallback,this);
         }
 #if MOVEIT==1
         // planning scene of RViZ
@@ -3632,7 +3634,8 @@ bool QNode::getElements(scenarioPtr scene)
         // this is the order of the object in this scenario
         objs_prefix.push_back("Cylinder_small");   // obj_id = 0
         objs_prefix.push_back("Cylinder_tall");   // obj_id = 1
-        objs_prefix.push_back("Table");          // obj_id = 2
+        objs_prefix.push_back("BottleJuice");   // obj_id = 2
+        objs_prefix.push_back("Table");          // obj_id = 3
 
 
 
@@ -3730,9 +3733,13 @@ bool QNode::getElements(scenarioPtr scene)
 
         // this is the order of the poses in this scenario
         // pose_id = 0
-        poses_prefix.push_back("Target_pose");
+        poses_prefix.push_back("Target_pose_1");
         poses_rel.push_back(true);
-        poses_obj_id.push_back(3);
+        poses_obj_id.push_back(2);
+        // pose_id = 1
+        poses_prefix.push_back("Target_pose_2");
+        poses_rel.push_back(true);
+        poses_obj_id.push_back(2);
 
         while(cnt_pose < n_poses){
             signPrefix = poses_prefix[cnt_pose];

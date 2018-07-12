@@ -18,12 +18,18 @@ NatCollAvDialog::~NatCollAvDialog()
 
 void NatCollAvDialog::setupPlots(vector<vector<double>> &hand_linear_velocity,vector<vector<double> > &hand_position, vector<vector<vector<double> > > &timesteps)
 {
+    this->qtime.clear();
+    this->linear_vel_x_squared.clear();
+    this->lift_vel_squared.clear();
+    this->linear_vel_squared.clear();
+    this->T_mov.clear();
+
     vector<vector<vector<vector<double>>>> hand_position_task;
     // time
     vector<double> time_task; QVector<double> tot_timesteps;
     vector<int> index;
     //QVector<double> K; // Curvature of the task
-    QVector<double> T; // Torsion of the task
+    //QVector<double> T; // Torsion of the task
     //QVector<double> vel; // Velocity of the task
     //QVector<double> acc; // Acceleration of the task
     //double coeff_tot=0; // sum of the coefficient

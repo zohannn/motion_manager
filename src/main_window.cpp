@@ -3000,6 +3000,7 @@ void MainWindow::on_pushButton_load_task_clicked()
 
         // compute the hand values
         this->handPosition_task.resize(tot_steps); this->handVelocityNorm_task.resize(tot_steps);
+        this->handLinearVelocity_task.resize(tot_steps);
         if(arm_code==0){
             this->handPosition_task_left.resize(tot_steps); this->handVelocityNorm_task_left.resize(tot_steps);
         }
@@ -3023,6 +3024,7 @@ void MainWindow::on_pushButton_load_task_clicked()
                         vector<double> velocities; velocities.resize(vel_row.size());
                         VectorXd::Map(&velocities[0], vel_row.size()) = vel_row;
                         this->handVelocityNorm_task.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(arm_code,posture,velocities);
+                        this->curr_scene->getHumanoid()->getHandVel(arm_code,this->handLinearVelocity_task.at(step),posture,velocities);
                     }else{
                         // dual-arm
                         // right hand position
