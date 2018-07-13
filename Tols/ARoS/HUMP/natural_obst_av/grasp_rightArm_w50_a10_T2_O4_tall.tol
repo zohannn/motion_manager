@@ -7,8 +7,7 @@ Elbow_radius=70.0
 
 Wrist_radius=60.0
 
-Hand_radius=20
-
+Hand_radius=50
 Hand_1_1=5
 
 Hand_1_2=5
@@ -242,8 +241,7 @@ post_grasp_y=0
 
 post_grasp_z=-0.866025404
 
-post_grasp_dist=10
-
+post_grasp_dist=20
 # Place settings
 pre_place_x=0
 

@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Transport, Arm: right, Object: Cylinder_small, Object Engaged: , Pose: Target_pose, Grip Type: Full
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: Target_pose_2, Grip Type: Full
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
@@ -7,7 +7,8 @@ Elbow_radius=70.0
 
 Wrist_radius=60
 
-Hand_radius=30
+Hand_radius=50
+
 Hand_1_1=25
 
 Hand_1_2=25
@@ -20,20 +21,14 @@ Hand_2_2=25
 
 Hand_2_3=25
 
-Hand_3_1=15
-
-Hand_3_2=15
-
-Hand_3_3=15
-
-Hand_tip_1=5
-
-Hand_tip_2=5
-
-Hand_tip_3=5
-
+Hand_3_1=5
+Hand_3_2=5
+Hand_3_3=5
+Hand_tip_1=25
+Hand_tip_2=25
+Hand_tip_3=25
 # Joint Expanse factors
-lambda_1=0.99
+lambda_1=1
 
 lambda_2=1
 
@@ -56,13 +51,13 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=-0.0108216
-init_vel_2=0.0523586
-init_vel_3=0.0132753
-init_vel_4=-0.044808
-init_vel_5=0.0298899
-init_vel_6=-0.0162289
-init_vel_7=0.0122305
+init_vel_1=-0.0233358
+init_vel_2=0.0488298
+init_vel_3=0.0325883
+init_vel_4=-0.0478878
+init_vel_5=0.0239778
+init_vel_6=-0.0286904
+init_vel_7=0.0213367
 init_vel_8=0
 init_vel_9=0
 init_vel_10=0
@@ -91,13 +86,13 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=-0.0212447
-init_acc_2=0.102789
-init_acc_3=0.0260618
-init_acc_4=-0.087966
-init_acc_5=0.0586791
-init_acc_6=-0.0318601
-init_acc_7=0.0240106
+init_acc_1=-0.0222153
+init_acc_2=0.0464851
+init_acc_3=0.0310234
+init_acc_4=-0.0455883
+init_acc_5=0.0228264
+init_acc_6=-0.0273127
+init_acc_7=0.0203121
 init_acc_8=0
 init_acc_9=0
 init_acc_10=0
@@ -163,19 +158,21 @@ tar_yz_2=0
 tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
-obs_xx_1=0
-obs_xx_2=0
-obs_xx_3=0
-obs_yy_1=0
-obs_yy_2=0
+obs_xx_1=10
 
-obs_yy_3=0
-obs_zz_1=0
+obs_xx_2=10
 
-obs_zz_2=0
+obs_xx_3=10
 
-obs_zz_3=0
+obs_yy_1=30
 
+obs_yy_2=30
+
+obs_yy_3=30
+
+obs_zz_1=60
+obs_zz_2=60
+obs_zz_3=60
 obs_xy_1=0
 
 obs_xy_2=0
@@ -217,11 +214,11 @@ post_grasp_z=0
 post_grasp_dist=10
 
 # Place settings
-pre_place_x=0.5
+pre_place_x=1
 
 pre_place_y=0
 
-pre_place_z=-0.866025404
+pre_place_z=0
 
 pre_place_dist=10
 

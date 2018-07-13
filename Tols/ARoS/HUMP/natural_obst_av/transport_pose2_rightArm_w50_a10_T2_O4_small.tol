@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# Planner: HUMP ,Movement: Transport, Arm: right, Object: Cylinder_tall, Object Engaged: , Pose: Target_pose, Grip Type: Full
+# Planner: HUMP ,Movement: Transport, Arm: right, Object: BottleJuice, Object Engaged: , Pose: Target_pose_2, Grip Type: Full
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
@@ -7,7 +7,7 @@ Elbow_radius=70.0
 
 Wrist_radius=60
 
-Hand_radius=70
+Hand_radius=50
 Hand_1_1=25
 
 Hand_1_2=25
@@ -26,14 +26,14 @@ Hand_3_2=15
 
 Hand_3_3=15
 
-Hand_tip_1=5
+Hand_tip_1=25
 
-Hand_tip_2=5
+Hand_tip_2=25
 
-Hand_tip_3=5
+Hand_tip_3=25
 
 # Joint Expanse factors
-lambda_1=0.99
+lambda_1=1
 lambda_2=1
 
 lambda_3=1.0
@@ -55,13 +55,13 @@ lambda_10=1.0
 lambda_11=1.0
 
 # Initial Velocity 
-init_vel_1=0.00534579
-init_vel_2=0.0189413
-init_vel_3=-0.00472086
-init_vel_4=-0.057589
-init_vel_5=-0.00897075
-init_vel_6=0.0101621
-init_vel_7=0.0492452
+init_vel_1=0.0172779
+init_vel_2=-0.0152273
+init_vel_3=-0.0373486
+init_vel_4=-0.0307108
+init_vel_5=-0.0310525
+init_vel_6=0.0416944
+init_vel_7=0.0394081
 init_vel_8=0
 init_vel_9=0
 init_vel_10=0
@@ -90,13 +90,13 @@ final_vel_10=0.0
 final_vel_11=0.0
 
 # Initial Acceleration 
-init_acc_1=0.00709934
-init_acc_2=0.0251545
-init_acc_3=-0.00626941
-init_acc_4=-0.0764796
-init_acc_5=-0.0119134
-init_acc_6=0.0134955
-init_acc_7=0.0653988
+init_acc_1=0.0273057
+init_acc_2=-0.0240649
+init_acc_3=-0.059025
+init_acc_4=-0.0485348
+init_acc_5=-0.0490747
+init_acc_6=0.065893
+init_acc_7=0.0622798
 init_acc_8=0
 init_acc_9=0
 init_acc_10=0
@@ -162,15 +162,18 @@ tar_yz_2=0
 tar_yz_3=0
 
 # Tolerances with the obstacles [mm]
-obs_xx_1=40
-obs_xx_2=40
-obs_xx_3=40
-obs_yy_1=0
-obs_yy_2=0
-obs_yy_3=0
-obs_zz_1=100
-obs_zz_2=100
-obs_zz_3=100
+obs_xx_1=5
+obs_xx_2=5
+obs_xx_3=5
+obs_yy_1=20
+
+obs_yy_2=20
+
+obs_yy_3=20
+
+obs_zz_1=50
+obs_zz_2=50
+obs_zz_3=50
 obs_xy_1=0
 
 obs_xy_2=0
@@ -213,11 +216,9 @@ post_grasp_dist=10
 
 # Place settings
 pre_place_x=1
-
 pre_place_y=0
 
 pre_place_z=0
-
 pre_place_dist=10
 
 post_place_x=0

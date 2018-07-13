@@ -1,5 +1,5 @@
 ### Parameters of the Human-like Upper-limbs Motion Library ###
-# 
+# Planner: HUMP ,Movement: Reach-to-grasp, Arm: right, Object: BottleJuice, Object Engaged: , Pose: , Grip Type: Full
 # Geometric Dimensions of the arms and of the fingers
 Shoulder_radius=80.0
 
@@ -7,8 +7,7 @@ Elbow_radius=70.0
 
 Wrist_radius=60.0
 
-Hand_radius=20
-
+Hand_radius=50
 Hand_1_1=5
 
 Hand_1_2=5
