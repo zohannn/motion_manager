@@ -59,6 +59,12 @@ public Q_SLOTS:
     void checkAddPlane(int state);
 
     /**
+     * @brief checkWarmStart
+     * @param state
+     */
+    void checkWarmStart(int state);
+
+    /**
      * @brief checkSetHandCond
      * @param state
      */
@@ -368,7 +374,8 @@ public:
 private:
     Ui::TolDialogHUMP *ui; /**< handle of the user interface */
     string infoLine; /**< information about the tuning of the planner */
-    bool rand_init;
+    bool rand_init;/**< random initialization */
+    bool warm_start;/**< warm start option */
 };
 
 } // namespace motion_manager

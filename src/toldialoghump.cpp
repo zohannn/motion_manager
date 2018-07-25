@@ -15,6 +15,7 @@ TolDialogHUMP::TolDialogHUMP(QWidget *parent) :
      QObject::connect(ui->checkBox_retreat, SIGNAL(stateChanged(int)), this, SLOT(checkRetreat(int)));
      QObject::connect(ui->checkBox_sel_final_posture, SIGNAL(stateChanged(int)), this, SLOT(checkFinalPosture(int)));
      QObject::connect(ui->checkBox_add_plane, SIGNAL(stateChanged(int)), this, SLOT(checkAddPlane(int)));
+     QObject::connect(ui->checkBox_warm_start, SIGNAL(stateChanged(int)), this, SLOT(checkWarmStart(int)));
      //QObject::connect(ui->checkBox_hand_cond, SIGNAL(stateChanged(int)), this, SLOT(checkHandCond(int)));
      //QObject::connect(ui->checkBox_hand_cond_approach, SIGNAL(stateChanged(int)), this, SLOT(checkHandCondApproach(int)));
 
@@ -687,6 +688,7 @@ void TolDialogHUMP::on_pushButton_save_clicked()
        if(ui->checkBox_coll->isChecked()){stream << "coll=false"<<endl;}else{stream << "coll=true"<<endl;}
        if(ui->checkBox_coll_body->isChecked()){stream << "coll_body=false"<<endl;}else{stream << "coll_body=true"<<endl;}
        if(ui->checkBox_straight_line->isChecked()){stream << "straight_line=true"<<endl;}else{stream << "straight_line=false"<<endl;}
+       if(ui->checkBox_warm_start->isChecked()){stream << "warm_start=true"<<endl;}else{stream << "warm_start=false"<<endl;}
        //stream << "# END" << endl;
 
 
@@ -1139,6 +1141,13 @@ void TolDialogHUMP::on_pushButton_load_clicked()
                         ui->checkBox_straight_line->setChecked(true);
                     }
 
+                }else if(QString::compare(fields.at(0),QString("warm_start"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_warm_start->setChecked(false);
+                    }else{
+                        ui->checkBox_warm_start->setChecked(true);
+                    }
+
                 }
 
             }
@@ -1202,6 +1211,17 @@ void TolDialogHUMP::checkAddPlane(int state)
     }else{
         //checked
         ui->groupBox_plane->setEnabled(true);
+    }
+}
+
+void TolDialogHUMP::checkWarmStart(int state)
+{
+    if(state==0){
+        //unchecked
+        ui->tab_hump_warm->setEnabled(false);
+    }else{
+        //checked
+        ui->tab_hump_warm->setEnabled(true);
     }
 }
 
