@@ -28,6 +28,7 @@
 #include "prmdialog.hpp"
 #include "prmstardialog.hpp"
 #include "results_plan_joints_dialog.hpp"
+#include "results_warm_start_dialog.hpp"
 #include "power_law_dialog.hpp"
 #include "powerlaw3ddialog.hpp"
 #include "comp_velocity_dialog.hpp"
@@ -467,6 +468,11 @@ public Q_SLOTS:
         void on_pushButton_comp_vel_mov_clicked();
 
         /**
+         * @brief on_pushButton_warm_start_res_clicked
+         */
+        void on_pushButton_warm_start_res_clicked();
+
+        /**
          * @brief on_pushButton_comp_vel_mov_right_clicked
          */
         void on_pushButton_comp_vel_mov_right_clicked();
@@ -517,6 +523,7 @@ private:
         PowerLaw3DDialog *mPowerLaw3Ddlg; /**< handle of the 1/6 power law dialog*/
         CompVelocityDialog *mCompVeldlg; /**< handle of the velocity components dlg */
         NatCollAvDialog *mNatCollAvdlg; /**< handle of the natural collision avoidance dlg */
+        WarmStartResultsDialog *mWarmdlg; /**< handle of the warm start results dialog */
         int scenario_id; /**< id of the current scenario */
         QVector<QString> scenarios;  /**< list of scenarios */
 
@@ -527,6 +534,8 @@ private:
         vector< MatrixXd > jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
         vector< MatrixXd > jointsPosition_mov; /**< trajectory of the joint position of the movement */
         vector< string > traj_descr_mov; /**< description of the trajectories */
+        vector<HUMotion::warm_start_params> final_warm_start_res_mov; /**< warm start results of the target posture selections solved for the movement */
+        HUMotion::warm_start_params bounce_warm_start_res_mov; /**< warm start results of the bounce posture selection solved for the movement */
         vector<double> jointsEndPosition_mov; /**< end joint position of the movement */
         vector<double> jointsEndVelocity_mov; /**< end joint velocity of the movement */
         vector<double> jointsEndAcceleration_mov; /**< end joint acceleration of the movement */

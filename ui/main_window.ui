@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1096,7 +1096,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tab_results_plan_mov">
          <attribute name="title">
@@ -1231,13 +1231,20 @@ p, li { white-space: pre-wrap; }
            <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
-              <x>800</x>
+              <x>620</x>
               <y>420</y>
-              <width>431</width>
+              <width>590</width>
               <height>25</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_17">
+             <item>
+              <widget class="QPushButton" name="pushButton_warm_start_res">
+               <property name="text">
+                <string>show the warm start results</string>
+               </property>
+              </widget>
+             </item>
              <item>
               <widget class="QPushButton" name="pushButton_comp_vel_mov">
                <property name="text">
@@ -1638,7 +1645,7 @@ p, li { white-space: pre-wrap; }
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="">
+           <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
               <x>368</x>

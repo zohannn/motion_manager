@@ -96,6 +96,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mNatCollAvdlg = new NatCollAvDialog(this);
     mNatCollAvdlg->setModal(false);
 
+    // create the warm start results dialog
+    mWarmdlg = new WarmStartResultsDialog(this);
+    mWarmdlg->setModal(false);
+
 
 
     ReadSettings();
@@ -1114,6 +1118,8 @@ void MainWindow::on_pushButton_plan_clicked()
                     this->jointsVelocity_mov.clear(); this->jointsVelocity_mov = h_results->velocity_stages;
                     this->jointsAcceleration_mov.clear(); this->jointsAcceleration_mov = h_results->acceleration_stages;
                     this->traj_descr_mov.clear(); this->traj_descr_mov = h_results->trajectory_descriptions;
+                    this->final_warm_start_res_mov = h_results->final_warm_start_res;
+                    this->bounce_warm_start_res_mov = h_results->bounce_warm_start_res;
                     std::vector<double> timesteps_stage_aux;
                     for(size_t i=0; i<h_results->trajectory_stages.size();++i){
                         timesteps_stage_aux.clear();
@@ -4324,6 +4330,73 @@ void MainWindow::on_pushButton_comp_vel_mov_clicked()
 
     this->mCompVeldlg->setDual(false); this->mCompVeldlg->setRight(true);
     this->mCompVeldlg->show();
+}
+
+void MainWindow::on_pushButton_warm_start_res_clicked()
+{
+
+    this->mWarmdlg->enablePlanData(false);
+    this->mWarmdlg->enableApproachData(false);
+    this->mWarmdlg->enableRetreatData(false);
+    this->mWarmdlg->enableBounceData(false);
+
+    if(!this->final_warm_start_res_mov.empty())
+    {
+
+        if(this->final_warm_start_res_mov.size()==3)
+        {
+            this->mWarmdlg->enablePlanData(true);
+            HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(1);
+            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars);
+
+            this->mWarmdlg->enableApproachData(true);
+            HUMotion::warm_start_params approach_tar = this->final_warm_start_res_mov.at(0);
+            this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars);
+
+            this->mWarmdlg->enableRetreatData(true);
+            HUMotion::warm_start_params retreat_tar = this->final_warm_start_res_mov.at(2);
+            this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars);
+
+        }else if(this->final_warm_start_res_mov.size()==2){
+
+            if(this->traj_descr_mov.at(1).compare("approach")==0)
+            {
+                this->mWarmdlg->enableApproachData(true);
+                HUMotion::warm_start_params approach_tar = this->final_warm_start_res_mov.at(0);
+                this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars);
+
+                this->mWarmdlg->enablePlanData(true);
+                HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(1);
+                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars);
+
+            }else{
+
+                this->mWarmdlg->enablePlanData(true);
+                HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(0);
+                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars);
+
+                this->mWarmdlg->enableRetreatData(true);
+                HUMotion::warm_start_params retreat_tar = this->final_warm_start_res_mov.at(1);
+                this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars);
+
+            }
+        }else{
+            this->mWarmdlg->enablePlanData(true);
+            HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(0);
+            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars);
+        }
+    }
+
+    // bounce posture data
+    if (this->bounce_warm_start_res_mov.valid)
+    {
+        this->mWarmdlg->enableBounceData(true);
+        this->mWarmdlg->setBounceData(this->bounce_warm_start_res_mov.iterations,this->bounce_warm_start_res_mov.cpu_time,this->bounce_warm_start_res_mov.obj_value,this->bounce_warm_start_res_mov.x,this->bounce_warm_start_res_mov.zL,this->bounce_warm_start_res_mov.zU,this->bounce_warm_start_res_mov.dual_vars);
+    }else{
+        this->mWarmdlg->enableBounceData(false);
+    }
+
+    this->mWarmdlg->show();
 }
 
 void MainWindow::on_pushButton_comp_vel_mov_right_clicked()
