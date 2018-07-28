@@ -20,6 +20,15 @@ WarmStartResultsDialog::~WarmStartResultsDialog()
 
 void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars)
 {
+
+    this->iterations_plan = iter;
+    this->cpu_time_plan = cpu_time;
+    this->obj_plan = obj;
+    this->x_plan = x;
+    this->zL_plan = zL;
+    this->zU_plan = zU;
+    this->dual_plan = dual_vars;
+
     this->ui->label_iter_count_plan_value->setText(QString::number(iter));
     this->ui->label_cpu_time_plan_value->setText(QString::number(cpu_time));
     this->ui->label_obj_func_plan_value->setText(QString::number(obj));
@@ -67,6 +76,15 @@ void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, 
 
 void WarmStartResultsDialog::setApproachData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars)
 {
+
+    this->iterations_approach = iter;
+    this->cpu_time_approach = cpu_time;
+    this->obj_approach = obj;
+    this->x_approach = x;
+    this->zL_approach = zL;
+    this->zU_approach = zU;
+    this->dual_approach = dual_vars;
+
     this->ui->label_iter_count_app_value->setText(QString::number(iter));
     this->ui->label_cpu_time_app_value->setText(QString::number(cpu_time));
     this->ui->label_obj_func_app_value->setText(QString::number(obj));
@@ -114,6 +132,15 @@ void WarmStartResultsDialog::setApproachData(int iter, double cpu_time, double o
 
 void WarmStartResultsDialog::setRetreatData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars)
 {
+
+    this->iterations_retreat = iter;
+    this->cpu_time_retreat = cpu_time;
+    this->obj_retreat = obj;
+    this->x_retreat = x;
+    this->zL_retreat = zL;
+    this->zU_retreat = zU;
+    this->dual_retreat = dual_vars;
+
     this->ui->label_iter_count_retreat_value->setText(QString::number(iter));
     this->ui->label_cpu_time_retreat_value->setText(QString::number(cpu_time));
     this->ui->label_obj_func_retreat_value->setText(QString::number(obj));
@@ -161,6 +188,15 @@ void WarmStartResultsDialog::setRetreatData(int iter, double cpu_time, double ob
 
 void WarmStartResultsDialog::setBounceData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars)
 {
+
+    this->iterations_bounce = iter;
+    this->cpu_time_bounce = cpu_time;
+    this->obj_bounce = obj;
+    this->x_bounce = x;
+    this->zL_bounce = zL;
+    this->zU_bounce = zU;
+    this->dual_bounce = dual_vars;
+
     this->ui->label_iter_count_bounce_value->setText(QString::number(iter));
     this->ui->label_cpu_time_bounce_value->setText(QString::number(cpu_time));
     this->ui->label_obj_func_bounce_value->setText(QString::number(obj));
@@ -208,21 +244,25 @@ void WarmStartResultsDialog::setBounceData(int iter, double cpu_time, double obj
 
 void WarmStartResultsDialog::enablePlanData(bool en)
 {
+    this->en_plan = en;
     this->ui->tabWidget->setTabEnabled(0, en);
 }
 
 void WarmStartResultsDialog::enableApproachData(bool en)
 {
+    this->en_approach = en;
     this->ui->tabWidget->setTabEnabled(1, en);
 }
 
 void WarmStartResultsDialog::enableRetreatData(bool en)
 {
+    this->en_retreat = en;
     this->ui->tabWidget->setTabEnabled(2, en);
 }
 
 void WarmStartResultsDialog::enableBounceData(bool en)
 {
+    this->en_bounce = en;
     this->ui->tabWidget->setTabEnabled(3, en);
 }
 
@@ -230,60 +270,227 @@ void WarmStartResultsDialog::enableBounceData(bool en)
 
 void WarmStartResultsDialog::on_pushButton_save_warm_start_res_clicked()
 {
-/*
-    QString path;
 
-    if(dual)
-    {
-        if(right){
-            struct stat st = {0};
-            if (stat("results", &st) == -1) {
-                mkdir("results", 0700);
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    tr("Save the file of dual variables"),
+                                                    QString(MAIN_PATH)+"/Duals",
+                                                    "All Files (*.*);;Tol Files (*.dual)");
+    QFile f( filename );
+    if(f.open( QIODevice::WriteOnly )){
+
+        QTextStream stream( &f );
+        stream << "### Dual variables and solutions of the optimization problems ###" << endl;
+        if(this->en_plan)
+        {
+            stream << "## Plan target posture selection data ##"<<endl;
+            stream << "Iterations_plan=" << QString::number(this->iterations_plan).toStdString().c_str() << endl;
+            stream << "Cpu_time_plan=" << QString::number(this->cpu_time_plan).toStdString().c_str() << endl;
+            stream << "Obj_plan=" << QString::number(this->obj_plan).toStdString().c_str() << endl;
+
+            stream << "X_plan=";
+            for(size_t i=0; i<this->x_plan.size();++i)
+            {
+                stream << this->x_plan.at(i);
+                if(i!=this->x_plan.size()-1)
+                {
+                    stream << "|";
+                }
             }
-            if (stat("results/planning", &st) == -1) {
-                mkdir("results/planning", 0700);
+            stream<< endl;
+
+            stream << "ZL_plan=";
+            for(size_t i=0; i<this->zL_plan.size();++i)
+            {
+                stream << this->zL_plan.at(i);
+                if(i!=this->zL_plan.size()-1)
+                {
+                    stream << "|";
+                }
             }
-            if (stat("results/planning/shoulder_right", &st) == -1) {
-                mkdir("results/planning/shoulder_right", 0700);
+            stream<< endl;
+
+            stream << "ZU_plan=";
+            for(size_t i=0; i<this->zU_plan.size();++i)
+            {
+                stream << this->zU_plan.at(i);
+                if(i!=this->zU_plan.size()-1)
+                {
+                    stream << "|";
+                }
             }
-            path = QString("results/planning/shoulder_right/");
-        }else{
-            struct stat st = {0};
-            if (stat("results", &st) == -1) {
-                mkdir("results", 0700);
+            stream<< endl;
+
+            stream << "Dual_plan=";
+            for(size_t i=0; i<this->dual_plan.size();++i)
+            {
+                stream << this->dual_plan.at(i);
+                if(i!=this->dual_plan.size()-1)
+                {
+                    stream << "|";
+                }
             }
-            if (stat("results/planning", &st) == -1) {
-                mkdir("results/planning", 0700);
-            }
-            if (stat("results/planning/shoulder_left", &st) == -1) {
-                mkdir("results/planning/shoulder_left", 0700);
-            }
-            path = QString("results/planning/shoulder_left/");
+            stream<< endl;
         }
-    }else{
-        struct stat st = {0};
-        if (stat("results", &st) == -1) {
-            mkdir("results", 0700);
+
+        if(this->en_approach)
+        {
+            stream << "## Approach target posture selection data ##"<<endl;
+            stream << "Iterations_approach=" << QString::number(this->iterations_approach).toStdString().c_str() << endl;
+            stream << "Cpu_time_approach=" << QString::number(this->cpu_time_approach).toStdString().c_str() << endl;
+            stream << "Obj_approach=" << QString::number(this->obj_approach).toStdString().c_str() << endl;
+
+            stream << "X_approach=";
+            for(size_t i=0; i<this->x_approach.size();++i)
+            {
+                stream << this->x_approach.at(i);
+                if(i!=this->x_approach.size()-1)
+                {
+                    stream << "|";
+                }
+            }
+            stream<< endl;
+
+            stream << "ZL_approach=";
+            for(size_t i=0; i<this->zL_approach.size();++i)
+            {
+                stream << this->zL_approach.at(i);
+                if(i!=this->zL_approach.size()-1)
+                {
+                    stream << "|";
+                }
+            }
+            stream<< endl;
+
+            stream << "ZU_approach=";
+            for(size_t i=0; i<this->zU_approach.size();++i)
+            {
+                stream << this->zU_approach.at(i);
+                if(i!=this->zU_approach.size()-1)
+                {
+                    stream << "|";
+                }
+            }
+            stream<< endl;
+
+            stream << "Dual_approach=";
+            for(size_t i=0; i<this->dual_approach.size();++i)
+            {
+                stream << this->dual_approach.at(i);
+                if(i!=this->dual_approach.size()-1)
+                {
+                    stream << "|";
+                }
+            }
+            stream<< endl;
         }
-        if (stat("results/planning", &st) == -1) {
-            mkdir("results/planning", 0700);
+
+        if(this->en_retreat)
+        {
+            stream << "## Retreat target posture selection data ##"<<endl;
+            stream << "Iterations_retreat=" << QString::number(this->iterations_retreat).toStdString().c_str() << endl;
+            stream << "Cpu_time_retreat=" << QString::number(this->cpu_time_retreat).toStdString().c_str() << endl;
+            stream << "Obj_retreat=" << QString::number(this->obj_retreat).toStdString().c_str() << endl;
+
+            stream << "X_retreat=";
+            for(size_t i=0; i<this->x_retreat.size();++i)
+            {
+                stream << this->x_retreat.at(i);
+                if(i!=this->x_retreat.size()-1)
+                {
+                    stream << "|";
+                }
+            }
+            stream<< endl;
+
+            stream << "ZL_retreat=";
+            for(size_t i=0; i<this->zL_retreat.size();++i)
+            {
+                stream << this->zL_retreat.at(i);
+                if(i!=this->zL_retreat.size()-1)
+                {
+                    stream << "|";
+                }
+            }
+            stream<< endl;
+
+            stream << "ZU_retreat=";
+            for(size_t i=0; i<this->zU_retreat.size();++i)
+            {
+                stream << this->zU_retreat.at(i);
+                if(i!=this->zU_retreat.size()-1)
+                {
+                    stream << "|";
+                }
+            }
+            stream<< endl;
+
+            stream << "Dual_retreat=";
+            for(size_t i=0; i<this->dual_retreat.size();++i)
+            {
+                stream << this->dual_retreat.at(i);
+                if(i!=this->dual_retreat.size()-1)
+                {
+                    stream << "|";
+                }
+            }
+            stream<< endl;
         }
-        if (stat("results/planning/shoulder", &st) == -1) {
-            mkdir("results/planning/shoulder", 0700);
+
+        if(this->en_bounce)
+        {
+            stream << "## Bounce posture selection data ##"<<endl;
+            stream << "Iterations_bounce=" << QString::number(this->iterations_bounce).toStdString().c_str() << endl;
+            stream << "Cpu_time_bounce=" << QString::number(this->cpu_time_bounce).toStdString().c_str() << endl;
+            stream << "Obj_bounce=" << QString::number(this->obj_bounce).toStdString().c_str() << endl;
+
+            stream << "X_bounce=";
+            for(size_t i=0; i<this->x_bounce.size();++i)
+            {
+                stream << this->x_bounce.at(i);
+                if(i!=this->x_bounce.size()-1)
+                {
+                    stream << "|";
+                }
+            }
+            stream<< endl;
+
+            stream << "ZL_bounce=";
+            for(size_t i=0; i<this->zL_bounce.size();++i)
+            {
+                stream << this->zL_bounce.at(i);
+                if(i!=this->zL_bounce.size()-1)
+                {
+                    stream << "|";
+                }
+            }
+            stream<< endl;
+
+            stream << "ZU_bounce=";
+            for(size_t i=0; i<this->zU_bounce.size();++i)
+            {
+                stream << this->zU_bounce.at(i);
+                if(i!=this->zU_bounce.size()-1)
+                {
+                    stream << "|";
+                }
+            }
+            stream<< endl;
+
+            stream << "Dual_bounce=";
+            for(size_t i=0; i<this->dual_bounce.size();++i)
+            {
+                stream << this->dual_bounce.at(i);
+                if(i!=this->dual_bounce.size()-1)
+                {
+                    stream << "|";
+                }
+            }
+            stream<< endl;
         }
-        path = QString("results/planning/shoulder/");
+
+        f.close();
     }
 
-    ui->plot_shoulder_x->savePdf(path+QString("shoulder_vel_x.pdf"),true,0,0,QString(),QString("Shoulder Linear Velocity x"));
-    ui->plot_shoulder_y->savePdf(path+QString("shoulder_vel_y.pdf"),true,0,0,QString(),QString("Shoulder Linear Velocity y"));
-    ui->plot_shoulder_z->savePdf(path+QString("shoulder_vel_z.pdf"),true,0,0,QString(),QString("Shoulder Linear Velocity z"));
-    ui->plot_shoulder_lin_vel->savePdf(path+QString("shoulder_lin_vel.pdf"),true,0,0,QString(),QString("Shoulder Linear Velocity Norm"));
-    ui->plot_shoulder_wx->savePdf(path+QString("shoulder_vel_wx.pdf"),true,0,0,QString(),QString("Shoulder Angular Velocity x"));
-    ui->plot_shoulder_wy->savePdf(path+QString("shoulder_vel_wy.pdf"),true,0,0,QString(),QString("Shoulder Angular Velocity x"));
-    ui->plot_shoulder_wz->savePdf(path+QString("shoulder_vel_wz.pdf"),true,0,0,QString(),QString("Shoulder Angular Velocity x"));
-    ui->plot_shoulder_ang_vel->savePdf(path+QString("shoulder_ang_vel.pdf"),true,0,0,QString(),QString("Shoulder Angular Velocity Norm"));
-
-*/
 }
 
 
