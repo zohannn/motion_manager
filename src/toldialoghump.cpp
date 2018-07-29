@@ -695,7 +695,266 @@ void TolDialogHUMP::on_pushButton_save_clicked()
        f.close();
    }
 
+}
 
+void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
+{
+
+    this->ui->tabWidget_warm_start->setTabEnabled(0,false); // plan
+    x_plan.clear(); zL_plan.clear(); zU_plan.clear(); dual_plan.clear();
+    this->ui->tabWidget_warm_start->setTabEnabled(1,false); // approach
+    x_approach.clear(); zL_approach.clear(); zU_approach.clear(); dual_approach.clear();
+    this->ui->tabWidget_warm_start->setTabEnabled(2,false); // retreat
+    x_retreat.clear(); zL_retreat.clear(); zU_retreat.clear(); dual_retreat.clear();
+    this->ui->tabWidget_warm_start->setTabEnabled(3,false); // bounce
+    x_bounce.clear(); zL_bounce.clear(); zU_bounce.clear(); dual_bounce.clear();
+
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    tr("Load the file of warm start settings"),
+                                                    QString(MAIN_PATH)+"/Duals",
+                                                    "All Files (*.*);; Tol Files (*.dual)");
+    QFile f( filename );
+    if(f.open( QIODevice::ReadOnly )){
+
+        QTextStream stream( &f );
+        QString line;
+        while(!stream.atEnd()){
+            line = f.readLine();
+            if(line.at(0)!=QChar('#')){
+                QStringList fields = line.split("=");
+                if (QString::compare(fields.at(0),QString("X_plan"),Qt::CaseInsensitive)==0){
+                    this->ui->tabWidget_warm_start->setTabEnabled(0,true);
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        x_plan.push_back(data.at(i).toDouble());
+                }else if (QString::compare(fields.at(0),QString("ZL_plan"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zL_plan.push_back(data.at(i).toDouble());
+                }else if (QString::compare(fields.at(0),QString("ZU_plan"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zU_plan.push_back(data.at(i).toDouble());
+                }else if (QString::compare(fields.at(0),QString("Dual_plan"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        dual_plan.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("X_approach"),Qt::CaseInsensitive)==0){
+                    this->ui->tabWidget_warm_start->setTabEnabled(1,true);
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        x_approach.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("ZL_approach"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zL_approach.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("ZU_approach"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zU_approach.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("Dual_approach"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        dual_approach.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("X_retreat"),Qt::CaseInsensitive)==0){
+                    this->ui->tabWidget_warm_start->setTabEnabled(2,true);
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        x_retreat.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("ZL_retreat"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zL_retreat.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("ZU_retreat"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zU_retreat.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("Dual_retreat"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        dual_retreat.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("X_bounce"),Qt::CaseInsensitive)==0){
+                    this->ui->tabWidget_warm_start->setTabEnabled(3,true);
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        x_bounce.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("ZL_bounce"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zL_bounce.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("ZU_bounce"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zU_bounce.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("Dual_bounce"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        dual_bounce.push_back(data.at(i).toDouble());
+                }
+            }
+        }
+
+        f.close();
+    }
+
+    QStringList h_headers; h_headers << "Solution [rad]" << "Lower Bounds [rad]" << "Upper Bounds [rad]";
+    QStringList v_headers;
+    QStringList h_dual_headers;  h_dual_headers << "Lagrange multipliers";
+    QStringList v_dual_headers;
+
+    // ----------- display the plan data ----------------------- //
+    this->ui->tableWidget_init_guess_plan->clear();
+    this->ui->tableWidget_dual_vars_plan->clear();
+
+    // initial guess and bounds multipliers
+    v_headers.clear();
+    this->ui->tableWidget_init_guess_plan->setColumnCount(h_headers.size());
+    this->ui->tableWidget_init_guess_plan->setRowCount(x_plan.size());
+    for(int i =0; i < x_plan.size(); ++i){
+        double x_value = x_plan.at(i);
+        double zL_value = zL_plan.at(i);
+        double zU_value = zU_plan.at(i);
+        v_headers.push_back(QString("Joint ")+QString::number(i));
+        std::vector<QString> row = {QString::number(x_value),QString::number(zL_value),QString::number(zU_value)};
+        for(int j=0; j < h_headers.size(); ++j){
+           QString item = row.at(j);
+           this->ui->tableWidget_init_guess_plan->setItem(i,j,new QTableWidgetItem(item));
+        }
+    }
+    this->ui->tableWidget_init_guess_plan->setHorizontalHeaderLabels(h_headers);
+    this->ui->tableWidget_init_guess_plan->setVerticalHeaderLabels(v_headers);
+
+    // constraints lagrange multipliers
+    v_dual_headers.clear();
+    this->ui->tableWidget_dual_vars_plan->setColumnCount(h_dual_headers.size());
+    this->ui->tableWidget_dual_vars_plan->setRowCount(dual_plan.size());
+    for(int i =0; i < dual_plan.size(); ++i){
+        double d_value = dual_plan.at(i);
+        v_dual_headers.push_back(QString("Constraint ")+QString::number(i));
+        std::vector<QString> row = {QString::number(d_value)};
+        for(int j=0; j < h_dual_headers.size(); ++j){
+           QString item = row.at(j);
+           this->ui->tableWidget_dual_vars_plan->setItem(i,j,new QTableWidgetItem(item));
+        }
+    }
+    this->ui->tableWidget_dual_vars_plan->setHorizontalHeaderLabels(h_dual_headers);
+    this->ui->tableWidget_dual_vars_plan->setVerticalHeaderLabels(v_dual_headers);
+
+
+    // ----------- display the approach data ----------------------- //
+    this->ui->tableWidget_init_guess_approach->clear();
+    this->ui->tableWidget_dual_vars_approach->clear();
+
+    // initial guess and bounds multipliers
+    v_headers.clear();
+    this->ui->tableWidget_init_guess_approach->setColumnCount(h_headers.size());
+    this->ui->tableWidget_init_guess_approach->setRowCount(x_approach.size());
+    for(int i =0; i < x_approach.size(); ++i){
+        double x_value = x_approach.at(i);
+        double zL_value = zL_approach.at(i);
+        double zU_value = zU_approach.at(i);
+        v_headers.push_back(QString("Joint ")+QString::number(i));
+        std::vector<QString> row = {QString::number(x_value),QString::number(zL_value),QString::number(zU_value)};
+        for(int j=0; j < h_headers.size(); ++j){
+           QString item = row.at(j);
+           this->ui->tableWidget_init_guess_approach->setItem(i,j,new QTableWidgetItem(item));
+        }
+    }
+    this->ui->tableWidget_init_guess_approach->setHorizontalHeaderLabels(h_headers);
+    this->ui->tableWidget_init_guess_approach->setVerticalHeaderLabels(v_headers);
+
+    // constraints lagrange multipliers
+    v_dual_headers.clear();
+    this->ui->tableWidget_dual_vars_approach->setColumnCount(h_dual_headers.size());
+    this->ui->tableWidget_dual_vars_approach->setRowCount(dual_approach.size());
+    for(int i =0; i < dual_approach.size(); ++i){
+        double d_value = dual_approach.at(i);
+        v_dual_headers.push_back(QString("Constraint ")+QString::number(i));
+        std::vector<QString> row = {QString::number(d_value)};
+        for(int j=0; j < h_dual_headers.size(); ++j){
+           QString item = row.at(j);
+           this->ui->tableWidget_dual_vars_approach->setItem(i,j,new QTableWidgetItem(item));
+        }
+    }
+    this->ui->tableWidget_dual_vars_approach->setHorizontalHeaderLabels(h_dual_headers);
+    this->ui->tableWidget_dual_vars_approach->setVerticalHeaderLabels(v_dual_headers);
+
+    // ----------- display the retreat data ----------------------- //
+    this->ui->tableWidget_init_guess_retreat->clear();
+    this->ui->tableWidget_dual_vars_retreat->clear();
+
+    // initial guess and bounds multipliers
+    v_headers.clear();
+    this->ui->tableWidget_init_guess_retreat->setColumnCount(h_headers.size());
+    this->ui->tableWidget_init_guess_retreat->setRowCount(x_retreat.size());
+    for(int i =0; i < x_retreat.size(); ++i){
+        double x_value = x_retreat.at(i);
+        double zL_value = zL_retreat.at(i);
+        double zU_value = zU_retreat.at(i);
+        v_headers.push_back(QString("Joint ")+QString::number(i));
+        std::vector<QString> row = {QString::number(x_value),QString::number(zL_value),QString::number(zU_value)};
+        for(int j=0; j < h_headers.size(); ++j){
+           QString item = row.at(j);
+           this->ui->tableWidget_init_guess_retreat->setItem(i,j,new QTableWidgetItem(item));
+        }
+    }
+    this->ui->tableWidget_init_guess_retreat->setHorizontalHeaderLabels(h_headers);
+    this->ui->tableWidget_init_guess_retreat->setVerticalHeaderLabels(v_headers);
+
+    // constraints lagrange multipliers
+    v_dual_headers.clear();
+    this->ui->tableWidget_dual_vars_retreat->setColumnCount(h_dual_headers.size());
+    this->ui->tableWidget_dual_vars_retreat->setRowCount(dual_retreat.size());
+    for(int i =0; i < dual_retreat.size(); ++i){
+        double d_value = dual_retreat.at(i);
+        v_dual_headers.push_back(QString("Constraint ")+QString::number(i));
+        std::vector<QString> row = {QString::number(d_value)};
+        for(int j=0; j < h_dual_headers.size(); ++j){
+           QString item = row.at(j);
+           this->ui->tableWidget_dual_vars_retreat->setItem(i,j,new QTableWidgetItem(item));
+        }
+    }
+    this->ui->tableWidget_dual_vars_retreat->setHorizontalHeaderLabels(h_dual_headers);
+    this->ui->tableWidget_dual_vars_retreat->setVerticalHeaderLabels(v_dual_headers);
+
+
+    // ----------- display the bounce data ----------------------- //
+    this->ui->tableWidget_init_guess_bounce->clear();
+    this->ui->tableWidget_dual_vars_bounce->clear();
+
+    // initial guess and bounds multipliers
+    v_headers.clear();
+    this->ui->tableWidget_init_guess_bounce->setColumnCount(h_headers.size());
+    this->ui->tableWidget_init_guess_bounce->setRowCount(x_bounce.size());
+    for(int i =0; i < x_bounce.size(); ++i){
+        double x_value = x_bounce.at(i);
+        double zL_value = zL_bounce.at(i);
+        double zU_value = zU_bounce.at(i);
+        v_headers.push_back(QString("Joint ")+QString::number(i));
+        std::vector<QString> row = {QString::number(x_value),QString::number(zL_value),QString::number(zU_value)};
+        for(int j=0; j < h_headers.size(); ++j){
+           QString item = row.at(j);
+           this->ui->tableWidget_init_guess_bounce->setItem(i,j,new QTableWidgetItem(item));
+        }
+    }
+    this->ui->tableWidget_init_guess_bounce->setHorizontalHeaderLabels(h_headers);
+    this->ui->tableWidget_init_guess_bounce->setVerticalHeaderLabels(v_headers);
+
+    // constraints lagrange multipliers
+    v_dual_headers.clear();
+    this->ui->tableWidget_dual_vars_bounce->setColumnCount(h_dual_headers.size());
+    this->ui->tableWidget_dual_vars_bounce->setRowCount(dual_bounce.size());
+    for(int i =0; i < dual_bounce.size(); ++i){
+        double d_value = dual_bounce.at(i);
+        v_dual_headers.push_back(QString("Constraint ")+QString::number(i));
+        std::vector<QString> row = {QString::number(d_value)};
+        for(int j=0; j < h_dual_headers.size(); ++j){
+           QString item = row.at(j);
+           this->ui->tableWidget_dual_vars_bounce->setItem(i,j,new QTableWidgetItem(item));
+        }
+    }
+    this->ui->tableWidget_dual_vars_bounce->setHorizontalHeaderLabels(h_dual_headers);
+    this->ui->tableWidget_dual_vars_bounce->setVerticalHeaderLabels(v_dual_headers);
 
 
 }
@@ -1219,9 +1478,11 @@ void TolDialogHUMP::checkWarmStart(int state)
     if(state==0){
         //unchecked
         ui->tab_hump_warm->setEnabled(false);
+        //ui->tabWidget->setTabEnabled(4,false);
     }else{
         //checked
         ui->tab_hump_warm->setEnabled(true);
+        //ui->tabWidget->setTabEnabled(4,true);
     }
 }
 

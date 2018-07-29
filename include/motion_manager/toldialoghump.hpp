@@ -4,7 +4,7 @@
 #include<QFileDialog>
 #include <QFile>
 #include <QTextStream>
-#include<QMessageBox>
+#include <QMessageBox>
 #include <ui_toldialoghump.h>
 #include <eigen3/Eigen/Dense>
 #include "config.hpp"
@@ -33,6 +33,11 @@ public Q_SLOTS:
      * @brief This method loads the tuning parameters from a file
      */
     void on_pushButton_load_clicked();
+
+    /**
+     * @brief on_pushButton_load_warm_start_settings_clicked
+     */
+    void on_pushButton_load_warm_start_settings_clicked();
 
     /**
      * @brief checkApproach
@@ -375,7 +380,30 @@ private:
     Ui::TolDialogHUMP *ui; /**< handle of the user interface */
     string infoLine; /**< information about the tuning of the planner */
     bool rand_init;/**< random initialization */
+
+    // warm start settings
     bool warm_start;/**< warm start option */
+    // plan
+    vector<double> x_plan; /**< initial guess of the plan target posture selection problem */
+    vector<double> zL_plan; /**< lower bounds multipliers of the plan target posture selection problem */
+    vector<double> zU_plan; /**< upper bounds multipliers of the plan target posture selection problem */
+    vector<double> dual_plan; /**< constraints multipliers of the plan target posture selection problem */
+    // approach
+    vector<double> x_approach; /**< initial guess of the approach target posture selection problem */
+    vector<double> zL_approach; /**< lower bounds multipliers of the approach target posture selection problem */
+    vector<double> zU_approach; /**< upper bounds multipliers of the approach target posture selection problem */
+    vector<double> dual_approach; /**< constraints multipliers of the approach target posture selection problem */
+    // retreat
+    vector<double> x_retreat; /**< initial guess of the retreat target posture selection problem */
+    vector<double> zL_retreat; /**< lower bounds multipliers of the retreat target posture selection problem */
+    vector<double> zU_retreat; /**< upper bounds multipliers of the retreat target posture selection problem */
+    vector<double> dual_retreat; /**< constraints multipliers of the retreat target posture selection problem */
+    // bounce
+    vector<double> x_bounce; /**< initial guess of the bounce target posture selection problem */
+    vector<double> zL_bounce; /**< lower bounds multipliers of the bounce target posture selection problem */
+    vector<double> zU_bounce; /**< upper bounds multipliers of the bounce target posture selection problem */
+    vector<double> dual_bounce; /**< constraints multipliers of the bounce target posture selection problem */
+
 };
 
 } // namespace motion_manager

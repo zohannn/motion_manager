@@ -3248,149 +3248,131 @@
     <attribute name="title">
      <string>Warm start settings</string>
     </attribute>
-    <widget class="QGroupBox" name="groupBox_warm_final">
+    <widget class="QPushButton" name="pushButton_load_warm_start_settings">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>451</width>
-       <height>501</height>
+       <x>21</x>
+       <y>541</y>
+       <width>80</width>
+       <height>23</height>
       </rect>
      </property>
-     <property name="title">
-      <string>Target selection warm start parameters</string>
+     <property name="text">
+      <string>Load</string>
      </property>
-     <widget class="QTableView" name="tableView_tar_bounds">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>60</y>
-        <width>261</width>
-        <height>431</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QTableView" name="tableView_tar_dual">
-      <property name="geometry">
-       <rect>
-        <x>290</x>
-        <y>60</y>
-        <width>151</width>
-        <height>431</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_tar_bounds">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>121</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Bounds Multipliers</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_tar_bounds_2">
-      <property name="geometry">
-       <rect>
-        <x>290</x>
-        <y>30</y>
-        <width>101</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Dual Multipliers</string>
-      </property>
-     </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_warm_bounce">
+    <widget class="QTabWidget" name="tabWidget_warm_start">
      <property name="geometry">
       <rect>
-       <x>480</x>
-       <y>10</y>
-       <width>461</width>
-       <height>551</height>
+       <x>6</x>
+       <y>9</y>
+       <width>941</width>
+       <height>521</height>
       </rect>
      </property>
-     <property name="title">
-      <string>Bounce selection warm start parameters</string>
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <widget class="QLabel" name="label_tar_bounds_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>121</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Bounds Multipliers</string>
-      </property>
+     <widget class="QWidget" name="tab_warm_start_plan">
+      <attribute name="title">
+       <string>Plan target posture parameters</string>
+      </attribute>
+      <widget class="QTableWidget" name="tableWidget_init_guess_plan">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>381</width>
+         <height>321</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QTableWidget" name="tableWidget_dual_vars_plan">
+       <property name="geometry">
+        <rect>
+         <x>550</x>
+         <y>30</y>
+         <width>341</width>
+         <height>441</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
-     <widget class="QLabel" name="label_tar_bounds_3">
-      <property name="geometry">
-       <rect>
-        <x>260</x>
-        <y>30</y>
-        <width>101</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Dual Multipliers</string>
-      </property>
+     <widget class="QWidget" name="tab_warm_start_approach">
+      <attribute name="title">
+       <string>Approach target posture parameters</string>
+      </attribute>
+      <widget class="QTableWidget" name="tableWidget_dual_vars_approach">
+       <property name="geometry">
+        <rect>
+         <x>550</x>
+         <y>30</y>
+         <width>341</width>
+         <height>441</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QTableWidget" name="tableWidget_init_guess_approach">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>381</width>
+         <height>321</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
-     <widget class="QTableView" name="tableView_bounce_bounds">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>60</y>
-        <width>241</width>
-        <height>431</height>
-       </rect>
-      </property>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>Retreat target posture parameters</string>
+      </attribute>
+      <widget class="QTableWidget" name="tableWidget_dual_vars_retreat">
+       <property name="geometry">
+        <rect>
+         <x>550</x>
+         <y>30</y>
+         <width>341</width>
+         <height>441</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QTableWidget" name="tableWidget_init_guess_retreat">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>381</width>
+         <height>321</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
-     <widget class="QTableView" name="tableView_bounce_dual">
-      <property name="geometry">
-       <rect>
-        <x>260</x>
-        <y>60</y>
-        <width>191</width>
-        <height>481</height>
-       </rect>
-      </property>
+     <widget class="QWidget" name="tab_warm_start_bounce">
+      <attribute name="title">
+       <string>Bounce posture parameters</string>
+      </attribute>
+      <widget class="QTableWidget" name="tableWidget_dual_vars_bounce">
+       <property name="geometry">
+        <rect>
+         <x>550</x>
+         <y>30</y>
+         <width>341</width>
+         <height>441</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QTableWidget" name="tableWidget_init_guess_bounce">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>30</y>
+         <width>381</width>
+         <height>321</height>
+        </rect>
+       </property>
+      </widget>
      </widget>
-    </widget>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>540</y>
-       <width>168</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_24">
-      <item>
-       <widget class="QPushButton" name="pushButton_save_warm">
-        <property name="text">
-         <string>Save</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_load_warm">
-        <property name="text">
-         <string>Load</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </widget>
   </widget>
