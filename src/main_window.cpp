@@ -1105,6 +1105,44 @@ void MainWindow::on_pushButton_plan_clicked()
             prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
             tols.mov_specs.use_move_plane = mTolHumpdlg->get_add_plane();
             mTolHumpdlg->getPlaneParameters(tols.mov_specs.plane_params);
+            // warm start option
+            if(mTolHumpdlg->getWarmStartOption()){
+                tols.mov_specs.warm_start = true;
+                // plan
+                if(mTolHumpdlg->getWarmStartPlanOption()){
+                    HUMotion::warm_start_params final_plan;
+                    final_plan.valid = true;
+                    final_plan.description = "plan";
+                    mTolHumpdlg->getPlanData(final_plan.x,final_plan.zL,final_plan.zU,final_plan.dual_vars);
+                    tols.mov_specs.final_warm_start_params.push_back(final_plan);
+                }
+                // approach
+                if(mTolHumpdlg->getWarmStartApproachOption()){
+                    HUMotion::warm_start_params final_approach;
+                    final_approach.valid = true;
+                    final_approach.description = "approach";
+                    mTolHumpdlg->getApproachData(final_approach.x,final_approach.zL,final_approach.zU,final_approach.dual_vars);
+                    tols.mov_specs.final_warm_start_params.push_back(final_approach);
+                }
+                // retreat
+                if(mTolHumpdlg->getWarmStartRetreatOption()){
+                    HUMotion::warm_start_params final_retreat;
+                    final_retreat.valid = true;
+                    final_retreat.description = "retreat";
+                    mTolHumpdlg->getRetreatData(final_retreat.x,final_retreat.zL,final_retreat.zU,final_retreat.dual_vars);
+                    tols.mov_specs.final_warm_start_params.push_back(final_retreat);
+                }
+                // bounce
+                if(mTolHumpdlg->getWarmStartBounceOption()){
+                    HUMotion::warm_start_params bounce;
+                    bounce.valid = true;
+                    bounce.description = "bounce";
+                    mTolHumpdlg->getBounceData(bounce.x,bounce.zL,bounce.zU,bounce.dual_vars);
+                    tols.mov_specs.bounce_warm_start_params = bounce;
+                }
+            }else{
+                tols.mov_specs.warm_start = false;
+            }
 
             h_results = prob->solve(tols); // plan the movement
 

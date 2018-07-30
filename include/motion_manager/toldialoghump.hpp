@@ -372,7 +372,71 @@ public:
      */
     void setPlaneParameters(std::vector<double> &point1,std::vector<double> &point2,std::vector<double> &point3);
 
+    /**
+     * @brief getWarmStartOption
+     * @return
+     */
+    bool getWarmStartOption();
 
+    /**
+     * @brief getWarmStartPlanOption
+     * @return
+     */
+    bool getWarmStartPlanOption();
+
+    /**
+     * @brief getWarmStartApproachOption
+     * @return
+     */
+    bool getWarmStartApproachOption();
+
+    /**
+     * @brief getWarmStartRetreatOption
+     * @return
+     */
+    bool getWarmStartRetreatOption();
+
+    /**
+     * @brief getWarmStartBounceOption
+     * @return
+     */
+    bool getWarmStartBounceOption();
+
+    /**
+     * @brief getPlanData
+     * @param x
+     * @param zL
+     * @param zU
+     * @param dual
+     */
+    void getPlanData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual);
+
+    /**
+     * @brief getApproachData
+     * @param x
+     * @param zL
+     * @param zU
+     * @param dual
+     */
+    void getApproachData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual);
+
+    /**
+     * @brief getRetreatData
+     * @param x
+     * @param zL
+     * @param zU
+     * @param dual
+     */
+    void getRetreatData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual);
+
+    /**
+     * @brief getBounceData
+     * @param x
+     * @param zL
+     * @param zU
+     * @param dual
+     */
+    void getBounceData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual);
 
 
 
@@ -384,21 +448,25 @@ private:
     // warm start settings
     bool warm_start;/**< warm start option */
     // plan
+    bool warm_start_plan; /**< true if there are plan target warm start parameters */
     vector<double> x_plan; /**< initial guess of the plan target posture selection problem */
     vector<double> zL_plan; /**< lower bounds multipliers of the plan target posture selection problem */
     vector<double> zU_plan; /**< upper bounds multipliers of the plan target posture selection problem */
     vector<double> dual_plan; /**< constraints multipliers of the plan target posture selection problem */
     // approach
+    bool warm_start_approach; /**< true if there are approach target warm start parameters */
     vector<double> x_approach; /**< initial guess of the approach target posture selection problem */
     vector<double> zL_approach; /**< lower bounds multipliers of the approach target posture selection problem */
     vector<double> zU_approach; /**< upper bounds multipliers of the approach target posture selection problem */
     vector<double> dual_approach; /**< constraints multipliers of the approach target posture selection problem */
     // retreat
+    bool warm_start_retreat; /**< true if there are retreat target warm start parameters */
     vector<double> x_retreat; /**< initial guess of the retreat target posture selection problem */
     vector<double> zL_retreat; /**< lower bounds multipliers of the retreat target posture selection problem */
     vector<double> zU_retreat; /**< upper bounds multipliers of the retreat target posture selection problem */
     vector<double> dual_retreat; /**< constraints multipliers of the retreat target posture selection problem */
     // bounce
+    bool warm_start_bounce; /**< true if there are bounce warm start parameters */
     vector<double> x_bounce; /**< initial guess of the bounce target posture selection problem */
     vector<double> zL_bounce; /**< lower bounds multipliers of the bounce target posture selection problem */
     vector<double> zU_bounce; /**< upper bounds multipliers of the bounce target posture selection problem */

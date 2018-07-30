@@ -29,6 +29,17 @@ TolDialogHUMP::TolDialogHUMP(QWidget *parent) :
         ui->groupBox_post_place->setEnabled(false);
         ui->label_pick->setEnabled(false);
     }
+
+    if(ui->checkBox_warm_start->isChecked()){
+        ui->tab_hump_warm->setEnabled(true);
+    }else{
+        ui->tab_hump_warm->setEnabled(false);
+    }
+
+    this->warm_start_plan = false;
+    this->warm_start_approach = false;
+    this->warm_start_retreat = false;
+    this->warm_start_bounce = false;
 }
 
 TolDialogHUMP::~TolDialogHUMP()
@@ -700,6 +711,10 @@ void TolDialogHUMP::on_pushButton_save_clicked()
 void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
 {
 
+    this->warm_start_plan = false;
+    this->warm_start_approach = false;
+    this->warm_start_retreat = false;
+    this->warm_start_bounce = false;
     this->ui->tabWidget_warm_start->setTabEnabled(0,false); // plan
     x_plan.clear(); zL_plan.clear(); zU_plan.clear(); dual_plan.clear();
     this->ui->tabWidget_warm_start->setTabEnabled(1,false); // approach
@@ -724,6 +739,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
                 QStringList fields = line.split("=");
                 if (QString::compare(fields.at(0),QString("X_plan"),Qt::CaseInsensitive)==0){
                     this->ui->tabWidget_warm_start->setTabEnabled(0,true);
+                    this->warm_start_plan = true;
                     QStringList data = fields.at(1).split("|");
                     for (size_t i=0; i<data.size();++i)
                         x_plan.push_back(data.at(i).toDouble());
@@ -741,6 +757,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
                         dual_plan.push_back(data.at(i).toDouble());
                 }else if(QString::compare(fields.at(0),QString("X_approach"),Qt::CaseInsensitive)==0){
                     this->ui->tabWidget_warm_start->setTabEnabled(1,true);
+                    this->warm_start_approach = true;
                     QStringList data = fields.at(1).split("|");
                     for (size_t i=0; i<data.size();++i)
                         x_approach.push_back(data.at(i).toDouble());
@@ -758,6 +775,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
                         dual_approach.push_back(data.at(i).toDouble());
                 }else if(QString::compare(fields.at(0),QString("X_retreat"),Qt::CaseInsensitive)==0){
                     this->ui->tabWidget_warm_start->setTabEnabled(2,true);
+                    this->warm_start_retreat = true;
                     QStringList data = fields.at(1).split("|");
                     for (size_t i=0; i<data.size();++i)
                         x_retreat.push_back(data.at(i).toDouble());
@@ -775,6 +793,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
                         dual_retreat.push_back(data.at(i).toDouble());
                 }else if(QString::compare(fields.at(0),QString("X_bounce"),Qt::CaseInsensitive)==0){
                     this->ui->tabWidget_warm_start->setTabEnabled(3,true);
+                    this->warm_start_bounce = true;
                     QStringList data = fields.at(1).split("|");
                     for (size_t i=0; i<data.size();++i)
                         x_bounce.push_back(data.at(i).toDouble());
@@ -1595,6 +1614,65 @@ void TolDialogHUMP::set_add_plane(bool plane)
 {
     ui->checkBox_add_plane->setChecked(plane);
 }
+
+bool TolDialogHUMP::getWarmStartOption()
+{
+    return this->warm_start;
+}
+
+bool TolDialogHUMP::getWarmStartPlanOption()
+{
+    return this->warm_start_plan;
+}
+
+bool TolDialogHUMP::getWarmStartApproachOption()
+{
+    return this->warm_start_approach;
+}
+
+bool TolDialogHUMP::getWarmStartRetreatOption()
+{
+    return this->warm_start_retreat;
+}
+
+bool TolDialogHUMP::getWarmStartBounceOption()
+{
+    return this->warm_start_bounce;
+}
+
+
+void TolDialogHUMP::getPlanData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual)
+{
+    x = this->x_plan;
+    zL = this->zL_plan;
+    zU = this->zU_plan;
+    dual = this->dual_plan;
+}
+
+void TolDialogHUMP::getApproachData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual)
+{
+    x = this->x_approach;
+    zL = this->zL_approach;
+    zU = this->zU_approach;
+    dual = this->dual_approach;
+}
+
+void TolDialogHUMP::getRetreatData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual)
+{
+    x = this->x_retreat;
+    zL = this->zL_retreat;
+    zU = this->zU_retreat;
+    dual = this->dual_retreat;
+}
+
+void TolDialogHUMP::getBounceData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual)
+{
+    x = this->x_bounce;
+    zL = this->zL_bounce;
+    zU = this->zU_bounce;
+    dual = this->dual_bounce;
+}
+
 
 
 } // namespace motion_manager
