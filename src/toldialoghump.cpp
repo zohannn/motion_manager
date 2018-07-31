@@ -36,6 +36,7 @@ TolDialogHUMP::TolDialogHUMP(QWidget *parent) :
         ui->tab_hump_warm->setEnabled(false);
     }
 
+    this->warm_start = false;
     this->warm_start_plan = false;
     this->warm_start_approach = false;
     this->warm_start_retreat = false;
@@ -1496,10 +1497,12 @@ void TolDialogHUMP::checkWarmStart(int state)
 {
     if(state==0){
         //unchecked
+        warm_start = false;
         ui->tab_hump_warm->setEnabled(false);
         //ui->tabWidget->setTabEnabled(4,false);
     }else{
         //checked
+        warm_start = true;
         ui->tab_hump_warm->setEnabled(true);
         //ui->tabWidget->setTabEnabled(4,true);
     }
