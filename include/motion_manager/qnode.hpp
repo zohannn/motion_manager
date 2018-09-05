@@ -307,6 +307,9 @@ private:
         // Natural obstacle avoidance with ARoS scenario -------------------------------------------------------------------------------------
         ros::Subscriber subCylinderSmall; /**< ROS sunscriber to the topic /vrep/Cylinder_small  */
         ros::Subscriber subCylinderTall; /**< ROS sunscriber to the topic /vrep/Cylinder_tall  */
+        // -----------------------------------------------------------------------------------------------------------------------------------
+        // Learning tasks: reaching with one obstacle scenario -------------------------------------------------------------------------------------
+        ros::Subscriber subObstacle;
 
 #if MOVEIT==1
         boost::shared_ptr<moveit::planning_interface::PlanningSceneInterface> planning_scene_interface_ptr;/**< scene interface */
@@ -561,6 +564,13 @@ private:
          * @param data
          */
         void Cylinder_tall_Callback(const geometry_msgs::PoseStamped& data);
+
+        // Learning tasks: reaching with one obstacle scenario -------------------------------------------------------------------------------------
+        /**
+         * @brief Obstacle_Callback
+         * @param data
+         */
+        void Obstacle_Callback(const geometry_msgs::PoseStamped& data);
 
         /**
          * @brief This method returns the linear interpolation

@@ -167,6 +167,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     scenarios.push_back(QString("Assembly scenario: swap two columns of the toy vehicle"));
     scenarios.push_back(QString("Human assistance scenario: Moving a tray with ARoS"));
     scenarios.push_back(QString("Natural obstacle avoidance with ARoS"));
+    scenarios.push_back(QString("Learning tasks: reaching with one obstacle"));
 
 #endif
 
@@ -419,6 +420,8 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              string path_vrep_drinking_aros_dual_arm_tray = PATH_SCENARIOS+string("/vrep/DrinkingServiceTask_aros_dual_arm_tray.ttt");
              // Natural obstacle avoidance with ARoS
              string path_vrep_natural_obst_av = PATH_SCENARIOS+string("/vrep/Natural_obst_avoidance_aros_1.ttt");
+             // Learning tasks: reaching with one obstacle
+             string path_vrep_learning_tasks_reaching_1 = PATH_SCENARIOS+string("/vrep/Learning_Reaching_1.ttt");
 
              switch(i){
              case 0: // Assembly scenario
@@ -548,7 +551,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                  }
 #endif
                  break;
-             case 4: // Challenging scenario
+             case 4: // Challenging scenario: picking a cup from a shelf with ARoS
 #if HAND==0
 
 #elif HAND==1
@@ -598,7 +601,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 #endif
 
                  break;                 
-             case 6: // Human assistance scenario: Moving a tray with ARoS
+             case 6: // Human assistance scenario: Moving a tray with ARoS (dual-arms)
 #if HAND==0
 
 #elif HAND==1
@@ -646,9 +649,32 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      ui.pushButton_loadScenario->setEnabled(true);
                  }
 #endif
-
                  break;
 
+             case 8: // Learning Tasks: reaching with one obstacle
+#if HAND==0
+
+#elif HAND==1
+                this->scenario_id = 9;
+                 if (qnode.loadScenario(path_vrep_learning_tasks_reaching_1,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Learning tasks: reaching with one obstacle HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Learning tasks: reaching with one obstacle");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
+                     //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
+                 }else{
+                     qnode.log(QNode::Error,std::string("Learning tasks: reaching with one obstacle HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+#endif
+                 break;
              }
 
          }
