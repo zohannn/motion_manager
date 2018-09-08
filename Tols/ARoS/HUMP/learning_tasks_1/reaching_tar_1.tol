@@ -7,8 +7,7 @@ Elbow_radius=70.0
 
 Wrist_radius=60.0
 
-Hand_radius=50.0
-
+Hand_radius=100
 Hand_1_1=25.0
 
 Hand_1_2=25.0
@@ -34,7 +33,7 @@ Hand_tip_2=5.0
 Hand_tip_3=5.0
 
 # Joint Expanse factors
-lambda_1=1.0
+lambda_1=0.99
 
 lambda_2=1.0
 
@@ -198,12 +197,9 @@ obs_yy_2=5.0
 
 obs_yy_3=5.0
 
-obs_zz_1=5.0
-
-obs_zz_2=5.0
-
-obs_zz_3=5.0
-
+obs_zz_1=150
+obs_zz_2=150
+obs_zz_3=150
 obs_xy_1=5.0
 
 obs_xy_2=5.0

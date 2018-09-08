@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1057,6 +1057,197 @@ p, li { white-space: pre-wrap; }
      <attribute name="title">
       <string>Learning</string>
      </attribute>
+     <widget class="QGroupBox" name="groupBox_tar_var">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>341</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Variations of the Target</string>
+      </property>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>311</width>
+         <height>106</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_40">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_18">
+          <item>
+           <widget class="QLabel" name="label_tar_pos_var">
+            <property name="text">
+             <string>Positions [mm]</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_tar_x_var"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_tar_y_var"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_tar_z_var"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_19">
+          <item>
+           <widget class="QLabel" name="label_tar_orient_var">
+            <property name="text">
+             <string>Orientation [rad]</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_tar_roll_var"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_tar_pitch_var"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_tar_yaw_var"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_obsts_var">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>20</y>
+        <width>341</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Variations of the Obstacles</string>
+      </property>
+      <widget class="QWidget" name="layoutWidget_7">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>311</width>
+         <height>106</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_43">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_20">
+          <item>
+           <widget class="QLabel" name="label_obsts_pos_var">
+            <property name="text">
+             <string>Positions [mm]</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_obsts_x_var"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_obsts_y_var"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_obsts_z_var"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_21">
+          <item>
+           <widget class="QLabel" name="label_obsts_orient_var">
+            <property name="text">
+             <string>Orientation [rad]</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_obsts_roll_var"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_obsts_pitch_var"/>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_obsts_yaw_var"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="pushButton_plan_collect">
+      <property name="geometry">
+       <rect>
+        <x>740</x>
+        <y>150</y>
+        <width>131</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Plan and collect</string>
+      </property>
+     </widget>
+     <widget class="QWidget" name="">
+      <property name="geometry">
+       <rect>
+        <x>740</x>
+        <y>90</y>
+        <width>291</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_46">
+       <item>
+        <widget class="QLabel" name="label_trials">
+         <property name="text">
+          <string>Number of successful trials</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_trials"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="">
+      <property name="geometry">
+       <rect>
+        <x>740</x>
+        <y>40</y>
+        <width>291</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_47">
+       <item>
+        <widget class="QPushButton" name="pushButton_load_learn_prim_duals">
+         <property name="text">
+          <string>Load primals/duals</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_loaded">
+         <property name="text">
+          <string>unloaded</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_control">
      <attribute name="title">

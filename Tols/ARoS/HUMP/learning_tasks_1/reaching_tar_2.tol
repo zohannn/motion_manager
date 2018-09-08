@@ -5,8 +5,9 @@ Shoulder_radius=80.0
 
 Elbow_radius=70.0
 
-Wrist_radius=100
+Wrist_radius=150
 Hand_radius=100
+
 Hand_1_1=25.0
 
 Hand_1_2=25.0
@@ -20,13 +21,19 @@ Hand_2_2=25.0
 Hand_2_3=25.0
 
 Hand_3_1=20
+
 Hand_3_2=20
+
 Hand_3_3=20
-Hand_tip_1=5
-Hand_tip_2=5
-Hand_tip_3=5
+
+Hand_tip_1=15
+
+Hand_tip_2=15
+
+Hand_tip_3=15
+
 # Joint Expanse factors
-lambda_1=0.99
+lambda_1=1
 lambda_2=1.0
 
 lambda_3=1.0
@@ -178,14 +185,20 @@ tar_yz_3=5.0
 
 # Tolerances with the obstacles [mm]
 obs_xx_1=10
+
 obs_xx_2=10
+
 obs_xx_3=10
-obs_yy_1=50
-obs_yy_2=50
-obs_yy_3=50
-obs_zz_1=50
-obs_zz_2=50
-obs_zz_3=50
+
+obs_yy_1=0
+obs_yy_2=0
+obs_yy_3=0
+obs_zz_1=150
+
+obs_zz_2=150
+
+obs_zz_3=150
+
 obs_xy_1=5.0
 
 obs_xy_2=5.0
