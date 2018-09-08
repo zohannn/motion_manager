@@ -725,6 +725,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
     this->ui->tabWidget_warm_start->setTabEnabled(3,false); // bounce
     x_bounce.clear(); zL_bounce.clear(); zU_bounce.clear(); dual_bounce.clear();
 
+
     QString filename = QFileDialog::getOpenFileName(this,
                                                     tr("Load the file of warm start settings"),
                                                     QString(MAIN_PATH)+"/Duals",

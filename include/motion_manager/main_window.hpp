@@ -501,6 +501,20 @@ public Q_SLOTS:
          */
         void on_pushButton_save_res_task_dual_clicked();
 
+        // -----------------------------------------------------
+        // Learning
+
+        /**
+         * @brief on_pushButton_load_learn_prim_duals_clicked
+         */
+        void on_pushButton_load_learn_prim_duals_clicked();
+
+        /**
+         * @brief on_pushButton_plan_collect_clicked
+         */
+        void on_pushButton_plan_collect_clicked();
+
+
 
 
 private:
@@ -676,6 +690,36 @@ private:
         // Joint 8 = 70.0
         // Joint 9 = 70.0
         // Joint 10 = 70.0
+
+        // ---------------------------- Learning ------------------------------------- //
+
+        // solution of the given problems
+        bool sol_loaded;/**< loaded solution flag */
+        // plan
+        bool sol_plan; /**< true if there are plan target solution */
+        vector<double> x_plan; /**< initial guess of the plan target posture selection problem */
+        vector<double> zL_plan; /**< lower bounds multipliers of the plan target posture selection problem */
+        vector<double> zU_plan; /**< upper bounds multipliers of the plan target posture selection problem */
+        vector<double> dual_plan; /**< constraints multipliers of the plan target posture selection problem */
+        // approach
+        bool sol_approach; /**< true if there are approach target solution */
+        vector<double> x_approach; /**< initial guess of the approach target posture selection problem */
+        vector<double> zL_approach; /**< lower bounds multipliers of the approach target posture selection problem */
+        vector<double> zU_approach; /**< upper bounds multipliers of the approach target posture selection problem */
+        vector<double> dual_approach; /**< constraints multipliers of the approach target posture selection problem */
+        // retreat
+        bool sol_retreat; /**< true if there are retreat target solution */
+        vector<double> x_retreat; /**< initial guess of the retreat target posture selection problem */
+        vector<double> zL_retreat; /**< lower bounds multipliers of the retreat target posture selection problem */
+        vector<double> zU_retreat; /**< upper bounds multipliers of the retreat target posture selection problem */
+        vector<double> dual_retreat; /**< constraints multipliers of the retreat target posture selection problem */
+        // bounce
+        bool sol_bounce; /**< true if there are bounce solution */
+        vector<double> x_bounce; /**< initial guess of the bounce target posture selection problem */
+        vector<double> zL_bounce; /**< lower bounds multipliers of the bounce target posture selection problem */
+        vector<double> zU_bounce; /**< upper bounds multipliers of the bounce target posture selection problem */
+        vector<double> dual_bounce; /**< constraints multipliers of the bounce target posture selection problem */
+
 
 };
 

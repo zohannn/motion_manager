@@ -5351,6 +5351,221 @@ void MainWindow::on_pushButton_save_res_task_dual_clicked()
 
 }
 
+// -----------------------------------------------------
+// Learning
+
+void MainWindow::on_pushButton_load_learn_prim_duals_clicked()
+{
+    this->sol_loaded = false;
+    this->ui.label_loaded->setText("Unloaded");
+    this->ui.label_trials->setEnabled(false);
+    this->ui.lineEdit_trials->setEnabled(false);
+    this->ui.pushButton_plan_collect->setEnabled(false);
+
+    this->sol_plan = false;
+    this->sol_approach = false;
+    this->sol_retreat = false;
+    this->sol_bounce = false;
+    // plan
+    x_plan.clear(); zL_plan.clear(); zU_plan.clear(); dual_plan.clear();
+    // approach
+    x_approach.clear(); zL_approach.clear(); zU_approach.clear(); dual_approach.clear();
+    // retreat
+    x_retreat.clear(); zL_retreat.clear(); zU_retreat.clear(); dual_retreat.clear();
+    // bounce
+    x_bounce.clear(); zL_bounce.clear(); zU_bounce.clear(); dual_bounce.clear();
+
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    tr("Load the solution of the original problems"),
+                                                    QString(MAIN_PATH)+"/Duals",
+                                                    "All Files (*.*);; Tol Files (*.dual)");
+    QFile f( filename );
+    if(f.open( QIODevice::ReadOnly )){
+
+        QTextStream stream( &f );
+        QString line;
+        while(!stream.atEnd()){
+            line = f.readLine();
+            if(line.at(0)!=QChar('#')){
+                QStringList fields = line.split("=");
+                if (QString::compare(fields.at(0),QString("X_plan"),Qt::CaseInsensitive)==0){
+                    //this->ui->tabWidget_warm_start->setTabEnabled(0,true);
+                    this->sol_plan = true;
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        x_plan.push_back(data.at(i).toDouble());
+                }else if (QString::compare(fields.at(0),QString("ZL_plan"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zL_plan.push_back(data.at(i).toDouble());
+                }else if (QString::compare(fields.at(0),QString("ZU_plan"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zU_plan.push_back(data.at(i).toDouble());
+                }else if (QString::compare(fields.at(0),QString("Dual_plan"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        dual_plan.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("X_approach"),Qt::CaseInsensitive)==0){
+                    //this->ui->tabWidget_warm_start->setTabEnabled(1,true);
+                    this->sol_approach = true;
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        x_approach.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("ZL_approach"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zL_approach.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("ZU_approach"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zU_approach.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("Dual_approach"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        dual_approach.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("X_retreat"),Qt::CaseInsensitive)==0){
+                    //this->ui->tabWidget_warm_start->setTabEnabled(2,true);
+                    this->sol_retreat = true;
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        x_retreat.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("ZL_retreat"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zL_retreat.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("ZU_retreat"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zU_retreat.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("Dual_retreat"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        dual_retreat.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("X_bounce"),Qt::CaseInsensitive)==0){
+                    //this->ui->tabWidget_warm_start->setTabEnabled(3,true);
+                    this->sol_bounce = true;
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        x_bounce.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("ZL_bounce"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zL_bounce.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("ZU_bounce"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        zU_bounce.push_back(data.at(i).toDouble());
+                }else if(QString::compare(fields.at(0),QString("Dual_bounce"),Qt::CaseInsensitive)==0){
+                    QStringList data = fields.at(1).split("|");
+                    for (size_t i=0; i<data.size();++i)
+                        dual_bounce.push_back(data.at(i).toDouble());
+                }
+            }
+        }
+
+        f.close();
+        this->sol_loaded = true;
+        this->ui.label_loaded->setText("Loaded");
+        this->ui.label_trials->setEnabled(true);
+        this->ui.lineEdit_trials->setEnabled(true);
+        this->ui.pushButton_plan_collect->setEnabled(true);
+    }
+}
+
+void MainWindow::on_pushButton_plan_collect_clicked()
+{
+    problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
+    int planner_id = prob->getPlannerID();
+    int arm_sel = prob->getMovement()->getArm();
+    HUMotion::hump_params  tols;
+    std::vector<double> move_target;
+    std::vector<double> move_final_hand;
+    std::vector<double> move_final_arm;
+    bool use_final;
+    int trials = ui.lineEdit_trials->text().toInt();
+
+    try{
+        switch(planner_id){
+        case 0: // HUMP
+            if(arm_sel!=0)
+            {// single-arm
+                mTolHumpdlg->setInfo(prob->getInfoLine());
+                // --- Tolerances for the final posture selection ---- //
+                tols.tolTarPos = mTolHumpdlg->getTolTarPos(); // target position tolerances
+                tols.tolTarOr = mTolHumpdlg->getTolTarOr(); // target orientation tolerances
+                mTolHumpdlg->getTolsArm(tols.tolsArm);// tolerances of the arm : radius in [mm]
+                mTolHumpdlg->getTolsHand(tols.tolsHand);// tolerances of the hand: radius in [mm]
+                tols.target_avoidance = mTolHumpdlg->getTargetAvoidance();// target avoidance
+                tols.obstacle_avoidance = mTolHumpdlg->getObstacleAvoidance(); //obstacle avoidance
+                mTolHumpdlg->getLambda(tols.lambda_final); // joint expense factors
+                mTolHumpdlg->getLambda(tols.lambda_bounce); // joint expense factors
+                // --- Tolerances for the bounce posture selection ---- //
+                tols.w_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getWMax()*M_PI/180)); // max joint velocity
+                tols.alpha_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getAlphaMax()*M_PI/180)); // max joint acceleration
+                mTolHumpdlg->getInitVel(tols.bounds.vel_0); // initial velocity
+                mTolHumpdlg->getFinalVel(tols.bounds.vel_f); // final velocity
+                mTolHumpdlg->getInitAcc(tols.bounds.acc_0); // initial acceleration
+                mTolHumpdlg->getFinalAcc(tols.bounds.acc_f); // final acceleration
+                // tolerances for the obstacles
+                mTolHumpdlg->getTolsObstacles(tols.final_tolsObstacles); // final posture tols
+                tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
+                tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1));
+                mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(0));
+                mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(1));
+                // tolerances for the target
+                tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
+                tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+                tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+                mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
+                tols.singleArm_tolsTarget.at(1) = tols.singleArm_tolsTarget.at(0)/100;
+                tols.singleArm_tolsTarget.at(2) = 0*tols.singleArm_tolsTarget.at(0);
+                //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
+                //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
+                // pick / place settings
+                tols.mov_specs.approach = mTolHumpdlg->getApproach();
+                tols.mov_specs.retreat = mTolHumpdlg->getRetreat();
+                mTolHumpdlg->getPreGraspApproach(tols.mov_specs.pre_grasp_approach); // pick approach
+                mTolHumpdlg->getPostGraspRetreat(tols.mov_specs.post_grasp_retreat); // pick retreat
+                mTolHumpdlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
+                mTolHumpdlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
+                tols.mov_specs.rand_init = mTolHumpdlg->getRandInit(); // random initialization for "plan" stages
+                tols.mov_specs.coll = mTolHumpdlg->getColl(); // collisions option
+                tols.coll_body = mTolHumpdlg->getCollBody(); // collisions with the body
+                tols.mov_specs.straight_line = mTolHumpdlg->get_straight_line(); // hand straight line trajectory
+                tols.mov_specs.w_red_app_max = mTolHumpdlg->getW_red_app(); // set the max velocity reduction when approaching
+                tols.mov_specs.w_red_ret_max = mTolHumpdlg->getW_red_ret(); // set the max velocity reduction when retreating
+                // move settings
+                mTolHumpdlg->getTargetMove(move_target);
+                mTolHumpdlg->getFinalHand(move_final_hand);
+                mTolHumpdlg->getFinalArm(move_final_arm);
+                use_final = mTolHumpdlg->get_use_final_posture();
+                prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
+                tols.mov_specs.use_move_plane = mTolHumpdlg->get_add_plane();
+                mTolHumpdlg->getPlaneParameters(tols.mov_specs.plane_params);
+                //warm start settings
+                tols.mov_specs.warm_start = false;
+
+                for(int i=0;i<trials;++i){
+                    // TO DO
+                    // modify target data (move_target)
+                    //prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
+                    // modify obstacles data
+                    // prob
+                    h_results = prob->solve(tols); // plan the movement
+                }
+            }
+            break;
+
+        default:
+            break;
+        }
+    }catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
+    }catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
+
+
+
+}
 
 
 void MainWindow::ReadSettings()
