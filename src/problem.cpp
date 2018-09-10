@@ -79,6 +79,7 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
                     // single-arm movement
                     if(!obj->isTargetRightEnabled() && !obj->isTargetLeftEnabled()){
                         this->h_planner->addObstacle(hump_obj); // the object is an obstacle for the planner
+                        this->obsts.push_back(obj); // the object is anobstacle in the scenario
                     }
                 }else{
                     // dual-arm movement
@@ -260,6 +261,7 @@ Problem::Problem(const Problem& s)
 
     this->planner_id=s.planner_id;
     this->planner_name=s.planner_name;
+    this->obsts = s.obsts;
 }
 
 
@@ -372,6 +374,31 @@ void Problem::setMoveSettings(std::vector<double> &tar_right, std::vector<double
     this->use_posture_left=use_posture_left;
 
 }
+
+bool Problem::getObstacles(std::vector<objectPtr>& obs)
+{
+    obs = this->obsts;
+    return true;
+}
+
+bool Problem::setObstacle(objectPtr obs, unsigned pos)
+{
+    if((!this->obsts.empty()) && (pos < this->obsts.size()))
+    {
+        this->obsts.at(pos) = obs;
+        HUMotion::objectPtr hump_obj;
+        std::vector<double> position = {obs->getPos().Xpos,obs->getPos().Ypos,obs->getPos().Zpos};
+        std::vector<double> orientation = {obs->getOr().roll,obs->getOr().pitch,obs->getOr().yaw};
+        std::vector<double> dimension = {obs->getSize().Xsize,obs->getSize().Ysize,obs->getSize().Zsize};
+        hump_obj.reset(new HUMotion::Object(obs->getName()));
+        hump_obj->setParams(position,orientation,dimension);
+        this->h_planner->setObstacle(hump_obj,pos);
+        return true;
+    }else{
+        return false;
+    }
+}
+
 
 bool Problem::finalPostureFingers(int hand_id)
 {

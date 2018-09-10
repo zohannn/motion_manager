@@ -132,6 +132,22 @@ public:
                          bool use_posture_right,bool use_posture_left);
 
     /**
+     * @brief getObstacles
+     * @param obs
+     * @return
+     */
+    bool getObstacles(std::vector<objectPtr>& obs);
+
+    /**
+     * @brief setObstacle
+     * @param obs
+     * @param pos
+     * @return
+     */
+    bool setObstacle(objectPtr obs, unsigned pos);
+
+
+    /**
      * @brief This method solves the problem given the tolerances and the parameters of the planner HUMP
      * @param tols
      * @return
@@ -221,7 +237,7 @@ public:
 private:
 
     bool solved; /**< true if the problem has been solved */
-    double exec_time;/**< time taken by the functions of the planning libraries [ms]*/
+    double exec_time; /**< time taken by the functions of the planning libraries [ms]*/
 
    /**
      * @brief error log of the problem (TO DO!!!!!!!!!!!!!!!!!!!!)
@@ -264,6 +280,7 @@ private:
     objectPtr obj_curr; /**< current object being manipulated */
     targetPtr tar_eng; /**< target of the engaged object */
     objectPtr obj_eng; /**< engaged object */
+    std::vector<objectPtr> obsts; /**< obstacles in the scene */
 
     int planner_id; /**<  planner id of the selected planner */
     string planner_name; /**< name of the selected planner */
