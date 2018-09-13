@@ -514,6 +514,11 @@ public Q_SLOTS:
          */
         void on_pushButton_plan_collect_clicked();
 
+        /**
+         * @brief on_pushButton_plan_collect_pressed
+         */
+        void on_pushButton_plan_collect_pressed();
+
 
 
 
