@@ -5591,28 +5591,28 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                 ofstream data_csv;
                 data_csv.open(path.toStdString()+filename_csv);
                 // headers
-                data_csv << "Target x [mm],Target y [mm],Target z [mm],Target roll [rad],Target pitch [rad],Target yaw [rad]";
+                data_csv << "target_x_mm,target_y_mm,target_z_mm,target_roll_rad,target_pitch_rad,target_yaw_rad";
                 for(size_t j=0;j<obsts.size();++j){
-                    data_csv << ",Obstacle "+to_string(j+1)+" x [mm],Obstacle "+to_string(j+1)+" y [mm],Obstacle "+to_string(j+1)+" z [mm],Obstacle "+to_string(j+1)+" roll [rad],Obstacle "+to_string(j+1)+" pitch [rad],Obstacle "+to_string(j+1)+" yaw [rad]";
+                    data_csv << ",obstacle_"+to_string(j+1)+"_x_mm,obstacle_"+to_string(j+1)+"_y_mm,obstacle_"+to_string(j+1)+"_z_mm,obstacle_"+to_string(j+1)+"_roll_rad,obstacle_"+to_string(j+1)+"_pitch_rad,obstacle_"+to_string(j+1)+"_yaw_rad";
                 }
                 if(mov_type==1 || mov_type==5){ // move movement
 
                     // final posture selection
-                    data_csv << ",xf_plan 1 [rad],xf_plan 2 [rad],xf_plan 3 [rad],xf_plan 4 [rad],xf_plan 5 [rad],xf_plan 6 [rad],xf_plan 7 [rad]";
-                    data_csv << ",zf_L_plan 1,zf_L_plan 2,zf_L_plan 3,zf_L_plan 4,zf_L_plan 5,zf_L_plan 6,zf_L_plan 7";
-                    data_csv << ",zf_U_plan 1,zf_U_plan 2,zf_U_plan 3,zf_U_plan 4,zf_U_plan 5,zf_U_plan 6,zf_U_plan 7";
+                    data_csv << ",xf_plan_1_rad,xf_plan_2_rad,xf_plan_3_rad,xf_plan_4_rad,xf_plan_5_rad,xf_plan_6_rad,xf_plan_7_rad";
+                    data_csv << ",zf_L_plan_1,zf_L_plan_2,zf_L_plan_3,zf_L_plan_4,zf_L_plan_5,zf_L_plan_6,zf_L_plan_7";
+                    data_csv << ",zf_U_plan_1,zf_U_plan_2,zf_U_plan_3,zf_U_plan_4,zf_U_plan_5,zf_U_plan_6,zf_U_plan_7";
                     //data_csv << ",lf_plan_pos 1,lf_plan_or 2";
                     for(size_t j=0;j<dual_plan.size();++j){
-                        data_csv << ",dual_f_plan "+to_string(j);
+                        data_csv << ",dual_f_plan_"+to_string(j);
                     }
                     //data_csv << ",lf_plan_body 1,lf_plan_body 2,lf_plan_body 3";
 
                     // bounce posture selection
-                    data_csv << ",x_bounce 1 [rad],x_bounce 2 [rad],x_bounce 3 [rad],x_bounce 4 [rad],x_bounce 5 [rad],x_bounce 6 [rad],x_bounce 7 [rad],x_bounce 8 [rad],x_bounce 9 [rad]";
-                    data_csv << ",zb_L 1,zb_L 2,zb_L 3,zb_L 4,zb_L 5,zb_L 6,zb_L 7,zb_L 8,zb_L 9";
-                    data_csv << ",zb_U 1,zb_U 2,zb_U 3,zb_U 4,zb_U 5,zb_U 6,zb_U 7,zb_U 8,zb_U 9";
+                    data_csv << ",x_bounce_1_rad,x_bounce_2_rad,x_bounce_3_rad,x_bounce_4_rad,x_bounce_5_rad,x_bounce_6_rad,x_bounce_7_rad,x_bounce_8_rad,x_bounce_9_rad";
+                    data_csv << ",zb_L_1,zb_L_2,zb_L_3,zb_L_4,zb_L_5,zb_L_6,zb_L_7,zb_L_8,zb_L_9";
+                    data_csv << ",zb_U_1,zb_U_2,zb_U_3,zb_U_4,zb_U_5,zb_U_6,zb_U_7,zb_U_8,zb_U_9";
                     for(size_t j=0;j<dual_bounce.size();++j){
-                        data_csv << ",dual_bounce "+to_string(j);
+                        data_csv << ",dual_bounce_"+to_string(j);
                     }
 
                 }
