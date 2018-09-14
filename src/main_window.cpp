@@ -5719,7 +5719,12 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                     }
                                     for(size_t h=0;h<b_res.dual_vars.size();++h){
                                         string dual_str =  boost::str(boost::format("%.8f") % (b_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
-                                        data_csv << dual_str+",";
+                                        if(h == b_res.dual_vars.size()-1){
+                                            //last column
+                                            data_csv << dual_str;
+                                        }else{
+                                            data_csv << dual_str+",";
+                                        }
                                     }
 
                                     data_csv << "\n";
