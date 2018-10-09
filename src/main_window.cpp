@@ -5745,8 +5745,57 @@ void MainWindow::on_pushButton_plan_collect_clicked()
     }catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
     }catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
 
+}
 
+void MainWindow::on_pushButton_py_train_file_clicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    tr("Select the python file for training"),
+                                                    QString(MAIN_PATH)+"/scripts",
+                                                    "Python Files (*.py)");
+    this->ui.lineEdit_py_train_file->setText(filename);
+}
 
+void MainWindow::on_pushButton_train_data_clicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    tr("Select the data file for training"),
+                                                    QString(MAIN_PATH),
+                                                    "CSV Files (*.csv)");
+    this->ui.lineEdit_train_data->setText(filename);
+}
+
+void MainWindow::on_pushButton_models_clicked()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select the Directory to store trained models"),
+                                                    QString(MAIN_PATH),
+                                                    QFileDialog::ShowDirsOnly
+                                                    | QFileDialog::DontResolveSymlinks);
+    this->ui.lineEdit_models->setText(dir);
+}
+
+void MainWindow::on_pushButton_train_pressed()
+{
+    qnode.log(QNode::Info,std::string("Training started"));
+    qnode.log(QNode::Info,std::string("Training . . . "));
+}
+
+bool MainWindow::on_pushButton_train_clicked()
+{
+    if (!this->ui.lineEdit_py_train_file->text().isEmpty() && !this->ui.lineEdit_train_data->text().isEmpty() && !this->ui.lineEdit_models->text().isEmpty())
+    {
+        string cmdLine;
+        string py_file = this->ui.lineEdit_py_train_file->text().toStdString();
+        string data_file = this->ui.lineEdit_train_data->text().toStdString();
+        string models_dir = this->ui.lineEdit_models->text().toStdString();
+
+        cmdLine = string("python3 ") + py_file + string(" ") + data_file + string(" ") + models_dir;
+
+        int status = system(cmdLine.c_str());
+        return(status==0);
+    }else{
+        return false;
+    }
 }
 
 

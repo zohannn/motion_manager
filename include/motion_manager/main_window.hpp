@@ -519,7 +519,31 @@ public Q_SLOTS:
          */
         void on_pushButton_plan_collect_pressed();
 
+        /**
+         * @brief on_pushButton_py_train_file_clicked
+         */
+        void on_pushButton_py_train_file_clicked();
 
+        /**
+         * @brief on_pushButton_train_data_clicked
+         */
+        void on_pushButton_train_data_clicked();
+
+        /**
+         * @brief on_pushButton_models_clicked
+         */
+        void on_pushButton_models_clicked();
+
+        /**
+         * @brief on_pushButton_train_pressed
+         */
+        void on_pushButton_train_pressed();
+
+        /**
+         * @brief on_pushButton_train_clicked
+         * @return
+         */
+        bool on_pushButton_train_clicked();
 
 
 private:
