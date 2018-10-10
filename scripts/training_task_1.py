@@ -37,44 +37,41 @@ if len(sys.argv) <= 2:
 data_file = str(sys.argv[1])
 models_dir = str(sys.argv[2])
 
-#print("My command line args are " + ca_one + " and " + ca_two)
-#sys.exit("OK")
-
 # Settings
 
-print_en = False
+print_en = True
 
 print_en_xf_plan = False
-train_xf_plan = True
-train_xf_plan_class = True
+train_xf_plan = False
+train_xf_plan_class = False
 dir_path_xf_plan = models_dir + "/xf_plan"
 
 print_en_zf_L_plan = False
-train_zf_L_plan = True
-train_zf_L_plan_class = True
+train_zf_L_plan = False
+train_zf_L_plan_class = False
 dir_path_zf_L_plan = models_dir + "/zf_L_plan"
 
 print_en_zf_U_plan = False
-train_zf_U_plan = True
-train_zf_U_plan_class = True
+train_zf_U_plan = False
+train_zf_U_plan_class = False
 dir_path_zf_U_plan = models_dir + "/zf_U_plan"
 
 print_en_dual_f_plan = False
-train_dual_f_plan = True
-train_dual_f_plan_class = True
+train_dual_f_plan = False
+train_dual_f_plan_class = False
 dir_path_dual_f_plan = models_dir + "/dual_f_plan"
 
 print_en_x_bounce = False
-train_x_bounce = True
-train_x_bounce_class = True
+train_x_bounce = False
+train_x_bounce_class = False
 dir_path_x_bounce = models_dir + "/x_bounce"
 
 print_en_zb_L = False
-train_zb_L = True
-train_zb_L_class = True
+train_zb_L = False
+train_zb_L_class = False
 dir_path_zb_L = models_dir + "/zb_L"
 
-print_en_dual_bounce = False
+print_en_dual_bounce = True
 train_dual_bounce = True
 train_dual_bounce_class = True
 dir_path_dual_bounce = models_dir + "/dual_bounce"
@@ -246,8 +243,14 @@ if not outputs_xf_plan_df.empty:
         fig = plt.figure()
         ax_xf_plan = Axes3D(fig)
         ax_xf_plan.scatter(xf_plan[:, 0], xf_plan[:, 1], xf_plan[:, 2], c=labels_xf_plan)
-        ax_xf_plan.scatter(C_xf_plan[:, 0], C_xf_plan[:, 1], C_xf_plan[:, 2], marker='*', c='#050505', s=1000)
-        plt.show()
+        #ax_xf_plan.scatter(C_xf_plan[:, 0], C_xf_plan[:, 1], C_xf_plan[:, 2], marker='*', c='#050505', s=1000)
+        ax_xf_plan.set_xlabel('normalized xf_plan 1 [rad]')
+        ax_xf_plan.set_ylabel('normalized xf_plan 2 [rad]')
+        ax_xf_plan.set_zlabel('normalized xf_plan 3 [rad]')
+        ax_xf_plan.set_title('Clusters of the xf_plan')
+        plt.savefig(dir_path_xf_plan + "/clusters.pdf")
+        plt.clf()
+        #plt.show()
 
     cl_0_inputs_list_xf_plan = []
     cl_0_inputs_test_list_xf_plan = []
@@ -448,10 +451,26 @@ if not outputs_xf_plan_df.empty:
                     print(pca_xf_plan.explained_variance_ratio_)
                     print(pca_xf_plan.explained_variance_ratio_.sum())
                     df = pd.DataFrame({'var': pca_xf_plan.explained_variance_ratio_, 'PC': cols_x_f_plan[0:n_comps]})
-                    sns.barplot(x='PC', y="var", data=df, color="c")
+
+                    pc_file = open(dir_path_xf_plan+"/cluster"+repr(i)+"/p_comps.csv", "w")
+                    pc_file.write("### Principal components ###\n")
+                    pc_file.write(df.iloc[0, 0]+", ")
+                    pc_file.write(df.iloc[1, 0] + ", ")
+                    pc_file.write(df.iloc[2, 0] + ", ")
+                    pc_file.write(df.iloc[3, 0] + "\n")
+                    pc_file.write("%.3f, " % df.iloc[0, 1])
+                    pc_file.write("%.3f, " % df.iloc[1, 1])
+                    pc_file.write("%.3f, " % df.iloc[2, 1])
+                    pc_file.write("%.3f\n" % df.iloc[3, 1])
+                    pc_file.close()
+
+                    sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
+                    fig_pc = sns_plot.get_figure()
+                    fig_pc.savefig(dir_path_xf_plan+"/cluster"+repr(i)+"/p_comps.pdf")
                     threedee_train = plt.figure().gca(projection='3d')
                     threedee_train.scatter(cl_in_xf_plan_df["target_x_mm"], cl_in_xf_plan_df["target_y_mm"], pc_df['xf_plan_1_rad'])
-                    plt.show()
+                    plt.clf()
+                    #plt.show()
 
                 # ---------------------------- regression --------------------------------- #
                 size = len(cl_out_xf_plan_df.index)
@@ -496,11 +515,11 @@ if not outputs_xf_plan_df.empty:
                     print("Test targets summary:")
                     display.display(test_targets.describe())
 
-                    threedee_train = plt.figure().gca(projection='3d')
-                    threedee_test = plt.figure().gca(projection='3d')
-                    threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['xf_plan_1_rad'])
-                    threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['xf_plan_1_rad'])
-                    plt.show()
+                    #threedee_train = plt.figure().gca(projection='3d')
+                    #threedee_test = plt.figure().gca(projection='3d')
+                    #threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['xf_plan_1_rad'])
+                    #threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['xf_plan_1_rad'])
+                    #plt.show()
 
                 test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
                 test_predictions_1 = np.array([])
@@ -601,7 +620,9 @@ if not outputs_xf_plan_df.empty:
                 plt.xlabel("xf_plan_1_rad")
                 plt.ylabel("xf_plan_2_rad")
                 plt.legend(loc='upper right')
-                plt.show()
+                plt.savefig(dir_path_xf_plan+"/cluster"+repr(i)+"/xf_pred.pdf")
+                plt.clf()
+                #plt.show()
 # ----- FINAL POSTURE SELECTION: Lower bounds --------------------------------------------- #
 if not outputs_zf_L_plan_df.empty:
     # ------------------------- K-means clustering ---------------------------------------- #
@@ -627,7 +648,11 @@ if not outputs_zf_L_plan_df.empty:
         fig = plt.figure()
         ax_zf_L_plan = fig.add_subplot(111)
         ax_zf_L_plan.scatter(normalized_inputs["target_x_mm"],zf_L_plan, s=10, c=labels_zf_L_plan, marker="s")
-        plt.show()
+        ax_zf_L_plan.set_xlabel("normalized target x [mm]")
+        ax_zf_L_plan.set_ylabel("zf_L_plan")
+        plt.savefig(dir_path_zf_L_plan + "/clusters.pdf")
+        plt.clf()
+        #plt.show()
 
     cl_0_inputs_list_zf_L_plan = []
     cl_0_inputs_test_list_zf_L_plan = []
@@ -829,10 +854,26 @@ if not outputs_zf_L_plan_df.empty:
                         print(pca_zf_L_plan.explained_variance_ratio_)
                         print(pca_zf_L_plan.explained_variance_ratio_.sum())
                         df = pd.DataFrame({'var': pca_zf_L_plan.explained_variance_ratio_, 'PC': cols_zf_L_plan[0:n_comps]})
-                        sns.barplot(x='PC', y="var", data=df, color="c")
+
+                        pc_file = open(dir_path_zf_L_plan+"/cluster"+repr(i)+"/p_comps.csv", "w")
+                        pc_file.write("### Principal components ###\n")
+                        pc_file.write(df.iloc[0, 0]+", ")
+                        pc_file.write(df.iloc[1, 0] + ", ")
+                        pc_file.write(df.iloc[2, 0] + ", ")
+                        pc_file.write(df.iloc[3, 0] + "\n")
+                        pc_file.write("%.3f, " % df.iloc[0, 1])
+                        pc_file.write("%.3f, " % df.iloc[1, 1])
+                        pc_file.write("%.3f, " % df.iloc[2, 1])
+                        pc_file.write("%.3f\n" % df.iloc[3, 1])
+                        pc_file.close()
+
+                        sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
+                        fig_pc = sns_plot.get_figure()
+                        fig_pc.savefig(dir_path_zf_L_plan+"/cluster"+repr(i)+"/p_comps.pdf")
                         threedee_train = plt.figure().gca(projection='3d')
-                        threedee_train.scatter(cl_in_zf_L_plan_df["target_x_mm"], cl_in_zf_L_plan_df["target_y_mm"], pc_df['zf_L_plan_1'])
-                        plt.show()
+                        threedee_train.scatter(cl_in_zf_L_plan_df["target_x_mm"], cl_in_zf_L_plan_df["target_y_mm"], pc_df['zf_L_plan_2'])
+                        plt.clf()
+                        #plt.show()
                 else:
                     pc_df = cl_out_zf_L_plan_df
                     n_comps = len(cl_out_zf_L_plan_df.columns)
@@ -880,11 +921,11 @@ if not outputs_zf_L_plan_df.empty:
                     print("Test targets summary:")
                     display.display(test_targets.describe())
 
-                    threedee_train = plt.figure().gca(projection='3d')
-                    threedee_test = plt.figure().gca(projection='3d')
-                    threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['zf_L_plan_2'])
-                    threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['zf_L_plan_2'])
-                    plt.show()
+                    #threedee_train = plt.figure().gca(projection='3d')
+                    #threedee_test = plt.figure().gca(projection='3d')
+                    #threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['zf_L_plan_2'])
+                    #threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['zf_L_plan_2'])
+                    #plt.show()
 
                 test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
                 test_predictions_1 = np.array([])
@@ -976,8 +1017,8 @@ if not outputs_zf_L_plan_df.empty:
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
 
                 root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
-                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % root_mean_squared_error_proj)
 
+                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % root_mean_squared_error_proj)
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
                 ax1.scatter(test_examples["target_x_mm"], denorm_test_targets["zf_L_plan_2"], s=10, c='b', marker="s",label='test_targets')
@@ -985,7 +1026,10 @@ if not outputs_zf_L_plan_df.empty:
                 plt.xlabel("normalized target_x [mm]")
                 plt.ylabel("zf_L_plan_2")
                 plt.legend(loc='upper right')
-                plt.show()
+                #plt.title()
+                plt.savefig(dir_path_zf_L_plan+"/cluster"+repr(i)+"/zf_L_pred.pdf")
+                plt.clf()
+                #plt.show()
 
 # ----- FINAL POSTURE SELECTION: Upper bounds --------------------------------------------- #
 if not outputs_zf_U_plan_df.empty:
@@ -1012,7 +1056,12 @@ if not outputs_zf_U_plan_df.empty:
         fig = plt.figure()
         ax_zf_U_plan = fig.add_subplot(111)
         ax_zf_U_plan.scatter(zf_U_plan[:,0],zf_U_plan[:,1], s=10, c=labels_zf_U_plan, marker="s")
-        plt.show()
+        ax_zf_U_plan.set_xlabel('normalized zf_U_plan 1')
+        ax_zf_U_plan.set_ylabel('normalized zf_U_plan 2')
+        ax_zf_U_plan.set_title('Clusters of the zf_U_plan')
+        plt.savefig(dir_path_zf_U_plan + "/clusters.pdf")
+        plt.clf()
+        #plt.show()
 
     cl_0_inputs_list_zf_U_plan = []
     cl_0_inputs_test_list_zf_U_plan = []
@@ -1214,10 +1263,27 @@ if not outputs_zf_U_plan_df.empty:
                         print(pca_zf_U_plan.explained_variance_ratio_)
                         print(pca_zf_U_plan.explained_variance_ratio_.sum())
                         df = pd.DataFrame({'var': pca_zf_U_plan.explained_variance_ratio_, 'PC': cols_zf_U_plan[0:n_comps]})
-                        sns.barplot(x='PC', y="var", data=df, color="c")
+
+
+                        pc_file = open(dir_path_zf_U_plan+"/cluster"+repr(i)+"/p_comps.csv", "w")
+                        pc_file.write("### Principal components ###\n")
+                        pc_file.write(df.iloc[0, 0]+", ")
+                        pc_file.write(df.iloc[1, 0] + ", ")
+                        pc_file.write(df.iloc[2, 0] + ", ")
+                        pc_file.write(df.iloc[3, 0] + "\n")
+                        pc_file.write("%.3f, " % df.iloc[0, 1])
+                        pc_file.write("%.3f, " % df.iloc[1, 1])
+                        pc_file.write("%.3f, " % df.iloc[2, 1])
+                        pc_file.write("%.3f\n" % df.iloc[3, 1])
+                        pc_file.close()
+
+                        sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
+                        fig_pc = sns_plot.get_figure()
+                        fig_pc.savefig(dir_path_xf_plan+"/cluster"+repr(i)+"/p_comps.pdf")
                         threedee_train = plt.figure().gca(projection='3d')
-                        threedee_train.scatter(cl_in_zf_U_plan_df["target_x_mm"], cl_in_zf_U_plan_df["target_y_mm"], pc_df['zf_U_plan_3'])
-                        plt.show()
+                        threedee_train.scatter(cl_in_zf_U_plan_df["target_x_mm"], cl_in_zf_U_plan_df["target_y_mm"], pc_df['zf_U_plan_4'])
+                        plt.clf()
+                        #plt.show()
                 else:
                     pc_df = cl_out_zf_U_plan_df
                     n_comps = len(cl_out_zf_U_plan_df.columns)
@@ -1265,11 +1331,11 @@ if not outputs_zf_U_plan_df.empty:
                     print("Test targets summary:")
                     display.display(test_targets.describe())
 
-                    threedee_train = plt.figure().gca(projection='3d')
-                    threedee_test = plt.figure().gca(projection='3d')
-                    threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['zf_U_plan_3'])
-                    threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['zf_U_plan_3'])
-                    plt.show()
+                    #threedee_train = plt.figure().gca(projection='3d')
+                    #threedee_test = plt.figure().gca(projection='3d')
+                    #threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['zf_U_plan_3'])
+                    #threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['zf_U_plan_3'])
+                    #plt.show()
 
                 test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
                 test_predictions_1 = np.array([])
@@ -1372,7 +1438,9 @@ if not outputs_zf_U_plan_df.empty:
                 plt.xlabel("zf_U_plan_3")
                 plt.ylabel("zf_U_plan_7")
                 plt.legend(loc='upper right')
-                plt.show()
+                plt.savefig(dir_path_zf_U_plan+"/cluster"+repr(i)+"/zf_U_pred.pdf")
+                plt.clf()
+                #plt.show()
 
 # ----- FINAL POSTURE SELECTION: dual variables  --------------------------------------------- #
 if not outputs_dual_f_plan_df.empty:
@@ -1399,7 +1467,13 @@ if not outputs_dual_f_plan_df.empty:
         fig = plt.figure()
         ax_dual_f_plan = Axes3D(fig)
         ax_dual_f_plan.scatter(dual_f_plan[:, 0], dual_f_plan[:, 1], dual_f_plan[:, 2], c=labels_dual_f_plan)
-        plt.show()
+        ax_xf_plan.set_xlabel('normalized dual_f_plan 1')
+        ax_xf_plan.set_ylabel('normalized dual_f_plan 2')
+        ax_xf_plan.set_zlabel('normalized dual_f_plan 3')
+        ax_xf_plan.set_title('Clusters of the dual_f_plan')
+        plt.savefig(dir_path_dual_f_plan + "/clusters.pdf")
+        plt.clf()
+        #plt.show()
 
     cl_0_inputs_list_dual_f_plan = []
     cl_0_inputs_test_list_dual_f_plan = []
@@ -1600,10 +1674,26 @@ if not outputs_dual_f_plan_df.empty:
                         print(pca_dual_f_plan.explained_variance_ratio_)
                         print(pca_dual_f_plan.explained_variance_ratio_.sum())
                         df = pd.DataFrame({'var': pca_dual_f_plan.explained_variance_ratio_, 'PC': cols_dual_f_plan[0:n_comps]})
-                        sns.barplot(x='PC', y="var", data=df, color="c")
+
+                        pc_file = open(dir_path_dual_f_plan+"/cluster"+repr(i)+"/p_comps.csv", "w")
+                        pc_file.write("### Principal components ###\n")
+                        pc_file.write(df.iloc[0, 0]+", ")
+                        pc_file.write(df.iloc[1, 0] + ", ")
+                        pc_file.write(df.iloc[2, 0] + ", ")
+                        pc_file.write(df.iloc[3, 0] + "\n")
+                        pc_file.write("%.3f, " % df.iloc[0, 1])
+                        pc_file.write("%.3f, " % df.iloc[1, 1])
+                        pc_file.write("%.3f, " % df.iloc[2, 1])
+                        pc_file.write("%.3f\n" % df.iloc[3, 1])
+                        pc_file.close()
+
+                        sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
+                        fig_pc = sns_plot.get_figure()
+                        fig_pc.savefig(dir_path_dual_f_plan+"/cluster"+repr(i)+"/p_comps.pdf")
                         threedee_train = plt.figure().gca(projection='3d')
                         threedee_train.scatter(cl_in_dual_f_plan_df["target_x_mm"], cl_in_dual_f_plan_df["target_y_mm"], pc_df['dual_f_plan_1'])
-                        plt.show()
+                        plt.clf()
+                        #plt.show()
                 else:
                     pc_df = cl_out_dual_f_plan_df
                     n_comps = len(cl_out_dual_f_plan_df.columns)
@@ -1652,11 +1742,11 @@ if not outputs_dual_f_plan_df.empty:
                     print("Test targets summary:")
                     display.display(test_targets.describe())
 
-                    threedee_train = plt.figure().gca(projection='3d')
-                    threedee_test = plt.figure().gca(projection='3d')
-                    threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['dual_f_plan_1'])
-                    threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['dual_f_plan_1'])
-                    plt.show()
+                    #threedee_train = plt.figure().gca(projection='3d')
+                    #threedee_test = plt.figure().gca(projection='3d')
+                    #threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['dual_f_plan_1'])
+                    #threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['dual_f_plan_1'])
+                    #plt.show()
 
                 test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
                 test_predictions_1 = np.array([])
@@ -1758,7 +1848,9 @@ if not outputs_dual_f_plan_df.empty:
                 plt.xlabel("dual_f_plan_1")
                 plt.ylabel("dual_f_plan_4")
                 plt.legend(loc='upper right')
-                plt.show()
+                plt.savefig(dir_path_dual_f_plan+"/cluster"+repr(i)+"/dual_f_plan_pred.pdf")
+                plt.clf()
+                #plt.show()
 
 
 # ----- BOUNCE POSTURE SELECTION: bounce posture  --------------------------------------------- #
@@ -1784,9 +1876,15 @@ if not outputs_x_bounce_df.empty:
     C_x_bounce = kmeans_x_bounce.cluster_centers_
     if (print_en_x_bounce):
         fig = plt.figure()
-        ax_dual_f_plan = Axes3D(fig)
-        ax_dual_f_plan.scatter(x_bounce[:, 0], x_bounce[:, 1], x_bounce[:, 2], c=labels_x_bounce)
-        plt.show()
+        ax_x_bounce = Axes3D(fig)
+        ax_x_bounce.scatter(x_bounce[:, 0], x_bounce[:, 1], x_bounce[:, 2], c=labels_x_bounce)
+        ax_x_bounce.set_xlabel('normalized x_bounce 1 [rad]')
+        ax_x_bounce.set_ylabel('normalized x_bounce 2 [rad]')
+        ax_x_bounce.set_zlabel('normalized x_bounce 3 [rad]')
+        ax_x_bounce.set_title('Clusters of the x_bounce')
+        plt.savefig(dir_path_x_bounce + "/clusters.pdf")
+        plt.clf()
+        #plt.show()
 
     cl_0_inputs_list_x_bounce = []
     cl_0_inputs_test_list_x_bounce = []
@@ -1987,10 +2085,26 @@ if not outputs_x_bounce_df.empty:
                         print(pca_x_bounce.explained_variance_ratio_)
                         print(pca_x_bounce.explained_variance_ratio_.sum())
                         df = pd.DataFrame({'var': pca_x_bounce.explained_variance_ratio_, 'PC': cols_x_bounce[0:n_comps]})
-                        sns.barplot(x='PC', y="var", data=df, color="c")
+
+                        pc_file = open(dir_path_x_bounce+"/cluster"+repr(i)+"/p_comps.csv", "w")
+                        pc_file.write("### Principal components ###\n")
+                        pc_file.write(df.iloc[0, 0]+", ")
+                        pc_file.write(df.iloc[1, 0] + ", ")
+                        pc_file.write(df.iloc[2, 0] + ", ")
+                        pc_file.write(df.iloc[3, 0] + "\n")
+                        pc_file.write("%.3f, " % df.iloc[0, 1])
+                        pc_file.write("%.3f, " % df.iloc[1, 1])
+                        pc_file.write("%.3f, " % df.iloc[2, 1])
+                        pc_file.write("%.3f\n" % df.iloc[3, 1])
+                        pc_file.close()
+
+                        sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
+                        fig_pc = sns_plot.get_figure()
+                        fig_pc.savefig(dir_path_x_bounce+"/cluster"+repr(i)+"/p_comps.pdf")
                         threedee_train = plt.figure().gca(projection='3d')
                         threedee_train.scatter(cl_in_x_bounce_df["target_x_mm"], cl_in_x_bounce_df["target_y_mm"], pc_df['x_bounce_1_rad'])
-                        plt.show()
+                        plt.clf()
+                        #plt.show()
                 else:
                     pc_df = cl_out_x_bounce_df
                     n_comps = len(cl_out_x_bounce_df.columns)
@@ -2039,11 +2153,11 @@ if not outputs_x_bounce_df.empty:
                     print("Test targets summary:")
                     display.display(test_targets.describe())
 
-                    threedee_train = plt.figure().gca(projection='3d')
-                    threedee_test = plt.figure().gca(projection='3d')
-                    threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['x_bounce_1_rad'])
-                    threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['x_bounce_1_rad'])
-                    plt.show()
+                    #threedee_train = plt.figure().gca(projection='3d')
+                    #threedee_test = plt.figure().gca(projection='3d')
+                    #threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['x_bounce_1_rad'])
+                    #threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['x_bounce_1_rad'])
+                    #plt.show()
 
                 test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
                 test_predictions_1 = np.array([])
@@ -2146,7 +2260,9 @@ if not outputs_x_bounce_df.empty:
                 plt.xlabel("x_bounce_1_rad")
                 plt.ylabel("x_bounce_2_rad")
                 plt.legend(loc='upper right')
-                plt.show()
+                plt.savefig(dir_path_x_bounce+"/cluster"+repr(i)+"/x_bounce_pred.pdf")
+                plt.clf()
+                #plt.show()
 
 
 # ----- BOUNCE POSTURE SELECTION: Lower bounds --------------------------------------------- #
@@ -2174,7 +2290,11 @@ if not outputs_zb_L_df.empty:
         fig = plt.figure()
         ax_zb_L_plan = fig.add_subplot(111)
         ax_zb_L_plan.scatter(normalized_inputs["target_x_mm"],zb_L, s=10, c=labels_zb_L, marker="s")
-        plt.show()
+        ax_zb_L_plan.set_xlabel("normalized target x mm")
+        ax_zb_L_plan.set_ylabel("zb_L")
+        plt.savefig(dir_path_zb_L+"/clusters.pdf")
+        plt.clf()
+        #plt.show()
 
     cl_0_inputs_list_zb_L = []
     cl_0_inputs_test_list_zb_L = []
@@ -2429,11 +2549,11 @@ if not outputs_zb_L_df.empty:
                     print("Test targets summary:")
                     display.display(test_targets.describe())
 
-                    threedee_train = plt.figure().gca(projection='3d')
-                    threedee_test = plt.figure().gca(projection='3d')
-                    threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['zb_L_4'])
-                    threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['zb_L_4'])
-                    plt.show()
+                    #threedee_train = plt.figure().gca(projection='3d')
+                    #threedee_test = plt.figure().gca(projection='3d')
+                    #threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['zb_L_4'])
+                    #threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['zb_L_4'])
+                    #plt.show()
 
                 test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
                 test_predictions_1 = np.array([])
@@ -2534,7 +2654,9 @@ if not outputs_zb_L_df.empty:
                 plt.xlabel("normalized target_x [mm]")
                 plt.ylabel("zb_L_plan_4")
                 plt.legend(loc='upper right')
-                plt.show()
+                plt.savefig(dir_path_zb_L+"/cluster"+repr(i)+"/zb_L_pred.pdf")
+                plt.clf()
+                #plt.show()
 
 # ----- BOUNCE POSTURE SELECTION: dual variables  --------------------------------------------- #
 if not outputs_dual_bounce_df.empty:
@@ -2559,10 +2681,16 @@ if not outputs_dual_bounce_df.empty:
     C_dual_bounce = kmeans_dual_bounce.cluster_centers_
     if (print_en_dual_bounce):
         fig = plt.figure()
-        ax = Axes3D(fig)
-        ax.scatter(dual_bounce[:, 6], dual_bounce[:, 7], dual_bounce[:, 8], c=labels_dual_bounce)
-        ax.scatter(C_dual_bounce[:, 6], C_dual_bounce[:, 7], C_dual_bounce[:, 8], marker='*', c='#050505', s=1000)
-        plt.show()
+        ax_dual_bounce = Axes3D(fig)
+        ax_dual_bounce.scatter(dual_bounce[:, 6], dual_bounce[:, 7], dual_bounce[:, 8], c=labels_dual_bounce)
+        #ax.scatter(C_dual_bounce[:, 6], C_dual_bounce[:, 7], C_dual_bounce[:, 8], marker='*', c='#050505', s=1000)
+        ax_dual_bounce.set_xlabel('normalized dual_bounce 6')
+        ax_dual_bounce.set_ylabel('normalized dual_bounce 7')
+        ax_dual_bounce.set_zlabel('normalized dual_bounce 8')
+        ax_dual_bounce.set_title('Clusters of the dual_bounce')
+        plt.savefig(dir_path_dual_bounce + "/clusters.pdf")
+        plt.clf()
+        #plt.show()
 
     cl_0_inputs_list_dual_bounce = []
     cl_0_inputs_test_list_dual_bounce = []
@@ -2763,16 +2891,31 @@ if not outputs_dual_bounce_df.empty:
                         print(pca_dual_bounce.explained_variance_ratio_)
                         print(pca_dual_bounce.explained_variance_ratio_.sum())
                         df = pd.DataFrame({'var': pca_dual_bounce.explained_variance_ratio_, 'PC': cols_dual_bounce[0:n_comps]})
-                        sns.barplot(x='PC', y="var", data=df, color="c")
+
+                        pc_file = open(dir_path_dual_bounce+"/cluster"+repr(i)+"/p_comps.csv", "w")
+                        pc_file.write("### Principal components ###\n")
+                        pc_file.write(df.iloc[0, 0]+", ")
+                        pc_file.write(df.iloc[1, 0] + ", ")
+                        pc_file.write(df.iloc[2, 0] + ", ")
+                        pc_file.write(df.iloc[3, 0] + "\n")
+                        pc_file.write("%.3f, " % df.iloc[0, 1])
+                        pc_file.write("%.3f, " % df.iloc[1, 1])
+                        pc_file.write("%.3f, " % df.iloc[2, 1])
+                        pc_file.write("%.3f\n" % df.iloc[3, 1])
+                        pc_file.close()
+
+                        sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
+                        fig_pc = sns_plot.get_figure()
+                        fig_pc.savefig(dir_path_dual_bounce+"/cluster"+repr(i)+"/p_comps.pdf")
                         threedee_train = plt.figure().gca(projection='3d')
                         threedee_train.scatter(cl_in_dual_bounce_df["target_x_mm"], cl_in_dual_bounce_df["target_y_mm"], pc_df['dual_bounce_39'])
-                        plt.show()
+                        plt.clf()
+                        #plt.show()
                 else:
                     pc_df = cl_out_dual_bounce_df
                     n_comps = len(cl_out_dual_bounce_df.columns)
 
                 # ---------------------------- regression --------------------------------- #
-
                 size = len(cl_out_dual_bounce_df.index)
                 inputs_df, inputs_df_max, inputs_df_min = normalize_linear_scale(cl_in_dual_bounce_df)
                 outputs_df = pc_df
@@ -2817,11 +2960,11 @@ if not outputs_dual_bounce_df.empty:
                     print("Test targets summary:")
                     display.display(test_targets.describe())
 
-                    threedee_train = plt.figure().gca(projection='3d')
-                    threedee_test = plt.figure().gca(projection='3d')
-                    threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['dual_bounce_39'])
-                    threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['dual_bounce_39'])
-                    plt.show()
+                    #threedee_train = plt.figure().gca(projection='3d')
+                    #threedee_test = plt.figure().gca(projection='3d')
+                    #threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['dual_bounce_39'])
+                    #threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['dual_bounce_39'])
+                    #plt.show()
 
                 test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
                 test_predictions_1 = np.array([])
@@ -2922,4 +3065,6 @@ if not outputs_dual_bounce_df.empty:
                 plt.xlabel("dual_bounce_39")
                 plt.ylabel("dual_bounce_40")
                 plt.legend(loc='upper right')
-                plt.show()
+                plt.savefig(dir_path_dual_bounce+"/cluster"+repr(i)+"/dual_bounce_pred.pdf")
+                plt.clf()
+                #plt.show()

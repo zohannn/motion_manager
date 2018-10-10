@@ -310,6 +310,22 @@ def train_nn_regression_model(
         validation_rmse.append(validation_root_mean_squared_error)
     print("Model training finished.")
 
+    res_file = open(model_dir+"/results.txt", "w")
+    res_file.write("### Results of the regression ###\n")
+    res_file.write("Final RMSE (on training data):   %0.3f\n" % training_root_mean_squared_error)
+    res_file.write("Final RMSE (on validation data):   %0.3f\n" % validation_root_mean_squared_error)
+    res_file.close()
+
+    errors_file = open(model_dir + "/errors.csv", "w")
+    errors_file.write("### Root Mean Squared Errors of the regression ###\n")
+    errors_file.write("### training_rmse, validation_rmse ###\n")
+    size = len(training_rmse)
+    for i in range(0, size):
+        errors_file.write("%.6f," % training_rmse[i])
+        errors_file.write("%.6f\n" % validation_rmse[i])
+    errors_file.close()
+
+
     # Output a graph of loss metrics over periods.
     plt.ylabel("RMSE")
     plt.xlabel("Periods")
@@ -318,7 +334,9 @@ def train_nn_regression_model(
     plt.plot(training_rmse, label="training")
     plt.plot(validation_rmse, label="validation")
     plt.legend()
-    plt.show()
+    plt.savefig(model_dir + "/rmse.pdf")
+    plt.clf()
+    #plt.show()
 
     print("Final RMSE (on training data):   %0.2f" % training_root_mean_squared_error)
     print("Final RMSE (on validation data): %0.2f" % validation_root_mean_squared_error)
@@ -419,12 +437,29 @@ def train_nn_classifier_model(
         validation_log_losses.append(validation_log_loss)
     print("Model training finished.")
 
+    res_file = open(model_dir+"/results.txt", "w")
+    res_file.write("### Results of the classification ###\n")
+    res_file.write("Final LogLoss (on training data):   %0.3f\n" % training_log_loss)
+    res_file.write("Final LogLoss (on validation data): %0.3f\n" % validation_log_loss)
+
     print("Final LogLoss (on training data):   %0.3f" % training_log_loss)
     print("Final LogLoss (on validation data): %0.3f" % validation_log_loss)
 
     evaluation_metrics = nn_classifier.evaluate(input_fn=predict_validation_input_fn)
+    res_file.write("Average loss on the validation set: %0.3f\n" % evaluation_metrics['average_loss'])
+    res_file.write("Accuracy on the validation set: %0.3f\n" % evaluation_metrics['accuracy'])
     print("Average loss on the validation set: %0.3f" % evaluation_metrics['average_loss'])
     print("Accuracy on the validation set: %0.3f" % evaluation_metrics['accuracy'])
+    res_file.close()
+
+    losses_file = open(model_dir + "/log_losses.csv", "w")
+    losses_file.write("### Log losses of the classification ###\n")
+    losses_file.write("### training_log_losses, validation_log_losses ###\n")
+    size = len(training_log_losses)
+    for i in range(0, size):
+        losses_file.write("%.6f," % training_log_losses[i])
+        losses_file.write("%.6f\n" % validation_log_losses[i])
+    losses_file.close()
 
     # Output a graph of loss metrics over periods.
     plt.ylabel("LogLoss")
@@ -434,50 +469,9 @@ def train_nn_classifier_model(
     plt.plot(training_log_losses, label="training")
     plt.plot(validation_log_losses, label="validation")
     plt.legend()
-    plt.show()
+    plt.savefig(model_dir+"/log_loss.pdf")
+    plt.clf()
+    #plt.show()
+
 
     return nn_classifier, training_log_losses, validation_log_losses
-
-'''
-def serving_input_receiver_fn():
-  """An input receiver that expects a serialized tf.Example."""
-  serialized_tf_example = tf.placeholder(dtype=tf.float32,
-                                         shape=[None],
-                                         name='input_example_tensor')
-  receiver_tensors = {'examples': serialized_tf_example}
-  features = tf.parse_example(serialized_tf_example, feature_spec)
-  return tf.estimator.export.ServingInputReceiver(features, receiver_tensors)
-'''
-'''
-def serving_input_receiver_fn():
-  """Build the serving inputs."""
-  # The outer dimension (None) allows us to batch up inputs for
-  # efficiency. However, it also means that if we want a prediction
-  # for a single instance, we'll need to wrap it in an outer list.
-  inputs = {"target_x_mm": tf.placeholder(shape=[None], dtype=tf.float32),
-            "target_y_mm": tf.placeholder(shape=[None], dtype=tf.float32),
-            "target_z_mm": tf.placeholder(shape=[None], dtype=tf.float32),
-            "target_roll_rad": tf.placeholder(shape=[None], dtype=tf.float32),
-            "target_pitch_rad": tf.placeholder(shape=[None], dtype=tf.float32),
-            "target_yaw_rad": tf.placeholder(shape=[None], dtype=tf.float32),
-            "obstacle_1_x_mm": tf.placeholder(shape=[None], dtype=tf.float32),
-            "obstacle_1_y_mm": tf.placeholder(shape=[None], dtype=tf.float32),
-            "obstacle_1_z_mm": tf.placeholder(shape=[None], dtype=tf.float32),
-            "obstacle_1_roll_rad": tf.placeholder(shape=[None], dtype=tf.float32),
-            "obstacle_1_pitch_rad": tf.placeholder(shape=[None], dtype=tf.float32),
-            "obstacle_1_yaw_rad": tf.placeholder(shape=[None], dtype=tf.float32)}
-
-  return tf.estimator.export.ServingInputReceiver(inputs, inputs)
-
-def save_model(model,dir_path,input_df):
-    feature_spec = tf.feature_column.make_parse_example_spec(feature_columns = construct_feature_columns(input_df))
-    export_input_fn = tf.estimator.export.build_parsing_serving_input_receiver_fn(feature_spec)
-    servable_model_path = model.export_savedmodel(export_dir_base = dir_path, serving_input_receiver_fn = export_input_fn)
-    return servable_model_path
-
-def load_model(dir_path):
-    learner = tf.contrib.predictor.from_saved_model(dir_path)
-    return learner
-
-'''
-

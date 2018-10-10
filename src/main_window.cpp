@@ -5796,6 +5796,55 @@ bool MainWindow::on_pushButton_train_clicked()
     }else{
         return false;
     }
+    qnode.log(QNode::Info,std::string("Training ended"));
+}
+
+void MainWindow::on_pushButton_py_pred_file_clicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    tr("Select the python file for prediction"),
+                                                    QString(MAIN_PATH)+"/scripts",
+                                                    "Python Files (*.py)");
+    this->ui.lineEdit_py_pred_file->setText(filename);
+}
+
+void MainWindow::on_pushButton_predictions_clicked()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select the Directory to store the predicted solutions"),
+                                                    QString(MAIN_PATH),
+                                                    QFileDialog::ShowDirsOnly
+                                                    | QFileDialog::DontResolveSymlinks);
+    this->ui.lineEdit_predictions->setText(dir);
+}
+
+void MainWindow::on_pushButton_pred_plan_pressed()
+{
+    qnode.log(QNode::Info,std::string("Prediction and planning started"));
+    qnode.log(QNode::Info,std::string("Prediction and planning . . . "));
+}
+
+bool MainWindow::on_pushButton_pred_plan_clicked()
+{
+    if (!this->ui.lineEdit_py_pred_file->text().isEmpty() && !this->ui.lineEdit_train_data->text().isEmpty() && !this->ui.lineEdit_predictions->text().isEmpty())
+    {
+        string cmdLine;
+        string py_file = this->ui.lineEdit_py_pred_file->text().toStdString();
+        string data_file = this->ui.lineEdit_train_data->text().toStdString();
+        string models_dir = this->ui.lineEdit_models->text().toStdString();
+        string pred_dir = this->ui.lineEdit_predictions->text().toStdString();
+
+
+
+
+
+        cmdLine = string("python3 ") + py_file + string(" ") + data_file + string(" ") + models_dir + string(" ") + pred_file;
+
+        int status = system(cmdLine.c_str());
+        return(status==0);
+    }else{
+        return false;
+    }
+    qnode.log(QNode::Info,std::string("Prediction and planning ended"));
 }
 
 

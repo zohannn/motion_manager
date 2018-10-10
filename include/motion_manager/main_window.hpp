@@ -545,6 +545,27 @@ public Q_SLOTS:
          */
         bool on_pushButton_train_clicked();
 
+        /**
+         * @brief on_pushButton_py_pred_file_clicked
+         */
+        void on_pushButton_py_pred_file_clicked();
+
+        /**
+         * @brief on_pushButton_predictions_clicked
+         */
+        void on_pushButton_predictions_clicked();
+
+        /**
+         * @brief on_pushButton_pred_plan_pressed
+         */
+        void on_pushButton_pred_plan_pressed();
+
+        /**
+         * @brief on_pushButton_pred_plan_clicked
+         * @return
+         */
+        bool on_pushButton_pred_plan_clicked();
+
 
 private:
         Ui::MainWindowDesign ui; /**< handles of the main user interface */
