@@ -562,9 +562,8 @@ public Q_SLOTS:
 
         /**
          * @brief on_pushButton_pred_plan_clicked
-         * @return
          */
-        bool on_pushButton_pred_plan_clicked();
+        void on_pushButton_pred_plan_clicked();
 
 
 private:

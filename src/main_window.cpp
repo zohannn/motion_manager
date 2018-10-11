@@ -5361,6 +5361,9 @@ void MainWindow::on_pushButton_load_learn_prim_duals_clicked()
     this->ui.label_trials->setEnabled(false);
     this->ui.lineEdit_trials->setEnabled(false);
     this->ui.pushButton_plan_collect->setEnabled(false);
+    this->ui.label_n_predictions->setEnabled(false);
+    this->ui.lineEdit_n_predictions->setEnabled(false);
+    this->ui.pushButton_pred_plan->setEnabled(false);
 
     this->sol_plan = false;
     this->sol_approach = false;
@@ -5376,7 +5379,7 @@ void MainWindow::on_pushButton_load_learn_prim_duals_clicked()
     x_bounce.clear(); zL_bounce.clear(); zU_bounce.clear(); dual_bounce.clear();
 
     QString filename = QFileDialog::getOpenFileName(this,
-                                                    tr("Load the solution of the original problems"),
+                                                    tr("Load the solution of the original problem"),
                                                     QString(MAIN_PATH)+"/Duals",
                                                     "All Files (*.*);; Tol Files (*.dual)");
     QFile f( filename );
@@ -5470,6 +5473,9 @@ void MainWindow::on_pushButton_load_learn_prim_duals_clicked()
         this->ui.label_trials->setEnabled(true);
         this->ui.lineEdit_trials->setEnabled(true);
         this->ui.pushButton_plan_collect->setEnabled(true);
+        this->ui.label_n_predictions->setEnabled(true);
+        this->ui.lineEdit_n_predictions->setEnabled(true);
+        this->ui.pushButton_pred_plan->setEnabled(true);
     }
 }
 
@@ -5823,7 +5829,7 @@ void MainWindow::on_pushButton_pred_plan_pressed()
     qnode.log(QNode::Info,std::string("Prediction and planning . . . "));
 }
 
-bool MainWindow::on_pushButton_pred_plan_clicked()
+void MainWindow::on_pushButton_pred_plan_clicked()
 {
     if (!this->ui.lineEdit_py_pred_file->text().isEmpty() && !this->ui.lineEdit_train_data->text().isEmpty() && !this->ui.lineEdit_predictions->text().isEmpty())
     {
@@ -5833,16 +5839,451 @@ bool MainWindow::on_pushButton_pred_plan_clicked()
         string models_dir = this->ui.lineEdit_models->text().toStdString();
         string pred_dir = this->ui.lineEdit_predictions->text().toStdString();
 
+        problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
+        int planner_id = prob->getPlannerID();
+        int arm_sel = prob->getMovement()->getArm();
+        int mov_type = prob->getMovement()->getType();
+        HUMotion::hump_params  tols;
+        std::vector<double> move_target;
+        std::vector<double> move_target_mod;
+        std::vector<double> move_final_hand;
+        std::vector<double> move_final_arm;
+        bool use_final;
+        HUMotion::planning_result_ptr h_results_no_ws;
+        HUMotion::planning_result_ptr h_results_ws_or;
+        HUMotion::planning_result_ptr h_results_ws_pred;
+        int n_pred = ui.lineEdit_n_predictions->text().toInt();
+        ui.pushButton_pred_plan->setCheckable(false);
 
+        try{
+            switch (planner_id) {
+            case 0: // HUMP
+                if(arm_sel!=0)
+                { // single-arm
+                    mTolHumpdlg->setInfo(prob->getInfoLine());
+                    // --- Tolerances for the final posture selection ---- //
+                    tols.tolTarPos = mTolHumpdlg->getTolTarPos(); // target position tolerances
+                    tols.tolTarOr = mTolHumpdlg->getTolTarOr(); // target orientation tolerances
+                    mTolHumpdlg->getTolsArm(tols.tolsArm);// tolerances of the arm : radius in [mm]
+                    mTolHumpdlg->getTolsHand(tols.tolsHand);// tolerances of the hand: radius in [mm]
+                    tols.target_avoidance = mTolHumpdlg->getTargetAvoidance();// target avoidance
+                    tols.obstacle_avoidance = mTolHumpdlg->getObstacleAvoidance(); //obstacle avoidance
+                    mTolHumpdlg->getLambda(tols.lambda_final); // joint expense factors
+                    mTolHumpdlg->getLambda(tols.lambda_bounce); // joint expense factors
+                    // --- Tolerances for the bounce posture selection ---- //
+                    tols.w_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getWMax()*M_PI/180)); // max joint velocity
+                    tols.alpha_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getAlphaMax()*M_PI/180)); // max joint acceleration
+                    mTolHumpdlg->getInitVel(tols.bounds.vel_0); // initial velocity
+                    mTolHumpdlg->getFinalVel(tols.bounds.vel_f); // final velocity
+                    mTolHumpdlg->getInitAcc(tols.bounds.acc_0); // initial acceleration
+                    mTolHumpdlg->getFinalAcc(tols.bounds.acc_f); // final acceleration
+                    // tolerances for the obstacles
+                    mTolHumpdlg->getTolsObstacles(tols.final_tolsObstacles); // final posture tols
+                    tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
+                    tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1));
+                    mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(0));
+                    mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(1));
+                    // tolerances for the target
+                    tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
+                    tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+                    tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+                    mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
+                    tols.singleArm_tolsTarget.at(1) = tols.singleArm_tolsTarget.at(0)/100;
+                    tols.singleArm_tolsTarget.at(2) = 0*tols.singleArm_tolsTarget.at(0);
+                    //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
+                    //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
+                    // pick / place settings
+                    tols.mov_specs.approach = mTolHumpdlg->getApproach();
+                    tols.mov_specs.retreat = mTolHumpdlg->getRetreat();
+                    mTolHumpdlg->getPreGraspApproach(tols.mov_specs.pre_grasp_approach); // pick approach
+                    mTolHumpdlg->getPostGraspRetreat(tols.mov_specs.post_grasp_retreat); // pick retreat
+                    mTolHumpdlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
+                    mTolHumpdlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
+                    tols.mov_specs.rand_init = mTolHumpdlg->getRandInit(); // random initialization for "plan" stages
+                    tols.mov_specs.coll = mTolHumpdlg->getColl(); // collisions option
+                    tols.coll_body = mTolHumpdlg->getCollBody(); // collisions with the body
+                    tols.mov_specs.straight_line = mTolHumpdlg->get_straight_line(); // hand straight line trajectory
+                    tols.mov_specs.w_red_app_max = mTolHumpdlg->getW_red_app(); // set the max velocity reduction when approaching
+                    tols.mov_specs.w_red_ret_max = mTolHumpdlg->getW_red_ret(); // set the max velocity reduction when retreating
+                    // move settings
+                    mTolHumpdlg->getTargetMove(move_target);
+                    move_target_mod.resize(move_target.size());
+                    mTolHumpdlg->getFinalHand(move_final_hand);
+                    mTolHumpdlg->getFinalArm(move_final_arm);
+                    use_final = mTolHumpdlg->get_use_final_posture();
+                    prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
+                    tols.mov_specs.use_move_plane = mTolHumpdlg->get_add_plane();
+                    mTolHumpdlg->getPlaneParameters(tols.mov_specs.plane_params);
+                    // Maximum variations of the target
+                    double tar_x_var = ui.lineEdit_tar_x_var->text().toDouble();
+                    double tar_y_var = ui.lineEdit_tar_y_var->text().toDouble();
+                    double tar_z_var = ui.lineEdit_tar_z_var->text().toDouble();
+                    double tar_roll_var = ui.lineEdit_tar_roll_var->text().toDouble();
+                    double tar_pitch_var = ui.lineEdit_tar_pitch_var->text().toDouble();
+                    double tar_yaw_var = ui.lineEdit_tar_yaw_var->text().toDouble();
+                    // Maximum variations of the obstacles
+                    double obsts_x_var = ui.lineEdit_obsts_x_var->text().toDouble();
+                    double obsts_y_var = ui.lineEdit_obsts_y_var->text().toDouble();
+                    double obsts_z_var = ui.lineEdit_obsts_z_var->text().toDouble();
+                    double obsts_roll_var = ui.lineEdit_obsts_roll_var->text().toDouble();
+                    double obsts_pitch_var = ui.lineEdit_obsts_pitch_var->text().toDouble();
+                    double obsts_yaw_var = ui.lineEdit_obsts_yaw_var->text().toDouble();
+                    // get the obstacles of the scenario
+                    std::vector<objectPtr> obsts; prob->getObstacles(obsts);
 
+                     // csv
+                    struct stat st = {0};
+                    if (stat("results", &st) == -1) {
+                        mkdir("results", 0700);
+                    }
+                    if (stat("results/learning", &st) == -1) {
+                        mkdir("results/learning", 0700);
+                    }
+                    if (stat("results/learning/predictions", &st) == -1) {
+                        mkdir("results/learning/predictions", 0700);
+                    }
+                    QString path("results/learning/predictions/");
 
+                    string filename_csv("learning_predictions.csv");
+                    ofstream pred_csv;
+                    pred_csv.open(path.toStdString()+filename_csv);
+                    // headers
+                    pred_csv << "target_x_mm,target_y_mm,target_z_mm,target_roll_rad,target_pitch_rad,target_yaw_rad";
+                    for(size_t j=0;j<obsts.size();++j){
+                        pred_csv << ",obstacle_"+to_string(j+1)+"_x_mm,obstacle_"+to_string(j+1)+"_y_mm,obstacle_"+to_string(j+1)+"_z_mm,obstacle_"+to_string(j+1)+"_roll_rad,obstacle_"+to_string(j+1)+"_pitch_rad,obstacle_"+to_string(j+1)+"_yaw_rad";
+                    }
+                    if(mov_type==1 || mov_type==5){ // move movement
+                        // no warm start
+                        pred_csv << ",Success_f_no_ws,Iterations_f_plan_no_ws,Cpu_time_f_plan_no_ws,Obj_f_plan_no_ws,";
+                        pred_csv << "Success_b_no_ws,Iterations_bounce_no_ws,Cpu_time_bounce_no_ws,Obj_bounce_no_ws,";
 
-        cmdLine = string("python3 ") + py_file + string(" ") + data_file + string(" ") + models_dir + string(" ") + pred_file;
+                        // warm start with the original solution
+                        pred_csv << "Success_f_ws_or,Iterations_f_plan_ws_or,Cpu_time_f_plan_ws_or,Obj_f_plan_ws_or,";
+                        pred_csv << "Success_b_ws_or,Iterations_bounce_ws_or,Cpu_time_bounce_ws_or,Obj_bounce_ws_or,";
 
-        int status = system(cmdLine.c_str());
-        return(status==0);
-    }else{
-        return false;
+                        // warm start with the predicted solution
+                        pred_csv << "Success_f_ws_pred,Iterations_f_plan_ws_pred,Cpu_time_f_plan_ws_pred,Obj_f_plan_ws_pred,";
+                        pred_csv << "Success_b_ws_pred,Iterations_bounce_ws_pred,Cpu_time_bounce_ws_pred,Obj_bounce_ws_pred";
+                    }
+                    pred_csv << " \n";
+
+                    for(int i=0;i<n_pred;++i){
+
+                        sleep(1);
+                        qnode.log(QNode::Info,std::string("Prediction: ")+to_string(i));
+                        std::srand(std::time(NULL));
+
+                        // modify target data (move_target)
+                        move_target_mod.at(0) = move_target.at(0) - (tar_x_var/2) + tar_x_var*(rand() / double(RAND_MAX));
+                        move_target_mod.at(1) = move_target.at(1) - (tar_y_var/2) + tar_y_var*(rand() / double(RAND_MAX));
+                        move_target_mod.at(2) = move_target.at(2) - (tar_z_var/2) + tar_z_var*(rand() / double(RAND_MAX));
+                        move_target_mod.at(3) = move_target.at(3) - (tar_roll_var/2) + tar_roll_var*(rand() / double(RAND_MAX));
+                        move_target_mod.at(4) = move_target.at(4) - (tar_pitch_var/2) + tar_pitch_var*(rand() / double(RAND_MAX));
+                        move_target_mod.at(5) = move_target.at(5) - (tar_yaw_var/2) + tar_yaw_var*(rand() / double(RAND_MAX));
+                        prob->setMoveSettings(move_target_mod,move_final_hand,move_final_arm,use_final);
+
+                        string tar_x_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(0))); boost::replace_all(tar_x_pos_str,",",".");
+                        string tar_y_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(1))); boost::replace_all(tar_y_pos_str,",",".");
+                        string tar_z_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(2))); boost::replace_all(tar_z_pos_str,",",".");
+                        string tar_roll_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(3))); boost::replace_all(tar_roll_str,",",".");
+                        string tar_pitch_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(4))); boost::replace_all(tar_pitch_str,",",".");
+                        string tar_yaw_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(5))); boost::replace_all(tar_yaw_str,",",".");
+
+                        string input_data_str = tar_x_pos_str + string(",") +
+                                                tar_y_pos_str + string(",") +
+                                                tar_z_pos_str + string(",") +
+                                                tar_roll_str + string(",") +
+                                                tar_pitch_str + string(",") +
+                                                tar_yaw_str;
+
+                        // modify obstacles data
+                        objectPtr obs_new;
+                        for(size_t j=0;j<obsts.size();++j){
+                            std::srand(std::time(NULL));
+                            objectPtr obs = obsts.at(j);
+                            obs_new.reset(new Object(obs->getName()));
+                            motion_manager::pos obs_pos;
+                            motion_manager::orient obs_or;
+                            obs_pos.Xpos = obs->getPos().Xpos - (obsts_x_var/2) + obsts_x_var*(rand() / double(RAND_MAX));
+                            obs_pos.Ypos = obs->getPos().Ypos - (obsts_y_var/2) + obsts_y_var*(rand() / double(RAND_MAX));
+                            obs_pos.Zpos = obs->getPos().Zpos - (obsts_z_var/2) + obsts_z_var*(rand() / double(RAND_MAX));
+                            obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
+                            obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
+                            obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
+                            obs_new->setPos(obs_pos,false);
+                            obs_new->setOr(obs_or,false);
+                            obs_new->setSize(obs->getSize());
+                            string obs_x_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Xpos)); boost::replace_all(obs_x_pos_str,",",".");
+                            string obs_y_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Ypos)); boost::replace_all(obs_y_pos_str,",",".");
+                            string obs_z_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Zpos)); boost::replace_all(obs_z_pos_str,",",".");
+                            string obs_roll_str =  boost::str(boost::format("%.8f") % (obs->getOr().roll)); boost::replace_all(obs_roll_str,",",".");
+                            string obs_pitch_str =  boost::str(boost::format("%.8f") % (obs->getOr().pitch)); boost::replace_all(obs_pitch_str,",",".");
+                            string obs_yaw_str =  boost::str(boost::format("%.8f") % (obs->getOr().yaw)); boost::replace_all(obs_yaw_str,",",".");
+                            string obs_str = obs_x_pos_str + string(",") +
+                                             obs_y_pos_str + string(",") +
+                                             obs_z_pos_str + string(",") +
+                                             obs_roll_str + string(",") +
+                                             obs_pitch_str + string(",") +
+                                             obs_yaw_str;
+                            input_data_str.append(string(",") + obs_str);
+                            prob->setObstacle(obs_new,j);
+                        }// for loop obstacles
+
+                        // predict the solution
+                        string pred_file = pred_dir +string("/pred_sol_")+to_string(i)+string(".dual");
+                        cmdLine = string("python3 ") + py_file + string(" ") + data_file + string(" ") + models_dir + string(" ") + pred_file + string(" ") + input_data_str;
+                        //std::cout << cmdLine << std::endl;
+                        int status = system(cmdLine.c_str());
+                        bool pred_sol_plan = false, pred_sol_approach = false, pred_sol_retreat = false, pred_sol_bounce = false;
+                        std::vector<double> pred_x_plan, pred_zL_plan, pred_zU_plan, pred_dual_plan;
+                        std::vector<double> pred_x_approach, pred_zL_approach, pred_zU_approach, pred_dual_approach;
+                        std::vector<double> pred_x_retreat, pred_zL_retreat, pred_zU_retreat, pred_dual_retreat;
+                        std::vector<double> pred_x_bounce, pred_zL_bounce, pred_zU_bounce, pred_dual_bounce;
+
+                        if(status==0)
+                        { // successful prediction, read the prediced solution
+                            QString q_pred_file = QString::fromStdString(pred_file);
+                            QFile f(q_pred_file);
+                            if(f.open( QIODevice::ReadOnly )){
+                                QTextStream stream( &f );
+                                QString line;
+                                while(!stream.atEnd()){
+                                    line = f.readLine();
+                                    if(line.at(0)!=QChar('#')){
+                                        QStringList fields = line.split("=");
+                                        if (QString::compare(fields.at(0),QString("X_plan"),Qt::CaseInsensitive)==0){
+                                            pred_sol_plan = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("ZL_plan"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("ZU_plan"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("Dual_plan"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_plan.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_approach"),Qt::CaseInsensitive)==0){
+                                            pred_sol_approach = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_approach.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_approach"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_approach.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_approach"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_approach.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_approach"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_approach.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_retreat"),Qt::CaseInsensitive)==0){
+                                            pred_sol_retreat = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_retreat.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_retreat"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_retreat.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_retreat"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_retreat.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_retreat"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_retreat.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_bounce"),Qt::CaseInsensitive)==0){
+                                            pred_sol_bounce = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_bounce"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_bounce"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_bounce"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_bounce.push_back(data.at(i).toDouble());
+                                        }
+                                    }
+                                }
+                                f.close();
+                            }
+                        }
+
+                        // plan the movement
+
+                        // no warm start
+                        tols.mov_specs.warm_start = false;
+                        h_results_no_ws = prob->solve(tols);
+
+                        // warm start with the original solution
+                        tols.mov_specs.warm_start = true;
+                        if(this->sol_plan)
+                        {
+                            HUMotion::warm_start_params final_plan;
+                            final_plan.valid = true;
+                            final_plan.description = "plan";
+                            final_plan.x = this->x_plan;
+                            final_plan.zL = this->zL_plan;
+                            final_plan.zU = this->zU_plan;
+                            final_plan.dual_vars = this->dual_plan;
+                            tols.mov_specs.final_warm_start_params.push_back(final_plan);
+                        }
+                        if(this->sol_bounce)
+                        {
+                            HUMotion::warm_start_params bounce;
+                            bounce.valid = true;
+                            bounce.description = "bounce";
+                            bounce.x = this->x_bounce;
+                            bounce.zL = this->zL_bounce;
+                            bounce.zU = this->zU_bounce;
+                            bounce.dual_vars = this->dual_bounce;
+                            tols.mov_specs.bounce_warm_start_params = bounce;
+                        }
+                        h_results_ws_or = prob->solve(tols);
+                        tols.mov_specs.final_warm_start_params.clear();
+
+                        // warm start with the predicted solution
+                        tols.mov_specs.warm_start = true;
+                        if(pred_sol_plan)
+                        {
+                            HUMotion::warm_start_params final_plan;
+                            final_plan.valid = true;
+                            final_plan.description = "plan";
+                            final_plan.x = pred_x_plan;
+                            final_plan.zL = pred_zL_plan;
+                            final_plan.zU = pred_zU_plan;
+                            final_plan.dual_vars = pred_dual_plan;
+                            tols.mov_specs.final_warm_start_params.push_back(final_plan);
+                        }
+                        if(pred_sol_bounce)
+                        {
+                            HUMotion::warm_start_params bounce;
+                            bounce.valid = true;
+                            bounce.description = "bounce";
+                            bounce.x = pred_x_bounce;
+                            bounce.zL = pred_zL_bounce;
+                            bounce.zU = pred_zU_bounce;
+                            bounce.dual_vars = pred_dual_bounce;
+                            tols.mov_specs.bounce_warm_start_params = bounce;
+                        }
+                        h_results_ws_pred = prob->solve(tols);
+                        tols.mov_specs.final_warm_start_params.clear();
+
+                        // collection of the results
+                        // target
+                        pred_csv << tar_x_pos_str+","+tar_y_pos_str+","+tar_z_pos_str+","+tar_roll_str+","+tar_pitch_str+","+tar_yaw_str;
+                        // obstacles
+                        std::vector<objectPtr> obsts_new; prob->getObstacles(obsts_new);
+                        for(size_t j=0;j<obsts_new.size();++j){
+                            objectPtr obs = obsts_new.at(j);
+                            string obs_x_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Xpos)); boost::replace_all(obs_x_pos_str,",",".");
+                            string obs_y_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Ypos)); boost::replace_all(obs_y_pos_str,",",".");
+                            string obs_z_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Zpos)); boost::replace_all(obs_z_pos_str,",",".");
+                            string obs_roll_str =  boost::str(boost::format("%.8f") % (obs->getOr().roll)); boost::replace_all(obs_roll_str,",",".");
+                            string obs_pitch_str =  boost::str(boost::format("%.8f") % (obs->getOr().pitch)); boost::replace_all(obs_pitch_str,",",".");
+                            string obs_yaw_str =  boost::str(boost::format("%.8f") % (obs->getOr().yaw)); boost::replace_all(obs_yaw_str,",",".");
+                            pred_csv << ","+obs_x_pos_str+","+obs_y_pos_str+","+obs_z_pos_str+","+obs_roll_str+","+obs_pitch_str+","+obs_yaw_str;
+                        }
+
+                        // no warm start
+                        if(h_results_no_ws!=nullptr){
+                            if(h_results_no_ws->status==0){
+                                // movement planned successfully
+                                if(mov_type==1 || mov_type==5){ // move movement
+                                    HUMotion::warm_start_params plan_tar = (h_results_no_ws->final_warm_start_res).at(0);
+                                    string iter_f_plan_str = to_string(plan_tar.iterations);
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    HUMotion::warm_start_params bounce_ws = h_results_no_ws->bounce_warm_start_res;
+                                    string iter_bounce_str = to_string(bounce_ws.iterations);
+                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
+                                }
+                            }else{
+                                pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                                qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
+                            }
+                        }else{
+                            pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                            qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
+                        }
+
+                        // warm start with the original solution
+                        if(h_results_ws_or!=nullptr){
+                            if(h_results_ws_or->status==0){
+                                // movement planned successfully
+                                if(mov_type==1 || mov_type==5){ // move movement
+                                    HUMotion::warm_start_params plan_tar = (h_results_ws_or->final_warm_start_res).at(0);
+                                    string iter_f_plan_str = to_string(plan_tar.iterations);
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    HUMotion::warm_start_params bounce_ws = h_results_ws_or->bounce_warm_start_res;
+                                    string iter_bounce_str = to_string(bounce_ws.iterations);
+                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
+                                }
+                            }else{
+                                pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                                qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
+                            }
+                        }else{
+                            pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                            qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
+                        }
+
+                        // warm start with the predicted solution
+                        if(h_results_ws_pred!=nullptr){
+                            if(h_results_ws_pred->status==0){
+                                // movement planned successfully
+                                if(mov_type==1 || mov_type==5){ // move movement
+                                    HUMotion::warm_start_params plan_tar = (h_results_ws_pred->final_warm_start_res).at(0);
+                                    string iter_f_plan_str = to_string(plan_tar.iterations);
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    HUMotion::warm_start_params bounce_ws = h_results_ws_pred->bounce_warm_start_res;
+                                    string iter_bounce_str = to_string(bounce_ws.iterations);
+                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
+                                }
+                            }else{
+                                pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                                qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
+                            }
+                        }else{
+                            pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                            qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
+                        }
+                        pred_csv << "\n";
+                    }// for loop predictions
+                    pred_csv.close();
+                }
+                break;
+            default:
+                break;
+            }
+
+        }catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
+        }catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
     }
     qnode.log(QNode::Info,std::string("Prediction and planning ended"));
 }

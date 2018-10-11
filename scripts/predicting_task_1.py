@@ -157,6 +157,14 @@ units_dual_bounce = [10,10]
 units_dual_bounce_class = [10,10,10]
 
 task_1_dataframe = pd.read_csv(data_file,sep=",")
+cols_x_f_plan_tot = [col for col in task_1_dataframe if col.startswith('xf_plan')]
+cols_zf_L_plan_tot = [col for col in task_1_dataframe if col.startswith('zf_L_plan')]
+cols_zf_U_plan_tot = [col for col in task_1_dataframe if col.startswith('zf_U_plan')]
+cols_dual_f_plan_tot = [col for col in task_1_dataframe if col.startswith('dual_f_plan')]
+cols_x_bounce_tot = [col for col in task_1_dataframe if col.startswith('x_bounce')]
+cols_zb_L_tot = [col for col in task_1_dataframe if col.startswith('zb_L')]
+cols_zb_U_tot = [col for col in task_1_dataframe if col.startswith('zb_U')]
+cols_dual_bounce_tot = [col for col in task_1_dataframe if col.startswith('dual_bounce')]
 task_1_dataframe = task_1_dataframe.reindex(np.random.permutation(task_1_dataframe.index))
 
 inputs_dataframe = preprocess_features(task_1_dataframe)
@@ -340,9 +348,9 @@ if predict_zf_L_plan:
 
         denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
 
-        zero_data_zf_L_tot = np.zeros(shape=(1, len(cols_zf_L_plan)))
-        denorm_test_predictions_tot_df = pd.DataFrame(zero_data_zf_L_tot, columns=cols_zf_L_plan)
-        for str in cols_zf_L_plan:
+        zero_data_zf_L_tot = np.zeros(shape=(1, len(cols_zf_L_plan_tot)))
+        denorm_test_predictions_tot_df = pd.DataFrame(zero_data_zf_L_tot, columns=cols_zf_L_plan_tot)
+        for str in cols_zf_L_plan_tot:
             if str in denorm_test_predictions_df:
                 denorm_test_predictions_tot_df[str] = denorm_test_predictions_df[str].values
 
@@ -444,9 +452,9 @@ if predict_zf_U_plan:
 
         denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zf_U_plan_df_max, outputs_zf_U_plan_df_min)
 
-        zero_data_zf_U_tot = np.zeros(shape=(1, len(cols_zf_U_plan)))
-        denorm_test_predictions_tot_df = pd.DataFrame(zero_data_zf_U_tot, columns=cols_zf_U_plan)
-        for str in cols_zf_U_plan:
+        zero_data_zf_U_tot = np.zeros(shape=(1, len(cols_zf_U_plan_tot)))
+        denorm_test_predictions_tot_df = pd.DataFrame(zero_data_zf_U_tot, columns=cols_zf_U_plan_tot)
+        for str in cols_zf_U_plan_tot:
             if str in denorm_test_predictions_df:
                 denorm_test_predictions_tot_df[str] = denorm_test_predictions_df[str].values
 
@@ -546,9 +554,9 @@ if predict_dual_f_plan:
 
         denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
 
-        zero_data_dual_f_tot = np.zeros(shape=(1, len(cols_dual_f_plan)))
-        denorm_test_predictions_tot_df = pd.DataFrame(zero_data_dual_f_tot, columns=cols_dual_f_plan)
-        for str in cols_dual_f_plan:
+        zero_data_dual_f_tot = np.zeros(shape=(1, len(cols_dual_f_plan_tot)))
+        denorm_test_predictions_tot_df = pd.DataFrame(zero_data_dual_f_tot, columns=cols_dual_f_plan_tot)
+        for str in cols_dual_f_plan_tot:
             if str in denorm_test_predictions_df:
                 denorm_test_predictions_tot_df[str] = denorm_test_predictions_df[str].values
 
@@ -716,9 +724,9 @@ if predict_zb_L:
 
         denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zb_L_df_max, outputs_zb_L_df_min)
 
-        zero_data_zb_L_tot = np.zeros(shape=(1, len(cols_zb_L)))
-        denorm_test_predictions_tot_df = pd.DataFrame(zero_data_zb_L_tot, columns=cols_zb_L)
-        for str in cols_zb_L:
+        zero_data_zb_L_tot = np.zeros(shape=(1, len(cols_zb_L_tot)))
+        denorm_test_predictions_tot_df = pd.DataFrame(zero_data_zb_L_tot, columns=cols_zb_L_tot)
+        for str in cols_zb_L_tot:
             if str in denorm_test_predictions_df:
                 denorm_test_predictions_tot_df[str] = denorm_test_predictions_df[str].values
 
@@ -802,9 +810,9 @@ if predict_dual_bounce:
         test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_bounce)
         denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_dual_bounce_df_max, outputs_dual_bounce_df_min)
 
-        zero_data_dual_bounce_tot = np.zeros(shape=(1, len(cols_dual_bounce)))
-        denorm_test_predictions_tot_df = pd.DataFrame(zero_data_dual_bounce_tot, columns=cols_dual_bounce)
-        for str in cols_dual_bounce:
+        zero_data_dual_bounce_tot = np.zeros(shape=(1, len(cols_dual_bounce_tot)))
+        denorm_test_predictions_tot_df = pd.DataFrame(zero_data_dual_bounce_tot, columns=cols_dual_bounce_tot)
+        for str in cols_dual_bounce_tot:
             if str in denorm_test_predictions_df:
                 denorm_test_predictions_tot_df[str] = denorm_test_predictions_df[str].values
 
