@@ -5798,11 +5798,13 @@ bool MainWindow::on_pushButton_train_clicked()
         cmdLine = string("python3 ") + py_file + string(" ") + data_file + string(" ") + models_dir;
 
         int status = system(cmdLine.c_str());
-        return(status==0);
+        qnode.log(QNode::Info,std::string("Training ended"));
+        return(status==0);        
     }else{
+        qnode.log(QNode::Info,std::string("Training ended"));
         return false;
     }
-    qnode.log(QNode::Info,std::string("Training ended"));
+
 }
 
 void MainWindow::on_pushButton_py_pred_file_clicked()
@@ -5854,6 +5856,31 @@ void MainWindow::on_pushButton_pred_plan_clicked()
         HUMotion::planning_result_ptr h_results_ws_pred;
         int n_pred = ui.lineEdit_n_predictions->text().toInt();
         ui.pushButton_pred_plan->setCheckable(false);
+
+        // clear the results
+        // plan
+        success_no_ws_plan.clear(); iter_no_ws_plan.clear(); cpu_no_ws_plan.clear(); obj_no_ws_plan.clear();
+        success_ws_or_plan.clear(); iter_ws_or_plan.clear(); cpu_ws_or_plan.clear(); obj_ws_or_plan.clear();
+        success_ws_pred_plan.clear(); iter_ws_pred_plan.clear(); cpu_ws_pred_plan.clear(); obj_ws_pred_plan.clear();
+        // approach
+        success_no_ws_app.clear(); iter_no_ws_app.clear(); cpu_no_ws_app.clear(); obj_no_ws_app.clear();
+        success_ws_or_app.clear(); iter_ws_or_app.clear(); cpu_ws_or_app.clear(); obj_ws_or_app.clear();
+        success_ws_pred_app.clear(); iter_ws_pred_app.clear(); cpu_ws_pred_app.clear(); obj_ws_pred_app.clear();
+        // retreat
+        success_no_ws_ret.clear(); iter_no_ws_ret.clear(); cpu_no_ws_ret.clear(); obj_no_ws_ret.clear();
+        success_ws_or_ret.clear(); iter_ws_or_ret.clear(); cpu_ws_or_ret.clear(); obj_ws_or_ret.clear();
+        success_ws_pred_ret.clear(); iter_ws_pred_ret.clear(); cpu_ws_pred_ret.clear(); obj_ws_pred_ret.clear();
+        // bounce
+        success_no_ws_bounce.clear(); iter_no_ws_bounce.clear(); cpu_no_ws_bounce.clear(); obj_no_ws_bounce.clear();
+        success_ws_or_bounce.clear(); iter_ws_or_bounce.clear(); cpu_ws_or_bounce.clear(); obj_ws_or_bounce.clear();
+        success_ws_pred_bounce.clear(); iter_ws_pred_bounce.clear(); cpu_ws_pred_bounce.clear(); obj_ws_pred_bounce.clear();
+
+        if(mov_type==1 || mov_type==5){ // move movement
+            this->ui.tabWidget_learning_res->setTabEnabled(0,true);
+            this->ui.tabWidget_learning_res->setTabEnabled(1,false);
+            this->ui.tabWidget_learning_res->setTabEnabled(2,false);
+            this->ui.tabWidget_learning_res->setTabEnabled(3,true);
+        }
 
         try{
             switch (planner_id) {
@@ -6216,13 +6243,19 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
                                     string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
+                                    success_no_ws_plan.push_back(1); iter_no_ws_plan.push_back(plan_tar.iterations); cpu_no_ws_plan.push_back(plan_tar.cpu_time); obj_no_ws_plan.push_back(plan_tar.obj_value);
+                                    success_no_ws_bounce.push_back(1); iter_no_ws_bounce.push_back(bounce_ws.iterations); cpu_no_ws_bounce.push_back(bounce_ws.cpu_time); obj_no_ws_bounce.push_back(bounce_ws.obj_value);
                                 }
                             }else{
                                 pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                                success_no_ws_plan.push_back(0);
+                                success_no_ws_bounce.push_back(0);
                                 qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
                             }
                         }else{
                             pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                            success_no_ws_plan.push_back(0);
+                            success_no_ws_bounce.push_back(0);
                             qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
                         }
 
@@ -6240,13 +6273,19 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
                                     string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
+                                    success_ws_or_plan.push_back(1); iter_ws_or_plan.push_back(plan_tar.iterations); cpu_ws_or_plan.push_back(plan_tar.cpu_time); obj_ws_or_plan.push_back(plan_tar.obj_value);
+                                    success_ws_or_bounce.push_back(1); iter_ws_or_bounce.push_back(bounce_ws.iterations); cpu_ws_or_bounce.push_back(bounce_ws.cpu_time); obj_ws_or_bounce.push_back(bounce_ws.obj_value);
                                 }
                             }else{
                                 pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                                success_ws_or_plan.push_back(0);
+                                success_ws_or_bounce.push_back(0);
                                 qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
                             }
                         }else{
                             pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                            success_ws_or_plan.push_back(0);
+                            success_ws_or_bounce.push_back(0);
                             qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
                         }
 
@@ -6264,13 +6303,19 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
                                     string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
+                                    success_ws_pred_plan.push_back(1); iter_ws_pred_plan.push_back(plan_tar.iterations); cpu_ws_pred_plan.push_back(plan_tar.cpu_time); obj_ws_pred_plan.push_back(plan_tar.obj_value);
+                                    success_ws_pred_bounce.push_back(1); iter_ws_pred_bounce.push_back(bounce_ws.iterations); cpu_ws_pred_bounce.push_back(bounce_ws.cpu_time); obj_ws_pred_bounce.push_back(bounce_ws.obj_value);
                                 }
                             }else{
                                 pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                                success_ws_pred_plan.push_back(0);
+                                success_ws_pred_bounce.push_back(0);
                                 qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
                             }
                         }else{
                             pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                            success_ws_pred_plan.push_back(0);
+                            success_ws_pred_bounce.push_back(0);
                             qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
                         }
                         pred_csv << "\n";
@@ -6281,11 +6326,452 @@ void MainWindow::on_pushButton_pred_plan_clicked()
             default:
                 break;
             }
+            // diplay the results
+            std::unordered_map<int,int> m; int n1;
+            if(!success_no_ws_plan.empty()){// plan
+
+                // no warm start
+                count_occurrence(m, success_no_ws_plan); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_no_ws_plan = 100*(n1/double(success_no_ws_plan.size()));
+                this->ui.label_rate_no_ws_plan_value->setText(QString::number(succ_rate_no_ws_plan) + QString(" %"));
+
+                double iter_no_ws_plan_mean = accumulate( iter_no_ws_plan.begin(), iter_no_ws_plan.end(), 0.0)/iter_no_ws_plan.size();
+                this->ui.label_iter_mean_no_ws_plan_value->setText(QString::number(iter_no_ws_plan_mean));
+                double iter_no_ws_plan_sq_sum = std::inner_product(iter_no_ws_plan.begin(), iter_no_ws_plan.end(), iter_no_ws_plan.begin(), 0.0);
+                double iter_no_ws_plan_std = std::sqrt(iter_no_ws_plan_sq_sum / iter_no_ws_plan.size() - iter_no_ws_plan_mean * iter_no_ws_plan_mean);
+                this->ui.label_iter_std_no_ws_plan_value->setText(QString::number(iter_no_ws_plan_std));
+                double iter_no_ws_plan_median = median(iter_no_ws_plan);
+                this->ui.label_iter_median_no_ws_plan_value->setText(QString::number(iter_no_ws_plan_median));
+                double iter_no_ws_plan_max= *std::max_element(iter_no_ws_plan.begin(),iter_no_ws_plan.end());
+                this->ui.label_iter_max_no_ws_plan_value->setText(QString::number(iter_no_ws_plan_max));
+
+                double cpu_no_ws_plan_mean = accumulate( cpu_no_ws_plan.begin(), cpu_no_ws_plan.end(), 0.0)/cpu_no_ws_plan.size();
+                this->ui.label_cpu_mean_no_ws_plan_value->setText(QString::number(cpu_no_ws_plan_mean));
+                double cpu_no_ws_plan_sq_sum = std::inner_product(cpu_no_ws_plan.begin(), cpu_no_ws_plan.end(), cpu_no_ws_plan.begin(), 0.0);
+                double cpu_no_ws_plan_std = std::sqrt(cpu_no_ws_plan_sq_sum / cpu_no_ws_plan.size() - cpu_no_ws_plan_mean * cpu_no_ws_plan_mean);
+                this->ui.label_cpu_std_no_ws_plan_value->setText(QString::number(cpu_no_ws_plan_std));
+                double cpu_no_ws_plan_median = median(cpu_no_ws_plan);
+                this->ui.label_cpu_median_no_ws_plan_value->setText(QString::number(cpu_no_ws_plan_median));
+                double cpu_no_ws_plan_max= *std::max_element(cpu_no_ws_plan.begin(),cpu_no_ws_plan.end());
+                this->ui.label_cpu_max_no_ws_plan_value->setText(QString::number(cpu_no_ws_plan_max));
+
+                double obj_no_ws_plan_mean = accumulate( obj_no_ws_plan.begin(), obj_no_ws_plan.end(), 0.0)/obj_no_ws_plan.size();
+                this->ui.label_obj_mean_no_ws_plan_value->setText(QString::number(obj_no_ws_plan_mean));
+                double obj_no_ws_plan_sq_sum = std::inner_product(obj_no_ws_plan.begin(), obj_no_ws_plan.end(), obj_no_ws_plan.begin(), 0.0);
+                double obj_no_ws_plan_std = std::sqrt(obj_no_ws_plan_sq_sum / obj_no_ws_plan.size() - obj_no_ws_plan_mean * obj_no_ws_plan_mean);
+                this->ui.label_obj_std_no_ws_plan_value->setText(QString::number(obj_no_ws_plan_std));
+                double obj_no_ws_plan_median = median(obj_no_ws_plan);
+                this->ui.label_obj_median_no_ws_plan_value->setText(QString::number(obj_no_ws_plan_median));
+                double obj_no_ws_plan_max= *std::max_element(obj_no_ws_plan.begin(),obj_no_ws_plan.end());
+                this->ui.label_obj_max_no_ws_plan_value->setText(QString::number(obj_no_ws_plan_max));
+
+                // warm start with the original solution
+                count_occurrence(m, success_ws_or_plan); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_ws_or_plan = 100*(n1/double(success_ws_or_plan.size()));
+                this->ui.label_rate_ws_or_plan_value->setText(QString::number(succ_rate_ws_or_plan) + QString(" %"));
+
+                double iter_ws_or_plan_mean = accumulate( iter_ws_or_plan.begin(), iter_ws_or_plan.end(), 0.0)/iter_ws_or_plan.size();
+                this->ui.label_iter_mean_ws_or_plan_value->setText(QString::number(iter_ws_or_plan_mean));
+                double iter_ws_or_plan_sq_sum = std::inner_product(iter_ws_or_plan.begin(), iter_ws_or_plan.end(), iter_ws_or_plan.begin(), 0.0);
+                double iter_ws_or_plan_std = std::sqrt(iter_ws_or_plan_sq_sum / iter_ws_or_plan.size() - iter_ws_or_plan_mean * iter_ws_or_plan_mean);
+                this->ui.label_iter_std_ws_or_plan_value->setText(QString::number(iter_ws_or_plan_std));
+                double iter_ws_or_plan_median = median(iter_ws_or_plan);
+                this->ui.label_iter_median_ws_or_plan_value->setText(QString::number(iter_ws_or_plan_median));
+                double iter_ws_or_plan_max= *std::max_element(iter_ws_or_plan.begin(),iter_ws_or_plan.end());
+                this->ui.label_iter_max_ws_or_plan_value->setText(QString::number(iter_ws_or_plan_max));
+
+                double cpu_ws_or_plan_mean = accumulate( cpu_ws_or_plan.begin(), cpu_ws_or_plan.end(), 0.0)/cpu_ws_or_plan.size();
+                this->ui.label_cpu_mean_ws_or_plan_value->setText(QString::number(cpu_ws_or_plan_mean));
+                double cpu_ws_or_plan_sq_sum = std::inner_product(cpu_ws_or_plan.begin(), cpu_ws_or_plan.end(), cpu_ws_or_plan.begin(), 0.0);
+                double cpu_ws_or_plan_std = std::sqrt(cpu_ws_or_plan_sq_sum / cpu_ws_or_plan.size() - cpu_ws_or_plan_mean * cpu_ws_or_plan_mean);
+                this->ui.label_cpu_std_ws_or_plan_value->setText(QString::number(cpu_ws_or_plan_std));
+                double cpu_ws_or_plan_median = median(cpu_ws_or_plan);
+                this->ui.label_cpu_median_ws_or_plan_value->setText(QString::number(cpu_ws_or_plan_median));
+                double cpu_ws_or_plan_max= *std::max_element(cpu_ws_or_plan.begin(),cpu_ws_or_plan.end());
+                this->ui.label_cpu_max_ws_or_plan_value->setText(QString::number(cpu_ws_or_plan_max));
+
+                double obj_ws_or_plan_mean = accumulate( obj_ws_or_plan.begin(), obj_ws_or_plan.end(), 0.0)/obj_ws_or_plan.size();
+                this->ui.label_obj_mean_ws_or_plan_value->setText(QString::number(obj_ws_or_plan_mean));
+                double obj_ws_or_plan_sq_sum = std::inner_product(obj_ws_or_plan.begin(), obj_ws_or_plan.end(), obj_ws_or_plan.begin(), 0.0);
+                double obj_ws_or_plan_std = std::sqrt(obj_ws_or_plan_sq_sum / obj_ws_or_plan.size() - obj_ws_or_plan_mean * obj_ws_or_plan_mean);
+                this->ui.label_obj_std_ws_or_plan_value->setText(QString::number(obj_ws_or_plan_std));
+                double obj_ws_or_plan_median = median(obj_ws_or_plan);
+                this->ui.label_obj_median_ws_or_plan_value->setText(QString::number(obj_ws_or_plan_median));
+                double obj_ws_or_plan_max= *std::max_element(obj_ws_or_plan.begin(),obj_ws_or_plan.end());
+                this->ui.label_obj_max_ws_or_plan_value->setText(QString::number(obj_ws_or_plan_max));
+
+                // warm start with the predicted solution
+                count_occurrence(m, success_ws_pred_plan); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_ws_pred_plan = 100*(n1/double(success_ws_pred_plan.size()));
+                this->ui.label_rate_ws_pred_plan_value->setText(QString::number(succ_rate_ws_pred_plan) + QString(" %"));
+
+                double iter_ws_pred_plan_mean = accumulate( iter_ws_pred_plan.begin(), iter_ws_pred_plan.end(), 0.0)/iter_ws_pred_plan.size();
+                this->ui.label_iter_mean_ws_pred_plan_value->setText(QString::number(iter_ws_pred_plan_mean));
+                double iter_ws_pred_plan_sq_sum = std::inner_product(iter_ws_pred_plan.begin(), iter_ws_pred_plan.end(), iter_ws_pred_plan.begin(), 0.0);
+                double iter_ws_pred_plan_std = std::sqrt(iter_ws_pred_plan_sq_sum / iter_ws_pred_plan.size() - iter_ws_pred_plan_mean * iter_ws_pred_plan_mean);
+                this->ui.label_iter_std_ws_pred_plan_value->setText(QString::number(iter_ws_pred_plan_std));
+                double iter_ws_pred_plan_median = median(iter_ws_pred_plan);
+                this->ui.label_iter_median_ws_pred_plan_value->setText(QString::number(iter_ws_pred_plan_median));
+                double iter_ws_pred_plan_max= *std::max_element(iter_ws_pred_plan.begin(),iter_ws_pred_plan.end());
+                this->ui.label_iter_max_ws_pred_plan_value->setText(QString::number(iter_ws_pred_plan_max));
+
+                double cpu_ws_pred_plan_mean = accumulate( cpu_ws_pred_plan.begin(), cpu_ws_pred_plan.end(), 0.0)/cpu_ws_pred_plan.size();
+                this->ui.label_cpu_mean_ws_pred_plan_value->setText(QString::number(cpu_ws_pred_plan_mean));
+                double cpu_ws_pred_plan_sq_sum = std::inner_product(cpu_ws_pred_plan.begin(), cpu_ws_pred_plan.end(), cpu_ws_pred_plan.begin(), 0.0);
+                double cpu_ws_pred_plan_std = std::sqrt(cpu_ws_pred_plan_sq_sum / cpu_ws_pred_plan.size() - cpu_ws_pred_plan_mean * cpu_ws_pred_plan_mean);
+                this->ui.label_cpu_std_ws_pred_plan_value->setText(QString::number(cpu_ws_pred_plan_std));
+                double cpu_ws_pred_plan_median = median(cpu_ws_pred_plan);
+                this->ui.label_cpu_median_ws_pred_plan_value->setText(QString::number(cpu_ws_pred_plan_median));
+                double cpu_ws_pred_plan_max= *std::max_element(cpu_ws_pred_plan.begin(),cpu_ws_pred_plan.end());
+                this->ui.label_cpu_max_ws_pred_plan_value->setText(QString::number(cpu_ws_pred_plan_max));
+
+                double obj_ws_pred_plan_mean = accumulate( obj_ws_pred_plan.begin(), obj_ws_pred_plan.end(), 0.0)/obj_ws_pred_plan.size();
+                this->ui.label_obj_mean_ws_pred_plan_value->setText(QString::number(obj_ws_pred_plan_mean));
+                double obj_ws_pred_plan_sq_sum = std::inner_product(obj_ws_pred_plan.begin(), obj_ws_pred_plan.end(), obj_ws_pred_plan.begin(), 0.0);
+                double obj_ws_pred_plan_std = std::sqrt(obj_ws_pred_plan_sq_sum / obj_ws_pred_plan.size() - obj_ws_pred_plan_mean * obj_ws_pred_plan_mean);
+                this->ui.label_obj_std_ws_pred_plan_value->setText(QString::number(obj_ws_pred_plan_std));
+                double obj_ws_pred_plan_median = median(obj_ws_pred_plan);
+                this->ui.label_obj_median_ws_pred_plan_value->setText(QString::number(obj_ws_pred_plan_median));
+                double obj_ws_pred_plan_max= *std::max_element(obj_ws_pred_plan.begin(),obj_ws_pred_plan.end());
+                this->ui.label_obj_max_ws_pred_plan_value->setText(QString::number(obj_ws_pred_plan_max));
+
+            }
+            if(!success_no_ws_bounce.empty()){ // bounce
+
+                // no warm start
+                count_occurrence(m, success_no_ws_bounce); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_no_ws_bounce = 100*(n1/double(success_no_ws_bounce.size()));
+                this->ui.label_rate_no_ws_bounce_value->setText(QString::number(succ_rate_no_ws_bounce) + QString(" %"));
+
+                double iter_no_ws_bounce_mean = accumulate( iter_no_ws_bounce.begin(), iter_no_ws_bounce.end(), 0.0)/iter_no_ws_bounce.size();
+                this->ui.label_iter_mean_no_ws_bounce_value->setText(QString::number(iter_no_ws_bounce_mean));
+                double iter_no_ws_bounce_sq_sum = std::inner_product(iter_no_ws_bounce.begin(), iter_no_ws_bounce.end(), iter_no_ws_bounce.begin(), 0.0);
+                double iter_no_ws_bounce_std = std::sqrt(iter_no_ws_bounce_sq_sum / iter_no_ws_bounce.size() - iter_no_ws_bounce_mean * iter_no_ws_bounce_mean);
+                this->ui.label_iter_std_no_ws_bounce_value->setText(QString::number(iter_no_ws_bounce_std));
+                double iter_no_ws_bounce_median = median(iter_no_ws_bounce);
+                this->ui.label_iter_median_no_ws_bounce_value->setText(QString::number(iter_no_ws_bounce_median));
+                double iter_no_ws_bounce_max= *std::max_element(iter_no_ws_bounce.begin(),iter_no_ws_bounce.end());
+                this->ui.label_iter_max_no_ws_bounce_value->setText(QString::number(iter_no_ws_bounce_max));
+
+                double cpu_no_ws_bounce_mean = accumulate( cpu_no_ws_bounce.begin(), cpu_no_ws_bounce.end(), 0.0)/cpu_no_ws_bounce.size();
+                this->ui.label_cpu_mean_no_ws_bounce_value->setText(QString::number(cpu_no_ws_bounce_mean));
+                double cpu_no_ws_bounce_sq_sum = std::inner_product(cpu_no_ws_bounce.begin(), cpu_no_ws_bounce.end(), cpu_no_ws_bounce.begin(), 0.0);
+                double cpu_no_ws_bounce_std = std::sqrt(cpu_no_ws_bounce_sq_sum / cpu_no_ws_bounce.size() - cpu_no_ws_bounce_mean * cpu_no_ws_bounce_mean);
+                this->ui.label_cpu_std_no_ws_bounce_value->setText(QString::number(cpu_no_ws_bounce_std));
+                double cpu_no_ws_bounce_median = median(cpu_no_ws_bounce);
+                this->ui.label_cpu_median_no_ws_bounce_value->setText(QString::number(cpu_no_ws_bounce_median));
+                double cpu_no_ws_bounce_max= *std::max_element(cpu_no_ws_bounce.begin(),cpu_no_ws_bounce.end());
+                this->ui.label_cpu_max_no_ws_bounce_value->setText(QString::number(cpu_no_ws_bounce_max));
+
+                double obj_no_ws_bounce_mean = accumulate( obj_no_ws_bounce.begin(), obj_no_ws_bounce.end(), 0.0)/obj_no_ws_bounce.size();
+                this->ui.label_obj_mean_no_ws_bounce_value->setText(QString::number(obj_no_ws_bounce_mean));
+                double obj_no_ws_bounce_sq_sum = std::inner_product(obj_no_ws_bounce.begin(), obj_no_ws_bounce.end(), obj_no_ws_bounce.begin(), 0.0);
+                double obj_no_ws_bounce_std = std::sqrt(obj_no_ws_bounce_sq_sum / obj_no_ws_bounce.size() - obj_no_ws_bounce_mean * obj_no_ws_bounce_mean);
+                this->ui.label_obj_std_no_ws_bounce_value->setText(QString::number(obj_no_ws_bounce_std));
+                double obj_no_ws_bounce_median = median(obj_no_ws_bounce);
+                this->ui.label_obj_median_no_ws_bounce_value->setText(QString::number(obj_no_ws_bounce_median));
+                double obj_no_ws_bounce_max= *std::max_element(obj_no_ws_bounce.begin(),obj_no_ws_bounce.end());
+                this->ui.label_obj_max_no_ws_bounce_value->setText(QString::number(obj_no_ws_bounce_max));
+
+                // warm start with the original solution
+                count_occurrence(m, success_ws_or_bounce); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_ws_or_bounce = 100*(n1/double(success_ws_or_bounce.size()));
+                this->ui.label_rate_ws_or_bounce_value->setText(QString::number(succ_rate_ws_or_bounce) + QString(" %"));
+
+                double iter_ws_or_bounce_mean = accumulate( iter_ws_or_bounce.begin(), iter_ws_or_bounce.end(), 0.0)/iter_ws_or_bounce.size();
+                this->ui.label_iter_mean_ws_or_bounce_value->setText(QString::number(iter_ws_or_bounce_mean));
+                double iter_ws_or_bounce_sq_sum = std::inner_product(iter_ws_or_bounce.begin(), iter_ws_or_bounce.end(), iter_ws_or_bounce.begin(), 0.0);
+                double iter_ws_or_bounce_std = std::sqrt(iter_ws_or_bounce_sq_sum / iter_ws_or_bounce.size() - iter_ws_or_bounce_mean * iter_ws_or_bounce_mean);
+                this->ui.label_iter_std_ws_or_bounce_value->setText(QString::number(iter_ws_or_bounce_std));
+                double iter_ws_or_bounce_median = median(iter_ws_or_bounce);
+                this->ui.label_iter_median_ws_or_bounce_value->setText(QString::number(iter_ws_or_bounce_median));
+                double iter_ws_or_bounce_max= *std::max_element(iter_ws_or_bounce.begin(),iter_ws_or_bounce.end());
+                this->ui.label_iter_max_ws_or_bounce_value->setText(QString::number(iter_ws_or_bounce_max));
+
+                double cpu_ws_or_bounce_mean = accumulate( cpu_ws_or_bounce.begin(), cpu_ws_or_bounce.end(), 0.0)/cpu_ws_or_bounce.size();
+                this->ui.label_cpu_mean_ws_or_bounce_value->setText(QString::number(cpu_ws_or_bounce_mean));
+                double cpu_ws_or_bounce_sq_sum = std::inner_product(cpu_ws_or_bounce.begin(), cpu_ws_or_bounce.end(), cpu_ws_or_bounce.begin(), 0.0);
+                double cpu_ws_or_bounce_std = std::sqrt(cpu_ws_or_bounce_sq_sum / cpu_ws_or_bounce.size() - cpu_ws_or_bounce_mean * cpu_ws_or_bounce_mean);
+                this->ui.label_cpu_std_ws_or_bounce_value->setText(QString::number(cpu_ws_or_bounce_std));
+                double cpu_ws_or_bounce_median = median(cpu_ws_or_bounce);
+                this->ui.label_cpu_median_ws_or_bounce_value->setText(QString::number(cpu_ws_or_bounce_median));
+                double cpu_ws_or_bounce_max= *std::max_element(cpu_ws_or_bounce.begin(),cpu_ws_or_bounce.end());
+                this->ui.label_cpu_max_ws_or_bounce_value->setText(QString::number(cpu_ws_or_bounce_max));
+
+                double obj_ws_or_bounce_mean = accumulate( obj_ws_or_bounce.begin(), obj_ws_or_bounce.end(), 0.0)/obj_ws_or_bounce.size();
+                this->ui.label_obj_mean_ws_or_bounce_value->setText(QString::number(obj_ws_or_bounce_mean));
+                double obj_ws_or_bounce_sq_sum = std::inner_product(obj_ws_or_bounce.begin(), obj_ws_or_bounce.end(), obj_ws_or_bounce.begin(), 0.0);
+                double obj_ws_or_bounce_std = std::sqrt(obj_ws_or_bounce_sq_sum / obj_ws_or_bounce.size() - obj_ws_or_bounce_mean * obj_ws_or_bounce_mean);
+                this->ui.label_obj_std_ws_or_bounce_value->setText(QString::number(obj_ws_or_bounce_std));
+                double obj_ws_or_bounce_median = median(obj_ws_or_bounce);
+                this->ui.label_obj_median_ws_or_bounce_value->setText(QString::number(obj_ws_or_bounce_median));
+                double obj_ws_or_bounce_max= *std::max_element(obj_ws_or_bounce.begin(),obj_ws_or_bounce.end());
+                this->ui.label_obj_max_ws_or_bounce_value->setText(QString::number(obj_ws_or_bounce_max));
+
+                // warm start with the predicted solution
+                count_occurrence(m, success_ws_pred_bounce); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_ws_pred_bounce = 100*(n1/double(success_ws_pred_bounce.size()));
+                this->ui.label_rate_ws_pred_bounce_value->setText(QString::number(succ_rate_ws_pred_bounce) + QString(" %"));
+
+                double iter_ws_pred_bounce_mean = accumulate( iter_ws_pred_bounce.begin(), iter_ws_pred_bounce.end(), 0.0)/iter_ws_pred_bounce.size();
+                this->ui.label_iter_mean_ws_pred_bounce_value->setText(QString::number(iter_ws_pred_bounce_mean));
+                double iter_ws_pred_bounce_sq_sum = std::inner_product(iter_ws_pred_bounce.begin(), iter_ws_pred_bounce.end(), iter_ws_pred_bounce.begin(), 0.0);
+                double iter_ws_pred_bounce_std = std::sqrt(iter_ws_pred_bounce_sq_sum / iter_ws_pred_bounce.size() - iter_ws_pred_bounce_mean * iter_ws_pred_bounce_mean);
+                this->ui.label_iter_std_ws_pred_bounce_value->setText(QString::number(iter_ws_pred_bounce_std));
+                double iter_ws_pred_bounce_median = median(iter_ws_pred_bounce);
+                this->ui.label_iter_median_ws_pred_bounce_value->setText(QString::number(iter_ws_pred_bounce_median));
+                double iter_ws_pred_bounce_max= *std::max_element(iter_ws_pred_bounce.begin(),iter_ws_pred_bounce.end());
+                this->ui.label_iter_max_ws_pred_bounce_value->setText(QString::number(iter_ws_pred_bounce_max));
+
+                double cpu_ws_pred_bounce_mean = accumulate( cpu_ws_pred_bounce.begin(), cpu_ws_pred_bounce.end(), 0.0)/cpu_ws_pred_bounce.size();
+                this->ui.label_cpu_mean_ws_pred_bounce_value->setText(QString::number(cpu_ws_pred_bounce_mean));
+                double cpu_ws_pred_bounce_sq_sum = std::inner_product(cpu_ws_pred_bounce.begin(), cpu_ws_pred_bounce.end(), cpu_ws_pred_bounce.begin(), 0.0);
+                double cpu_ws_pred_bounce_std = std::sqrt(cpu_ws_pred_bounce_sq_sum / cpu_ws_pred_bounce.size() - cpu_ws_pred_bounce_mean * cpu_ws_pred_bounce_mean);
+                this->ui.label_cpu_std_ws_pred_bounce_value->setText(QString::number(cpu_ws_pred_bounce_std));
+                double cpu_ws_pred_bounce_median = median(cpu_ws_pred_bounce);
+                this->ui.label_cpu_median_ws_pred_bounce_value->setText(QString::number(cpu_ws_pred_bounce_median));
+                double cpu_ws_pred_bounce_max= *std::max_element(cpu_ws_pred_bounce.begin(),cpu_ws_pred_bounce.end());
+                this->ui.label_cpu_max_ws_pred_bounce_value->setText(QString::number(cpu_ws_pred_bounce_max));
+
+                double obj_ws_pred_bounce_mean = accumulate( obj_ws_pred_bounce.begin(), obj_ws_pred_bounce.end(), 0.0)/obj_ws_pred_bounce.size();
+                this->ui.label_obj_mean_ws_pred_bounce_value->setText(QString::number(obj_ws_pred_bounce_mean));
+                double obj_ws_pred_bounce_sq_sum = std::inner_product(obj_ws_pred_bounce.begin(), obj_ws_pred_bounce.end(), obj_ws_pred_bounce.begin(), 0.0);
+                double obj_ws_pred_bounce_std = std::sqrt(obj_ws_pred_bounce_sq_sum / obj_ws_pred_bounce.size() - obj_ws_pred_bounce_mean * obj_ws_pred_bounce_mean);
+                this->ui.label_obj_std_ws_pred_bounce_value->setText(QString::number(obj_ws_pred_bounce_std));
+                double obj_ws_pred_bounce_median = median(obj_ws_pred_bounce);
+                this->ui.label_obj_median_ws_pred_bounce_value->setText(QString::number(obj_ws_pred_bounce_median));
+                double obj_ws_pred_bounce_max= *std::max_element(obj_ws_pred_bounce.begin(),obj_ws_pred_bounce.end());
+                this->ui.label_obj_max_ws_pred_bounce_value->setText(QString::number(obj_ws_pred_bounce_max));
+
+            }
+
 
         }catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
         }catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
     }
     qnode.log(QNode::Info,std::string("Prediction and planning ended"));
+}
+
+void MainWindow::on_pushButton_save_learning_res_clicked()
+{
+    struct stat st = {0};
+    if (stat("results", &st) == -1) {
+        mkdir("results", 0700);
+    }
+    if (stat("results/learning", &st) == -1) {
+        mkdir("results/learning", 0700);
+    }
+    if (stat("results/learning/predictions", &st) == -1) {
+        mkdir("results/learning/predictions", 0700);
+    }
+    QString path("results/learning/predictions/");
+
+    // txt
+    string filename("results_learn_pred.txt");
+    ofstream results;
+    results.open(path.toStdString()+filename);
+
+    results << string("# STATISTICS OF THE PREDICTIONS  \n");
+    // plan
+    if(this->ui.tabWidget_learning_res->isTabEnabled(0))
+    {
+        results << string("# Plan target posture selection results  \n");
+        results << string(" # No warm start\n");
+        results << string("success_rate_no_ws_plan =")+this->ui.label_rate_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_plan_mean =")+this->ui.label_iter_mean_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_plan_std =")+this->ui.label_iter_std_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_plan_median =")+this->ui.label_iter_median_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_plan_max =")+this->ui.label_iter_max_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_plan_mean =")+this->ui.label_cpu_mean_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_plan_std =")+this->ui.label_cpu_std_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_plan_median =")+this->ui.label_cpu_median_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_plan_max =")+this->ui.label_cpu_max_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_plan_mean =")+this->ui.label_obj_mean_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_plan_std =")+this->ui.label_obj_std_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_plan_median =")+this->ui.label_obj_median_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_plan_max =")+this->ui.label_obj_max_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with the original solution \n");
+        results << string("success_rate_ws_or_plan =")+this->ui.label_rate_ws_or_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_plan_mean =")+this->ui.label_iter_mean_ws_or_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_plan_std =")+this->ui.label_iter_std_ws_or_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_plan_median =")+this->ui.label_iter_median_ws_or_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_plan_max =")+this->ui.label_iter_max_ws_or_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_plan_mean =")+this->ui.label_cpu_mean_ws_or_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_plan_std =")+this->ui.label_cpu_std_ws_or_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_plan_median =")+this->ui.label_cpu_median_ws_or_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_plan_max =")+this->ui.label_cpu_max_ws_or_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_plan_mean =")+this->ui.label_obj_mean_ws_or_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_plan_std =")+this->ui.label_obj_std_ws_or_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_plan_median =")+this->ui.label_obj_median_ws_or_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_plan_max =")+this->ui.label_obj_max_ws_or_plan_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with the predicted solution \n");
+        results << string("success_rate_ws_pred_plan =")+this->ui.label_rate_ws_pred_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_plan_mean =")+this->ui.label_iter_mean_ws_pred_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_plan_std =")+this->ui.label_iter_std_ws_pred_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_plan_median =")+this->ui.label_iter_median_ws_pred_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_plan_max =")+this->ui.label_iter_max_ws_pred_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_plan_mean =")+this->ui.label_cpu_mean_ws_pred_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_plan_std =")+this->ui.label_cpu_std_ws_pred_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_plan_median =")+this->ui.label_cpu_median_ws_pred_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_plan_max =")+this->ui.label_cpu_max_ws_pred_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_plan_mean =")+this->ui.label_obj_mean_ws_pred_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_plan_std =")+this->ui.label_obj_std_ws_pred_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_plan_median =")+this->ui.label_obj_median_ws_pred_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_plan_max =")+this->ui.label_obj_max_ws_pred_plan_value->text().toStdString()+string(";\n");
+
+    }
+    // approach
+    if(this->ui.tabWidget_learning_res->isTabEnabled(1))
+    {
+        results << string("# Approach target posture selection results  \n");
+        results << string(" # No warm start\n");
+        results << string("success_rate_no_ws_app =")+this->ui.label_rate_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_app_mean =")+this->ui.label_iter_mean_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_app_std =")+this->ui.label_iter_std_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_app_median =")+this->ui.label_iter_median_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_app_max =")+this->ui.label_iter_max_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_app_mean =")+this->ui.label_cpu_mean_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_app_std =")+this->ui.label_cpu_std_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_app_median =")+this->ui.label_cpu_median_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_app_max =")+this->ui.label_cpu_max_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_app_mean =")+this->ui.label_obj_mean_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_app_std =")+this->ui.label_obj_std_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_app_median =")+this->ui.label_obj_median_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_app_max =")+this->ui.label_obj_max_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with the original solution \n");
+        results << string("success_rate_ws_or_app =")+this->ui.label_rate_ws_or_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_app_mean =")+this->ui.label_iter_mean_ws_or_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_app_std =")+this->ui.label_iter_std_ws_or_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_app_median =")+this->ui.label_iter_median_ws_or_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_app_max =")+this->ui.label_iter_max_ws_or_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_app_mean =")+this->ui.label_cpu_mean_ws_or_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_app_std =")+this->ui.label_cpu_std_ws_or_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_app_median =")+this->ui.label_cpu_median_ws_or_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_app_max =")+this->ui.label_cpu_max_ws_or_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_app_mean =")+this->ui.label_obj_mean_ws_or_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_app_std =")+this->ui.label_obj_std_ws_or_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_app_median =")+this->ui.label_obj_median_ws_or_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_app_max =")+this->ui.label_obj_max_ws_or_app_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with the predicted solution \n");
+        results << string("success_rate_ws_pred_app =")+this->ui.label_rate_ws_pred_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_app_mean =")+this->ui.label_iter_mean_ws_pred_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_app_std =")+this->ui.label_iter_std_ws_pred_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_app_median =")+this->ui.label_iter_median_ws_pred_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_app_max =")+this->ui.label_iter_max_ws_pred_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_app_mean =")+this->ui.label_cpu_mean_ws_pred_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_app_std =")+this->ui.label_cpu_std_ws_pred_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_app_median =")+this->ui.label_cpu_median_ws_pred_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_app_max =")+this->ui.label_cpu_max_ws_pred_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_app_mean =")+this->ui.label_obj_mean_ws_pred_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_app_std =")+this->ui.label_obj_std_ws_pred_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_app_median =")+this->ui.label_obj_median_ws_pred_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_app_max =")+this->ui.label_obj_max_ws_pred_app_value->text().toStdString()+string(";\n");
+
+    }
+    // retreat
+    if(this->ui.tabWidget_learning_res->isTabEnabled(2))
+    {
+        results << string("# Retreat target posture selection results  \n");
+        results << string(" # No warm start\n");
+        results << string("success_rate_no_ws_ret =")+this->ui.label_rate_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_ret_mean =")+this->ui.label_iter_mean_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_ret_std =")+this->ui.label_iter_std_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_ret_median =")+this->ui.label_iter_median_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_ret_max =")+this->ui.label_iter_max_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_ret_mean =")+this->ui.label_cpu_mean_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_ret_std =")+this->ui.label_cpu_std_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_ret_median =")+this->ui.label_cpu_median_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_ret_max =")+this->ui.label_cpu_max_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_ret_mean =")+this->ui.label_obj_mean_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_ret_std =")+this->ui.label_obj_std_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_ret_median =")+this->ui.label_obj_median_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_ret_max =")+this->ui.label_obj_max_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with the original solution \n");
+        results << string("success_rate_ws_or_ret =")+this->ui.label_rate_ws_or_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_ret_mean =")+this->ui.label_iter_mean_ws_or_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_ret_std =")+this->ui.label_iter_std_ws_or_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_ret_median =")+this->ui.label_iter_median_ws_or_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_ret_max =")+this->ui.label_iter_max_ws_or_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_ret_mean =")+this->ui.label_cpu_mean_ws_or_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_ret_std =")+this->ui.label_cpu_std_ws_or_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_ret_median =")+this->ui.label_cpu_median_ws_or_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_ret_max =")+this->ui.label_cpu_max_ws_or_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_ret_mean =")+this->ui.label_obj_mean_ws_or_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_ret_std =")+this->ui.label_obj_std_ws_or_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_ret_median =")+this->ui.label_obj_median_ws_or_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_ret_max =")+this->ui.label_obj_max_ws_or_ret_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with the predicted solution \n");
+        results << string("success_rate_ws_pred_ret =")+this->ui.label_rate_ws_pred_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_ret_mean =")+this->ui.label_iter_mean_ws_pred_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_ret_std =")+this->ui.label_iter_std_ws_pred_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_ret_median =")+this->ui.label_iter_median_ws_pred_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_ret_max =")+this->ui.label_iter_max_ws_pred_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_ret_mean =")+this->ui.label_cpu_mean_ws_pred_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_ret_std =")+this->ui.label_cpu_std_ws_pred_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_ret_median =")+this->ui.label_cpu_median_ws_pred_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_ret_max =")+this->ui.label_cpu_max_ws_pred_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_ret_mean =")+this->ui.label_obj_mean_ws_pred_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_ret_std =")+this->ui.label_obj_std_ws_pred_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_ret_median =")+this->ui.label_obj_median_ws_pred_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_ret_max =")+this->ui.label_obj_max_ws_pred_ret_value->text().toStdString()+string(";\n");
+
+    }
+    // bounce
+    if(this->ui.tabWidget_learning_res->isTabEnabled(3))
+    {
+        results << string("# Bounce target posture selection results  \n");
+        results << string(" # No warm start\n");
+        results << string("success_rate_no_ws_bounce =")+this->ui.label_rate_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_bounce_mean =")+this->ui.label_iter_mean_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_bounce_std =")+this->ui.label_iter_std_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_bounce_median =")+this->ui.label_iter_median_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_no_ws_bounce_max =")+this->ui.label_iter_max_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_bounce_mean =")+this->ui.label_cpu_mean_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_bounce_std =")+this->ui.label_cpu_std_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_bounce_median =")+this->ui.label_cpu_median_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_no_ws_bounce_max =")+this->ui.label_cpu_max_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_bounce_mean =")+this->ui.label_obj_mean_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_bounce_std =")+this->ui.label_obj_std_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_bounce_median =")+this->ui.label_obj_median_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_no_ws_bounce_max =")+this->ui.label_obj_max_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with the original solution \n");
+        results << string("success_rate_ws_or_bounce =")+this->ui.label_rate_ws_or_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_bounce_mean =")+this->ui.label_iter_mean_ws_or_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_bounce_std =")+this->ui.label_iter_std_ws_or_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_bounce_median =")+this->ui.label_iter_median_ws_or_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_or_bounce_max =")+this->ui.label_iter_max_ws_or_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_bounce_mean =")+this->ui.label_cpu_mean_ws_or_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_bounce_std =")+this->ui.label_cpu_std_ws_or_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_bounce_median =")+this->ui.label_cpu_median_ws_or_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_or_bounce_max =")+this->ui.label_cpu_max_ws_or_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_bounce_mean =")+this->ui.label_obj_mean_ws_or_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_bounce_std =")+this->ui.label_obj_std_ws_or_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_bounce_median =")+this->ui.label_obj_median_ws_or_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_or_bounce_max =")+this->ui.label_obj_max_ws_or_bounce_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with the predicted solution \n");
+        results << string("success_rate_ws_pred_bounce =")+this->ui.label_rate_ws_pred_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_bounce_mean =")+this->ui.label_iter_mean_ws_pred_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_bounce_std =")+this->ui.label_iter_std_ws_pred_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_bounce_median =")+this->ui.label_iter_median_ws_pred_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_pred_bounce_max =")+this->ui.label_iter_max_ws_pred_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_bounce_mean =")+this->ui.label_cpu_mean_ws_pred_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_bounce_std =")+this->ui.label_cpu_std_ws_pred_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_bounce_median =")+this->ui.label_cpu_median_ws_pred_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_pred_bounce_max =")+this->ui.label_cpu_max_ws_pred_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_bounce_mean =")+this->ui.label_obj_mean_ws_pred_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_bounce_std =")+this->ui.label_obj_std_ws_pred_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_bounce_median =")+this->ui.label_obj_median_ws_pred_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_pred_bounce_max =")+this->ui.label_obj_max_ws_pred_bounce_value->text().toStdString()+string(";\n");
+    }
+    results.close();
+    qnode.log(QNode::Info,std::string("Results of learning saved at ")+std::string(MAIN_PATH)+std::string("/")+path.toStdString()+filename);
+
 }
 
 
@@ -6578,6 +7064,39 @@ double MainWindow::getThirdQuartile(vector<int> v)
     }
 
     return third_quartile;
+}
+
+void MainWindow::count_occurrence(std::unordered_map<int,int>& m, std::vector<int>& v){
+    m.clear();
+    for (auto itr = v.begin(); itr != v.end(); ++itr){
+        ++m[*itr];
+    }
+}
+
+double MainWindow::median(std::vector<double>& len)
+{
+    if(!len.empty())
+    {
+        if (len.size() % 2 == 0) {
+            const auto median_it1 = len.begin() + len.size() / 2 - 1;
+            const auto median_it2 = len.begin() + len.size() / 2;
+
+            std::nth_element(len.begin(), median_it1 , len.end());
+            const auto e1 = *median_it1;
+
+            std::nth_element(len.begin(), median_it2 , len.end());
+            const auto e2 = *median_it2;
+
+            return (e1 + e2) / 2;
+
+        } else {
+            const auto median_it = len.begin() + len.size() / 2;
+            std::nth_element(len.begin(), median_it , len.end());
+            return *median_it;
+        }
+    }else{
+        return -1.0;
+    }
 }
 
 

@@ -46,42 +46,42 @@ obstacle_1_yaw = float(data_pred[11])
 pd.set_option('display.max_columns', 10)
 print_en = False
 
-print_en_xf_plan = True
+print_en_xf_plan = False
 predict_xf_plan = True
 dir_path_xf_plan = models_dir+"/xf_plan"
 xf_plan_prediction = pd.DataFrame()
 
-print_en_zf_L_plan = True
+print_en_zf_L_plan = False
 predict_zf_L_plan = True
 dir_path_zf_L_plan = models_dir+"/zf_L_plan"
 zf_L_plan_prediction = pd.DataFrame()
 
-print_en_zf_U_plan = True
+print_en_zf_U_plan = False
 predict_zf_U_plan = True
 dir_path_zf_U_plan = models_dir+"/zf_U_plan"
 zf_U_plan_prediction = pd.DataFrame()
 
-print_en_dual_f_plan = True
+print_en_dual_f_plan = False
 predict_dual_f_plan = True
 dir_path_dual_f_plan = models_dir+"/dual_f_plan"
 dual_f_plan_prediction = pd.DataFrame()
 
-print_en_x_bounce = True
+print_en_x_bounce = False
 predict_x_bounce = True
 dir_path_x_bounce = models_dir+"/x_bounce"
 x_bounce_prediction = pd.DataFrame()
 
-print_en_zb_L= True
+print_en_zb_L= False
 predict_zb_L = True
 dir_path_zb_L = models_dir+"/zb_L"
 zb_L_prediction = pd.DataFrame()
 
-print_en_zb_U = True
+print_en_zb_U = False
 predict_zb_U = True
 dir_path_zb_U = models_dir+"/zb_U"
 zb_U_prediction = pd.DataFrame()
 
-print_en_dual_bounce = True
+print_en_dual_bounce = False
 predict_dual_bounce = True
 dir_path_dual_bounce = models_dir+"/dual_bounce"
 dual_bounce_prediction = pd.DataFrame()
@@ -131,19 +131,19 @@ n_pca_comps_x_bounce = 4
 n_clusters_x_bounce = 6
 min_cluster_size_x_bounce = 10
 th_x_bounce = 0.001
-periods_x_bounce = 20
+periods_x_bounce = 10
 steps_x_bounce = 500
 batch_size_x_bounce = 100
-units_x_bounce = [10,10]
+units_x_bounce = [10]
 units_x_bounce_class = [10,10,10]
 
 n_clusters_zb_L = 6
 min_cluster_size_zb_L = 10
 th_zb_L = 0.001
-periods_zb_L = 20
+periods_zb_L = 10
 steps_zb_L = 500
 batch_size_zb_L = 100
-units_zb_L = [10,10]
+units_zb_L = [10]
 units_zb_L_class = [10,10,10]
 
 n_pca_comps_dual_bounce = 4
@@ -897,3 +897,6 @@ pred_file.write("\n")
 
 
 pred_file.close()
+
+
+

@@ -41,34 +41,34 @@ models_dir = str(sys.argv[2])
 
 print_en = True
 
-print_en_xf_plan = True
-train_xf_plan = True
-train_xf_plan_class = True
+print_en_xf_plan = False
+train_xf_plan = False
+train_xf_plan_class = False
 dir_path_xf_plan = models_dir + "/xf_plan"
 
-print_en_zf_L_plan = True
-train_zf_L_plan = True
-train_zf_L_plan_class = True
+print_en_zf_L_plan = False
+train_zf_L_plan = False
+train_zf_L_plan_class = False
 dir_path_zf_L_plan = models_dir + "/zf_L_plan"
 
-print_en_zf_U_plan = True
-train_zf_U_plan = True
-train_zf_U_plan_class = True
+print_en_zf_U_plan = False
+train_zf_U_plan = False
+train_zf_U_plan_class = False
 dir_path_zf_U_plan = models_dir + "/zf_U_plan"
 
-print_en_dual_f_plan = True
-train_dual_f_plan = True
-train_dual_f_plan_class = True
+print_en_dual_f_plan = False
+train_dual_f_plan = False
+train_dual_f_plan_class = False
 dir_path_dual_f_plan = models_dir + "/dual_f_plan"
 
-print_en_x_bounce = True
-train_x_bounce = True
-train_x_bounce_class = True
+print_en_x_bounce = False
+train_x_bounce = False
+train_x_bounce_class = False
 dir_path_x_bounce = models_dir + "/x_bounce"
 
-print_en_zb_L = True
-train_zb_L = True
-train_zb_L_class = True
+print_en_zb_L = False
+train_zb_L = False
+train_zb_L_class = False
 dir_path_zb_L = models_dir + "/zb_L"
 
 print_en_dual_bounce = True
@@ -131,10 +131,10 @@ units_dual_f_plan_class = [10,10,10]
 n_clusters_x_bounce = 6
 min_cluster_size_x_bounce = 10
 th_x_bounce = 0.001
-periods_x_bounce = 20
+periods_x_bounce = 10
 steps_x_bounce = 500
 batch_size_x_bounce = 100
-units_x_bounce = [10,10]
+units_x_bounce = [10]
 periods_x_bounce_class = 20
 steps_x_bounce_class = 1000
 batch_size_x_bounce_class = 100
@@ -143,10 +143,10 @@ units_x_bounce_class = [10,10,10]
 n_clusters_zb_L = 6
 min_cluster_size_zb_L = 10
 th_zb_L = 0.001
-periods_zb_L = 20
+periods_zb_L = 10
 steps_zb_L = 500
 batch_size_zb_L = 100
-units_zb_L = [10,10]
+units_zb_L = [10]
 periods_zb_L_class = 20
 steps_zb_L_class = 1000
 batch_size_zb_L_class = 100

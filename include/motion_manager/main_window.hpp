@@ -6,6 +6,7 @@
 /*****************************************************************************
 ** Includes
 *****************************************************************************/
+#include <unordered_map>
 #include <qcustomplot.h>
 #include <qcpdocumentobject.h>
 #include <qwt3d_io.h>
@@ -565,6 +566,11 @@ public Q_SLOTS:
          */
         void on_pushButton_pred_plan_clicked();
 
+        /**
+         * @brief on_pushButton_save_learning_res_clicked
+         */
+        void on_pushButton_save_learning_res_clicked();
+
 
 private:
         Ui::MainWindowDesign ui; /**< handles of the main user interface */
@@ -741,6 +747,19 @@ private:
         // Joint 10 = 70.0
 
         // ---------------------------- Learning ------------------------------------- //
+        /**
+         * @brief count_occurrence
+         * @param m
+         * @param v
+         */
+        void count_occurrence(std::unordered_map<int,int>& m, std::vector<int>& v);
+
+        /**
+         * @brief median
+         * @param len
+         * @return
+         */
+        double median(std::vector<double>& len);
 
         // solution of the given problems
         bool sol_loaded;/**< loaded solution flag */
@@ -768,6 +787,61 @@ private:
         vector<double> zL_bounce; /**< lower bounds multipliers of the bounce target posture selection problem */
         vector<double> zU_bounce; /**< upper bounds multipliers of the bounce target posture selection problem */
         vector<double> dual_bounce; /**< constraints multipliers of the bounce target posture selection problem */
+
+        // results of the predictions
+        // plan
+        vector<int> success_no_ws_plan; /**< success flags with no warm start */
+        vector<double> iter_no_ws_plan; /**< iterations with no warm start */
+        vector<double> cpu_no_ws_plan; /**< cpu time with no warm start */
+        vector<double> obj_no_ws_plan; /**< objective function values with no warm start */
+        vector<int> success_ws_or_plan; /**< success flags with warm start from the original solution */
+        vector<double> iter_ws_or_plan; /**< iterations with warm start from the original solution */
+        vector<double> cpu_ws_or_plan; /**< cpu time with warm start from the original solution */
+        vector<double> obj_ws_or_plan; /**< objective function values with warm start from the original solution */
+        vector<int> success_ws_pred_plan; /**< success flags with warm start from the predicted solution */
+        vector<double> iter_ws_pred_plan; /**< iterations with warm start from the predicted solution */
+        vector<double> cpu_ws_pred_plan; /**< cpu time with warm start from the predicted solution */
+        vector<double> obj_ws_pred_plan; /**< objective function values with warm start from the predicted solution */
+        // approach
+        vector<int> success_no_ws_app; /**< success flags with no warm start */
+        vector<double> iter_no_ws_app; /**< iterations with no warm start */
+        vector<double> cpu_no_ws_app; /**< cpu time with no warm start */
+        vector<double> obj_no_ws_app; /**< objective function values with no warm start */
+        vector<int> success_ws_or_app; /**< success flags with warm start from the original solution */
+        vector<double> iter_ws_or_app; /**< iterations with warm start from the original solution */
+        vector<double> cpu_ws_or_app; /**< cpu time with warm start from the original solution */
+        vector<double> obj_ws_or_app; /**< objective function values with warm start from the original solution */
+        vector<int> success_ws_pred_app; /**< success flags with warm start from the predicted solution */
+        vector<double> iter_ws_pred_app; /**< iterations with warm start from the predicted solution */
+        vector<double> cpu_ws_pred_app; /**< cpu time with warm start from the predicted solution */
+        vector<double> obj_ws_pred_app; /**< objective function values with warm start from the predicted solution */
+        // retreat
+        vector<int> success_no_ws_ret; /**< success flags with no warm start */
+        vector<double> iter_no_ws_ret; /**< iterations with no warm start */
+        vector<double> cpu_no_ws_ret; /**< cpu time with no warm start */
+        vector<double> obj_no_ws_ret; /**< objective function values with no warm start */
+        vector<int> success_ws_or_ret; /**< success flags with warm start from the original solution */
+        vector<double> iter_ws_or_ret; /**< iterations with warm start from the original solution */
+        vector<double> cpu_ws_or_ret; /**< cpu time with warm start from the original solution */
+        vector<double> obj_ws_or_ret; /**< objective function values with warm start from the original solution */
+        vector<int> success_ws_pred_ret; /**< success flags with warm start from the predicted solution */
+        vector<double> iter_ws_pred_ret; /**< iterations with warm start from the predicted solution */
+        vector<double> cpu_ws_pred_ret; /**< cpu time with warm start from the predicted solution */
+        vector<double> obj_ws_pred_ret; /**< objective function values with warm start from the predicted solution */
+        // bounce
+        vector<int> success_no_ws_bounce; /**< success flags with no warm start */
+        vector<double> iter_no_ws_bounce; /**< iterations with no warm start */
+        vector<double> cpu_no_ws_bounce; /**< cpu time with no warm start */
+        vector<double> obj_no_ws_bounce; /**< objective function values with no warm start */
+        vector<int> success_ws_or_bounce; /**< success flags with warm start from the original solution */
+        vector<double> iter_ws_or_bounce; /**< iterations with warm start from the original solution */
+        vector<double> cpu_ws_or_bounce; /**< cpu time with warm start from the original solution */
+        vector<double> obj_ws_or_bounce; /**< objective function values with warm start from the original solution */
+        vector<int> success_ws_pred_bounce; /**< success flags with warm start from the predicted solution */
+        vector<double> iter_ws_pred_bounce; /**< iterations with warm start from the predicted solution */
+        vector<double> cpu_ws_pred_bounce; /**< cpu time with warm start from the predicted solution */
+        vector<double> obj_ws_pred_bounce; /**< objective function values with warm start from the predicted solution */
+
 
 
 };
