@@ -154,7 +154,7 @@ units_zb_L_class = [10,10,10]
 
 n_clusters_dual_bounce = 6
 min_cluster_size_dual_bounce = 10
-th_dual_bounce = 0.01
+th_dual_bounce = 0.001
 periods_dual_bounce = 20
 steps_dual_bounce = 1000
 batch_size_dual_bounce = 100

@@ -46,42 +46,42 @@ obstacle_1_yaw = float(data_pred[11])
 pd.set_option('display.max_columns', 10)
 print_en = False
 
-print_en_xf_plan = True
+print_en_xf_plan = False
 predict_xf_plan = True
 dir_path_xf_plan = models_dir+"/xf_plan"
 xf_plan_prediction = pd.DataFrame()
 
-print_en_zf_L_plan = True
+print_en_zf_L_plan = False
 predict_zf_L_plan = True
 dir_path_zf_L_plan = models_dir+"/zf_L_plan"
 zf_L_plan_prediction = pd.DataFrame()
 
-print_en_zf_U_plan = True
+print_en_zf_U_plan = False
 predict_zf_U_plan = True
 dir_path_zf_U_plan = models_dir+"/zf_U_plan"
 zf_U_plan_prediction = pd.DataFrame()
 
-print_en_dual_f_plan = True
+print_en_dual_f_plan = False
 predict_dual_f_plan = True
 dir_path_dual_f_plan = models_dir+"/dual_f_plan"
 dual_f_plan_prediction = pd.DataFrame()
 
-print_en_x_bounce = True
+print_en_x_bounce = False
 predict_x_bounce = True
 dir_path_x_bounce = models_dir+"/x_bounce"
 x_bounce_prediction = pd.DataFrame()
 
-print_en_zb_L= True
+print_en_zb_L= False
 predict_zb_L = True
 dir_path_zb_L = models_dir+"/zb_L"
 zb_L_prediction = pd.DataFrame()
 
-print_en_zb_U = True
+print_en_zb_U = False
 predict_zb_U = True
 dir_path_zb_U = models_dir+"/zb_U"
 zb_U_prediction = pd.DataFrame()
 
-print_en_dual_bounce = True
+print_en_dual_bounce = False
 predict_dual_bounce = True
 dir_path_dual_bounce = models_dir+"/dual_bounce"
 dual_bounce_prediction = pd.DataFrame()
@@ -149,7 +149,7 @@ units_zb_L_class = [10,10,10]
 n_pca_comps_dual_bounce = 4
 n_clusters_dual_bounce = 6
 min_cluster_size_dual_bounce = 10
-th_dual_bounce = 0.001
+th_dual_bounce = 0.01
 periods_dual_bounce = 20
 steps_dual_bounce = 1000
 batch_size_dual_bounce = 100
@@ -772,6 +772,8 @@ if predict_dual_bounce:
         test_pred = np.array([item['class_ids'][0] for item in test_probabilities])
 
         n_cluster = test_pred[0] # the input belongs to this cluster
+        #print("Cluster number:")
+        #print(n_cluster)
         selected_cl_in_dual_bounce_df = pd.read_csv(dir_path_dual_bounce+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_dual_bounce_df = pd.read_csv(dir_path_dual_bounce+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
@@ -781,7 +783,14 @@ if predict_dual_bounce:
         pc_df = pd.DataFrame(data=pc, columns=cols_dual_bounce[0:n_pca_comps_dual_bounce])
 
         col_names = list(pc_df.columns.values)
+        col_names_pc_tot = list(pc_df.columns.values)
+        col_names_2 = ["",""]
+        if(n_cluster==5): # only two components for regression, the others two are zero
+            col_names_2[1] = col_names.pop()
+            col_names_2[0] = col_names.pop()
 
+        #print(col_names_2)
+        #print(col_names_pc_tot)
         predictor = tf.estimator.DNNRegressor(
                                                 feature_columns=construct_feature_columns(norm_inputs_test_df),
                                                 hidden_units=units_dual_bounce,
@@ -797,6 +806,7 @@ if predict_dual_bounce:
                                                     shuffle=False)
 
         test_predictions = predictor.predict(input_fn=predict_test_input_fn)
+        #print(col_names)
         test_predictions = np.array([item['predictions'][0:len(col_names)] for item in test_predictions])
 
         test_predictions_df = pd.DataFrame(data=test_predictions[0:, 0:],  # values
@@ -804,7 +814,15 @@ if predict_dual_bounce:
                                              columns=col_names)
 
         #print(test_predictions_df)
+        if(n_cluster==5):
+            test_zeros = np.zeros(shape=(1, len(col_names_2)))
+            test_predictions_df_2 = pd.DataFrame(test_zeros, columns=col_names_2)
+            #print(test_predictions_df_2)
+            for str in col_names_pc_tot:
+                if str in col_names_2:
+                    test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
+        #print(test_predictions_df)
         test_predictions = test_predictions_df.values
         test_predictions_proj = pca_dual_bounce.inverse_transform(test_predictions)
         test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_bounce)
