@@ -1061,9 +1061,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>750</x>
-        <y>50</y>
+        <y>130</y>
         <width>461</width>
-        <height>141</height>
+        <height>81</height>
        </rect>
       </property>
       <property name="title">
@@ -1073,7 +1073,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>80</y>
+         <y>40</y>
          <width>391</width>
          <height>25</height>
         </rect>
@@ -1106,32 +1106,6 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="text">
            <string>Plan and collect</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>29</x>
-         <y>40</y>
-         <width>291</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_47">
-        <item>
-         <widget class="QPushButton" name="pushButton_load_learn_prim_duals">
-          <property name="text">
-           <string>Load primals/duals</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_loaded">
-          <property name="text">
-           <string>Unloaded</string>
           </property>
          </widget>
         </item>
@@ -1378,7 +1352,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_obsts_x_var">
               <property name="text">
-               <string>50.0</string>
+               <string>100.0</string>
               </property>
              </widget>
             </item>
@@ -1396,7 +1370,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_obsts_y_var">
               <property name="text">
-               <string>50.0</string>
+               <string>100.0</string>
               </property>
              </widget>
             </item>
@@ -1414,7 +1388,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_obsts_z_var">
               <property name="text">
-               <string>50.0</string>
+               <string>100.0</string>
               </property>
              </widget>
             </item>
@@ -1443,7 +1417,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_obsts_roll_var">
               <property name="text">
-               <string>0.26</string>
+               <string>0.5</string>
               </property>
              </widget>
             </item>
@@ -1461,7 +1435,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_obsts_pitch_var">
               <property name="text">
-               <string>0.26</string>
+               <string>0.5</string>
               </property>
              </widget>
             </item>
@@ -1479,7 +1453,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_obsts_yaw_var">
               <property name="text">
-               <string>0.26</string>
+               <string>0.5</string>
               </property>
              </widget>
             </item>
@@ -1533,7 +1507,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_tar_x_var">
               <property name="text">
-               <string>50.0</string>
+               <string>100.0</string>
               </property>
              </widget>
             </item>
@@ -1551,7 +1525,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_tar_y_var">
               <property name="text">
-               <string>50.0</string>
+               <string>100.0</string>
               </property>
              </widget>
             </item>
@@ -1569,7 +1543,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_tar_z_var">
               <property name="text">
-               <string>50.0</string>
+               <string>100.0</string>
               </property>
              </widget>
             </item>
@@ -1598,7 +1572,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_tar_roll_var">
               <property name="text">
-               <string>0.26</string>
+               <string>0.5</string>
               </property>
              </widget>
             </item>
@@ -1616,7 +1590,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_tar_pitch_var">
               <property name="text">
-               <string>0.26</string>
+               <string>0.5</string>
               </property>
              </widget>
             </item>
@@ -1634,7 +1608,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_tar_yaw_var">
               <property name="text">
-               <string>0.26</string>
+               <string>0.5</string>
               </property>
              </widget>
             </item>
@@ -1644,6 +1618,32 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>920</x>
+        <y>70</y>
+        <width>291</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_47">
+       <item>
+        <widget class="QPushButton" name="pushButton_load_learn_prim_duals">
+         <property name="text">
+          <string>Load primals/duals</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_loaded">
+         <property name="text">
+          <string>Unloaded</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_control">

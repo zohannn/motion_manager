@@ -5958,22 +5958,10 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                     // get the obstacles of the scenario
                     std::vector<objectPtr> obsts; prob->getObstacles(obsts);
 
-                     // csv
-                    struct stat st = {0};
-                    if (stat("results", &st) == -1) {
-                        mkdir("results", 0700);
-                    }
-                    if (stat("results/learning", &st) == -1) {
-                        mkdir("results/learning", 0700);
-                    }
-                    if (stat("results/learning/predictions", &st) == -1) {
-                        mkdir("results/learning/predictions", 0700);
-                    }
-                    QString path("results/learning/predictions/");
-
+                    // csv
                     string filename_csv("learning_predictions.csv");
                     ofstream pred_csv;
-                    pred_csv.open(path.toStdString()+filename_csv);
+                    pred_csv.open(pred_dir+string("/")+filename_csv);
                     // headers
                     pred_csv << "target_x_mm,target_y_mm,target_z_mm,target_roll_rad,target_pitch_rad,target_yaw_rad";
                     for(size_t j=0;j<obsts.size();++j){
@@ -6560,22 +6548,11 @@ void MainWindow::on_pushButton_pred_plan_clicked()
 
 void MainWindow::on_pushButton_save_learning_res_clicked()
 {
-    struct stat st = {0};
-    if (stat("results", &st) == -1) {
-        mkdir("results", 0700);
-    }
-    if (stat("results/learning", &st) == -1) {
-        mkdir("results/learning", 0700);
-    }
-    if (stat("results/learning/predictions", &st) == -1) {
-        mkdir("results/learning/predictions", 0700);
-    }
-    QString path("results/learning/predictions/");
-
+    string pred_dir = this->ui.lineEdit_predictions->text().toStdString();
     // txt
     string filename("results_learn_pred.txt");
     ofstream results;
-    results.open(path.toStdString()+filename);
+    results.open(pred_dir+string("/")+filename);
 
     results << string("# STATISTICS OF THE PREDICTIONS  \n");
     // plan
@@ -6770,7 +6747,7 @@ void MainWindow::on_pushButton_save_learning_res_clicked()
         results << string("obj_ws_pred_bounce_max =")+this->ui.label_obj_max_ws_pred_bounce_value->text().toStdString()+string(";\n");
     }
     results.close();
-    qnode.log(QNode::Info,std::string("Results of learning saved at ")+std::string(MAIN_PATH)+std::string("/")+path.toStdString()+filename);
+    qnode.log(QNode::Info,std::string("Results of learning saved at ")+pred_dir+std::string("/")+filename);
 
 }
 
