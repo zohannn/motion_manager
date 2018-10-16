@@ -1061,9 +1061,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>750</x>
-        <y>130</y>
+        <y>150</y>
         <width>461</width>
-        <height>81</height>
+        <height>121</height>
        </rect>
       </property>
       <property name="title">
@@ -1073,7 +1073,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>30</x>
-         <y>40</y>
+         <y>80</y>
          <width>391</width>
          <height>25</height>
         </rect>
@@ -1111,6 +1111,31 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="layoutWidget_53">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>40</y>
+         <width>421</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_295">
+        <item>
+         <widget class="QLineEdit" name="lineEdit_collections"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_collections">
+          <property name="text">
+           <string>Select directory of collection</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <zorder>layoutWidget</zorder>
+      <zorder>layoutWidget_53</zorder>
+      <zorder>groupBox_prediction</zorder>
      </widget>
      <widget class="QGroupBox" name="groupBox_training">
       <property name="geometry">
@@ -1208,30 +1233,14 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>620</x>
-        <y>270</y>
-        <width>581</width>
-        <height>231</height>
+        <y>330</y>
+        <width>591</width>
+        <height>171</height>
        </rect>
       </property>
       <property name="title">
        <string>Prediction</string>
       </property>
-      <widget class="QPushButton" name="pushButton_pred_plan">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>430</x>
-         <y>190</y>
-         <width>121</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Predict and plan</string>
-       </property>
-      </widget>
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
@@ -1279,30 +1288,44 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>30</x>
-         <y>120</y>
-         <width>267</width>
-         <height>25</height>
+         <x>170</x>
+         <y>130</y>
+         <width>381</width>
+         <height>27</height>
         </rect>
        </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_65">
+       <layout class="QHBoxLayout" name="horizontalLayout_294">
         <item>
-         <widget class="QLabel" name="label_n_predictions">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Number of predictions</string>
-          </property>
-         </widget>
+         <layout class="QHBoxLayout" name="horizontalLayout_65">
+          <item>
+           <widget class="QLabel" name="label_n_predictions">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Number of predictions</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_n_predictions">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>10</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_n_predictions">
+         <widget class="QPushButton" name="pushButton_pred_plan">
           <property name="enabled">
            <bool>false</bool>
           </property>
           <property name="text">
-           <string>10</string>
+           <string>Predict and plan</string>
           </property>
          </widget>
         </item>
@@ -1622,7 +1645,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>920</x>
+        <x>770</x>
         <y>70</y>
         <width>291</width>
         <height>31</height>

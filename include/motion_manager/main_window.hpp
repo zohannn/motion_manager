@@ -557,6 +557,11 @@ public Q_SLOTS:
         void on_pushButton_predictions_clicked();
 
         /**
+         * @brief on_pushButton_collections_clicked
+         */
+        void on_pushButton_collections_clicked();
+
+        /**
          * @brief on_pushButton_pred_plan_pressed
          */
         void on_pushButton_pred_plan_pressed();
