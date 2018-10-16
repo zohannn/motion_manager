@@ -576,6 +576,78 @@ public Q_SLOTS:
          */
         void on_pushButton_save_learning_res_clicked();
 
+        /**
+         * @brief check_tar_x_pos_var
+         * @param state
+         */
+        void check_tar_x_pos_var(int state);
+
+        /**
+         * @brief check_tar_y_pos_var
+         * @param state
+         */
+        void check_tar_y_pos_var(int state);
+
+        /**
+         * @brief check_tar_z_pos_var
+         * @param state
+         */
+        void check_tar_z_pos_var(int state);
+
+        /**
+         * @brief check_tar_roll_var
+         * @param state
+         */
+        void check_tar_roll_var(int state);
+
+        /**
+         * @brief check_tar_pitch_var
+         * @param state
+         */
+        void check_tar_pitch_var(int state);
+
+        /**
+         * @brief check_tar_yaw_var
+         * @param state
+         */
+        void check_tar_yaw_var(int state);
+
+        /**
+         * @brief check_obsts_x_pos_var
+         * @param state
+         */
+        void check_obsts_x_pos_var(int state);
+
+        /**
+         * @brief check_obsts_y_pos_var
+         * @param state
+         */
+        void check_obsts_y_pos_var(int state);
+
+        /**
+         * @brief check_obsts_z_pos_var
+         * @param state
+         */
+        void check_obsts_z_pos_var(int state);
+
+        /**
+         * @brief check_obsts_roll_var
+         * @param state
+         */
+        void check_obsts_roll_var(int state);
+
+        /**
+         * @brief check_obsts_pitch_var
+         * @param state
+         */
+        void check_obsts_pitch_var(int state);
+
+        /**
+         * @brief check_obsts_yaw_var
+         * @param state
+         */
+        void check_obsts_yaw_var(int state);
+
 
 private:
         Ui::MainWindowDesign ui; /**< handles of the main user interface */

@@ -100,6 +100,21 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mWarmdlg = new WarmStartResultsDialog(this);
     mWarmdlg->setModal(false);
 
+    // check boxes
+    QObject::connect(this->ui.checkBox_tar_x_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_tar_x_pos_var(int)));
+    QObject::connect(this->ui.checkBox_tar_y_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_tar_y_pos_var(int)));
+    QObject::connect(this->ui.checkBox_tar_z_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_tar_z_pos_var(int)));
+    QObject::connect(this->ui.checkBox_tar_roll_var, SIGNAL(stateChanged(int)), this, SLOT(check_tar_roll_var(int)));
+    QObject::connect(this->ui.checkBox_tar_pitch_var, SIGNAL(stateChanged(int)), this, SLOT(check_tar_pitch_var(int)));
+    QObject::connect(this->ui.checkBox_tar_yaw_var, SIGNAL(stateChanged(int)), this, SLOT(check_tar_yaw_var(int)));
+
+    QObject::connect(this->ui.checkBox_obsts_x_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_obsts_x_pos_var(int)));
+    QObject::connect(this->ui.checkBox_obsts_y_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_obsts_y_pos_var(int)));
+    QObject::connect(this->ui.checkBox_obsts_z_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_obsts_z_pos_var(int)));
+    QObject::connect(this->ui.checkBox_obsts_roll_var, SIGNAL(stateChanged(int)), this, SLOT(check_obsts_roll_var(int)));
+    QObject::connect(this->ui.checkBox_obsts_pitch_var, SIGNAL(stateChanged(int)), this, SLOT(check_obsts_pitch_var(int)));
+    QObject::connect(this->ui.checkBox_obsts_yaw_var, SIGNAL(stateChanged(int)), this, SLOT(check_obsts_yaw_var(int)));
+
 
 
     ReadSettings();
@@ -287,6 +302,8 @@ void MainWindow::addObject(string value)
 
    ui.comboBox_objects_left->addItem(QString(value.c_str()));
    ui.comboBox_objects_eng_left->addItem(QString(value.c_str()));
+
+   ui.listWidget_obsts_except->addItem(QString(value.c_str()));
 }
 
 void MainWindow::addPose(string value)
@@ -5502,6 +5519,12 @@ void MainWindow::on_pushButton_plan_collect_clicked()
     int trials = ui.lineEdit_trials->text().toInt();
     ui.pushButton_plan_collect->setCheckable(false);
 
+    QList<QListWidgetItem*> obsts_items = this->ui.listWidget_obsts_except->selectedItems();
+    vector<string> obsts_except;
+    for(int ii=0;ii<obsts_items.count();++ii){
+        obsts_except.push_back(obsts_items.at(ii)->text().toStdString());
+    }
+
     try{
         switch(planner_id){
         case 0: // HUMP
@@ -5588,7 +5611,7 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                     ofstream data_csv;
                     data_csv.open(collect_dir+string("/")+filename_csv);
                     // headers
-                    data_csv << "target_x_mm,target_y_mm,target_z_mm,target_roll_rad,target_pitch_rad,target_yaw_rad";
+                    data_csv << "target_x_mm,target_y_mm,target_z_mm,target_roll_rad,target_pitch_rad,target_yaw_rad";                    
                     for(size_t j=0;j<obsts.size();++j){
                         data_csv << ",obstacle_"+to_string(j+1)+"_x_mm,obstacle_"+to_string(j+1)+"_y_mm,obstacle_"+to_string(j+1)+"_z_mm,obstacle_"+to_string(j+1)+"_roll_rad,obstacle_"+to_string(j+1)+"_pitch_rad,obstacle_"+to_string(j+1)+"_yaw_rad";
                     }
@@ -5623,12 +5646,36 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                             std::srand(std::time(NULL));
 
                             // modify target data (move_target)
-                            move_target_mod.at(0) = move_target.at(0) - (tar_x_var/2) + tar_x_var*(rand() / double(RAND_MAX));
-                            move_target_mod.at(1) = move_target.at(1) - (tar_y_var/2) + tar_y_var*(rand() / double(RAND_MAX));
-                            move_target_mod.at(2) = move_target.at(2) - (tar_z_var/2) + tar_z_var*(rand() / double(RAND_MAX));
-                            move_target_mod.at(3) = move_target.at(3) - (tar_roll_var/2) + tar_roll_var*(rand() / double(RAND_MAX));
-                            move_target_mod.at(4) = move_target.at(4) - (tar_pitch_var/2) + tar_pitch_var*(rand() / double(RAND_MAX));
-                            move_target_mod.at(5) = move_target.at(5) - (tar_yaw_var/2) + tar_yaw_var*(rand() / double(RAND_MAX));
+                            if(this->ui.lineEdit_tar_x_var->isEnabled()){
+                                move_target_mod.at(0) = move_target.at(0) - (tar_x_var/2) + tar_x_var*(rand() / double(RAND_MAX));
+                            }else{
+                                move_target_mod.at(0) = move_target.at(0);
+                            }
+                            if(this->ui.lineEdit_tar_y_var->isEnabled()){
+                                move_target_mod.at(1) = move_target.at(1) - (tar_y_var/2) + tar_y_var*(rand() / double(RAND_MAX));
+                            }else{
+                                move_target_mod.at(1) = move_target.at(1);
+                            }
+                            if(this->ui.lineEdit_tar_z_var->isEnabled()){
+                                move_target_mod.at(2) = move_target.at(2) - (tar_z_var/2) + tar_z_var*(rand() / double(RAND_MAX));
+                            }else{
+                                move_target_mod.at(2) = move_target.at(2);
+                            }
+                            if(this->ui.lineEdit_tar_roll_var->isEnabled()){
+                                move_target_mod.at(3) = move_target.at(3) - (tar_roll_var/2) + tar_roll_var*(rand() / double(RAND_MAX));
+                            }else{
+                                move_target_mod.at(3) = move_target.at(3);
+                            }
+                            if(this->ui.lineEdit_tar_pitch_var->isEnabled()){
+                                move_target_mod.at(4) = move_target.at(4) - (tar_pitch_var/2) + tar_pitch_var*(rand() / double(RAND_MAX));
+                            }else{
+                                move_target_mod.at(4) = move_target.at(4);
+                            }
+                            if(this->ui.lineEdit_tar_yaw_var->isEnabled()){
+                                move_target_mod.at(5) = move_target.at(5) - (tar_yaw_var/2) + tar_yaw_var*(rand() / double(RAND_MAX));
+                            }else{
+                                move_target_mod.at(5) = move_target.at(5);
+                            }
                             prob->setMoveSettings(move_target_mod,move_final_hand,move_final_arm,use_final);
 
                             // modify obstacles data
@@ -5636,15 +5683,44 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                             for(size_t j=0;j<obsts.size();++j){
                                 std::srand(std::time(NULL));
                                 objectPtr obs = obsts.at(j);
-                                obs_new.reset(new Object(obs->getName()));
+                                string obs_name = obs->getName();
+                                if (std::find(obsts_except.begin(), obsts_except.end(), obs_name) != obsts_except.end())
+                                {
+                                    continue;
+                                }
+                                obs_new.reset(new Object(obs_name));
                                 motion_manager::pos obs_pos;
                                 motion_manager::orient obs_or;
-                                obs_pos.Xpos = obs->getPos().Xpos - (obsts_x_var/2) + obsts_x_var*(rand() / double(RAND_MAX));
-                                obs_pos.Ypos = obs->getPos().Ypos - (obsts_y_var/2) + obsts_y_var*(rand() / double(RAND_MAX));
-                                obs_pos.Zpos = obs->getPos().Zpos - (obsts_z_var/2) + obsts_z_var*(rand() / double(RAND_MAX));
-                                obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
-                                obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
-                                obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
+                                if(this->ui.lineEdit_obsts_x_var->isEnabled()){
+                                    obs_pos.Xpos = obs->getPos().Xpos - (obsts_x_var/2) + obsts_x_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    obs_pos.Xpos = obs->getPos().Xpos;
+                                }
+                                if(this->ui.lineEdit_obsts_y_var->isEnabled()){
+                                    obs_pos.Ypos = obs->getPos().Ypos - (obsts_y_var/2) + obsts_y_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    obs_pos.Ypos = obs->getPos().Ypos;
+                                }
+                                if(this->ui.lineEdit_obsts_z_var->isEnabled()){
+                                    obs_pos.Zpos = obs->getPos().Zpos - (obsts_z_var/2) + obsts_z_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    obs_pos.Zpos = obs->getPos().Zpos;
+                                }
+                                if(this->ui.lineEdit_obsts_roll_var->isEnabled()){
+                                    obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    obs_or.roll = obs->getOr().roll;
+                                }
+                                if(this->ui.lineEdit_obsts_pitch_var->isEnabled()){
+                                    obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    obs_or.pitch = obs->getOr().pitch;
+                                }
+                                if(this->ui.lineEdit_obsts_yaw_var->isEnabled()){
+                                    obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    obs_or.yaw = obs->getOr().yaw;
+                                }
                                 obs_new->setPos(obs_pos,false);
                                 obs_new->setOr(obs_or,false);
                                 obs_new->setSize(obs->getSize());
@@ -5858,6 +5934,12 @@ void MainWindow::on_pushButton_pred_plan_clicked()
         int n_pred = ui.lineEdit_n_predictions->text().toInt();
         ui.pushButton_pred_plan->setCheckable(false);
 
+        QList<QListWidgetItem*> obsts_items = this->ui.listWidget_obsts_except->selectedItems();
+        vector<string> obsts_except;
+        for(int ii=0;ii<obsts_items.count();++ii){
+            obsts_except.push_back(obsts_items.at(ii)->text().toStdString());
+        }
+
         // clear the results
         // plan
         success_no_ws_plan.clear(); iter_no_ws_plan.clear(); cpu_no_ws_plan.clear(); obj_no_ws_plan.clear();
@@ -5990,14 +6072,37 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                         std::srand(std::time(NULL));
 
                         // modify target data (move_target)
-                        move_target_mod.at(0) = move_target.at(0) - (tar_x_var/2) + tar_x_var*(rand() / double(RAND_MAX));
-                        move_target_mod.at(1) = move_target.at(1) - (tar_y_var/2) + tar_y_var*(rand() / double(RAND_MAX));
-                        move_target_mod.at(2) = move_target.at(2) - (tar_z_var/2) + tar_z_var*(rand() / double(RAND_MAX));
-                        move_target_mod.at(3) = move_target.at(3) - (tar_roll_var/2) + tar_roll_var*(rand() / double(RAND_MAX));
-                        move_target_mod.at(4) = move_target.at(4) - (tar_pitch_var/2) + tar_pitch_var*(rand() / double(RAND_MAX));
-                        move_target_mod.at(5) = move_target.at(5) - (tar_yaw_var/2) + tar_yaw_var*(rand() / double(RAND_MAX));
+                        if(this->ui.lineEdit_tar_x_var->isEnabled()){
+                            move_target_mod.at(0) = move_target.at(0) - (tar_x_var/2) + tar_x_var*(rand() / double(RAND_MAX));
+                        }else{
+                            move_target_mod.at(0) = move_target.at(0);
+                        }
+                        if(this->ui.lineEdit_tar_y_var->isEnabled()){
+                            move_target_mod.at(1) = move_target.at(1) - (tar_y_var/2) + tar_y_var*(rand() / double(RAND_MAX));
+                        }else{
+                            move_target_mod.at(1) = move_target.at(1);
+                        }
+                        if(this->ui.lineEdit_tar_z_var->isEnabled()){
+                            move_target_mod.at(2) = move_target.at(2) - (tar_z_var/2) + tar_z_var*(rand() / double(RAND_MAX));
+                        }else{
+                            move_target_mod.at(2) = move_target.at(2);
+                        }
+                        if(this->ui.lineEdit_tar_roll_var->isEnabled()){
+                            move_target_mod.at(3) = move_target.at(3) - (tar_roll_var/2) + tar_roll_var*(rand() / double(RAND_MAX));
+                        }else{
+                            move_target_mod.at(3) = move_target.at(3);
+                        }
+                        if(this->ui.lineEdit_tar_pitch_var->isEnabled()){
+                            move_target_mod.at(4) = move_target.at(4) - (tar_pitch_var/2) + tar_pitch_var*(rand() / double(RAND_MAX));
+                        }else{
+                            move_target_mod.at(4) = move_target.at(4);
+                        }
+                        if(this->ui.lineEdit_tar_yaw_var->isEnabled()){
+                            move_target_mod.at(5) = move_target.at(5) - (tar_yaw_var/2) + tar_yaw_var*(rand() / double(RAND_MAX));
+                        }else{
+                            move_target_mod.at(5) = move_target.at(5);
+                        }
                         prob->setMoveSettings(move_target_mod,move_final_hand,move_final_arm,use_final);
-
                         string tar_x_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(0))); boost::replace_all(tar_x_pos_str,",",".");
                         string tar_y_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(1))); boost::replace_all(tar_y_pos_str,",",".");
                         string tar_z_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(2))); boost::replace_all(tar_z_pos_str,",",".");
@@ -6017,15 +6122,44 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                         for(size_t j=0;j<obsts.size();++j){
                             std::srand(std::time(NULL));
                             objectPtr obs = obsts.at(j);
-                            obs_new.reset(new Object(obs->getName()));
+                            string obs_name = obs->getName();
+                            if (std::find(obsts_except.begin(), obsts_except.end(), obs_name) != obsts_except.end())
+                            {
+                                continue;
+                            }
+                            obs_new.reset(new Object(obs_name));
                             motion_manager::pos obs_pos;
                             motion_manager::orient obs_or;
-                            obs_pos.Xpos = obs->getPos().Xpos - (obsts_x_var/2) + obsts_x_var*(rand() / double(RAND_MAX));
-                            obs_pos.Ypos = obs->getPos().Ypos - (obsts_y_var/2) + obsts_y_var*(rand() / double(RAND_MAX));
-                            obs_pos.Zpos = obs->getPos().Zpos - (obsts_z_var/2) + obsts_z_var*(rand() / double(RAND_MAX));
-                            obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
-                            obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
-                            obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
+                            if(this->ui.lineEdit_obsts_x_var->isEnabled()){
+                                obs_pos.Xpos = obs->getPos().Xpos - (obsts_x_var/2) + obsts_x_var*(rand() / double(RAND_MAX));
+                            }else{
+                                obs_pos.Xpos = obs->getPos().Xpos;
+                            }
+                            if(this->ui.lineEdit_obsts_y_var->isEnabled()){
+                                obs_pos.Ypos = obs->getPos().Ypos - (obsts_y_var/2) + obsts_y_var*(rand() / double(RAND_MAX));
+                            }else{
+                                obs_pos.Ypos = obs->getPos().Ypos;
+                            }
+                            if(this->ui.lineEdit_obsts_z_var->isEnabled()){
+                                obs_pos.Zpos = obs->getPos().Zpos - (obsts_z_var/2) + obsts_z_var*(rand() / double(RAND_MAX));
+                            }else{
+                                obs_pos.Zpos = obs->getPos().Zpos;
+                            }
+                            if(this->ui.lineEdit_obsts_roll_var->isEnabled()){
+                                obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
+                            }else{
+                                obs_or.roll = obs->getOr().roll;
+                            }
+                            if(this->ui.lineEdit_obsts_pitch_var->isEnabled()){
+                                obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
+                            }else{
+                                obs_or.pitch = obs->getOr().pitch;
+                            }
+                            if(this->ui.lineEdit_obsts_yaw_var->isEnabled()){
+                                obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
+                            }else{
+                                obs_or.yaw = obs->getOr().yaw;
+                            }
                             obs_new->setPos(obs_pos,false);
                             obs_new->setOr(obs_or,false);
                             obs_new->setSize(obs->getSize());
@@ -7076,6 +7210,139 @@ double MainWindow::median(std::vector<double>& len)
         return -1.0;
     }
 }
+
+void MainWindow::check_tar_x_pos_var(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_tar_x_var->setEnabled(false);
+    }else{
+        // checked
+        this->ui.lineEdit_tar_x_var->setEnabled(true);
+    }
+}
+
+void MainWindow::check_tar_y_pos_var(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_tar_y_var->setEnabled(false);
+    }else{
+        // checked
+        this->ui.lineEdit_tar_y_var->setEnabled(true);
+    }
+}
+
+void MainWindow::check_tar_z_pos_var(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_tar_z_var->setEnabled(false);
+    }else{
+        // checked
+        this->ui.lineEdit_tar_z_var->setEnabled(true);
+    }
+}
+
+void MainWindow::check_tar_roll_var(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_tar_roll_var->setEnabled(false);
+    }else{
+        // checked
+        this->ui.lineEdit_tar_roll_var->setEnabled(true);
+    }
+}
+
+void MainWindow::check_tar_pitch_var(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_tar_pitch_var->setEnabled(false);
+    }else{
+        // checked
+        this->ui.lineEdit_tar_pitch_var->setEnabled(true);
+    }
+}
+
+void MainWindow::check_tar_yaw_var(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_tar_yaw_var->setEnabled(false);
+    }else{
+        // checked
+        this->ui.lineEdit_tar_yaw_var->setEnabled(true);
+    }
+}
+
+void MainWindow::check_obsts_x_pos_var(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_obsts_x_var->setEnabled(false);
+    }else{
+        // checked
+        this->ui.lineEdit_obsts_x_var->setEnabled(true);
+    }
+}
+
+void MainWindow::check_obsts_y_pos_var(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_obsts_y_var->setEnabled(false);
+    }else{
+        // checked
+        this->ui.lineEdit_obsts_y_var->setEnabled(true);
+    }
+}
+
+void MainWindow::check_obsts_z_pos_var(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_obsts_z_var->setEnabled(false);
+    }else{
+        // checked
+        this->ui.lineEdit_obsts_z_var->setEnabled(true);
+    }
+}
+
+void MainWindow::check_obsts_roll_var(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_obsts_roll_var->setEnabled(false);
+    }else{
+        // checked
+        this->ui.lineEdit_obsts_roll_var->setEnabled(true);
+    }
+}
+
+void MainWindow::check_obsts_pitch_var(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_obsts_pitch_var->setEnabled(false);
+    }else{
+        // checked
+        this->ui.lineEdit_obsts_pitch_var->setEnabled(true);
+    }
+}
+
+void MainWindow::check_obsts_yaw_var(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_obsts_yaw_var->setEnabled(false);
+    }else{
+        // checked
+        this->ui.lineEdit_obsts_yaw_var->setEnabled(true);
+    }
+}
+
 
 
 

@@ -1060,9 +1060,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_collection">
       <property name="geometry">
        <rect>
-        <x>750</x>
-        <y>150</y>
-        <width>461</width>
+        <x>790</x>
+        <y>250</y>
+        <width>431</width>
         <height>121</height>
        </rect>
       </property>
@@ -1072,7 +1072,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>20</x>
          <y>80</y>
          <width>391</width>
          <height>25</height>
@@ -1116,7 +1116,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>20</x>
          <y>40</y>
-         <width>421</width>
+         <width>391</width>
          <height>25</height>
         </rect>
        </property>
@@ -1133,17 +1133,14 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-      <zorder>layoutWidget</zorder>
-      <zorder>layoutWidget_53</zorder>
-      <zorder>groupBox_prediction</zorder>
      </widget>
      <widget class="QGroupBox" name="groupBox_training">
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>270</y>
+        <y>330</y>
         <width>571</width>
-        <height>231</height>
+        <height>201</height>
        </rect>
       </property>
       <property name="title">
@@ -1153,7 +1150,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>430</x>
-         <y>190</y>
+         <y>160</y>
          <width>121</width>
          <height>23</height>
         </rect>
@@ -1232,10 +1229,10 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_prediction">
       <property name="geometry">
        <rect>
-        <x>620</x>
-        <y>330</y>
+        <x>630</x>
+        <y>370</y>
         <width>591</width>
-        <height>171</height>
+        <height>161</height>
        </rect>
       </property>
       <property name="title">
@@ -1289,7 +1286,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>170</x>
-         <y>130</y>
+         <y>120</y>
          <width>381</width>
          <height>27</height>
         </rect>
@@ -1335,9 +1332,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_obsts_var">
       <property name="geometry">
        <rect>
-        <x>380</x>
+        <x>400</x>
         <y>50</y>
-        <width>341</width>
+        <width>651</width>
         <height>161</height>
        </rect>
       </property>
@@ -1347,10 +1344,10 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>12</x>
-         <y>42</y>
-         <width>317</width>
-         <height>112</height>
+         <x>10</x>
+         <y>31</y>
+         <width>321</width>
+         <height>121</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_59">
@@ -1366,9 +1363,12 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_43">
             <item>
-             <widget class="QLabel" name="label_obsts_x_pos_var">
+             <widget class="QCheckBox" name="checkBox_obsts_x_pos_var">
               <property name="text">
                <string>X</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1384,9 +1384,12 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_54">
             <item>
-             <widget class="QLabel" name="label_obsts_y_pos_var">
+             <widget class="QCheckBox" name="checkBox_obsts_y_pos_var">
               <property name="text">
                <string>Y</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1402,9 +1405,12 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_55">
             <item>
-             <widget class="QLabel" name="label_obsts_z_pos_var">
+             <widget class="QCheckBox" name="checkBox_obsts_z_pos_var">
               <property name="text">
                <string>Z</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1431,9 +1437,12 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_56">
             <item>
-             <widget class="QLabel" name="label_obsts_roll_var">
+             <widget class="QCheckBox" name="checkBox_obsts_roll_var">
               <property name="text">
                <string>Roll</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1449,9 +1458,12 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_57">
             <item>
-             <widget class="QLabel" name="label_obsts_pitch_var">
+             <widget class="QCheckBox" name="checkBox_obsts_pitch_var">
               <property name="text">
                <string>Pitch</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1467,9 +1479,12 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_58">
             <item>
-             <widget class="QLabel" name="label_obsts_yaw_var">
+             <widget class="QCheckBox" name="checkBox_obsts_yaw_var">
               <property name="text">
                <string>Yaw</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1486,13 +1501,39 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>367</x>
+         <y>30</y>
+         <width>261</width>
+         <height>121</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_58">
+        <item>
+         <widget class="QLabel" name="label_obsts_except">
+          <property name="text">
+           <string>Except:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="listWidget_obsts_except">
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_tar_var">
       <property name="geometry">
        <rect>
         <x>20</x>
         <y>50</y>
-        <width>341</width>
+        <width>351</width>
         <height>161</height>
        </rect>
       </property>
@@ -1502,10 +1543,10 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>12</x>
-         <y>42</y>
-         <width>301</width>
-         <height>112</height>
+         <x>20</x>
+         <y>31</y>
+         <width>311</width>
+         <height>121</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_53">
@@ -1521,9 +1562,12 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_40">
             <item>
-             <widget class="QLabel" name="label_tar_x_pos_var">
+             <widget class="QCheckBox" name="checkBox_tar_x_pos_var">
               <property name="text">
                <string>X</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1539,9 +1583,12 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_48">
             <item>
-             <widget class="QLabel" name="label_tar_y_pos_var">
+             <widget class="QCheckBox" name="checkBox_tar_y_pos_var">
               <property name="text">
                <string>Y</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1557,9 +1604,12 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_49">
             <item>
-             <widget class="QLabel" name="label_tar_z_pos_var">
+             <widget class="QCheckBox" name="checkBox_tar_z_pos_var">
               <property name="text">
                <string>Z</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1584,11 +1634,14 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_50">
+           <layout class="QHBoxLayout" name="horizontalLayout_52">
             <item>
-             <widget class="QLabel" name="label_tar_roll_var">
+             <widget class="QCheckBox" name="checkBox_tar_roll_var">
               <property name="text">
                <string>Roll</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1604,9 +1657,12 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_51">
             <item>
-             <widget class="QLabel" name="label_tar_pitch_var">
+             <widget class="QCheckBox" name="checkBox_tar_pitch_var">
               <property name="text">
                <string>Pitch</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1620,11 +1676,14 @@ p, li { white-space: pre-wrap; }
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_52">
+           <layout class="QHBoxLayout" name="horizontalLayout_50">
             <item>
-             <widget class="QLabel" name="label_tar_yaw_var">
+             <widget class="QCheckBox" name="checkBox_tar_yaw_var">
               <property name="text">
                <string>Yaw</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1645,8 +1704,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>770</x>
-        <y>70</y>
+        <x>460</x>
+        <y>270</y>
         <width>291</width>
         <height>31</height>
        </rect>
@@ -1691,7 +1750,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_results_plan">
        <attribute name="title">
