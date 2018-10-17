@@ -109,7 +109,7 @@ batch_size_zf_L_plan = 100
 units_zf_L_plan = [10,10]
 units_zf_L_plan_class = [10,10,10]
 
-n_clusters_zf_U_plan = 3
+n_clusters_zf_U_plan = 6
 min_cluster_size_zf_U_plan = 10
 th_zf_U_plan = 0.001
 periods_zf_U_plan = 10
@@ -118,8 +118,7 @@ batch_size_zf_U_plan = 100
 units_zf_U_plan = [10,10]
 units_zf_U_plan_class = [10,10,10]
 
-n_pca_comps_dual_f_plan = 4
-n_clusters_dual_f_plan = 6
+n_clusters_dual_f_plan = 3
 min_cluster_size_dual_f_plan = 10
 th_dual_f_plan = 0.0001
 periods_dual_f_plan = 10
@@ -138,7 +137,7 @@ batch_size_x_bounce = 100
 units_x_bounce = [10,10]
 units_x_bounce_class = [10,10,10]
 
-n_clusters_zb_L = 3
+n_clusters_zb_L = 4
 min_cluster_size_zb_L = 10
 th_zb_L = 0.001
 periods_zb_L = 10
@@ -147,13 +146,13 @@ batch_size_zb_L = 100
 units_zb_L = [10,10]
 units_zb_L_class = [10,10,10]
 
-n_clusters_zb_U = 3
+n_clusters_zb_U = 1
 min_cluster_size_zb_U = 10
 th_zb_U = 0.001
 periods_zb_U = 10
 steps_zb_U = 500
 batch_size_zb_U = 100
-units_zb_U = [10,10]
+units_zb_U = [10]
 units_zb_U_class = [10,10,10]
 
 n_pca_comps_dual_bounce = 4
@@ -408,105 +407,15 @@ if predict_zf_L_plan:
 
 if predict_zf_U_plan:
     # ----- FINAL POSTURE SELECTION: UPPER BOUNDS  --------------------------------------------- #
-    if not outputs_zf_U_plan_df.empty:
-        # ------------------------- K-means clustering ---------------------------------------- #
-        outputs_zf_U_plan_df_max = pd.Series.from_csv(dir_path_zf_U_plan + "/zf_U_plan_max.csv", sep=',')
-        outputs_zf_U_plan_df_min = pd.Series.from_csv(dir_path_zf_U_plan + "/zf_U_plan_min.csv", sep=',')
+    if outputs_zf_U_plan_df.empty:
+        col_names = [col for col in null_outputs if col.startswith('zf_U_plan')]
+        zeros = np.zeros(shape=(1,len(col_names)))
+        test_pred_df = pd.DataFrame(zeros,columns=col_names)
 
-        classifier = tf.estimator.DNNClassifier(
-                                        feature_columns=construct_feature_columns(norm_inputs_test_df),
-                                        optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate_class),
-                                        n_classes=n_clusters_zf_U_plan,
-                                        hidden_units=units_zf_U_plan_class,
-                                        model_dir=dir_path_zf_U_plan+"/classification"
-                                    )
-
-        targets_df = pd.DataFrame([[0.0]])
-        predict_test_input_fn = lambda: my_input_fn(norm_inputs_test_df,
-                                                    targets_df,
-                                                    num_epochs=1,
-                                                    shuffle=False)
-
-        test_probabilities = classifier.predict(input_fn=predict_test_input_fn)
-        test_pred = np.array([item['class_ids'][0] for item in test_probabilities])
-
-        n_cluster = test_pred[0] # the input belongs to this cluster
-        selected_cl_in_zf_U_plan_df = pd.read_csv(dir_path_zf_U_plan+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
-        selected_cl_out_zf_U_plan_df = pd.read_csv(dir_path_zf_U_plan+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
-
-        col_names = list(selected_cl_out_zf_U_plan_df.columns.values)
-        dim = len(selected_cl_out_zf_U_plan_df.columns.values)
-        ldim = dim
-        test_predictions_1 = np.array([])
-        test_predictions_2 = []
-        test_predictions_df = pd.DataFrame()
-        test_predictions_df_1 = pd.DataFrame()
-        test_predictions_df_2 = pd.DataFrame()
-        tar_zeros = np.zeros(shape=(1,len(col_names)))
-        targets_df = pd.DataFrame(tar_zeros, columns=col_names)
-        test_pred_col_names_1 = []
-        col_names_1 = list(selected_cl_out_zf_U_plan_df.columns.values)
-
-        for j in range(0, dim):
-            if (math.sqrt(math.pow((selected_cl_out_zf_U_plan_df.iloc[0:, j].quantile(0.25) - selected_cl_out_zf_U_plan_df.iloc[0:, j].quantile(0.75)),2)) <= th_zf_U_plan):
-                if (test_predictions_1.size == 0):
-                    test_predictions_1 = np.full((targets_df.shape[0], 1), selected_cl_out_zf_U_plan_df.iloc[0:, j].mean())
-                else:
-                    test_predictions_1 = np.concatenate([test_predictions_1, np.full((targets_df.shape[0], 1), selected_cl_out_zf_U_plan_df.iloc[0:, j].mean())],axis=1)
-                ldim = ldim - 1
-                test_pred_col_names_1.append(selected_cl_out_zf_U_plan_df.columns[j])
-
-        for str in test_pred_col_names_1:
-            col_names_1.remove(str)
-
-        if (test_predictions_1.size != 0):
-            test_predictions_df_1 = pd.DataFrame(data=test_predictions_1[0:, 0:],  # values
-                                                 index=norm_inputs_test_df.index,
-                                                 columns=test_pred_col_names_1)
-        if (ldim != 0):
-            predictor = tf.estimator.DNNRegressor(
-                                        feature_columns=construct_feature_columns(norm_inputs_test_df),
-                                        hidden_units=units_zf_U_plan,
-                                        optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate),
-                                        label_dimension=ldim,
-                                        model_dir=dir_path_zf_U_plan + "/cluster" + repr(n_cluster)
-                                    )
-
-            predict_test_input_fn = lambda: my_input_fn(norm_inputs_test_df,
-                                                        targets_df[col_names_1],
-                                                        num_epochs=1,
-                                                        shuffle=False)
-
-            test_predictions_2 = predictor.predict(input_fn=predict_test_input_fn)
-            test_predictions_2 = np.array([item['predictions'][0:ldim] for item in test_predictions_2])
-
-            test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                               index=norm_inputs_test_df.index,
-                                               columns=col_names_1)
-
-        if (test_predictions_df_1.empty):
-            test_predictions_df = test_predictions_df_2
-        elif (test_predictions_df_2.empty):
-            test_predictions_df = test_predictions_df_1
-        else:
-            for str in col_names:
-                if str in test_predictions_df_1:
-                    test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_1[str]], axis=1)
-                elif str in test_predictions_df_2:
-                    test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
-
-        denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zf_U_plan_df_max, outputs_zf_U_plan_df_min)
-
-        zero_data_zf_U_tot = np.zeros(shape=(1, len(cols_zf_U_plan_tot)))
-        denorm_test_predictions_tot_df = pd.DataFrame(zero_data_zf_U_tot, columns=cols_zf_U_plan_tot)
-        for str in cols_zf_U_plan_tot:
-            if str in denorm_test_predictions_df:
-                denorm_test_predictions_tot_df[str] = denorm_test_predictions_df[str].values
-
-        zf_U_plan_prediction = denorm_test_predictions_tot_df.copy()
+        zf_U_plan_prediction = test_pred_df.copy()
         if(print_en_zf_U_plan):
             print("Predicted target:")
-            print(denorm_test_predictions_tot_df)
+            print(test_pred_df)
 
 if predict_dual_f_plan:
     # ----- FINAL POSTURE SELECTION: DUAL VARIABLES  --------------------------------------------- #
@@ -536,13 +445,8 @@ if predict_dual_f_plan:
         selected_cl_in_dual_f_plan_df = pd.read_csv(dir_path_dual_f_plan+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_dual_f_plan_df = pd.read_csv(dir_path_dual_f_plan+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
-        dual_f_plan = selected_cl_out_dual_f_plan_df.values
-        pca_dual_f_plan = decomposition.PCA(n_components=n_pca_comps_dual_f_plan)
-        pc = pca_dual_f_plan.fit_transform(dual_f_plan)
-        pc_df = pd.DataFrame(data=pc, columns=cols_dual_f_plan[0:n_pca_comps_dual_f_plan])
-
-        col_names = list(pc_df.columns.values)
-        dim = len(pc_df.columns.values)
+        col_names = list(selected_cl_out_dual_f_plan_df.columns.values)
+        dim = len(selected_cl_out_dual_f_plan_df.columns.values)
         ldim = dim
         test_predictions_1 = np.array([])
         test_predictions_2 = []
@@ -552,16 +456,16 @@ if predict_dual_f_plan:
         tar_zeros = np.zeros(shape=(1, len(col_names)))
         targets_df = pd.DataFrame(tar_zeros, columns=col_names)
         test_pred_col_names_1 = []
-        col_names_1 = list(pc_df.columns.values)
+        col_names_1 = list(selected_cl_out_dual_f_plan_df.columns.values)
 
         for j in range(0, dim):
-            if (math.sqrt(math.pow((pc_df.iloc[0:, j].quantile(0.25) - pc_df.iloc[0:, j].quantile(0.75)),2)) <= th_dual_f_plan):
+            if (math.sqrt(math.pow((selected_cl_out_dual_f_plan_df.iloc[0:, j].quantile(0.25) - selected_cl_out_dual_f_plan_df.iloc[0:, j].quantile(0.75)),2)) <= th_dual_f_plan):
                 if (test_predictions_1.size == 0):
-                    test_predictions_1 = np.full((targets_df.shape[0], 1), pc_df.iloc[0:, j].mean())
+                    test_predictions_1 = np.full((targets_df.shape[0], 1), selected_cl_out_dual_f_plan_df.iloc[0:, j].mean())
                 else:
-                    test_predictions_1 = np.concatenate([test_predictions_1, np.full((targets_df.shape[0], 1), pc_df.iloc[0:, j].mean())],axis=1)
+                    test_predictions_1 = np.concatenate([test_predictions_1, np.full((targets_df.shape[0], 1), selected_cl_out_dual_f_plan_df.iloc[0:, j].mean())],axis=1)
                 ldim = ldim - 1
-                test_pred_col_names_1.append(pc_df.columns[j])
+                test_pred_col_names_1.append(selected_cl_out_dual_f_plan_df.columns[j])
 
         for str in test_pred_col_names_1:
             col_names_1.remove(str)
@@ -602,10 +506,7 @@ if predict_dual_f_plan:
                 elif str in test_predictions_df_2:
                     test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
-        test_predictions = test_predictions_df.values
-        test_predictions_proj = pca_dual_f_plan.inverse_transform(test_predictions)
-        test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_f_plan)
-        denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
+        denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
 
         zero_data_dual_f_tot = np.zeros(shape=(1, len(cols_dual_f_plan_tot)))
         denorm_test_predictions_tot_df = pd.DataFrame(zero_data_dual_f_tot, columns=cols_dual_f_plan_tot)
@@ -795,24 +696,7 @@ if predict_zb_U:
         outputs_zb_U_df_max = pd.Series.from_csv(dir_path_zb_U + "/zb_U_max.csv", sep=',')
         outputs_zb_U_df_min = pd.Series.from_csv(dir_path_zb_U + "/zb_U_min.csv", sep=',')
 
-        classifier = tf.estimator.DNNClassifier(
-                                        feature_columns=construct_feature_columns(norm_inputs_test_df),
-                                        optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate_class),
-                                        n_classes=n_clusters_zb_U,
-                                        hidden_units=units_zb_U_class,
-                                        model_dir=dir_path_zb_U+"/classification"
-                                    )
-
-        targets_df = pd.DataFrame([[0.0]])
-        predict_test_input_fn = lambda: my_input_fn(norm_inputs_test_df,
-                                                    targets_df,
-                                                    num_epochs=1,
-                                                    shuffle=False)
-
-        test_probabilities = classifier.predict(input_fn=predict_test_input_fn)
-        test_pred = np.array([item['class_ids'][0] for item in test_probabilities])
-
-        n_cluster = test_pred[0] # the input belongs to this cluster
+        n_cluster = 0 # the input belongs to this cluster
         selected_cl_in_zb_U_df = pd.read_csv(dir_path_zb_U+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_zb_U_df = pd.read_csv(dir_path_zb_U+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
