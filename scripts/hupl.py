@@ -437,19 +437,18 @@ def train_nn_classifier_model(
         validation_log_losses.append(validation_log_loss)
     print("Model training finished.")
 
+    print("Final LogLoss (on training data):   %0.3f" % training_log_loss)
+    print("Final LogLoss (on validation data): %0.3f" % validation_log_loss)
+    evaluation_metrics = nn_classifier.evaluate(input_fn=predict_validation_input_fn)
+    print("Average loss on the validation set: %0.3f" % evaluation_metrics['average_loss'])
+    print("Accuracy on the validation set: %0.3f" % evaluation_metrics['accuracy'])
+
     res_file = open(model_dir+"/results.txt", "w")
     res_file.write("### Results of the classification ###\n")
     res_file.write("Final LogLoss (on training data):   %0.3f\n" % training_log_loss)
     res_file.write("Final LogLoss (on validation data): %0.3f\n" % validation_log_loss)
-
-    print("Final LogLoss (on training data):   %0.3f" % training_log_loss)
-    print("Final LogLoss (on validation data): %0.3f" % validation_log_loss)
-
-    evaluation_metrics = nn_classifier.evaluate(input_fn=predict_validation_input_fn)
     res_file.write("Average loss on the validation set: %0.3f\n" % evaluation_metrics['average_loss'])
     res_file.write("Accuracy on the validation set: %0.3f\n" % evaluation_metrics['accuracy'])
-    print("Average loss on the validation set: %0.3f" % evaluation_metrics['average_loss'])
-    print("Accuracy on the validation set: %0.3f" % evaluation_metrics['accuracy'])
     res_file.close()
 
     losses_file = open(model_dir + "/log_losses.csv", "w")
