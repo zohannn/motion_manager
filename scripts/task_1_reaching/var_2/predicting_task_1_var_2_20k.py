@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys
 import pandas as pd
 
@@ -25,7 +26,6 @@ data_file = str(sys.argv[1])
 models_dir = str(sys.argv[2])
 pred_file_path = str(sys.argv[3])
 data_pred = sys.argv[4].split(',')
-#print(data_pred)
 
 # Target info
 target_x = float(data_pred[0])
@@ -100,7 +100,7 @@ batch_size_xf_plan = 100
 units_xf_plan = [10,10]
 units_xf_plan_class = [10,10,10]
 
-n_clusters_zf_L_plan = 6
+n_clusters_zf_L_plan = 5
 min_cluster_size_zf_L_plan = 10
 th_zf_L_plan = 0.001
 periods_zf_L_plan = 15
@@ -109,7 +109,7 @@ batch_size_zf_L_plan = 100
 units_zf_L_plan = [10,10]
 units_zf_L_plan_class = [10,10,10]
 
-n_clusters_zf_U_plan = 3
+n_clusters_zf_U_plan = 2
 min_cluster_size_zf_U_plan = 10
 th_zf_U_plan = 0.001
 periods_zf_U_plan = 10
@@ -119,7 +119,7 @@ units_zf_U_plan = [10,10]
 units_zf_U_plan_class = [10,10,10]
 
 n_pca_comps_dual_f_plan = 4
-n_clusters_dual_f_plan = 6
+n_clusters_dual_f_plan = 4
 min_cluster_size_dual_f_plan = 10
 th_dual_f_plan = 0.0001
 periods_dual_f_plan = 10
@@ -147,7 +147,7 @@ batch_size_zb_L = 100
 units_zb_L = [10,10]
 units_zb_L_class = [10,10,10]
 
-n_clusters_zb_U = 3
+n_clusters_zb_U = 1
 min_cluster_size_zb_U = 10
 th_zb_U = 0.001
 periods_zb_U = 10
@@ -795,24 +795,26 @@ if predict_zb_U:
         outputs_zb_U_df_max = pd.Series.from_csv(dir_path_zb_U + "/zb_U_max.csv", sep=',')
         outputs_zb_U_df_min = pd.Series.from_csv(dir_path_zb_U + "/zb_U_min.csv", sep=',')
 
-        classifier = tf.estimator.DNNClassifier(
-                                        feature_columns=construct_feature_columns(norm_inputs_test_df),
-                                        optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate_class),
-                                        n_classes=n_clusters_zb_U,
-                                        hidden_units=units_zb_U_class,
-                                        model_dir=dir_path_zb_U+"/classification"
-                                    )
+        #classifier = tf.estimator.DNNClassifier(
+        #                                feature_columns=construct_feature_columns(norm_inputs_test_df),
+        #                                optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate_class),
+        #                                n_classes=n_clusters_zb_U,
+        #                                hidden_units=units_zb_U_class,
+        #                                model_dir=dir_path_zb_U+"/classification"
+        #                            )
 
-        targets_df = pd.DataFrame([[0.0]])
-        predict_test_input_fn = lambda: my_input_fn(norm_inputs_test_df,
-                                                    targets_df,
-                                                    num_epochs=1,
-                                                    shuffle=False)
+        #targets_df = pd.DataFrame([[0.0]])
+        #predict_test_input_fn = lambda: my_input_fn(norm_inputs_test_df,
+        #                                            targets_df,
+        #                                            num_epochs=1,
+        #                                            shuffle=False)
 
-        test_probabilities = classifier.predict(input_fn=predict_test_input_fn)
-        test_pred = np.array([item['class_ids'][0] for item in test_probabilities])
+        #test_probabilities = classifier.predict(input_fn=predict_test_input_fn)
+        #test_pred = np.array([item['class_ids'][0] for item in test_probabilities])
 
-        n_cluster = test_pred[0] # the input belongs to this cluster
+        #n_cluster = test_pred[0] # the input belongs to this cluster
+
+        n_cluster = 0
         selected_cl_in_zb_U_df = pd.read_csv(dir_path_zb_U+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_zb_U_df = pd.read_csv(dir_path_zb_U+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 

@@ -38,7 +38,6 @@ data_file = str(sys.argv[1])
 models_dir = str(sys.argv[2])
 
 # Settings
-
 print_en = True
 
 print_en_xf_plan = True
@@ -109,7 +108,7 @@ steps_zf_L_plan_class = 1000
 batch_size_zf_L_plan_class = 100
 units_zf_L_plan_class = [10,10,10]
 
-n_clusters_zf_U_plan = 6
+n_clusters_zf_U_plan = 3
 min_cluster_size_zf_U_plan = 10
 th_zf_U_plan = 0.001
 periods_zf_U_plan = 10
@@ -121,7 +120,7 @@ steps_zf_U_plan_class = 1000
 batch_size_zf_U_plan_class = 100
 units_zf_U_plan_class = [10,10,10]
 
-n_clusters_dual_f_plan = 3
+n_clusters_dual_f_plan = 6
 min_cluster_size_dual_f_plan = 10
 th_dual_f_plan = 0.0001
 periods_dual_f_plan = 10
@@ -145,7 +144,7 @@ steps_x_bounce_class = 1000
 batch_size_x_bounce_class = 100
 units_x_bounce_class = [10,10,10]
 
-n_clusters_zb_L = 4
+n_clusters_zb_L = 3
 min_cluster_size_zb_L = 10
 th_zb_L = 0.001
 periods_zb_L = 10
@@ -157,13 +156,13 @@ steps_zb_L_class = 1000
 batch_size_zb_L_class = 100
 units_zb_L_class = [10,10,10]
 
-n_clusters_zb_U = 1
+n_clusters_zb_U = 2
 min_cluster_size_zb_U = 10
 th_zb_U = 0.001
 periods_zb_U = 10
 steps_zb_U = 500
 batch_size_zb_U = 100
-units_zb_U = [10]
+units_zb_U = [10,10]
 periods_zb_U_class = 20
 steps_zb_U_class = 1000
 batch_size_zb_U_class = 100
@@ -448,6 +447,12 @@ if not outputs_xf_plan_df.empty:
         print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
         print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
 
+        res_file = open(dir_path_xf_plan + "/classification/results.txt", "a")
+        res_file.write("LogLoss (on test data): %0.3f\n" % test_log_loss)
+        res_file.write("Average loss on the test set: %0.3f\n" % evaluation_metrics['average_loss'])
+        res_file.write("Accuracy on the test set: %0.3f\n" % evaluation_metrics['accuracy'])
+        res_file.close()
+
 
     if (train_xf_plan):
         # ----------------------------------------------- PCA  and regression on each cluster --------------------------------------- #
@@ -531,12 +536,6 @@ if not outputs_xf_plan_df.empty:
                     print("Test targets summary:")
                     display.display(test_targets.describe())
 
-                    #threedee_train = plt.figure().gca(projection='3d')
-                    #threedee_test = plt.figure().gca(projection='3d')
-                    #threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['xf_plan_1_rad'])
-                    #threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['xf_plan_1_rad'])
-                    #plt.show()
-
                 test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
                 test_predictions_1 = np.array([])
                 test_pred_col_names_1 = []
@@ -576,7 +575,7 @@ if not outputs_xf_plan_df.empty:
                                         label_dimension=ldim,
                                         model_dir=dir_path_xf_plan+"/cluster"+repr(i))
                     else:
-                        learner, training_losses, validation_losses = train_nn_regression_model(
+                        learner, training_rmses, validation_rmses = train_nn_regression_model(
                                                 my_optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate),
                                                 dimensions=ldim,
                                                 periods=periods_xf_plan,
@@ -626,8 +625,13 @@ if not outputs_xf_plan_df.empty:
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_xf_plan_df_max, outputs_xf_plan_df_min)
 
-                root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
-                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % root_mean_squared_error_proj)
+                test_root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
+                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % test_root_mean_squared_error_proj)
+
+                if not test_predictor:
+                    res_file = open(dir_path_xf_plan+"/cluster"+repr(i)+"/results.txt", "a")
+                    res_file.write("RMSE (on test data):   %0.3f\n" % test_root_mean_squared_error_proj)
+                    res_file.close()
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
@@ -639,6 +643,7 @@ if not outputs_xf_plan_df.empty:
                 plt.savefig(dir_path_xf_plan+"/cluster"+repr(i)+"/xf_pred.pdf")
                 plt.clf()
                 #plt.show()
+
 # ----- FINAL POSTURE SELECTION: Lower bounds --------------------------------------------- #
 if not outputs_zf_L_plan_df.empty:
     # ------------------------- K-means clustering ---------------------------------------- #
@@ -792,8 +797,8 @@ if not outputs_zf_L_plan_df.empty:
     # ---------------------------------- Classifier training ------------------------------------------------------------#
     if (train_zf_L_plan_class):
         size = len(normalized_inputs.index)
-        train = int(size * 0.7)  # 70%
-        val = int(size * 0.9)  # 20%
+        train = int(size * 0.6)
+        val = int(size * 0.9)
 
         # Choose the first 70% examples for training.
         training_examples_class = normalized_inputs.iloc[:train, :]
@@ -850,6 +855,12 @@ if not outputs_zf_L_plan_df.empty:
         evaluation_metrics = classifier.evaluate(input_fn=predict_test_input_fn)
         print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
         print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
+
+        res_file = open(dir_path_zf_L_plan + "/classification/results.txt", "a")
+        res_file.write("LogLoss (on test data): %0.3f\n" % test_log_loss)
+        res_file.write("Average loss on the test set: %0.3f\n" % evaluation_metrics['average_loss'])
+        res_file.write("Accuracy on the test set: %0.3f\n" % evaluation_metrics['accuracy'])
+        res_file.close()
 
     if (train_zf_L_plan):
         # ----------------------------------------------- PCA  and regression on each cluster --------------------------------------- #
@@ -937,12 +948,6 @@ if not outputs_zf_L_plan_df.empty:
                     print("Test targets summary:")
                     display.display(test_targets.describe())
 
-                    #threedee_train = plt.figure().gca(projection='3d')
-                    #threedee_test = plt.figure().gca(projection='3d')
-                    #threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['zf_L_plan_2'])
-                    #threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['zf_L_plan_2'])
-                    #plt.show()
-
                 test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
                 test_predictions_1 = np.array([])
                 test_pred_col_names_1 = []
@@ -981,7 +986,7 @@ if not outputs_zf_L_plan_df.empty:
                                     label_dimension=ldim,
                                     model_dir=dir_path_zf_L_plan+"/cluster"+repr(i))
                     else:
-                        learner, training_losses, validation_losses = train_nn_regression_model(
+                        learner, training_rmses, validation_rmses = train_nn_regression_model(
                                                 my_optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate),
                                                 dimensions=ldim,
                                                 periods=periods_zf_L_plan,
@@ -1031,10 +1036,14 @@ if not outputs_zf_L_plan_df.empty:
                     denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
+                test_root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
+                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % test_root_mean_squared_error_proj)
 
-                root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
+                if not test_predictor:
+                    res_file = open(dir_path_zf_L_plan+"/cluster"+repr(i)+"/results.txt", "a")
+                    res_file.write("Final RMSE (on test data):   %0.3f\n" % test_root_mean_squared_error_proj)
+                    res_file.close()
 
-                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % root_mean_squared_error_proj)
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
                 ax1.scatter(test_examples["target_x_mm"], denorm_test_targets["zf_L_plan_2"], s=10, c='b', marker="s",label='test_targets')
@@ -1201,8 +1210,8 @@ if not outputs_zf_U_plan_df.empty:
     # ---------------------------------- Classifier training ------------------------------------------------------------#
     if (train_zf_U_plan_class):
         size = len(normalized_inputs.index)
-        train = int(size * 0.7)  # 70%
-        val = int(size * 0.9)  # 20%
+        train = int(size * 0.5)
+        val = int(size * 0.7)
 
         # Choose the first 70% examples for training.
         training_examples_class = normalized_inputs.iloc[:train, :]
@@ -1246,19 +1255,25 @@ if not outputs_zf_U_plan_df.empty:
                                         model_dir=dir_path_zf_U_plan + "/classification")
 
         # ---------- Evaluation on test data ---------- #
-        #predict_test_input_fn = lambda: my_input_fn(test_examples_class,
-        #                                            test_targets_class,
-        #                                                  num_epochs=1,
-        #                                                  shuffle=False)
+        predict_test_input_fn = lambda: my_input_fn(test_examples_class,
+                                                    test_targets_class,
+                                                          num_epochs=1,
+                                                          shuffle=False)
 
-        #test_pred = classifier.predict(input_fn=predict_test_input_fn)
-        #test_probabilities = np.array([item['probabilities'] for item in test_pred])
+        test_pred = classifier.predict(input_fn=predict_test_input_fn)
+        test_probabilities = np.array([item['probabilities'] for item in test_pred])
 
-        #test_log_loss = metrics.log_loss(test_targets_class, test_probabilities)
-        #print("LogLoss (on test data): %0.3f" % test_log_loss)
-        #evaluation_metrics = classifier.evaluate(input_fn=predict_test_input_fn)
-        #print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
-        #print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
+        test_log_loss = metrics.log_loss(test_targets_class, test_probabilities)
+        print("LogLoss (on test data): %0.3f" % test_log_loss)
+        evaluation_metrics = classifier.evaluate(input_fn=predict_test_input_fn)
+        print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
+        print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
+
+        res_file = open(dir_path_zf_U_plan + "/classification/results.txt", "a")
+        res_file.write("LogLoss (on test data): %0.3f\n" % test_log_loss)
+        res_file.write("Average loss on the test set: %0.3f\n" % evaluation_metrics['average_loss'])
+        res_file.write("Accuracy on the test set: %0.3f\n" % evaluation_metrics['accuracy'])
+        res_file.close()
 
     if (train_zf_U_plan):
         # ----------------------------------------------- PCA  and regression on each cluster --------------------------------------- #
@@ -1346,12 +1361,6 @@ if not outputs_zf_U_plan_df.empty:
                     display.display(validation_targets.describe())
                     print("Test targets summary:")
                     display.display(test_targets.describe())
-
-                    #threedee_train = plt.figure().gca(projection='3d')
-                    #threedee_test = plt.figure().gca(projection='3d')
-                    #threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['zf_U_plan_3'])
-                    #threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['zf_U_plan_3'])
-                    #plt.show()
 
                 test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
                 test_predictions_1 = np.array([])
@@ -1444,8 +1453,13 @@ if not outputs_zf_U_plan_df.empty:
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zf_U_plan_df_max, outputs_zf_U_plan_df_min)
 
-                root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
-                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % root_mean_squared_error_proj)
+                test_root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
+                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % test_root_mean_squared_error_proj)
+
+                if not test_predictor:
+                    res_file = open(dir_path_zf_U_plan+"/cluster"+repr(i)+"/results.txt", "a")
+                    res_file.write("RMSE (on test data):   %0.3f\n" % test_root_mean_squared_error_proj)
+                    res_file.close()
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
@@ -1654,19 +1668,25 @@ if not outputs_dual_f_plan_df.empty:
                                                         model_dir=dir_path_dual_f_plan + "/classification")
 
         # ---------- Evaluation on test data ---------- #
-        #predict_test_input_fn = lambda: my_input_fn(test_examples_class,
-        #                                            test_targets_class,
-        #                                            num_epochs=1,
-        #                                            shuffle=False)
+        predict_test_input_fn = lambda: my_input_fn(test_examples_class,
+                                                    test_targets_class,
+                                                    num_epochs=1,
+                                                    shuffle=False)
 
-        #test_pred = classifier.predict(input_fn=predict_test_input_fn)
-        #test_probabilities = np.array([item['probabilities'] for item in test_pred])
+        test_pred = classifier.predict(input_fn=predict_test_input_fn)
+        test_probabilities = np.array([item['probabilities'] for item in test_pred])
 
-        #test_log_loss = metrics.log_loss(test_targets_class, test_probabilities)
-        #print("LogLoss (on test data): %0.3f" % test_log_loss)
-        #evaluation_metrics = classifier.evaluate(input_fn=predict_test_input_fn)
-        #print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
-        #print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
+        test_log_loss = metrics.log_loss(test_targets_class, test_probabilities)
+        print("LogLoss (on test data): %0.3f" % test_log_loss)
+        evaluation_metrics = classifier.evaluate(input_fn=predict_test_input_fn)
+        print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
+        print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
+
+        res_file = open(dir_path_dual_f_plan + "/classification/results.txt", "a")
+        res_file.write("LogLoss (on test data): %0.3f\n" % test_log_loss)
+        res_file.write("Average loss on the test set: %0.3f\n" % evaluation_metrics['average_loss'])
+        res_file.write("Accuracy on the test set: %0.3f\n" % evaluation_metrics['accuracy'])
+        res_file.close()
 
     if (train_dual_f_plan):
         # ----------------------------------------------- PCA  and regression on each cluster --------------------------------------- #
@@ -1754,12 +1774,6 @@ if not outputs_dual_f_plan_df.empty:
                     display.display(validation_targets.describe())
                     print("Test targets summary:")
                     display.display(test_targets.describe())
-
-                    #threedee_train = plt.figure().gca(projection='3d')
-                    #threedee_test = plt.figure().gca(projection='3d')
-                    #threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['dual_f_plan_1'])
-                    #threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['dual_f_plan_1'])
-                    #plt.show()
 
                 test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
                 test_predictions_1 = np.array([])
@@ -1851,8 +1865,13 @@ if not outputs_dual_f_plan_df.empty:
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
 
-                root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
-                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % root_mean_squared_error_proj)
+                test_root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
+                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % test_root_mean_squared_error_proj)
+
+                if not test_predictor:
+                    res_file = open(dir_path_dual_f_plan+"/cluster"+repr(i)+"/results.txt", "a")
+                    res_file.write("RMSE (on test data):   %0.3f\n" % test_root_mean_squared_error_proj)
+                    res_file.close()
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
@@ -2079,6 +2098,12 @@ if not outputs_x_bounce_df.empty:
         print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
         print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
 
+        res_file = open(dir_path_x_bounce + "/classification/results.txt", "a")
+        res_file.write("LogLoss (on test data): %0.3f\n" % test_log_loss)
+        res_file.write("Average loss on the test set: %0.3f\n" % evaluation_metrics['average_loss'])
+        res_file.write("Accuracy on the test set: %0.3f\n" % evaluation_metrics['accuracy'])
+        res_file.close()
+
     if (train_x_bounce):
         # ----------------------------------------------- PCA  and regression on each cluster --------------------------------------- #
         for i in range(0,n_clusters_x_bounce):
@@ -2165,12 +2190,6 @@ if not outputs_x_bounce_df.empty:
                     display.display(validation_targets.describe())
                     print("Test targets summary:")
                     display.display(test_targets.describe())
-
-                    #threedee_train = plt.figure().gca(projection='3d')
-                    #threedee_test = plt.figure().gca(projection='3d')
-                    #threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['x_bounce_1_rad'])
-                    #threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['x_bounce_1_rad'])
-                    #plt.show()
 
                 test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
                 test_predictions_1 = np.array([])
@@ -2263,8 +2282,13 @@ if not outputs_x_bounce_df.empty:
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_x_bounce_df_max, outputs_x_bounce_df_min)
 
-                root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
-                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % root_mean_squared_error_proj)
+                test_root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
+                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % test_root_mean_squared_error_proj)
+
+                if not test_predictor:
+                    res_file = open(dir_path_x_bounce+"/cluster"+repr(i)+"/results.txt", "a")
+                    res_file.write("RMSE (on test data):   %0.3f\n" % test_root_mean_squared_error_proj)
+                    res_file.close()
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
@@ -2302,7 +2326,7 @@ if not outputs_zb_L_df.empty:
     if (print_en_zb_L):
         fig = plt.figure()
         ax_zb_L_plan = fig.add_subplot(111)
-        ax_zb_L_plan.scatter(zb_L[:,0],zb_L[:,1], s=10, c=labels_zb_L, marker="s")
+        ax_zb_L_plan.scatter(normalized_inputs["target_x_mm"],zb_L, s=10, c=labels_zb_L, marker="s")
         ax_zb_L_plan.set_xlabel("zb_L_1")
         ax_zb_L_plan.set_ylabel("zb_L_2")
         plt.savefig(dir_path_zb_L+"/clusters.pdf")
@@ -2431,7 +2455,7 @@ if not outputs_zb_L_df.empty:
     # ---------------------------------- Classifier training ------------------------------------------------------------#
     if (train_zb_L_class):
         size = len(normalized_inputs.index)
-        train = int(size * 0.6)  # 70%
+        train = int(size * 0.7)  # 70%
         val = int(size * 0.9)  # 20%
 
         # Choose the first 70% examples for training.
@@ -2476,20 +2500,25 @@ if not outputs_zb_L_df.empty:
                                         model_dir=dir_path_zb_L + "/classification")
 
         # ---------- Evaluation on test data ---------- #
-        #predict_test_input_fn = lambda: my_input_fn(test_examples_class,
-        #                                            test_targets_class,
-        #                                                  num_epochs=1,
-        #                                                  shuffle=False)
+        predict_test_input_fn = lambda: my_input_fn(test_examples_class,
+                                                    test_targets_class,
+                                                          num_epochs=1,
+                                                          shuffle=False)
 
-        #test_pred = classifier.predict(input_fn=predict_test_input_fn)
-        #test_classes = np.array([item['class_ids'][0] for item in test_pred])
-        #test_probabilities = np.array([item['probabilities'] for item in test_pred])
+        test_pred = classifier.predict(input_fn=predict_test_input_fn)
+        test_probabilities = np.array([item['probabilities'] for item in test_pred])
 
-        #test_log_loss = metrics.log_loss(test_targets_class, test_probabilities)
-        #print("LogLoss (on test data): %0.3f" % test_log_loss)
-        #evaluation_metrics = classifier.evaluate(input_fn=predict_test_input_fn)
-        #print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
-        #print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
+        test_log_loss = metrics.log_loss(test_targets_class, test_probabilities)
+        print("LogLoss (on test data): %0.3f" % test_log_loss)
+        evaluation_metrics = classifier.evaluate(input_fn=predict_test_input_fn)
+        print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
+        print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
+
+        res_file = open(dir_path_zb_L + "/classification/results.txt", "a")
+        res_file.write("LogLoss (on test data): %0.3f\n" % test_log_loss)
+        res_file.write("Average loss on the test set: %0.3f\n" % evaluation_metrics['average_loss'])
+        res_file.write("Accuracy on the test set: %0.3f\n" % evaluation_metrics['accuracy'])
+        res_file.close()
 
     if (train_zb_L):
         # ----------------------------------------------- PCA  and regression on each cluster --------------------------------------- #
@@ -2561,12 +2590,6 @@ if not outputs_zb_L_df.empty:
                     display.display(validation_targets.describe())
                     print("Test targets summary:")
                     display.display(test_targets.describe())
-
-                    #threedee_train = plt.figure().gca(projection='3d')
-                    #threedee_test = plt.figure().gca(projection='3d')
-                    #threedee_train.scatter(training_examples["target_x_mm"], training_examples["target_y_mm"],training_targets['zb_L_4'])
-                    #threedee_test.scatter(test_examples["target_x_mm"], test_examples["target_y_mm"],test_targets['zb_L_4'])
-                    #plt.show()
 
                 test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
                 test_predictions_1 = np.array([])
@@ -2650,15 +2673,20 @@ if not outputs_zb_L_df.empty:
                     # test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_df_0_max,outputs_df_0_min)
                     test_predictions = test_predictions_df.values
                     test_predictions_proj = pca_zb_L.inverse_transform(test_predictions)
-                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zf_L_plan)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_L)
                     denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zb_L_df_max, outputs_zb_L_df_min)
                 else:
                     denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zb_L_df_max, outputs_zb_L_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zb_L_df_max, outputs_zb_L_df_min)
 
-                root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
-                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % root_mean_squared_error_proj)
+                test_root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
+                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % test_root_mean_squared_error_proj)
+
+                if not test_predictor:
+                    res_file = open(dir_path_zb_L+"/cluster"+repr(i)+"/results.txt", "a")
+                    res_file.write("RMSE (on test data):   %0.3f\n" % test_root_mean_squared_error_proj)
+                    res_file.close()
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
@@ -2695,7 +2723,7 @@ if not outputs_zb_U_df.empty:
     if (print_en_zb_U):
         fig = plt.figure()
         ax_zb_U = fig.add_subplot(111)
-        ax_zb_U.scatter(normalized_inputs["target_x_mm"],zb_U, s=10, c=labels_zb_U, marker="s")
+        ax_zb_U.scatter(zb_U[:,0],zb_U[:,1], s=10, c=labels_zb_U, marker="s")
         plt.savefig(dir_path_zb_U + "/clusters.pdf")
         plt.clf()
         #plt.show()
@@ -2820,71 +2848,72 @@ if not outputs_zb_U_df.empty:
         print(cl_5_zb_U_df.describe())
 
     # ---------------------------------- Classifier training ------------------------------------------------------------#
-    #if (train_zb_U_class):
-    #    size = len(normalized_inputs.index)
-    #    train = int(size * 0.6)  # 70%
-    #    val = int(size * 0.9)  # 20%
+    if (train_zb_U_class):
+        size = len(normalized_inputs.index)
+        train = int(size * 0.6)
+        val = int(size * 0.8)
 
         # Choose the first 70% examples for training.
-        #training_examples_class = normalized_inputs.iloc[:train, :]
-        #training_targets_class = labels_zb_U_df.iloc[:train, :]
+        training_examples_class = normalized_inputs.iloc[:train, :]
+        training_targets_class = labels_zb_U_df.iloc[:train, :]
 
         # Choose the last 20%  examples for validation.
-        #validation_examples_class = normalized_inputs.iloc[train:val, :]
-        #validation_targets_class = labels_zb_U_df.iloc[train:val, :]
+        validation_examples_class = normalized_inputs.iloc[train:val, :]
+        validation_targets_class = labels_zb_U_df.iloc[train:val, :]
 
         # Choose the examples for test. 10%
-        #test_examples_class = normalized_inputs.iloc[val:, :]
-        #test_targets_class = labels_zb_U_df.iloc[val:, :]
+        test_examples_class = normalized_inputs.iloc[val:, :]
+        test_targets_class = labels_zb_U_df.iloc[val:, :]
 
-        #if (print_en_zb_U):
+        if (print_en_zb_U):
             # Double-check that we've done the right thing.
-            #print("Training examples for classification summary:")
-            #display.display(training_examples_class.describe())
-            #print("Validation examples for classification summary:")
-            #display.display(validation_examples_class.describe())
-            #print("Test examples for classification summary:")
-            #display.display(test_examples_class.describe())
-            #print("Training targets for classification summary:")
-            #display.display(training_targets_class.describe())
-            #print("Validation targets for classification summary:")
-            #display.display(validation_targets_class.describe())
-            #print("Test targets for classification summary:")
-            #display.display(test_targets_class.describe())
+            print("Training examples for classification summary:")
+            display.display(training_examples_class.describe())
+            print("Validation examples for classification summary:")
+            display.display(validation_examples_class.describe())
+            print("Test examples for classification summary:")
+            display.display(test_examples_class.describe())
+            print("Training targets for classification summary:")
+            display.display(training_targets_class.describe())
+            print("Validation targets for classification summary:")
+            display.display(validation_targets_class.describe())
+            print("Test targets for classification summary:")
+            display.display(test_targets_class.describe())
 
 
-        #(classifier, training_log_losses, validation_log_losses) = train_nn_classifier_model(
-        #                                my_optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate_class),
-        #                                n_classes=n_clusters_zb_U,
-        #                                periods=periods_zb_U_class,
-        #                                steps=steps_zb_U_class,
-        #                                batch_size=batch_size_zb_U_class,
-        #                                hidden_units=units_zb_U_class,
-        #                                training_examples=training_examples_class,
-        #                                training_targets=training_targets_class,
-        #                                validation_examples=validation_examples_class,
-        #                                validation_targets=validation_targets_class,
-        #                                model_dir=dir_path_zb_U + "/classification")
+        (classifier, training_log_losses, validation_log_losses) = train_nn_classifier_model(
+                                        my_optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate_class),
+                                        n_classes=n_clusters_zb_U,
+                                        periods=periods_zb_U_class,
+                                        steps=steps_zb_U_class,
+                                        batch_size=batch_size_zb_U_class,
+                                        hidden_units=units_zb_U_class,
+                                        training_examples=training_examples_class,
+                                        training_targets=training_targets_class,
+                                        validation_examples=validation_examples_class,
+                                        validation_targets=validation_targets_class,
+                                        model_dir=dir_path_zb_U + "/classification")
 
         # ---------- Evaluation on test data ---------- #
-        #predict_test_input_fn = lambda: my_input_fn(test_examples_class,
-        #                                            test_targets_class,
-        #                                                  num_epochs=1,
-        #                                                  shuffle=False)
+        predict_test_input_fn = lambda: my_input_fn(test_examples_class,
+                                                    test_targets_class,
+                                                          num_epochs=1,
+                                                          shuffle=False)
 
-        #test_pred = classifier.predict(input_fn=predict_test_input_fn)
-        #test_classes = np.array([item['class_ids'][0] for item in test_pred])
-        #test_probabilities = np.array([item['probabilities'] for item in test_pred])
+        test_pred = classifier.predict(input_fn=predict_test_input_fn)
+        test_probabilities = np.array([item['probabilities'] for item in test_pred])
 
-        #print(test_probabilities)
-        #print(test_targets_class)
-        #print(test_classes)
+        test_log_loss = metrics.log_loss(test_targets_class, test_probabilities)
+        print("LogLoss (on test data): %0.3f" % test_log_loss)
+        evaluation_metrics = classifier.evaluate(input_fn=predict_test_input_fn)
+        print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
+        print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
 
-        #test_log_loss = metrics.log_loss(test_targets_class, test_probabilities)
-        #print("LogLoss (on test data): %0.3f" % test_log_loss)
-        #evaluation_metrics = classifier.evaluate(input_fn=predict_test_input_fn)
-        #print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
-        #print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
+        res_file = open(dir_path_zb_U + "/classification/results.txt", "a")
+        res_file.write("LogLoss (on test data): %0.3f\n" % test_log_loss)
+        res_file.write("Average loss on the test set: %0.3f\n" % evaluation_metrics['average_loss'])
+        res_file.write("Accuracy on the test set: %0.3f\n" % evaluation_metrics['accuracy'])
+        res_file.close()
 
     if (train_zb_U):
         # ----------------------------------------------- PCA  and regression on each cluster --------------------------------------- #
@@ -3050,18 +3079,21 @@ if not outputs_zb_U_df.empty:
                 if (len(cl_out_zb_U_df.columns) > 4):
                     # test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_df_0_max,outputs_df_0_min)
                     test_predictions = test_predictions_df.values
-                    test_predictions_proj = pca_zb_L.inverse_transform(test_predictions)
-                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zf_U_plan)
+                    test_predictions_proj = pca_zb_U.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_U)
                     denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zb_U_df_max, outputs_zb_U_df_min)
                 else:
                     denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zb_U_df_max, outputs_zb_U_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zb_U_df_max, outputs_zb_U_df_min)
 
-                root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
-                #explained_variance_score = metrics.explained_variance_score(denorm_test_predictions_df, denorm_test_targets)
-                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % root_mean_squared_error_proj)
-                # print("Cluster 0. Explained Variance Score (on projected test data): %0.3f" % explained_variance_score)
+                test_root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
+                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % test_root_mean_squared_error_proj)
+
+                if not test_predictor:
+                    res_file = open(dir_path_zb_U+"/cluster"+repr(i)+"/results.txt", "a")
+                    res_file.write("RMSE (on test data):   %0.3f\n" % test_root_mean_squared_error_proj)
+                    res_file.close()
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
@@ -3292,6 +3324,12 @@ if not outputs_dual_bounce_df.empty:
         print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
         print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
 
+        res_file = open(dir_path_dual_bounce + "/classification/results.txt", "a")
+        res_file.write("LogLoss (on test data): %0.3f\n" % test_log_loss)
+        res_file.write("Average loss on the test set: %0.3f\n" % evaluation_metrics['average_loss'])
+        res_file.write("Accuracy on the test set: %0.3f\n" % evaluation_metrics['accuracy'])
+        res_file.close()
+
     if (train_dual_bounce):
         # ----------------------------------------------- PCA  and regression on each cluster --------------------------------------- #
         for i in range(0,n_clusters_dual_bounce):
@@ -3328,7 +3366,7 @@ if not outputs_dual_bounce_df.empty:
                         fig_pc = sns_plot.get_figure()
                         fig_pc.savefig(dir_path_dual_bounce+"/cluster"+repr(i)+"/p_comps.pdf")
                         threedee_train = plt.figure().gca(projection='3d')
-                        threedee_train.scatter(cl_in_dual_bounce_df["target_x_mm"], cl_in_dual_bounce_df["target_y_mm"], pc_df['dual_bounce_32'])
+                        threedee_train.scatter(cl_in_dual_bounce_df["target_x_mm"], cl_in_dual_bounce_df["target_y_mm"], pc_df['dual_bounce_28'])
                         plt.clf()
                         #plt.show()
                 else:
@@ -3469,15 +3507,20 @@ if not outputs_dual_bounce_df.empty:
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_dual_bounce_df_max, outputs_dual_bounce_df_min)
 
-                root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
-                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % root_mean_squared_error_proj)
+                test_root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
+                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % test_root_mean_squared_error_proj)
+
+                if not test_predictor:
+                    res_file = open(dir_path_dual_bounce+"/cluster"+repr(i)+"/results.txt", "a")
+                    res_file.write("RMSE (on test data):   %0.3f\n" % test_root_mean_squared_error_proj)
+                    res_file.close()
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(denorm_test_targets["dual_bounce_32"], denorm_test_targets["dual_bounce_48"], s=10, c='b', marker="s", label='test_targets')
-                ax1.scatter(denorm_test_predictions_df["dual_bounce_32"], denorm_test_predictions_df["dual_bounce_48"], s=10, c='r', marker="o", label='test_predictions')
-                plt.xlabel("dual_bounce_32")
-                plt.ylabel("dual_bounce_48")
+                ax1.scatter(denorm_test_targets["dual_bounce_28"], denorm_test_targets["dual_bounce_35"], s=10, c='b', marker="s", label='test_targets')
+                ax1.scatter(denorm_test_predictions_df["dual_bounce_28"], denorm_test_predictions_df["dual_bounce_35"], s=10, c='r', marker="o", label='test_predictions')
+                plt.xlabel("dual_bounce_28")
+                plt.ylabel("dual_bounce_35")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_dual_bounce+"/cluster"+repr(i)+"/dual_bounce_pred.pdf")
                 plt.clf()
