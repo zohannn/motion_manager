@@ -40,8 +40,8 @@ models_dir = str(sys.argv[2])
 # Settings
 print_en = True
 
-print_en_xf_plan = True
-train_xf_plan = True
+print_en_xf_plan = False
+train_xf_plan = False
 train_xf_plan_class = False
 dir_path_xf_plan = models_dir + "/xf_plan"
 
@@ -60,8 +60,8 @@ train_dual_f_plan = False
 train_dual_f_plan_class = False
 dir_path_dual_f_plan = models_dir + "/dual_f_plan"
 
-print_en_x_bounce = False
-train_x_bounce = False
+print_en_x_bounce = True
+train_x_bounce = True
 train_x_bounce_class = False
 dir_path_x_bounce = models_dir + "/x_bounce"
 
@@ -96,7 +96,7 @@ steps_xf_plan_class = 1000
 batch_size_xf_plan_class = 100
 units_xf_plan_class = [10,10,10]
 
-n_clusters_zf_L_plan = 6
+n_clusters_zf_L_plan = 2
 min_cluster_size_zf_L_plan = 10
 th_zf_L_plan = 0.001
 periods_zf_L_plan = 15
@@ -108,7 +108,7 @@ steps_zf_L_plan_class = 1000
 batch_size_zf_L_plan_class = 100
 units_zf_L_plan_class = [10,10,10]
 
-n_clusters_zf_U_plan = 3
+n_clusters_zf_U_plan = 2
 min_cluster_size_zf_U_plan = 10
 th_zf_U_plan = 0.001
 periods_zf_U_plan = 10
@@ -120,7 +120,7 @@ steps_zf_U_plan_class = 1000
 batch_size_zf_U_plan_class = 100
 units_zf_U_plan_class = [10,10,10]
 
-n_clusters_dual_f_plan = 6
+n_clusters_dual_f_plan = 4
 min_cluster_size_dual_f_plan = 10
 th_dual_f_plan = 0.0001
 periods_dual_f_plan = 10
@@ -144,7 +144,7 @@ steps_x_bounce_class = 1000
 batch_size_x_bounce_class = 100
 units_x_bounce_class = [10,10,10]
 
-n_clusters_zb_L = 3
+n_clusters_zb_L = 2
 min_cluster_size_zb_L = 10
 th_zb_L = 0.001
 periods_zb_L = 10
@@ -189,7 +189,7 @@ inputs_cols = ['target_x_mm', 'target_y_mm','target_z_mm','target_roll_rad','tar
 
 inputs_dataframe = preprocess_features(task_1_dataframe)
 normalized_inputs,normalized_inputs_max,normalized_inputs_min = normalize_linear_scale(inputs_dataframe)
-(outputs_dataframe, null_outputs,const_outputs) = preprocess_targets(task_1_dataframe)
+(outputs_dataframe, null_outputs) = preprocess_targets(task_1_dataframe)
 
 # plan final posture columns
 cols_x_f_plan = [col for col in outputs_dataframe if col.startswith('xf_plan')]
@@ -231,6 +231,10 @@ if(print_en):
     print(outputs_zb_U_df.head())
     print("dual_bounce:")
     print(outputs_dual_bounce_df.head())
+    print("Null outputs:")
+    print(null_outputs)
+    #print("Const outputs")
+    #print(const_outputs)
 
 
 # ----- FINAL POSTURE SELECTION: FINAL POSTURE  --------------------------------------------- #
@@ -478,11 +482,17 @@ if not outputs_xf_plan_df.empty:
                     pc_file.write(df.iloc[0, 0]+", ")
                     pc_file.write(df.iloc[1, 0] + ", ")
                     pc_file.write(df.iloc[2, 0] + ", ")
-                    pc_file.write(df.iloc[3, 0] + "\n")
+                    pc_file.write(df.iloc[3, 0] + ", ")
+                    pc_file.write(df.iloc[4, 0] + ", ")
+                    pc_file.write(df.iloc[5, 0] + ", ")
+                    pc_file.write(df.iloc[6, 0] + "\n")
                     pc_file.write("%.3f, " % df.iloc[0, 1])
                     pc_file.write("%.3f, " % df.iloc[1, 1])
                     pc_file.write("%.3f, " % df.iloc[2, 1])
-                    pc_file.write("%.3f\n" % df.iloc[3, 1])
+                    pc_file.write("%.3f, " % df.iloc[3, 1])
+                    pc_file.write("%.3f, " % df.iloc[4, 1])
+                    pc_file.write("%.3f, " % df.iloc[5, 1])
+                    pc_file.write("%.3f\n" % df.iloc[6, 1])
                     pc_file.close()
 
                     sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
@@ -663,8 +673,8 @@ if not outputs_zf_L_plan_df.empty:
     if (print_en_zf_L_plan):
         fig = plt.figure()
         ax_zf_L_plan = fig.add_subplot(111)
-        ax_zf_L_plan.scatter(zf_L_plan[:,0],zf_L_plan[:,1], s=10, c=labels_zf_L_plan, marker="s")
-        ax_zf_L_plan.set_xlabel("zf_L_plan_2")
+        ax_zf_L_plan.scatter(normalized_inputs["target_x_mm"],zf_L_plan, s=10, c=labels_zf_L_plan, marker="s")
+        ax_zf_L_plan.set_xlabel("target_x_mm")
         ax_zf_L_plan.set_ylabel("zf_L_plan_4")
         plt.savefig(dir_path_zf_L_plan + "/clusters.pdf")
         plt.clf()
@@ -1458,10 +1468,10 @@ if not outputs_zf_U_plan_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(denorm_test_targets["zf_U_plan_3"], denorm_test_targets["zf_U_plan_7"], s=10, c='b', marker="s",label='test_targets')
-                ax1.scatter(denorm_test_predictions_df["zf_U_plan_3"], denorm_test_predictions_df["zf_U_plan_7"], s=10, c='r', marker="o", label='test_predictions')
+                ax1.scatter(denorm_test_targets["zf_U_plan_3"], denorm_test_targets["zf_U_plan_5"], s=10, c='b', marker="s",label='test_targets')
+                ax1.scatter(denorm_test_predictions_df["zf_U_plan_3"], denorm_test_predictions_df["zf_U_plan_5"], s=10, c='r', marker="o", label='test_predictions')
                 plt.xlabel("zf_U_plan_3")
-                plt.ylabel("zf_U_plan_7")
+                plt.ylabel("zf_U_plan_5")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_zf_U_plan+"/cluster"+repr(i)+"/zf_U_pred.pdf")
                 plt.clf()
@@ -1493,6 +1503,8 @@ if not outputs_dual_f_plan_df.empty:
         ax_dual_f_plan = fig.add_subplot(111)
         ax_dual_f_plan.scatter(dual_f_plan[:,0],dual_f_plan[:,1], s=10, c=labels_dual_f_plan, marker="s")
         ax_dual_f_plan.set_title('Clusters of the dual_f_plan')
+        ax_dual_f_plan.set_xlabel('dual_f_plan_0')
+        ax_dual_f_plan.set_ylabel('dual_f_plan_1')
         plt.savefig(dir_path_dual_f_plan + "/clusters.pdf")
         plt.clf()
         #plt.show()
@@ -2106,7 +2118,7 @@ if not outputs_x_bounce_df.empty:
             cl_out_x_bounce_df = clusters_outputs_x_bounce[i]
             if (len(cl_out_x_bounce_df.index) > min_cluster_size_x_bounce):
                 if (len(cl_out_x_bounce_df.columns) > 4):
-                    n_comps = 4  # at least 95% of the information with 3 components
+                    n_comps = 9  # at least 95% of the information with 3 components
                     x_bounce = cl_out_x_bounce_df.values
                     pca_x_bounce = decomposition.PCA(n_components=n_comps)
                     pc = pca_x_bounce.fit_transform(x_bounce)
@@ -2124,11 +2136,21 @@ if not outputs_x_bounce_df.empty:
                         pc_file.write(df.iloc[0, 0]+", ")
                         pc_file.write(df.iloc[1, 0] + ", ")
                         pc_file.write(df.iloc[2, 0] + ", ")
-                        pc_file.write(df.iloc[3, 0] + "\n")
+                        pc_file.write(df.iloc[3, 0] + ", ")
+                        pc_file.write(df.iloc[4, 0] + ", ")
+                        pc_file.write(df.iloc[5, 0] + ", ")
+                        pc_file.write(df.iloc[6, 0] + ", ")
+                        pc_file.write(df.iloc[7, 0] + ", ")
+                        pc_file.write(df.iloc[8, 0] + "\n")
                         pc_file.write("%.3f, " % df.iloc[0, 1])
                         pc_file.write("%.3f, " % df.iloc[1, 1])
                         pc_file.write("%.3f, " % df.iloc[2, 1])
-                        pc_file.write("%.3f\n" % df.iloc[3, 1])
+                        pc_file.write("%.3f, " % df.iloc[3, 1])
+                        pc_file.write("%.3f, " % df.iloc[4, 1])
+                        pc_file.write("%.3f, " % df.iloc[5, 1])
+                        pc_file.write("%.3f, " % df.iloc[6, 1])
+                        pc_file.write("%.3f, " % df.iloc[7, 1])
+                        pc_file.write("%.3f\n " % df.iloc[8, 1])
                         pc_file.close()
 
                         sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
@@ -3331,8 +3353,8 @@ if not outputs_dual_bounce_df.empty:
             cl_in_dual_bounce_df = clusters_inputs_dual_bounce[i]
             cl_out_dual_bounce_df = clusters_outputs_dual_bounce[i]
             if (len(cl_out_dual_bounce_df.index) > min_cluster_size_dual_bounce):
-                if (len(cl_out_dual_bounce_df.columns) > 4):
-                    n_comps = 4  # at least 95% of the information with 3 components
+                if (len(cl_out_dual_bounce_df.columns) > 10):
+                    n_comps = 10  # at least 95% of the information with 3 components
                     dual_bounce = cl_out_dual_bounce_df.values
                     pca_dual_bounce = decomposition.PCA(n_components=n_comps)
                     pc = pca_dual_bounce.fit_transform(dual_bounce)
@@ -3350,18 +3372,30 @@ if not outputs_dual_bounce_df.empty:
                         pc_file.write(df.iloc[0, 0]+", ")
                         pc_file.write(df.iloc[1, 0] + ", ")
                         pc_file.write(df.iloc[2, 0] + ", ")
-                        pc_file.write(df.iloc[3, 0] + "\n")
+                        pc_file.write(df.iloc[3, 0] + ", ")
+                        pc_file.write(df.iloc[4, 0] + ", ")
+                        pc_file.write(df.iloc[5, 0] + ", ")
+                        pc_file.write(df.iloc[6, 0] + ", ")
+                        pc_file.write(df.iloc[7, 0] + ", ")
+                        pc_file.write(df.iloc[8, 0] + ", ")
+                        pc_file.write(df.iloc[9, 0] + "\n")
                         pc_file.write("%.3f, " % df.iloc[0, 1])
                         pc_file.write("%.3f, " % df.iloc[1, 1])
                         pc_file.write("%.3f, " % df.iloc[2, 1])
-                        pc_file.write("%.3f\n" % df.iloc[3, 1])
+                        pc_file.write("%.3f, " % df.iloc[3, 1])
+                        pc_file.write("%.3f, " % df.iloc[4, 1])
+                        pc_file.write("%.3f, " % df.iloc[5, 1])
+                        pc_file.write("%.3f, " % df.iloc[6, 1])
+                        pc_file.write("%.3f, " % df.iloc[7, 1])
+                        pc_file.write("%.3f, " % df.iloc[8, 1])
+                        pc_file.write("%.3f\n" % df.iloc[9, 1])
                         pc_file.close()
 
                         sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
                         fig_pc = sns_plot.get_figure()
                         fig_pc.savefig(dir_path_dual_bounce+"/cluster"+repr(i)+"/p_comps.pdf")
                         threedee_train = plt.figure().gca(projection='3d')
-                        threedee_train.scatter(cl_in_dual_bounce_df["target_x_mm"], cl_in_dual_bounce_df["target_y_mm"], pc_df['dual_bounce_28'])
+                        threedee_train.scatter(cl_in_dual_bounce_df["target_x_mm"], cl_in_dual_bounce_df["target_y_mm"], pc_df['dual_bounce_39'])
                         plt.clf()
                         #plt.show()
                 else:
@@ -3492,7 +3526,7 @@ if not outputs_dual_bounce_df.empty:
 
                 #print(test_predictions_df.describe())
 
-                if (len(cl_out_dual_bounce_df.columns) > 4):
+                if (len(cl_out_dual_bounce_df.columns) > 10):
                     test_predictions = test_predictions_df.values
                     test_predictions_proj = pca_dual_bounce.inverse_transform(test_predictions)
                     test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_bounce)
@@ -3512,10 +3546,10 @@ if not outputs_dual_bounce_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(denorm_test_targets["dual_bounce_28"], denorm_test_targets["dual_bounce_35"], s=10, c='b', marker="s", label='test_targets')
-                ax1.scatter(denorm_test_predictions_df["dual_bounce_28"], denorm_test_predictions_df["dual_bounce_35"], s=10, c='r', marker="o", label='test_predictions')
-                plt.xlabel("dual_bounce_28")
-                plt.ylabel("dual_bounce_35")
+                ax1.scatter(denorm_test_targets["dual_bounce_59"], denorm_test_targets["dual_bounce_39"], s=10, c='b', marker="s", label='test_targets')
+                ax1.scatter(denorm_test_predictions_df["dual_bounce_59"], denorm_test_predictions_df["dual_bounce_39"], s=10, c='r', marker="o", label='test_predictions')
+                plt.xlabel("dual_bounce_59")
+                plt.ylabel("dual_bounce_39")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_dual_bounce+"/cluster"+repr(i)+"/dual_bounce_pred.pdf")
                 plt.clf()

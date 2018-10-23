@@ -54,7 +54,7 @@ def preprocess_targets(task_dataframe):
   """
   selected_targets = task_dataframe
   null_targets = []
-  const_targets = []
+  #const_targets = []
 
   del selected_targets['target_x_mm']
   del selected_targets['target_y_mm']
@@ -78,13 +78,13 @@ def preprocess_targets(task_dataframe):
           #print(output_targets[column])
           null_targets.append(column)
           del selected_targets[column]
-      elif (selected_targets[column].std() <= th):
-          const_targets.append(column)
-          del selected_targets[column]
+      #elif (selected_targets[column].std() <= th):
+          #const_targets.append(column)
+          #del selected_targets[column]
 
   output_targets = selected_targets.copy()
 
-  return (output_targets,null_targets,const_targets)
+  return (output_targets,null_targets)
 
 def linear_scale(series):
   '''

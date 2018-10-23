@@ -90,8 +90,8 @@ dual_bounce_prediction = pd.DataFrame()
 learning_rate=0.009
 learning_rate_class=0.009
 
-n_pca_comps_xf_plan = 4
-n_clusters_xf_plan = 6
+n_pca_comps_xf_plan = 7
+n_clusters_xf_plan = 4
 min_cluster_size_xf_plan = 10
 th_xf_plan = 0.001
 periods_xf_plan = 10
@@ -100,7 +100,7 @@ batch_size_xf_plan = 100
 units_xf_plan = [10,10]
 units_xf_plan_class = [10,10,10]
 
-n_clusters_zf_L_plan = 6
+n_clusters_zf_L_plan = 2
 min_cluster_size_zf_L_plan = 10
 th_zf_L_plan = 0.001
 periods_zf_L_plan = 15
@@ -109,7 +109,7 @@ batch_size_zf_L_plan = 100
 units_zf_L_plan = [10,10]
 units_zf_L_plan_class = [10,10,10]
 
-n_clusters_zf_U_plan = 3
+n_clusters_zf_U_plan = 2
 min_cluster_size_zf_U_plan = 10
 th_zf_U_plan = 0.001
 periods_zf_U_plan = 10
@@ -119,7 +119,7 @@ units_zf_U_plan = [10,10]
 units_zf_U_plan_class = [10,10,10]
 
 n_pca_comps_dual_f_plan = 4
-n_clusters_dual_f_plan = 6
+n_clusters_dual_f_plan = 4
 min_cluster_size_dual_f_plan = 10
 th_dual_f_plan = 0.0001
 periods_dual_f_plan = 10
@@ -128,7 +128,7 @@ batch_size_dual_f_plan = 100
 units_dual_f_plan = [10,10]
 units_dual_f_plan_class = [10,10,10]
 
-n_pca_comps_x_bounce = 4
+n_pca_comps_x_bounce = 9
 n_clusters_x_bounce = 6
 min_cluster_size_x_bounce = 10
 th_x_bounce = 0.001
@@ -138,7 +138,7 @@ batch_size_x_bounce = 100
 units_x_bounce = [10,10]
 units_x_bounce_class = [10,10,10]
 
-n_clusters_zb_L = 3
+n_clusters_zb_L = 2
 min_cluster_size_zb_L = 10
 th_zb_L = 0.001
 periods_zb_L = 10
@@ -156,7 +156,7 @@ batch_size_zb_U = 100
 units_zb_U = [10,10]
 units_zb_U_class = [10,10,10]
 
-n_pca_comps_dual_bounce = 4
+n_pca_comps_dual_bounce = 10
 n_clusters_dual_bounce = 6
 min_cluster_size_dual_bounce = 10
 th_dual_bounce = 0.001
@@ -179,7 +179,7 @@ task_1_dataframe = task_1_dataframe.reindex(np.random.permutation(task_1_datafra
 
 inputs_dataframe = preprocess_features(task_1_dataframe)
 normalized_inputs,normalized_inputs_max,normalized_inputs_min = normalize_linear_scale(inputs_dataframe)
-(outputs_dataframe, null_outputs,const_outputs) = preprocess_targets(task_1_dataframe)
+(outputs_dataframe, null_outputs) = preprocess_targets(task_1_dataframe)
 
 inputs_cols = list(inputs_dataframe.columns.values)
 inputs_test_df= pd.DataFrame([data_pred],columns=inputs_cols)
@@ -536,10 +536,12 @@ if predict_dual_f_plan:
         selected_cl_in_dual_f_plan_df = pd.read_csv(dir_path_dual_f_plan+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_dual_f_plan_df = pd.read_csv(dir_path_dual_f_plan+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
-        dual_f_plan = selected_cl_out_dual_f_plan_df.values
-        pca_dual_f_plan = decomposition.PCA(n_components=n_pca_comps_dual_f_plan)
-        pc = pca_dual_f_plan.fit_transform(dual_f_plan)
-        pc_df = pd.DataFrame(data=pc, columns=cols_dual_f_plan[0:n_pca_comps_dual_f_plan])
+        #dual_f_plan = selected_cl_out_dual_f_plan_df.values
+        #pca_dual_f_plan = decomposition.PCA(n_components=n_pca_comps_dual_f_plan)
+        #pc = pca_dual_f_plan.fit_transform(dual_f_plan)
+        #pc_df = pd.DataFrame(data=pc, columns=cols_dual_f_plan[0:n_pca_comps_dual_f_plan])
+
+        pc_df = selected_cl_out_dual_f_plan_df
 
         col_names = list(pc_df.columns.values)
         dim = len(pc_df.columns.values)
@@ -602,10 +604,10 @@ if predict_dual_f_plan:
                 elif str in test_predictions_df_2:
                     test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
-        test_predictions = test_predictions_df.values
-        test_predictions_proj = pca_dual_f_plan.inverse_transform(test_predictions)
-        test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_f_plan)
-        denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
+        #test_predictions = test_predictions_df.values
+        #test_predictions_proj = pca_dual_f_plan.inverse_transform(test_predictions)
+        #test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_f_plan)
+        denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
 
         zero_data_dual_f_tot = np.zeros(shape=(1, len(cols_dual_f_plan_tot)))
         denorm_test_predictions_tot_df = pd.DataFrame(zero_data_dual_f_tot, columns=cols_dual_f_plan_tot)
@@ -646,10 +648,18 @@ if predict_x_bounce:
         selected_cl_in_x_bounce_df = pd.read_csv(dir_path_x_bounce+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_x_bounce_df = pd.read_csv(dir_path_x_bounce+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
+        #print("Cluster:")
+        #print(n_cluster)
+        n_comps = n_pca_comps_x_bounce
+        if (n_cluster==2 or n_cluster==5):
+            n_comps = n_pca_comps_x_bounce - 3
+        elif(n_cluster==0 or n_cluster==3 or n_cluster==4):
+            n_comps = n_pca_comps_x_bounce - 2
+
         X_bounce = selected_cl_out_x_bounce_df.values
-        pca_x_bounce = decomposition.PCA(n_components=n_pca_comps_x_bounce)
+        pca_x_bounce = decomposition.PCA(n_components=n_comps)
         pc = pca_x_bounce.fit_transform(X_bounce)
-        pc_df = pd.DataFrame(data=pc, columns=cols_x_bounce[0:n_pca_comps_x_bounce])
+        pc_df = pd.DataFrame(data=pc, columns=cols_x_bounce[0:n_comps])
 
         col_names = list(pc_df.columns.values)
 
@@ -657,7 +667,7 @@ if predict_x_bounce:
                                             feature_columns=construct_feature_columns(norm_inputs_test_df),
                                             hidden_units=units_x_bounce,
                                             optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate),
-                                            label_dimension=n_pca_comps_x_bounce,
+                                            label_dimension=n_comps,
                                             model_dir=dir_path_x_bounce + "/cluster" + repr(n_cluster)
                                             )
 
@@ -670,7 +680,7 @@ if predict_x_bounce:
                                                     shuffle=False)
 
         test_predictions = predictor.predict(input_fn=predict_test_input_fn)
-        test_predictions = np.array([item['predictions'][0:n_pca_comps_x_bounce] for item in test_predictions])
+        test_predictions = np.array([item['predictions'][0:n_comps] for item in test_predictions])
 
         test_predictions_df = pd.DataFrame(data=test_predictions[0:, 0:],  # values
                                              index=norm_inputs_test_df.index,
@@ -890,6 +900,16 @@ if predict_zb_U:
             print("Predicted target:")
             print(denorm_test_predictions_tot_df)
 
+    else:
+        col_names = [col for col in null_outputs if col.startswith('zb_U')]
+        zeros = np.zeros(shape=(1,len(col_names)))
+        test_pred_df = pd.DataFrame(zeros,columns=col_names)
+
+        zb_U_prediction = test_pred_df.copy()
+        if(print_en_zb_U):
+            print("Predicted target:")
+            print(test_pred_df)
+
 
 if predict_dual_bounce:
     # ----- BOUNCE POSTURE SELECTION: DUAL VARIABLES  --------------------------------------------- #
@@ -921,20 +941,23 @@ if predict_dual_bounce:
         selected_cl_in_dual_bounce_df = pd.read_csv(dir_path_dual_bounce+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_dual_bounce_df = pd.read_csv(dir_path_dual_bounce+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
+        n_comps = n_pca_comps_dual_bounce
+        if(n_cluster==0):
+            n_comps = n_pca_comps_dual_bounce - 5
+        elif (n_cluster==2 or n_cluster==3):
+            n_comps = n_pca_comps_dual_bounce - 7
+        elif(n_cluster==4):
+            n_comps = n_pca_comps_dual_bounce - 6
+        elif(n_cluster==5):
+            n_comps = n_pca_comps_dual_bounce - 4
+
+
         Dual_bounce = selected_cl_out_dual_bounce_df.values
-        pca_dual_bounce = decomposition.PCA(n_components=n_pca_comps_dual_bounce)
+        pca_dual_bounce = decomposition.PCA(n_components=n_comps)
         pc = pca_dual_bounce.fit_transform(Dual_bounce)
-        pc_df = pd.DataFrame(data=pc, columns=cols_dual_bounce[0:n_pca_comps_dual_bounce])
+        pc_df = pd.DataFrame(data=pc, columns=cols_dual_bounce[0:n_comps])
 
         col_names = list(pc_df.columns.values)
-        #col_names_pc_tot = list(pc_df.columns.values)
-        #col_names_2 = ["",""]
-        #if(n_cluster==5): # only two components for regression, the others two are zero
-        #    col_names_2[1] = col_names.pop()
-        #    col_names_2[0] = col_names.pop()
-
-        #print(col_names_2)
-        #print(col_names_pc_tot)
         predictor = tf.estimator.DNNRegressor(
                                                 feature_columns=construct_feature_columns(norm_inputs_test_df),
                                                 hidden_units=units_dual_bounce,
@@ -950,7 +973,6 @@ if predict_dual_bounce:
                                                     shuffle=False)
 
         test_predictions = predictor.predict(input_fn=predict_test_input_fn)
-        #print(col_names)
         test_predictions = np.array([item['predictions'][0:len(col_names)] for item in test_predictions])
 
         test_predictions_df = pd.DataFrame(data=test_predictions[0:, 0:],  # values
@@ -958,15 +980,7 @@ if predict_dual_bounce:
                                              columns=col_names)
 
         #print(test_predictions_df)
-        #if(n_cluster==5):
-        #    test_zeros = np.zeros(shape=(1, len(col_names_2)))
-        #    test_predictions_df_2 = pd.DataFrame(test_zeros, columns=col_names_2)
-            #print(test_predictions_df_2)
-        #    for str in col_names_pc_tot:
-        #        if str in col_names_2:
-        #            test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
-        #print(test_predictions_df)
         test_predictions = test_predictions_df.values
         test_predictions_proj = pca_dual_bounce.inverse_transform(test_predictions)
         test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_bounce)

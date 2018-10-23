@@ -1,3 +1,8 @@
 doc/
 *.user
 config.hpp
+scripts/__pycache__/*
+scripts/task_1_reaching/var_0/__pycache__/*
+scripts/task_1_reaching/var_1/__pycache__/*
+scripts/task_1_reaching/var_2/__pycache__/*
+
