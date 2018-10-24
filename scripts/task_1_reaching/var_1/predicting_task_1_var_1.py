@@ -795,6 +795,8 @@ if predict_dual_bounce:
             n_comps = 4
         elif(n_cluster==2):
             n_comps=7
+        elif(n_cluster==3):
+            n_comps=5
 
         Dual_bounce = selected_cl_out_dual_bounce_df.values
         pca_dual_bounce = decomposition.PCA(n_components=n_comps)
