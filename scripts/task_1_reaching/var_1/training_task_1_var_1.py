@@ -42,37 +42,37 @@ print_en = True
 
 print_en_xf_plan = True
 train_xf_plan = True
-train_xf_plan_class = True
+train_xf_plan_class = False
 dir_path_xf_plan = models_dir + "/xf_plan"
 
-print_en_zf_L_plan = True
-train_zf_L_plan = True
-train_zf_L_plan_class = True
+print_en_zf_L_plan = False
+train_zf_L_plan = False
+train_zf_L_plan_class = False
 dir_path_zf_L_plan = models_dir + "/zf_L_plan"
 
-print_en_zf_U_plan = True
-train_zf_U_plan = True
-train_zf_U_plan_class = True
+print_en_zf_U_plan = False
+train_zf_U_plan = False
+train_zf_U_plan_class = False
 dir_path_zf_U_plan = models_dir + "/zf_U_plan"
 
 print_en_dual_f_plan = True
 train_dual_f_plan = True
-train_dual_f_plan_class = True
+train_dual_f_plan_class = False
 dir_path_dual_f_plan = models_dir + "/dual_f_plan"
 
-print_en_x_bounce = True
-train_x_bounce = True
-train_x_bounce_class = True
+print_en_x_bounce = False
+train_x_bounce = False
+train_x_bounce_class = False
 dir_path_x_bounce = models_dir + "/x_bounce"
 
-print_en_zb_L = True
-train_zb_L = True
-train_zb_L_class = True
+print_en_zb_L = False
+train_zb_L = False
+train_zb_L_class = False
 dir_path_zb_L = models_dir + "/zb_L"
 
-print_en_dual_bounce = True
-train_dual_bounce = True
-train_dual_bounce_class = True
+print_en_dual_bounce = False
+train_dual_bounce = False
+train_dual_bounce_class = False
 dir_path_dual_bounce = models_dir + "/dual_bounce"
 
 learning_rate=0.009
@@ -82,8 +82,8 @@ test_predictor = False
 n_clusters_xf_plan = 6
 min_cluster_size_xf_plan = 10
 th_xf_plan = 0.001
-periods_xf_plan = 10
-steps_xf_plan = 500
+periods_xf_plan = 20
+steps_xf_plan = 1000
 batch_size_xf_plan = 100
 units_xf_plan = [10,10]
 periods_xf_plan_class = 20
@@ -118,8 +118,8 @@ units_zf_U_plan_class = [10,10,10]
 n_clusters_dual_f_plan = 6
 min_cluster_size_dual_f_plan = 10
 th_dual_f_plan = 0.001
-periods_dual_f_plan = 10
-steps_dual_f_plan = 1000
+periods_dual_f_plan = 20
+steps_dual_f_plan = 2000
 batch_size_dual_f_plan = 100
 units_dual_f_plan = [10,10]
 periods_dual_f_plan_class = 20
@@ -172,7 +172,7 @@ inputs_cols = ['target_x_mm', 'target_y_mm','target_z_mm','target_roll_rad','tar
 
 inputs_dataframe = preprocess_features(task_1_dataframe)
 normalized_inputs,normalized_inputs_max,normalized_inputs_min = normalize_linear_scale(inputs_dataframe)
-(outputs_dataframe, null_outputs,const_outputs) = preprocess_targets(task_1_dataframe)
+(outputs_dataframe, null_outputs) = preprocess_targets(task_1_dataframe)
 
 # plan final posture columns
 cols_x_f_plan = [col for col in outputs_dataframe if col.startswith('xf_plan')]
@@ -441,7 +441,7 @@ if not outputs_xf_plan_df.empty:
             cl_in_xf_plan_df = clusters_inputs_xf_plan[i]
             cl_out_xf_plan_df = clusters_outputs_xf_plan[i]
             if (len(cl_out_xf_plan_df.index) > min_cluster_size_xf_plan):
-                n_comps = 4  # at least 95% of the information with 3 components
+                n_comps = 7  # at least 95% of the information with 3 components
                 X_f_plan = cl_out_xf_plan_df.values
                 pca_xf_plan = decomposition.PCA(n_components=n_comps)
                 pc = pca_xf_plan.fit_transform(X_f_plan)
@@ -459,11 +459,17 @@ if not outputs_xf_plan_df.empty:
                     pc_file.write(df.iloc[0, 0]+", ")
                     pc_file.write(df.iloc[1, 0] + ", ")
                     pc_file.write(df.iloc[2, 0] + ", ")
-                    pc_file.write(df.iloc[3, 0] + "\n")
+                    pc_file.write(df.iloc[3, 0] + ", ")
+                    pc_file.write(df.iloc[4, 0] + ", ")
+                    pc_file.write(df.iloc[5, 0] + ", ")
+                    pc_file.write(df.iloc[6, 0] + "\n")
                     pc_file.write("%.3f, " % df.iloc[0, 1])
                     pc_file.write("%.3f, " % df.iloc[1, 1])
                     pc_file.write("%.3f, " % df.iloc[2, 1])
-                    pc_file.write("%.3f\n" % df.iloc[3, 1])
+                    pc_file.write("%.3f, " % df.iloc[3, 1])
+                    pc_file.write("%.3f, " % df.iloc[4, 1])
+                    pc_file.write("%.3f, " % df.iloc[5, 1])
+                    pc_file.write("%.3f\n" % df.iloc[6, 1])
                     pc_file.close()
 
                     sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
@@ -1678,8 +1684,8 @@ if not outputs_dual_f_plan_df.empty:
             cl_in_dual_f_plan_df = clusters_inputs_dual_f_plan[i]
             cl_out_dual_f_plan_df = clusters_outputs_dual_f_plan[i]
             if (len(cl_out_dual_f_plan_df.index) > min_cluster_size_dual_f_plan):
-                if (len(cl_out_dual_f_plan_df.columns) > 4):
-                    n_comps = 4  # at least 95% of the information with 3 components
+                if (len(cl_out_dual_f_plan_df.columns) > 10):
+                    n_comps = 10  # at least 95% of the information with 3 components
                     Dual_f_plan = cl_out_dual_f_plan_df.values
                     pca_dual_f_plan = decomposition.PCA(n_components=n_comps)
                     pc = pca_dual_f_plan.fit_transform(Dual_f_plan)
@@ -1697,11 +1703,23 @@ if not outputs_dual_f_plan_df.empty:
                         pc_file.write(df.iloc[0, 0]+", ")
                         pc_file.write(df.iloc[1, 0] + ", ")
                         pc_file.write(df.iloc[2, 0] + ", ")
-                        pc_file.write(df.iloc[3, 0] + "\n")
+                        pc_file.write(df.iloc[3, 0] + ", ")
+                        pc_file.write(df.iloc[4, 0] + ", ")
+                        pc_file.write(df.iloc[5, 0] + ", ")
+                        pc_file.write(df.iloc[6, 0] + ", ")
+                        pc_file.write(df.iloc[7, 0] + ", ")
+                        pc_file.write(df.iloc[8, 0] + ", ")
+                        pc_file.write(df.iloc[9, 0] + "\n")
                         pc_file.write("%.3f, " % df.iloc[0, 1])
                         pc_file.write("%.3f, " % df.iloc[1, 1])
                         pc_file.write("%.3f, " % df.iloc[2, 1])
-                        pc_file.write("%.3f\n" % df.iloc[3, 1])
+                        pc_file.write("%.3f, " % df.iloc[3, 1])
+                        pc_file.write("%.3f, " % df.iloc[4, 1])
+                        pc_file.write("%.3f, " % df.iloc[5, 1])
+                        pc_file.write("%.3f, " % df.iloc[6, 1])
+                        pc_file.write("%.3f, " % df.iloc[7, 1])
+                        pc_file.write("%.3f, " % df.iloc[8, 1])
+                        pc_file.write("%.3f\n" % df.iloc[9, 1])
                         pc_file.close()
 
                         sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
@@ -1838,7 +1856,7 @@ if not outputs_dual_f_plan_df.empty:
 
                 #print(test_predictions_df.describe())
 
-                if (len(cl_out_dual_f_plan_df.columns) > 4):
+                if (len(cl_out_dual_f_plan_df.columns) > 10):
                     # test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_df_0_max,outputs_df_0_min)
                     test_predictions = test_predictions_df.values
                     test_predictions_proj = pca_dual_f_plan.inverse_transform(test_predictions)
@@ -2095,7 +2113,7 @@ if not outputs_x_bounce_df.empty:
             cl_out_x_bounce_df = clusters_outputs_x_bounce[i]
             if (len(cl_out_x_bounce_df.index) > min_cluster_size_x_bounce):
                 if (len(cl_out_x_bounce_df.columns) > 4):
-                    n_comps = 4  # at least 95% of the information with 3 components
+                    n_comps = 9  # at least 95% of the information with 3 components
                     x_bounce = cl_out_x_bounce_df.values
                     pca_x_bounce = decomposition.PCA(n_components=n_comps)
                     pc = pca_x_bounce.fit_transform(x_bounce)
@@ -2113,11 +2131,21 @@ if not outputs_x_bounce_df.empty:
                         pc_file.write(df.iloc[0, 0]+", ")
                         pc_file.write(df.iloc[1, 0] + ", ")
                         pc_file.write(df.iloc[2, 0] + ", ")
-                        pc_file.write(df.iloc[3, 0] + "\n")
+                        pc_file.write(df.iloc[3, 0] + ", ")
+                        pc_file.write(df.iloc[4, 0] + ", ")
+                        pc_file.write(df.iloc[5, 0] + ", ")
+                        pc_file.write(df.iloc[6, 0] + ", ")
+                        pc_file.write(df.iloc[7, 0] + ", ")
+                        pc_file.write(df.iloc[8, 0] + "\n")
                         pc_file.write("%.3f, " % df.iloc[0, 1])
                         pc_file.write("%.3f, " % df.iloc[1, 1])
                         pc_file.write("%.3f, " % df.iloc[2, 1])
-                        pc_file.write("%.3f\n" % df.iloc[3, 1])
+                        pc_file.write("%.3f, " % df.iloc[3, 1])
+                        pc_file.write("%.3f, " % df.iloc[4, 1])
+                        pc_file.write("%.3f, " % df.iloc[5, 1])
+                        pc_file.write("%.3f, " % df.iloc[6, 1])
+                        pc_file.write("%.3f, " % df.iloc[7, 1])
+                        pc_file.write("%.3f\n" % df.iloc[8, 1])
                         pc_file.close()
 
                         sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
@@ -2909,8 +2937,8 @@ if not outputs_dual_bounce_df.empty:
             cl_in_dual_bounce_df = clusters_inputs_dual_bounce[i]
             cl_out_dual_bounce_df = clusters_outputs_dual_bounce[i]
             if (len(cl_out_dual_bounce_df.index) > min_cluster_size_dual_bounce):
-                if (len(cl_out_dual_bounce_df.columns) > 4):
-                    n_comps = 4  # at least 95% of the information with 3 components
+                if (len(cl_out_dual_bounce_df.columns) > 10):
+                    n_comps = 10  # at least 95% of the information with 3 components
                     dual_bounce = cl_out_dual_bounce_df.values
                     pca_dual_bounce = decomposition.PCA(n_components=n_comps)
                     pc = pca_dual_bounce.fit_transform(dual_bounce)
@@ -2928,11 +2956,23 @@ if not outputs_dual_bounce_df.empty:
                         pc_file.write(df.iloc[0, 0]+", ")
                         pc_file.write(df.iloc[1, 0] + ", ")
                         pc_file.write(df.iloc[2, 0] + ", ")
-                        pc_file.write(df.iloc[3, 0] + "\n")
+                        pc_file.write(df.iloc[3, 0] + ", ")
+                        pc_file.write(df.iloc[4, 0] + ", ")
+                        pc_file.write(df.iloc[5, 0] + ", ")
+                        pc_file.write(df.iloc[6, 0] + ", ")
+                        pc_file.write(df.iloc[7, 0] + ", ")
+                        pc_file.write(df.iloc[8, 0] + ", ")
+                        pc_file.write(df.iloc[9, 0] + "\n")
                         pc_file.write("%.3f, " % df.iloc[0, 1])
                         pc_file.write("%.3f, " % df.iloc[1, 1])
                         pc_file.write("%.3f, " % df.iloc[2, 1])
-                        pc_file.write("%.3f\n" % df.iloc[3, 1])
+                        pc_file.write("%.3f, " % df.iloc[3, 1])
+                        pc_file.write("%.3f, " % df.iloc[4, 1])
+                        pc_file.write("%.3f, " % df.iloc[5, 1])
+                        pc_file.write("%.3f, " % df.iloc[6, 1])
+                        pc_file.write("%.3f, " % df.iloc[7, 1])
+                        pc_file.write("%.3f, " % df.iloc[8, 1])
+                        pc_file.write("%.3f\n" % df.iloc[9, 1])
                         pc_file.close()
 
                         sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
@@ -3070,7 +3110,7 @@ if not outputs_dual_bounce_df.empty:
 
                 #print(test_predictions_df.describe())
 
-                if (len(cl_out_dual_bounce_df.columns) > 4):
+                if (len(cl_out_dual_bounce_df.columns) > 10):
                     test_predictions = test_predictions_df.values
                     test_predictions_proj = pca_dual_bounce.inverse_transform(test_predictions)
                     test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_bounce)

@@ -91,12 +91,12 @@ dual_bounce_prediction = pd.DataFrame()
 learning_rate=0.009
 learning_rate_class=0.009
 
-n_pca_comps_xf_plan = 4
+n_pca_comps_xf_plan = 7
 n_clusters_xf_plan = 6
 min_cluster_size_xf_plan = 10
 th_xf_plan = 0.001
-periods_xf_plan = 10
-steps_xf_plan = 500
+periods_xf_plan = 20
+steps_xf_plan = 1000
 batch_size_xf_plan = 100
 units_xf_plan = [10,10]
 units_xf_plan_class = [10,10,10]
@@ -122,13 +122,13 @@ units_zf_U_plan_class = [10,10,10]
 n_clusters_dual_f_plan = 6
 min_cluster_size_dual_f_plan = 10
 th_dual_f_plan = 0.001
-periods_dual_f_plan = 10
-steps_dual_f_plan = 1000
+periods_dual_f_plan = 20
+steps_dual_f_plan = 2000
 batch_size_dual_f_plan = 100
 units_dual_f_plan = [10,10]
 units_dual_f_plan_class = [10,10,10]
 
-n_pca_comps_x_bounce = 4
+n_pca_comps_x_bounce = 9
 n_clusters_x_bounce = 6
 min_cluster_size_x_bounce = 10
 th_x_bounce = 0.001
@@ -147,7 +147,7 @@ batch_size_zb_L = 100
 units_zb_L = [10,10]
 units_zb_L_class = [10,10,10]
 
-n_pca_comps_dual_bounce = 4
+n_pca_comps_dual_bounce = 10
 n_clusters_dual_bounce = 6
 min_cluster_size_dual_bounce = 10
 th_dual_bounce = 0.01
@@ -170,7 +170,7 @@ task_1_dataframe = task_1_dataframe.reindex(np.random.permutation(task_1_datafra
 
 inputs_dataframe = preprocess_features(task_1_dataframe)
 normalized_inputs,normalized_inputs_max,normalized_inputs_min = normalize_linear_scale(inputs_dataframe)
-(outputs_dataframe, null_outputs,const_outputs) = preprocess_targets(task_1_dataframe)
+(outputs_dataframe, null_outputs) = preprocess_targets(task_1_dataframe)
 
 inputs_cols = list(inputs_dataframe.columns.values)
 inputs_test_df= pd.DataFrame([data_pred],columns=inputs_cols)
@@ -253,10 +253,14 @@ if predict_xf_plan:
         selected_cl_in_xf_plan_df = pd.read_csv(dir_path_xf_plan+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_xf_plan_df = pd.read_csv(dir_path_xf_plan+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
+        n_comps = n_pca_comps_xf_plan
+        if (n_cluster==3):
+            n_comps = 6
+
         X_f_plan = selected_cl_out_xf_plan_df.values
-        pca_xf_plan = decomposition.PCA(n_components=n_pca_comps_xf_plan)
+        pca_xf_plan = decomposition.PCA(n_components=n_comps)
         pc = pca_xf_plan.fit_transform(X_f_plan)
-        pc_df = pd.DataFrame(data=pc, columns=cols_x_f_plan[0:n_pca_comps_xf_plan])
+        pc_df = pd.DataFrame(data=pc, columns=cols_x_f_plan[0:n_comps])
 
         col_names = list(pc_df.columns.values)
 
@@ -264,7 +268,7 @@ if predict_xf_plan:
                                             feature_columns=construct_feature_columns(norm_inputs_test_df),
                                             hidden_units=units_xf_plan,
                                             optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate),
-                                            label_dimension=n_pca_comps_xf_plan,
+                                            label_dimension=n_comps,
                                             model_dir=dir_path_xf_plan + "/cluster" + repr(n_cluster)
                                             )
 
@@ -277,7 +281,7 @@ if predict_xf_plan:
                                                     shuffle=False)
 
         test_predictions = predictor.predict(input_fn=predict_test_input_fn)
-        test_predictions = np.array([item['predictions'][0:n_pca_comps_xf_plan] for item in test_predictions])
+        test_predictions = np.array([item['predictions'][0:n_comps] for item in test_predictions])
 
         test_predictions_df = pd.DataFrame(data=test_predictions[0:, 0:],  # values
                                              index=norm_inputs_test_df.index,
@@ -594,10 +598,18 @@ if predict_x_bounce:
         selected_cl_in_x_bounce_df = pd.read_csv(dir_path_x_bounce+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_x_bounce_df = pd.read_csv(dir_path_x_bounce+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
+        #print("Cluster number:")
+        #print(n_cluster)
+        n_comps = n_pca_comps_x_bounce
+        if(n_cluster==1 or n_cluster==2):
+            n_comps = 7
+        elif(n_cluster==3):
+            n_comps = 8
+
         X_bounce = selected_cl_out_x_bounce_df.values
-        pca_x_bounce = decomposition.PCA(n_components=n_pca_comps_x_bounce)
+        pca_x_bounce = decomposition.PCA(n_components=n_comps)
         pc = pca_x_bounce.fit_transform(X_bounce)
-        pc_df = pd.DataFrame(data=pc, columns=cols_x_bounce[0:n_pca_comps_x_bounce])
+        pc_df = pd.DataFrame(data=pc, columns=cols_x_bounce[0:n_comps])
 
         col_names = list(pc_df.columns.values)
 
@@ -605,7 +617,7 @@ if predict_x_bounce:
                                             feature_columns=construct_feature_columns(norm_inputs_test_df),
                                             hidden_units=units_x_bounce,
                                             optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate),
-                                            label_dimension=n_pca_comps_x_bounce,
+                                            label_dimension=n_comps,
                                             model_dir=dir_path_x_bounce + "/cluster" + repr(n_cluster)
                                             )
 
@@ -618,7 +630,7 @@ if predict_x_bounce:
                                                     shuffle=False)
 
         test_predictions = predictor.predict(input_fn=predict_test_input_fn)
-        test_predictions = np.array([item['predictions'][0:n_pca_comps_x_bounce] for item in test_predictions])
+        test_predictions = np.array([item['predictions'][0:n_comps] for item in test_predictions])
 
         test_predictions_df = pd.DataFrame(data=test_predictions[0:, 0:],  # values
                                              index=norm_inputs_test_df.index,
@@ -778,17 +790,23 @@ if predict_dual_bounce:
         selected_cl_in_dual_bounce_df = pd.read_csv(dir_path_dual_bounce+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_dual_bounce_df = pd.read_csv(dir_path_dual_bounce+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
+        n_comps = n_pca_comps_dual_bounce
+        if(n_cluster==0):
+            n_comps = 4
+        elif(n_cluster==2):
+            n_comps=7
+
         Dual_bounce = selected_cl_out_dual_bounce_df.values
-        pca_dual_bounce = decomposition.PCA(n_components=n_pca_comps_dual_bounce)
+        pca_dual_bounce = decomposition.PCA(n_components=n_comps)
         pc = pca_dual_bounce.fit_transform(Dual_bounce)
-        pc_df = pd.DataFrame(data=pc, columns=cols_dual_bounce[0:n_pca_comps_dual_bounce])
+        pc_df = pd.DataFrame(data=pc, columns=cols_dual_bounce[0:n_comps])
 
         col_names = list(pc_df.columns.values)
         col_names_pc_tot = list(pc_df.columns.values)
-        col_names_2 = ["",""]
-        if(n_cluster==5): # only two components for regression, the others two are zero
-            col_names_2[1] = col_names.pop()
-            col_names_2[0] = col_names.pop()
+        #col_names_2 = ["",""]
+        #if(n_cluster==5): # only two components for regression, the others two are zero
+        #    col_names_2[1] = col_names.pop()
+        #    col_names_2[0] = col_names.pop()
 
         #print(col_names_2)
         #print(col_names_pc_tot)
@@ -815,13 +833,13 @@ if predict_dual_bounce:
                                              columns=col_names)
 
         #print(test_predictions_df)
-        if(n_cluster==5):
-            test_zeros = np.zeros(shape=(1, len(col_names_2)))
-            test_predictions_df_2 = pd.DataFrame(test_zeros, columns=col_names_2)
+        #if(n_cluster==5):
+        #    test_zeros = np.zeros(shape=(1, len(col_names_2)))
+        #    test_predictions_df_2 = pd.DataFrame(test_zeros, columns=col_names_2)
             #print(test_predictions_df_2)
-            for str in col_names_pc_tot:
-                if str in col_names_2:
-                    test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
+        #    for str in col_names_pc_tot:
+        #        if str in col_names_2:
+        #            test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
         #print(test_predictions_df)
         test_predictions = test_predictions_df.values
