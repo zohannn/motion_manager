@@ -55,7 +55,7 @@ print_en = True
 
 print_en_xf_plan = True
 train_xf_plan = True
-train_xf_plan_class = False
+train_xf_plan_class = True
 dir_path_xf_plan = models_dir + "/xf_plan"
 
 print_en_zf_L_plan = True
@@ -851,7 +851,7 @@ if not outputs_xf_plan_df.empty:
                 plt.clf()
                 #plt.show()
 
-                test_predictions_df.drop(test_predictions_df.index, inplace=True)
+                test_predictions_df = pd.DataFrame()
                 # ---------- Support Vector Machine ---------------- #
                 (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_xf_plan,
                                                             gamma=gamma_xf_plan,
@@ -880,7 +880,7 @@ if not outputs_xf_plan_df.empty:
                         elif str in test_predictions_df_2:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
-                print(test_predictions_df.describe())
+                #print(test_predictions_df.describe())
                 test_predictions = test_predictions_df.values
                 test_predictions_proj = pca_xf_plan.inverse_transform(test_predictions)
                 test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_x_f_plan)
@@ -909,7 +909,7 @@ if not outputs_xf_plan_df.empty:
                 plt.clf()
                 #plt.show()
 
-                test_predictions_df.drop(test_predictions_df.index, inplace=True)
+                test_predictions_df = pd.DataFrame()
                 # ---------- K-Nearest Neighbors ---------------- #
                 (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_xf_plan,
                                                             weights = weights_xf_plan,
@@ -1437,6 +1437,7 @@ if not outputs_zf_L_plan_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- Support Vector Machine ---------------- #
                 (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_zf_L_plan,
                                                             gamma=gamma_zf_L_plan,
@@ -1495,6 +1496,7 @@ if not outputs_zf_L_plan_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- K-Nearest Neighbors ---------------- #
                 (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zf_L_plan,
                                                             weights = weights_zf_L_plan,
@@ -2025,6 +2027,7 @@ if not outputs_zf_U_plan_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- Support Vector Machine ---------------- #
                 (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_zf_U_plan,
                                                             gamma=gamma_zf_U_plan,
@@ -2082,6 +2085,7 @@ if not outputs_zf_U_plan_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- K-Nearest Neighbors ---------------- #
                 (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zf_U_plan,
                                                             weights = weights_zf_U_plan,
@@ -2620,6 +2624,7 @@ if not outputs_dual_f_plan_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- Support Vector Machine ---------------- #
                 (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_dual_f_plan,
                                                                 gamma=gamma_dual_f_plan,
@@ -2677,6 +2682,7 @@ if not outputs_dual_f_plan_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- K-Nearest Neighbors ---------------- #
                 (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_dual_f_plan,
                                                             weights = weights_dual_f_plan,
@@ -3158,7 +3164,6 @@ if not outputs_x_bounce_df.empty:
                                                                             validation_targets=validation_targets[train_col_names_1],
                                                                             model_dir=dir_path_x_bounce+"/cluster"+repr(i)+"/nn")
 
-                    # ---------- Evaluation on test data ---------------- #
                     predict_test_input_fn = lambda: my_input_fn(test_examples,
                                                                 test_targets[train_col_names_1],
                                                                 num_epochs=1,
@@ -3212,6 +3217,7 @@ if not outputs_x_bounce_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- Support Vector Machine ---------------- #
                 (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_x_bounce,
                                                                 gamma=gamma_x_bounce,
@@ -3269,6 +3275,7 @@ if not outputs_x_bounce_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- K-Nearest Neighbors ---------------- #
                 (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_x_bounce,
                                                             weights = weights_x_bounce,
@@ -3723,7 +3730,6 @@ if not outputs_zb_L_df.empty:
                                                                         validation_targets=validation_targets[train_col_names_1],
                                                                         model_dir=dir_path_zb_L+"/cluster"+repr(i)+"/nn")
 
-                    # ---------- Evaluation on test data ---------------- #
                     predict_test_input_fn = lambda: my_input_fn(test_examples,
                                                                 test_targets[train_col_names_1],
                                                                 num_epochs=1,
@@ -3780,6 +3786,7 @@ if not outputs_zb_L_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- Support Vector Machine ---------------- #
                 (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_zb_L,
                                                                 gamma=gamma_zb_L,
@@ -3837,6 +3844,7 @@ if not outputs_zb_L_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- K-Nearest Neighbors ---------------- #
                 (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zb_L,
                                                             weights = weights_zb_L,
@@ -4352,6 +4360,7 @@ if not outputs_zb_U_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- Support Vector Machine ---------------- #
                 (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_zb_U,
                                                                 gamma=gamma_zb_U,
@@ -4409,6 +4418,7 @@ if not outputs_zb_U_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- K-Nearest Neighbors ---------------- #
                 (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zb_U,
                                                                 weights = weights_zb_U,
@@ -4954,6 +4964,7 @@ if not outputs_dual_bounce_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- Support Vector Machine ---------------- #
                 (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_dual_bounce,
                                                                 gamma=gamma_dual_bounce,
@@ -5011,6 +5022,7 @@ if not outputs_dual_bounce_df.empty:
                 plt.clf()
                 #plt.show()
 
+                test_predictions_df = pd.DataFrame()
                 # ---------- K-Nearest Neighbors ---------------- #
                 (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_dual_bounce,
                                                                 weights = weights_dual_bounce,
