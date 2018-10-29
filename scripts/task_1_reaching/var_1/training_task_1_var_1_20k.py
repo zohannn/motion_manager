@@ -65,8 +65,8 @@ train_x_bounce = False
 train_x_bounce_class = False
 dir_path_x_bounce = models_dir + "/x_bounce"
 
-print_en_zb_L = True
-train_zb_L = True
+print_en_zb_L = False
+train_zb_L = False
 train_zb_L_class = False
 dir_path_zb_L = models_dir + "/zb_L"
 
@@ -193,6 +193,7 @@ outputs_dual_f_plan_df = outputs_dataframe[cols_dual_f_plan]
 
 outputs_x_bounce_df = outputs_dataframe[cols_x_bounce]
 outputs_zb_L_df = outputs_dataframe[cols_zb_L]
+outputs_zb_L_df = outputs_zb_L_df.clip(lower=0.0001,upper=50)
 outputs_zb_U_df = outputs_dataframe[cols_zb_U]
 outputs_dual_bounce_df = outputs_dataframe[cols_dual_bounce]
 outputs_dual_bounce_df = outputs_dual_bounce_df.clip(lower=0.0001,upper=50)
@@ -2725,6 +2726,10 @@ if not outputs_dual_bounce_df.empty:
 
     kmeans = KMeans(n_clusters=n_clusters_dual_bounce, init='k-means++', max_iter=500, n_init=10, verbose=0, random_state=3425)
     # Fitting with inputs
+    dual_nan = np.any(np.isnan(dual_bounce))
+    # Find indicies that you need to replace
+    inds = np.where(np.isnan(dual_bounce))
+    dual_bounce[inds] = 0.0
     kmeans_dual_bounce = kmeans.fit(dual_bounce)
     # Predicting the clusters
     labels_dual_bounce = kmeans_dual_bounce.predict(dual_bounce)
@@ -2867,8 +2872,8 @@ if not outputs_dual_bounce_df.empty:
     # ---------------------------------- Classifier training ------------------------------------------------------------#
     if (train_dual_bounce_class):
         size = len(normalized_inputs.index)
-        train = int(size * 0.7)  # 70%
-        val = int(size * 0.9)  # 20%
+        train = int(size * 0.6)  # 70%
+        val = int(size * 0.8)  # 20%
 
         # Choose the first 70% examples for training.
         training_examples_class = normalized_inputs.iloc[:train, :]

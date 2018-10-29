@@ -10,7 +10,13 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn import metrics
-#from sklearn import preprocessing
+from sklearn import svm
+from sklearn.model_selection import cross_val_score
+from sklearn.externals import joblib
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neighbors import KNeighborsRegressor
+
 import tensorflow as tf
 from tensorflow.python.data import Dataset
 
@@ -215,7 +221,7 @@ def my_input_fn(features, targets, batch_size=1, shuffle=True, num_epochs=None):
     features, labels = ds.make_one_shot_iterator().get_next()
     return features, labels
 
-def train_nn_regression_model(
+def train_nn_regressor_model(
         my_optimizer,
         dimensions,
         periods,
@@ -474,3 +480,97 @@ def train_nn_classifier_model(
 
 
     return nn_classifier, training_log_losses, validation_log_losses
+
+
+def train_svm_classifier_model(kernel,cv,training_examples_class_list,training_targets_class_list,model_dir ):
+
+ classifier = svm.SVC(kernel=kernel, gamma='auto', decision_function_shape='ovr')
+ classifier.fit(training_examples_class_list, training_targets_class_list)
+
+ scores = cross_val_score(classifier, training_examples_class_list, training_targets_class_list, cv=cv)
+ print("Accuracy mean on the validation set: %0.3f (+/- %0.3f)" % (scores.mean(), scores.std() * 2))
+
+ res_file = open(model_dir + "/results.txt", "w")
+ res_file.write("### Results of the classification ###\n")
+ res_file.write("Accuracy mean on the validation set: %0.3f (+/- %0.3f)\n" % (scores.mean(), scores.std() * 2))
+ res_file.close()
+
+ joblib.dump(classifier, model_dir + "/svm_clf.joblib")
+
+ return classifier,scores
+
+def train_knn_classifier_model(n_neighbors,cv,weights,algorithm,training_examples_class_list,training_targets_class_list,model_dir ):
+
+ classifier = KNeighborsClassifier(n_neighbors=n_neighbors,weights=weights,algorithm=algorithm)
+ classifier.fit(training_examples_class_list, training_targets_class_list)
+
+ scores = cross_val_score(classifier, training_examples_class_list, training_targets_class_list, cv=cv)
+ print("Accuracy mean on the validation set: %0.3f (+/- %0.3f)" % (scores.mean(), scores.std() * 2))
+
+ res_file = open(model_dir + "/results.txt", "w")
+ res_file.write("### Results of the classification ###\n")
+ res_file.write("Accuracy mean on the validation set: %0.3f (+/- %0.3f)\n" % (scores.mean(), scores.std() * 2))
+ res_file.close()
+
+ joblib.dump(classifier, model_dir + "/knn_clf.joblib")
+
+ return classifier,scores
+
+def classification_report_csv(report,model_dir):
+    report_data = []
+    lines = report.split('\n')
+    for line in lines[2:-3]:
+        row = {}
+        row_data = line.split('      ')
+        row['class'] = row_data[1]
+        row['precision'] = float(row_data[2])
+        row['recall'] = float(row_data[3])
+        row['f1_score'] = float(row_data[4])
+        row['support'] = float(row_data[5])
+        report_data.append(row)
+    dataframe = pd.DataFrame.from_dict(report_data)
+    dataframe.to_csv(model_dir+'/classification_report.csv', index = False)
+
+def train_svm_regressor_model(kernel,gamma,coeff,degree,epsilon,training_examples,training_targets,model_dir):
+
+ svr = svm.SVR(kernel=kernel, gamma=gamma,C=coeff,degree=degree,epsilon=epsilon)
+ regressor = MultiOutputRegressor(svr)
+ regressor.fit(training_examples, training_targets)
+
+ r2_score = regressor.score(training_examples, training_targets)
+ print("R^2 score (on training data): %0.3f " % r2_score)
+
+ rmse = math.sqrt(metrics.mean_squared_error(training_examples, training_targets))
+ print("Final RMSE (on training data): %0.3f" % rmse)
+
+ res_file = open(model_dir + "/results.txt", "w")
+ res_file.write("### Results of the regression ###\n")
+ res_file.write("R^2 score (on training data): %0.3f\n" % r2_score)
+ res_file.write("Final RMSE (on training data): %0.3f\n" % rmse)
+ res_file.close()
+
+ joblib.dump(regressor, model_dir + "/svm_reg.joblib")
+
+ return regressor,r2_score
+
+def train_knn_regressor_model(n_neighbors,weights,algorithm,training_examples,training_targets,model_dir):
+
+ neigh_reg = KNeighborsRegressor(n_neighbors=n_neighbors,weights=weights,algorithm=algorithm)
+ regressor = MultiOutputRegressor(neigh_reg)
+ regressor.fit(training_examples, training_targets)
+
+ r2_score = regressor.score(training_examples, training_targets)
+ print("R^2 score (on training data): %0.3f " % r2_score)
+
+ rmse = math.sqrt(metrics.mean_squared_error(training_examples, training_targets))
+ print("Final RMSE (on training data): %0.3f" % rmse)
+
+ res_file = open(model_dir + "/results.txt", "w")
+ res_file.write("### Results of the regression ###\n")
+ res_file.write("R^2 score (on training data): %0.3f\n" % r2_score)
+ res_file.write("Final RMSE (on training data): %0.3f\n" % rmse)
+ res_file.close()
+
+ joblib.dump(regressor, model_dir + "/knn_reg.joblib")
+
+ return regressor,r2_score
