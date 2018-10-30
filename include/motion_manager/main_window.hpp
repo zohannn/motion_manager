@@ -867,57 +867,109 @@ private:
 
         // results of the predictions
         // plan
-        vector<int> success_no_ws_plan; /**< success flags with no warm start */
-        vector<double> iter_no_ws_plan; /**< iterations with no warm start */
-        vector<double> cpu_no_ws_plan; /**< cpu time with no warm start */
-        vector<double> obj_no_ws_plan; /**< objective function values with no warm start */
+        vector<int> success_cold_plan; /**< success flags with cold start */
+        vector<double> iter_cold_plan; /**< iterations with cold start */
+        vector<double> cpu_cold_plan; /**< cpu time with cold start */
+        vector<double> obj_cold_plan; /**< objective function values with cold start */
         vector<int> success_ws_or_plan; /**< success flags with warm start from the original solution */
         vector<double> iter_ws_or_plan; /**< iterations with warm start from the original solution */
         vector<double> cpu_ws_or_plan; /**< cpu time with warm start from the original solution */
         vector<double> obj_ws_or_plan; /**< objective function values with warm start from the original solution */
-        vector<int> success_ws_pred_plan; /**< success flags with warm start from the predicted solution */
-        vector<double> iter_ws_pred_plan; /**< iterations with warm start from the predicted solution */
-        vector<double> cpu_ws_pred_plan; /**< cpu time with warm start from the predicted solution */
-        vector<double> obj_ws_pred_plan; /**< objective function values with warm start from the predicted solution */
+        vector<int> success_ws_rdm_plan; /**< success flags with warm start from the random solution */
+        vector<double> iter_ws_rdm_plan; /**< iterations with warm start from the random solution */
+        vector<double> cpu_ws_rdm_plan; /**< cpu time with warm start from the random solution */
+        vector<double> obj_ws_rdm_plan; /**< objective function values with warm start from the random solution */
+        vector<int> success_ws_nn_plan; /**< success flags with warm start from the neural network solution */
+        vector<double> iter_ws_nn_plan; /**< iterations with warm start from the neural network solution */
+        vector<double> cpu_ws_nn_plan; /**< cpu time with warm start from the neural network solution */
+        vector<double> obj_ws_nn_plan; /**< objective function values with warm start from the neural network solution */
+        vector<int> success_ws_svm_plan; /**< success flags with warm start from the support vector machines solution */
+        vector<double> iter_ws_svm_plan; /**< iterations with warm start from the support vector machines solution */
+        vector<double> cpu_ws_svm_plan; /**< cpu time with warm start from the support vector machines solution */
+        vector<double> obj_ws_svm_plan; /**< objective function values with warm start from the support vector machines solution */
+        vector<int> success_ws_knn_plan; /**< success flags with warm start from the k-nearest neighbors solution */
+        vector<double> iter_ws_knn_plan; /**< iterations with warm start from the k-nearest neighbors solution */
+        vector<double> cpu_ws_knn_plan; /**< cpu time with warm start from the k-nearest neighbors solution */
+        vector<double> obj_ws_knn_plan; /**< objective function values with warm start from the k-nearest neighbors solution */
+
         // approach
-        vector<int> success_no_ws_app; /**< success flags with no warm start */
-        vector<double> iter_no_ws_app; /**< iterations with no warm start */
-        vector<double> cpu_no_ws_app; /**< cpu time with no warm start */
-        vector<double> obj_no_ws_app; /**< objective function values with no warm start */
+        vector<int> success_cold_app; /**< success flags with cold start */
+        vector<double> iter_cold_app; /**< iterations with cold start */
+        vector<double> cpu_cold_app; /**< cpu time with cold start */
+        vector<double> obj_cold_app; /**< objective function values with cold start */
         vector<int> success_ws_or_app; /**< success flags with warm start from the original solution */
         vector<double> iter_ws_or_app; /**< iterations with warm start from the original solution */
         vector<double> cpu_ws_or_app; /**< cpu time with warm start from the original solution */
         vector<double> obj_ws_or_app; /**< objective function values with warm start from the original solution */
-        vector<int> success_ws_pred_app; /**< success flags with warm start from the predicted solution */
-        vector<double> iter_ws_pred_app; /**< iterations with warm start from the predicted solution */
-        vector<double> cpu_ws_pred_app; /**< cpu time with warm start from the predicted solution */
-        vector<double> obj_ws_pred_app; /**< objective function values with warm start from the predicted solution */
+        vector<int> success_ws_rdm_app; /**< success flags with warm start from the random solution */
+        vector<double> iter_ws_rdm_app; /**< iterations with warm start from the random solution */
+        vector<double> cpu_ws_rdm_app; /**< cpu time with warm start from the random solution */
+        vector<double> obj_ws_rdm_app; /**< objective function values with warm start from the random solution */
+        vector<int> success_ws_nn_app; /**< success flags with warm start from the neural network solution */
+        vector<double> iter_ws_nn_app; /**< iterations with warm start from the neural network solution */
+        vector<double> cpu_ws_nn_app; /**< cpu time with warm start from the neural network solution */
+        vector<double> obj_ws_nn_app; /**< objective function values with warm start from the neural network solution */
+        vector<int> success_ws_svm_app; /**< success flags with warm start from the support vector machines solution */
+        vector<double> iter_ws_svm_app; /**< iterations with warm start from the support vector machines solution */
+        vector<double> cpu_ws_svm_app; /**< cpu time with warm start from the support vector machines solution */
+        vector<double> obj_ws_svm_app; /**< objective function values with warm start from the support vector machines solution */
+        vector<int> success_ws_knn_app; /**< success flags with warm start from the k-nearest neighbors solution */
+        vector<double> iter_ws_knn_app; /**< iterations with warm start from the k-nearest neighbors solution */
+        vector<double> cpu_ws_knn_app; /**< cpu time with warm start from the k-nearest neighbors solution */
+        vector<double> obj_ws_knn_app; /**< objective function values with warm start from the k-nearest neighbors solution */
+
         // retreat
-        vector<int> success_no_ws_ret; /**< success flags with no warm start */
-        vector<double> iter_no_ws_ret; /**< iterations with no warm start */
-        vector<double> cpu_no_ws_ret; /**< cpu time with no warm start */
-        vector<double> obj_no_ws_ret; /**< objective function values with no warm start */
+        vector<int> success_cold_ret; /**< success flags with cold start */
+        vector<double> iter_cold_ret; /**< iterations with cold start */
+        vector<double> cpu_cold_ret; /**< cpu time with cold start */
+        vector<double> obj_cold_ret; /**< objective function values with cold start */
         vector<int> success_ws_or_ret; /**< success flags with warm start from the original solution */
         vector<double> iter_ws_or_ret; /**< iterations with warm start from the original solution */
         vector<double> cpu_ws_or_ret; /**< cpu time with warm start from the original solution */
         vector<double> obj_ws_or_ret; /**< objective function values with warm start from the original solution */
-        vector<int> success_ws_pred_ret; /**< success flags with warm start from the predicted solution */
-        vector<double> iter_ws_pred_ret; /**< iterations with warm start from the predicted solution */
-        vector<double> cpu_ws_pred_ret; /**< cpu time with warm start from the predicted solution */
-        vector<double> obj_ws_pred_ret; /**< objective function values with warm start from the predicted solution */
+        vector<int> success_ws_rdm_ret; /**< success flags with warm start from the random solution */
+        vector<double> iter_ws_rdm_ret; /**< iterations with warm start from the random solution */
+        vector<double> cpu_ws_rdm_ret; /**< cpu time with warm start from the random solution */
+        vector<double> obj_ws_rdm_ret; /**< objective function values with warm start from the random solution */
+        vector<int> success_ws_nn_ret; /**< success flags with warm start from the neural network solution */
+        vector<double> iter_ws_nn_ret; /**< iterations with warm start from the neural network solution */
+        vector<double> cpu_ws_nn_ret; /**< cpu time with warm start from the neural network solution */
+        vector<double> obj_ws_nn_ret; /**< objective function values with warm start from the neural network solution */
+        vector<int> success_ws_svm_ret; /**< success flags with warm start from the support vector machines solution */
+        vector<double> iter_ws_svm_ret; /**< iterations with warm start from the support vector machines solution */
+        vector<double> cpu_ws_svm_ret; /**< cpu time with warm start from the support vector machines solution */
+        vector<double> obj_ws_svm_ret; /**< objective function values with warm start from the support vector machines solution */
+        vector<int> success_ws_knn_ret; /**< success flags with warm start from the k-nearest neighbors solution */
+        vector<double> iter_ws_knn_ret; /**< iterations with warm start from the k-nearest neighbors solution */
+        vector<double> cpu_ws_knn_ret; /**< cpu time with warm start from the k-nearest neighbors solution */
+        vector<double> obj_ws_knn_ret; /**< objective function values with warm start from the k-nearest neighbors solution */
+
         // bounce
-        vector<int> success_no_ws_bounce; /**< success flags with no warm start */
-        vector<double> iter_no_ws_bounce; /**< iterations with no warm start */
-        vector<double> cpu_no_ws_bounce; /**< cpu time with no warm start */
-        vector<double> obj_no_ws_bounce; /**< objective function values with no warm start */
+        vector<int> success_cold_bounce; /**< success flags with cold start */
+        vector<double> iter_cold_bounce; /**< iterations with cold start */
+        vector<double> cpu_cold_bounce; /**< cpu time with cold start */
+        vector<double> obj_cold_bounce; /**< objective function values with cold start */
         vector<int> success_ws_or_bounce; /**< success flags with warm start from the original solution */
         vector<double> iter_ws_or_bounce; /**< iterations with warm start from the original solution */
         vector<double> cpu_ws_or_bounce; /**< cpu time with warm start from the original solution */
         vector<double> obj_ws_or_bounce; /**< objective function values with warm start from the original solution */
-        vector<int> success_ws_pred_bounce; /**< success flags with warm start from the predicted solution */
-        vector<double> iter_ws_pred_bounce; /**< iterations with warm start from the predicted solution */
-        vector<double> cpu_ws_pred_bounce; /**< cpu time with warm start from the predicted solution */
-        vector<double> obj_ws_pred_bounce; /**< objective function values with warm start from the predicted solution */
+        vector<int> success_ws_rdm_bounce; /**< success flags with warm start from the random solution */
+        vector<double> iter_ws_rdm_bounce; /**< iterations with warm start from the random solution */
+        vector<double> cpu_ws_rdm_bounce; /**< cpu time with warm start from the random solution */
+        vector<double> obj_ws_rdm_bounce; /**< objective function values with warm start from the random solution */
+        vector<int> success_ws_nn_bounce; /**< success flags with warm start from the neural network solution */
+        vector<double> iter_ws_nn_bounce; /**< iterations with warm start from the neural network solution */
+        vector<double> cpu_ws_nn_bounce; /**< cpu time with warm start from the neural network solution */
+        vector<double> obj_ws_nn_bounce; /**< objective function values with warm start from the neural network solution */
+        vector<int> success_ws_svm_bounce; /**< success flags with warm start from the support vector machines solution */
+        vector<double> iter_ws_svm_bounce; /**< iterations with warm start from the support vector machines solution */
+        vector<double> cpu_ws_svm_bounce; /**< cpu time with warm start from the support vector machines solution */
+        vector<double> obj_ws_svm_bounce; /**< objective function values with warm start from the support vector machines solution */
+        vector<int> success_ws_knn_bounce; /**< success flags with warm start from the k-nearest neighbors solution */
+        vector<double> iter_ws_knn_bounce; /**< iterations with warm start from the k-nearest neighbors solution */
+        vector<double> cpu_ws_knn_bounce; /**< cpu time with warm start from the k-nearest neighbors solution */
+        vector<double> obj_ws_knn_bounce; /**< objective function values with warm start from the k-nearest neighbors solution */
+
 
 
 

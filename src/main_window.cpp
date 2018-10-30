@@ -5928,9 +5928,12 @@ void MainWindow::on_pushButton_pred_plan_clicked()
         std::vector<double> move_final_hand;
         std::vector<double> move_final_arm;
         bool use_final;
-        HUMotion::planning_result_ptr h_results_no_ws;
+        HUMotion::planning_result_ptr h_results_cold;
         HUMotion::planning_result_ptr h_results_ws_or;
-        HUMotion::planning_result_ptr h_results_ws_pred;
+        HUMotion::planning_result_ptr h_results_ws_rdm_pred;
+        HUMotion::planning_result_ptr h_results_ws_nn_pred;
+        HUMotion::planning_result_ptr h_results_ws_svm_pred;
+        HUMotion::planning_result_ptr h_results_ws_knn_pred;
         int n_pred = ui.lineEdit_n_predictions->text().toInt();
         ui.pushButton_pred_plan->setCheckable(false);
 
@@ -5942,21 +5945,21 @@ void MainWindow::on_pushButton_pred_plan_clicked()
 
         // clear the results
         // plan
-        success_no_ws_plan.clear(); iter_no_ws_plan.clear(); cpu_no_ws_plan.clear(); obj_no_ws_plan.clear();
+        success_cold_plan.clear(); iter_cold_plan.clear(); cpu_cold_plan.clear(); obj_cold_plan.clear();
         success_ws_or_plan.clear(); iter_ws_or_plan.clear(); cpu_ws_or_plan.clear(); obj_ws_or_plan.clear();
-        success_ws_pred_plan.clear(); iter_ws_pred_plan.clear(); cpu_ws_pred_plan.clear(); obj_ws_pred_plan.clear();
+        success_ws_rdm_plan.clear(); iter_ws_rdm_plan.clear(); cpu_ws_rdm_plan.clear(); obj_ws_rdm_plan.clear();
         // approach
-        success_no_ws_app.clear(); iter_no_ws_app.clear(); cpu_no_ws_app.clear(); obj_no_ws_app.clear();
+        success_cold_app.clear(); iter_cold_app.clear(); cpu_cold_app.clear(); obj_cold_app.clear();
         success_ws_or_app.clear(); iter_ws_or_app.clear(); cpu_ws_or_app.clear(); obj_ws_or_app.clear();
-        success_ws_pred_app.clear(); iter_ws_pred_app.clear(); cpu_ws_pred_app.clear(); obj_ws_pred_app.clear();
+        success_ws_rdm_app.clear(); iter_ws_rdm_app.clear(); cpu_ws_rdm_app.clear(); obj_ws_rdm_app.clear();
         // retreat
-        success_no_ws_ret.clear(); iter_no_ws_ret.clear(); cpu_no_ws_ret.clear(); obj_no_ws_ret.clear();
+        success_cold_ret.clear(); iter_cold_ret.clear(); cpu_cold_ret.clear(); obj_cold_ret.clear();
         success_ws_or_ret.clear(); iter_ws_or_ret.clear(); cpu_ws_or_ret.clear(); obj_ws_or_ret.clear();
-        success_ws_pred_ret.clear(); iter_ws_pred_ret.clear(); cpu_ws_pred_ret.clear(); obj_ws_pred_ret.clear();
+        success_ws_rdm_ret.clear(); iter_ws_rdm_ret.clear(); cpu_ws_rdm_ret.clear(); obj_ws_rdm_ret.clear();
         // bounce
-        success_no_ws_bounce.clear(); iter_no_ws_bounce.clear(); cpu_no_ws_bounce.clear(); obj_no_ws_bounce.clear();
+        success_cold_bounce.clear(); iter_cold_bounce.clear(); cpu_cold_bounce.clear(); obj_cold_bounce.clear();
         success_ws_or_bounce.clear(); iter_ws_or_bounce.clear(); cpu_ws_or_bounce.clear(); obj_ws_or_bounce.clear();
-        success_ws_pred_bounce.clear(); iter_ws_pred_bounce.clear(); cpu_ws_pred_bounce.clear(); obj_ws_pred_bounce.clear();
+        success_ws_rdm_bounce.clear(); iter_ws_rdm_bounce.clear(); cpu_ws_rdm_bounce.clear(); obj_ws_rdm_bounce.clear();
 
         if(mov_type==1 || mov_type==5){ // move movement
             this->ui.tabWidget_learning_res->setTabEnabled(0,true);
@@ -6051,17 +6054,29 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                         pred_csv << ",obstacle_"+to_string(j+1)+"_x_mm,obstacle_"+to_string(j+1)+"_y_mm,obstacle_"+to_string(j+1)+"_z_mm,obstacle_"+to_string(j+1)+"_roll_rad,obstacle_"+to_string(j+1)+"_pitch_rad,obstacle_"+to_string(j+1)+"_yaw_rad";
                     }
                     if(mov_type==1 || mov_type==5){ // move movement
-                        // no warm start
-                        pred_csv << ",Success_f_no_ws,Iterations_f_plan_no_ws,Cpu_time_f_plan_no_ws,Obj_f_plan_no_ws,";
-                        pred_csv << "Success_b_no_ws,Iterations_bounce_no_ws,Cpu_time_bounce_no_ws,Obj_bounce_no_ws,";
+                        // cold start
+                        pred_csv << ",Success_f_cold,Iterations_f_plan_cold,Cpu_time_f_plan_cold,Obj_f_plan_cold,";
+                        pred_csv << "Success_b_cold,Iterations_bounce_cold,Cpu_time_bounce_cold,Obj_bounce_cold,";
 
                         // warm start with the original solution
                         pred_csv << "Success_f_ws_or,Iterations_f_plan_ws_or,Cpu_time_f_plan_ws_or,Obj_f_plan_ws_or,";
                         pred_csv << "Success_b_ws_or,Iterations_bounce_ws_or,Cpu_time_bounce_ws_or,Obj_bounce_ws_or,";
 
-                        // warm start with the predicted solution
-                        pred_csv << "Success_f_ws_pred,Iterations_f_plan_ws_pred,Cpu_time_f_plan_ws_pred,Obj_f_plan_ws_pred,";
-                        pred_csv << "Success_b_ws_pred,Iterations_bounce_ws_pred,Cpu_time_bounce_ws_pred,Obj_bounce_ws_pred";
+                        // warm start with the random solution
+                        pred_csv << "Success_f_ws_rdm,Iterations_f_plan_ws_rdm,Cpu_time_f_plan_ws_rdm,Obj_f_plan_ws_rdm,";
+                        pred_csv << "Success_b_ws_rdm,Iterations_bounce_ws_rdm,Cpu_time_bounce_ws_rdm,Obj_bounce_ws_rdm";
+
+                        // warm start with the neural network
+                        pred_csv << "Success_f_ws_nn_pred,Iterations_f_plan_ws_nn_pred,Cpu_time_f_plan_ws_nn_pred,Obj_f_plan_ws_nn_pred,";
+                        pred_csv << "Success_b_ws_nn_pred,Iterations_bounce_ws_nn_pred,Cpu_time_bounce_ws_nn_pred,Obj_bounce_ws_nn_pred";
+
+                        // warm start with the support vector machines
+                        pred_csv << "Success_f_ws_svm_pred,Iterations_f_plan_ws_svm_pred,Cpu_time_f_plan_ws_svm_pred,Obj_f_plan_ws_svm_pred,";
+                        pred_csv << "Success_b_ws_svm_pred,Iterations_bounce_ws_svm_pred,Cpu_time_bounce_ws_svm_pred,Obj_bounce_ws_svm_pred";
+
+                        // warm start with the k-nearest neighbors
+                        pred_csv << "Success_f_ws_knn_pred,Iterations_f_plan_ws_knn_pred,Cpu_time_f_plan_ws_knn_pred,Obj_f_plan_ws_knn_pred,";
+                        pred_csv << "Success_b_ws_knn_pred,Iterations_bounce_ws_knn_pred,Cpu_time_bounce_ws_knn_pred,Obj_bounce_ws_knn_pred";
                     }
                     pred_csv << " \n";
 
@@ -6184,11 +6199,31 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                         cmdLine = string("python3 ") + py_file + string(" ") + data_file + string(" ") + models_dir + string(" ") + pred_file + string(" ") + input_data_str;
                         //std::cout << cmdLine << std::endl;
                         int status = system(cmdLine.c_str());
-                        bool pred_sol_plan = false, pred_sol_approach = false, pred_sol_retreat = false, pred_sol_bounce = false;
-                        std::vector<double> pred_x_plan, pred_zL_plan, pred_zU_plan, pred_dual_plan;
-                        std::vector<double> pred_x_approach, pred_zL_approach, pred_zU_approach, pred_dual_approach;
-                        std::vector<double> pred_x_retreat, pred_zL_retreat, pred_zU_retreat, pred_dual_retreat;
-                        std::vector<double> pred_x_bounce, pred_zL_bounce, pred_zU_bounce, pred_dual_bounce;
+
+                        // Random solution
+                        bool pred_sol_rdm_plan = false, pred_sol_rdm_app = false, pred_sol_rdm_ret = false, pred_sol_rdm_bounce = false;
+                        std::vector<double> pred_x_rdm_plan, pred_zL_rdm_plan, pred_zU_rdm_plan, pred_dual_rdm_plan;
+                        std::vector<double> pred_x_rdm_app, pred_zL_rdm_app, pred_zU_rdm_app, pred_dual_rdm_app;
+                        std::vector<double> pred_x_rdm_ret, pred_zL_rdm_ret, pred_zU_rdm_ret, pred_dual_rdm_ret;
+                        std::vector<double> pred_x_rdm_bounce, pred_zL_rdm_bounce, pred_zU_rdm_bounce, pred_dual_rdm_bounce;
+                        // Neural Network solution
+                        bool pred_sol_nn_plan = false, pred_sol_nn_app = false, pred_sol_nn_ret = false, pred_sol_nn_bounce = false;
+                        std::vector<double> pred_x_nn_plan, pred_zL_nn_plan, pred_zU_nn_plan, pred_dual_nn_plan;
+                        std::vector<double> pred_x_nn_app, pred_zL_nn_app, pred_zU_nn_app, pred_dual_nn_app;
+                        std::vector<double> pred_x_nn_ret, pred_zL_nn_ret, pred_zU_nn_ret, pred_dual_nn_ret;
+                        std::vector<double> pred_x_nn_bounce, pred_zL_nn_bounce, pred_zU_nn_bounce, pred_dual_nn_bounce;
+                        // Support Vector Machines solution
+                        bool pred_sol_svm_plan = false, pred_sol_svm_app = false, pred_sol_svm_ret = false, pred_sol_svm_bounce = false;
+                        std::vector<double> pred_x_svm_plan, pred_zL_svm_plan, pred_zU_svm_plan, pred_dual_svm_plan;
+                        std::vector<double> pred_x_svm_app, pred_zL_svm_app, pred_zU_svm_app, pred_dual_svm_app;
+                        std::vector<double> pred_x_svm_ret, pred_zL_svm_ret, pred_zU_svm_ret, pred_dual_svm_ret;
+                        std::vector<double> pred_x_svm_bounce, pred_zL_svm_bounce, pred_zU_svm_bounce, pred_dual_svm_bounce;
+                        // K-Nearest Neighbors solution
+                        bool pred_sol_knn_plan = false, pred_sol_knn_app = false, pred_sol_knn_ret = false, pred_sol_knn_bounce = false;
+                        std::vector<double> pred_x_knn_plan, pred_zL_knn_plan, pred_zU_knn_plan, pred_dual_knn_plan;
+                        std::vector<double> pred_x_knn_app, pred_zL_knn_app, pred_zU_knn_app, pred_dual_knn_app;
+                        std::vector<double> pred_x_knn_ret, pred_zL_knn_ret, pred_zU_knn_ret, pred_dual_knn_ret;
+                        std::vector<double> pred_x_knn_bounce, pred_zL_knn_bounce, pred_zU_knn_bounce, pred_dual_knn_bounce;
 
                         if(status==0)
                         { // successful prediction, read the prediced solution
@@ -6201,74 +6236,285 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     line = f.readLine();
                                     if(line.at(0)!=QChar('#')){
                                         QStringList fields = line.split("=");
-                                        if (QString::compare(fields.at(0),QString("X_plan"),Qt::CaseInsensitive)==0){
-                                            pred_sol_plan = true;
+                                        // random solution
+                                        if (QString::compare(fields.at(0),QString("X_rdm_plan"),Qt::CaseInsensitive)==0){
+                                            pred_sol_rdm_plan = true;
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_x_plan.push_back(data.at(i).toDouble());
-                                        }else if (QString::compare(fields.at(0),QString("ZL_plan"),Qt::CaseInsensitive)==0){
+                                                pred_x_rdm_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("ZL_rdm_plan"),Qt::CaseInsensitive)==0){
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_zL_plan.push_back(data.at(i).toDouble());
-                                        }else if (QString::compare(fields.at(0),QString("ZU_plan"),Qt::CaseInsensitive)==0){
+                                                pred_zL_rdm_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("ZU_rdm_plan"),Qt::CaseInsensitive)==0){
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_zU_plan.push_back(data.at(i).toDouble());
-                                        }else if (QString::compare(fields.at(0),QString("Dual_plan"),Qt::CaseInsensitive)==0){
+                                                pred_zU_rdm_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("Dual_rdm_plan"),Qt::CaseInsensitive)==0){
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_dual_plan.push_back(data.at(i).toDouble());
-                                        }else if(QString::compare(fields.at(0),QString("X_approach"),Qt::CaseInsensitive)==0){
-                                            pred_sol_approach = true;
+                                                pred_dual_rdm_plan.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_rdm_approach"),Qt::CaseInsensitive)==0){
+                                            pred_sol_rdm_app = true;
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_x_approach.push_back(data.at(i).toDouble());
-                                        }else if(QString::compare(fields.at(0),QString("ZL_approach"),Qt::CaseInsensitive)==0){
+                                                pred_x_rdm_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_rdm_approach"),Qt::CaseInsensitive)==0){
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_zL_approach.push_back(data.at(i).toDouble());
-                                        }else if(QString::compare(fields.at(0),QString("ZU_approach"),Qt::CaseInsensitive)==0){
+                                                pred_zL_rdm_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_rdm_approach"),Qt::CaseInsensitive)==0){
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_zU_approach.push_back(data.at(i).toDouble());
-                                        }else if(QString::compare(fields.at(0),QString("Dual_approach"),Qt::CaseInsensitive)==0){
+                                                pred_zU_rdm_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_rdm_approach"),Qt::CaseInsensitive)==0){
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_dual_approach.push_back(data.at(i).toDouble());
-                                        }else if(QString::compare(fields.at(0),QString("X_retreat"),Qt::CaseInsensitive)==0){
-                                            pred_sol_retreat = true;
+                                                pred_dual_rdm_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_rdm_retreat"),Qt::CaseInsensitive)==0){
+                                            pred_sol_rdm_ret = true;
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_x_retreat.push_back(data.at(i).toDouble());
-                                        }else if(QString::compare(fields.at(0),QString("ZL_retreat"),Qt::CaseInsensitive)==0){
+                                                pred_x_rdm_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_rdm_retreat"),Qt::CaseInsensitive)==0){
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_zL_retreat.push_back(data.at(i).toDouble());
-                                        }else if(QString::compare(fields.at(0),QString("ZU_retreat"),Qt::CaseInsensitive)==0){
+                                                pred_zL_rdm_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_rdm_retreat"),Qt::CaseInsensitive)==0){
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_zU_retreat.push_back(data.at(i).toDouble());
-                                        }else if(QString::compare(fields.at(0),QString("Dual_retreat"),Qt::CaseInsensitive)==0){
+                                                pred_zU_rdm_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_rdm_retreat"),Qt::CaseInsensitive)==0){
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_dual_retreat.push_back(data.at(i).toDouble());
-                                        }else if(QString::compare(fields.at(0),QString("X_bounce"),Qt::CaseInsensitive)==0){
-                                            pred_sol_bounce = true;
+                                                pred_dual_rdm_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_rdm_bounce"),Qt::CaseInsensitive)==0){
+                                            pred_sol_rdm_bounce = true;
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_x_bounce.push_back(data.at(i).toDouble());
-                                        }else if(QString::compare(fields.at(0),QString("ZL_bounce"),Qt::CaseInsensitive)==0){
+                                                pred_x_rdm_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_rdm_bounce"),Qt::CaseInsensitive)==0){
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_zL_bounce.push_back(data.at(i).toDouble());
-                                        }else if(QString::compare(fields.at(0),QString("ZU_bounce"),Qt::CaseInsensitive)==0){
+                                                pred_zL_rdm_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_rdm_bounce"),Qt::CaseInsensitive)==0){
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_zU_bounce.push_back(data.at(i).toDouble());
-                                        }else if(QString::compare(fields.at(0),QString("Dual_bounce"),Qt::CaseInsensitive)==0){
+                                                pred_zU_rdm_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_rdm_bounce"),Qt::CaseInsensitive)==0){
                                             QStringList data = fields.at(1).split("|");
                                             for (size_t i=0; i<data.size();++i)
-                                                pred_dual_bounce.push_back(data.at(i).toDouble());
+                                                pred_dual_rdm_bounce.push_back(data.at(i).toDouble());
+                                        }
+                                        // neural network solution
+                                        if (QString::compare(fields.at(0),QString("X_nn_plan"),Qt::CaseInsensitive)==0){
+                                            pred_sol_nn_plan = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_nn_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("ZL_nn_plan"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_nn_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("ZU_nn_plan"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_nn_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("Dual_nn_plan"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_nn_plan.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_nn_approach"),Qt::CaseInsensitive)==0){
+                                            pred_sol_nn_app = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_nn_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_nn_approach"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_nn_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_nn_approach"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_nn_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_nn_approach"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_nn_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_nn_retreat"),Qt::CaseInsensitive)==0){
+                                            pred_sol_nn_ret = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_nn_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_nn_retreat"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_nn_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_nn_retreat"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_nn_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_nn_retreat"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_nn_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_nn_bounce"),Qt::CaseInsensitive)==0){
+                                            pred_sol_nn_bounce = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_nn_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_nn_bounce"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_nn_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_nn_bounce"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_nn_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_nn_bounce"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_nn_bounce.push_back(data.at(i).toDouble());
+                                        }
+                                        // support vector machines solution
+                                        if (QString::compare(fields.at(0),QString("X_svm_plan"),Qt::CaseInsensitive)==0){
+                                            pred_sol_svm_plan = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_svm_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("ZL_svm_plan"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_svm_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("ZU_svm_plan"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_svm_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("Dual_svm_plan"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_svm_plan.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_svm_approach"),Qt::CaseInsensitive)==0){
+                                            pred_sol_svm_app = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_svm_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_svm_approach"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_svm_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_svm_approach"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_svm_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_svm_approach"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_svm_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_svm_retreat"),Qt::CaseInsensitive)==0){
+                                            pred_sol_svm_ret = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_svm_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_svm_retreat"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_svm_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_svm_retreat"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_svm_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_svm_retreat"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_svm_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_svm_bounce"),Qt::CaseInsensitive)==0){
+                                            pred_sol_svm_bounce = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_svm_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_svm_bounce"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_svm_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_svm_bounce"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_svm_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_svm_bounce"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_svm_bounce.push_back(data.at(i).toDouble());
+                                        }
+                                        // k-nearest neighbors solution
+                                        if (QString::compare(fields.at(0),QString("X_knn_plan"),Qt::CaseInsensitive)==0){
+                                            pred_sol_knn_plan = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_knn_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("ZL_knn_plan"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_knn_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("ZU_knn_plan"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_knn_plan.push_back(data.at(i).toDouble());
+                                        }else if (QString::compare(fields.at(0),QString("Dual_knn_plan"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_knn_plan.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_knn_approach"),Qt::CaseInsensitive)==0){
+                                            pred_sol_knn_app = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_knn_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_knn_approach"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_knn_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_knn_approach"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_knn_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_knn_approach"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_knn_app.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_knn_retreat"),Qt::CaseInsensitive)==0){
+                                            pred_sol_knn_ret = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_knn_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_knn_retreat"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_knn_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_knn_retreat"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_knn_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_knn_retreat"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_knn_ret.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("X_knn_bounce"),Qt::CaseInsensitive)==0){
+                                            pred_sol_knn_bounce = true;
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_x_knn_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZL_knn_bounce"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zL_knn_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("ZU_knn_bounce"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_zU_knn_bounce.push_back(data.at(i).toDouble());
+                                        }else if(QString::compare(fields.at(0),QString("Dual_knn_bounce"),Qt::CaseInsensitive)==0){
+                                            QStringList data = fields.at(1).split("|");
+                                            for (size_t i=0; i<data.size();++i)
+                                                pred_dual_knn_bounce.push_back(data.at(i).toDouble());
                                         }
                                     }
                                 }
@@ -6278,9 +6524,9 @@ void MainWindow::on_pushButton_pred_plan_clicked()
 
                         // plan the movement
 
-                        // no warm start
+                        // cold start
                         tols.mov_specs.warm_start = false;
-                        h_results_no_ws = prob->solve(tols);
+                        h_results_cold = prob->solve(tols);
 
                         // warm start with the original solution
                         tols.mov_specs.warm_start = true;
@@ -6309,32 +6555,114 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                         h_results_ws_or = prob->solve(tols);
                         tols.mov_specs.final_warm_start_params.clear();
 
-                        // warm start with the predicted solution
+                        // warm start with the random solution
                         tols.mov_specs.warm_start = true;
-                        if(pred_sol_plan)
+                        if(pred_sol_rdm_plan)
                         {
                             HUMotion::warm_start_params final_plan;
                             final_plan.valid = true;
                             final_plan.description = "plan";
-                            final_plan.x = pred_x_plan;
-                            final_plan.zL = pred_zL_plan;
-                            final_plan.zU = pred_zU_plan;
-                            final_plan.dual_vars = pred_dual_plan;
+                            final_plan.x = pred_x_rdm_plan;
+                            final_plan.zL = pred_zL_rdm_plan;
+                            final_plan.zU = pred_zU_rdm_plan;
+                            final_plan.dual_vars = pred_dual_rdm_plan;
                             tols.mov_specs.final_warm_start_params.push_back(final_plan);
                         }
-                        if(pred_sol_bounce)
+                        if(pred_sol_rdm_bounce)
                         {
                             HUMotion::warm_start_params bounce;
                             bounce.valid = true;
                             bounce.description = "bounce";
-                            bounce.x = pred_x_bounce;
-                            bounce.zL = pred_zL_bounce;
-                            bounce.zU = pred_zU_bounce;
-                            bounce.dual_vars = pred_dual_bounce;
+                            bounce.x = pred_x_rdm_bounce;
+                            bounce.zL = pred_zL_rdm_bounce;
+                            bounce.zU = pred_zU_rdm_bounce;
+                            bounce.dual_vars = pred_dual_rdm_bounce;
                             tols.mov_specs.bounce_warm_start_params = bounce;
                         }
-                        h_results_ws_pred = prob->solve(tols);
+                        h_results_ws_rdm_pred = prob->solve(tols);
                         tols.mov_specs.final_warm_start_params.clear();
+
+                        // warm start with the neural network solution
+                        tols.mov_specs.warm_start = true;
+                        if(pred_sol_nn_plan)
+                        {
+                            HUMotion::warm_start_params final_plan;
+                            final_plan.valid = true;
+                            final_plan.description = "plan";
+                            final_plan.x = pred_x_nn_plan;
+                            final_plan.zL = pred_zL_nn_plan;
+                            final_plan.zU = pred_zU_nn_plan;
+                            final_plan.dual_vars = pred_dual_nn_plan;
+                            tols.mov_specs.final_warm_start_params.push_back(final_plan);
+                        }
+                        if(pred_sol_nn_bounce)
+                        {
+                            HUMotion::warm_start_params bounce;
+                            bounce.valid = true;
+                            bounce.description = "bounce";
+                            bounce.x = pred_x_nn_bounce;
+                            bounce.zL = pred_zL_nn_bounce;
+                            bounce.zU = pred_zU_nn_bounce;
+                            bounce.dual_vars = pred_dual_nn_bounce;
+                            tols.mov_specs.bounce_warm_start_params = bounce;
+                        }
+                        h_results_ws_nn_pred = prob->solve(tols);
+                        tols.mov_specs.final_warm_start_params.clear();
+
+                        // warm start with the support vector machines solution
+                        tols.mov_specs.warm_start = true;
+                        if(pred_sol_svm_plan)
+                        {
+                            HUMotion::warm_start_params final_plan;
+                            final_plan.valid = true;
+                            final_plan.description = "plan";
+                            final_plan.x = pred_x_svm_plan;
+                            final_plan.zL = pred_zL_svm_plan;
+                            final_plan.zU = pred_zU_svm_plan;
+                            final_plan.dual_vars = pred_dual_svm_plan;
+                            tols.mov_specs.final_warm_start_params.push_back(final_plan);
+                        }
+                        if(pred_sol_svm_bounce)
+                        {
+                            HUMotion::warm_start_params bounce;
+                            bounce.valid = true;
+                            bounce.description = "bounce";
+                            bounce.x = pred_x_svm_bounce;
+                            bounce.zL = pred_zL_svm_bounce;
+                            bounce.zU = pred_zU_svm_bounce;
+                            bounce.dual_vars = pred_dual_svm_bounce;
+                            tols.mov_specs.bounce_warm_start_params = bounce;
+                        }
+                        h_results_ws_svm_pred = prob->solve(tols);
+                        tols.mov_specs.final_warm_start_params.clear();
+
+                        // warm start with the k-nearest neighbors solution
+                        tols.mov_specs.warm_start = true;
+                        if(pred_sol_knn_plan)
+                        {
+                            HUMotion::warm_start_params final_plan;
+                            final_plan.valid = true;
+                            final_plan.description = "plan";
+                            final_plan.x = pred_x_knn_plan;
+                            final_plan.zL = pred_zL_knn_plan;
+                            final_plan.zU = pred_zU_knn_plan;
+                            final_plan.dual_vars = pred_dual_knn_plan;
+                            tols.mov_specs.final_warm_start_params.push_back(final_plan);
+                        }
+                        if(pred_sol_knn_bounce)
+                        {
+                            HUMotion::warm_start_params bounce;
+                            bounce.valid = true;
+                            bounce.description = "bounce";
+                            bounce.x = pred_x_knn_bounce;
+                            bounce.zL = pred_zL_knn_bounce;
+                            bounce.zU = pred_zU_knn_bounce;
+                            bounce.dual_vars = pred_dual_knn_bounce;
+                            tols.mov_specs.bounce_warm_start_params = bounce;
+                        }
+                        h_results_ws_knn_pred = prob->solve(tols);
+                        tols.mov_specs.final_warm_start_params.clear();
+
 
                         // collection of the results
                         // target
@@ -6352,34 +6680,34 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                             pred_csv << ","+obs_x_pos_str+","+obs_y_pos_str+","+obs_z_pos_str+","+obs_roll_str+","+obs_pitch_str+","+obs_yaw_str;
                         }
 
-                        // no warm start
-                        if(h_results_no_ws!=nullptr){
-                            if(h_results_no_ws->status==0){
+                        // cold start
+                        if(h_results_cold!=nullptr){
+                            if(h_results_cold->status==0){
                                 // movement planned successfully
                                 if(mov_type==1 || mov_type==5){ // move movement
-                                    HUMotion::warm_start_params plan_tar = (h_results_no_ws->final_warm_start_res).at(0);
+                                    HUMotion::warm_start_params plan_tar = (h_results_cold->final_warm_start_res).at(0);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
                                     string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
                                     string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
-                                    HUMotion::warm_start_params bounce_ws = h_results_no_ws->bounce_warm_start_res;
+                                    HUMotion::warm_start_params bounce_ws = h_results_cold->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
                                     string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
                                     string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
-                                    success_no_ws_plan.push_back(1); iter_no_ws_plan.push_back(plan_tar.iterations); cpu_no_ws_plan.push_back(plan_tar.cpu_time); obj_no_ws_plan.push_back(plan_tar.obj_value);
-                                    success_no_ws_bounce.push_back(1); iter_no_ws_bounce.push_back(bounce_ws.iterations); cpu_no_ws_bounce.push_back(bounce_ws.cpu_time); obj_no_ws_bounce.push_back(bounce_ws.obj_value);
+                                    success_cold_plan.push_back(1); iter_cold_plan.push_back(plan_tar.iterations); cpu_cold_plan.push_back(plan_tar.cpu_time); obj_cold_plan.push_back(plan_tar.obj_value);
+                                    success_cold_bounce.push_back(1); iter_cold_bounce.push_back(bounce_ws.iterations); cpu_cold_bounce.push_back(bounce_ws.cpu_time); obj_cold_bounce.push_back(bounce_ws.obj_value);
                                 }
                             }else{
                                 pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
-                                success_no_ws_plan.push_back(0);
-                                success_no_ws_bounce.push_back(0);
-                                qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
+                                success_cold_plan.push_back(0);
+                                success_cold_bounce.push_back(0);
+                                qnode.log(QNode::Info,std::string("Planning with cold start failed"));
                             }
                         }else{
                             pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
-                            success_no_ws_plan.push_back(0);
-                            success_no_ws_bounce.push_back(0);
-                            qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
+                            success_cold_plan.push_back(0);
+                            success_cold_bounce.push_back(0);
+                            qnode.log(QNode::Info,std::string("Planning with cold start failed"));
                         }
 
                         // warm start with the original solution
@@ -6403,43 +6731,133 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                 pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
                                 success_ws_or_plan.push_back(0);
                                 success_ws_or_bounce.push_back(0);
-                                qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
+                                qnode.log(QNode::Info,std::string("Planning with cold start failed"));
                             }
                         }else{
                             pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
                             success_ws_or_plan.push_back(0);
                             success_ws_or_bounce.push_back(0);
-                            qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
+                            qnode.log(QNode::Info,std::string("Planning with cold start failed"));
                         }
 
-                        // warm start with the predicted solution
-                        if(h_results_ws_pred!=nullptr){
-                            if(h_results_ws_pred->status==0){
+                        // warm start with the random solution
+                        if(h_results_ws_rdm_pred!=nullptr){
+                            if(h_results_ws_rdm_pred->status==0){
                                 // movement planned successfully
                                 if(mov_type==1 || mov_type==5){ // move movement
-                                    HUMotion::warm_start_params plan_tar = (h_results_ws_pred->final_warm_start_res).at(0);
+                                    HUMotion::warm_start_params plan_tar = (h_results_ws_rdm_pred->final_warm_start_res).at(0);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
                                     string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
                                     string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
-                                    HUMotion::warm_start_params bounce_ws = h_results_ws_pred->bounce_warm_start_res;
+                                    HUMotion::warm_start_params bounce_ws = h_results_ws_rdm_pred->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
                                     string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
                                     string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
-                                    success_ws_pred_plan.push_back(1); iter_ws_pred_plan.push_back(plan_tar.iterations); cpu_ws_pred_plan.push_back(plan_tar.cpu_time); obj_ws_pred_plan.push_back(plan_tar.obj_value);
-                                    success_ws_pred_bounce.push_back(1); iter_ws_pred_bounce.push_back(bounce_ws.iterations); cpu_ws_pred_bounce.push_back(bounce_ws.cpu_time); obj_ws_pred_bounce.push_back(bounce_ws.obj_value);
+                                    success_ws_rdm_plan.push_back(1); iter_ws_rdm_plan.push_back(plan_tar.iterations); cpu_ws_rdm_plan.push_back(plan_tar.cpu_time); obj_ws_rdm_plan.push_back(plan_tar.obj_value);
+                                    success_ws_rdm_bounce.push_back(1); iter_ws_rdm_bounce.push_back(bounce_ws.iterations); cpu_ws_rdm_bounce.push_back(bounce_ws.cpu_time); obj_ws_rdm_bounce.push_back(bounce_ws.obj_value);
                                 }
                             }else{
                                 pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
-                                success_ws_pred_plan.push_back(0);
-                                success_ws_pred_bounce.push_back(0);
-                                qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
+                                success_ws_rdm_plan.push_back(0);
+                                success_ws_rdm_bounce.push_back(0);
+                                qnode.log(QNode::Info,std::string("Planning with cold start failed"));
                             }
                         }else{
                             pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
-                            success_ws_pred_plan.push_back(0);
-                            success_ws_pred_bounce.push_back(0);
-                            qnode.log(QNode::Info,std::string("Planning with no warm start failed"));
+                            success_ws_rdm_plan.push_back(0);
+                            success_ws_rdm_bounce.push_back(0);
+                            qnode.log(QNode::Info,std::string("Planning with cold start failed"));
+                        }
+
+                        // warm start with the neural network solution
+                        if(h_results_ws_nn_pred!=nullptr){
+                            if(h_results_ws_nn_pred->status==0){
+                                // movement planned successfully
+                                if(mov_type==1 || mov_type==5){ // move movement
+                                    HUMotion::warm_start_params plan_tar = (h_results_ws_nn_pred->final_warm_start_res).at(0);
+                                    string iter_f_plan_str = to_string(plan_tar.iterations);
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    HUMotion::warm_start_params bounce_ws = h_results_ws_nn_pred->bounce_warm_start_res;
+                                    string iter_bounce_str = to_string(bounce_ws.iterations);
+                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
+                                    success_ws_nn_plan.push_back(1); iter_ws_nn_plan.push_back(plan_tar.iterations); cpu_ws_nn_plan.push_back(plan_tar.cpu_time); obj_ws_nn_plan.push_back(plan_tar.obj_value);
+                                    success_ws_nn_bounce.push_back(1); iter_ws_nn_bounce.push_back(bounce_ws.iterations); cpu_ws_nn_bounce.push_back(bounce_ws.cpu_time); obj_ws_nn_bounce.push_back(bounce_ws.obj_value);
+                                }
+                            }else{
+                                pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                                success_ws_nn_plan.push_back(0);
+                                success_ws_nn_bounce.push_back(0);
+                                qnode.log(QNode::Info,std::string("Planning with warm start NN failed"));
+                            }
+                        }else{
+                            pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                            success_ws_nn_plan.push_back(0);
+                            success_ws_nn_bounce.push_back(0);
+                            qnode.log(QNode::Info,std::string("Planning with warm start NN failed"));
+                        }
+
+                        // warm start with the support vector machines solution
+                        if(h_results_ws_svm_pred!=nullptr){
+                            if(h_results_ws_svm_pred->status==0){
+                                // movement planned successfully
+                                if(mov_type==1 || mov_type==5){ // move movement
+                                    HUMotion::warm_start_params plan_tar = (h_results_ws_svm_pred->final_warm_start_res).at(0);
+                                    string iter_f_plan_str = to_string(plan_tar.iterations);
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    HUMotion::warm_start_params bounce_ws = h_results_ws_svm_pred->bounce_warm_start_res;
+                                    string iter_bounce_str = to_string(bounce_ws.iterations);
+                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
+                                    success_ws_svm_plan.push_back(1); iter_ws_svm_plan.push_back(plan_tar.iterations); cpu_ws_svm_plan.push_back(plan_tar.cpu_time); obj_ws_svm_plan.push_back(plan_tar.obj_value);
+                                    success_ws_svm_bounce.push_back(1); iter_ws_svm_bounce.push_back(bounce_ws.iterations); cpu_ws_svm_bounce.push_back(bounce_ws.cpu_time); obj_ws_svm_bounce.push_back(bounce_ws.obj_value);
+                                }
+                            }else{
+                                pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                                success_ws_svm_plan.push_back(0);
+                                success_ws_svm_bounce.push_back(0);
+                                qnode.log(QNode::Info,std::string("Planning with warm start SVM failed"));
+                            }
+                        }else{
+                            pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                            success_ws_svm_plan.push_back(0);
+                            success_ws_svm_bounce.push_back(0);
+                            qnode.log(QNode::Info,std::string("Planning with warm start SVM failed"));
+                        }
+
+                        // warm start with the k-nearest neighbors solution
+                        if(h_results_ws_knn_pred!=nullptr){
+                            if(h_results_ws_knn_pred->status==0){
+                                // movement planned successfully
+                                if(mov_type==1 || mov_type==5){ // move movement
+                                    HUMotion::warm_start_params plan_tar = (h_results_ws_knn_pred->final_warm_start_res).at(0);
+                                    string iter_f_plan_str = to_string(plan_tar.iterations);
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    HUMotion::warm_start_params bounce_ws = h_results_ws_knn_pred->bounce_warm_start_res;
+                                    string iter_bounce_str = to_string(bounce_ws.iterations);
+                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
+                                    success_ws_knn_plan.push_back(1); iter_ws_knn_plan.push_back(plan_tar.iterations); cpu_ws_knn_plan.push_back(plan_tar.cpu_time); obj_ws_knn_plan.push_back(plan_tar.obj_value);
+                                    success_ws_knn_bounce.push_back(1); iter_ws_knn_bounce.push_back(bounce_ws.iterations); cpu_ws_knn_bounce.push_back(bounce_ws.cpu_time); obj_ws_knn_bounce.push_back(bounce_ws.obj_value);
+                                }
+                            }else{
+                                pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                                success_ws_knn_plan.push_back(0);
+                                success_ws_knn_bounce.push_back(0);
+                                qnode.log(QNode::Info,std::string("Planning with warm start KNN failed"));
+                            }
+                        }else{
+                            pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
+                            success_ws_knn_plan.push_back(0);
+                            success_ws_knn_bounce.push_back(0);
+                            qnode.log(QNode::Info,std::string("Planning with warm start KNN failed"));
                         }
                         pred_csv << "\n";
                     }// for loop predictions
@@ -6449,46 +6867,49 @@ void MainWindow::on_pushButton_pred_plan_clicked()
             default:
                 break;
             }
+
             // diplay the results
             std::unordered_map<int,int> m; int n1;
-            if(!success_no_ws_plan.empty()){// plan
 
-                // no warm start
-                count_occurrence(m, success_no_ws_plan); n1 = m[1];
+            // plan
+            if(!success_cold_plan.empty()){
+                // cold start
+                count_occurrence(m, success_cold_plan); n1 = m[1];
                 //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
-                double succ_rate_no_ws_plan = 100*(n1/double(success_no_ws_plan.size()));
-                this->ui.label_rate_no_ws_plan_value->setText(QString::number(succ_rate_no_ws_plan) + QString(" %"));
+                double succ_rate_cold_plan = 100*(n1/double(success_cold_plan.size()));
+                this->ui.label_rate_cold_plan_value->setText(QString::number(succ_rate_cold_plan) + QString(" %"));
 
-                double iter_no_ws_plan_mean = accumulate( iter_no_ws_plan.begin(), iter_no_ws_plan.end(), 0.0)/iter_no_ws_plan.size();
-                this->ui.label_iter_mean_no_ws_plan_value->setText(QString::number(iter_no_ws_plan_mean));
-                double iter_no_ws_plan_sq_sum = std::inner_product(iter_no_ws_plan.begin(), iter_no_ws_plan.end(), iter_no_ws_plan.begin(), 0.0);
-                double iter_no_ws_plan_std = std::sqrt(iter_no_ws_plan_sq_sum / iter_no_ws_plan.size() - iter_no_ws_plan_mean * iter_no_ws_plan_mean);
-                this->ui.label_iter_std_no_ws_plan_value->setText(QString::number(iter_no_ws_plan_std));
-                double iter_no_ws_plan_median = median(iter_no_ws_plan);
-                this->ui.label_iter_median_no_ws_plan_value->setText(QString::number(iter_no_ws_plan_median));
-                double iter_no_ws_plan_max= *std::max_element(iter_no_ws_plan.begin(),iter_no_ws_plan.end());
-                this->ui.label_iter_max_no_ws_plan_value->setText(QString::number(iter_no_ws_plan_max));
+                double iter_cold_plan_mean = accumulate( iter_cold_plan.begin(), iter_cold_plan.end(), 0.0)/iter_cold_plan.size();
+                this->ui.label_iter_mean_cold_plan_value->setText(QString::number(iter_cold_plan_mean));
+                double iter_cold_plan_sq_sum = std::inner_product(iter_cold_plan.begin(), iter_cold_plan.end(), iter_cold_plan.begin(), 0.0);
+                double iter_cold_plan_std = std::sqrt(iter_cold_plan_sq_sum / iter_cold_plan.size() - iter_cold_plan_mean * iter_cold_plan_mean);
+                this->ui.label_iter_std_cold_plan_value->setText(QString::number(iter_cold_plan_std));
+                double iter_cold_plan_median = median(iter_cold_plan);
+                this->ui.label_iter_median_cold_plan_value->setText(QString::number(iter_cold_plan_median));
+                double iter_cold_plan_max= *std::max_element(iter_cold_plan.begin(),iter_cold_plan.end());
+                this->ui.label_iter_max_cold_plan_value->setText(QString::number(iter_cold_plan_max));
 
-                double cpu_no_ws_plan_mean = accumulate( cpu_no_ws_plan.begin(), cpu_no_ws_plan.end(), 0.0)/cpu_no_ws_plan.size();
-                this->ui.label_cpu_mean_no_ws_plan_value->setText(QString::number(cpu_no_ws_plan_mean));
-                double cpu_no_ws_plan_sq_sum = std::inner_product(cpu_no_ws_plan.begin(), cpu_no_ws_plan.end(), cpu_no_ws_plan.begin(), 0.0);
-                double cpu_no_ws_plan_std = std::sqrt(cpu_no_ws_plan_sq_sum / cpu_no_ws_plan.size() - cpu_no_ws_plan_mean * cpu_no_ws_plan_mean);
-                this->ui.label_cpu_std_no_ws_plan_value->setText(QString::number(cpu_no_ws_plan_std));
-                double cpu_no_ws_plan_median = median(cpu_no_ws_plan);
-                this->ui.label_cpu_median_no_ws_plan_value->setText(QString::number(cpu_no_ws_plan_median));
-                double cpu_no_ws_plan_max= *std::max_element(cpu_no_ws_plan.begin(),cpu_no_ws_plan.end());
-                this->ui.label_cpu_max_no_ws_plan_value->setText(QString::number(cpu_no_ws_plan_max));
+                double cpu_cold_plan_mean = accumulate( cpu_cold_plan.begin(), cpu_cold_plan.end(), 0.0)/cpu_cold_plan.size();
+                this->ui.label_cpu_mean_cold_plan_value->setText(QString::number(cpu_cold_plan_mean));
+                double cpu_cold_plan_sq_sum = std::inner_product(cpu_cold_plan.begin(), cpu_cold_plan.end(), cpu_cold_plan.begin(), 0.0);
+                double cpu_cold_plan_std = std::sqrt(cpu_cold_plan_sq_sum / cpu_cold_plan.size() - cpu_cold_plan_mean * cpu_cold_plan_mean);
+                this->ui.label_cpu_std_cold_plan_value->setText(QString::number(cpu_cold_plan_std));
+                double cpu_cold_plan_median = median(cpu_cold_plan);
+                this->ui.label_cpu_median_cold_plan_value->setText(QString::number(cpu_cold_plan_median));
+                double cpu_cold_plan_max= *std::max_element(cpu_cold_plan.begin(),cpu_cold_plan.end());
+                this->ui.label_cpu_max_cold_plan_value->setText(QString::number(cpu_cold_plan_max));
 
-                double obj_no_ws_plan_mean = accumulate( obj_no_ws_plan.begin(), obj_no_ws_plan.end(), 0.0)/obj_no_ws_plan.size();
-                this->ui.label_obj_mean_no_ws_plan_value->setText(QString::number(obj_no_ws_plan_mean));
-                double obj_no_ws_plan_sq_sum = std::inner_product(obj_no_ws_plan.begin(), obj_no_ws_plan.end(), obj_no_ws_plan.begin(), 0.0);
-                double obj_no_ws_plan_std = std::sqrt(obj_no_ws_plan_sq_sum / obj_no_ws_plan.size() - obj_no_ws_plan_mean * obj_no_ws_plan_mean);
-                this->ui.label_obj_std_no_ws_plan_value->setText(QString::number(obj_no_ws_plan_std));
-                double obj_no_ws_plan_median = median(obj_no_ws_plan);
-                this->ui.label_obj_median_no_ws_plan_value->setText(QString::number(obj_no_ws_plan_median));
-                double obj_no_ws_plan_max= *std::max_element(obj_no_ws_plan.begin(),obj_no_ws_plan.end());
-                this->ui.label_obj_max_no_ws_plan_value->setText(QString::number(obj_no_ws_plan_max));
-
+                double obj_cold_plan_mean = accumulate( obj_cold_plan.begin(), obj_cold_plan.end(), 0.0)/obj_cold_plan.size();
+                this->ui.label_obj_mean_cold_plan_value->setText(QString::number(obj_cold_plan_mean));
+                double obj_cold_plan_sq_sum = std::inner_product(obj_cold_plan.begin(), obj_cold_plan.end(), obj_cold_plan.begin(), 0.0);
+                double obj_cold_plan_std = std::sqrt(obj_cold_plan_sq_sum / obj_cold_plan.size() - obj_cold_plan_mean * obj_cold_plan_mean);
+                this->ui.label_obj_std_cold_plan_value->setText(QString::number(obj_cold_plan_std));
+                double obj_cold_plan_median = median(obj_cold_plan);
+                this->ui.label_obj_median_cold_plan_value->setText(QString::number(obj_cold_plan_median));
+                double obj_cold_plan_max= *std::max_element(obj_cold_plan.begin(),obj_cold_plan.end());
+                this->ui.label_obj_max_cold_plan_value->setText(QString::number(obj_cold_plan_max));
+            }
+            if(!success_ws_or_plan.empty()){
                 // warm start with the original solution
                 count_occurrence(m, success_ws_or_plan); n1 = m[1];
                 //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
@@ -6524,82 +6945,200 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                 this->ui.label_obj_median_ws_or_plan_value->setText(QString::number(obj_ws_or_plan_median));
                 double obj_ws_or_plan_max= *std::max_element(obj_ws_or_plan.begin(),obj_ws_or_plan.end());
                 this->ui.label_obj_max_ws_or_plan_value->setText(QString::number(obj_ws_or_plan_max));
-
-                // warm start with the predicted solution
-                count_occurrence(m, success_ws_pred_plan); n1 = m[1];
-                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
-                double succ_rate_ws_pred_plan = 100*(n1/double(success_ws_pred_plan.size()));
-                this->ui.label_rate_ws_pred_plan_value->setText(QString::number(succ_rate_ws_pred_plan) + QString(" %"));
-
-                double iter_ws_pred_plan_mean = accumulate( iter_ws_pred_plan.begin(), iter_ws_pred_plan.end(), 0.0)/iter_ws_pred_plan.size();
-                this->ui.label_iter_mean_ws_pred_plan_value->setText(QString::number(iter_ws_pred_plan_mean));
-                double iter_ws_pred_plan_sq_sum = std::inner_product(iter_ws_pred_plan.begin(), iter_ws_pred_plan.end(), iter_ws_pred_plan.begin(), 0.0);
-                double iter_ws_pred_plan_std = std::sqrt(iter_ws_pred_plan_sq_sum / iter_ws_pred_plan.size() - iter_ws_pred_plan_mean * iter_ws_pred_plan_mean);
-                this->ui.label_iter_std_ws_pred_plan_value->setText(QString::number(iter_ws_pred_plan_std));
-                double iter_ws_pred_plan_median = median(iter_ws_pred_plan);
-                this->ui.label_iter_median_ws_pred_plan_value->setText(QString::number(iter_ws_pred_plan_median));
-                double iter_ws_pred_plan_max= *std::max_element(iter_ws_pred_plan.begin(),iter_ws_pred_plan.end());
-                this->ui.label_iter_max_ws_pred_plan_value->setText(QString::number(iter_ws_pred_plan_max));
-
-                double cpu_ws_pred_plan_mean = accumulate( cpu_ws_pred_plan.begin(), cpu_ws_pred_plan.end(), 0.0)/cpu_ws_pred_plan.size();
-                this->ui.label_cpu_mean_ws_pred_plan_value->setText(QString::number(cpu_ws_pred_plan_mean));
-                double cpu_ws_pred_plan_sq_sum = std::inner_product(cpu_ws_pred_plan.begin(), cpu_ws_pred_plan.end(), cpu_ws_pred_plan.begin(), 0.0);
-                double cpu_ws_pred_plan_std = std::sqrt(cpu_ws_pred_plan_sq_sum / cpu_ws_pred_plan.size() - cpu_ws_pred_plan_mean * cpu_ws_pred_plan_mean);
-                this->ui.label_cpu_std_ws_pred_plan_value->setText(QString::number(cpu_ws_pred_plan_std));
-                double cpu_ws_pred_plan_median = median(cpu_ws_pred_plan);
-                this->ui.label_cpu_median_ws_pred_plan_value->setText(QString::number(cpu_ws_pred_plan_median));
-                double cpu_ws_pred_plan_max= *std::max_element(cpu_ws_pred_plan.begin(),cpu_ws_pred_plan.end());
-                this->ui.label_cpu_max_ws_pred_plan_value->setText(QString::number(cpu_ws_pred_plan_max));
-
-                double obj_ws_pred_plan_mean = accumulate( obj_ws_pred_plan.begin(), obj_ws_pred_plan.end(), 0.0)/obj_ws_pred_plan.size();
-                this->ui.label_obj_mean_ws_pred_plan_value->setText(QString::number(obj_ws_pred_plan_mean));
-                double obj_ws_pred_plan_sq_sum = std::inner_product(obj_ws_pred_plan.begin(), obj_ws_pred_plan.end(), obj_ws_pred_plan.begin(), 0.0);
-                double obj_ws_pred_plan_std = std::sqrt(obj_ws_pred_plan_sq_sum / obj_ws_pred_plan.size() - obj_ws_pred_plan_mean * obj_ws_pred_plan_mean);
-                this->ui.label_obj_std_ws_pred_plan_value->setText(QString::number(obj_ws_pred_plan_std));
-                double obj_ws_pred_plan_median = median(obj_ws_pred_plan);
-                this->ui.label_obj_median_ws_pred_plan_value->setText(QString::number(obj_ws_pred_plan_median));
-                double obj_ws_pred_plan_max= *std::max_element(obj_ws_pred_plan.begin(),obj_ws_pred_plan.end());
-                this->ui.label_obj_max_ws_pred_plan_value->setText(QString::number(obj_ws_pred_plan_max));
-
             }
-            if(!success_no_ws_bounce.empty()){ // bounce
-
-                // no warm start
-                count_occurrence(m, success_no_ws_bounce); n1 = m[1];
+            if(!success_ws_rdm_plan.empty()){
+                // warm start with the random solution
+                count_occurrence(m, success_ws_rdm_plan); n1 = m[1];
                 //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
-                double succ_rate_no_ws_bounce = 100*(n1/double(success_no_ws_bounce.size()));
-                this->ui.label_rate_no_ws_bounce_value->setText(QString::number(succ_rate_no_ws_bounce) + QString(" %"));
+                double succ_rate_ws_rdm_plan = 100*(n1/double(success_ws_rdm_plan.size()));
+                this->ui.label_rate_ws_rdm_plan_value->setText(QString::number(succ_rate_ws_rdm_plan) + QString(" %"));
 
-                double iter_no_ws_bounce_mean = accumulate( iter_no_ws_bounce.begin(), iter_no_ws_bounce.end(), 0.0)/iter_no_ws_bounce.size();
-                this->ui.label_iter_mean_no_ws_bounce_value->setText(QString::number(iter_no_ws_bounce_mean));
-                double iter_no_ws_bounce_sq_sum = std::inner_product(iter_no_ws_bounce.begin(), iter_no_ws_bounce.end(), iter_no_ws_bounce.begin(), 0.0);
-                double iter_no_ws_bounce_std = std::sqrt(iter_no_ws_bounce_sq_sum / iter_no_ws_bounce.size() - iter_no_ws_bounce_mean * iter_no_ws_bounce_mean);
-                this->ui.label_iter_std_no_ws_bounce_value->setText(QString::number(iter_no_ws_bounce_std));
-                double iter_no_ws_bounce_median = median(iter_no_ws_bounce);
-                this->ui.label_iter_median_no_ws_bounce_value->setText(QString::number(iter_no_ws_bounce_median));
-                double iter_no_ws_bounce_max= *std::max_element(iter_no_ws_bounce.begin(),iter_no_ws_bounce.end());
-                this->ui.label_iter_max_no_ws_bounce_value->setText(QString::number(iter_no_ws_bounce_max));
+                double iter_ws_rdm_plan_mean = accumulate( iter_ws_rdm_plan.begin(), iter_ws_rdm_plan.end(), 0.0)/iter_ws_rdm_plan.size();
+                this->ui.label_iter_mean_ws_rdm_plan_value->setText(QString::number(iter_ws_rdm_plan_mean));
+                double iter_ws_rdm_plan_sq_sum = std::inner_product(iter_ws_rdm_plan.begin(), iter_ws_rdm_plan.end(), iter_ws_rdm_plan.begin(), 0.0);
+                double iter_ws_rdm_plan_std = std::sqrt(iter_ws_rdm_plan_sq_sum / iter_ws_rdm_plan.size() - iter_ws_rdm_plan_mean * iter_ws_rdm_plan_mean);
+                this->ui.label_iter_std_ws_rdm_plan_value->setText(QString::number(iter_ws_rdm_plan_std));
+                double iter_ws_rdm_plan_median = median(iter_ws_rdm_plan);
+                this->ui.label_iter_median_ws_rdm_plan_value->setText(QString::number(iter_ws_rdm_plan_median));
+                double iter_ws_rdm_plan_max= *std::max_element(iter_ws_rdm_plan.begin(),iter_ws_rdm_plan.end());
+                this->ui.label_iter_max_ws_rdm_plan_value->setText(QString::number(iter_ws_rdm_plan_max));
 
-                double cpu_no_ws_bounce_mean = accumulate( cpu_no_ws_bounce.begin(), cpu_no_ws_bounce.end(), 0.0)/cpu_no_ws_bounce.size();
-                this->ui.label_cpu_mean_no_ws_bounce_value->setText(QString::number(cpu_no_ws_bounce_mean));
-                double cpu_no_ws_bounce_sq_sum = std::inner_product(cpu_no_ws_bounce.begin(), cpu_no_ws_bounce.end(), cpu_no_ws_bounce.begin(), 0.0);
-                double cpu_no_ws_bounce_std = std::sqrt(cpu_no_ws_bounce_sq_sum / cpu_no_ws_bounce.size() - cpu_no_ws_bounce_mean * cpu_no_ws_bounce_mean);
-                this->ui.label_cpu_std_no_ws_bounce_value->setText(QString::number(cpu_no_ws_bounce_std));
-                double cpu_no_ws_bounce_median = median(cpu_no_ws_bounce);
-                this->ui.label_cpu_median_no_ws_bounce_value->setText(QString::number(cpu_no_ws_bounce_median));
-                double cpu_no_ws_bounce_max= *std::max_element(cpu_no_ws_bounce.begin(),cpu_no_ws_bounce.end());
-                this->ui.label_cpu_max_no_ws_bounce_value->setText(QString::number(cpu_no_ws_bounce_max));
+                double cpu_ws_rdm_plan_mean = accumulate( cpu_ws_rdm_plan.begin(), cpu_ws_rdm_plan.end(), 0.0)/cpu_ws_rdm_plan.size();
+                this->ui.label_cpu_mean_ws_rdm_plan_value->setText(QString::number(cpu_ws_rdm_plan_mean));
+                double cpu_ws_rdm_plan_sq_sum = std::inner_product(cpu_ws_rdm_plan.begin(), cpu_ws_rdm_plan.end(), cpu_ws_rdm_plan.begin(), 0.0);
+                double cpu_ws_rdm_plan_std = std::sqrt(cpu_ws_rdm_plan_sq_sum / cpu_ws_rdm_plan.size() - cpu_ws_rdm_plan_mean * cpu_ws_rdm_plan_mean);
+                this->ui.label_cpu_std_ws_rdm_plan_value->setText(QString::number(cpu_ws_rdm_plan_std));
+                double cpu_ws_rdm_plan_median = median(cpu_ws_rdm_plan);
+                this->ui.label_cpu_median_ws_rdm_plan_value->setText(QString::number(cpu_ws_rdm_plan_median));
+                double cpu_ws_rdm_plan_max= *std::max_element(cpu_ws_rdm_plan.begin(),cpu_ws_rdm_plan.end());
+                this->ui.label_cpu_max_ws_rdm_plan_value->setText(QString::number(cpu_ws_rdm_plan_max));
 
-                double obj_no_ws_bounce_mean = accumulate( obj_no_ws_bounce.begin(), obj_no_ws_bounce.end(), 0.0)/obj_no_ws_bounce.size();
-                this->ui.label_obj_mean_no_ws_bounce_value->setText(QString::number(obj_no_ws_bounce_mean));
-                double obj_no_ws_bounce_sq_sum = std::inner_product(obj_no_ws_bounce.begin(), obj_no_ws_bounce.end(), obj_no_ws_bounce.begin(), 0.0);
-                double obj_no_ws_bounce_std = std::sqrt(obj_no_ws_bounce_sq_sum / obj_no_ws_bounce.size() - obj_no_ws_bounce_mean * obj_no_ws_bounce_mean);
-                this->ui.label_obj_std_no_ws_bounce_value->setText(QString::number(obj_no_ws_bounce_std));
-                double obj_no_ws_bounce_median = median(obj_no_ws_bounce);
-                this->ui.label_obj_median_no_ws_bounce_value->setText(QString::number(obj_no_ws_bounce_median));
-                double obj_no_ws_bounce_max= *std::max_element(obj_no_ws_bounce.begin(),obj_no_ws_bounce.end());
-                this->ui.label_obj_max_no_ws_bounce_value->setText(QString::number(obj_no_ws_bounce_max));
+                double obj_ws_rdm_plan_mean = accumulate( obj_ws_rdm_plan.begin(), obj_ws_rdm_plan.end(), 0.0)/obj_ws_rdm_plan.size();
+                this->ui.label_obj_mean_ws_rdm_plan_value->setText(QString::number(obj_ws_rdm_plan_mean));
+                double obj_ws_rdm_plan_sq_sum = std::inner_product(obj_ws_rdm_plan.begin(), obj_ws_rdm_plan.end(), obj_ws_rdm_plan.begin(), 0.0);
+                double obj_ws_rdm_plan_std = std::sqrt(obj_ws_rdm_plan_sq_sum / obj_ws_rdm_plan.size() - obj_ws_rdm_plan_mean * obj_ws_rdm_plan_mean);
+                this->ui.label_obj_std_ws_rdm_plan_value->setText(QString::number(obj_ws_rdm_plan_std));
+                double obj_ws_rdm_plan_median = median(obj_ws_rdm_plan);
+                this->ui.label_obj_median_ws_rdm_plan_value->setText(QString::number(obj_ws_rdm_plan_median));
+                double obj_ws_rdm_plan_max= *std::max_element(obj_ws_rdm_plan.begin(),obj_ws_rdm_plan.end());
+                this->ui.label_obj_max_ws_rdm_plan_value->setText(QString::number(obj_ws_rdm_plan_max));
+            }
 
+            if(!success_ws_nn_plan.empty()){
+                // warm start with the neural network solution
+                count_occurrence(m, success_ws_nn_plan); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_ws_nn_plan = 100*(n1/double(success_ws_nn_plan.size()));
+                this->ui.label_rate_ws_nn_plan_value->setText(QString::number(succ_rate_ws_nn_plan) + QString(" %"));
+
+                double iter_ws_nn_plan_mean = accumulate( iter_ws_nn_plan.begin(), iter_ws_nn_plan.end(), 0.0)/iter_ws_nn_plan.size();
+                this->ui.label_iter_mean_ws_nn_plan_value->setText(QString::number(iter_ws_nn_plan_mean));
+                double iter_ws_nn_plan_sq_sum = std::inner_product(iter_ws_nn_plan.begin(), iter_ws_nn_plan.end(), iter_ws_nn_plan.begin(), 0.0);
+                double iter_ws_nn_plan_std = std::sqrt(iter_ws_nn_plan_sq_sum / iter_ws_nn_plan.size() - iter_ws_nn_plan_mean * iter_ws_nn_plan_mean);
+                this->ui.label_iter_std_ws_nn_plan_value->setText(QString::number(iter_ws_nn_plan_std));
+                double iter_ws_nn_plan_median = median(iter_ws_nn_plan);
+                this->ui.label_iter_median_ws_nn_plan_value->setText(QString::number(iter_ws_nn_plan_median));
+                double iter_ws_nn_plan_max= *std::max_element(iter_ws_nn_plan.begin(),iter_ws_nn_plan.end());
+                this->ui.label_iter_max_ws_nn_plan_value->setText(QString::number(iter_ws_nn_plan_max));
+
+                double cpu_ws_nn_plan_mean = accumulate( cpu_ws_nn_plan.begin(), cpu_ws_nn_plan.end(), 0.0)/cpu_ws_nn_plan.size();
+                this->ui.label_cpu_mean_ws_nn_plan_value->setText(QString::number(cpu_ws_nn_plan_mean));
+                double cpu_ws_nn_plan_sq_sum = std::inner_product(cpu_ws_nn_plan.begin(), cpu_ws_nn_plan.end(), cpu_ws_nn_plan.begin(), 0.0);
+                double cpu_ws_nn_plan_std = std::sqrt(cpu_ws_nn_plan_sq_sum / cpu_ws_nn_plan.size() - cpu_ws_nn_plan_mean * cpu_ws_nn_plan_mean);
+                this->ui.label_cpu_std_ws_nn_plan_value->setText(QString::number(cpu_ws_nn_plan_std));
+                double cpu_ws_nn_plan_median = median(cpu_ws_nn_plan);
+                this->ui.label_cpu_median_ws_nn_plan_value->setText(QString::number(cpu_ws_nn_plan_median));
+                double cpu_ws_nn_plan_max= *std::max_element(cpu_ws_nn_plan.begin(),cpu_ws_nn_plan.end());
+                this->ui.label_cpu_max_ws_nn_plan_value->setText(QString::number(cpu_ws_nn_plan_max));
+
+                double obj_ws_nn_plan_mean = accumulate( obj_ws_nn_plan.begin(), obj_ws_nn_plan.end(), 0.0)/obj_ws_nn_plan.size();
+                this->ui.label_obj_mean_ws_nn_plan_value->setText(QString::number(obj_ws_nn_plan_mean));
+                double obj_ws_nn_plan_sq_sum = std::inner_product(obj_ws_nn_plan.begin(), obj_ws_nn_plan.end(), obj_ws_nn_plan.begin(), 0.0);
+                double obj_ws_nn_plan_std = std::sqrt(obj_ws_nn_plan_sq_sum / obj_ws_nn_plan.size() - obj_ws_nn_plan_mean * obj_ws_nn_plan_mean);
+                this->ui.label_obj_std_ws_nn_plan_value->setText(QString::number(obj_ws_nn_plan_std));
+                double obj_ws_nn_plan_median = median(obj_ws_nn_plan);
+                this->ui.label_obj_median_ws_nn_plan_value->setText(QString::number(obj_ws_nn_plan_median));
+                double obj_ws_nn_plan_max= *std::max_element(obj_ws_nn_plan.begin(),obj_ws_nn_plan.end());
+                this->ui.label_obj_max_ws_nn_plan_value->setText(QString::number(obj_ws_nn_plan_max));
+            }
+
+            if(!success_ws_svm_plan.empty()){
+                // warm start with the support vector machines solution
+                count_occurrence(m, success_ws_svm_plan); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_ws_svm_plan = 100*(n1/double(success_ws_svm_plan.size()));
+                this->ui.label_rate_ws_svm_plan_value->setText(QString::number(succ_rate_ws_svm_plan) + QString(" %"));
+
+                double iter_ws_svm_plan_mean = accumulate( iter_ws_svm_plan.begin(), iter_ws_svm_plan.end(), 0.0)/iter_ws_svm_plan.size();
+                this->ui.label_iter_mean_ws_svm_plan_value->setText(QString::number(iter_ws_svm_plan_mean));
+                double iter_ws_svm_plan_sq_sum = std::inner_product(iter_ws_svm_plan.begin(), iter_ws_svm_plan.end(), iter_ws_svm_plan.begin(), 0.0);
+                double iter_ws_svm_plan_std = std::sqrt(iter_ws_svm_plan_sq_sum / iter_ws_svm_plan.size() - iter_ws_svm_plan_mean * iter_ws_svm_plan_mean);
+                this->ui.label_iter_std_ws_svm_plan_value->setText(QString::number(iter_ws_svm_plan_std));
+                double iter_ws_svm_plan_median = median(iter_ws_svm_plan);
+                this->ui.label_iter_median_ws_svm_plan_value->setText(QString::number(iter_ws_svm_plan_median));
+                double iter_ws_svm_plan_max= *std::max_element(iter_ws_svm_plan.begin(),iter_ws_svm_plan.end());
+                this->ui.label_iter_max_ws_svm_plan_value->setText(QString::number(iter_ws_svm_plan_max));
+
+                double cpu_ws_svm_plan_mean = accumulate( cpu_ws_svm_plan.begin(), cpu_ws_svm_plan.end(), 0.0)/cpu_ws_svm_plan.size();
+                this->ui.label_cpu_mean_ws_svm_plan_value->setText(QString::number(cpu_ws_svm_plan_mean));
+                double cpu_ws_svm_plan_sq_sum = std::inner_product(cpu_ws_svm_plan.begin(), cpu_ws_svm_plan.end(), cpu_ws_svm_plan.begin(), 0.0);
+                double cpu_ws_svm_plan_std = std::sqrt(cpu_ws_svm_plan_sq_sum / cpu_ws_svm_plan.size() - cpu_ws_svm_plan_mean * cpu_ws_svm_plan_mean);
+                this->ui.label_cpu_std_ws_svm_plan_value->setText(QString::number(cpu_ws_svm_plan_std));
+                double cpu_ws_svm_plan_median = median(cpu_ws_svm_plan);
+                this->ui.label_cpu_median_ws_svm_plan_value->setText(QString::number(cpu_ws_svm_plan_median));
+                double cpu_ws_svm_plan_max= *std::max_element(cpu_ws_svm_plan.begin(),cpu_ws_svm_plan.end());
+                this->ui.label_cpu_max_ws_svm_plan_value->setText(QString::number(cpu_ws_svm_plan_max));
+
+                double obj_ws_svm_plan_mean = accumulate( obj_ws_svm_plan.begin(), obj_ws_svm_plan.end(), 0.0)/obj_ws_svm_plan.size();
+                this->ui.label_obj_mean_ws_svm_plan_value->setText(QString::number(obj_ws_svm_plan_mean));
+                double obj_ws_svm_plan_sq_sum = std::inner_product(obj_ws_svm_plan.begin(), obj_ws_svm_plan.end(), obj_ws_svm_plan.begin(), 0.0);
+                double obj_ws_svm_plan_std = std::sqrt(obj_ws_svm_plan_sq_sum / obj_ws_svm_plan.size() - obj_ws_svm_plan_mean * obj_ws_svm_plan_mean);
+                this->ui.label_obj_std_ws_svm_plan_value->setText(QString::number(obj_ws_svm_plan_std));
+                double obj_ws_svm_plan_median = median(obj_ws_svm_plan);
+                this->ui.label_obj_median_ws_svm_plan_value->setText(QString::number(obj_ws_svm_plan_median));
+                double obj_ws_svm_plan_max= *std::max_element(obj_ws_svm_plan.begin(),obj_ws_svm_plan.end());
+                this->ui.label_obj_max_ws_svm_plan_value->setText(QString::number(obj_ws_svm_plan_max));
+            }
+
+            if(!success_ws_knn_plan.empty()){
+                // warm start with the k-nearest neighbors solution
+                count_occurrence(m, success_ws_knn_plan); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_ws_knn_plan = 100*(n1/double(success_ws_knn_plan.size()));
+                this->ui.label_rate_ws_knn_plan_value->setText(QString::number(succ_rate_ws_knn_plan) + QString(" %"));
+
+                double iter_ws_knn_plan_mean = accumulate( iter_ws_knn_plan.begin(), iter_ws_knn_plan.end(), 0.0)/iter_ws_knn_plan.size();
+                this->ui.label_iter_mean_ws_knn_plan_value->setText(QString::number(iter_ws_knn_plan_mean));
+                double iter_ws_knn_plan_sq_sum = std::inner_product(iter_ws_knn_plan.begin(), iter_ws_knn_plan.end(), iter_ws_knn_plan.begin(), 0.0);
+                double iter_ws_knn_plan_std = std::sqrt(iter_ws_knn_plan_sq_sum / iter_ws_knn_plan.size() - iter_ws_knn_plan_mean * iter_ws_knn_plan_mean);
+                this->ui.label_iter_std_ws_knn_plan_value->setText(QString::number(iter_ws_knn_plan_std));
+                double iter_ws_knn_plan_median = median(iter_ws_knn_plan);
+                this->ui.label_iter_median_ws_knn_plan_value->setText(QString::number(iter_ws_knn_plan_median));
+                double iter_ws_knn_plan_max= *std::max_element(iter_ws_knn_plan.begin(),iter_ws_knn_plan.end());
+                this->ui.label_iter_max_ws_knn_plan_value->setText(QString::number(iter_ws_knn_plan_max));
+
+                double cpu_ws_knn_plan_mean = accumulate( cpu_ws_knn_plan.begin(), cpu_ws_knn_plan.end(), 0.0)/cpu_ws_knn_plan.size();
+                this->ui.label_cpu_mean_ws_knn_plan_value->setText(QString::number(cpu_ws_knn_plan_mean));
+                double cpu_ws_knn_plan_sq_sum = std::inner_product(cpu_ws_knn_plan.begin(), cpu_ws_knn_plan.end(), cpu_ws_knn_plan.begin(), 0.0);
+                double cpu_ws_knn_plan_std = std::sqrt(cpu_ws_knn_plan_sq_sum / cpu_ws_knn_plan.size() - cpu_ws_knn_plan_mean * cpu_ws_knn_plan_mean);
+                this->ui.label_cpu_std_ws_knn_plan_value->setText(QString::number(cpu_ws_knn_plan_std));
+                double cpu_ws_knn_plan_median = median(cpu_ws_knn_plan);
+                this->ui.label_cpu_median_ws_knn_plan_value->setText(QString::number(cpu_ws_knn_plan_median));
+                double cpu_ws_knn_plan_max= *std::max_element(cpu_ws_knn_plan.begin(),cpu_ws_knn_plan.end());
+                this->ui.label_cpu_max_ws_knn_plan_value->setText(QString::number(cpu_ws_knn_plan_max));
+
+                double obj_ws_knn_plan_mean = accumulate( obj_ws_knn_plan.begin(), obj_ws_knn_plan.end(), 0.0)/obj_ws_knn_plan.size();
+                this->ui.label_obj_mean_ws_knn_plan_value->setText(QString::number(obj_ws_knn_plan_mean));
+                double obj_ws_knn_plan_sq_sum = std::inner_product(obj_ws_knn_plan.begin(), obj_ws_knn_plan.end(), obj_ws_knn_plan.begin(), 0.0);
+                double obj_ws_knn_plan_std = std::sqrt(obj_ws_knn_plan_sq_sum / obj_ws_knn_plan.size() - obj_ws_knn_plan_mean * obj_ws_knn_plan_mean);
+                this->ui.label_obj_std_ws_knn_plan_value->setText(QString::number(obj_ws_knn_plan_std));
+                double obj_ws_knn_plan_median = median(obj_ws_knn_plan);
+                this->ui.label_obj_median_ws_knn_plan_value->setText(QString::number(obj_ws_knn_plan_median));
+                double obj_ws_knn_plan_max= *std::max_element(obj_ws_knn_plan.begin(),obj_ws_knn_plan.end());
+                this->ui.label_obj_max_ws_knn_plan_value->setText(QString::number(obj_ws_knn_plan_max));
+            }
+
+            // bounce
+
+            if(!success_cold_bounce.empty()){
+                // cold start
+                count_occurrence(m, success_cold_bounce); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_cold_bounce = 100*(n1/double(success_cold_bounce.size()));
+                this->ui.label_rate_cold_bounce_value->setText(QString::number(succ_rate_cold_bounce) + QString(" %"));
+
+                double iter_cold_bounce_mean = accumulate( iter_cold_bounce.begin(), iter_cold_bounce.end(), 0.0)/iter_cold_bounce.size();
+                this->ui.label_iter_mean_cold_bounce_value->setText(QString::number(iter_cold_bounce_mean));
+                double iter_cold_bounce_sq_sum = std::inner_product(iter_cold_bounce.begin(), iter_cold_bounce.end(), iter_cold_bounce.begin(), 0.0);
+                double iter_cold_bounce_std = std::sqrt(iter_cold_bounce_sq_sum / iter_cold_bounce.size() - iter_cold_bounce_mean * iter_cold_bounce_mean);
+                this->ui.label_iter_std_cold_bounce_value->setText(QString::number(iter_cold_bounce_std));
+                double iter_cold_bounce_median = median(iter_cold_bounce);
+                this->ui.label_iter_median_cold_bounce_value->setText(QString::number(iter_cold_bounce_median));
+                double iter_cold_bounce_max= *std::max_element(iter_cold_bounce.begin(),iter_cold_bounce.end());
+                this->ui.label_iter_max_cold_bounce_value->setText(QString::number(iter_cold_bounce_max));
+
+                double cpu_cold_bounce_mean = accumulate( cpu_cold_bounce.begin(), cpu_cold_bounce.end(), 0.0)/cpu_cold_bounce.size();
+                this->ui.label_cpu_mean_cold_bounce_value->setText(QString::number(cpu_cold_bounce_mean));
+                double cpu_cold_bounce_sq_sum = std::inner_product(cpu_cold_bounce.begin(), cpu_cold_bounce.end(), cpu_cold_bounce.begin(), 0.0);
+                double cpu_cold_bounce_std = std::sqrt(cpu_cold_bounce_sq_sum / cpu_cold_bounce.size() - cpu_cold_bounce_mean * cpu_cold_bounce_mean);
+                this->ui.label_cpu_std_cold_bounce_value->setText(QString::number(cpu_cold_bounce_std));
+                double cpu_cold_bounce_median = median(cpu_cold_bounce);
+                this->ui.label_cpu_median_cold_bounce_value->setText(QString::number(cpu_cold_bounce_median));
+                double cpu_cold_bounce_max= *std::max_element(cpu_cold_bounce.begin(),cpu_cold_bounce.end());
+                this->ui.label_cpu_max_cold_bounce_value->setText(QString::number(cpu_cold_bounce_max));
+
+                double obj_cold_bounce_mean = accumulate( obj_cold_bounce.begin(), obj_cold_bounce.end(), 0.0)/obj_cold_bounce.size();
+                this->ui.label_obj_mean_cold_bounce_value->setText(QString::number(obj_cold_bounce_mean));
+                double obj_cold_bounce_sq_sum = std::inner_product(obj_cold_bounce.begin(), obj_cold_bounce.end(), obj_cold_bounce.begin(), 0.0);
+                double obj_cold_bounce_std = std::sqrt(obj_cold_bounce_sq_sum / obj_cold_bounce.size() - obj_cold_bounce_mean * obj_cold_bounce_mean);
+                this->ui.label_obj_std_cold_bounce_value->setText(QString::number(obj_cold_bounce_std));
+                double obj_cold_bounce_median = median(obj_cold_bounce);
+                this->ui.label_obj_median_cold_bounce_value->setText(QString::number(obj_cold_bounce_median));
+                double obj_cold_bounce_max= *std::max_element(obj_cold_bounce.begin(),obj_cold_bounce.end());
+                this->ui.label_obj_max_cold_bounce_value->setText(QString::number(obj_cold_bounce_max));
+            }
+
+            if(!success_ws_or_bounce.empty()){
                 // warm start with the original solution
                 count_occurrence(m, success_ws_or_bounce); n1 = m[1];
                 //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
@@ -6635,45 +7174,159 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                 this->ui.label_obj_median_ws_or_bounce_value->setText(QString::number(obj_ws_or_bounce_median));
                 double obj_ws_or_bounce_max= *std::max_element(obj_ws_or_bounce.begin(),obj_ws_or_bounce.end());
                 this->ui.label_obj_max_ws_or_bounce_value->setText(QString::number(obj_ws_or_bounce_max));
-
-                // warm start with the predicted solution
-                count_occurrence(m, success_ws_pred_bounce); n1 = m[1];
-                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
-                double succ_rate_ws_pred_bounce = 100*(n1/double(success_ws_pred_bounce.size()));
-                this->ui.label_rate_ws_pred_bounce_value->setText(QString::number(succ_rate_ws_pred_bounce) + QString(" %"));
-
-                double iter_ws_pred_bounce_mean = accumulate( iter_ws_pred_bounce.begin(), iter_ws_pred_bounce.end(), 0.0)/iter_ws_pred_bounce.size();
-                this->ui.label_iter_mean_ws_pred_bounce_value->setText(QString::number(iter_ws_pred_bounce_mean));
-                double iter_ws_pred_bounce_sq_sum = std::inner_product(iter_ws_pred_bounce.begin(), iter_ws_pred_bounce.end(), iter_ws_pred_bounce.begin(), 0.0);
-                double iter_ws_pred_bounce_std = std::sqrt(iter_ws_pred_bounce_sq_sum / iter_ws_pred_bounce.size() - iter_ws_pred_bounce_mean * iter_ws_pred_bounce_mean);
-                this->ui.label_iter_std_ws_pred_bounce_value->setText(QString::number(iter_ws_pred_bounce_std));
-                double iter_ws_pred_bounce_median = median(iter_ws_pred_bounce);
-                this->ui.label_iter_median_ws_pred_bounce_value->setText(QString::number(iter_ws_pred_bounce_median));
-                double iter_ws_pred_bounce_max= *std::max_element(iter_ws_pred_bounce.begin(),iter_ws_pred_bounce.end());
-                this->ui.label_iter_max_ws_pred_bounce_value->setText(QString::number(iter_ws_pred_bounce_max));
-
-                double cpu_ws_pred_bounce_mean = accumulate( cpu_ws_pred_bounce.begin(), cpu_ws_pred_bounce.end(), 0.0)/cpu_ws_pred_bounce.size();
-                this->ui.label_cpu_mean_ws_pred_bounce_value->setText(QString::number(cpu_ws_pred_bounce_mean));
-                double cpu_ws_pred_bounce_sq_sum = std::inner_product(cpu_ws_pred_bounce.begin(), cpu_ws_pred_bounce.end(), cpu_ws_pred_bounce.begin(), 0.0);
-                double cpu_ws_pred_bounce_std = std::sqrt(cpu_ws_pred_bounce_sq_sum / cpu_ws_pred_bounce.size() - cpu_ws_pred_bounce_mean * cpu_ws_pred_bounce_mean);
-                this->ui.label_cpu_std_ws_pred_bounce_value->setText(QString::number(cpu_ws_pred_bounce_std));
-                double cpu_ws_pred_bounce_median = median(cpu_ws_pred_bounce);
-                this->ui.label_cpu_median_ws_pred_bounce_value->setText(QString::number(cpu_ws_pred_bounce_median));
-                double cpu_ws_pred_bounce_max= *std::max_element(cpu_ws_pred_bounce.begin(),cpu_ws_pred_bounce.end());
-                this->ui.label_cpu_max_ws_pred_bounce_value->setText(QString::number(cpu_ws_pred_bounce_max));
-
-                double obj_ws_pred_bounce_mean = accumulate( obj_ws_pred_bounce.begin(), obj_ws_pred_bounce.end(), 0.0)/obj_ws_pred_bounce.size();
-                this->ui.label_obj_mean_ws_pred_bounce_value->setText(QString::number(obj_ws_pred_bounce_mean));
-                double obj_ws_pred_bounce_sq_sum = std::inner_product(obj_ws_pred_bounce.begin(), obj_ws_pred_bounce.end(), obj_ws_pred_bounce.begin(), 0.0);
-                double obj_ws_pred_bounce_std = std::sqrt(obj_ws_pred_bounce_sq_sum / obj_ws_pred_bounce.size() - obj_ws_pred_bounce_mean * obj_ws_pred_bounce_mean);
-                this->ui.label_obj_std_ws_pred_bounce_value->setText(QString::number(obj_ws_pred_bounce_std));
-                double obj_ws_pred_bounce_median = median(obj_ws_pred_bounce);
-                this->ui.label_obj_median_ws_pred_bounce_value->setText(QString::number(obj_ws_pred_bounce_median));
-                double obj_ws_pred_bounce_max= *std::max_element(obj_ws_pred_bounce.begin(),obj_ws_pred_bounce.end());
-                this->ui.label_obj_max_ws_pred_bounce_value->setText(QString::number(obj_ws_pred_bounce_max));
-
             }
 
+            if(!success_ws_rdm_bounce.empty()){
+                // warm start with the random solution
+                count_occurrence(m, success_ws_rdm_bounce); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_ws_rdm_bounce = 100*(n1/double(success_ws_rdm_bounce.size()));
+                this->ui.label_rate_ws_rdm_bounce_value->setText(QString::number(succ_rate_ws_rdm_bounce) + QString(" %"));
+
+                double iter_ws_rdm_bounce_mean = accumulate( iter_ws_rdm_bounce.begin(), iter_ws_rdm_bounce.end(), 0.0)/iter_ws_rdm_bounce.size();
+                this->ui.label_iter_mean_ws_rdm_bounce_value->setText(QString::number(iter_ws_rdm_bounce_mean));
+                double iter_ws_rdm_bounce_sq_sum = std::inner_product(iter_ws_rdm_bounce.begin(), iter_ws_rdm_bounce.end(), iter_ws_rdm_bounce.begin(), 0.0);
+                double iter_ws_rdm_bounce_std = std::sqrt(iter_ws_rdm_bounce_sq_sum / iter_ws_rdm_bounce.size() - iter_ws_rdm_bounce_mean * iter_ws_rdm_bounce_mean);
+                this->ui.label_iter_std_ws_rdm_bounce_value->setText(QString::number(iter_ws_rdm_bounce_std));
+                double iter_ws_rdm_bounce_median = median(iter_ws_rdm_bounce);
+                this->ui.label_iter_median_ws_rdm_bounce_value->setText(QString::number(iter_ws_rdm_bounce_median));
+                double iter_ws_rdm_bounce_max= *std::max_element(iter_ws_rdm_bounce.begin(),iter_ws_rdm_bounce.end());
+                this->ui.label_iter_max_ws_rdm_bounce_value->setText(QString::number(iter_ws_rdm_bounce_max));
+
+                double cpu_ws_rdm_bounce_mean = accumulate( cpu_ws_rdm_bounce.begin(), cpu_ws_rdm_bounce.end(), 0.0)/cpu_ws_rdm_bounce.size();
+                this->ui.label_cpu_mean_ws_rdm_bounce_value->setText(QString::number(cpu_ws_rdm_bounce_mean));
+                double cpu_ws_rdm_bounce_sq_sum = std::inner_product(cpu_ws_rdm_bounce.begin(), cpu_ws_rdm_bounce.end(), cpu_ws_rdm_bounce.begin(), 0.0);
+                double cpu_ws_rdm_bounce_std = std::sqrt(cpu_ws_rdm_bounce_sq_sum / cpu_ws_rdm_bounce.size() - cpu_ws_rdm_bounce_mean * cpu_ws_rdm_bounce_mean);
+                this->ui.label_cpu_std_ws_rdm_bounce_value->setText(QString::number(cpu_ws_rdm_bounce_std));
+                double cpu_ws_rdm_bounce_median = median(cpu_ws_rdm_bounce);
+                this->ui.label_cpu_median_ws_rdm_bounce_value->setText(QString::number(cpu_ws_rdm_bounce_median));
+                double cpu_ws_rdm_bounce_max= *std::max_element(cpu_ws_rdm_bounce.begin(),cpu_ws_rdm_bounce.end());
+                this->ui.label_cpu_max_ws_rdm_bounce_value->setText(QString::number(cpu_ws_rdm_bounce_max));
+
+                double obj_ws_rdm_bounce_mean = accumulate( obj_ws_rdm_bounce.begin(), obj_ws_rdm_bounce.end(), 0.0)/obj_ws_rdm_bounce.size();
+                this->ui.label_obj_mean_ws_rdm_bounce_value->setText(QString::number(obj_ws_rdm_bounce_mean));
+                double obj_ws_rdm_bounce_sq_sum = std::inner_product(obj_ws_rdm_bounce.begin(), obj_ws_rdm_bounce.end(), obj_ws_rdm_bounce.begin(), 0.0);
+                double obj_ws_rdm_bounce_std = std::sqrt(obj_ws_rdm_bounce_sq_sum / obj_ws_rdm_bounce.size() - obj_ws_rdm_bounce_mean * obj_ws_rdm_bounce_mean);
+                this->ui.label_obj_std_ws_rdm_bounce_value->setText(QString::number(obj_ws_rdm_bounce_std));
+                double obj_ws_rdm_bounce_median = median(obj_ws_rdm_bounce);
+                this->ui.label_obj_median_ws_rdm_bounce_value->setText(QString::number(obj_ws_rdm_bounce_median));
+                double obj_ws_rdm_bounce_max= *std::max_element(obj_ws_rdm_bounce.begin(),obj_ws_rdm_bounce.end());
+                this->ui.label_obj_max_ws_rdm_bounce_value->setText(QString::number(obj_ws_rdm_bounce_max));
+            }            
+
+            if(!success_ws_nn_bounce.empty()){
+                // warm start with the neural network solution
+                count_occurrence(m, success_ws_nn_bounce); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_ws_nn_bounce = 100*(n1/double(success_ws_nn_bounce.size()));
+                this->ui.label_rate_ws_nn_bounce_value->setText(QString::number(succ_rate_ws_nn_bounce) + QString(" %"));
+
+                double iter_ws_nn_bounce_mean = accumulate( iter_ws_nn_bounce.begin(), iter_ws_nn_bounce.end(), 0.0)/iter_ws_nn_bounce.size();
+                this->ui.label_iter_mean_ws_nn_bounce_value->setText(QString::number(iter_ws_nn_bounce_mean));
+                double iter_ws_nn_bounce_sq_sum = std::inner_product(iter_ws_nn_bounce.begin(), iter_ws_nn_bounce.end(), iter_ws_nn_bounce.begin(), 0.0);
+                double iter_ws_nn_bounce_std = std::sqrt(iter_ws_nn_bounce_sq_sum / iter_ws_nn_bounce.size() - iter_ws_nn_bounce_mean * iter_ws_nn_bounce_mean);
+                this->ui.label_iter_std_ws_nn_bounce_value->setText(QString::number(iter_ws_nn_bounce_std));
+                double iter_ws_nn_bounce_median = median(iter_ws_nn_bounce);
+                this->ui.label_iter_median_ws_nn_bounce_value->setText(QString::number(iter_ws_nn_bounce_median));
+                double iter_ws_nn_bounce_max= *std::max_element(iter_ws_nn_bounce.begin(),iter_ws_nn_bounce.end());
+                this->ui.label_iter_max_ws_nn_bounce_value->setText(QString::number(iter_ws_nn_bounce_max));
+
+                double cpu_ws_nn_bounce_mean = accumulate( cpu_ws_nn_bounce.begin(), cpu_ws_nn_bounce.end(), 0.0)/cpu_ws_nn_bounce.size();
+                this->ui.label_cpu_mean_ws_nn_bounce_value->setText(QString::number(cpu_ws_nn_bounce_mean));
+                double cpu_ws_nn_bounce_sq_sum = std::inner_product(cpu_ws_nn_bounce.begin(), cpu_ws_nn_bounce.end(), cpu_ws_nn_bounce.begin(), 0.0);
+                double cpu_ws_nn_bounce_std = std::sqrt(cpu_ws_nn_bounce_sq_sum / cpu_ws_nn_bounce.size() - cpu_ws_nn_bounce_mean * cpu_ws_nn_bounce_mean);
+                this->ui.label_cpu_std_ws_nn_bounce_value->setText(QString::number(cpu_ws_nn_bounce_std));
+                double cpu_ws_nn_bounce_median = median(cpu_ws_nn_bounce);
+                this->ui.label_cpu_median_ws_nn_bounce_value->setText(QString::number(cpu_ws_nn_bounce_median));
+                double cpu_ws_nn_bounce_max= *std::max_element(cpu_ws_nn_bounce.begin(),cpu_ws_nn_bounce.end());
+                this->ui.label_cpu_max_ws_nn_bounce_value->setText(QString::number(cpu_ws_nn_bounce_max));
+
+                double obj_ws_nn_bounce_mean = accumulate( obj_ws_nn_bounce.begin(), obj_ws_nn_bounce.end(), 0.0)/obj_ws_nn_bounce.size();
+                this->ui.label_obj_mean_ws_nn_bounce_value->setText(QString::number(obj_ws_nn_bounce_mean));
+                double obj_ws_nn_bounce_sq_sum = std::inner_product(obj_ws_nn_bounce.begin(), obj_ws_nn_bounce.end(), obj_ws_nn_bounce.begin(), 0.0);
+                double obj_ws_nn_bounce_std = std::sqrt(obj_ws_nn_bounce_sq_sum / obj_ws_nn_bounce.size() - obj_ws_nn_bounce_mean * obj_ws_nn_bounce_mean);
+                this->ui.label_obj_std_ws_nn_bounce_value->setText(QString::number(obj_ws_nn_bounce_std));
+                double obj_ws_nn_bounce_median = median(obj_ws_nn_bounce);
+                this->ui.label_obj_median_ws_nn_bounce_value->setText(QString::number(obj_ws_nn_bounce_median));
+                double obj_ws_nn_bounce_max= *std::max_element(obj_ws_nn_bounce.begin(),obj_ws_nn_bounce.end());
+                this->ui.label_obj_max_ws_nn_bounce_value->setText(QString::number(obj_ws_nn_bounce_max));
+            }
+
+            if(!success_ws_svm_bounce.empty()){
+                // warm start with the support vector machines solution
+                count_occurrence(m, success_ws_svm_bounce); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_ws_svm_bounce = 100*(n1/double(success_ws_svm_bounce.size()));
+                this->ui.label_rate_ws_svm_bounce_value->setText(QString::number(succ_rate_ws_svm_bounce) + QString(" %"));
+
+                double iter_ws_svm_bounce_mean = accumulate( iter_ws_svm_bounce.begin(), iter_ws_svm_bounce.end(), 0.0)/iter_ws_svm_bounce.size();
+                this->ui.label_iter_mean_ws_svm_bounce_value->setText(QString::number(iter_ws_svm_bounce_mean));
+                double iter_ws_svm_bounce_sq_sum = std::inner_product(iter_ws_svm_bounce.begin(), iter_ws_svm_bounce.end(), iter_ws_svm_bounce.begin(), 0.0);
+                double iter_ws_svm_bounce_std = std::sqrt(iter_ws_svm_bounce_sq_sum / iter_ws_svm_bounce.size() - iter_ws_svm_bounce_mean * iter_ws_svm_bounce_mean);
+                this->ui.label_iter_std_ws_svm_bounce_value->setText(QString::number(iter_ws_svm_bounce_std));
+                double iter_ws_svm_bounce_median = median(iter_ws_svm_bounce);
+                this->ui.label_iter_median_ws_svm_bounce_value->setText(QString::number(iter_ws_svm_bounce_median));
+                double iter_ws_svm_bounce_max= *std::max_element(iter_ws_svm_bounce.begin(),iter_ws_svm_bounce.end());
+                this->ui.label_iter_max_ws_svm_bounce_value->setText(QString::number(iter_ws_svm_bounce_max));
+
+                double cpu_ws_svm_bounce_mean = accumulate( cpu_ws_svm_bounce.begin(), cpu_ws_svm_bounce.end(), 0.0)/cpu_ws_svm_bounce.size();
+                this->ui.label_cpu_mean_ws_svm_bounce_value->setText(QString::number(cpu_ws_svm_bounce_mean));
+                double cpu_ws_svm_bounce_sq_sum = std::inner_product(cpu_ws_svm_bounce.begin(), cpu_ws_svm_bounce.end(), cpu_ws_svm_bounce.begin(), 0.0);
+                double cpu_ws_svm_bounce_std = std::sqrt(cpu_ws_svm_bounce_sq_sum / cpu_ws_svm_bounce.size() - cpu_ws_svm_bounce_mean * cpu_ws_svm_bounce_mean);
+                this->ui.label_cpu_std_ws_svm_bounce_value->setText(QString::number(cpu_ws_svm_bounce_std));
+                double cpu_ws_svm_bounce_median = median(cpu_ws_svm_bounce);
+                this->ui.label_cpu_median_ws_svm_bounce_value->setText(QString::number(cpu_ws_svm_bounce_median));
+                double cpu_ws_svm_bounce_max= *std::max_element(cpu_ws_svm_bounce.begin(),cpu_ws_svm_bounce.end());
+                this->ui.label_cpu_max_ws_svm_bounce_value->setText(QString::number(cpu_ws_svm_bounce_max));
+
+                double obj_ws_svm_bounce_mean = accumulate( obj_ws_svm_bounce.begin(), obj_ws_svm_bounce.end(), 0.0)/obj_ws_svm_bounce.size();
+                this->ui.label_obj_mean_ws_svm_bounce_value->setText(QString::number(obj_ws_svm_bounce_mean));
+                double obj_ws_svm_bounce_sq_sum = std::inner_product(obj_ws_svm_bounce.begin(), obj_ws_svm_bounce.end(), obj_ws_svm_bounce.begin(), 0.0);
+                double obj_ws_svm_bounce_std = std::sqrt(obj_ws_svm_bounce_sq_sum / obj_ws_svm_bounce.size() - obj_ws_svm_bounce_mean * obj_ws_svm_bounce_mean);
+                this->ui.label_obj_std_ws_svm_bounce_value->setText(QString::number(obj_ws_svm_bounce_std));
+                double obj_ws_svm_bounce_median = median(obj_ws_svm_bounce);
+                this->ui.label_obj_median_ws_svm_bounce_value->setText(QString::number(obj_ws_svm_bounce_median));
+                double obj_ws_svm_bounce_max= *std::max_element(obj_ws_svm_bounce.begin(),obj_ws_svm_bounce.end());
+                this->ui.label_obj_max_ws_svm_bounce_value->setText(QString::number(obj_ws_svm_bounce_max));
+            }
+
+            if(!success_ws_knn_bounce.empty()){
+                // warm start with the k-nearest neighbors solution
+                count_occurrence(m, success_ws_knn_bounce); n1 = m[1];
+                //std::cout<<m[1]<<std::endl; //print the number of occurrences of 1
+                double succ_rate_ws_knn_bounce = 100*(n1/double(success_ws_knn_bounce.size()));
+                this->ui.label_rate_ws_knn_bounce_value->setText(QString::number(succ_rate_ws_knn_bounce) + QString(" %"));
+
+                double iter_ws_knn_bounce_mean = accumulate( iter_ws_knn_bounce.begin(), iter_ws_knn_bounce.end(), 0.0)/iter_ws_knn_bounce.size();
+                this->ui.label_iter_mean_ws_knn_bounce_value->setText(QString::number(iter_ws_knn_bounce_mean));
+                double iter_ws_knn_bounce_sq_sum = std::inner_product(iter_ws_knn_bounce.begin(), iter_ws_knn_bounce.end(), iter_ws_knn_bounce.begin(), 0.0);
+                double iter_ws_knn_bounce_std = std::sqrt(iter_ws_knn_bounce_sq_sum / iter_ws_knn_bounce.size() - iter_ws_knn_bounce_mean * iter_ws_knn_bounce_mean);
+                this->ui.label_iter_std_ws_knn_bounce_value->setText(QString::number(iter_ws_knn_bounce_std));
+                double iter_ws_knn_bounce_median = median(iter_ws_knn_bounce);
+                this->ui.label_iter_median_ws_knn_bounce_value->setText(QString::number(iter_ws_knn_bounce_median));
+                double iter_ws_knn_bounce_max= *std::max_element(iter_ws_knn_bounce.begin(),iter_ws_knn_bounce.end());
+                this->ui.label_iter_max_ws_knn_bounce_value->setText(QString::number(iter_ws_knn_bounce_max));
+
+                double cpu_ws_knn_bounce_mean = accumulate( cpu_ws_knn_bounce.begin(), cpu_ws_knn_bounce.end(), 0.0)/cpu_ws_knn_bounce.size();
+                this->ui.label_cpu_mean_ws_knn_bounce_value->setText(QString::number(cpu_ws_knn_bounce_mean));
+                double cpu_ws_knn_bounce_sq_sum = std::inner_product(cpu_ws_knn_bounce.begin(), cpu_ws_knn_bounce.end(), cpu_ws_knn_bounce.begin(), 0.0);
+                double cpu_ws_knn_bounce_std = std::sqrt(cpu_ws_knn_bounce_sq_sum / cpu_ws_knn_bounce.size() - cpu_ws_knn_bounce_mean * cpu_ws_knn_bounce_mean);
+                this->ui.label_cpu_std_ws_knn_bounce_value->setText(QString::number(cpu_ws_knn_bounce_std));
+                double cpu_ws_knn_bounce_median = median(cpu_ws_knn_bounce);
+                this->ui.label_cpu_median_ws_knn_bounce_value->setText(QString::number(cpu_ws_knn_bounce_median));
+                double cpu_ws_knn_bounce_max= *std::max_element(cpu_ws_knn_bounce.begin(),cpu_ws_knn_bounce.end());
+                this->ui.label_cpu_max_ws_knn_bounce_value->setText(QString::number(cpu_ws_knn_bounce_max));
+
+                double obj_ws_knn_bounce_mean = accumulate( obj_ws_knn_bounce.begin(), obj_ws_knn_bounce.end(), 0.0)/obj_ws_knn_bounce.size();
+                this->ui.label_obj_mean_ws_knn_bounce_value->setText(QString::number(obj_ws_knn_bounce_mean));
+                double obj_ws_knn_bounce_sq_sum = std::inner_product(obj_ws_knn_bounce.begin(), obj_ws_knn_bounce.end(), obj_ws_knn_bounce.begin(), 0.0);
+                double obj_ws_knn_bounce_std = std::sqrt(obj_ws_knn_bounce_sq_sum / obj_ws_knn_bounce.size() - obj_ws_knn_bounce_mean * obj_ws_knn_bounce_mean);
+                this->ui.label_obj_std_ws_knn_bounce_value->setText(QString::number(obj_ws_knn_bounce_std));
+                double obj_ws_knn_bounce_median = median(obj_ws_knn_bounce);
+                this->ui.label_obj_median_ws_knn_bounce_value->setText(QString::number(obj_ws_knn_bounce_median));
+                double obj_ws_knn_bounce_max= *std::max_element(obj_ws_knn_bounce.begin(),obj_ws_knn_bounce.end());
+                this->ui.label_obj_max_ws_knn_bounce_value->setText(QString::number(obj_ws_knn_bounce_max));
+            }
 
         }catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
         }catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
@@ -6694,20 +7347,20 @@ void MainWindow::on_pushButton_save_learning_res_clicked()
     if(this->ui.tabWidget_learning_res->isTabEnabled(0))
     {
         results << string("# Plan target posture selection results  \n");
-        results << string(" # No warm start\n");
-        results << string("success_rate_no_ws_plan =")+this->ui.label_rate_no_ws_plan_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_plan_mean =")+this->ui.label_iter_mean_no_ws_plan_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_plan_std =")+this->ui.label_iter_std_no_ws_plan_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_plan_median =")+this->ui.label_iter_median_no_ws_plan_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_plan_max =")+this->ui.label_iter_max_no_ws_plan_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_plan_mean =")+this->ui.label_cpu_mean_no_ws_plan_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_plan_std =")+this->ui.label_cpu_std_no_ws_plan_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_plan_median =")+this->ui.label_cpu_median_no_ws_plan_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_plan_max =")+this->ui.label_cpu_max_no_ws_plan_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_plan_mean =")+this->ui.label_obj_mean_no_ws_plan_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_plan_std =")+this->ui.label_obj_std_no_ws_plan_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_plan_median =")+this->ui.label_obj_median_no_ws_plan_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_plan_max =")+this->ui.label_obj_max_no_ws_plan_value->text().toStdString()+string(";\n");
+        results << string(" # Cold start\n");
+        results << string("success_rate_cold_plan =")+this->ui.label_rate_cold_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_plan_mean =")+this->ui.label_iter_mean_cold_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_plan_std =")+this->ui.label_iter_std_cold_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_plan_median =")+this->ui.label_iter_median_cold_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_plan_max =")+this->ui.label_iter_max_cold_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_plan_mean =")+this->ui.label_cpu_mean_cold_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_plan_std =")+this->ui.label_cpu_std_cold_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_plan_median =")+this->ui.label_cpu_median_cold_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_plan_max =")+this->ui.label_cpu_max_cold_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_plan_mean =")+this->ui.label_obj_mean_cold_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_plan_std =")+this->ui.label_obj_std_cold_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_plan_median =")+this->ui.label_obj_median_cold_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_plan_max =")+this->ui.label_obj_max_cold_plan_value->text().toStdString()+string(";\n");
         results << string(" # Warm start with the original solution \n");
         results << string("success_rate_ws_or_plan =")+this->ui.label_rate_ws_or_plan_value->text().toStdString()+string(";\n");
         results << string("iterations_ws_or_plan_mean =")+this->ui.label_iter_mean_ws_or_plan_value->text().toStdString()+string(";\n");
@@ -6722,40 +7375,82 @@ void MainWindow::on_pushButton_save_learning_res_clicked()
         results << string("obj_ws_or_plan_std =")+this->ui.label_obj_std_ws_or_plan_value->text().toStdString()+string(";\n");
         results << string("obj_ws_or_plan_median =")+this->ui.label_obj_median_ws_or_plan_value->text().toStdString()+string(";\n");
         results << string("obj_ws_or_plan_max =")+this->ui.label_obj_max_ws_or_plan_value->text().toStdString()+string(";\n");
-        results << string(" # Warm start with the predicted solution \n");
-        results << string("success_rate_ws_pred_plan =")+this->ui.label_rate_ws_pred_plan_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_plan_mean =")+this->ui.label_iter_mean_ws_pred_plan_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_plan_std =")+this->ui.label_iter_std_ws_pred_plan_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_plan_median =")+this->ui.label_iter_median_ws_pred_plan_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_plan_max =")+this->ui.label_iter_max_ws_pred_plan_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_plan_mean =")+this->ui.label_cpu_mean_ws_pred_plan_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_plan_std =")+this->ui.label_cpu_std_ws_pred_plan_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_plan_median =")+this->ui.label_cpu_median_ws_pred_plan_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_plan_max =")+this->ui.label_cpu_max_ws_pred_plan_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_plan_mean =")+this->ui.label_obj_mean_ws_pred_plan_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_plan_std =")+this->ui.label_obj_std_ws_pred_plan_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_plan_median =")+this->ui.label_obj_median_ws_pred_plan_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_plan_max =")+this->ui.label_obj_max_ws_pred_plan_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with the random solution \n");
+        results << string("success_rate_ws_rdm_plan =")+this->ui.label_rate_ws_rdm_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_plan_mean =")+this->ui.label_iter_mean_ws_rdm_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_plan_std =")+this->ui.label_iter_std_ws_rdm_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_plan_median =")+this->ui.label_iter_median_ws_rdm_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_plan_max =")+this->ui.label_iter_max_ws_rdm_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_plan_mean =")+this->ui.label_cpu_mean_ws_rdm_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_plan_std =")+this->ui.label_cpu_std_ws_rdm_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_plan_median =")+this->ui.label_cpu_median_ws_rdm_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_plan_max =")+this->ui.label_cpu_max_ws_rdm_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_plan_mean =")+this->ui.label_obj_mean_ws_rdm_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_plan_std =")+this->ui.label_obj_std_ws_rdm_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_plan_median =")+this->ui.label_obj_median_ws_rdm_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_plan_max =")+this->ui.label_obj_max_ws_rdm_plan_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with Neural Network \n");
+        results << string("success_rate_ws_nn_plan =")+this->ui.label_rate_ws_nn_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_plan_mean =")+this->ui.label_iter_mean_ws_nn_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_plan_std =")+this->ui.label_iter_std_ws_nn_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_plan_median =")+this->ui.label_iter_median_ws_nn_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_plan_max =")+this->ui.label_iter_max_ws_nn_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_plan_mean =")+this->ui.label_cpu_mean_ws_nn_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_plan_std =")+this->ui.label_cpu_std_ws_nn_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_plan_median =")+this->ui.label_cpu_median_ws_nn_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_plan_max =")+this->ui.label_cpu_max_ws_nn_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_plan_mean =")+this->ui.label_obj_mean_ws_nn_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_plan_std =")+this->ui.label_obj_std_ws_nn_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_plan_median =")+this->ui.label_obj_median_ws_nn_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_plan_max =")+this->ui.label_obj_max_ws_nn_plan_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with Support Vector Machines \n");
+        results << string("success_rate_ws_svm_plan =")+this->ui.label_rate_ws_svm_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_plan_mean =")+this->ui.label_iter_mean_ws_svm_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_plan_std =")+this->ui.label_iter_std_ws_svm_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_plan_median =")+this->ui.label_iter_median_ws_svm_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_plan_max =")+this->ui.label_iter_max_ws_svm_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_plan_mean =")+this->ui.label_cpu_mean_ws_svm_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_plan_std =")+this->ui.label_cpu_std_ws_svm_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_plan_median =")+this->ui.label_cpu_median_ws_svm_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_plan_max =")+this->ui.label_cpu_max_ws_svm_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_plan_mean =")+this->ui.label_obj_mean_ws_svm_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_plan_std =")+this->ui.label_obj_std_ws_svm_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_plan_median =")+this->ui.label_obj_median_ws_svm_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_plan_max =")+this->ui.label_obj_max_ws_svm_plan_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with K-Nearest Neighbors \n");
+        results << string("success_rate_ws_knn_plan =")+this->ui.label_rate_ws_knn_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_plan_mean =")+this->ui.label_iter_mean_ws_knn_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_plan_std =")+this->ui.label_iter_std_ws_knn_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_plan_median =")+this->ui.label_iter_median_ws_knn_plan_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_plan_max =")+this->ui.label_iter_max_ws_knn_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_plan_mean =")+this->ui.label_cpu_mean_ws_knn_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_plan_std =")+this->ui.label_cpu_std_ws_knn_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_plan_median =")+this->ui.label_cpu_median_ws_knn_plan_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_plan_max =")+this->ui.label_cpu_max_ws_knn_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_plan_mean =")+this->ui.label_obj_mean_ws_knn_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_plan_std =")+this->ui.label_obj_std_ws_knn_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_plan_median =")+this->ui.label_obj_median_ws_knn_plan_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_plan_max =")+this->ui.label_obj_max_ws_knn_plan_value->text().toStdString()+string(";\n");
 
     }
     // approach
     if(this->ui.tabWidget_learning_res->isTabEnabled(1))
     {
         results << string("# Approach target posture selection results  \n");
-        results << string(" # No warm start\n");
-        results << string("success_rate_no_ws_app =")+this->ui.label_rate_no_ws_app_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_app_mean =")+this->ui.label_iter_mean_no_ws_app_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_app_std =")+this->ui.label_iter_std_no_ws_app_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_app_median =")+this->ui.label_iter_median_no_ws_app_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_app_max =")+this->ui.label_iter_max_no_ws_app_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_app_mean =")+this->ui.label_cpu_mean_no_ws_app_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_app_std =")+this->ui.label_cpu_std_no_ws_app_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_app_median =")+this->ui.label_cpu_median_no_ws_app_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_app_max =")+this->ui.label_cpu_max_no_ws_app_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_app_mean =")+this->ui.label_obj_mean_no_ws_app_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_app_std =")+this->ui.label_obj_std_no_ws_app_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_app_median =")+this->ui.label_obj_median_no_ws_app_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_app_max =")+this->ui.label_obj_max_no_ws_app_value->text().toStdString()+string(";\n");
+        results << string(" # Cold start\n");
+        results << string("success_rate_cold_app =")+this->ui.label_rate_cold_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_app_mean =")+this->ui.label_iter_mean_cold_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_app_std =")+this->ui.label_iter_std_cold_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_app_median =")+this->ui.label_iter_median_cold_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_app_max =")+this->ui.label_iter_max_cold_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_app_mean =")+this->ui.label_cpu_mean_cold_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_app_std =")+this->ui.label_cpu_std_cold_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_app_median =")+this->ui.label_cpu_median_cold_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_app_max =")+this->ui.label_cpu_max_cold_app_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_app_mean =")+this->ui.label_obj_mean_cold_app_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_app_std =")+this->ui.label_obj_std_cold_app_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_app_median =")+this->ui.label_obj_median_cold_app_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_app_max =")+this->ui.label_obj_max_cold_app_value->text().toStdString()+string(";\n");
         results << string(" # Warm start with the original solution \n");
         results << string("success_rate_ws_or_app =")+this->ui.label_rate_ws_or_app_value->text().toStdString()+string(";\n");
         results << string("iterations_ws_or_app_mean =")+this->ui.label_iter_mean_ws_or_app_value->text().toStdString()+string(";\n");
@@ -6770,40 +7465,82 @@ void MainWindow::on_pushButton_save_learning_res_clicked()
         results << string("obj_ws_or_app_std =")+this->ui.label_obj_std_ws_or_app_value->text().toStdString()+string(";\n");
         results << string("obj_ws_or_app_median =")+this->ui.label_obj_median_ws_or_app_value->text().toStdString()+string(";\n");
         results << string("obj_ws_or_app_max =")+this->ui.label_obj_max_ws_or_app_value->text().toStdString()+string(";\n");
-        results << string(" # Warm start with the predicted solution \n");
-        results << string("success_rate_ws_pred_app =")+this->ui.label_rate_ws_pred_app_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_app_mean =")+this->ui.label_iter_mean_ws_pred_app_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_app_std =")+this->ui.label_iter_std_ws_pred_app_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_app_median =")+this->ui.label_iter_median_ws_pred_app_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_app_max =")+this->ui.label_iter_max_ws_pred_app_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_app_mean =")+this->ui.label_cpu_mean_ws_pred_app_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_app_std =")+this->ui.label_cpu_std_ws_pred_app_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_app_median =")+this->ui.label_cpu_median_ws_pred_app_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_app_max =")+this->ui.label_cpu_max_ws_pred_app_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_app_mean =")+this->ui.label_obj_mean_ws_pred_app_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_app_std =")+this->ui.label_obj_std_ws_pred_app_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_app_median =")+this->ui.label_obj_median_ws_pred_app_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_app_max =")+this->ui.label_obj_max_ws_pred_app_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with the random solution \n");
+        results << string("success_rate_ws_rdm_app =")+this->ui.label_rate_ws_rdm_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_app_mean =")+this->ui.label_iter_mean_ws_rdm_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_app_std =")+this->ui.label_iter_std_ws_rdm_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_app_median =")+this->ui.label_iter_median_ws_rdm_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_app_max =")+this->ui.label_iter_max_ws_rdm_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_app_mean =")+this->ui.label_cpu_mean_ws_rdm_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_app_std =")+this->ui.label_cpu_std_ws_rdm_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_app_median =")+this->ui.label_cpu_median_ws_rdm_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_app_max =")+this->ui.label_cpu_max_ws_rdm_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_app_mean =")+this->ui.label_obj_mean_ws_rdm_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_app_std =")+this->ui.label_obj_std_ws_rdm_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_app_median =")+this->ui.label_obj_median_ws_rdm_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_app_max =")+this->ui.label_obj_max_ws_rdm_app_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with Neural Network \n");
+        results << string("success_rate_ws_nn_app =")+this->ui.label_rate_ws_nn_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_app_mean =")+this->ui.label_iter_mean_ws_nn_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_app_std =")+this->ui.label_iter_std_ws_nn_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_app_median =")+this->ui.label_iter_median_ws_nn_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_app_max =")+this->ui.label_iter_max_ws_nn_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_app_mean =")+this->ui.label_cpu_mean_ws_nn_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_app_std =")+this->ui.label_cpu_std_ws_nn_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_app_median =")+this->ui.label_cpu_median_ws_nn_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_app_max =")+this->ui.label_cpu_max_ws_nn_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_app_mean =")+this->ui.label_obj_mean_ws_nn_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_app_std =")+this->ui.label_obj_std_ws_nn_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_app_median =")+this->ui.label_obj_median_ws_nn_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_app_max =")+this->ui.label_obj_max_ws_nn_app_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with Support Vector Machines \n");
+        results << string("success_rate_ws_svm_app =")+this->ui.label_rate_ws_svm_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_app_mean =")+this->ui.label_iter_mean_ws_svm_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_app_std =")+this->ui.label_iter_std_ws_svm_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_app_median =")+this->ui.label_iter_median_ws_svm_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_app_max =")+this->ui.label_iter_max_ws_svm_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_app_mean =")+this->ui.label_cpu_mean_ws_svm_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_app_std =")+this->ui.label_cpu_std_ws_svm_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_app_median =")+this->ui.label_cpu_median_ws_svm_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_app_max =")+this->ui.label_cpu_max_ws_svm_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_app_mean =")+this->ui.label_obj_mean_ws_svm_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_app_std =")+this->ui.label_obj_std_ws_svm_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_app_median =")+this->ui.label_obj_median_ws_svm_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_app_max =")+this->ui.label_obj_max_ws_svm_app_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with K-Nearest Neighbors \n");
+        results << string("success_rate_ws_knn_app =")+this->ui.label_rate_ws_knn_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_app_mean =")+this->ui.label_iter_mean_ws_knn_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_app_std =")+this->ui.label_iter_std_ws_knn_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_app_median =")+this->ui.label_iter_median_ws_knn_app_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_app_max =")+this->ui.label_iter_max_ws_knn_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_app_mean =")+this->ui.label_cpu_mean_ws_knn_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_app_std =")+this->ui.label_cpu_std_ws_knn_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_app_median =")+this->ui.label_cpu_median_ws_knn_app_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_app_max =")+this->ui.label_cpu_max_ws_knn_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_app_mean =")+this->ui.label_obj_mean_ws_knn_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_app_std =")+this->ui.label_obj_std_ws_knn_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_app_median =")+this->ui.label_obj_median_ws_knn_app_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_app_max =")+this->ui.label_obj_max_ws_knn_app_value->text().toStdString()+string(";\n");
 
     }
     // retreat
     if(this->ui.tabWidget_learning_res->isTabEnabled(2))
     {
         results << string("# Retreat target posture selection results  \n");
-        results << string(" # No warm start\n");
-        results << string("success_rate_no_ws_ret =")+this->ui.label_rate_no_ws_ret_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_ret_mean =")+this->ui.label_iter_mean_no_ws_ret_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_ret_std =")+this->ui.label_iter_std_no_ws_ret_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_ret_median =")+this->ui.label_iter_median_no_ws_ret_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_ret_max =")+this->ui.label_iter_max_no_ws_ret_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_ret_mean =")+this->ui.label_cpu_mean_no_ws_ret_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_ret_std =")+this->ui.label_cpu_std_no_ws_ret_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_ret_median =")+this->ui.label_cpu_median_no_ws_ret_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_ret_max =")+this->ui.label_cpu_max_no_ws_ret_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_ret_mean =")+this->ui.label_obj_mean_no_ws_ret_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_ret_std =")+this->ui.label_obj_std_no_ws_ret_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_ret_median =")+this->ui.label_obj_median_no_ws_ret_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_ret_max =")+this->ui.label_obj_max_no_ws_ret_value->text().toStdString()+string(";\n");
+        results << string(" # Cold start\n");
+        results << string("success_rate_cold_ret =")+this->ui.label_rate_cold_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_ret_mean =")+this->ui.label_iter_mean_cold_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_ret_std =")+this->ui.label_iter_std_cold_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_ret_median =")+this->ui.label_iter_median_cold_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_ret_max =")+this->ui.label_iter_max_cold_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_ret_mean =")+this->ui.label_cpu_mean_cold_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_ret_std =")+this->ui.label_cpu_std_cold_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_ret_median =")+this->ui.label_cpu_median_cold_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_ret_max =")+this->ui.label_cpu_max_cold_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_ret_mean =")+this->ui.label_obj_mean_cold_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_ret_std =")+this->ui.label_obj_std_cold_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_ret_median =")+this->ui.label_obj_median_cold_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_ret_max =")+this->ui.label_obj_max_cold_ret_value->text().toStdString()+string(";\n");
         results << string(" # Warm start with the original solution \n");
         results << string("success_rate_ws_or_ret =")+this->ui.label_rate_ws_or_ret_value->text().toStdString()+string(";\n");
         results << string("iterations_ws_or_ret_mean =")+this->ui.label_iter_mean_ws_or_ret_value->text().toStdString()+string(";\n");
@@ -6818,40 +7555,82 @@ void MainWindow::on_pushButton_save_learning_res_clicked()
         results << string("obj_ws_or_ret_std =")+this->ui.label_obj_std_ws_or_ret_value->text().toStdString()+string(";\n");
         results << string("obj_ws_or_ret_median =")+this->ui.label_obj_median_ws_or_ret_value->text().toStdString()+string(";\n");
         results << string("obj_ws_or_ret_max =")+this->ui.label_obj_max_ws_or_ret_value->text().toStdString()+string(";\n");
-        results << string(" # Warm start with the predicted solution \n");
-        results << string("success_rate_ws_pred_ret =")+this->ui.label_rate_ws_pred_ret_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_ret_mean =")+this->ui.label_iter_mean_ws_pred_ret_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_ret_std =")+this->ui.label_iter_std_ws_pred_ret_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_ret_median =")+this->ui.label_iter_median_ws_pred_ret_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_ret_max =")+this->ui.label_iter_max_ws_pred_ret_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_ret_mean =")+this->ui.label_cpu_mean_ws_pred_ret_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_ret_std =")+this->ui.label_cpu_std_ws_pred_ret_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_ret_median =")+this->ui.label_cpu_median_ws_pred_ret_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_ret_max =")+this->ui.label_cpu_max_ws_pred_ret_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_ret_mean =")+this->ui.label_obj_mean_ws_pred_ret_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_ret_std =")+this->ui.label_obj_std_ws_pred_ret_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_ret_median =")+this->ui.label_obj_median_ws_pred_ret_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_ret_max =")+this->ui.label_obj_max_ws_pred_ret_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with the random solution \n");
+        results << string("success_rate_ws_rdm_ret =")+this->ui.label_rate_ws_rdm_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_ret_mean =")+this->ui.label_iter_mean_ws_rdm_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_ret_std =")+this->ui.label_iter_std_ws_rdm_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_ret_median =")+this->ui.label_iter_median_ws_rdm_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_ret_max =")+this->ui.label_iter_max_ws_rdm_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_ret_mean =")+this->ui.label_cpu_mean_ws_rdm_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_ret_std =")+this->ui.label_cpu_std_ws_rdm_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_ret_median =")+this->ui.label_cpu_median_ws_rdm_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_ret_max =")+this->ui.label_cpu_max_ws_rdm_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_ret_mean =")+this->ui.label_obj_mean_ws_rdm_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_ret_std =")+this->ui.label_obj_std_ws_rdm_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_ret_median =")+this->ui.label_obj_median_ws_rdm_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_ret_max =")+this->ui.label_obj_max_ws_rdm_ret_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with Neural Network \n");
+        results << string("success_rate_ws_nn_ret =")+this->ui.label_rate_ws_nn_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_ret_mean =")+this->ui.label_iter_mean_ws_nn_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_ret_std =")+this->ui.label_iter_std_ws_nn_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_ret_median =")+this->ui.label_iter_median_ws_nn_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_ret_max =")+this->ui.label_iter_max_ws_nn_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_ret_mean =")+this->ui.label_cpu_mean_ws_nn_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_ret_std =")+this->ui.label_cpu_std_ws_nn_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_ret_median =")+this->ui.label_cpu_median_ws_nn_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_ret_max =")+this->ui.label_cpu_max_ws_nn_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_ret_mean =")+this->ui.label_obj_mean_ws_nn_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_ret_std =")+this->ui.label_obj_std_ws_nn_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_ret_median =")+this->ui.label_obj_median_ws_nn_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_ret_max =")+this->ui.label_obj_max_ws_nn_ret_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with Support Vector Machines \n");
+        results << string("success_rate_ws_svm_ret =")+this->ui.label_rate_ws_svm_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_ret_mean =")+this->ui.label_iter_mean_ws_svm_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_ret_std =")+this->ui.label_iter_std_ws_svm_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_ret_median =")+this->ui.label_iter_median_ws_svm_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_ret_max =")+this->ui.label_iter_max_ws_svm_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_ret_mean =")+this->ui.label_cpu_mean_ws_svm_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_ret_std =")+this->ui.label_cpu_std_ws_svm_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_ret_median =")+this->ui.label_cpu_median_ws_svm_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_ret_max =")+this->ui.label_cpu_max_ws_svm_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_ret_mean =")+this->ui.label_obj_mean_ws_svm_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_ret_std =")+this->ui.label_obj_std_ws_svm_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_ret_median =")+this->ui.label_obj_median_ws_svm_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_ret_max =")+this->ui.label_obj_max_ws_svm_ret_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with K-Nearest Neighbors \n");
+        results << string("success_rate_ws_knn_ret =")+this->ui.label_rate_ws_knn_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_ret_mean =")+this->ui.label_iter_mean_ws_knn_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_ret_std =")+this->ui.label_iter_std_ws_knn_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_ret_median =")+this->ui.label_iter_median_ws_knn_ret_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_ret_max =")+this->ui.label_iter_max_ws_knn_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_ret_mean =")+this->ui.label_cpu_mean_ws_knn_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_ret_std =")+this->ui.label_cpu_std_ws_knn_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_ret_median =")+this->ui.label_cpu_median_ws_knn_ret_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_ret_max =")+this->ui.label_cpu_max_ws_knn_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_ret_mean =")+this->ui.label_obj_mean_ws_knn_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_ret_std =")+this->ui.label_obj_std_ws_knn_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_ret_median =")+this->ui.label_obj_median_ws_knn_ret_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_ret_max =")+this->ui.label_obj_max_ws_knn_ret_value->text().toStdString()+string(";\n");
 
     }
     // bounce
     if(this->ui.tabWidget_learning_res->isTabEnabled(3))
     {
         results << string("# Bounce target posture selection results  \n");
-        results << string(" # No warm start\n");
-        results << string("success_rate_no_ws_bounce =")+this->ui.label_rate_no_ws_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_bounce_mean =")+this->ui.label_iter_mean_no_ws_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_bounce_std =")+this->ui.label_iter_std_no_ws_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_bounce_median =")+this->ui.label_iter_median_no_ws_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_no_ws_bounce_max =")+this->ui.label_iter_max_no_ws_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_bounce_mean =")+this->ui.label_cpu_mean_no_ws_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_bounce_std =")+this->ui.label_cpu_std_no_ws_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_bounce_median =")+this->ui.label_cpu_median_no_ws_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_no_ws_bounce_max =")+this->ui.label_cpu_max_no_ws_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_bounce_mean =")+this->ui.label_obj_mean_no_ws_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_bounce_std =")+this->ui.label_obj_std_no_ws_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_bounce_median =")+this->ui.label_obj_median_no_ws_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_no_ws_bounce_max =")+this->ui.label_obj_max_no_ws_bounce_value->text().toStdString()+string(";\n");
+        results << string(" # Cold start\n");
+        results << string("success_rate_cold_bounce =")+this->ui.label_rate_cold_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_bounce_mean =")+this->ui.label_iter_mean_cold_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_bounce_std =")+this->ui.label_iter_std_cold_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_bounce_median =")+this->ui.label_iter_median_cold_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_cold_bounce_max =")+this->ui.label_iter_max_cold_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_bounce_mean =")+this->ui.label_cpu_mean_cold_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_bounce_std =")+this->ui.label_cpu_std_cold_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_bounce_median =")+this->ui.label_cpu_median_cold_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_cold_bounce_max =")+this->ui.label_cpu_max_cold_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_bounce_mean =")+this->ui.label_obj_mean_cold_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_bounce_std =")+this->ui.label_obj_std_cold_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_bounce_median =")+this->ui.label_obj_median_cold_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_cold_bounce_max =")+this->ui.label_obj_max_cold_bounce_value->text().toStdString()+string(";\n");
         results << string(" # Warm start with the original solution \n");
         results << string("success_rate_ws_or_bounce =")+this->ui.label_rate_ws_or_bounce_value->text().toStdString()+string(";\n");
         results << string("iterations_ws_or_bounce_mean =")+this->ui.label_iter_mean_ws_or_bounce_value->text().toStdString()+string(";\n");
@@ -6866,20 +7645,62 @@ void MainWindow::on_pushButton_save_learning_res_clicked()
         results << string("obj_ws_or_bounce_std =")+this->ui.label_obj_std_ws_or_bounce_value->text().toStdString()+string(";\n");
         results << string("obj_ws_or_bounce_median =")+this->ui.label_obj_median_ws_or_bounce_value->text().toStdString()+string(";\n");
         results << string("obj_ws_or_bounce_max =")+this->ui.label_obj_max_ws_or_bounce_value->text().toStdString()+string(";\n");
-        results << string(" # Warm start with the predicted solution \n");
-        results << string("success_rate_ws_pred_bounce =")+this->ui.label_rate_ws_pred_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_bounce_mean =")+this->ui.label_iter_mean_ws_pred_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_bounce_std =")+this->ui.label_iter_std_ws_pred_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_bounce_median =")+this->ui.label_iter_median_ws_pred_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_pred_bounce_max =")+this->ui.label_iter_max_ws_pred_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_bounce_mean =")+this->ui.label_cpu_mean_ws_pred_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_bounce_std =")+this->ui.label_cpu_std_ws_pred_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_bounce_median =")+this->ui.label_cpu_median_ws_pred_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_pred_bounce_max =")+this->ui.label_cpu_max_ws_pred_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_bounce_mean =")+this->ui.label_obj_mean_ws_pred_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_bounce_std =")+this->ui.label_obj_std_ws_pred_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_bounce_median =")+this->ui.label_obj_median_ws_pred_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_pred_bounce_max =")+this->ui.label_obj_max_ws_pred_bounce_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with the random solution \n");
+        results << string("success_rate_ws_rdm_bounce =")+this->ui.label_rate_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_bounce_mean =")+this->ui.label_iter_mean_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_bounce_std =")+this->ui.label_iter_std_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_bounce_median =")+this->ui.label_iter_median_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_rdm_bounce_max =")+this->ui.label_iter_max_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_bounce_mean =")+this->ui.label_cpu_mean_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_bounce_std =")+this->ui.label_cpu_std_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_bounce_median =")+this->ui.label_cpu_median_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_rdm_bounce_max =")+this->ui.label_cpu_max_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_bounce_mean =")+this->ui.label_obj_mean_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_bounce_std =")+this->ui.label_obj_std_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_bounce_median =")+this->ui.label_obj_median_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_rdm_bounce_max =")+this->ui.label_obj_max_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with Neural Network \n");
+        results << string("success_rate_ws_nn_bounce =")+this->ui.label_rate_ws_nn_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_bounce_mean =")+this->ui.label_iter_mean_ws_nn_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_bounce_std =")+this->ui.label_iter_std_ws_nn_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_bounce_median =")+this->ui.label_iter_median_ws_nn_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_nn_bounce_max =")+this->ui.label_iter_max_ws_nn_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_bounce_mean =")+this->ui.label_cpu_mean_ws_nn_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_bounce_std =")+this->ui.label_cpu_std_ws_nn_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_bounce_median =")+this->ui.label_cpu_median_ws_nn_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_nn_bounce_max =")+this->ui.label_cpu_max_ws_nn_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_bounce_mean =")+this->ui.label_obj_mean_ws_nn_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_bounce_std =")+this->ui.label_obj_std_ws_nn_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_bounce_median =")+this->ui.label_obj_median_ws_nn_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_nn_bounce_max =")+this->ui.label_obj_max_ws_nn_bounce_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with Support Vector Machines \n");
+        results << string("success_rate_ws_svm_bounce =")+this->ui.label_rate_ws_svm_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_bounce_mean =")+this->ui.label_iter_mean_ws_svm_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_bounce_std =")+this->ui.label_iter_std_ws_svm_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_bounce_median =")+this->ui.label_iter_median_ws_svm_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_svm_bounce_max =")+this->ui.label_iter_max_ws_svm_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_bounce_mean =")+this->ui.label_cpu_mean_ws_svm_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_bounce_std =")+this->ui.label_cpu_std_ws_svm_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_bounce_median =")+this->ui.label_cpu_median_ws_svm_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_svm_bounce_max =")+this->ui.label_cpu_max_ws_svm_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_bounce_mean =")+this->ui.label_obj_mean_ws_svm_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_bounce_std =")+this->ui.label_obj_std_ws_svm_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_bounce_median =")+this->ui.label_obj_median_ws_svm_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_svm_bounce_max =")+this->ui.label_obj_max_ws_svm_bounce_value->text().toStdString()+string(";\n");
+        results << string(" # Warm start with K-Nearest Neighbors \n");
+        results << string("success_rate_ws_knn_bounce =")+this->ui.label_rate_ws_knn_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_bounce_mean =")+this->ui.label_iter_mean_ws_knn_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_bounce_std =")+this->ui.label_iter_std_ws_knn_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_bounce_median =")+this->ui.label_iter_median_ws_knn_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_bounce_max =")+this->ui.label_iter_max_ws_knn_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_bounce_mean =")+this->ui.label_cpu_mean_ws_knn_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_bounce_std =")+this->ui.label_cpu_std_ws_knn_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_bounce_median =")+this->ui.label_cpu_median_ws_knn_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_bounce_max =")+this->ui.label_cpu_max_ws_knn_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_bounce_mean =")+this->ui.label_obj_mean_ws_knn_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_bounce_std =")+this->ui.label_obj_std_ws_knn_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_bounce_median =")+this->ui.label_obj_median_ws_knn_bounce_value->text().toStdString()+string(";\n");
+        results << string("obj_ws_knn_bounce_max =")+this->ui.label_obj_max_ws_knn_bounce_value->text().toStdString()+string(";\n");
     }
     results.close();
     qnode.log(QNode::Info,std::string("Results of learning saved at ")+pred_dir+std::string("/")+filename);

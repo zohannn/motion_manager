@@ -53,44 +53,44 @@ models_dir = str(sys.argv[2])
 # Settings
 print_en = True
 
-print_en_xf_plan = True
-train_xf_plan = True
-train_xf_plan_class = True
+print_en_xf_plan = False
+train_xf_plan = False
+train_xf_plan_class = False
 dir_path_xf_plan = models_dir + "/xf_plan"
 
 print_en_zf_L_plan = True
 train_zf_L_plan = True
-train_zf_L_plan_class = True
+train_zf_L_plan_class = False
 dir_path_zf_L_plan = models_dir + "/zf_L_plan"
 
-print_en_zf_U_plan = True
-train_zf_U_plan = True
-train_zf_U_plan_class = True
+print_en_zf_U_plan = False
+train_zf_U_plan = False
+train_zf_U_plan_class = False
 dir_path_zf_U_plan = models_dir + "/zf_U_plan"
 
-print_en_dual_f_plan = True
-train_dual_f_plan = True
-train_dual_f_plan_class = True
+print_en_dual_f_plan = False
+train_dual_f_plan = False
+train_dual_f_plan_class = False
 dir_path_dual_f_plan = models_dir + "/dual_f_plan"
 
-print_en_x_bounce = True
-train_x_bounce = True
-train_x_bounce_class = True
+print_en_x_bounce = False
+train_x_bounce = False
+train_x_bounce_class = False
 dir_path_x_bounce = models_dir + "/x_bounce"
 
-print_en_zb_L = True
-train_zb_L = True
-train_zb_L_class = True
+print_en_zb_L = False
+train_zb_L = False
+train_zb_L_class = False
 dir_path_zb_L = models_dir + "/zb_L"
 
-print_en_zb_U = True
-train_zb_U = True
-train_zb_U_class = True
+print_en_zb_U = False
+train_zb_U = False
+train_zb_U_class = False
 dir_path_zb_U = models_dir + "/zb_U"
 
-print_en_dual_bounce = True
-train_dual_bounce = True
-train_dual_bounce_class = True
+print_en_dual_bounce = False
+train_dual_bounce = False
+train_dual_bounce_class = False
 dir_path_dual_bounce = models_dir + "/dual_bounce"
 
 learning_rate=0.009
@@ -852,23 +852,24 @@ if not outputs_xf_plan_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- Support Vector Machine ---------------- #
-                (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_xf_plan,
-                                                            gamma=gamma_xf_plan,
-                                                            coeff=coeff_xf_plan,
-                                                            degree=degree_xf_plan,
-                                                            epsilon=epsilon_xf_plan,
-                                                            training_examples=training_examples.iloc[:,0:ldim],
-                                                            training_targets=training_targets.iloc[:,0:ldim],
-                                                            model_dir=dir_path_xf_plan + "/cluster"+repr(i)+"/svm")
+                if(ldim!=0):
+                    # ---------- Support Vector Machine ---------------- #
+                    (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_xf_plan,
+                                                                gamma=gamma_xf_plan,
+                                                                coeff=coeff_xf_plan,
+                                                                degree=degree_xf_plan,
+                                                                epsilon=epsilon_xf_plan,
+                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_targets=training_targets.iloc[:,0:ldim],
+                                                                model_dir=dir_path_xf_plan + "/cluster"+repr(i)+"/svm")
 
-                test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
+                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
 
-                #print(test_predictions_df_2)
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -910,21 +911,23 @@ if not outputs_xf_plan_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- K-Nearest Neighbors ---------------- #
-                (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_xf_plan,
-                                                            weights = weights_xf_plan,
-                                                            algorithm = algorithm_xf_plan,
-                                                            training_examples=training_examples.iloc[:,0:ldim],
-                                                            training_targets=training_targets.iloc[:,0:ldim],
-                                                            model_dir=dir_path_xf_plan + "/cluster"+repr(i)+"/knn")
 
-                test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
+                if(ldim!=0):
+                    # ---------- K-Nearest Neighbors ---------------- #
+                    (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_xf_plan,
+                                                                weights = weights_xf_plan,
+                                                                algorithm = algorithm_xf_plan,
+                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_targets=training_targets.iloc[:,0:ldim],
+                                                                model_dir=dir_path_xf_plan + "/cluster"+repr(i)+"/knn")
 
-                #print(test_predictions_df_2)
+                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -1438,23 +1441,25 @@ if not outputs_zf_L_plan_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- Support Vector Machine ---------------- #
-                (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_zf_L_plan,
-                                                            gamma=gamma_zf_L_plan,
-                                                            coeff=coeff_zf_L_plan,
-                                                            degree=degree_zf_L_plan,
-                                                            epsilon=epsilon_zf_L_plan,
-                                                            training_examples=training_examples.iloc[:,0:ldim],
-                                                            training_targets=training_targets.iloc[:,0:ldim],
-                                                            model_dir=dir_path_zf_L_plan + "/cluster"+repr(i)+"/svm")
 
-                test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
+                if(ldim!=0):
+                    # ---------- Support Vector Machine ---------------- #
+                    (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_zf_L_plan,
+                                                                gamma=gamma_zf_L_plan,
+                                                                coeff=coeff_zf_L_plan,
+                                                                degree=degree_zf_L_plan,
+                                                                epsilon=epsilon_zf_L_plan,
+                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_targets=training_targets.iloc[:,0:ldim],
+                                                                model_dir=dir_path_zf_L_plan + "/cluster"+repr(i)+"/svm")
 
-                #print(test_predictions_df_2)
+                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -1467,10 +1472,13 @@ if not outputs_zf_L_plan_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_zf_L_plan.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zf_L_plan)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
+                if (len(cl_out_zf_L_plan_df.columns) > 4):
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_zf_L_plan.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zf_L_plan)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
 
@@ -1497,21 +1505,23 @@ if not outputs_zf_L_plan_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- K-Nearest Neighbors ---------------- #
-                (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zf_L_plan,
-                                                            weights = weights_zf_L_plan,
-                                                            algorithm = algorithm_zf_L_plan,
-                                                            training_examples=training_examples.iloc[:,0:ldim],
-                                                            training_targets=training_targets.iloc[:,0:ldim],
-                                                            model_dir=dir_path_zf_L_plan + "/cluster"+repr(i)+"/knn")
 
-                test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
+                if (ldim!=0):
+                    # ---------- K-Nearest Neighbors ---------------- #
+                    (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zf_L_plan,
+                                                                weights = weights_zf_L_plan,
+                                                                algorithm = algorithm_zf_L_plan,
+                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_targets=training_targets.iloc[:,0:ldim],
+                                                                model_dir=dir_path_zf_L_plan + "/cluster"+repr(i)+"/knn")
 
-                #print(test_predictions_df_2)
+                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -1524,10 +1534,13 @@ if not outputs_zf_L_plan_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_zf_L_plan.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zf_L_plan)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
+                if (len(cl_out_zf_L_plan_df.columns) > 4):
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_zf_L_plan.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zf_L_plan)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
 
@@ -1549,7 +1562,7 @@ if not outputs_zf_L_plan_df.empty:
                 plt.ylabel("zf_L_plan_2")
                 plt.legend(loc='upper right')
                 #plt.title()
-                plt.savefig(dir_path_zf_L_plan+"/cluster"+repr(i)+"/svm/zf_L_pred.pdf")
+                plt.savefig(dir_path_zf_L_plan+"/cluster"+repr(i)+"/knn/zf_L_pred.pdf")
                 plt.clf()
                 #plt.show()
 
@@ -2028,23 +2041,25 @@ if not outputs_zf_U_plan_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- Support Vector Machine ---------------- #
-                (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_zf_U_plan,
-                                                            gamma=gamma_zf_U_plan,
-                                                            coeff=coeff_zf_U_plan,
-                                                            degree=degree_zf_U_plan,
-                                                            epsilon=epsilon_zf_U_plan,
-                                                            training_examples=training_examples.iloc[:,0:ldim],
-                                                            training_targets=training_targets.iloc[:,0:ldim],
-                                                            model_dir=dir_path_zf_U_plan + "/cluster"+repr(i)+"/svm")
 
-                test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
+                if (ldim!=0):
+                    # ---------- Support Vector Machine ---------------- #
+                    (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_zf_U_plan,
+                                                                gamma=gamma_zf_U_plan,
+                                                                coeff=coeff_zf_U_plan,
+                                                                degree=degree_zf_U_plan,
+                                                                epsilon=epsilon_zf_U_plan,
+                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_targets=training_targets.iloc[:,0:ldim],
+                                                                model_dir=dir_path_zf_U_plan + "/cluster"+repr(i)+"/svm")
 
-                #print(test_predictions_df_2)
+                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -2057,10 +2072,13 @@ if not outputs_zf_U_plan_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_zf_U_plan.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zf_U_plan)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zf_U_plan_df_max, outputs_zf_U_plan_df_min)
+                if (len(cl_out_zf_U_plan_df.columns) > 4):
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_zf_U_plan.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zf_U_plan)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zf_U_plan_df_max, outputs_zf_U_plan_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zf_U_plan_df_max, outputs_zf_U_plan_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zf_U_plan_df_max, outputs_zf_U_plan_df_min)
 
@@ -2086,21 +2104,23 @@ if not outputs_zf_U_plan_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- K-Nearest Neighbors ---------------- #
-                (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zf_U_plan,
-                                                            weights = weights_zf_U_plan,
-                                                            algorithm = algorithm_zf_U_plan,
-                                                            training_examples=training_examples.iloc[:,0:ldim],
-                                                            training_targets=training_targets.iloc[:,0:ldim],
-                                                            model_dir=dir_path_zf_U_plan + "/cluster"+repr(i)+"/knn")
 
-                test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
+                if (ldim!=0):
+                    # ---------- K-Nearest Neighbors ---------------- #
+                    (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zf_U_plan,
+                                                                weights = weights_zf_U_plan,
+                                                                algorithm = algorithm_zf_U_plan,
+                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_targets=training_targets.iloc[:,0:ldim],
+                                                                model_dir=dir_path_zf_U_plan + "/cluster"+repr(i)+"/knn")
 
-                #print(test_predictions_df_2)
+                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -2113,10 +2133,14 @@ if not outputs_zf_U_plan_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_zf_U_plan.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zf_U_plan)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zf_U_plan_df_max, outputs_zf_U_plan_df_min)
+                if (len(cl_out_zf_U_plan_df.columns) > 4):
+                    # test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_df_0_max,outputs_df_0_min)
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_zf_U_plan.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zf_U_plan)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zf_U_plan_df_max, outputs_zf_U_plan_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zf_U_plan_df_max, outputs_zf_U_plan_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zf_U_plan_df_max, outputs_zf_U_plan_df_min)
 
@@ -2625,23 +2649,25 @@ if not outputs_dual_f_plan_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- Support Vector Machine ---------------- #
-                (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_dual_f_plan,
-                                                                gamma=gamma_dual_f_plan,
-                                                                coeff=coeff_dual_f_plan,
-                                                                degree=degree_dual_f_plan,
-                                                                epsilon=epsilon_dual_f_plan,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
-                                                                training_targets=training_targets.iloc[:,0:ldim],
-                                                                model_dir=dir_path_dual_f_plan + "/cluster"+repr(i)+"/svm")
 
-                test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
+                if (ldim!=0):
+                    # ---------- Support Vector Machine ---------------- #
+                    (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_dual_f_plan,
+                                                                    gamma=gamma_dual_f_plan,
+                                                                    coeff=coeff_dual_f_plan,
+                                                                    degree=degree_dual_f_plan,
+                                                                    epsilon=epsilon_dual_f_plan,
+                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_targets=training_targets.iloc[:,0:ldim],
+                                                                    model_dir=dir_path_dual_f_plan + "/cluster"+repr(i)+"/svm")
 
-                #print(test_predictions_df_2)
+                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -2654,10 +2680,13 @@ if not outputs_dual_f_plan_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_dual_f_plan.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_f_plan)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
+                if (len(cl_out_dual_f_plan_df.columns) > 10):
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_dual_f_plan.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_f_plan)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
 
@@ -2683,21 +2712,23 @@ if not outputs_dual_f_plan_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- K-Nearest Neighbors ---------------- #
-                (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_dual_f_plan,
-                                                            weights = weights_dual_f_plan,
-                                                            algorithm = algorithm_dual_f_plan,
-                                                            training_examples=training_examples.iloc[:,0:ldim],
-                                                            training_targets=training_targets.iloc[:,0:ldim],
-                                                            model_dir=dir_path_dual_f_plan + "/cluster"+repr(i)+"/knn")
 
-                test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
+                if (ldim!=0):
+                    # ---------- K-Nearest Neighbors ---------------- #
+                    (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_dual_f_plan,
+                                                                weights = weights_dual_f_plan,
+                                                                algorithm = algorithm_dual_f_plan,
+                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_targets=training_targets.iloc[:,0:ldim],
+                                                                model_dir=dir_path_dual_f_plan + "/cluster"+repr(i)+"/knn")
 
-                #print(test_predictions_df_2)
+                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -2710,10 +2741,13 @@ if not outputs_dual_f_plan_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_dual_f_plan.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_f_plan)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
+                if (len(cl_out_dual_f_plan_df.columns) > 10):
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_dual_f_plan.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_f_plan)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_dual_f_plan_df_max, outputs_dual_f_plan_df_min)
 
@@ -2961,12 +2995,12 @@ if not outputs_x_bounce_df.empty:
                                                     num_epochs=1,
                                                     shuffle=False)
 
-        test_pred = classifier.predict(input_fn=predict_test_input_fn)
+        test_pred = nn_classifier.predict(input_fn=predict_test_input_fn)
         test_probabilities = np.array([item['probabilities'] for item in test_pred])
 
         test_log_loss = metrics.log_loss(test_targets_class, test_probabilities)
         print("LogLoss (on test data): %0.3f" % test_log_loss)
-        evaluation_metrics = classifier.evaluate(input_fn=predict_test_input_fn)
+        evaluation_metrics = nn_classifier.evaluate(input_fn=predict_test_input_fn)
         print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
         print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
 
@@ -3218,23 +3252,25 @@ if not outputs_x_bounce_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- Support Vector Machine ---------------- #
-                (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_x_bounce,
-                                                                gamma=gamma_x_bounce,
-                                                                coeff=coeff_x_bounce,
-                                                                degree=degree_x_bounce,
-                                                                epsilon=epsilon_x_bounce,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
-                                                                training_targets=training_targets.iloc[:,0:ldim],
-                                                                model_dir=dir_path_x_bounce + "/cluster"+repr(i)+"/svm")
 
-                test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
+                if (ldim!=0):
+                    # ---------- Support Vector Machine ---------------- #
+                    (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_x_bounce,
+                                                                    gamma=gamma_x_bounce,
+                                                                    coeff=coeff_x_bounce,
+                                                                    degree=degree_x_bounce,
+                                                                    epsilon=epsilon_x_bounce,
+                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_targets=training_targets.iloc[:,0:ldim],
+                                                                    model_dir=dir_path_x_bounce + "/cluster"+repr(i)+"/svm")
 
-                #print(test_predictions_df_2)
+                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -3276,21 +3312,23 @@ if not outputs_x_bounce_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- K-Nearest Neighbors ---------------- #
-                (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_x_bounce,
-                                                            weights = weights_x_bounce,
-                                                            algorithm = algorithm_x_bounce,
-                                                            training_examples=training_examples.iloc[:,0:ldim],
-                                                            training_targets=training_targets.iloc[:,0:ldim],
-                                                            model_dir=dir_path_x_bounce + "/cluster"+repr(i)+"/knn")
 
-                test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
+                if (ldim!=0):
+                    # ---------- K-Nearest Neighbors ---------------- #
+                    (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_x_bounce,
+                                                                weights = weights_x_bounce,
+                                                                algorithm = algorithm_x_bounce,
+                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_targets=training_targets.iloc[:,0:ldim],
+                                                                model_dir=dir_path_x_bounce + "/cluster"+repr(i)+"/knn")
 
-                #print(test_predictions_df_2)
+                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -3787,23 +3825,25 @@ if not outputs_zb_L_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- Support Vector Machine ---------------- #
-                (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_zb_L,
-                                                                gamma=gamma_zb_L,
-                                                                coeff=coeff_zb_L,
-                                                                degree=degree_zb_L,
-                                                                epsilon=epsilon_zb_L,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
-                                                                training_targets=training_targets.iloc[:,0:ldim],
-                                                                model_dir=dir_path_zb_L + "/cluster"+repr(i)+"/svm")
 
-                test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
+                if (ldim!=0):
+                    # ---------- Support Vector Machine ---------------- #
+                    (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_zb_L,
+                                                                    gamma=gamma_zb_L,
+                                                                    coeff=coeff_zb_L,
+                                                                    degree=degree_zb_L,
+                                                                    epsilon=epsilon_zb_L,
+                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_targets=training_targets.iloc[:,0:ldim],
+                                                                    model_dir=dir_path_zb_L + "/cluster"+repr(i)+"/svm")
 
-                #print(test_predictions_df_2)
+                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -3816,10 +3856,13 @@ if not outputs_zb_L_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_zb_L.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_L)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zb_L_df_max, outputs_zb_L_df_min)
+                if (len(cl_out_zb_L_df.columns) > 4):
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_zb_L.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_L)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zb_L_df_max, outputs_zb_L_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zb_L_df_max, outputs_zb_L_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zb_L_df_max, outputs_zb_L_df_min)
 
@@ -3845,20 +3888,22 @@ if not outputs_zb_L_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- K-Nearest Neighbors ---------------- #
-                (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zb_L,
-                                                            weights = weights_zb_L,
-                                                            algorithm = algorithm_zb_L,
-                                                            training_examples=training_examples.iloc[:,0:ldim],
-                                                            training_targets=training_targets.iloc[:,0:ldim],
-                                                            model_dir=dir_path_zb_L + "/cluster"+repr(i)+"/knn")
 
-                test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
-                #print(test_predictions_df_2)
+                if (ldim!=0):
+                    # ---------- K-Nearest Neighbors ---------------- #
+                    (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zb_L,
+                                                                weights = weights_zb_L,
+                                                                algorithm = algorithm_zb_L,
+                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_targets=training_targets.iloc[:,0:ldim],
+                                                                model_dir=dir_path_zb_L + "/cluster"+repr(i)+"/knn")
+
+                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -3871,10 +3916,13 @@ if not outputs_zb_L_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_zb_L.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_L)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zb_L_df_max, outputs_zb_L_df_min)
+                if (len(cl_out_zb_L_df.columns) > 4):
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_zb_L.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_L)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zb_L_df_max, outputs_zb_L_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zb_L_df_max, outputs_zb_L_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zb_L_df_max, outputs_zb_L_df_min)
 
@@ -4361,23 +4409,25 @@ if not outputs_zb_U_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- Support Vector Machine ---------------- #
-                (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_zb_U,
-                                                                gamma=gamma_zb_U,
-                                                                coeff=coeff_zb_U,
-                                                                degree=degree_zb_U,
-                                                                epsilon=epsilon_zb_U,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
-                                                                training_targets=training_targets.iloc[:,0:ldim],
-                                                                model_dir=dir_path_zb_U + "/cluster"+repr(i)+"/svm")
 
-                test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
+                if (ldim!=0):
+                    # ---------- Support Vector Machine ---------------- #
+                    (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_zb_U,
+                                                                    gamma=gamma_zb_U,
+                                                                    coeff=coeff_zb_U,
+                                                                    degree=degree_zb_U,
+                                                                    epsilon=epsilon_zb_U,
+                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_targets=training_targets.iloc[:,0:ldim],
+                                                                    model_dir=dir_path_zb_U + "/cluster"+repr(i)+"/svm")
 
-                #print(test_predictions_df_2)
+                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -4390,10 +4440,13 @@ if not outputs_zb_U_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_zb_U.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_U)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zb_U_df_max, outputs_zb_U_df_min)
+                if (len(cl_out_zb_U_df.columns) > 4):
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_zb_U.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_U)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zb_U_df_max, outputs_zb_U_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zb_U_df_max, outputs_zb_U_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zb_U_df_max, outputs_zb_U_df_min)
 
@@ -4419,20 +4472,21 @@ if not outputs_zb_U_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- K-Nearest Neighbors ---------------- #
-                (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zb_U,
-                                                                weights = weights_zb_U,
-                                                                algorithm = algorithm_zb_U,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
-                                                                training_targets=training_targets.iloc[:,0:ldim],
-                                                                model_dir=dir_path_zb_U + "/cluster"+repr(i)+"/knn")
+                if (ldim!=0):
+                    # ---------- K-Nearest Neighbors ---------------- #
+                    (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zb_U,
+                                                                    weights = weights_zb_U,
+                                                                    algorithm = algorithm_zb_U,
+                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_targets=training_targets.iloc[:,0:ldim],
+                                                                    model_dir=dir_path_zb_U + "/cluster"+repr(i)+"/knn")
 
-                test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
-                #print(test_predictions_df_2)
+                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -4445,10 +4499,13 @@ if not outputs_zb_U_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_zb_U.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_U)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zb_U_df_max, outputs_zb_U_df_min)
+                if (len(cl_out_zb_U_df.columns) > 4):
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_zb_U.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_U)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zb_U_df_max, outputs_zb_U_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zb_U_df_max, outputs_zb_U_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zb_U_df_max, outputs_zb_U_df_min)
 
@@ -4965,23 +5022,25 @@ if not outputs_dual_bounce_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- Support Vector Machine ---------------- #
-                (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_dual_bounce,
-                                                                gamma=gamma_dual_bounce,
-                                                                coeff=coeff_dual_bounce,
-                                                                degree=degree_dual_bounce,
-                                                                epsilon=epsilon_dual_bounce,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
-                                                                training_targets=training_targets.iloc[:,0:ldim],
-                                                                model_dir=dir_path_dual_bounce + "/cluster"+repr(i)+"/svm")
 
-                test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
+                if (ldim!=0):
+                    # ---------- Support Vector Machine ---------------- #
+                    (svm_regressor, r2) = train_svm_regressor_model(kernel=kernel_dual_bounce,
+                                                                    gamma=gamma_dual_bounce,
+                                                                    coeff=coeff_dual_bounce,
+                                                                    degree=degree_dual_bounce,
+                                                                    epsilon=epsilon_dual_bounce,
+                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_targets=training_targets.iloc[:,0:ldim],
+                                                                    model_dir=dir_path_dual_bounce + "/cluster"+repr(i)+"/svm")
 
-                #print(test_predictions_df_2)
+                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -4994,10 +5053,13 @@ if not outputs_dual_bounce_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_dual_bounce.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_bounce)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_dual_bounce_df_max, outputs_dual_bounce_df_min)
+                if (len(cl_out_dual_bounce_df.columns) > 10):
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_dual_bounce.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_bounce)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_dual_bounce_df_max, outputs_dual_bounce_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_dual_bounce_df_max, outputs_dual_bounce_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_dual_bounce_df_max, outputs_dual_bounce_df_min)
 
@@ -5023,20 +5085,21 @@ if not outputs_dual_bounce_df.empty:
                 #plt.show()
 
                 test_predictions_df = pd.DataFrame()
-                # ---------- K-Nearest Neighbors ---------------- #
-                (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_dual_bounce,
-                                                                weights = weights_dual_bounce,
-                                                                algorithm = algorithm_dual_bounce,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
-                                                                training_targets=training_targets.iloc[:,0:ldim],
-                                                                model_dir=dir_path_dual_bounce + "/cluster"+repr(i)+"/knn")
+                if (ldim!=0):
+                    # ---------- K-Nearest Neighbors ---------------- #
+                    (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_dual_bounce,
+                                                                    weights = weights_dual_bounce,
+                                                                    algorithm = algorithm_dual_bounce,
+                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_targets=training_targets.iloc[:,0:ldim],
+                                                                    model_dir=dir_path_dual_bounce + "/cluster"+repr(i)+"/knn")
 
-                test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
-                #print(test_predictions_2)
-                test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                     index=test_examples.index,
-                                                     columns=train_col_names_1)
-                #print(test_predictions_df_2)
+                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    #print(test_predictions_2)
+                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
+                                                         index=test_examples.index,
+                                                         columns=train_col_names_1)
+                    #print(test_predictions_df_2)
                 if (test_predictions_df_1.empty):
                     test_predictions_df = test_predictions_df_2
                 elif (test_predictions_df_2.empty):
@@ -5049,10 +5112,13 @@ if not outputs_dual_bounce_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_dual_bounce.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_bounce)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_dual_bounce_df_max, outputs_dual_bounce_df_min)
+                if (len(cl_out_dual_bounce_df.columns) > 10):
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_dual_bounce.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_dual_bounce)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_dual_bounce_df_max, outputs_dual_bounce_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_dual_bounce_df_max, outputs_dual_bounce_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_dual_bounce_df_max, outputs_dual_bounce_df_min)
 
