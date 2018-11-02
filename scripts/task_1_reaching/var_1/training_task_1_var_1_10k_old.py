@@ -40,8 +40,8 @@ models_dir = str(sys.argv[2])
 # Settings
 print_en = True
 
-print_en_xf_plan = False
-train_xf_plan = False
+print_en_xf_plan = True
+train_xf_plan = True
 train_xf_plan_class = False
 dir_path_xf_plan = models_dir + "/xf_plan"
 
@@ -55,8 +55,8 @@ train_zf_U_plan = False
 train_zf_U_plan_class = False
 dir_path_zf_U_plan = models_dir + "/zf_U_plan"
 
-print_en_dual_f_plan = False
-train_dual_f_plan = False
+print_en_dual_f_plan = True
+train_dual_f_plan = True
 train_dual_f_plan_class = False
 dir_path_dual_f_plan = models_dir + "/dual_f_plan"
 
@@ -70,13 +70,8 @@ train_zb_L = False
 train_zb_L_class = False
 dir_path_zb_L = models_dir + "/zb_L"
 
-print_en_zb_U = False
-train_zb_U = False
-train_zb_U_class = False
-dir_path_zb_U = models_dir + "/zb_U"
-
-print_en_dual_bounce = True
-train_dual_bounce = True
+print_en_dual_bounce = False
+train_dual_bounce = False
 train_dual_bounce_class = False
 dir_path_dual_bounce = models_dir + "/dual_bounce"
 
@@ -84,7 +79,7 @@ learning_rate=0.009
 learning_rate_class=0.009
 test_predictor = False
 
-n_clusters_xf_plan = 4
+n_clusters_xf_plan = 6
 min_cluster_size_xf_plan = 10
 th_xf_plan = 0.001
 periods_xf_plan = 20
@@ -96,7 +91,7 @@ steps_xf_plan_class = 1000
 batch_size_xf_plan_class = 100
 units_xf_plan_class = [10,10,10]
 
-n_clusters_zf_L_plan = 2
+n_clusters_zf_L_plan = 6
 min_cluster_size_zf_L_plan = 10
 th_zf_L_plan = 0.001
 periods_zf_L_plan = 15
@@ -108,7 +103,7 @@ steps_zf_L_plan_class = 1000
 batch_size_zf_L_plan_class = 100
 units_zf_L_plan_class = [10,10,10]
 
-n_clusters_zf_U_plan = 2
+n_clusters_zf_U_plan = 3
 min_cluster_size_zf_U_plan = 10
 th_zf_U_plan = 0.001
 periods_zf_U_plan = 10
@@ -120,11 +115,11 @@ steps_zf_U_plan_class = 1000
 batch_size_zf_U_plan_class = 100
 units_zf_U_plan_class = [10,10,10]
 
-n_clusters_dual_f_plan = 4
+n_clusters_dual_f_plan = 6
 min_cluster_size_dual_f_plan = 10
-th_dual_f_plan = 0.0001
-periods_dual_f_plan = 10
-steps_dual_f_plan = 1000
+th_dual_f_plan = 0.001
+periods_dual_f_plan = 20
+steps_dual_f_plan = 2000
 batch_size_dual_f_plan = 100
 units_dual_f_plan = [10,10]
 periods_dual_f_plan_class = 20
@@ -136,7 +131,7 @@ n_clusters_x_bounce = 6
 min_cluster_size_x_bounce = 10
 th_x_bounce = 0.001
 periods_x_bounce = 20
-steps_x_bounce = 1000
+steps_x_bounce = 500
 batch_size_x_bounce = 100
 units_x_bounce = [10,10]
 periods_x_bounce_class = 20
@@ -144,10 +139,10 @@ steps_x_bounce_class = 1000
 batch_size_x_bounce_class = 100
 units_x_bounce_class = [10,10,10]
 
-n_clusters_zb_L = 2
+n_clusters_zb_L = 3
 min_cluster_size_zb_L = 10
 th_zb_L = 0.001
-periods_zb_L = 10
+periods_zb_L = 20
 steps_zb_L = 500
 batch_size_zb_L = 100
 units_zb_L = [10,10]
@@ -155,18 +150,6 @@ periods_zb_L_class = 20
 steps_zb_L_class = 1000
 batch_size_zb_L_class = 100
 units_zb_L_class = [10,10,10]
-
-n_clusters_zb_U = 2
-min_cluster_size_zb_U = 10
-th_zb_U = 0.001
-periods_zb_U = 10
-steps_zb_U = 500
-batch_size_zb_U = 100
-units_zb_U = [10,10]
-periods_zb_U_class = 20
-steps_zb_U_class = 1000
-batch_size_zb_U_class = 100
-units_zb_U_class = [10,10,10]
 
 n_clusters_dual_bounce = 6
 min_cluster_size_dual_bounce = 10
@@ -231,10 +214,6 @@ if(print_en):
     print(outputs_zb_U_df.head())
     print("dual_bounce:")
     print(outputs_dual_bounce_df.head())
-    #print("Null outputs:")
-    #print(null_outputs)
-    #print("Const outputs")
-    #print(const_outputs)
 
 
 # ----- FINAL POSTURE SELECTION: FINAL POSTURE  --------------------------------------------- #
@@ -262,7 +241,6 @@ if not outputs_xf_plan_df.empty:
         fig = plt.figure()
         ax_xf_plan = Axes3D(fig)
         ax_xf_plan.scatter(xf_plan[:, 0], xf_plan[:, 1], xf_plan[:, 2], c=labels_xf_plan)
-        #ax_xf_plan.scatter(C_xf_plan[:, 0], C_xf_plan[:, 1], C_xf_plan[:, 2], marker='*', c='#050505', s=1000)
         ax_xf_plan.set_xlabel('normalized xf_plan 1 [rad]')
         ax_xf_plan.set_ylabel('normalized xf_plan 2 [rad]')
         ax_xf_plan.set_zlabel('normalized xf_plan 3 [rad]')
@@ -457,7 +435,6 @@ if not outputs_xf_plan_df.empty:
         res_file.write("Accuracy on the test set: %0.3f\n" % evaluation_metrics['accuracy'])
         res_file.close()
 
-
     if (train_xf_plan):
         # ----------------------------------------------- PCA  and regression on each cluster --------------------------------------- #
         for i in range(0,n_clusters_xf_plan):
@@ -585,7 +562,7 @@ if not outputs_xf_plan_df.empty:
                                         label_dimension=ldim,
                                         model_dir=dir_path_xf_plan+"/cluster"+repr(i))
                     else:
-                        learner, training_rmses, validation_rmses = train_nn_regression_model(
+                        learner, training_losses, validation_losses = train_nn_regression_model(
                                                 my_optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate),
                                                 dimensions=ldim,
                                                 periods=periods_xf_plan,
@@ -623,10 +600,15 @@ if not outputs_xf_plan_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_xf_plan.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_x_f_plan)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_xf_plan_df_max, outputs_xf_plan_df_min)
+
+                if (len(cl_out_xf_plan_df.columns) > 4):
+                    # test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_df_0_max,outputs_df_0_min)
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_xf_plan.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_x_f_plan)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_xf_plan_df_max, outputs_xf_plan_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_xf_plan_df_max, outputs_xf_plan_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_xf_plan_df_max, outputs_xf_plan_df_min)
 
@@ -674,8 +656,8 @@ if not outputs_zf_L_plan_df.empty:
         fig = plt.figure()
         ax_zf_L_plan = fig.add_subplot(111)
         ax_zf_L_plan.scatter(normalized_inputs["target_x_mm"],zf_L_plan, s=10, c=labels_zf_L_plan, marker="s")
-        ax_zf_L_plan.set_xlabel("target_x_mm")
-        ax_zf_L_plan.set_ylabel("zf_L_plan_4")
+        ax_zf_L_plan.set_xlabel("normalized target x [mm]")
+        ax_zf_L_plan.set_ylabel("zf_L_plan")
         plt.savefig(dir_path_zf_L_plan + "/clusters.pdf")
         plt.clf()
         #plt.show()
@@ -802,8 +784,8 @@ if not outputs_zf_L_plan_df.empty:
     # ---------------------------------- Classifier training ------------------------------------------------------------#
     if (train_zf_L_plan_class):
         size = len(normalized_inputs.index)
-        train = int(size * 0.6)
-        val = int(size * 0.9)
+        train = int(size * 0.7)  # 70%
+        val = int(size * 0.9)  # 20%
 
         # Choose the first 70% examples for training.
         training_examples_class = normalized_inputs.iloc[:train, :]
@@ -991,7 +973,7 @@ if not outputs_zf_L_plan_df.empty:
                                     label_dimension=ldim,
                                     model_dir=dir_path_zf_L_plan+"/cluster"+repr(i))
                     else:
-                        learner, training_rmses, validation_rmses = train_nn_regression_model(
+                        learner, training_losses, validation_losses = train_nn_regression_model(
                                                 my_optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate),
                                                 dimensions=ldim,
                                                 periods=periods_zf_L_plan,
@@ -1032,7 +1014,6 @@ if not outputs_zf_L_plan_df.empty:
                 #print(test_predictions_df.describe())
 
                 if (len(cl_out_zf_L_plan_df.columns) > 4):
-                    # test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_df_0_max,outputs_df_0_min)
                     test_predictions = test_predictions_df.values
                     test_predictions_proj = pca_zf_L_plan.inverse_transform(test_predictions)
                     test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zf_L_plan)
@@ -1041,6 +1022,7 @@ if not outputs_zf_L_plan_df.empty:
                     denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zf_L_plan_df_max, outputs_zf_L_plan_df_min)
+
                 test_root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
                 print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % test_root_mean_squared_error_proj)
 
@@ -1215,8 +1197,8 @@ if not outputs_zf_U_plan_df.empty:
     # ---------------------------------- Classifier training ------------------------------------------------------------#
     if (train_zf_U_plan_class):
         size = len(normalized_inputs.index)
-        train = int(size * 0.5)
-        val = int(size * 0.7)
+        train = int(size * 0.7)  # 70%
+        val = int(size * 0.9)  # 20%
 
         # Choose the first 70% examples for training.
         training_examples_class = normalized_inputs.iloc[:train, :]
@@ -1317,7 +1299,7 @@ if not outputs_zf_U_plan_df.empty:
                         fig_pc = sns_plot.get_figure()
                         fig_pc.savefig(dir_path_xf_plan+"/cluster"+repr(i)+"/p_comps.pdf")
                         threedee_train = plt.figure().gca(projection='3d')
-                        threedee_train.scatter(cl_in_zf_U_plan_df["target_x_mm"], cl_in_zf_U_plan_df["target_y_mm"], pc_df['zf_U_plan_3'])
+                        threedee_train.scatter(cl_in_zf_U_plan_df["target_x_mm"], cl_in_zf_U_plan_df["target_y_mm"], pc_df['zf_U_plan_4'])
                         plt.clf()
                         #plt.show()
                 else:
@@ -1468,10 +1450,10 @@ if not outputs_zf_U_plan_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(denorm_test_targets["zf_U_plan_3"], denorm_test_targets["zf_U_plan_5"], s=10, c='b', marker="s",label='test_targets')
-                ax1.scatter(denorm_test_predictions_df["zf_U_plan_3"], denorm_test_predictions_df["zf_U_plan_5"], s=10, c='r', marker="o", label='test_predictions')
+                ax1.scatter(denorm_test_targets["zf_U_plan_3"], denorm_test_targets["zf_U_plan_7"], s=10, c='b', marker="s",label='test_targets')
+                ax1.scatter(denorm_test_predictions_df["zf_U_plan_3"], denorm_test_predictions_df["zf_U_plan_7"], s=10, c='r', marker="o", label='test_predictions')
                 plt.xlabel("zf_U_plan_3")
-                plt.ylabel("zf_U_plan_5")
+                plt.ylabel("zf_U_plan_7")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_zf_U_plan+"/cluster"+repr(i)+"/zf_U_pred.pdf")
                 plt.clf()
@@ -1500,11 +1482,12 @@ if not outputs_dual_f_plan_df.empty:
     C_dual_f_plan = kmeans_dual_f_plan.cluster_centers_
     if (print_en_dual_f_plan):
         fig = plt.figure()
-        ax_dual_f_plan = fig.add_subplot(111)
-        ax_dual_f_plan.scatter(dual_f_plan[:,0],dual_f_plan[:,1], s=10, c=labels_dual_f_plan, marker="s")
+        ax_dual_f_plan = Axes3D(fig)
+        ax_dual_f_plan.scatter(dual_f_plan[:, 0], dual_f_plan[:, 1], dual_f_plan[:, 2], c=labels_dual_f_plan)
+        ax_dual_f_plan.set_xlabel('normalized dual_f_plan 1')
+        ax_dual_f_plan.set_ylabel('normalized dual_f_plan 2')
+        ax_dual_f_plan.set_zlabel('normalized dual_f_plan 3')
         ax_dual_f_plan.set_title('Clusters of the dual_f_plan')
-        ax_dual_f_plan.set_xlabel('dual_f_plan_0')
-        ax_dual_f_plan.set_ylabel('dual_f_plan_1')
         plt.savefig(dir_path_dual_f_plan + "/clusters.pdf")
         plt.clf()
         #plt.show()
@@ -1894,10 +1877,10 @@ if not outputs_dual_f_plan_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(denorm_test_targets["dual_f_plan_0"], denorm_test_targets["dual_f_plan_1"], s=10, c='b', marker="s",label='test_targets')
-                ax1.scatter(denorm_test_predictions_df["dual_f_plan_0"], denorm_test_predictions_df["dual_f_plan_1"], s=10, c='r', marker="o", label='test_predictions')
-                plt.xlabel("dual_f_plan_0")
-                plt.ylabel("dual_f_plan_1")
+                ax1.scatter(denorm_test_targets["dual_f_plan_1"], denorm_test_targets["dual_f_plan_4"], s=10, c='b', marker="s",label='test_targets')
+                ax1.scatter(denorm_test_predictions_df["dual_f_plan_1"], denorm_test_predictions_df["dual_f_plan_4"], s=10, c='r', marker="o", label='test_predictions')
+                plt.xlabel("dual_f_plan_1")
+                plt.ylabel("dual_f_plan_4")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_dual_f_plan+"/cluster"+repr(i)+"/dual_f_plan_pred.pdf")
                 plt.clf()
@@ -2162,7 +2145,7 @@ if not outputs_x_bounce_df.empty:
                         pc_file.write("%.3f, " % df.iloc[5, 1])
                         pc_file.write("%.3f, " % df.iloc[6, 1])
                         pc_file.write("%.3f, " % df.iloc[7, 1])
-                        pc_file.write("%.3f\n " % df.iloc[8, 1])
+                        pc_file.write("%.3f\n" % df.iloc[8, 1])
                         pc_file.close()
 
                         sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")
@@ -2300,10 +2283,14 @@ if not outputs_x_bounce_df.empty:
 
                 #print(test_predictions_df.describe())
 
-                test_predictions = test_predictions_df.values
-                test_predictions_proj = pca_x_bounce.inverse_transform(test_predictions)
-                test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_x_bounce)
-                denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_x_bounce_df_max, outputs_x_bounce_df_min)
+                if (len(cl_out_x_bounce_df.columns) > 4):
+                    # test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_df_0_max,outputs_df_0_min)
+                    test_predictions = test_predictions_df.values
+                    test_predictions_proj = pca_x_bounce.inverse_transform(test_predictions)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_x_bounce)
+                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_x_bounce_df_max, outputs_x_bounce_df_min)
+                else:
+                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_x_bounce_df_max, outputs_x_bounce_df_min)
 
                 denorm_test_targets = denormalize_linear_scale(test_targets, outputs_x_bounce_df_max, outputs_x_bounce_df_min)
 
@@ -2352,8 +2339,8 @@ if not outputs_zb_L_df.empty:
         fig = plt.figure()
         ax_zb_L_plan = fig.add_subplot(111)
         ax_zb_L_plan.scatter(normalized_inputs["target_x_mm"],zb_L, s=10, c=labels_zb_L, marker="s")
-        ax_zb_L_plan.set_xlabel("zb_L_1")
-        ax_zb_L_plan.set_ylabel("zb_L_2")
+        ax_zb_L_plan.set_xlabel("normalized target x mm")
+        ax_zb_L_plan.set_ylabel("zb_L")
         plt.savefig(dir_path_zb_L+"/clusters.pdf")
         plt.clf()
         #plt.show()
@@ -2480,8 +2467,8 @@ if not outputs_zb_L_df.empty:
     # ---------------------------------- Classifier training ------------------------------------------------------------#
     if (train_zb_L_class):
         size = len(normalized_inputs.index)
-        train = int(size * 0.7)  # 70%
-        val = int(size * 0.9)  # 20%
+        train = int(size * 0.5)
+        val = int(size * 0.7)
 
         # Choose the first 70% examples for training.
         training_examples_class = normalized_inputs.iloc[:train, :]
@@ -2567,7 +2554,7 @@ if not outputs_zb_L_df.empty:
                         sns.barplot(x='PC', y="var", data=df, color="c")
                         threedee_train = plt.figure().gca(projection='3d')
                         threedee_train.scatter(cl_in_zb_L_df["target_x_mm"], cl_in_zb_L_df["target_y_mm"], pc_df['zb_L_4'])
-                        #plt.show()
+                        plt.show()
                 else:
                     pc_df = cl_out_zb_L_df
                     n_comps = len(cl_out_zb_L_df.columns)
@@ -2644,7 +2631,7 @@ if not outputs_zb_L_df.empty:
                     test_predictions_df_1 = pd.DataFrame(data=test_predictions_1[0:, 0:],  # values
                                                          index=test_examples.index,
                                                          columns=test_pred_col_names_1)
-                    #print(test_predictions_df_1)
+                    print(test_predictions_df_1)
                 if (ldim != 0):
                     if(test_predictor):
                         learner = tf.estimator.DNNRegressor(
@@ -2698,7 +2685,7 @@ if not outputs_zb_L_df.empty:
                     # test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_df_0_max,outputs_df_0_min)
                     test_predictions = test_predictions_df.values
                     test_predictions_proj = pca_zb_L.inverse_transform(test_predictions)
-                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_L)
+                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zf_L_plan)
                     denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zb_L_df_max, outputs_zb_L_df_min)
                 else:
                     denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zb_L_df_max, outputs_zb_L_df_min)
@@ -2724,413 +2711,6 @@ if not outputs_zb_L_df.empty:
                 plt.clf()
                 #plt.show()
 
-# ----- BOUNCE POSTURE SELECTION: Upper bounds --------------------------------------------- #
-if not outputs_zb_U_df.empty:
-    # ------------------------- K-means clustering ---------------------------------------- #
-    norm_outputs_zb_U_df, outputs_zb_U_df_max, outputs_zb_U_df_min = normalize_linear_scale(outputs_zb_U_df)
-
-    if not os.path.exists(dir_path_zb_U):
-        os.mkdir(dir_path_zb_U)
-    outputs_zb_U_df_max.to_csv(dir_path_zb_U+"/zb_U_max.csv",sep=',')
-    outputs_zb_U_df_min.to_csv(dir_path_zb_U +"/zb_U_min.csv",sep=',')
-
-    zb_U = norm_outputs_zb_U_df.values
-
-    kmeans = KMeans(n_clusters=n_clusters_zb_U, init='k-means++', max_iter=100, n_init=5, verbose=0, random_state=3425)
-    # Fitting with inputs
-    kmeans_zb_U = kmeans.fit(zb_U)
-    # Predicting the clusters
-    labels_zb_U = kmeans_zb_U.predict(zb_U)
-    labels_zb_U_df = pd.DataFrame(data=labels_zb_U)
-
-    # Getting the cluster centers
-    C_zb_U = kmeans_zb_U.cluster_centers_
-    if (print_en_zb_U):
-        fig = plt.figure()
-        ax_zb_U = fig.add_subplot(111)
-        ax_zb_U.scatter(zb_U[:,0],zb_U[:,1], s=10, c=labels_zb_U, marker="s")
-        plt.savefig(dir_path_zb_U + "/clusters.pdf")
-        plt.clf()
-        #plt.show()
-
-    cl_0_inputs_list_zb_U = []
-    cl_0_inputs_test_list_zb_U = []
-    cl_0_list_zb_U = []
-    cl_0_test_list_zb_U = []
-
-    cl_1_inputs_list_zb_U = []
-    cl_1_inputs_test_list_zb_U = []
-    cl_1_list_zb_U = []
-    cl_1_test_list_zb_U = []
-
-    cl_2_inputs_list_zb_U = []
-    cl_2_inputs_test_list_zb_U = []
-    cl_2_list_zb_U = []
-    cl_2_test_list_zb_U = []
-
-    cl_3_inputs_list_zb_U = []
-    cl_3_inputs_test_list_zb_U = []
-    cl_3_list_zb_U = []
-    cl_3_test_list_zb_U = []
-
-    cl_4_inputs_list_zb_U = []
-    cl_4_inputs_test_list_zb_U = []
-    cl_4_list_zb_U = []
-    cl_4_test_list_zb_U = []
-
-    cl_5_inputs_list_zb_U = []
-    cl_5_inputs_test_list_zb_U = []
-    cl_5_list_zb_U = []
-    cl_5_test_list_zb_U = []
-
-    for i in range(len(labels_zb_U)):
-        cl = labels_zb_U[i]
-        if cl == 0:
-            cl_0_list_zb_U.append(norm_outputs_zb_U_df.iloc[i])
-            cl_0_inputs_list_zb_U.append(normalized_inputs.iloc[i])
-        elif cl == 1:
-            cl_1_list_zb_U.append(norm_outputs_zb_U_df.iloc[i])
-            cl_1_inputs_list_zb_U.append(normalized_inputs.iloc[i])
-        elif cl == 2:
-            cl_2_list_zb_U.append(norm_outputs_zb_U_df.iloc[i])
-            cl_2_inputs_list_zb_U.append(normalized_inputs.iloc[i])
-        elif cl == 3:
-            cl_3_list_zb_U.append(norm_outputs_zb_U_df.iloc[i])
-            cl_3_inputs_list_zb_U.append(normalized_inputs.iloc[i])
-        elif cl == 4:
-            cl_4_list_zb_U.append(norm_outputs_zb_U_df.iloc[i])
-            cl_4_inputs_list_zb_U.append(normalized_inputs.iloc[i])
-        elif cl == 5:
-            cl_5_list_zb_U.append(norm_outputs_zb_U_df.iloc[i])
-            cl_5_inputs_list_zb_U.append(normalized_inputs.iloc[i])
-
-    cl_0_inputs_zb_U_df = pd.DataFrame(cl_0_inputs_list_zb_U, columns=inputs_cols)
-    cl_0_zb_U_df = pd.DataFrame(cl_0_list_zb_U, columns=cols_zb_U)
-    cl_1_inputs_zb_U_df = pd.DataFrame(cl_1_inputs_list_zb_U, columns=inputs_cols)
-    cl_1_zb_U_df = pd.DataFrame(cl_1_list_zb_U, columns=cols_zb_U)
-    cl_2_inputs_zb_U_df = pd.DataFrame(cl_2_inputs_list_zb_U, columns=inputs_cols)
-    cl_2_zb_U_df = pd.DataFrame(cl_2_list_zb_U, columns=cols_zb_U)
-    cl_3_inputs_zb_U_df = pd.DataFrame(cl_3_inputs_list_zb_U, columns=inputs_cols)
-    cl_3_zb_U_df = pd.DataFrame(cl_3_list_zb_U, columns=cols_zb_U)
-    cl_4_inputs_zb_U_df = pd.DataFrame(cl_4_inputs_list_zb_U, columns=inputs_cols)
-    cl_4_zb_U_df = pd.DataFrame(cl_4_list_zb_U, columns=cols_zb_U)
-    cl_5_inputs_zb_U_df = pd.DataFrame(cl_5_inputs_list_zb_U, columns=inputs_cols)
-    cl_5_zb_U_df = pd.DataFrame(cl_5_list_zb_U, columns=cols_zb_U)
-
-    clusters_inputs_zb_U = [cl_0_inputs_zb_U_df,cl_1_inputs_zb_U_df,cl_2_inputs_zb_U_df,cl_3_inputs_zb_U_df,cl_4_inputs_zb_U_df,cl_5_inputs_zb_U_df]
-    clusters_outputs_zb_U = [cl_0_zb_U_df,cl_1_zb_U_df,cl_2_zb_U_df,cl_3_zb_U_df,cl_4_zb_U_df,cl_5_zb_U_df]
-
-    # save the dataframes of each cluster
-    # cluster 0
-    if not os.path.exists(dir_path_zb_U + "/cluster0"):
-        os.mkdir(dir_path_zb_U + "/cluster0")
-    cl_0_inputs_zb_U_df.to_csv(dir_path_zb_U + "/cluster0/inputs.csv", sep=',', index=False)
-    cl_0_zb_U_df.to_csv(dir_path_zb_U + "/cluster0/outputs.csv", sep=',', index=False)
-    # cluster 1
-    if not os.path.exists(dir_path_zb_U + "/cluster1"):
-        os.mkdir(dir_path_zb_U + "/cluster1")
-    cl_1_inputs_zb_U_df.to_csv(dir_path_zb_U + "/cluster1/inputs.csv", sep=',', index=False)
-    cl_1_zb_U_df.to_csv(dir_path_zb_U + "/cluster1/outputs.csv", sep=',', index=False)
-    # cluster 2
-    if not os.path.exists(dir_path_zb_U + "/cluster2"):
-        os.mkdir(dir_path_zb_U + "/cluster2")
-    cl_2_inputs_zb_U_df.to_csv(dir_path_zb_U + "/cluster2/inputs.csv", sep=',', index=False)
-    cl_2_zb_U_df.to_csv(dir_path_zb_U + "/cluster2/outputs.csv", sep=',', index=False)
-    # cluster 3
-    if not os.path.exists(dir_path_zb_U + "/cluster3"):
-        os.mkdir(dir_path_zb_U + "/cluster3")
-    cl_3_inputs_zb_U_df.to_csv(dir_path_zb_U + "/cluster3/inputs.csv", sep=',', index=False)
-    cl_3_zb_U_df.to_csv(dir_path_zb_U + "/cluster3/outputs.csv", sep=',', index=False)
-    # cluster 4
-    if not os.path.exists(dir_path_zb_U + "/cluster4"):
-        os.mkdir(dir_path_zb_U + "/cluster4")
-    cl_4_inputs_zb_U_df.to_csv(dir_path_zb_U + "/cluster4/inputs.csv", sep=',', index=False)
-    cl_4_zb_U_df.to_csv(dir_path_zb_U + "/cluster4/outputs.csv", sep=',', index=False)
-    # cluster 5
-    if not os.path.exists(dir_path_zb_U + "/cluster5"):
-        os.mkdir(dir_path_zb_U + "/cluster5")
-    cl_5_inputs_zb_U_df.to_csv(dir_path_zb_U + "/cluster5/inputs.csv", sep=',', index=False)
-    cl_5_zb_U_df.to_csv(dir_path_zb_U + "/cluster5/outputs.csv", sep=',', index=False)
-
-    if (print_en_zb_U):
-        print("Cluster 0:")
-        print(cl_0_inputs_zb_U_df.describe())
-        print(cl_0_zb_U_df.describe())
-        print("Cluster 1:")
-        print(cl_1_inputs_zb_U_df.describe())
-        print(cl_1_zb_U_df.describe())
-        print("Cluster 2:")
-        print(cl_2_inputs_zb_U_df.describe())
-        print(cl_2_zb_U_df.describe())
-        print("Cluster 3:")
-        print(cl_3_inputs_zb_U_df.describe())
-        print(cl_3_zb_U_df.describe())
-        print("Cluster 4:")
-        print(cl_4_inputs_zb_U_df.describe())
-        print(cl_4_zb_U_df.describe())
-        print("Cluster 5:")
-        print(cl_5_inputs_zb_U_df.describe())
-        print(cl_5_zb_U_df.describe())
-
-    # ---------------------------------- Classifier training ------------------------------------------------------------#
-    if (train_zb_U_class):
-        size = len(normalized_inputs.index)
-        train = int(size * 0.6)
-        val = int(size * 0.8)
-
-        # Choose the first 70% examples for training.
-        training_examples_class = normalized_inputs.iloc[:train, :]
-        training_targets_class = labels_zb_U_df.iloc[:train, :]
-
-        # Choose the last 20%  examples for validation.
-        validation_examples_class = normalized_inputs.iloc[train:val, :]
-        validation_targets_class = labels_zb_U_df.iloc[train:val, :]
-
-        # Choose the examples for test. 10%
-        test_examples_class = normalized_inputs.iloc[val:, :]
-        test_targets_class = labels_zb_U_df.iloc[val:, :]
-
-        if (print_en_zb_U):
-            # Double-check that we've done the right thing.
-            print("Training examples for classification summary:")
-            display.display(training_examples_class.describe())
-            print("Validation examples for classification summary:")
-            display.display(validation_examples_class.describe())
-            print("Test examples for classification summary:")
-            display.display(test_examples_class.describe())
-            print("Training targets for classification summary:")
-            display.display(training_targets_class.describe())
-            print("Validation targets for classification summary:")
-            display.display(validation_targets_class.describe())
-            print("Test targets for classification summary:")
-            display.display(test_targets_class.describe())
-
-
-        (classifier, training_log_losses, validation_log_losses) = train_nn_classifier_model(
-                                        my_optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate_class),
-                                        n_classes=n_clusters_zb_U,
-                                        periods=periods_zb_U_class,
-                                        steps=steps_zb_U_class,
-                                        batch_size=batch_size_zb_U_class,
-                                        hidden_units=units_zb_U_class,
-                                        training_examples=training_examples_class,
-                                        training_targets=training_targets_class,
-                                        validation_examples=validation_examples_class,
-                                        validation_targets=validation_targets_class,
-                                        model_dir=dir_path_zb_U + "/classification")
-
-        # ---------- Evaluation on test data ---------- #
-        predict_test_input_fn = lambda: my_input_fn(test_examples_class,
-                                                    test_targets_class,
-                                                          num_epochs=1,
-                                                          shuffle=False)
-
-        test_pred = classifier.predict(input_fn=predict_test_input_fn)
-        test_probabilities = np.array([item['probabilities'] for item in test_pred])
-
-        test_log_loss = metrics.log_loss(test_targets_class, test_probabilities)
-        print("LogLoss (on test data): %0.3f" % test_log_loss)
-        evaluation_metrics = classifier.evaluate(input_fn=predict_test_input_fn)
-        print("Average loss on the test set: %0.3f" % evaluation_metrics['average_loss'])
-        print("Accuracy on the test set: %0.3f" % evaluation_metrics['accuracy'])
-
-        res_file = open(dir_path_zb_U + "/classification/results.txt", "a")
-        res_file.write("LogLoss (on test data): %0.3f\n" % test_log_loss)
-        res_file.write("Average loss on the test set: %0.3f\n" % evaluation_metrics['average_loss'])
-        res_file.write("Accuracy on the test set: %0.3f\n" % evaluation_metrics['accuracy'])
-        res_file.close()
-
-    if (train_zb_U):
-        # ----------------------------------------------- PCA  and regression on each cluster --------------------------------------- #
-
-        for i in range(0,n_clusters_zb_U):
-            cl_in_zb_U_df = clusters_inputs_zb_U[i]
-            cl_out_zb_U_df = clusters_outputs_zb_U[i]
-            if (len(cl_out_zb_U_df.index) > min_cluster_size_zb_U):
-                if (len(cl_out_zb_U_df.columns) > 4):
-                    n_comps = 4  # at least 95% of the information with 3 components
-                    Z_b_U = cl_out_zb_U_df.values
-                    pca_zb_U = decomposition.PCA(n_components=n_comps)
-                    pc = pca_zb_U.fit_transform(Z_b_U)
-                    pc_df = pd.DataFrame(data=pc, columns=cols_zb_U[0:n_comps])
-                    if (print_en_zb_U):
-                        print(pca_zb_U.n_components_)
-                        print(pca_zb_U.components_)
-                        print(pc_df.describe())
-                        print(pca_zb_U.explained_variance_ratio_)
-                        print(pca_zb_U.explained_variance_ratio_.sum())
-                        df = pd.DataFrame({'var': pca_zb_U.explained_variance_ratio_, 'PC': cols_zb_U[0:n_comps]})
-                        sns.barplot(x='PC', y="var", data=df, color="c")
-                        threedee_train = plt.figure().gca(projection='3d')
-                        threedee_train.scatter(cl_in_zb_U_df["target_x_mm"], cl_in_zb_U_df["target_y_mm"], pc_df['zb_U_3'])
-                        #plt.show()
-                else:
-                    pc_df = cl_out_zb_U_df
-                    n_comps = len(cl_out_zb_U_df.columns)
-
-                # ---------------------------- regression --------------------------------- #
-
-                size = len(cl_out_zb_U_df.index)
-                inputs_df, inputs_df_max, inputs_df_min = normalize_linear_scale(cl_in_zb_U_df)
-                outputs_df = pc_df
-
-                if (print_en_zb_U):
-                    print("outputs_df "+repr(i)+":")
-                    print(outputs_df.describe())
-                    # print(outputs_df_0_max)
-                    # print(outputs_df_0_min)
-
-                train = int(size * 0.7)  # 70%
-                val = int(size * 0.9)  # 20%
-                tar = 0  # from 'PC1'
-                tar_end = n_comps  # to 'PC3'
-                dim = tar_end  # number of total outputs of the Neural Network
-
-                # Choose the first 70% examples for training.
-                training_examples = inputs_df.iloc[:train, :]
-                training_targets = outputs_df.iloc[:train, tar:tar_end]
-
-                # Choose the last 20%  examples for validation.
-                validation_examples = inputs_df.iloc[train:val, :]
-                validation_targets = outputs_df.iloc[train:val, tar:tar_end]
-
-                # Choose the examples for test. 10%
-                test_examples = inputs_df.iloc[val:, :]
-                # test_targets = outputs_df_0.iloc[val:, tar:tar_end]
-                test_targets = cl_out_zb_U_df.iloc[val:, :]
-
-                if (print_en_zb_U):
-                    # Double-check that we've done the right thing.
-                    print("Training examples summary:")
-                    display.display(training_examples.describe())
-                    print("Validation examples summary:")
-                    display.display(validation_examples.describe())
-                    print("Test examples summary:")
-                    display.display(test_examples.describe())
-                    print("Training targets summary:")
-                    display.display(training_targets.describe())
-                    print("Validation targets summary:")
-                    display.display(validation_targets.describe())
-                    print("Test targets summary:")
-                    display.display(test_targets.describe())
-
-                test_predictions = np.empty(shape=(test_targets.shape[0], test_targets.shape[1]))
-                test_predictions_1 = np.array([])
-                test_pred_col_names_1 = []
-                train_col_names = list(training_targets.columns.values)
-                train_col_names_1 = list(training_targets.columns.values)
-                test_predictions_2 = []
-                ldim = dim
-
-                test_predictions_df = pd.DataFrame()
-                test_predictions_df_1 = pd.DataFrame()
-                test_predictions_df_2 = pd.DataFrame()
-
-                for j in range(0, dim):
-                    if (math.sqrt(math.pow((training_targets.iloc[0:, j].quantile(0.25) - training_targets.iloc[0:, j].quantile(0.75)),2)) <= th_zb_U):
-                        if (test_predictions_1.size == 0):
-                            test_predictions_1 = np.full((test_targets.shape[0], 1),training_targets.iloc[0:, j].mean())
-                            # print(test_predictions_1)
-                        else:
-                            test_predictions_1 = np.concatenate([test_predictions_1, np.full((test_targets.shape[0], 1),training_targets.iloc[0:,j].mean())], axis=1)
-                            # print(test_predictions_1)
-                        ldim = ldim - 1
-                        test_pred_col_names_1.append(training_targets.columns[j])
-
-                # print(test_pred_col_names_1)
-                # print(train_col_names_1)
-                for str in test_pred_col_names_1:
-                    train_col_names_1.remove(str)
-
-                # print(train_col_names_1)
-                # print(test_predictions_1)
-
-                if (test_predictions_1.size != 0):
-                    test_predictions_df_1 = pd.DataFrame(data=test_predictions_1[0:, 0:],  # values
-                                                         index=test_examples.index,
-                                                         columns=test_pred_col_names_1)
-                    print(test_predictions_df_1)
-                if (ldim != 0):
-                    if(test_predictor):
-                        learner = tf.estimator.DNNRegressor(
-                                    feature_columns=construct_feature_columns(training_examples),
-                                    hidden_units=units_zb_U,
-                                    optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate),
-                                    label_dimension=ldim,
-                                    model_dir=dir_path_zb_U+"/cluster"+repr(i))
-                    else:
-                        learner, training_losses, validation_losses = train_nn_regression_model(
-                                                my_optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate),
-                                                dimensions=ldim,
-                                                periods=periods_zb_U,
-                                                steps=steps_zb_U,
-                                                batch_size=batch_size_zb_U,
-                                                hidden_units=units_zb_U,
-                                                training_examples=training_examples,
-                                                training_targets=training_targets[train_col_names_1],
-                                                validation_examples=validation_examples,
-                                                validation_targets=validation_targets[train_col_names_1],
-                                                model_dir=dir_path_zb_U+"/cluster"+repr(i))
-
-                    # ---------- Evaluation on test data ---------------- #
-                    predict_test_input_fn = lambda: my_input_fn(test_examples,
-                                                                test_targets[train_col_names_1],
-                                                                num_epochs=1,
-                                                                shuffle=False)
-
-                    test_predictions_2 = learner.predict(input_fn=predict_test_input_fn)
-                    test_predictions_2 = np.array([item['predictions'][0:ldim] for item in test_predictions_2])
-                    # print(test_predictions_2)
-
-                    test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
-                                                         index=test_examples.index,
-                                                         columns=train_col_names_1)
-
-                    print(test_predictions_df_2)
-
-                if (test_predictions_df_1.empty):
-                    test_predictions_df = test_predictions_df_2
-                elif (test_predictions_df_2.empty):
-                    test_predictions_df = test_predictions_df_1
-                else:
-                    for str in train_col_names:
-                        if str in test_predictions_df_1:
-                            test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_1[str]], axis=1)
-                        elif str in test_predictions_df_2:
-                            test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
-
-                print(test_predictions_df)
-
-                if (len(cl_out_zb_U_df.columns) > 4):
-                    # test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_df_0_max,outputs_df_0_min)
-                    test_predictions = test_predictions_df.values
-                    test_predictions_proj = pca_zb_U.inverse_transform(test_predictions)
-                    test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_U)
-                    denorm_test_predictions_df = denormalize_linear_scale(test_proj_df, outputs_zb_U_df_max, outputs_zb_U_df_min)
-                else:
-                    denorm_test_predictions_df = denormalize_linear_scale(test_predictions_df, outputs_zb_U_df_max, outputs_zb_U_df_min)
-
-                denorm_test_targets = denormalize_linear_scale(test_targets, outputs_zb_U_df_max, outputs_zb_U_df_min)
-
-                test_root_mean_squared_error_proj = math.sqrt(metrics.mean_squared_error(denorm_test_predictions_df, denorm_test_targets))
-                print("Cluster "+repr(i)+". Final RMSE (on projected test data): %0.3f" % test_root_mean_squared_error_proj)
-
-                if not test_predictor:
-                    res_file = open(dir_path_zb_U+"/cluster"+repr(i)+"/results.txt", "a")
-                    res_file.write("RMSE (on test data):   %0.3f\n" % test_root_mean_squared_error_proj)
-                    res_file.close()
-
-                fig = plt.figure()
-                ax1 = fig.add_subplot(111)
-                ax1.scatter(test_examples["target_x_mm"], denorm_test_targets["zb_U_3"], s=10, c='b', marker="s",label='test_targets')
-                ax1.scatter(test_examples["target_x_mm"], denorm_test_predictions_df["zb_U_3"], s=10, c='r', marker="o", label='test_predictions')
-                plt.xlabel("normalized target_x [mm]")
-                plt.ylabel("zb_U_3")
-                plt.legend(loc='upper right')
-                plt.savefig(dir_path_zb_U+"/cluster"+repr(i)+"/zb_U_pred.pdf")
-                plt.clf()
-                #plt.show()
-
 # ----- BOUNCE POSTURE SELECTION: dual variables  --------------------------------------------- #
 if not outputs_dual_bounce_df.empty:
     # ------------------------- K-means clustering ---------------------------------------- #
@@ -3145,10 +2725,6 @@ if not outputs_dual_bounce_df.empty:
 
     kmeans = KMeans(n_clusters=n_clusters_dual_bounce, init='k-means++', max_iter=500, n_init=10, verbose=0, random_state=3425)
     # Fitting with inputs
-    dual_nan = np.any(np.isnan(dual_bounce))
-    # Find indicies that you need to replace
-    inds = np.where(np.isnan(dual_bounce))
-    dual_bounce[inds] = 0.0
     kmeans_dual_bounce = kmeans.fit(dual_bounce)
     # Predicting the clusters
     labels_dual_bounce = kmeans_dual_bounce.predict(dual_bounce)
@@ -3554,10 +3130,10 @@ if not outputs_dual_bounce_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(denorm_test_targets["dual_bounce_59"], denorm_test_targets["dual_bounce_39"], s=10, c='b', marker="s", label='test_targets')
-                ax1.scatter(denorm_test_predictions_df["dual_bounce_59"], denorm_test_predictions_df["dual_bounce_39"], s=10, c='r', marker="o", label='test_predictions')
-                plt.xlabel("dual_bounce_59")
-                plt.ylabel("dual_bounce_39")
+                ax1.scatter(denorm_test_targets["dual_bounce_39"], denorm_test_targets["dual_bounce_40"], s=10, c='b', marker="s", label='test_targets')
+                ax1.scatter(denorm_test_predictions_df["dual_bounce_39"], denorm_test_predictions_df["dual_bounce_40"], s=10, c='r', marker="o", label='test_predictions')
+                plt.xlabel("dual_bounce_39")
+                plt.ylabel("dual_bounce_40")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_dual_bounce+"/cluster"+repr(i)+"/dual_bounce_pred.pdf")
                 plt.clf()

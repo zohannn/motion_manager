@@ -28,21 +28,21 @@ import math
 import os
 
 # HUPL
-from hupl import preprocess_features
-from hupl import preprocess_targets
-from hupl import normalize_linear_scale
-from hupl import denormalize_linear_scale
-from hupl import denormalize_z_score
-from hupl import train_nn_regressor_model
-from hupl import train_nn_classifier_model
-from hupl import train_svm_regressor_model
-from hupl import train_svm_classifier_model
-from hupl import train_knn_regressor_model
-from hupl import train_knn_classifier_model
-from hupl import classification_report_csv
-from hupl import my_input_fn
-from hupl import normalize_z_score
-from hupl import construct_feature_columns
+from HUPL.learner import preprocess_features
+from HUPL.learner import preprocess_targets
+from HUPL.learner import normalize_linear_scale
+from HUPL.learner import denormalize_linear_scale
+from HUPL.learner import denormalize_z_score
+from HUPL.learner import train_nn_regressor_model
+from HUPL.learner import train_nn_classifier_model
+from HUPL.learner import train_svm_regressor_model
+from HUPL.learner import train_svm_classifier_model
+from HUPL.learner import train_knn_regressor_model
+from HUPL.learner import train_knn_classifier_model
+from HUPL.learner import classification_report_csv
+from HUPL.learner import my_input_fn
+from HUPL.learner import normalize_z_score
+from HUPL.learner import construct_feature_columns
 
 
 if len(sys.argv) <= 2:

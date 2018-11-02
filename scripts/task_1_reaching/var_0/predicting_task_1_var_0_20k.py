@@ -14,12 +14,12 @@ import math
 from random import randint
 
 # HUPL
-from hupl import preprocess_features
-from hupl import preprocess_targets
-from hupl import normalize_linear_scale
-from hupl import denormalize_linear_scale
-from hupl import my_input_fn
-from hupl import construct_feature_columns
+from HUPL.learner import preprocess_features
+from HUPL.learner import preprocess_targets
+from HUPL.learner import normalize_linear_scale
+from HUPL.learner import denormalize_linear_scale
+from HUPL.learner import my_input_fn
+from HUPL.learner import construct_feature_columns
 
 
 if len(sys.argv) <= 3:
