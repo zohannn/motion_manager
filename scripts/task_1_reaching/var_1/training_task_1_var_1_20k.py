@@ -53,39 +53,39 @@ models_dir = str(sys.argv[2])
 # Settings
 print_en = True
 
-print_en_xf_plan = True
-train_xf_plan = True
-train_xf_plan_class = True
+print_en_xf_plan = False
+train_xf_plan = False
+train_xf_plan_class = False
 dir_path_xf_plan = models_dir + "/xf_plan"
 
-print_en_zf_L_plan = True
-train_zf_L_plan = True
-train_zf_L_plan_class = True
+print_en_zf_L_plan = False
+train_zf_L_plan = False
+train_zf_L_plan_class = False
 dir_path_zf_L_plan = models_dir + "/zf_L_plan"
 
-print_en_zf_U_plan = True
-train_zf_U_plan = True
-train_zf_U_plan_class = True
+print_en_zf_U_plan = False
+train_zf_U_plan = False
+train_zf_U_plan_class = False
 dir_path_zf_U_plan = models_dir + "/zf_U_plan"
 
-print_en_dual_f_plan = True
-train_dual_f_plan = True
-train_dual_f_plan_class = True
+print_en_dual_f_plan = False
+train_dual_f_plan = False
+train_dual_f_plan_class = False
 dir_path_dual_f_plan = models_dir + "/dual_f_plan"
 
-print_en_x_bounce = True
-train_x_bounce = True
-train_x_bounce_class = True
+print_en_x_bounce = False
+train_x_bounce = False
+train_x_bounce_class = False
 dir_path_x_bounce = models_dir + "/x_bounce"
 
-print_en_zb_L = True
-train_zb_L = True
-train_zb_L_class = True
+print_en_zb_L = False
+train_zb_L = False
+train_zb_L_class = False
 dir_path_zb_L = models_dir + "/zb_L"
 
-print_en_zb_U = True
-train_zb_U = True
-train_zb_U_class = True
+print_en_zb_U = False
+train_zb_U = False
+train_zb_U_class = False
 dir_path_zb_U = models_dir + "/zb_U"
 
 print_en_dual_bounce = True
@@ -209,7 +209,7 @@ n_neighbors_dual_f_plan = 10
 weights_dual_f_plan = 'distance'
 algorithm_dual_f_plan = 'auto'
 
-n_clusters_x_bounce = 6
+n_clusters_x_bounce = 2
 min_cluster_size_x_bounce = 10
 th_x_bounce = 0.001
 # NN
@@ -237,7 +237,7 @@ n_neighbors_x_bounce = 10
 weights_x_bounce = 'distance'
 algorithm_x_bounce = 'auto'
 
-n_clusters_zb_L = 3
+n_clusters_zb_L = 1
 min_cluster_size_zb_L = 10
 th_zb_L = 0.001
 # NN
@@ -265,7 +265,7 @@ n_neighbors_zb_L = 10
 weights_zb_L = 'distance'
 algorithm_zb_L = 'auto'
 
-n_clusters_zb_U = 2
+n_clusters_zb_U = 1
 min_cluster_size_zb_U = 10
 th_zb_U = 0.001
 # NN
@@ -293,7 +293,7 @@ n_neighbors_zb_U = 10
 weights_zb_U = 'distance'
 algorithm_zb_U = 'auto'
 
-n_clusters_dual_bounce = 6
+n_clusters_dual_bounce = 3
 min_cluster_size_dual_bounce = 10
 th_dual_bounce = 0.001
 # NN
@@ -3394,9 +3394,9 @@ if not outputs_zb_L_df.empty:
     if (print_en_zb_L):
         fig = plt.figure()
         ax_zb_L_plan = fig.add_subplot(111)
-        ax_zb_L_plan.scatter(normalized_inputs["target_x_mm"],zb_L, s=10, c=labels_zb_L, marker="s")
-        ax_zb_L_plan.set_xlabel("zb_L_1")
-        ax_zb_L_plan.set_ylabel("zb_L_2")
+        ax_zb_L_plan.scatter(zb_L[:,0],zb_L[:,1], s=10, c=labels_zb_L, marker="s")
+        ax_zb_L_plan.set_xlabel("zb_L_3")
+        ax_zb_L_plan.set_ylabel("zb_L_4")
         plt.savefig(dir_path_zb_L+"/clusters.pdf")
         plt.clf()
         #plt.show()
@@ -4700,8 +4700,8 @@ if not outputs_dual_bounce_df.empty:
             os.mkdir(dir_path_dual_bounce + "/classification/knn")
 
         size = len(normalized_inputs.index)
-        train = int(size * 0.7)  # 70%
-        val = int(size * 0.9)  # 20%
+        train = int(size * 0.6)  # 70%
+        val = int(size * 0.8)  # 20%
 
         # Choose the first 70% examples for training.
         training_examples_class = normalized_inputs.iloc[:train, :]
