@@ -183,6 +183,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     scenarios.push_back(QString("Human assistance scenario: Moving a tray with ARoS"));
     scenarios.push_back(QString("Natural obstacle avoidance with ARoS"));
     scenarios.push_back(QString("Learning tasks: reaching with one obstacle"));
+    scenarios.push_back(QString("Learning tasks: reaching with many obstacles"));
+    scenarios.push_back(QString("Learning tasks: picking the blue column"));
 
 #endif
 
@@ -439,6 +441,10 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              string path_vrep_natural_obst_av = PATH_SCENARIOS+string("/vrep/Natural_obst_avoidance_aros_1.ttt");
              // Learning tasks: reaching with one obstacle
              string path_vrep_learning_tasks_reaching_1 = PATH_SCENARIOS+string("/vrep/Learning_Reaching_1.ttt");
+             // Learning tasks: reaching with many obstacles
+             string path_vrep_learning_tasks_reaching_2 = PATH_SCENARIOS+string("/vrep/Learning_Reaching_2.ttt");
+             // Learning tasks: picking the blue column
+             string path_vrep_learning_tasks_picking_1 = PATH_SCENARIOS+string("/vrep/Learning_Picking_1.ttt");
 
              switch(i){
              case 0: // Assembly scenario
@@ -686,6 +692,54 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 #endif
                  }else{
                      qnode.log(QNode::Error,std::string("Learning tasks: reaching with one obstacle HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+#endif
+                 break;
+             case 9: // Learning Tasks: reaching with many obstacles
+#if HAND==0
+
+#elif HAND==1
+                this->scenario_id = 10;
+                 if (qnode.loadScenario(path_vrep_learning_tasks_reaching_2,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Learning tasks: reaching with many obstacles HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Learning tasks: reaching with many obstacles");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
+                     //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
+                 }else{
+                     qnode.log(QNode::Error,std::string("Learning tasks: reaching with many obstacles HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+#endif
+                 break;
+             case 10: // Learning Tasks: picking the blue column
+#if HAND==0
+
+#elif HAND==1
+                this->scenario_id = 11;
+                 if (qnode.loadScenario(path_vrep_learning_tasks_picking_1,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Learning tasks: picking the blue column HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Learning tasks: picking the blue column");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
+                     //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
+                 }else{
+                     qnode.log(QNode::Error,std::string("Learning tasks: picking the blue column HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
