@@ -131,7 +131,7 @@ units_dual_f_plan = [10,10]
 units_dual_f_plan_class = [10,10,10]
 
 n_pca_comps_x_bounce = 9
-n_clusters_x_bounce = 2
+n_clusters_x_bounce = 6
 min_cluster_size_x_bounce = 10
 th_x_bounce = 0.001
 periods_x_bounce = 20
