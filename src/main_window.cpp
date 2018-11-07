@@ -305,7 +305,6 @@ void MainWindow::addObject(string value)
    ui.comboBox_objects_left->addItem(QString(value.c_str()));
    ui.comboBox_objects_eng_left->addItem(QString(value.c_str()));
 
-   ui.listWidget_obsts_except->addItem(QString(value.c_str()));
 }
 
 void MainWindow::addPose(string value)
@@ -991,6 +990,15 @@ void MainWindow::on_pushButton_addMov_clicked()
                  }
                  ui.listWidget_movs->setCurrentRow(ui.listWidget_movs->count()-1);
 
+             }
+
+             // add obstacles in the exception list
+             problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
+             std::vector<objectPtr> obsts; prob->getObstacles(obsts);
+             for(size_t j=0;j<obsts.size();++j){
+                 objectPtr obs = obsts.at(j);
+                 string obs_name = obs->getName();
+                 ui.listWidget_obsts_except->addItem(QString(obs_name.c_str()));
              }
 
         }else{
@@ -5654,8 +5662,7 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                 double obsts_roll_var = ui.lineEdit_obsts_roll_var->text().toDouble();
                 double obsts_pitch_var = ui.lineEdit_obsts_pitch_var->text().toDouble();
                 double obsts_yaw_var = ui.lineEdit_obsts_yaw_var->text().toDouble();
-                // get the obstacles of the scenario
-                std::vector<objectPtr> obsts; prob->getObstacles(obsts);
+                std::vector<objectPtr> obsts; prob->getObstacles(obsts);     // get the obstacles of the scenario
 
                 bool solved = false;
                 // csv
@@ -5669,17 +5676,49 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                     for(size_t j=0;j<obsts.size();++j){
                         data_csv << ",obstacle_"+to_string(j+1)+"_x_mm,obstacle_"+to_string(j+1)+"_y_mm,obstacle_"+to_string(j+1)+"_z_mm,obstacle_"+to_string(j+1)+"_roll_rad,obstacle_"+to_string(j+1)+"_pitch_rad,obstacle_"+to_string(j+1)+"_yaw_rad";
                     }
-                    if(mov_type==1 || mov_type==5){ // move movement
+                    if(mov_type==0){ // reach-to-grasp movement
+
+                        // final plan posture selection
+                        data_csv << ",xf_plan_1_rad,xf_plan_2_rad,xf_plan_3_rad,xf_plan_4_rad,xf_plan_5_rad,xf_plan_6_rad,xf_plan_7_rad";
+                        data_csv << ",zf_L_plan_1,zf_L_plan_2,zf_L_plan_3,zf_L_plan_4,zf_L_plan_5,zf_L_plan_6,zf_L_plan_7";
+                        data_csv << ",zf_U_plan_1,zf_U_plan_2,zf_U_plan_3,zf_U_plan_4,zf_U_plan_5,zf_U_plan_6,zf_U_plan_7";
+                        for(size_t j=0;j<dual_plan.size();++j){
+                            data_csv << ",dual_f_plan_"+to_string(j);
+                        }
+
+                        // final approach posture selection
+                        data_csv << ",xf_approach_1_rad,xf_approach_2_rad,xf_approach_3_rad,xf_approach_4_rad,xf_approach_5_rad,xf_approach_6_rad,xf_approach_7_rad";
+                        data_csv << ",zf_L_approach_1,zf_L_approach_2,zf_L_approach_3,zf_L_approach_4,zf_L_approach_5,zf_L_approach_6,zf_L_approach_7";
+                        data_csv << ",zf_U_approach_1,zf_U_approach_2,zf_U_approach_3,zf_U_approach_4,zf_U_approach_5,zf_U_approach_6,zf_U_approach_7";
+                        for(size_t j=0;j<dual_approach.size();++j){
+                            data_csv << ",dual_f_approach_"+to_string(j);
+                        }
+
+                        // final retreat posture selection
+                        data_csv << ",xf_retreat_1_rad,xf_retreat_2_rad,xf_retreat_3_rad,xf_retreat_4_rad,xf_retreat_5_rad,xf_retreat_6_rad,xf_retreat_7_rad";
+                        data_csv << ",zf_L_retreat_1,zf_L_retreat_2,zf_L_retreat_3,zf_L_retreat_4,zf_L_retreat_5,zf_L_retreat_6,zf_L_retreat_7";
+                        data_csv << ",zf_U_retreat_1,zf_U_retreat_2,zf_U_retreat_3,zf_U_retreat_4,zf_U_retreat_5,zf_U_retreat_6,zf_U_retreat_7";
+                        for(size_t j=0;j<dual_retreat.size();++j){
+                            data_csv << ",dual_f_retreat_"+to_string(j);
+                        }
+
+                        // bounce posture selection
+                        data_csv << ",x_bounce_1_rad,x_bounce_2_rad,x_bounce_3_rad,x_bounce_4_rad,x_bounce_5_rad,x_bounce_6_rad,x_bounce_7_rad,x_bounce_8_rad,x_bounce_9_rad";
+                        data_csv << ",zb_L_1,zb_L_2,zb_L_3,zb_L_4,zb_L_5,zb_L_6,zb_L_7,zb_L_8,zb_L_9";
+                        data_csv << ",zb_U_1,zb_U_2,zb_U_3,zb_U_4,zb_U_5,zb_U_6,zb_U_7,zb_U_8,zb_U_9";
+                        for(size_t j=0;j<dual_bounce.size();++j){
+                            data_csv << ",dual_bounce_"+to_string(j);
+                        }
+
+                    }else if(mov_type==1 || mov_type==5){ // move movement
 
                         // final posture selection
                         data_csv << ",xf_plan_1_rad,xf_plan_2_rad,xf_plan_3_rad,xf_plan_4_rad,xf_plan_5_rad,xf_plan_6_rad,xf_plan_7_rad";
                         data_csv << ",zf_L_plan_1,zf_L_plan_2,zf_L_plan_3,zf_L_plan_4,zf_L_plan_5,zf_L_plan_6,zf_L_plan_7";
                         data_csv << ",zf_U_plan_1,zf_U_plan_2,zf_U_plan_3,zf_U_plan_4,zf_U_plan_5,zf_U_plan_6,zf_U_plan_7";
-                        //data_csv << ",lf_plan_pos 1,lf_plan_or 2";
                         for(size_t j=0;j<dual_plan.size();++j){
                             data_csv << ",dual_f_plan_"+to_string(j);
                         }
-                        //data_csv << ",lf_plan_body 1,lf_plan_body 2,lf_plan_body 3";
 
                         // bounce posture selection
                         data_csv << ",x_bounce_1_rad,x_bounce_2_rad,x_bounce_3_rad,x_bounce_4_rad,x_bounce_5_rad,x_bounce_6_rad,x_bounce_7_rad,x_bounce_8_rad,x_bounce_9_rad";
@@ -5698,39 +5737,78 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                             sleep(1);
                             qnode.log(QNode::Info,std::string("Trial: ")+to_string(i));
                             std::srand(std::time(NULL));
+                            if(mov_type==0){ // reach-to-grasp movement
+                                objectPtr obj_tar = prob->getMovement()->getObject();
+                                motion_manager::pos obj_pos;
+                                motion_manager::orient obj_or;
+                                if(this->ui.lineEdit_tar_x_var->isEnabled()){
+                                    obj_pos.Xpos = obj_tar->getPos().Xpos - (tar_x_var/2) + tar_x_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    obj_pos.Xpos = obj_tar->getPos().Xpos;
+                                }
+                                if(this->ui.lineEdit_tar_y_var->isEnabled()){
+                                    obj_pos.Ypos = obj_tar->getPos().Ypos - (tar_y_var/2) + tar_y_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    obj_pos.Ypos = obj_tar->getPos().Ypos;
+                                }
+                                if(this->ui.lineEdit_tar_z_var->isEnabled()){
+                                    obj_pos.Zpos = obj_tar->getPos().Zpos - (tar_z_var/2) + tar_z_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    obj_pos.Zpos = obj_tar->getPos().Zpos;
+                                }
+                                if(this->ui.lineEdit_tar_roll_var->isEnabled()){
+                                    obj_or.roll = obj_tar->getOr().roll - (tar_roll_var/2) + tar_roll_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    obj_or.roll = obj_tar->getOr().roll;
+                                }
+                                if(this->ui.lineEdit_tar_pitch_var->isEnabled()){
+                                    obj_or.pitch = obj_tar->getOr().pitch - (tar_pitch_var/2) + tar_pitch_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    obj_or.pitch = obj_tar->getOr().pitch;
+                                }
+                                if(this->ui.lineEdit_tar_yaw_var->isEnabled()){
+                                    obj_or.yaw = obj_tar->getOr().yaw - (tar_yaw_var/2) + tar_yaw_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    obj_or.yaw = obj_tar->getOr().yaw;
+                                }
+                                obj_tar->setPos(obj_pos,true);
+                                obj_tar->setOr(obj_or,true);
+                                prob->getMovement()->setObject(obj_tar);
 
-                            // modify target data (move_target)
-                            if(this->ui.lineEdit_tar_x_var->isEnabled()){
-                                move_target_mod.at(0) = move_target.at(0) - (tar_x_var/2) + tar_x_var*(rand() / double(RAND_MAX));
-                            }else{
-                                move_target_mod.at(0) = move_target.at(0);
+                            }else if(mov_type==1 || mov_type==5){ // move movement
+                                // modify target data (move_target)
+                                if(this->ui.lineEdit_tar_x_var->isEnabled()){
+                                    move_target_mod.at(0) = move_target.at(0) - (tar_x_var/2) + tar_x_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    move_target_mod.at(0) = move_target.at(0);
+                                }
+                                if(this->ui.lineEdit_tar_y_var->isEnabled()){
+                                    move_target_mod.at(1) = move_target.at(1) - (tar_y_var/2) + tar_y_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    move_target_mod.at(1) = move_target.at(1);
+                                }
+                                if(this->ui.lineEdit_tar_z_var->isEnabled()){
+                                    move_target_mod.at(2) = move_target.at(2) - (tar_z_var/2) + tar_z_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    move_target_mod.at(2) = move_target.at(2);
+                                }
+                                if(this->ui.lineEdit_tar_roll_var->isEnabled()){
+                                    move_target_mod.at(3) = move_target.at(3) - (tar_roll_var/2) + tar_roll_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    move_target_mod.at(3) = move_target.at(3);
+                                }
+                                if(this->ui.lineEdit_tar_pitch_var->isEnabled()){
+                                    move_target_mod.at(4) = move_target.at(4) - (tar_pitch_var/2) + tar_pitch_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    move_target_mod.at(4) = move_target.at(4);
+                                }
+                                if(this->ui.lineEdit_tar_yaw_var->isEnabled()){
+                                    move_target_mod.at(5) = move_target.at(5) - (tar_yaw_var/2) + tar_yaw_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    move_target_mod.at(5) = move_target.at(5);
+                                }
+                                prob->setMoveSettings(move_target_mod,move_final_hand,move_final_arm,use_final);
                             }
-                            if(this->ui.lineEdit_tar_y_var->isEnabled()){
-                                move_target_mod.at(1) = move_target.at(1) - (tar_y_var/2) + tar_y_var*(rand() / double(RAND_MAX));
-                            }else{
-                                move_target_mod.at(1) = move_target.at(1);
-                            }
-                            if(this->ui.lineEdit_tar_z_var->isEnabled()){
-                                move_target_mod.at(2) = move_target.at(2) - (tar_z_var/2) + tar_z_var*(rand() / double(RAND_MAX));
-                            }else{
-                                move_target_mod.at(2) = move_target.at(2);
-                            }
-                            if(this->ui.lineEdit_tar_roll_var->isEnabled()){
-                                move_target_mod.at(3) = move_target.at(3) - (tar_roll_var/2) + tar_roll_var*(rand() / double(RAND_MAX));
-                            }else{
-                                move_target_mod.at(3) = move_target.at(3);
-                            }
-                            if(this->ui.lineEdit_tar_pitch_var->isEnabled()){
-                                move_target_mod.at(4) = move_target.at(4) - (tar_pitch_var/2) + tar_pitch_var*(rand() / double(RAND_MAX));
-                            }else{
-                                move_target_mod.at(4) = move_target.at(4);
-                            }
-                            if(this->ui.lineEdit_tar_yaw_var->isEnabled()){
-                                move_target_mod.at(5) = move_target.at(5) - (tar_yaw_var/2) + tar_yaw_var*(rand() / double(RAND_MAX));
-                            }else{
-                                move_target_mod.at(5) = move_target.at(5);
-                            }
-                            prob->setMoveSettings(move_target_mod,move_final_hand,move_final_arm,use_final);
 
                             // modify obstacles data
                             objectPtr obs_new;
@@ -5792,13 +5870,24 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                         qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
                                         solved=true;
                                         // target
-                                        string tar_x_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(0))); boost::replace_all(tar_x_pos_str,",",".");
-                                        string tar_y_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(1))); boost::replace_all(tar_y_pos_str,",",".");
-                                        string tar_z_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(2))); boost::replace_all(tar_z_pos_str,",",".");
-                                        string tar_roll_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(3))); boost::replace_all(tar_roll_str,",",".");
-                                        string tar_pitch_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(4))); boost::replace_all(tar_pitch_str,",",".");
-                                        string tar_yaw_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(5))); boost::replace_all(tar_yaw_str,",",".");
-                                        data_csv << tar_x_pos_str+","+tar_y_pos_str+","+tar_z_pos_str+","+tar_roll_str+","+tar_pitch_str+","+tar_yaw_str+",";
+                                        if(mov_type==0){ // reach-to-grasp movement
+                                            objectPtr obj_tar = prob->getMovement()->getObject();
+                                            string tar_x_pos_str =  boost::str(boost::format("%.8f") % (obj_tar->getPos().Xpos)); boost::replace_all(tar_x_pos_str,",",".");
+                                            string tar_y_pos_str =  boost::str(boost::format("%.8f") % (obj_tar->getPos().Ypos)); boost::replace_all(tar_y_pos_str,",",".");
+                                            string tar_z_pos_str =  boost::str(boost::format("%.8f") % (obj_tar->getPos().Zpos)); boost::replace_all(tar_z_pos_str,",",".");
+                                            string tar_roll_str =  boost::str(boost::format("%.8f") % (obj_tar->getOr().roll)); boost::replace_all(tar_roll_str,",",".");
+                                            string tar_pitch_str =  boost::str(boost::format("%.8f") % (obj_tar->getOr().pitch)); boost::replace_all(tar_pitch_str,",",".");
+                                            string tar_yaw_str =  boost::str(boost::format("%.8f") % (obj_tar->getOr().yaw)); boost::replace_all(tar_yaw_str,",",".");
+                                            data_csv << tar_x_pos_str+","+tar_y_pos_str+","+tar_z_pos_str+","+tar_roll_str+","+tar_pitch_str+","+tar_yaw_str+",";
+                                        }else if(mov_type==1 || mov_type==5){ // move movement
+                                            string tar_x_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(0))); boost::replace_all(tar_x_pos_str,",",".");
+                                            string tar_y_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(1))); boost::replace_all(tar_y_pos_str,",",".");
+                                            string tar_z_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(2))); boost::replace_all(tar_z_pos_str,",",".");
+                                            string tar_roll_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(3))); boost::replace_all(tar_roll_str,",",".");
+                                            string tar_pitch_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(4))); boost::replace_all(tar_pitch_str,",",".");
+                                            string tar_yaw_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(5))); boost::replace_all(tar_yaw_str,",",".");
+                                            data_csv << tar_x_pos_str+","+tar_y_pos_str+","+tar_z_pos_str+","+tar_roll_str+","+tar_pitch_str+","+tar_yaw_str+",";
+                                        }
                                         // obstacles
                                         std::vector<objectPtr> obsts_new; prob->getObstacles(obsts_new);
                                         for(size_t j=0;j<obsts_new.size();++j){
@@ -5812,8 +5901,133 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                             data_csv << obs_x_pos_str+","+obs_y_pos_str+","+obs_z_pos_str+","+obs_roll_str+","+obs_pitch_str+","+obs_yaw_str+",";
                                         }
                                         // final posture selections
-                                        for(size_t k=0;k<h_results_tmp->final_warm_start_res.size();++k){
-                                            HUMotion::warm_start_params f_res = h_results_tmp->final_warm_start_res.at(k);
+                                        if(h_results_tmp->final_warm_start_res.size()==3){
+                                            // plan
+                                            HUMotion::warm_start_params f_plan_res = h_results_tmp->final_warm_start_res.at(1);
+                                            for(int h=0;h<f_plan_res.x.size();++h){
+                                                string x_str =  boost::str(boost::format("%.8f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                data_csv << x_str+",";
+                                            }
+                                            for(size_t h=0;h<f_plan_res.zL.size();++h){
+                                                string zL_str =  boost::str(boost::format("%.8f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                data_csv << zL_str+",";
+                                            }
+                                            for(size_t h=0;h<f_plan_res.zU.size();++h){
+                                                string zU_str =  boost::str(boost::format("%.8f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                data_csv << zU_str+",";
+                                            }
+                                            for(size_t h=0;h<f_plan_res.dual_vars.size();++h){
+                                                string dual_str =  boost::str(boost::format("%.8f") % (f_plan_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                data_csv << dual_str+",";
+                                            }
+                                            // approach
+                                            HUMotion::warm_start_params f_app_res = h_results_tmp->final_warm_start_res.at(0);
+                                            for(int h=0;h<f_app_res.x.size();++h){
+                                                string x_str =  boost::str(boost::format("%.8f") % (f_app_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                data_csv << x_str+",";
+                                            }
+                                            for(size_t h=0;h<f_app_res.zL.size();++h){
+                                                string zL_str =  boost::str(boost::format("%.8f") % (f_app_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                data_csv << zL_str+",";
+                                            }
+                                            for(size_t h=0;h<f_app_res.zU.size();++h){
+                                                string zU_str =  boost::str(boost::format("%.8f") % (f_app_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                data_csv << zU_str+",";
+                                            }
+                                            for(size_t h=0;h<f_app_res.dual_vars.size();++h){
+                                                string dual_str =  boost::str(boost::format("%.8f") % (f_app_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                data_csv << dual_str+",";
+                                            }
+                                            //retreat
+                                            HUMotion::warm_start_params f_ret_res = h_results_tmp->final_warm_start_res.at(2);
+                                            for(int h=0;h<f_ret_res.x.size();++h){
+                                                string x_str =  boost::str(boost::format("%.8f") % (f_ret_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                data_csv << x_str+",";
+                                            }
+                                            for(size_t h=0;h<f_ret_res.zL.size();++h){
+                                                string zL_str =  boost::str(boost::format("%.8f") % (f_ret_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                data_csv << zL_str+",";
+                                            }
+                                            for(size_t h=0;h<f_ret_res.zU.size();++h){
+                                                string zU_str =  boost::str(boost::format("%.8f") % (f_ret_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                data_csv << zU_str+",";
+                                            }
+                                            for(size_t h=0;h<f_ret_res.dual_vars.size();++h){
+                                                string dual_str =  boost::str(boost::format("%.8f") % (f_ret_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                data_csv << dual_str+",";
+                                            }
+                                        }else if(h_results_tmp->final_warm_start_res.size()==2){
+                                            if(h_results_tmp->trajectory_descriptions.at(1).compare("approach")==0)
+                                            {
+                                                // plan
+                                                HUMotion::warm_start_params f_plan_res = h_results_tmp->final_warm_start_res.at(1);
+                                                for(int h=0;h<f_plan_res.x.size();++h){
+                                                    string x_str =  boost::str(boost::format("%.8f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                    data_csv << x_str+",";
+                                                }
+                                                for(size_t h=0;h<f_plan_res.zL.size();++h){
+                                                    string zL_str =  boost::str(boost::format("%.8f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                    data_csv << zL_str+",";
+                                                }
+                                                for(size_t h=0;h<f_plan_res.zU.size();++h){
+                                                    string zU_str =  boost::str(boost::format("%.8f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                    data_csv << zU_str+",";
+                                                }
+                                                //approach
+                                                HUMotion::warm_start_params f_app_res = h_results_tmp->final_warm_start_res.at(0);
+                                                for(int h=0;h<f_app_res.x.size();++h){
+                                                    string x_str =  boost::str(boost::format("%.8f") % (f_app_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                    data_csv << x_str+",";
+                                                }
+                                                for(size_t h=0;h<f_app_res.zL.size();++h){
+                                                    string zL_str =  boost::str(boost::format("%.8f") % (f_app_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                    data_csv << zL_str+",";
+                                                }
+                                                for(size_t h=0;h<f_app_res.zU.size();++h){
+                                                    string zU_str =  boost::str(boost::format("%.8f") % (f_app_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                    data_csv << zU_str+",";
+                                                }
+                                                for(size_t h=0;h<f_app_res.dual_vars.size();++h){
+                                                    string dual_str =  boost::str(boost::format("%.8f") % (f_app_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                    data_csv << dual_str+",";
+                                                }
+                                            }else{
+                                                // plan
+                                                HUMotion::warm_start_params f_plan_res = h_results_tmp->final_warm_start_res.at(0);
+                                                for(int h=0;h<f_plan_res.x.size();++h){
+                                                    string x_str =  boost::str(boost::format("%.8f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                    data_csv << x_str+",";
+                                                }
+                                                for(size_t h=0;h<f_plan_res.zL.size();++h){
+                                                    string zL_str =  boost::str(boost::format("%.8f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                    data_csv << zL_str+",";
+                                                }
+                                                for(size_t h=0;h<f_plan_res.zU.size();++h){
+                                                    string zU_str =  boost::str(boost::format("%.8f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                    data_csv << zU_str+",";
+                                                }
+                                                // retreat
+                                                HUMotion::warm_start_params f_ret_res = h_results_tmp->final_warm_start_res.at(1);
+                                                for(int h=0;h<f_ret_res.x.size();++h){
+                                                    string x_str =  boost::str(boost::format("%.8f") % (f_ret_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                    data_csv << x_str+",";
+                                                }
+                                                for(size_t h=0;h<f_ret_res.zL.size();++h){
+                                                    string zL_str =  boost::str(boost::format("%.8f") % (f_ret_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                    data_csv << zL_str+",";
+                                                }
+                                                for(size_t h=0;h<f_ret_res.zU.size();++h){
+                                                    string zU_str =  boost::str(boost::format("%.8f") % (f_ret_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                    data_csv << zU_str+",";
+                                                }
+                                                for(size_t h=0;h<f_ret_res.dual_vars.size();++h){
+                                                    string dual_str =  boost::str(boost::format("%.8f") % (f_ret_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                    data_csv << dual_str+",";
+                                                }
+                                            }
+                                        }else if(h_results_tmp->final_warm_start_res.size()==1){
+                                            // plan
+                                            HUMotion::warm_start_params f_res = h_results_tmp->final_warm_start_res.at(0);
                                             for(int h=0;h<f_res.x.size();++h){
                                                 string x_str =  boost::str(boost::format("%.8f") % (f_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                 data_csv << x_str+",";
@@ -5853,7 +6067,6 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                                 data_csv << dual_str+",";
                                             }
                                         }
-
                                         data_csv << "\n";
                                     }else{qnode.log(QNode::Info,std::string("Number of steps different than the original"));}
                                 }else{qnode.log(QNode::Info,std::string("Planning failed"));}
