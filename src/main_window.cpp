@@ -993,6 +993,7 @@ void MainWindow::on_pushButton_addMov_clicked()
              }
 
              // add obstacles in the exception list
+             ui.listWidget_obsts_except->clear();
              problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
              std::vector<objectPtr> obsts; prob->getObstacles(obsts);
              for(size_t j=0;j<obsts.size();++j){
