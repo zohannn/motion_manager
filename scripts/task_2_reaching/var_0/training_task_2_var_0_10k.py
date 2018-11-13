@@ -53,51 +53,51 @@ models_dir = str(sys.argv[2])
 # Settings
 print_en = True
 
-print_en_xf_plan = False
-train_xf_plan = False
-train_xf_plan_class = False
+print_en_xf_plan = True
+train_xf_plan = True
+train_xf_plan_class = True
 dir_path_xf_plan = models_dir + "/xf_plan"
 
 print_en_zf_L_plan = True
 train_zf_L_plan = True
-train_zf_L_plan_class = False
+train_zf_L_plan_class = True
 dir_path_zf_L_plan = models_dir + "/zf_L_plan"
 
-print_en_zf_U_plan = False
-train_zf_U_plan = False
-train_zf_U_plan_class = False
+print_en_zf_U_plan = True
+train_zf_U_plan = True
+train_zf_U_plan_class = True
 dir_path_zf_U_plan = models_dir + "/zf_U_plan"
 
-print_en_dual_f_plan = False
-train_dual_f_plan = False
-train_dual_f_plan_class = False
+print_en_dual_f_plan = True
+train_dual_f_plan = True
+train_dual_f_plan_class = True
 dir_path_dual_f_plan = models_dir + "/dual_f_plan"
 
-print_en_x_bounce = False
-train_x_bounce = False
-train_x_bounce_class = False
+print_en_x_bounce = True
+train_x_bounce = True
+train_x_bounce_class = True
 dir_path_x_bounce = models_dir + "/x_bounce"
 
-print_en_zb_L = False
-train_zb_L = False
-train_zb_L_class = False
+print_en_zb_L = True
+train_zb_L = True
+train_zb_L_class = True
 dir_path_zb_L = models_dir + "/zb_L"
 
-print_en_zb_U = False
-train_zb_U = False
-train_zb_U_class = False
+print_en_zb_U = True
+train_zb_U = True
+train_zb_U_class = True
 dir_path_zb_U = models_dir + "/zb_U"
 
-print_en_dual_bounce = False
-train_dual_bounce = False
-train_dual_bounce_class = False
+print_en_dual_bounce = True
+train_dual_bounce = True
+train_dual_bounce_class = True
 dir_path_dual_bounce = models_dir + "/dual_bounce"
 
 learning_rate=0.009
 learning_rate_class=0.009
 
 
-n_clusters_xf_plan = 4
+n_clusters_xf_plan = 6
 min_cluster_size_xf_plan = 10
 th_xf_plan = 0.001
 # NN
@@ -323,6 +323,7 @@ algorithm_dual_bounce = 'auto'
 
 task_1_dataframe = pd.read_csv(data_file,sep=",")
 task_1_dataframe = task_1_dataframe.reindex(np.random.permutation(task_1_dataframe.index))
+
 
 (inputs_dataframe,inputs_cols) = preprocess_features(task_1_dataframe)
 normalized_inputs,normalized_inputs_max,normalized_inputs_min = normalize_linear_scale(inputs_dataframe)
@@ -2185,9 +2186,9 @@ if not outputs_dual_f_plan_df.empty:
     if (print_en_dual_f_plan):
         fig = plt.figure()
         ax_dual_f_plan = fig.add_subplot(111)
-        ax_dual_f_plan.scatter(dual_f_plan[:,0],dual_f_plan[:,1], s=10, c=labels_dual_f_plan, marker="s")
+        ax_dual_f_plan.scatter(normalized_inputs['target_x_mm'],dual_f_plan[:,0], s=10, c=labels_dual_f_plan, marker="s")
         ax_dual_f_plan.set_title('Clusters of the dual_f_plan')
-        ax_dual_f_plan.set_xlabel('dual_f_plan_0')
+        ax_dual_f_plan.set_xlabel('target_x_mm')
         ax_dual_f_plan.set_ylabel('dual_f_plan_1')
         plt.savefig(dir_path_dual_f_plan + "/clusters.pdf")
         plt.clf()
@@ -2635,9 +2636,9 @@ if not outputs_dual_f_plan_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(denorm_test_targets["dual_f_plan_0"], denorm_test_targets["dual_f_plan_1"], s=10, c='b', marker="s",label='test_targets')
-                ax1.scatter(denorm_test_predictions_df["dual_f_plan_0"], denorm_test_predictions_df["dual_f_plan_1"], s=10, c='r', marker="o", label='test_predictions')
-                plt.xlabel("dual_f_plan_0")
+                ax1.scatter(test_examples["target_x_mm"], denorm_test_targets["dual_f_plan_1"], s=10, c='b', marker="s",label='test_targets')
+                ax1.scatter(test_examples["target_x_mm"], denorm_test_predictions_df["dual_f_plan_1"], s=10, c='r', marker="o", label='test_predictions')
+                plt.xlabel("target_x_mm")
                 plt.ylabel("dual_f_plan_1")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_dual_f_plan+"/cluster"+repr(i)+"/nn/dual_f_plan_pred.pdf")
@@ -2698,9 +2699,9 @@ if not outputs_dual_f_plan_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(denorm_test_targets["dual_f_plan_0"], denorm_test_targets["dual_f_plan_1"], s=10, c='b', marker="s",label='test_targets')
-                ax1.scatter(denorm_test_predictions_df["dual_f_plan_0"], denorm_test_predictions_df["dual_f_plan_1"], s=10, c='r', marker="o", label='test_predictions')
-                plt.xlabel("dual_f_plan_0")
+                ax1.scatter(test_examples["target_x_mm"], denorm_test_targets["dual_f_plan_1"], s=10, c='b', marker="s",label='test_targets')
+                ax1.scatter(test_examples["target_x_mm"], denorm_test_predictions_df["dual_f_plan_1"], s=10, c='r', marker="o", label='test_predictions')
+                plt.xlabel("target_x_mm")
                 plt.ylabel("dual_f_plan_1")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_dual_f_plan+"/cluster"+repr(i)+"/svm/dual_f_plan_pred.pdf")
@@ -2759,9 +2760,9 @@ if not outputs_dual_f_plan_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(denorm_test_targets["dual_f_plan_0"], denorm_test_targets["dual_f_plan_1"], s=10, c='b', marker="s",label='test_targets')
-                ax1.scatter(denorm_test_predictions_df["dual_f_plan_0"], denorm_test_predictions_df["dual_f_plan_1"], s=10, c='r', marker="o", label='test_predictions')
-                plt.xlabel("dual_f_plan_0")
+                ax1.scatter(test_examples["target_x_mm"], denorm_test_targets["dual_f_plan_1"], s=10, c='b', marker="s",label='test_targets')
+                ax1.scatter(test_examples["target_x_mm"], denorm_test_predictions_df["dual_f_plan_1"], s=10, c='r', marker="o", label='test_predictions')
+                plt.xlabel("target_x_mm")
                 plt.ylabel("dual_f_plan_1")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_dual_f_plan+"/cluster"+repr(i)+"/knn/dual_f_plan_pred.pdf")
@@ -3390,9 +3391,9 @@ if not outputs_zb_L_df.empty:
     if (print_en_zb_L):
         fig = plt.figure()
         ax_zb_L_plan = fig.add_subplot(111)
-        ax_zb_L_plan.scatter(normalized_inputs["target_x_mm"],zb_L, s=10, c=labels_zb_L, marker="s")
-        ax_zb_L_plan.set_xlabel("zb_L_1")
-        ax_zb_L_plan.set_ylabel("zb_L_2")
+        ax_zb_L_plan.scatter(normalized_inputs["target_x_mm"],zb_L[:,0], s=10, c=labels_zb_L, marker="s")
+        ax_zb_L_plan.set_xlabel("target_x_mm")
+        ax_zb_L_plan.set_ylabel("zb_L_4")
         plt.savefig(dir_path_zb_L+"/clusters.pdf")
         plt.clf()
         #plt.show()
@@ -3646,7 +3647,7 @@ if not outputs_zb_L_df.empty:
             cl_in_zb_L_df = clusters_inputs_zb_L[i]
             cl_out_zb_L_df = clusters_outputs_zb_L[i]
             if (len(cl_out_zb_L_df.index) > min_cluster_size_zb_L):
-                if (len(cl_out_zb_L_df.columns) > 4):
+                if (len(cl_out_zb_L_df.columns) > 10):
                     n_comps = 4  # at least 95% of the information with 3 components
                     Z_b_L = cl_out_zb_L_df.values
                     pca_zb_L = decomposition.PCA(n_components=n_comps)
@@ -3789,7 +3790,7 @@ if not outputs_zb_L_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df)
-                if (len(cl_out_zb_L_df.columns) > 4):
+                if (len(cl_out_zb_L_df.columns) > 10):
                     test_predictions = test_predictions_df.values
                     test_predictions_proj = pca_zb_L.inverse_transform(test_predictions)
                     test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_L)
@@ -3852,7 +3853,7 @@ if not outputs_zb_L_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                if (len(cl_out_zb_L_df.columns) > 4):
+                if (len(cl_out_zb_L_df.columns) > 10):
                     test_predictions = test_predictions_df.values
                     test_predictions_proj = pca_zb_L.inverse_transform(test_predictions)
                     test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_L)
@@ -3912,7 +3913,7 @@ if not outputs_zb_L_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                if (len(cl_out_zb_L_df.columns) > 4):
+                if (len(cl_out_zb_L_df.columns) > 10):
                     test_predictions = test_predictions_df.values
                     test_predictions_proj = pca_zb_L.inverse_transform(test_predictions)
                     test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_L)
@@ -4222,7 +4223,7 @@ if not outputs_zb_U_df.empty:
             cl_in_zb_U_df = clusters_inputs_zb_U[i]
             cl_out_zb_U_df = clusters_outputs_zb_U[i]
             if (len(cl_out_zb_U_df.index) > min_cluster_size_zb_U):
-                if (len(cl_out_zb_U_df.columns) > 4):
+                if (len(cl_out_zb_U_df.columns) > 10):
                     n_comps = 4  # at least 95% of the information with 3 components
                     Z_b_U = cl_out_zb_U_df.values
                     pca_zb_U = decomposition.PCA(n_components=n_comps)
@@ -4373,7 +4374,7 @@ if not outputs_zb_U_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df)
-                if (len(cl_out_zb_U_df.columns) > 4):
+                if (len(cl_out_zb_U_df.columns) > 10):
                     test_predictions = test_predictions_df.values
                     test_predictions_proj = pca_zb_U.inverse_transform(test_predictions)
                     test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_U)
@@ -4436,7 +4437,7 @@ if not outputs_zb_U_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                if (len(cl_out_zb_U_df.columns) > 4):
+                if (len(cl_out_zb_U_df.columns) > 10):
                     test_predictions = test_predictions_df.values
                     test_predictions_proj = pca_zb_U.inverse_transform(test_predictions)
                     test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_U)
@@ -4495,7 +4496,7 @@ if not outputs_zb_U_df.empty:
                             test_predictions_df = pd.concat([test_predictions_df, test_predictions_df_2[str]], axis=1)
 
                 #print(test_predictions_df.describe())
-                if (len(cl_out_zb_U_df.columns) > 4):
+                if (len(cl_out_zb_U_df.columns) > 10):
                     test_predictions = test_predictions_df.values
                     test_predictions_proj = pca_zb_U.inverse_transform(test_predictions)
                     test_proj_df = pd.DataFrame(data=test_predictions_proj, columns=cols_zb_U)
@@ -4856,7 +4857,7 @@ if not outputs_dual_bounce_df.empty:
                         fig_pc = sns_plot.get_figure()
                         fig_pc.savefig(dir_path_dual_bounce+"/cluster"+repr(i)+"/p_comps.pdf")
                         threedee_train = plt.figure().gca(projection='3d')
-                        threedee_train.scatter(cl_in_dual_bounce_df["target_x_mm"], cl_in_dual_bounce_df["target_y_mm"], pc_df['dual_bounce_39'])
+                        threedee_train.scatter(cl_in_dual_bounce_df["target_x_mm"], cl_in_dual_bounce_df["target_y_mm"], pc_df['dual_bounce_287'])
                         plt.clf()
                         #plt.show()
                 else:
@@ -5008,10 +5009,10 @@ if not outputs_dual_bounce_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(denorm_test_targets["dual_bounce_59"], denorm_test_targets["dual_bounce_39"], s=10, c='b', marker="s", label='test_targets')
-                ax1.scatter(denorm_test_predictions_df["dual_bounce_59"], denorm_test_predictions_df["dual_bounce_39"], s=10, c='r', marker="o", label='test_predictions')
-                plt.xlabel("dual_bounce_59")
-                plt.ylabel("dual_bounce_39")
+                ax1.scatter(denorm_test_targets["dual_bounce_287"], denorm_test_targets["dual_bounce_318"], s=10, c='b', marker="s", label='test_targets')
+                ax1.scatter(denorm_test_predictions_df["dual_bounce_287"], denorm_test_predictions_df["dual_bounce_318"], s=10, c='r', marker="o", label='test_predictions')
+                plt.xlabel("dual_bounce_287")
+                plt.ylabel("dual_bounce_318")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_dual_bounce+"/cluster"+repr(i)+"/nn/dual_bounce_pred.pdf")
                 plt.clf()
@@ -5071,10 +5072,10 @@ if not outputs_dual_bounce_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(denorm_test_targets["dual_bounce_59"], denorm_test_targets["dual_bounce_39"], s=10, c='b', marker="s", label='test_targets')
-                ax1.scatter(denorm_test_predictions_df["dual_bounce_59"], denorm_test_predictions_df["dual_bounce_39"], s=10, c='r', marker="o", label='test_predictions')
-                plt.xlabel("dual_bounce_59")
-                plt.ylabel("dual_bounce_39")
+                ax1.scatter(denorm_test_targets["dual_bounce_287"], denorm_test_targets["dual_bounce_318"], s=10, c='b', marker="s", label='test_targets')
+                ax1.scatter(denorm_test_predictions_df["dual_bounce_287"], denorm_test_predictions_df["dual_bounce_318"], s=10, c='r', marker="o", label='test_predictions')
+                plt.xlabel("dual_bounce_287")
+                plt.ylabel("dual_bounce_318")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_dual_bounce+"/cluster"+repr(i)+"/svm/dual_bounce_pred.pdf")
                 plt.clf()
@@ -5130,10 +5131,10 @@ if not outputs_dual_bounce_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(denorm_test_targets["dual_bounce_59"], denorm_test_targets["dual_bounce_39"], s=10, c='b', marker="s", label='test_targets')
-                ax1.scatter(denorm_test_predictions_df["dual_bounce_59"], denorm_test_predictions_df["dual_bounce_39"], s=10, c='r', marker="o", label='test_predictions')
-                plt.xlabel("dual_bounce_59")
-                plt.ylabel("dual_bounce_39")
+                ax1.scatter(denorm_test_targets["dual_bounce_287"], denorm_test_targets["dual_bounce_318"], s=10, c='b', marker="s", label='test_targets')
+                ax1.scatter(denorm_test_predictions_df["dual_bounce_287"], denorm_test_predictions_df["dual_bounce_318"], s=10, c='r', marker="o", label='test_predictions')
+                plt.xlabel("dual_bounce_287")
+                plt.ylabel("dual_bounce_318")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_dual_bounce+"/cluster"+repr(i)+"/knn/dual_bounce_pred.pdf")
                 plt.clf()

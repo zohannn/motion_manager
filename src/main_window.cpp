@@ -185,6 +185,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     scenarios.push_back(QString("Learning tasks: reaching with one obstacle"));
     scenarios.push_back(QString("Learning tasks: reaching with many obstacles"));
     scenarios.push_back(QString("Learning tasks: picking the blue column"));
+    scenarios.push_back(QString("Controlling: scenario with no obstacles"));
 
 #endif
 
@@ -444,6 +445,8 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              string path_vrep_learning_tasks_reaching_2 = PATH_SCENARIOS+string("/vrep/Learning_Reaching_2.ttt");
              // Learning tasks: picking the blue column
              string path_vrep_learning_tasks_picking_1 = PATH_SCENARIOS+string("/vrep/Learning_Picking_1.ttt");
+             // Controlling: scenario without objects
+             string path_vrep_controlling_no_objs = PATH_SCENARIOS+string("/vrep/Controlling_no_objs.ttt");
 
              switch(i){
              case 0: // Assembly scenario
@@ -739,6 +742,30 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 #endif
                  }else{
                      qnode.log(QNode::Error,std::string("Learning tasks: picking the blue column HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+#endif
+                 break;
+             case 11: // Controlling: scenario with no objects
+#if HAND==0
+
+#elif HAND==1
+                this->scenario_id = 12;
+                 if (qnode.loadScenario(path_vrep_controlling_no_objs,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Controlling: scenario without objects HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Controlling: scenario without objects");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
+                     //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
+                 }else{
+                     qnode.log(QNode::Error,std::string("Controlling: scenario without objects HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3432,6 +3459,18 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     // Natural obstacle avoidance with ARoS
     string path_vrep_natural_obst_av = PATH_SCENARIOS+string("/vrep/Natural_obst_avoidance_aros_1.ttt");
 
+    // Learning tasks: reaching with one obstacle
+    string path_vrep_learning_tasks_reaching_1 = PATH_SCENARIOS+string("/vrep/Learning_Reaching_1.ttt");
+
+    // Learning tasks: reaching with many obstacles
+    string path_vrep_learning_tasks_reaching_2 = PATH_SCENARIOS+string("/vrep/Learning_Reaching_2.ttt");
+
+    // Learning tasks: picking the blue column
+    string path_vrep_learning_tasks_picking_1 = PATH_SCENARIOS+string("/vrep/Learning_Picking_1.ttt");
+
+    // Controlling: scenario without objects
+    string path_vrep_controlling_no_objs = PATH_SCENARIOS+string("/vrep/Controlling_no_objs.ttt");
+
     switch(scene_id){
 
     case 0:
@@ -3490,13 +3529,40 @@ void MainWindow::on_pushButton_scene_reset_clicked()
         success = string("Human assistance scenario: Moving a tray with ARoS HAS BEEN LOADED");
         failure = string("Human assistance scenario: Moving a tray with ARoS HAS NOT BEEN LOADED");
         break;
-
     case 8:
         // Natural obstacle avoidance with ARoS
         path = path_vrep_natural_obst_av;
         title = string("Natural obstacle avoidance with ARoS");
         success = string("Natural obstacle avoidance with ARoS HAS BEEN LOADED");
         failure = string("Natural obstacle avoidance with ARoS HAS NOT BEEN LOADED");
+        break;
+    case 9:
+        // Learning Tasks: reaching with one obstacle
+        path = path_vrep_learning_tasks_reaching_1;
+        title = string("Learning tasks: reaching with one obstacle");
+        success = string("Learning tasks: reaching with one obstacle HAS BEEN LOADED");
+        failure = string("Learning tasks: reaching with one obstacle HAS NOT BEEN LOADED");
+        break;
+    case 10:
+        // Learning Tasks: reaching with many obstacles
+        path = path_vrep_learning_tasks_reaching_2;
+        title = string("Learning tasks: reaching with many obstacles");
+        success = string("Learning tasks: reaching with many obstacles HAS BEEN LOADED");
+        failure = string("Learning tasks: reaching with many obstacles HAS NOT BEEN LOADED");
+        break;
+    case 11:
+        // Learning Tasks: picking the blue column
+        path = path_vrep_learning_tasks_picking_1;
+        title = string("Learning tasks: picking the blue column");
+        success = string("Learning tasks: picking the blue column HAS BEEN LOADED");
+        failure = string("Learning tasks: picking the blue column HAS NOT BEEN LOADED");
+        break;
+    case 12:
+        // Controlling: scenario with no objects
+        path = path_vrep_controlling_no_objs;
+        title = string("Controlling: scenario without objects");
+        success = string("Controlling: scenario without objects HAS BEEN LOADED");
+        failure = string("Controlling: scenario without objects HAS NOT BEEN LOADED");
         break;
 
     }
@@ -4072,6 +4138,48 @@ void MainWindow::onListScenarioItemClicked(QListWidgetItem *item)
                 // Assembly scenario: swap the two columns of the toy vehcile
                 ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
                                                          "ARoS picks and swaps the two columns of the toy vehicle."));
+
+                break;
+
+            case 6:
+                // Human assistance scenario: Moving a tray with ARoS (dual-arms)
+                ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
+                                                         "ARoS is moving a tray with both hands in a kitchen ."));
+
+                break;
+
+            case 7:
+                // Natural obstacle avoidance with ARoS
+                ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
+                                                         "This scenario is designed to study the human-likeness of the obstacle avoidance approach."));
+
+                break;
+
+            case 8:
+                // Learning Tasks: reaching with one obstacle
+                ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
+                                                         "ARoS learns reaching movements with one obstacle in the scenario."));
+
+                break;
+
+            case 9:
+                // Learning Tasks: reaching with many obstacles
+                ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
+                                                         "ARoS learns reaching movements with many obstacles in the scenario."));
+
+                break;
+
+            case 10:
+                // Learning Tasks: picking the blue column
+                ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
+                                                         "ARoS learns picking movements with no objects in the scenario."));
+
+                break;
+
+            case 11:
+                // Controlling: scenario with no objects
+                ui.textBrowser_scenario->setText(QString("Description of the selected scenario:\n"
+                                                         "ARoS controls movements with no objects in the scenario."));
 
                 break;
 

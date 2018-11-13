@@ -324,11 +324,8 @@ algorithm_dual_bounce = 'auto'
 task_1_dataframe = pd.read_csv(data_file,sep=",")
 task_1_dataframe = task_1_dataframe.reindex(np.random.permutation(task_1_dataframe.index))
 
-inputs_cols = ['target_x_mm', 'target_y_mm','target_z_mm','target_roll_rad','target_pitch_rad','target_yaw_rad'
-    ,'obstacle_1_x_mm','obstacle_1_y_mm','obstacle_1_z_mm','obstacle_1_roll_rad','obstacle_1_pitch_rad','obstacle_1_yaw_rad']
 
-
-inputs_dataframe = preprocess_features(task_1_dataframe)
+(inputs_dataframe,inputs_cols) = preprocess_features(task_1_dataframe)
 normalized_inputs,normalized_inputs_max,normalized_inputs_min = normalize_linear_scale(inputs_dataframe)
 (outputs_dataframe, null_outputs) = preprocess_targets(task_1_dataframe)
 
