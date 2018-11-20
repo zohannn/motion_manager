@@ -28,6 +28,7 @@ data_file = str(sys.argv[1])
 models_dir = str(sys.argv[2])
 pred_file_path = str(sys.argv[3])
 data_pred = sys.argv[4].split(',')
+data_pred_mod = np.array(data_pred)
 
 # Target info
 #target_x = float(data_pred[0])
@@ -170,7 +171,16 @@ units_dual_bounce_class = [10,10,10]
 
 task_1_dataframe = pd.read_csv(data_file,sep=",")
 task_1_dataframe = task_1_dataframe.reindex(np.random.permutation(task_1_dataframe.index))
-(inputs_dataframe,inputs_cols,null_in_cols) = preprocess_features(task_1_dataframe)
+(inputs_dataframe,inputs_cols,null_in_cols,id_null_cols) = preprocess_features(task_1_dataframe)
+#print("Input columns:")
+#print(inputs_cols)
+#print("Null columns:")
+#print(null_in_cols)
+#print("ID of null columns:")
+#print(id_null_cols)
+data_pred_mod_new = np.delete(data_pred_mod,id_null_cols)
+#print("Modified data:")
+#print(data_pred_mod_new)
 
 r = randint(0,len(task_1_dataframe.index))
 task_1_sample = task_1_dataframe.iloc[[r]]
@@ -185,12 +195,11 @@ cols_zb_U_tot = [col for col in task_1_dataframe if col.startswith('zb_U')]
 cols_dual_bounce_tot = [col for col in task_1_dataframe if col.startswith('dual_bounce')]
 
 
-
 normalized_inputs,normalized_inputs_max,normalized_inputs_min = normalize_linear_scale(inputs_dataframe)
 (outputs_dataframe, null_outputs) = preprocess_targets(task_1_dataframe)
 
-inputs_test_df= pd.DataFrame([data_pred],columns=inputs_cols)
-norm_inputs_test_df = pd.DataFrame([data_pred],columns=inputs_cols)
+inputs_test_df= pd.DataFrame([data_pred_mod_new],columns=inputs_cols)
+norm_inputs_test_df = pd.DataFrame([data_pred_mod_new],columns=inputs_cols)
 #print(inputs_test_df)
 for col in inputs_cols:
     min_val = normalized_inputs_min[col]
@@ -743,6 +752,24 @@ if predict_zf_L_plan:
         if(print_en_zf_L_plan):
             print("Predicted KNN zf_L_plan:")
             print(denorm_test_predictions_tot_df)
+    else:
+        col_names = [col for col in null_outputs if col.startswith('zf_L')]
+        zeros = np.zeros(shape=(1,len(col_names)))
+        test_pred_df = pd.DataFrame(zeros,columns=col_names)
+
+        zf_L_plan_rdm_prediction = test_pred_df.copy()
+        zf_L_plan_nn_prediction = test_pred_df.copy()
+        zf_L_plan_svm_prediction = test_pred_df.copy()
+        zf_L_plan_knn_prediction = test_pred_df.copy()
+        if(print_en_zf_L_plan):
+            print("Random zf_L:")
+            print(test_pred_df)
+            print("Predicted NN zf_L:")
+            print(test_pred_df)
+            print("Predicted SVM zf_L:")
+            print(test_pred_df)
+            print("Predicted KNN zf_L:")
+            print(test_pred_df)
 
 if predict_zf_U_plan:
     # ----- FINAL POSTURE SELECTION: UPPER BOUNDS  --------------------------------------------- #
@@ -975,6 +1002,24 @@ if predict_zf_U_plan:
         if(print_en_zf_U_plan):
             print("Predicted KNN zf_U_plan:")
             print(denorm_test_predictions_tot_df)
+    else:
+        col_names = [col for col in null_outputs if col.startswith('zf_U')]
+        zeros = np.zeros(shape=(1,len(col_names)))
+        test_pred_df = pd.DataFrame(zeros,columns=col_names)
+
+        zf_U_plan_rdm_prediction = test_pred_df.copy()
+        zf_U_plan_nn_prediction = test_pred_df.copy()
+        zf_U_plan_svm_prediction = test_pred_df.copy()
+        zf_U_plan_knn_prediction = test_pred_df.copy()
+        if(print_en_zf_U_plan):
+            print("Random zf_U:")
+            print(test_pred_df)
+            print("Predicted NN zf_U:")
+            print(test_pred_df)
+            print("Predicted SVM zf_U:")
+            print(test_pred_df)
+            print("Predicted KNN zf_U:")
+            print(test_pred_df)
 
 if predict_dual_f_plan:
     # ----- FINAL POSTURE SELECTION: DUAL VARIABLES  --------------------------------------------- #
@@ -1769,7 +1814,7 @@ if predict_zb_U:
                                                     targets_df,
                                                     num_epochs=1,
                                                     shuffle=False)
-        test_probabilities = classifier.predict(input_fn=predict_test_input_fn)
+        test_probabilities = nn_classifier.predict(input_fn=predict_test_input_fn)
         test_pred = np.array([item['class_ids'][0] for item in test_probabilities])
 
         n_cluster = test_pred[0] # the input belongs to this cluster
