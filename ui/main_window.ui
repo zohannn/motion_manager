@@ -1735,8 +1735,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_right_hand">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>20</y>
+        <x>10</x>
+        <y>10</y>
         <width>401</width>
         <height>241</height>
        </rect>
@@ -1744,7 +1744,7 @@ p, li { white-space: pre-wrap; }
       <property name="title">
        <string>Right Hand Status</string>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -1980,6 +1980,314 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_des_right_hand_vel">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>20</y>
+        <width>441</width>
+        <height>131</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Desired right hand velocity</string>
+      </property>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>421</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_543">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_61">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_309">
+            <item>
+             <widget class="QCheckBox" name="checkBox_des_right_hand_vel_x">
+              <property name="text">
+               <string>Velocity lin x [mm/s]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_des_right_hand_vel_x">
+              <property name="text">
+               <string>0.0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_310">
+            <item>
+             <widget class="QCheckBox" name="checkBox_des_right_hand_vel_y">
+              <property name="text">
+               <string>Velocity lin y [mm/s]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_des_right_hand_vel_y">
+              <property name="text">
+               <string>0.0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_311">
+            <item>
+             <widget class="QCheckBox" name="checkBox_des_right_hand_vel_z">
+              <property name="text">
+               <string>Velocity lin z [mm/s]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_des_right_hand_vel_z">
+              <property name="text">
+               <string>0.0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_98">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_312">
+            <item>
+             <widget class="QCheckBox" name="checkBox_des_right_hand_vel_wx">
+              <property name="text">
+               <string>Velocity wx [rad/s]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_des_right_hand_vel_wx">
+              <property name="text">
+               <string>0.0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_313">
+            <item>
+             <widget class="QCheckBox" name="checkBox_des_right_hand_vel_wy">
+              <property name="text">
+               <string>Velocity wy [rad/s]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_des_right_hand_vel_wy">
+              <property name="text">
+               <string>0.0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_314">
+            <item>
+             <widget class="QCheckBox" name="checkBox_des_right_hand_vel_wz">
+              <property name="text">
+               <string>Velocity wz [rad/s]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_des_right_hand_vel_wz">
+              <property name="text">
+               <string>0.0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_des_right_hand_pos">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>160</y>
+        <width>441</width>
+        <height>131</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Desired right hand position</string>
+      </property>
+      <widget class="QWidget" name="layoutWidget_54">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>421</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_544">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_99">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_545">
+            <item>
+             <widget class="QCheckBox" name="checkBox_des_right_hand_pos_x">
+              <property name="text">
+               <string>Position x [mm]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_des_right_hand_pos_x">
+              <property name="text">
+               <string>0.0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_546">
+            <item>
+             <widget class="QCheckBox" name="checkBox_des_right_hand_vel_y_2">
+              <property name="text">
+               <string>Position y [mm]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_des_right_hand_pos_y">
+              <property name="text">
+               <string>0.0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_547">
+            <item>
+             <widget class="QCheckBox" name="checkBox_des_right_hand_vel_z_2">
+              <property name="text">
+               <string>Position z [mm]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_des_right_hand_pos_z">
+              <property name="text">
+               <string>0.0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_100">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_548">
+            <item>
+             <widget class="QCheckBox" name="checkBox_des_right_hand_or_roll">
+              <property name="text">
+               <string>Orientation roll [rad]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_des_right_hand_or_roll">
+              <property name="text">
+               <string>0.0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_549">
+            <item>
+             <widget class="QCheckBox" name="checkBox_des_right_hand_or_pitch">
+              <property name="text">
+               <string>Orientation pitch [rad]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_des_right_hand_or_pitch">
+              <property name="text">
+               <string>0.0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_550">
+            <item>
+             <widget class="QCheckBox" name="checkBox_des_right_hand_or_yaw">
+              <property name="text">
+               <string>Orientation yaw [rad]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_des_right_hand_or_yaw">
+              <property name="text">
+               <string>0.0</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="pushButton_move_control">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>510</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Move</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_stop_control">
+      <property name="geometry">
+       <rect>
+        <x>110</x>
+        <y>510</y>
+        <width>71</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Stop</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_results">
