@@ -139,6 +139,10 @@ bool  QNode::loadScenario(const std::string& path,int id)
         subJoints_state = n.subscribe("/vrep/joints_state",1, &QNode::JointsCallback, this);
         subRightProxSensor = n.subscribe("/vrep/right_prox_sensor",1,&QNode::rightProxCallback,this);
         subLeftProxSensor = n.subscribe("/vrep/left_prox_sensor",1,&QNode::leftProxCallback,this);
+        subRightHandPos = n.subscribe("/vrep/right_hand_pose",1,&QNode::rightHandPosCallback,this);
+        subRightHandVel = n.subscribe("/vrep/right_hand_vel",1,&QNode::rightHandVelCallback,this);
+        subLeftHandPos = n.subscribe("/vrep/left_hand_pose",1,&QNode::leftHandPosCallback,this);
+        subLeftHandVel = n.subscribe("/vrep/left_hand_vel",1,&QNode::leftHandVelCallback,this);
 
         switch(id){
 
@@ -252,6 +256,10 @@ bool  QNode::loadScenario(const std::string& path,int id)
         case 11: // Learning Tasks: picking the Magenta Column
             // Blue Column (obj_id = 0)
             subBlueColumn = n.subscribe("/vrep/BlueColumn_pose",1,&QNode::BlueColumnCallback,this);
+
+            break;
+
+        case 12: // Controlling: scenario without objects
 
             break;
         }
@@ -6468,6 +6476,26 @@ void QNode::leftProxCallback(const vrep_common::ProximitySensorData& data)
     }
 }
 
+void QNode::rightHandPosCallback(const geometry_msgs::PoseStamped& data)
+{
+
+}
+
+void QNode::rightHandVelCallback(const geometry_msgs::Twist& data)
+{
+
+}
+
+void QNode::leftHandPosCallback(const geometry_msgs::PoseStamped& data)
+{
+
+}
+
+void QNode::leftHandVelCallback(const geometry_msgs::Twist& data)
+{
+
+}
+
 
 bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>& vel_mov, std::vector<std::vector<double>> timesteps, std::vector<double> tols_stop, std::vector<string>& traj_descr,movementPtr mov, scenarioPtr scene)
 {
@@ -8568,6 +8596,16 @@ double QNode::interpolate(double ya, double yb, double m)
     // linear interpolation
     return ya+(yb-ya)*m;
 
+}
+
+void QNode::startSim()
+{
+    ros::NodeHandle node;
+
+    // start the simulation
+    add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
+    vrep_common::simRosStartSimulation srvstart;
+    add_client.call(srvstart);
 }
 
 void QNode::stopSim()

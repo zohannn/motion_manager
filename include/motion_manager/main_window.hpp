@@ -648,6 +648,19 @@ public Q_SLOTS:
          */
         void check_obsts_yaw_var(int state);
 
+        // -----------------------------------------------------
+        // Controlling
+
+        /**
+         * @brief on_pushButton_move_control_clicked
+         */
+        void on_pushButton_move_control_clicked();
+
+        /**
+         * @brief on_pushButton_stop_control_clicked
+         */
+        void on_pushButton_stop_control_clicked();
+
 
 private:
         Ui::MainWindowDesign ui; /**< handles of the main user interface */

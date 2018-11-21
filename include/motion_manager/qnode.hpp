@@ -11,6 +11,7 @@
 
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Twist.h>
 #include <sensor_msgs/JointState.h>
 #include <string>
 #include <std_msgs/String.h>
@@ -182,6 +183,11 @@ public:
         void resetGlobals();
 
         /**
+         * @brief This methods starts the simulation in V-REP
+         */
+        void startSim();
+
+        /**
          * @brief This method stops the simulation in V-REP
          */
         void stopSim();
@@ -271,6 +277,10 @@ private:
         ros::Subscriber subJoints_state; /**< ROS subscriber to the topic /vrep/joint_state */
         ros::Subscriber subRightProxSensor;/**< ROS subscriber to the topic /vrep/right_prox_sensor */
         ros::Subscriber subLeftProxSensor; /**< ROS subscriber to the topic /vrep/left_prox_sensor */
+        ros::Subscriber subRightHandPos; /**< ROS subscriber to the topic /vrep/right_hand_pose */
+        ros::Subscriber subRightHandVel; /**< ROS subscriber to the topic /vrep/right_hand_vel */
+        ros::Subscriber subLeftHandPos; /**< ROS subscriber to the topic /vrep/left_hand_pose */
+        ros::Subscriber subLeftHandVel; /**< ROS subscriber to the topic /vrep/left_hand_vel */
         // Toy vehicle scenario --------------------------------------------------------------------------------------------------------------
         ros::Subscriber subBlueColumn; /**< ROS sunscriber to the topic /vrep/BlueColumn_pose (obj_id=0 in the toy vehicle scenario) */
         ros::Subscriber subGreenColumn; /**< ROS sunscriber to the topic /vrep/GreenColumn_pose (obj_id=1 in the toy vehicle scenario) */
@@ -383,6 +393,30 @@ private:
          * @param data
          */
         void leftProxCallback(const vrep_common::ProximitySensorData& data);
+
+        /**
+         * @brief rightHandPosCallback
+         * @param data
+         */
+        void rightHandPosCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief rightHandVelCallback
+         * @param data
+         */
+        void rightHandVelCallback(const geometry_msgs::Twist& data);
+
+        /**
+         * @brief leftHandPosCallback
+         * @param data
+         */
+        void leftHandPosCallback(const geometry_msgs::PoseStamped& data);
+
+        /**
+         * @brief leftHandVelCallback
+         * @param data
+         */
+        void leftHandVelCallback(const geometry_msgs::Twist& data);
 
         // Toy vehicle scenario ----------------------------------------------------------------------------------
         /**

@@ -8540,6 +8540,19 @@ void MainWindow::check_obsts_yaw_var(int state)
     }
 }
 
+// -----------------------------------------------------------------------
+// Controlling
+
+void MainWindow::on_pushButton_move_control_clicked()
+{
+    this->qnode.startSim();
+}
+
+void MainWindow::on_pushButton_stop_control_clicked()
+{
+    this->qnode.stopSim();
+}
+
 
 
 
