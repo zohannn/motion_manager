@@ -115,6 +115,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(this->ui.checkBox_obsts_pitch_var, SIGNAL(stateChanged(int)), this, SLOT(check_obsts_pitch_var(int)));
     QObject::connect(this->ui.checkBox_obsts_yaw_var, SIGNAL(stateChanged(int)), this, SLOT(check_obsts_yaw_var(int)));
 
+    QObject::connect(this->ui.checkBox_right_hand_status, SIGNAL(stateChanged(int)), this, SLOT(check_right_hand_status(int)));
+
 
 
     ReadSettings();
@@ -193,14 +195,56 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
         ui.listWidget_scenario->addItem(scenarios.at(i));
     }
 
+    get_right_hand_status = true;
+    display_r_hand_status_thrd = boost::thread(boost::bind(&MainWindow::display_r_hand_status, this));
+
 
 
 }
 
 MainWindow::~MainWindow()
 {
+    get_right_hand_status = false;
+    if (display_r_hand_status_thrd.joinable())
+        display_r_hand_status_thrd.join();
 
+}
 
+/*****************************************************************************
+** Implementation [Threads]
+*****************************************************************************/
+
+void MainWindow::display_r_hand_status()
+{
+    while(get_right_hand_status)
+    {
+        if (this->ui.checkBox_right_hand_status->isChecked())
+        {
+            ros::spinOnce();
+
+            vector<double> r_hand_pos; this->curr_scene->getHumanoid()->getHandPosMes(1,r_hand_pos);
+            vector<double> r_hand_vel; this->curr_scene->getHumanoid()->getHandVelMes(1,r_hand_vel);
+
+            if(!r_hand_pos.empty())
+            {
+                this->ui.label_right_hand_pos_x_value->setText(QString::number(r_hand_pos.at(0)));
+                this->ui.label_right_hand_pos_y_value->setText(QString::number(r_hand_pos.at(1)));
+                this->ui.label_right_hand_pos_z_value->setText(QString::number(r_hand_pos.at(2)));
+                this->ui.label_right_hand_or_roll_value->setText(QString::number(r_hand_pos.at(3)));
+                this->ui.label_right_hand_or_pitch_value->setText(QString::number(r_hand_pos.at(4)));
+                this->ui.label_right_hand_or_yaw_value->setText(QString::number(r_hand_pos.at(5)));
+            }
+            if(!r_hand_vel.empty())
+            {
+                this->ui.label_right_hand_vel_x_value->setText(QString::number(r_hand_vel.at(0)));
+                this->ui.label_right_hand_vel_y_value->setText(QString::number(r_hand_vel.at(1)));
+                this->ui.label_right_hand_vel_z_value->setText(QString::number(r_hand_vel.at(2)));
+                this->ui.label_right_hand_vel_wx_value->setText(QString::number(r_hand_vel.at(3)));
+                this->ui.label_right_hand_vel_wy_value->setText(QString::number(r_hand_vel.at(4)));
+                this->ui.label_right_hand_vel_wz_value->setText(QString::number(r_hand_vel.at(5)));
+            }
+        }
+    }
 }
 
 /*****************************************************************************
@@ -8540,12 +8584,39 @@ void MainWindow::check_obsts_yaw_var(int state)
     }
 }
 
+void MainWindow::check_right_hand_status(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.groupBox_right_hand->setEnabled(false);
+    }else{
+        // checked
+        this->ui.groupBox_right_hand->setEnabled(true);
+
+    }
+}
+
 // -----------------------------------------------------------------------
 // Controlling
 
 void MainWindow::on_pushButton_move_control_clicked()
 {
+    //this->qnode.startSim();
+}
+
+void MainWindow::on_pushButton_start_control_pressed()
+{
+    qnode.log(QNode::Info,string("Simulation Started"));
+}
+
+void MainWindow::on_pushButton_start_control_clicked()
+{
     this->qnode.startSim();
+}
+
+void MainWindow::on_pushButton_stop_control_pressed()
+{
+    qnode.log(QNode::Info,string("Simulation Stopped"));
 }
 
 void MainWindow::on_pushButton_stop_control_clicked()

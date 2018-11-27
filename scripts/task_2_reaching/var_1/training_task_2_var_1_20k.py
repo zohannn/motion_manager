@@ -73,19 +73,19 @@ train_dual_f_plan = False
 train_dual_f_plan_class = False
 dir_path_dual_f_plan = models_dir + "/dual_f_plan"
 
-print_en_x_bounce = True
-train_x_bounce = True
-train_x_bounce_class = True
+print_en_x_bounce = False
+train_x_bounce = False
+train_x_bounce_class = False
 dir_path_x_bounce = models_dir + "/x_bounce"
 
-print_en_zb_L = True
-train_zb_L = True
-train_zb_L_class = True
+print_en_zb_L = False
+train_zb_L = False
+train_zb_L_class = False
 dir_path_zb_L = models_dir + "/zb_L"
 
-print_en_zb_U = True
-train_zb_U = True
-train_zb_U_class = True
+print_en_zb_U = False
+train_zb_U = False
+train_zb_U_class = False
 dir_path_zb_U = models_dir + "/zb_U"
 
 print_en_dual_bounce = True
@@ -325,7 +325,7 @@ task_1_dataframe = pd.read_csv(data_file,sep=",")
 task_1_dataframe = task_1_dataframe.reindex(np.random.permutation(task_1_dataframe.index))
 
 
-(inputs_dataframe,inputs_cols) = preprocess_features(task_1_dataframe)
+(inputs_dataframe,inputs_cols,null_cols,id_null_cols) = preprocess_features(task_1_dataframe)
 normalized_inputs,normalized_inputs_max,normalized_inputs_min = normalize_linear_scale(inputs_dataframe)
 (outputs_dataframe, null_outputs) = preprocess_targets(task_1_dataframe)
 

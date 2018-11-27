@@ -165,10 +165,10 @@ Humanoid::Humanoid(string name, pos ppos, orient oor, dim ssize, arm aspecs, bar
         this->rightForces = vector<double>(JOINTS_ARM+JOINTS_HAND);
         this->leftForces = vector<double>(JOINTS_ARM+JOINTS_HAND);
 
-    this->mat_right = Matrix4d::Identity(4,4);
-    this->mat_left = Matrix4d::Identity(4,4);
-    this->mat_r_hand = Matrix4d::Identity(4,4);
-    this->mat_l_hand = Matrix4d::Identity(4,4);
+        this->mat_right = Matrix4d::Identity(4,4);
+        this->mat_left = Matrix4d::Identity(4,4);
+        this->mat_r_hand = Matrix4d::Identity(4,4);
+        this->mat_l_hand = Matrix4d::Identity(4,4);
 
 }
 
@@ -363,6 +363,11 @@ Humanoid::Humanoid(const Humanoid &hh)
     this->leftHandPos=hh.leftHandPos;
     this->leftHandOr=hh.leftHandOr;
     this->leftFingers=hh.leftFingers;
+
+    this->rightHandPos_mes=hh.rightHandPos_mes;
+    this->rightHandVel_mes=hh.rightHandVel_mes;
+    this->leftHandPos_mes=hh.leftHandPos_mes;
+    this->leftHandVel_mes=hh.leftHandVel_mes;
 
 
 
@@ -1397,6 +1402,54 @@ void Humanoid::getHandPos(int arm, vector<double> &pos, vector<double> &posture)
     pos.push_back(handPos[1]);
     pos.push_back(handPos[2]);
 
+}
+
+void Humanoid::getHandPosMes(int arm, vector<double>& ppos)
+{
+   switch(arm){
+   case 1: // right arm
+       ppos = this->rightHandPos_mes;
+       break;
+   case 2: // left arm
+       ppos = this->leftHandPos_mes;
+       break;
+   }
+}
+
+void Humanoid::setHandPosMes(int arm, vector<double> &ppos)
+{
+    switch(arm){
+    case 1: // right arm
+        this->rightHandPos_mes = ppos;
+        break;
+    case 2: // left arm
+        this->leftHandPos_mes = ppos;
+        break;
+    }
+}
+
+void Humanoid::getHandVelMes(int arm, vector<double> &vel)
+{
+    switch(arm){
+    case 1: // right hand
+        vel = this->rightHandVel_mes;
+        break;
+    case 2: // left hand
+        vel = this->leftHandVel_mes;
+        break;
+    }
+}
+
+void Humanoid::setHandVelMes(int arm, vector<double> &vel)
+{
+    switch(arm){
+    case 1: // right arm
+        this->rightHandVel_mes = vel;
+        break;
+    case 2: // left arm
+        this->leftHandVel_mes = vel;
+        break;
+    }
 }
 
 void Humanoid::getHandVel(int arm, vector<double> &vel, vector<double> &posture, vector<double> &velocities)

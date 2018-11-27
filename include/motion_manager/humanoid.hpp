@@ -597,6 +597,12 @@ public:
     void getRightHandPos(vector<double>& pos);
 
     /**
+     * @brief This method gets the mesured position of the right hand
+     * @param pos
+     */
+    void getRightHandPosMes(vector<double>& pos);
+
+    /**
      * @brief This method gets the norm of the vector pointing to the right hand
      * @return
      */
@@ -607,6 +613,12 @@ public:
      * @param orr
      */
     void getRightHandOr(Matrix3d& orr);
+
+    /**
+     * @brief This method gets the mesured orientation of the right hand
+     * @param orr
+     */
+    void getRightHandOrMes(Matrix3d& orr);
 
     /**
      * @brief getRightHandVel
@@ -714,6 +726,20 @@ public:
     void getHandPos(int arm, vector<double>& pos, vector<double>& posture);
 
     /**
+     * @brief getHandPosMes
+     * @param arm
+     * @param ppos
+     */
+    void getHandPosMes(int arm, vector<double>& ppos);
+
+    /**
+     * @brief setHandPosMes
+     * @param arm
+     * @param ppos
+     */
+    void setHandPosMes(int arm, vector<double>& ppos);
+
+    /**
      * @brief getHandVel
      * @param arm
      * @param vel
@@ -721,6 +747,20 @@ public:
      * @param velocities
      */
     void getHandVel(int arm, vector<double>& vel, vector<double>& posture,vector<double>& velocities);
+
+    /**
+     * @brief getHandVelMes
+     * @param arm
+     * @param vel
+     */
+    void getHandVelMes(int arm,vector<double>& vel);
+
+    /**
+     * @brief setHandVelMes
+     * @param arm
+     * @param vel
+     */
+    void setHandVelMes(int arm,vector<double>& vel);
 
     /**
      * @brief getHandVelNorm
@@ -916,6 +956,10 @@ private:
     Matrix3d rightWristOr; /**< orientation of the right wrist */
     Matrix3d rightHandOr; /**< orientation of the right hand */
 
+    // mesured positions and velocities of the right hand
+    vector<double> rightHandPos_mes; /**< mesured positions of the right hand: x,y,z,roll,pitch,yaw */
+    vector<double> rightHandVel_mes; /**< mesured velocities of the right hand: vx,vy,vz,wx,wy,wz */
+
     // positions on the right hand
     MatrixXd rightFingers; /**< positions of the phalanges of the fingers on the right hand */
 
@@ -930,6 +974,10 @@ private:
     Matrix3d leftElbowOr; /**< orientation of the left elbow */
     Matrix3d leftWristOr; /**< orientation of the left wrist */
     Matrix3d leftHandOr; /**< orientation of the left hand */
+
+    // mesured positions and velocities of the left hand
+    vector<double> leftHandPos_mes; /**< mesured positions of the left hand: x,y,z,roll,pitch,yaw */
+    vector<double> leftHandVel_mes; /**< mesured velocities of the left hand: vx,vy,vz,wx,wy,wz */
 
     //positions on the left hand
     MatrixXd leftFingers; /**< positions of the phalanges of the fingers on the left hand */

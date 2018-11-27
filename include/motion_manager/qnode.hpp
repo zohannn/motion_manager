@@ -11,7 +11,7 @@
 
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/TwistStamped.h>
 #include <sensor_msgs/JointState.h>
 #include <string>
 #include <std_msgs/String.h>
@@ -404,7 +404,7 @@ private:
          * @brief rightHandVelCallback
          * @param data
          */
-        void rightHandVelCallback(const geometry_msgs::Twist& data);
+        void rightHandVelCallback(const geometry_msgs::TwistStamped& data);
 
         /**
          * @brief leftHandPosCallback
@@ -416,7 +416,7 @@ private:
          * @brief leftHandVelCallback
          * @param data
          */
-        void leftHandVelCallback(const geometry_msgs::Twist& data);
+        void leftHandVelCallback(const geometry_msgs::TwistStamped& data);
 
         // Toy vehicle scenario ----------------------------------------------------------------------------------
         /**

@@ -1733,6 +1733,9 @@ p, li { white-space: pre-wrap; }
       <string>Controlling</string>
      </attribute>
      <widget class="QGroupBox" name="groupBox_right_hand">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -1993,7 +1996,7 @@ p, li { white-space: pre-wrap; }
       <property name="title">
        <string>Desired right hand velocity</string>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -2266,8 +2269,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="pushButton_move_control">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>510</y>
+        <x>910</x>
+        <y>260</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -2276,18 +2279,57 @@ p, li { white-space: pre-wrap; }
        <string>Move</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_stop_control">
+     <widget class="QCheckBox" name="checkBox_right_hand_status">
       <property name="geometry">
        <rect>
-        <x>110</x>
-        <y>510</y>
-        <width>71</width>
+        <x>20</x>
+        <y>270</y>
+        <width>211</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
-       <string>Stop</string>
+       <string>get current right hand status</string>
       </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_sim">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>470</y>
+        <width>171</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>V-REP Simulation</string>
+      </property>
+      <widget class="QPushButton" name="pushButton_stop_control">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>30</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Stop</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_start_control">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Start</string>
+       </property>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_results">

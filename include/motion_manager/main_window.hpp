@@ -36,6 +36,9 @@
 #include "nat_coll_av_dialog.hpp"
 #include "handposplot.hpp"
 
+#include <boost/atomic.hpp>
+#include <boost/thread.hpp>
+
 using namespace std;
 using namespace p1d;
 
@@ -657,9 +660,30 @@ public Q_SLOTS:
         void on_pushButton_move_control_clicked();
 
         /**
+         * @brief on_pushButton_start_control_pressed
+         */
+        void on_pushButton_start_control_pressed();
+
+        /**
+         * @brief on_pushButton_start_control_clicked
+         */
+        void on_pushButton_start_control_clicked();
+
+        /**
+         * @brief on_pushButton_stop_control_pressed
+         */
+        void on_pushButton_stop_control_pressed();
+
+        /**
          * @brief on_pushButton_stop_control_clicked
          */
         void on_pushButton_stop_control_clicked();
+
+        /**
+         * @brief check_right_hand_status
+         * @param state
+         */
+        void check_right_hand_status(int state);
 
 
 private:
@@ -982,6 +1006,11 @@ private:
         vector<double> iter_ws_knn_bounce; /**< iterations with warm start from the k-nearest neighbors solution */
         vector<double> cpu_ws_knn_bounce; /**< cpu time with warm start from the k-nearest neighbors solution */
         vector<double> obj_ws_knn_bounce; /**< objective function values with warm start from the k-nearest neighbors solution */
+
+        // ------------------------------------- Controlling -------------------------------------- //
+        boost::atomic<bool> get_right_hand_status;
+        boost::thread display_r_hand_status_thrd;
+        void display_r_hand_status();
 
 
 

@@ -6478,24 +6478,131 @@ void QNode::leftProxCallback(const vrep_common::ProximitySensorData& data)
 
 void QNode::rightHandPosCallback(const geometry_msgs::PoseStamped& data)
 {
+    vector<double> hand_pos_mes(6);
+
+    // position
+    pos poss;
+    poss.Xpos = data.pose.position.x * 1000; //[mm]
+    poss.Ypos = data.pose.position.y * 1000; //[mm]
+    poss.Zpos = data.pose.position.z * 1000; //[mm]
+
+    // orientation
+    orient orr;
+    // get the quaternion
+    double epx = data.pose.orientation.x;
+    double epy = data.pose.orientation.y;
+    double epz = data.pose.orientation.z;
+    double w = data.pose.orientation.w;
+
+    vector<double> rpy;
+    Matrix3d Rot;
+    Rot(0,0) = 2*(pow(w,2)+pow(epx,2))-1; Rot(0,1) = 2*(epx*epy-w*epz);         Rot(0,2) = 2*(epx*epz+w*epy);
+    Rot(1,0) = 2*(epx*epy+w*epz);         Rot(1,1) = 2*(pow(w,2)+pow(epy,2))-1; Rot(1,2) = 2*(epy*epz-w*epx);
+    Rot(2,0) = 2*(epx*epz-w*epy);         Rot(2,1) = 2*(epy*epz+w*epx);         Rot(2,2) = 2*(pow(w,2)+pow(epz,2))-1;
+
+    Matrix4d trans_obj;
+    trans_obj(0,0) = Rot(0,0); trans_obj(0,1) = Rot(0,1); trans_obj(0,2) = Rot(0,2); trans_obj(0,3) = poss.Xpos;
+    trans_obj(1,0) = Rot(1,0); trans_obj(1,1) = Rot(1,1); trans_obj(1,2) = Rot(1,2); trans_obj(1,3) = poss.Ypos;
+    trans_obj(2,0) = Rot(2,0); trans_obj(2,1) = Rot(2,1); trans_obj(2,2) = Rot(2,2); trans_obj(2,3) = poss.Zpos;
+    trans_obj(3,0) = 0;        trans_obj(3,1) = 0;        trans_obj(3,2) = 0;        trans_obj(3,3) = 1;
+
+    if (this->getRPY(trans_obj,rpy)){
+        orr.roll  = rpy.at(0);
+        orr.pitch = rpy.at(1);
+        orr.yaw = rpy.at(2);
+    }else{
+        // TO DO
+        // singularity: leave the previous orientation
+    }
+
+    hand_pos_mes.at(0) = poss.Xpos;
+    hand_pos_mes.at(1) = poss.Ypos;
+    hand_pos_mes.at(2) = poss.Zpos;
+    hand_pos_mes.at(3) = orr.roll;
+    hand_pos_mes.at(4) = orr.pitch;
+    hand_pos_mes.at(5) = orr.yaw;
+
+    this->curr_scene->getHumanoid()->setHandPosMes(1,hand_pos_mes);
 
 }
 
-void QNode::rightHandVelCallback(const geometry_msgs::Twist& data)
+void QNode::rightHandVelCallback(const geometry_msgs::TwistStamped& data)
 {
+    vector<double> hand_vel_mes(6);
+
+    hand_vel_mes.at(0) = data.twist.linear.x;
+    hand_vel_mes.at(1) = data.twist.linear.y;
+    hand_vel_mes.at(2) = data.twist.linear.z;
+    hand_vel_mes.at(3) = data.twist.angular.x;
+    hand_vel_mes.at(4) = data.twist.angular.y;
+    hand_vel_mes.at(5) = data.twist.angular.z;
+
+    this->curr_scene->getHumanoid()->setHandVelMes(1,hand_vel_mes);
 
 }
 
 void QNode::leftHandPosCallback(const geometry_msgs::PoseStamped& data)
 {
+    vector<double> hand_pos_mes(6);
 
+    // position
+    pos poss;
+    poss.Xpos = data.pose.position.x * 1000; //[mm]
+    poss.Ypos = data.pose.position.y * 1000; //[mm]
+    poss.Zpos = data.pose.position.z * 1000; //[mm]
+
+    // orientation
+    orient orr;
+    // get the quaternion
+    double epx = data.pose.orientation.x;
+    double epy = data.pose.orientation.y;
+    double epz = data.pose.orientation.z;
+    double w = data.pose.orientation.w;
+
+    vector<double> rpy;
+    Matrix3d Rot;
+    Rot(0,0) = 2*(pow(w,2)+pow(epx,2))-1; Rot(0,1) = 2*(epx*epy-w*epz);         Rot(0,2) = 2*(epx*epz+w*epy);
+    Rot(1,0) = 2*(epx*epy+w*epz);         Rot(1,1) = 2*(pow(w,2)+pow(epy,2))-1; Rot(1,2) = 2*(epy*epz-w*epx);
+    Rot(2,0) = 2*(epx*epz-w*epy);         Rot(2,1) = 2*(epy*epz+w*epx);         Rot(2,2) = 2*(pow(w,2)+pow(epz,2))-1;
+
+    Matrix4d trans_obj;
+    trans_obj(0,0) = Rot(0,0); trans_obj(0,1) = Rot(0,1); trans_obj(0,2) = Rot(0,2); trans_obj(0,3) = poss.Xpos;
+    trans_obj(1,0) = Rot(1,0); trans_obj(1,1) = Rot(1,1); trans_obj(1,2) = Rot(1,2); trans_obj(1,3) = poss.Ypos;
+    trans_obj(2,0) = Rot(2,0); trans_obj(2,1) = Rot(2,1); trans_obj(2,2) = Rot(2,2); trans_obj(2,3) = poss.Zpos;
+    trans_obj(3,0) = 0;        trans_obj(3,1) = 0;        trans_obj(3,2) = 0;        trans_obj(3,3) = 1;
+
+    if (this->getRPY(trans_obj,rpy)){
+        orr.roll  = rpy.at(0);
+        orr.pitch = rpy.at(1);
+        orr.yaw = rpy.at(2);
+    }else{
+        // TO DO
+        // singularity: leave the previous orientation
+    }
+
+    hand_pos_mes.at(0) = poss.Xpos;
+    hand_pos_mes.at(1) = poss.Ypos;
+    hand_pos_mes.at(2) = poss.Zpos;
+    hand_pos_mes.at(3) = orr.roll;
+    hand_pos_mes.at(4) = orr.pitch;
+    hand_pos_mes.at(5) = orr.yaw;
+
+    this->curr_scene->getHumanoid()->setHandPosMes(2,hand_pos_mes);
 }
 
-void QNode::leftHandVelCallback(const geometry_msgs::Twist& data)
+void QNode::leftHandVelCallback(const geometry_msgs::TwistStamped& data)
 {
+    vector<double> hand_vel_mes(6);
 
+    hand_vel_mes.at(0) = data.twist.linear.x;
+    hand_vel_mes.at(1) = data.twist.linear.y;
+    hand_vel_mes.at(2) = data.twist.linear.z;
+    hand_vel_mes.at(3) = data.twist.angular.x;
+    hand_vel_mes.at(4) = data.twist.angular.y;
+    hand_vel_mes.at(5) = data.twist.angular.z;
+
+    this->curr_scene->getHumanoid()->setHandVelMes(2,hand_vel_mes);
 }
-
 
 bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>& vel_mov, std::vector<std::vector<double>> timesteps, std::vector<double> tols_stop, std::vector<string>& traj_descr,movementPtr mov, scenarioPtr scene)
 {
