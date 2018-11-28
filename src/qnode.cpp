@@ -260,6 +260,7 @@ bool  QNode::loadScenario(const std::string& path,int id)
             break;
 
         case 12: // Controlling: scenario without objects
+            pub_joints = n.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
 
             break;
         }
@@ -8694,6 +8695,70 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
   return true;
 
 
+}
+
+bool QNode::execKinControl(int arm, vector<double> &r_posture, vector<double> &r_velocities)
+{
+
+    std::vector<int> handles;
+    switch (arm) {
+    case 0: // dual arm
+        // TO DO
+        break;
+    case 1: //right arm
+        handles = right_handles;
+        break;
+    case 2: // left arm
+        handles = left_handles;
+        break;
+    }
+
+
+    if(!simulationRunning)
+    {
+        ros::NodeHandle node;
+        // set joints position or velocity (it depends on the settings)
+        ros::ServiceClient client_enableSubscriber=node.serviceClient<vrep_common::simRosEnableSubscriber>("/vrep/simRosEnableSubscriber");
+        vrep_common::simRosEnableSubscriber srv_enableSubscriber;
+        srv_enableSubscriber.request.topicName="/"+nodeName+"/set_joints"; // the topic name
+        srv_enableSubscriber.request.queueSize=1; // the subscriber queue size (on V-REP side)
+        srv_enableSubscriber.request.streamCmd=simros_strmcmd_set_joint_state; // the subscriber type
+        client_enableSubscriber.call(srv_enableSubscriber);
+
+        // start the simulation
+        add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
+        vrep_common::simRosStartSimulation srvstart;
+        add_client.call(srvstart);
+
+        ros::spinOnce(); // first handle ROS messages
+    }
+
+    if(ros::ok() && simulationRunning)
+    {// ros is running, simulation is running
+
+
+        // handle ROS messages:
+        ros::spinOnce();
+
+        vrep_common::JointSetStateData data;
+        int exec_mode = 0; // position control
+        double exec_value;
+        //double time_step = simulationTime - timetot;
+        for (int i = 0; i < r_velocities.size(); ++i)
+        {
+            exec_value = r_posture.at(i) + (r_velocities.at(i)) * simulationTimeStep;
+
+            if(arm!=0){
+                // single-arm
+                data.handles.data.push_back(handles.at(i));
+                data.setModes.data.push_back(exec_mode); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+                data.values.data.push_back(exec_value);
+            }else{
+                // dual-arm (TO DO)
+            }
+        }// for loop joints
+        pub_joints.publish(data);
+    }
 }
 
 

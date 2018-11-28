@@ -660,6 +660,26 @@ public Q_SLOTS:
         void on_pushButton_move_control_clicked();
 
         /**
+         * @brief on_pushButton_start_sim_pressed
+         */
+        void on_pushButton_start_sim_pressed();
+
+        /**
+         * @brief on_pushButton_start_sim_clicked
+         */
+        void on_pushButton_start_sim_clicked();
+
+        /**
+         * @brief on_pushButton_stop_sim_pressed
+         */
+        void on_pushButton_stop_sim_pressed();
+
+        /**
+         * @brief on_pushButton_stop_sim_clicked
+         */
+        void on_pushButton_stop_sim_clicked();
+
+        /**
          * @brief on_pushButton_start_control_pressed
          */
         void on_pushButton_start_control_pressed();
@@ -684,6 +704,12 @@ public Q_SLOTS:
          * @param state
          */
         void check_right_hand_status(int state);
+
+        /**
+         * @brief check_const_vel_control
+         * @param state
+         */
+        void check_const_vel_control(int state);
 
 
 private:
@@ -1009,8 +1035,16 @@ private:
 
         // ------------------------------------- Controlling -------------------------------------- //
         boost::atomic<bool> get_right_hand_status;
+        boost::mutex hh_control_mtx;
         boost::thread display_r_hand_status_thrd;
         void display_r_hand_status();
+        boost::atomic<bool> exec_control;
+        boost::atomic<bool> pos_control;
+        boost::atomic<bool> vel_control;
+        boost::thread execPosControl_thrd;
+        void execPosControl();
+        boost::thread execVelControl_thrd;
+        void execVelControl();
 
 
 

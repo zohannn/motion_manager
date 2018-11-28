@@ -1732,263 +1732,14 @@ p, li { white-space: pre-wrap; }
      <attribute name="title">
       <string>Controlling</string>
      </attribute>
-     <widget class="QGroupBox" name="groupBox_right_hand">
+     <widget class="QGroupBox" name="groupBox_des_right_hand_vel">
       <property name="enabled">
        <bool>false</bool>
       </property>
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>401</width>
-        <height>241</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>Right Hand Status</string>
-      </property>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>381</width>
-         <height>201</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_308">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_59">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_296">
-            <item>
-             <widget class="QLabel" name="label_right_hand_pos_x">
-              <property name="text">
-               <string>Position x [mm]:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_right_hand_pos_x_value">
-              <property name="text">
-               <string>nan</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_297">
-            <item>
-             <widget class="QLabel" name="label_right_hand_pos_y">
-              <property name="text">
-               <string>Position y [mm]:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_right_hand_pos_y_value">
-              <property name="text">
-               <string>nan</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_298">
-            <item>
-             <widget class="QLabel" name="label_right_hand_pos_z">
-              <property name="text">
-               <string>Position z [mm]:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_right_hand_pos_z_value">
-              <property name="text">
-               <string>nan</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_299">
-            <item>
-             <widget class="QLabel" name="label_right_hand_or_roll">
-              <property name="text">
-               <string>Orientation roll [rad]:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_right_hand_or_roll_value">
-              <property name="text">
-               <string>nan</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_300">
-            <item>
-             <widget class="QLabel" name="label_right_hand_or_pitch">
-              <property name="text">
-               <string>Orientation pitch [rad]:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_right_hand_or_pitch_value">
-              <property name="text">
-               <string>nan</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_301">
-            <item>
-             <widget class="QLabel" name="label_right_hand_or_yaw">
-              <property name="text">
-               <string>Orientation yaw [rad]:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_right_hand_or_yaw_value">
-              <property name="text">
-               <string>nan</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_60">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_302">
-            <item>
-             <widget class="QLabel" name="label_right_hand_vel_x">
-              <property name="text">
-               <string>Velocity lin x [mm/s]:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_right_hand_vel_x_value">
-              <property name="text">
-               <string>nan</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_303">
-            <item>
-             <widget class="QLabel" name="label_right_hand_vel_y">
-              <property name="text">
-               <string>Velocity lin y [mm/s]:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_right_hand_vel_y_value">
-              <property name="text">
-               <string>nan</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_304">
-            <item>
-             <widget class="QLabel" name="label_right_hand_vel_z">
-              <property name="text">
-               <string>Velocity lin z [mm/s]:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_right_hand_vel_z_value">
-              <property name="text">
-               <string>nan</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_305">
-            <item>
-             <widget class="QLabel" name="label_right_hand_vel_wx">
-              <property name="text">
-               <string>Velocity wx [rad/s]:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_right_hand_vel_wx_value">
-              <property name="text">
-               <string>nan</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_306">
-            <item>
-             <widget class="QLabel" name="label_right_hand_vel_wy">
-              <property name="text">
-               <string>Velocity wy [rad/s]:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_right_hand_vel_wy_value">
-              <property name="text">
-               <string>nan</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_307">
-            <item>
-             <widget class="QLabel" name="label_right_hand_vel_wz">
-              <property name="text">
-               <string>Velocity wz [rad/s]:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_right_hand_vel_wz_value">
-              <property name="text">
-               <string>nan</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-     <widget class="QGroupBox" name="groupBox_des_right_hand_vel">
-      <property name="geometry">
-       <rect>
         <x>430</x>
-        <y>20</y>
+        <y>10</y>
         <width>441</width>
         <height>131</height>
        </rect>
@@ -2129,9 +1880,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>430</x>
-        <y>160</y>
+        <y>150</y>
         <width>441</width>
-        <height>131</height>
+        <height>161</height>
        </rect>
       </property>
       <property name="title">
@@ -2265,12 +2016,41 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>130</y>
+         <width>249</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_296">
+        <item>
+         <widget class="QLabel" name="label_coeff">
+          <property name="text">
+           <string>Control Coefficient </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_coeff">
+          <property name="text">
+           <string>0.001</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
      <widget class="QPushButton" name="pushButton_move_control">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
-        <x>910</x>
-        <y>260</y>
+        <x>800</x>
+        <y>330</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -2282,8 +2062,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="checkBox_right_hand_status">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>270</y>
+        <x>10</x>
+        <y>260</y>
         <width>211</width>
         <height>21</height>
        </rect>
@@ -2295,7 +2075,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_sim">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>1070</x>
         <y>470</y>
         <width>171</width>
         <height>61</height>
@@ -2304,10 +2084,314 @@ p, li { white-space: pre-wrap; }
       <property name="title">
        <string>V-REP Simulation</string>
       </property>
-      <widget class="QPushButton" name="pushButton_stop_control">
+      <widget class="QPushButton" name="pushButton_stop_sim">
        <property name="geometry">
         <rect>
          <x>90</x>
+         <y>30</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Stop</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_start_sim">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Start</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_const_vel_control">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>330</y>
+        <width>181</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>constant velocity control</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_right_hand_comp">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>401</width>
+        <height>241</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Right Hand Status (Direct kinematics)</string>
+      </property>
+      <widget class="QWidget" name="layoutWidget_55">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>381</width>
+         <height>201</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_551">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_101">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_552">
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_pos_x">
+              <property name="text">
+               <string>Position x [mm]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_pos_x_value">
+              <property name="text">
+               <string>nan</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_553">
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_pos_y">
+              <property name="text">
+               <string>Position y [mm]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_pos_y_value">
+              <property name="text">
+               <string>nan</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_554">
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_pos_z">
+              <property name="text">
+               <string>Position z [mm]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_pos_z_value">
+              <property name="text">
+               <string>nan</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_555">
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_or_roll">
+              <property name="text">
+               <string>Orientation roll [rad]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_or_roll_value">
+              <property name="text">
+               <string>nan</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_556">
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_or_pitch">
+              <property name="text">
+               <string>Orientation pitch [rad]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_or_pitch_value">
+              <property name="text">
+               <string>nan</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_557">
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_or_yaw">
+              <property name="text">
+               <string>Orientation yaw [rad]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_or_yaw_value">
+              <property name="text">
+               <string>nan</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_102">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_558">
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_vel_x">
+              <property name="text">
+               <string>Velocity lin x [mm/s]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_vel_x_value">
+              <property name="text">
+               <string>nan</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_559">
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_vel_y">
+              <property name="text">
+               <string>Velocity lin y [mm/s]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_vel_y_value">
+              <property name="text">
+               <string>nan</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_560">
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_vel_z">
+              <property name="text">
+               <string>Velocity lin z [mm/s]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_vel_z_value">
+              <property name="text">
+               <string>nan</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_561">
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_vel_wx">
+              <property name="text">
+               <string>Velocity wx [rad/s]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_vel_wx_value">
+              <property name="text">
+               <string>nan</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_562">
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_vel_wy">
+              <property name="text">
+               <string>Velocity wy [rad/s]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_vel_wy_value">
+              <property name="text">
+               <string>nan</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_563">
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_vel_wz">
+              <property name="text">
+               <string>Velocity wz [rad/s]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_comp_right_hand_vel_wz_value">
+              <property name="text">
+               <string>nan</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_control">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>470</y>
+        <width>191</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Start and Stop controlling</string>
+      </property>
+      <widget class="QPushButton" name="pushButton_stop_control">
+       <property name="geometry">
+        <rect>
+         <x>110</x>
          <y>30</y>
          <width>71</width>
          <height>21</height>

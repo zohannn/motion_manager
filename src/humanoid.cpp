@@ -1330,14 +1330,14 @@ void Humanoid::getHandPos(int arm, vector<double> &pos, vector<double> &posture)
     DHparams m_DH_arm;
     vector<DHparams> m_DH_hand;
 
-    vector<double> shoulderPos = vector<double>(3);
-    Matrix3d shoulderOr;
-    vector<double> elbowPos = vector<double>(3);
-    Matrix3d elbowOr;
-    vector<double> wristPos = vector<double>(3);
-    Matrix3d wristOr;
-    vector<double> handPos = vector<double>(3);
-    Matrix3d handOr;
+    vector<double> shoulderPos = vector<double>(6);
+    Matrix3d shoulderOr; vector<double> s_rpy;
+    vector<double> elbowPos = vector<double>(6);
+    Matrix3d elbowOr; vector<double> e_rpy;
+    vector<double> wristPos = vector<double>(6);
+    Matrix3d wristOr; vector<double> w_rpy;
+    vector<double> handPos = vector<double>(6);
+    Matrix3d handOr; vector<double> h_rpy;
 
     switch (arm) {
     case 1: // right arm
@@ -1367,32 +1367,48 @@ void Humanoid::getHandPos(int arm, vector<double> &pos, vector<double> &posture)
         if (i==0){
             // get the shoulder
             shoulderOr = T.block(0,0,3,3);
+            this->getRPY(s_rpy,shoulderOr);
             v = T.block(0,3,3,1);
             shoulderPos[0] = v[0];
             shoulderPos[1] = v[1];
             shoulderPos[2] = v[2];
+            shoulderPos[3] = s_rpy.at(0);
+            shoulderPos[4] = s_rpy.at(1);
+            shoulderPos[5] = s_rpy.at(2);
         }else if (i==2){
             // get the elbow
             elbowOr = T.block(0,0,3,3);
+            this->getRPY(e_rpy,elbowOr);
             v = T.block(0,3,3,1);
             elbowPos[0] = v[0];
             elbowPos[1] = v[1];
             elbowPos[2] = v[2];
+            elbowPos[3] = e_rpy.at(0);
+            elbowPos[4] = e_rpy.at(1);
+            elbowPos[5] = e_rpy.at(2);
         }else if (i==4){
             // get the wrist
             wristOr = T.block(0,0,3,3);
+            this->getRPY(w_rpy,wristOr);
             v = T.block(0,3,3,1);
             wristPos[0] = v[0];
             wristPos[1] = v[1];
             wristPos[2] = v[2];
+            wristPos[3] = w_rpy.at(0);
+            wristPos[4] = w_rpy.at(1);
+            wristPos[5] = w_rpy.at(2);
         } else if (i==6){
             //get the hand
             T = T * mat_hand;
             handOr = T.block(0,0,3,3);
+            this->getRPY(h_rpy,wristOr);
             v = T.block(0,3,3,1);
             handPos[0] = v[0];
             handPos[1] = v[1];
             handPos[2] = v[2];
+            handPos[3] = h_rpy.at(0);
+            handPos[4] = h_rpy.at(1);
+            handPos[5] = h_rpy.at(2);
         }
 
     }
@@ -1401,6 +1417,9 @@ void Humanoid::getHandPos(int arm, vector<double> &pos, vector<double> &posture)
     pos.push_back(handPos[0]);
     pos.push_back(handPos[1]);
     pos.push_back(handPos[2]);
+    pos.push_back(handPos[3]);
+    pos.push_back(handPos[4]);
+    pos.push_back(handPos[5]);
 
 }
 
@@ -2443,7 +2462,9 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
     }else{
         k=0.0;
     }
-    MatrixXd JT = JacobianArmT*(JJ+pow(k,2)*I);
+    MatrixXd JJk = (JJ+pow(k,2)*I);
+    MatrixXd JJk_inv = JJk.inverse();
+    MatrixXd JT = JacobianArmT*JJk_inv;
     VectorXd hand_vel_xd(6);
     hand_vel_xd << hand_vel.at(0),hand_vel.at(1),hand_vel.at(2),hand_vel.at(3),hand_vel.at(4),hand_vel.at(5);
     VectorXd joint_velocities = JT*hand_vel_xd;
@@ -2462,6 +2483,29 @@ void Humanoid::transfMatrix(double alpha, double a, double d, double theta, Matr
     T(2,0) = sin(theta)*sin(alpha); T(2,1) = cos(theta)*sin(alpha);  T(2,2) = cos(alpha);  T(2,3) = cos(alpha)*d;
     T(3,0) = 0.0;                   T(3,1) = 0.0;                    T(3,2) = 0.0;         T(3,3) = 1.0;
 
+}
+
+bool Humanoid::getRPY(std::vector<double>& rpy, Matrix3d& Rot)
+{
+    if((Rot.cols()==3) && (Rot.rows()==3))
+    {// the matrix is not empy
+        rpy.resize(3,0);
+        if((Rot(0,0)<1e-10) && (Rot(1,0)<1e-10))
+        {// singularity
+            rpy.at(0) = 0; // roll
+            rpy.at(1) = std::atan2(-Rot(2,0),Rot(0,0)); // pitch
+            rpy.at(2) = std::atan2(-Rot(1,2),Rot(1,1)); // yaw
+            return false;
+        }else{
+            rpy.at(0) = std::atan2(Rot(1,0),Rot(0,0)); // roll
+            double sp = std::sin(rpy.at(0)); double cp = std::cos(rpy.at(0));
+            rpy.at(1) = std::atan2(-Rot(2,0),cp*Rot(0,0)+sp*Rot(1,0)); // pitch
+            rpy.at(2) = std::atan2(sp*Rot(0,2)-cp*Rot(1,2),cp*Rot(1,1)-sp*Rot(0,1)); // yaw
+            return true;
+        }
+    }else{
+        return false;
+    }
 }
 
 

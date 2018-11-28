@@ -843,6 +843,15 @@ public:
      */
     DHparams getDH_leftArm();
 
+    /**
+     * @brief inverseDiffKinematicsSingleArm
+     * @param arm
+     * @param posture
+     * @param hand_vel
+     * @param velocities
+     */
+    void inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double>& velocities);
+
 //#if HEAD==1
   //  humanoid_part getHead();
 //#endif
@@ -1036,15 +1045,6 @@ private:
     void directKinematicsFinger(DHparams& p,Matrix4d& T_ext,Matrix4d& T_H_0_pos,int id_fing, MatrixXd& Fingers);
 
     /**
-     * @brief inverseDiffKinematicsSingleArm
-     * @param arm
-     * @param posture
-     * @param hand_vel
-     * @param velocities
-     */
-    void inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double>& velocities);
-
-    /**
      * @brief This method computes the transformation matrix from the D-H parameters
      * It performes the homogeneus transformation matrix given the D-H parameters: \n
      * - translate by d_i along the z_i axis \n
@@ -1058,6 +1058,14 @@ private:
      * @param T
      */
     void transfMatrix(double alpha, double a, double d, double theta, Matrix4d& T);
+
+    /**
+     * @brief getRPY
+     * @param rpy
+     * @param Rot
+     * @return
+     */
+    bool getRPY(std::vector<double>& rpy, Matrix3d& Rot);
 
 };
 

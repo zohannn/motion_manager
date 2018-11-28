@@ -172,6 +172,16 @@ public:
          * @return
          */
         bool execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double> > > &timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task, taskPtr task, scenarioPtr scene);
+
+        /**
+         * @brief execKinControl
+         * @param arm
+         * @param r_posture
+         * @param r_velocities
+         * @return
+         */
+        bool execKinControl(int arm, vector<double> &r_posture, vector<double>& r_velocities);
+
         /**
          * @brief This method sets to zero the time of simulation
          */
@@ -320,6 +330,9 @@ private:
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Learning tasks: reaching with one obstacle scenario -------------------------------------------------------------------------------------
         ros::Subscriber subObstacle;
+        // -----------------------------------------------------------------------------------------------------------------------------------
+        // Controlling: scenario without objects -------------------------------------------------------------------------------------
+        ros::Publisher pub_joints; /**< ROS publisher to the topic /motion_manager/set_joints */
 
 #if MOVEIT==1
         boost::shared_ptr<moveit::planning_interface::PlanningSceneInterface> planning_scene_interface_ptr;/**< scene interface */
