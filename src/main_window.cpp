@@ -8991,16 +8991,15 @@ void MainWindow::on_pushButton_control_plot_clicked()
     // plot the hand velocity norm
     if(!this->handVelocityNorm_ctrl.empty()){
 
-        vector<double> hand_vel_norm(this->handVelocityNorm_ctrl.begin()+1,this->handVelocityNorm_ctrl.end());
-        int inc_vel = round(hand_vel_norm.size()/n_samples);
+        int inc_vel = round(this->handVelocityNorm_ctrl.size()/n_samples);
 
         vector<double> hand_vel(n_samples);
-        vector<double> stime(this->sim_time.begin()+1,this->sim_time.end());
+        this->sim_time.at(0) = 0.0;
         vector<double> time(n_samples);
-        for(size_t i=0, j = 0; (i < hand_vel_norm.size() && j < n_samples); i += inc_vel,++j)
+        for(size_t i=0, j = 0; (i < this->handVelocityNorm_ctrl.size() && j < n_samples); i += inc_vel,++j)
         {
-            hand_vel.at(j) = hand_vel_norm.at(i);
-            time.at(j) = stime.at(i);
+            hand_vel.at(j) = this->handVelocityNorm_ctrl.at(i);
+            time.at(j) = this->sim_time.at(i);
         }
 
         QVector<double> qhand_vel = QVector<double>::fromStdVector(hand_vel);
