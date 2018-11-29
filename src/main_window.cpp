@@ -118,6 +118,19 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(this->ui.checkBox_right_hand_status, SIGNAL(stateChanged(int)), this, SLOT(check_right_hand_status(int)));
     QObject::connect(this->ui.checkBox_const_vel_control, SIGNAL(stateChanged(int)), this, SLOT(check_const_vel_control(int)));
 
+    QObject::connect(this->ui.checkBox_des_right_hand_pos_x, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_pos_x(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_pos_y, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_pos_y(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_pos_z, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_pos_z(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_or_roll, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_or_roll(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_or_pitch, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_or_pitch(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_or_yaw, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_or_yaw(int)));
+
+    QObject::connect(this->ui.checkBox_des_right_hand_vel_x, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_vel_x(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_vel_y, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_vel_y(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_vel_z, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_vel_z(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_vel_wx, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_vel_wx(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_vel_wy, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_vel_wy(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_vel_wz, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_vel_wz(int)));
 
 
     ReadSettings();
@@ -241,8 +254,9 @@ void MainWindow::display_r_hand_status()
             hh->getRightArmPosture(r_posture);
             hh->getRightArmVelocities(r_velocities);
 
-            vector<double> r_hand_pos_comp;
+            vector<double> r_hand_pos_comp; vector<double> r_hand_orr_comp;
             hh->getHandPos(1,r_hand_pos_comp,r_posture);
+            hh->getHandOr(1,r_hand_orr_comp,r_posture);
             vector<double> r_hand_vel_comp;
             hh->getHandVel(1,r_hand_vel_comp,r_posture,r_velocities);
 
@@ -251,9 +265,9 @@ void MainWindow::display_r_hand_status()
                 this->ui.label_comp_right_hand_pos_x_value->setText(QString::number(r_hand_pos_comp.at(0)));
                 this->ui.label_comp_right_hand_pos_y_value->setText(QString::number(r_hand_pos_comp.at(1)));
                 this->ui.label_comp_right_hand_pos_z_value->setText(QString::number(r_hand_pos_comp.at(2)));
-                this->ui.label_comp_right_hand_or_roll_value->setText(QString::number(r_hand_pos_comp.at(3)));
-                this->ui.label_comp_right_hand_or_pitch_value->setText(QString::number(r_hand_pos_comp.at(4)));
-                this->ui.label_comp_right_hand_or_yaw_value->setText(QString::number(r_hand_pos_comp.at(5)));
+                this->ui.label_comp_right_hand_or_roll_value->setText(QString::number(r_hand_orr_comp.at(0)));
+                this->ui.label_comp_right_hand_or_pitch_value->setText(QString::number(r_hand_orr_comp.at(1)));
+                this->ui.label_comp_right_hand_or_yaw_value->setText(QString::number(r_hand_orr_comp.at(2)));
             }
             if(!r_hand_vel_comp.empty())
             {
@@ -289,15 +303,35 @@ void MainWindow::execPosControl()
 
             MatrixXd Koeff = MatrixXd::Identity(6,6);
             double coeff = this->ui.lineEdit_coeff->text().toDouble();
-            Koeff(0,0) = coeff; Koeff(1,1) = coeff; Koeff(2,2) = coeff;
-            Koeff(3,3) = coeff; Koeff(4,4) = coeff; Koeff(5,5) = coeff;
+            if(this->ui.checkBox_des_right_hand_pos_x->isChecked()){
+                Koeff(0,0) = coeff;
+            }else{ Koeff(0,0) = 0.0;}
+            if(this->ui.checkBox_des_right_hand_pos_y->isChecked()){
+                Koeff(1,1) = coeff;
+            }else{ Koeff(1,1) = 0.0;}
+            if(this->ui.checkBox_des_right_hand_pos_z->isChecked()){
+                Koeff(2,2) = coeff;
+            }else{ Koeff(2,2) = 0.0;}
+            if(this->ui.checkBox_des_right_hand_or_roll->isChecked()){
+                Koeff(3,3) = coeff;
+            }else{ Koeff(3,3) = 0.0;}
+            if(this->ui.checkBox_des_right_hand_or_pitch->isChecked()){
+                Koeff(4,4) = coeff;
+            }else{ Koeff(4,4) = 0.0;}
+            if(this->ui.checkBox_des_right_hand_or_yaw->isChecked()){
+                Koeff(5,5) = coeff;
+            }else{ Koeff(5,5) = 0.0;}
 
-            vector<double> r_posture; vector<double> r_hand_pos;
+            vector<double> r_posture; vector<double> r_hand_pos; vector<double> r_hand_or; vector<double> r_hand_vel;
             this->curr_scene->getHumanoid()->getRightArmPosture(r_posture);
             this->curr_scene->getHumanoid()->getHandPos(1,r_hand_pos,r_posture);
+            this->curr_scene->getHumanoid()->getHandOr(1,r_hand_or,r_posture);
+            this->handPosition_ctrl.push_back(r_hand_pos);
+            this->handOrientation_ctrl.push_back(r_hand_or);
+
             VectorXd r_hand(6);
             r_hand << r_hand_pos.at(0),r_hand_pos.at(1),r_hand_pos.at(2),
-                      r_hand_pos.at(3),r_hand_pos.at(4),r_hand_pos.at(5);
+                      r_hand_or.at(0),r_hand_or.at(1),r_hand_or.at(2);
 
             VectorXd error = des_hand - r_hand;
             VectorXd hand_vel = Koeff * error;
@@ -307,7 +341,16 @@ void MainWindow::execPosControl()
             vector<double> r_velocities;
             this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
 
+            this->curr_scene->getHumanoid()->getHandVel(1,r_hand_vel,r_posture,r_velocities);
+            vector<double> r_hand_lin_vel(r_hand_vel.begin(), r_hand_vel.begin()+3);
+            vector<double> r_hand_ang_vel(r_hand_vel.begin()+3, r_hand_vel.begin()+6);
+            this->handLinearVelocity_ctrl.push_back(r_hand_lin_vel);
+            this->handAngularVelocity_ctrl.push_back(r_hand_ang_vel);
+
             this->qnode.execKinControl(1,r_posture,r_velocities);
+
+            this->handVelocityNorm_ctrl.push_back(this->curr_scene->getHumanoid()->getHandVelNorm(1,r_posture,r_velocities));
+            this->sim_time.push_back(this->qnode.getSimTime());
         }
     }
 
@@ -319,7 +362,60 @@ void MainWindow::execVelControl()
     {
         if(vel_control)
         {
+            boost::unique_lock<boost::mutex> lck(hh_control_mtx);
 
+            double des_hand_vel_x = this->ui.lineEdit_des_right_hand_vel_x->text().toDouble();
+            double des_hand_vel_y = this->ui.lineEdit_des_right_hand_vel_y->text().toDouble();
+            double des_hand_vel_z = this->ui.lineEdit_des_right_hand_vel_z->text().toDouble();
+            double des_hand_vel_wx = this->ui.lineEdit_des_right_hand_vel_wx->text().toDouble();
+            double des_hand_vel_wy = this->ui.lineEdit_des_right_hand_vel_wy->text().toDouble();
+            double des_hand_vel_wz = this->ui.lineEdit_des_right_hand_vel_wz->text().toDouble();
+            VectorXd hand_vel(6);
+            hand_vel << des_hand_vel_x,des_hand_vel_y,des_hand_vel_z,
+                        des_hand_vel_wx,des_hand_vel_wy,des_hand_vel_wz;
+
+            if(!this->ui.checkBox_des_right_hand_vel_x->isChecked()){
+                hand_vel(0) = 0.0;
+            }
+            if(!this->ui.checkBox_des_right_hand_vel_y->isChecked()){
+                hand_vel(1) = 0.0;
+            }
+            if(!this->ui.checkBox_des_right_hand_vel_z->isChecked()){
+                hand_vel(2) = 0.0;
+            }
+            if(!this->ui.checkBox_des_right_hand_vel_wx->isChecked()){
+                hand_vel(3) = 0.0;
+            }
+            if(!this->ui.checkBox_des_right_hand_vel_wy->isChecked()){
+                hand_vel(4) = 0.0;
+            }
+            if(!this->ui.checkBox_des_right_hand_vel_wz->isChecked()){
+                hand_vel(5) = 0.0;
+            }
+            vector<double> r_posture; vector<double> r_hand_pos; vector<double> r_hand_or;
+            this->curr_scene->getHumanoid()->getRightArmPosture(r_posture);
+            this->curr_scene->getHumanoid()->getHandPos(1,r_hand_pos,r_posture);
+            this->curr_scene->getHumanoid()->getHandOr(1,r_hand_or,r_posture);
+            this->handPosition_ctrl.push_back(r_hand_pos);
+            this->handOrientation_ctrl.push_back(r_hand_or);
+
+            vector<double> hand_vel_vec; hand_vel_vec.resize(hand_vel.size());
+            VectorXd::Map(&hand_vel_vec[0], hand_vel.size()) = hand_vel;
+
+            vector<double> r_velocities;
+            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
+
+            vector<double> r_hand_vel;
+            this->curr_scene->getHumanoid()->getHandVel(1,r_hand_vel,r_posture,r_velocities);
+            vector<double> r_hand_lin_vel(r_hand_vel.begin(), r_hand_vel.begin()+3);
+            vector<double> r_hand_ang_vel(r_hand_vel.begin()+3, r_hand_vel.begin()+6);
+            this->handLinearVelocity_ctrl.push_back(r_hand_lin_vel);
+            this->handAngularVelocity_ctrl.push_back(r_hand_ang_vel);
+
+            this->qnode.execKinControl(1,r_posture,r_velocities);
+
+            this->handVelocityNorm_ctrl.push_back(this->curr_scene->getHumanoid()->getHandVelNorm(1,r_posture,r_velocities));
+            this->sim_time.push_back(this->qnode.getSimTime());
         }
     }
 }
@@ -932,6 +1028,8 @@ void MainWindow::on_pushButton_getElements_clicked()
             this->curr_task = taskPtr(new Task());
             ui.pushButton_getElements->setEnabled(false);
             ui.tab_plan->setEnabled(true);
+            ui.tab_learn->setEnabled(true);
+            ui.tab_control->setEnabled(true);
             ui.tab_results->setEnabled(true);
             ui.groupBox_specs->setEnabled(true);
             ui.groupBox_task->setEnabled(false);
@@ -8685,47 +8783,140 @@ void MainWindow::check_const_vel_control(int state)
     }
 }
 
+void MainWindow::check_des_right_hand_pos_x(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_des_right_hand_pos_x->setEnabled(false);
+    }else{
+       // checked
+       this->ui.lineEdit_des_right_hand_pos_x->setEnabled(true);
+    }
+}
+
+void MainWindow::check_des_right_hand_pos_y(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_des_right_hand_pos_y->setEnabled(false);
+    }else{
+       // checked
+       this->ui.lineEdit_des_right_hand_pos_y->setEnabled(true);
+    }
+}
+
+void MainWindow::check_des_right_hand_pos_z(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_des_right_hand_pos_z->setEnabled(false);
+    }else{
+       // checked
+       this->ui.lineEdit_des_right_hand_pos_z->setEnabled(true);
+    }
+}
+
+void MainWindow::check_des_right_hand_or_roll(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_des_right_hand_or_roll->setEnabled(false);
+    }else{
+       // checked
+       this->ui.lineEdit_des_right_hand_or_roll->setEnabled(true);
+    }
+}
+
+void MainWindow::check_des_right_hand_or_pitch(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_des_right_hand_or_pitch->setEnabled(false);
+    }else{
+       // checked
+       this->ui.lineEdit_des_right_hand_or_pitch->setEnabled(true);
+    }
+}
+
+void MainWindow::check_des_right_hand_or_yaw(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_des_right_hand_or_yaw->setEnabled(false);
+    }else{
+       // checked
+       this->ui.lineEdit_des_right_hand_or_yaw->setEnabled(true);
+    }
+}
+
+void MainWindow::check_des_right_hand_vel_x(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_des_right_hand_vel_x->setEnabled(false);
+    }else{
+       // checked
+       this->ui.lineEdit_des_right_hand_vel_x->setEnabled(true);
+    }
+}
+
+void MainWindow::check_des_right_hand_vel_y(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_des_right_hand_vel_y->setEnabled(false);
+    }else{
+       // checked
+       this->ui.lineEdit_des_right_hand_vel_y->setEnabled(true);
+    }
+}
+
+void MainWindow::check_des_right_hand_vel_z(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_des_right_hand_vel_z->setEnabled(false);
+    }else{
+       // checked
+       this->ui.lineEdit_des_right_hand_vel_z->setEnabled(true);
+    }
+}
+
+void MainWindow::check_des_right_hand_vel_wx(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_des_right_hand_vel_wx->setEnabled(false);
+    }else{
+       // checked
+       this->ui.lineEdit_des_right_hand_vel_wx->setEnabled(true);
+    }
+}
+
+void MainWindow::check_des_right_hand_vel_wy(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_des_right_hand_vel_wy->setEnabled(false);
+    }else{
+       // checked
+       this->ui.lineEdit_des_right_hand_vel_wy->setEnabled(true);
+    }
+}
+
+void MainWindow::check_des_right_hand_vel_wz(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_des_right_hand_vel_wz->setEnabled(false);
+    }else{
+       // checked
+       this->ui.lineEdit_des_right_hand_vel_wz->setEnabled(true);
+    }
+}
+
 // -----------------------------------------------------------------------
 // Controlling
-
-void MainWindow::on_pushButton_move_control_clicked()
-{
-    if(!this->ui.checkBox_const_vel_control->isChecked())
-    {
-        double des_hand_pos_x = this->ui.lineEdit_des_right_hand_pos_x->text().toDouble();
-        double des_hand_pos_y = this->ui.lineEdit_des_right_hand_pos_y->text().toDouble();
-        double des_hand_pos_z = this->ui.lineEdit_des_right_hand_pos_z->text().toDouble();
-        double des_hand_or_roll = this->ui.lineEdit_des_right_hand_or_roll->text().toDouble();
-        double des_hand_or_pitch = this->ui.lineEdit_des_right_hand_or_pitch->text().toDouble();
-        double des_hand_or_yaw = this->ui.lineEdit_des_right_hand_or_yaw->text().toDouble();
-        VectorXd des_hand(6);
-        des_hand << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z,
-                    des_hand_or_roll,des_hand_or_pitch,des_hand_or_yaw;
-
-        MatrixXd Koeff = MatrixXd::Identity(6,6);
-        Koeff(0,0) = 0.1; Koeff(1,1) = 0.1; Koeff(2,2) = 0.1;
-        Koeff(3,3) = 0.1; Koeff(4,4) = 0.1; Koeff(5,5) = 0.1;
-
-        vector<double> r_posture; vector<double> r_hand_pos;
-        this->curr_scene->getHumanoid()->getRightArmPosture(r_posture);
-        this->curr_scene->getHumanoid()->getHandPos(1,r_hand_pos,r_posture);
-        VectorXd r_hand(6);
-        r_hand << r_hand_pos.at(0),r_hand_pos.at(1),r_hand_pos.at(2),
-                  r_hand_pos.at(3),r_hand_pos.at(4),r_hand_pos.at(5);
-
-        VectorXd error = des_hand - r_hand;
-        VectorXd hand_vel = Koeff * error;
-        vector<double> hand_vel_vec; hand_vel_vec.resize(hand_vel.size());
-        VectorXd::Map(&hand_vel_vec[0], hand_vel.size()) = hand_vel;
-        vector<double> r_velocities;
-        this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
-
-    }else{
-
-    }
-
-
-}
 
 void MainWindow::on_pushButton_start_sim_pressed()
 {
@@ -8754,7 +8945,11 @@ void MainWindow::on_pushButton_start_control_pressed()
 
 void MainWindow::on_pushButton_start_control_clicked()
 {
-
+    this->handPosition_ctrl.clear();
+    this->handLinearVelocity_ctrl.clear();
+    this->handAngularVelocity_ctrl.clear();
+    this->handVelocityNorm_ctrl.clear();
+    this->sim_time.clear();
     if(!this->ui.checkBox_const_vel_control->isChecked())
     {
         pos_control = true;
@@ -8775,6 +8970,80 @@ void MainWindow::on_pushButton_stop_control_clicked()
     pos_control = false;
     vel_control = false;
 }
+
+void MainWindow::on_pushButton_control_plot_clicked()
+{
+    int n_samples = this->ui.lineEdit_n_samples_value->text().toInt();
+
+    // plot the 3D hand position   
+    int inc_pos = round(this->handPosition_ctrl.size()/n_samples);
+    vector<vector<double>> hand_pos(n_samples);
+    for(size_t i=0, j = 0; (i < this->handPosition_ctrl.size() && j < n_samples); i += inc_pos,++j)
+    {
+        hand_pos.at(j) = this->handPosition_ctrl.at(i);
+    }
+
+    this->handPosPlot_ctrl_ptr.reset(new HandPosPlot(hand_pos));
+    this->handPosPlot_ctrl_ptr->setParent(this->ui.plot_control_hand_pos);
+    this->handPosPlot_ctrl_ptr->resize(522,329);
+    this->handPosPlot_ctrl_ptr->show();
+
+    // plot the hand velocity norm
+    if(!this->handVelocityNorm_ctrl.empty()){
+
+        vector<double> hand_vel_norm(this->handVelocityNorm_ctrl.begin()+1,this->handVelocityNorm_ctrl.end());
+        int inc_vel = round(hand_vel_norm.size()/n_samples);
+
+        vector<double> hand_vel(n_samples);
+        vector<double> stime(this->sim_time.begin()+1,this->sim_time.end());
+        vector<double> time(n_samples);
+        for(size_t i=0, j = 0; (i < hand_vel_norm.size() && j < n_samples); i += inc_vel,++j)
+        {
+            hand_vel.at(j) = hand_vel_norm.at(i);
+            time.at(j) = stime.at(i);
+        }
+
+        QVector<double> qhand_vel = QVector<double>::fromStdVector(hand_vel);
+        QVector<double> qtime = QVector<double>::fromStdVector(time);
+        ui.plot_control_hand_vel->plotLayout()->clear();
+        ui.plot_control_hand_vel->clearGraphs();
+        ui.plot_control_hand_vel->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_control_hand_vel);
+        wideAxisRect->setupFullAxesBox(true);
+        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_control_hand_vel);
+        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+        // move newly created axes on "axes" layer and grids on "grid" layer:
+        for (QCPAxisRect *rect : ui.plot_control_hand_vel->axisRects())
+        {
+          for (QCPAxis *axis : rect->axes())
+          {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+          }
+        }
+        QString title("Hand velocity");
+        ui.plot_control_hand_vel->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_control_hand_vel,title));
+        ui.plot_control_hand_vel->plotLayout()->addElement(1, 0, wideAxisRect);
+
+        ui.plot_control_hand_vel->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+        ui.plot_control_hand_vel->graph(0)->setPen(QPen(Qt::red));
+        ui.plot_control_hand_vel->graph(0)->setName(title);
+        ui.plot_control_hand_vel->graph(0)->valueAxis()->setLabel("hand velocity [mm/s]");
+        ui.plot_control_hand_vel->graph(0)->keyAxis()->setLabel("time [s]");
+        ui.plot_control_hand_vel->graph(0)->setData(qtime, qhand_vel);
+        ui.plot_control_hand_vel->graph(0)->valueAxis()->setRange(*std::min_element(qhand_vel.begin(), qhand_vel.end()),
+                                                          *std::max_element(qhand_vel.begin(), qhand_vel.end()));
+        ui.plot_control_hand_vel->graph(0)->rescaleAxes();
+        ui.plot_control_hand_vel->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        ui.plot_control_hand_vel->replot();
+    }else{
+        ui.plot_control_hand_vel->plotLayout()->clear();
+        ui.plot_control_hand_vel->clearGraphs();
+    }
+
+}
+
+
 
 
 }  // namespace motion_manager

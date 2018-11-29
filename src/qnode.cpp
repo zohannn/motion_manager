@@ -8741,12 +8741,14 @@ bool QNode::execKinControl(int arm, vector<double> &r_posture, vector<double> &r
         ros::spinOnce();
 
         vrep_common::JointSetStateData data;
-        int exec_mode = 0; // position control
+        int exec_mode = 0;
+        //int exec_mode = 2;
         double exec_value;
         //double time_step = simulationTime - timetot;
         for (int i = 0; i < r_velocities.size(); ++i)
         {
             exec_value = r_posture.at(i) + (r_velocities.at(i)) * simulationTimeStep;
+            //exec_value = r_velocities.at(i);
 
             if(arm!=0){
                 // single-arm
@@ -8791,6 +8793,11 @@ void QNode::stopSim()
     add_client.call(srvstop);
 
 
+}
+
+double QNode::getSimTime()
+{
+    return this->simulationTime;
 }
 
 

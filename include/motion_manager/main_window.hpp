@@ -655,11 +655,6 @@ public Q_SLOTS:
         // Controlling
 
         /**
-         * @brief on_pushButton_move_control_clicked
-         */
-        void on_pushButton_move_control_clicked();
-
-        /**
          * @brief on_pushButton_start_sim_pressed
          */
         void on_pushButton_start_sim_pressed();
@@ -700,6 +695,11 @@ public Q_SLOTS:
         void on_pushButton_stop_control_clicked();
 
         /**
+         * @brief on_pushButton_control_plot_clicked
+         */
+        void on_pushButton_control_plot_clicked();
+
+        /**
          * @brief check_right_hand_status
          * @param state
          */
@@ -710,6 +710,78 @@ public Q_SLOTS:
          * @param state
          */
         void check_const_vel_control(int state);
+
+        /**
+         * @brief check_des_right_hand_pos_x
+         * @param state
+         */
+        void check_des_right_hand_pos_x(int state);
+
+        /**
+         * @brief check_des_right_hand_pos_y
+         * @param state
+         */
+        void check_des_right_hand_pos_y(int state);
+
+        /**
+         * @brief check_des_right_hand_pos_z
+         * @param state
+         */
+        void check_des_right_hand_pos_z(int state);
+
+        /**
+         * @brief check_des_right_hand_or_roll
+         * @param state
+         */
+        void check_des_right_hand_or_roll(int state);
+
+        /**
+         * @brief check_des_right_hand_or_pitch
+         * @param state
+         */
+        void check_des_right_hand_or_pitch(int state);
+
+        /**
+         * @brief check_des_right_hand_or_yaw
+         * @param state
+         */
+        void check_des_right_hand_or_yaw(int state);
+
+        /**
+         * @brief check_des_right_hand_vel_x
+         * @param state
+         */
+        void check_des_right_hand_vel_x(int state);
+
+        /**
+         * @brief check_des_right_hand_vel_y
+         * @param state
+         */
+        void check_des_right_hand_vel_y(int state);
+
+        /**
+         * @brief check_des_right_hand_vel_z
+         * @param state
+         */
+        void check_des_right_hand_vel_z(int state);
+
+        /**
+         * @brief check_des_right_hand_vel_wx
+         * @param state
+         */
+        void check_des_right_hand_vel_wx(int state);
+
+        /**
+         * @brief check_des_right_hand_vel_wy
+         * @param state
+         */
+        void check_des_right_hand_vel_wy(int state);
+
+        /**
+         * @brief check_des_right_hand_vel_wz
+         * @param state
+         */
+        void check_des_right_hand_vel_wz(int state);
 
 
 private:
@@ -1045,6 +1117,16 @@ private:
         void execPosControl();
         boost::thread execVelControl_thrd;
         void execVelControl();
+
+        vector< MatrixXd > jointsVelocity_ctrl; /**< trajectory of the joint velocity during control */
+        vector< MatrixXd > jointsPosition_ctrl; /**< trajectory of the joint position during control */
+        boost::shared_ptr<HandPosPlot> handPosPlot_ctrl_ptr; /**< pointer to the hand position plot during control */
+        vector<vector<double>> handPosition_ctrl; /**< hand position during control. 0=x,1=y,2=z */
+        vector<vector<double>> handOrientation_ctrl; /**< hand orientation during control. 0=roll,1=pitch,2=yaw */
+        vector<vector<double>> handLinearVelocity_ctrl; /**< hand linear velocity during control */
+        vector<vector<double>> handAngularVelocity_ctrl;/**< hand angular velocity during control */
+        vector<double> handVelocityNorm_ctrl; /**< hand velocity norm during control */
+        vector<double> sim_time; /**< simulation time [s]*/
 
 
 

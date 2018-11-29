@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1054,6 +1054,9 @@ p, li { white-space: pre-wrap; }
      </widget>
     </widget>
     <widget class="QWidget" name="tab_learn">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <attribute name="title">
       <string>Learning</string>
      </attribute>
@@ -1729,6 +1732,9 @@ p, li { white-space: pre-wrap; }
      </widget>
     </widget>
     <widget class="QWidget" name="tab_control">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <attribute name="title">
       <string>Controlling</string>
      </attribute>
@@ -1766,6 +1772,9 @@ p, li { white-space: pre-wrap; }
               <property name="text">
                <string>Velocity lin x [mm/s]:</string>
               </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -1784,6 +1793,9 @@ p, li { white-space: pre-wrap; }
               <property name="text">
                <string>Velocity lin y [mm/s]:</string>
               </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -1801,6 +1813,9 @@ p, li { white-space: pre-wrap; }
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_z">
               <property name="text">
                <string>Velocity lin z [mm/s]:</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1824,6 +1839,9 @@ p, li { white-space: pre-wrap; }
               <property name="text">
                <string>Velocity wx [rad/s]:</string>
               </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -1842,6 +1860,9 @@ p, li { white-space: pre-wrap; }
               <property name="text">
                <string>Velocity wy [rad/s]:</string>
               </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -1859,6 +1880,9 @@ p, li { white-space: pre-wrap; }
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_wz">
               <property name="text">
                <string>Velocity wz [rad/s]:</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1907,6 +1931,9 @@ p, li { white-space: pre-wrap; }
               <property name="text">
                <string>Position x [mm]:</string>
               </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -1921,9 +1948,12 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_546">
             <item>
-             <widget class="QCheckBox" name="checkBox_des_right_hand_vel_y_2">
+             <widget class="QCheckBox" name="checkBox_des_right_hand_pos_y">
               <property name="text">
                <string>Position y [mm]:</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1939,9 +1969,12 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_547">
             <item>
-             <widget class="QCheckBox" name="checkBox_des_right_hand_vel_z_2">
+             <widget class="QCheckBox" name="checkBox_des_right_hand_pos_z">
               <property name="text">
                <string>Position z [mm]:</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1965,6 +1998,9 @@ p, li { white-space: pre-wrap; }
               <property name="text">
                <string>Orientation roll [rad]:</string>
               </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -1982,6 +2018,9 @@ p, li { white-space: pre-wrap; }
              <widget class="QCheckBox" name="checkBox_des_right_hand_or_pitch">
               <property name="text">
                <string>Orientation pitch [rad]:</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -2001,6 +2040,9 @@ p, li { white-space: pre-wrap; }
               <property name="text">
                <string>Orientation yaw [rad]:</string>
               </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -2016,7 +2058,7 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -2042,22 +2084,6 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-     </widget>
-     <widget class="QPushButton" name="pushButton_move_control">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>800</x>
-        <y>330</y>
-        <width>71</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Move</string>
-      </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_right_hand_status">
       <property name="geometry">
@@ -11900,6 +11926,105 @@ p, li { white-space: pre-wrap; }
        <attribute name="title">
         <string>Controlling</string>
        </attribute>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>480</y>
+          <width>168</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_297">
+         <item>
+          <widget class="QPushButton" name="pushButton_control_plot">
+           <property name="text">
+            <string>Plot</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_control_save">
+           <property name="text">
+            <string>Save</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>830</x>
+          <y>484</y>
+          <width>401</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_298">
+         <item>
+          <widget class="QPushButton" name="pushButton_control_pos_vel_comps">
+           <property name="text">
+            <string>show position and velocity components</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_control_joints">
+           <property name="text">
+            <string>show joints</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>400</y>
+          <width>201</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_300">
+         <item>
+          <widget class="QLabel" name="label_n_samples">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Number of Samples:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_n_samples_value">
+           <property name="text">
+            <string>10</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>10</y>
+          <width>1221</width>
+          <height>381</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_299">
+         <item>
+          <widget class="QWidget" name="plot_control_hand_pos" native="true"/>
+         </item>
+         <item>
+          <widget class="QCustomPlot" name="plot_control_hand_vel" native="true"/>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </widget>
     </widget>

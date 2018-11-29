@@ -203,6 +203,12 @@ public:
         void stopSim();
 
         /**
+         * @brief getSimTime
+         * @return
+         */
+        double getSimTime();
+
+        /**
          * @brief This is the run() method of the thread
          */
 	void run();

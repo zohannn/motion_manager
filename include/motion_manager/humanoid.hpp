@@ -726,6 +726,14 @@ public:
     void getHandPos(int arm, vector<double>& pos, vector<double>& posture);
 
     /**
+     * @brief getHandOr
+     * @param arm
+     * @param orr
+     * @param posture
+     */
+    void getHandOr(int arm, vector<double>& orr, vector<double>& posture);
+
+    /**
      * @brief getHandPosMes
      * @param arm
      * @param ppos
