@@ -22,7 +22,7 @@
 using namespace Qt;
 using namespace std;
 
-namespace motion_manager {
+namespace motion_manager{
 
 /*****************************************************************************
 ** Implementation [MainWindow]
@@ -99,6 +99,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     // create the warm start results dialog
     mWarmdlg = new WarmStartResultsDialog(this);
     mWarmdlg->setModal(false);
+
+    //create the Results Control Joints dialog
+    mResultsCtrlJointsdlg = new ResultsCtrlJointsDialog(this);
+    mResultsCtrlJointsdlg->setModal(false);
 
     // check boxes
     QObject::connect(this->ui.checkBox_tar_x_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_tar_x_pos_var(int)));

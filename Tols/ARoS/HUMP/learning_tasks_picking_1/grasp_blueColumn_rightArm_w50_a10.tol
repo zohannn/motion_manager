@@ -34,14 +34,12 @@ Hand_tip_2=5
 Hand_tip_3=5
 
 # Joint Expanse factors
-lambda_1=0.99
-
+lambda_1=1
 lambda_2=1
 
 lambda_3=1.0
 
-lambda_4=2
-
+lambda_4=1
 lambda_5=1.0
 
 lambda_6=1.0

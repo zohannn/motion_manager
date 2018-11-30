@@ -29,6 +29,7 @@
 #include "prmdialog.hpp"
 #include "prmstardialog.hpp"
 #include "results_plan_joints_dialog.hpp"
+#include "results_control_joints_dialog.hpp"
 #include "results_warm_start_dialog.hpp"
 #include "power_law_dialog.hpp"
 #include "powerlaw3ddialog.hpp"
@@ -805,6 +806,7 @@ private:
         CompVelocityDialog *mCompVeldlg; /**< handle of the velocity components dlg */
         NatCollAvDialog *mNatCollAvdlg; /**< handle of the natural collision avoidance dlg */
         WarmStartResultsDialog *mWarmdlg; /**< handle of the warm start results dialog */
+        ResultsCtrlJointsDialog *mResultsCtrlJointsdlg;/**< handle of the results joints dlg during control*/
         int scenario_id; /**< id of the current scenario */
         QVector<QString> scenarios;  /**< list of scenarios */
 
@@ -1127,7 +1129,6 @@ private:
         vector<vector<double>> handAngularVelocity_ctrl;/**< hand angular velocity during control */
         vector<double> handVelocityNorm_ctrl; /**< hand velocity norm during control */
         vector<double> sim_time; /**< simulation time [s]*/
-
 
 
 

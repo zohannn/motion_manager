@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ResultsCtrlJointsDialog</class>
+ <widget class="QDialog" name="ResultsCtrlJointsDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1550</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Results of the joints</string>
+  </property>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>30</y>
+     <width>1511</width>
+     <height>721</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QCustomPlot" name="plot_joint_1" native="true"/>
+    </item>
+    <item row="0" column="1">
+     <widget class="QCustomPlot" name="plot_joint_4" native="true"/>
+    </item>
+    <item row="0" column="2">
+     <widget class="QCustomPlot" name="plot_joint_7" native="true"/>
+    </item>
+    <item row="0" column="3">
+     <widget class="QCustomPlot" name="plot_joint_10" native="true"/>
+    </item>
+    <item row="1" column="0">
+     <widget class="QCustomPlot" name="plot_joint_2" native="true"/>
+    </item>
+    <item row="1" column="1">
+     <widget class="QCustomPlot" name="plot_joint_5" native="true"/>
+    </item>
+    <item row="1" column="2">
+     <widget class="QCustomPlot" name="plot_joint_8" native="true"/>
+    </item>
+    <item row="1" column="3">
+     <widget class="QCustomPlot" name="plot_joint_11" native="true"/>
+    </item>
+    <item row="2" column="0">
+     <widget class="QCustomPlot" name="plot_joint_3" native="true"/>
+    </item>
+    <item row="2" column="1">
+     <widget class="QCustomPlot" name="plot_joint_6" native="true"/>
+    </item>
+    <item row="2" column="2">
+     <widget class="QCustomPlot" name="plot_joint_9" native="true"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QPushButton" name="pushButton_save_joints_plots">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>770</y>
+     <width>80</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
