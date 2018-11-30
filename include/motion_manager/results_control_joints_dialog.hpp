@@ -45,37 +45,13 @@ public:
      * @brief setupPlots
      * @param pos
      * @param vel
-     * @param acc
-     * @param timesteps
+     * @param time
      */
-    void setupPlots(vector<MatrixXd> &pos,vector<MatrixXd> &vel,vector<MatrixXd> &acc,vector<vector<double>> &timesteps);
+    void setupPlots(vector<MatrixXd> &pos,vector<MatrixXd> &vel,vector<double> &time);
 
-    /**
-     * @brief setupPlots
-     * @param pos
-     * @param vel
-     * @param acc
-     * @param timesteps
-     */
-    void setupPlots(vector<vector<MatrixXd>> &pos, vector<vector<MatrixXd>> &vel,vector<vector<MatrixXd>> &acc,vector<vector<vector<double>>> &timesteps);
 
-    /**
-     * @brief setDual
-     * @param d
-     */
-    void setDual(bool d);
-
-    /**
-     * @brief setRight
-     * @param r
-     */
-    void setRight(bool r);
 private:
     Ui::ResultsCtrlJointsDialog *ui; /**< handle of the user interface */
-
-    bool dual;
-
-    bool right;
 
     /**
      * @brief plotJoint

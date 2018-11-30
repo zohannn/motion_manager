@@ -784,6 +784,11 @@ public Q_SLOTS:
          */
         void check_des_right_hand_vel_wz(int state);
 
+        /**
+         * @brief on_pushButton_control_plot_joints_clicked
+         */
+        void on_pushButton_control_plot_joints_clicked();
+
 
 private:
         Ui::MainWindowDesign ui; /**< handles of the main user interface */

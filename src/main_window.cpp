@@ -485,7 +485,7 @@ void MainWindow::updateVrepStatus(bool c)
 
 void MainWindow::updateRVizStatus(bool c)
 {
-    if (c){
+    if(c){
         ui.labelRVizComm->setText(QString("on-line"));
         ui.tab_scenario->setEnabled(true);
         ui.groupBox_selectScenario->setEnabled(true);
@@ -8917,6 +8917,14 @@ void MainWindow::check_des_right_hand_vel_wz(int state)
        // checked
        this->ui.lineEdit_des_right_hand_vel_wz->setEnabled(true);
     }
+}
+
+void MainWindow::on_pushButton_control_plot_joints_clicked()
+{
+
+    //if(!this->jointsVelocity_ctrl.empty())
+        //this->mResultsCtrlJointsdlg->setupPlots(this->jointsPosition_ctrl,this->jointsVelocity_ctrl,this->sim_time);
+    this->mResultsCtrlJointsdlg->show();
 }
 
 // -----------------------------------------------------------------------

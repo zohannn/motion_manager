@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -2459,7 +2459,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_results_plan">
        <attribute name="title">
@@ -11963,14 +11963,14 @@ p, li { white-space: pre-wrap; }
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_298">
          <item>
-          <widget class="QPushButton" name="pushButton_control_pos_vel_comps">
+          <widget class="QPushButton" name="pushButton_control_plot_pos_vel_comps">
            <property name="text">
             <string>show position and velocity components</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_control_joints">
+          <widget class="QPushButton" name="pushButton_control_plot_joints">
            <property name="text">
             <string>show joints</string>
            </property>
@@ -12007,7 +12007,7 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>11</x>
