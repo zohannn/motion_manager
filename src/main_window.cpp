@@ -6062,6 +6062,10 @@ void MainWindow::on_pushButton_plan_collect_clicked()
 
                     }
                     data_csv << " \n";
+                    objectPtr obj_tar_or; // the original object involved in the movement
+                    if(mov_type==0){ // reach-to-grasp movement
+                        obj_tar_or = prob->getMovement()->getObject();
+                    }
 
                     for(int i=0;i<trials;++i){
                         solved = false;
@@ -6070,38 +6074,38 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                             qnode.log(QNode::Info,std::string("Trial: ")+to_string(i));
                             std::srand(std::time(NULL));
                             if(mov_type==0){ // reach-to-grasp movement
-                                objectPtr obj_tar = prob->getMovement()->getObject();
+                                objectPtr obj_tar = objectPtr(new Object(*(obj_tar_or.get())));
                                 motion_manager::pos obj_pos;
                                 motion_manager::orient obj_or;
                                 if(this->ui.lineEdit_tar_x_var->isEnabled()){
-                                    obj_pos.Xpos = obj_tar->getPos().Xpos - (tar_x_var/2) + tar_x_var*(rand() / double(RAND_MAX));
+                                    obj_pos.Xpos = obj_tar_or->getPos().Xpos - (tar_x_var/2) + tar_x_var*(rand() / double(RAND_MAX));
                                 }else{
-                                    obj_pos.Xpos = obj_tar->getPos().Xpos;
+                                    obj_pos.Xpos = obj_tar_or->getPos().Xpos;
                                 }
                                 if(this->ui.lineEdit_tar_y_var->isEnabled()){
-                                    obj_pos.Ypos = obj_tar->getPos().Ypos - (tar_y_var/2) + tar_y_var*(rand() / double(RAND_MAX));
+                                    obj_pos.Ypos = obj_tar_or->getPos().Ypos - (tar_y_var/2) + tar_y_var*(rand() / double(RAND_MAX));
                                 }else{
-                                    obj_pos.Ypos = obj_tar->getPos().Ypos;
+                                    obj_pos.Ypos = obj_tar_or->getPos().Ypos;
                                 }
                                 if(this->ui.lineEdit_tar_z_var->isEnabled()){
-                                    obj_pos.Zpos = obj_tar->getPos().Zpos - (tar_z_var/2) + tar_z_var*(rand() / double(RAND_MAX));
+                                    obj_pos.Zpos = obj_tar_or->getPos().Zpos - (tar_z_var/2) + tar_z_var*(rand() / double(RAND_MAX));
                                 }else{
-                                    obj_pos.Zpos = obj_tar->getPos().Zpos;
+                                    obj_pos.Zpos = obj_tar_or->getPos().Zpos;
                                 }
                                 if(this->ui.lineEdit_tar_roll_var->isEnabled()){
-                                    obj_or.roll = obj_tar->getOr().roll - (tar_roll_var/2) + tar_roll_var*(rand() / double(RAND_MAX));
+                                    obj_or.roll = obj_tar_or->getOr().roll - (tar_roll_var/2) + tar_roll_var*(rand() / double(RAND_MAX));
                                 }else{
-                                    obj_or.roll = obj_tar->getOr().roll;
+                                    obj_or.roll = obj_tar_or->getOr().roll;
                                 }
                                 if(this->ui.lineEdit_tar_pitch_var->isEnabled()){
-                                    obj_or.pitch = obj_tar->getOr().pitch - (tar_pitch_var/2) + tar_pitch_var*(rand() / double(RAND_MAX));
+                                    obj_or.pitch = obj_tar_or->getOr().pitch - (tar_pitch_var/2) + tar_pitch_var*(rand() / double(RAND_MAX));
                                 }else{
-                                    obj_or.pitch = obj_tar->getOr().pitch;
+                                    obj_or.pitch = obj_tar_or->getOr().pitch;
                                 }
                                 if(this->ui.lineEdit_tar_yaw_var->isEnabled()){
-                                    obj_or.yaw = obj_tar->getOr().yaw - (tar_yaw_var/2) + tar_yaw_var*(rand() / double(RAND_MAX));
+                                    obj_or.yaw = obj_tar_or->getOr().yaw - (tar_yaw_var/2) + tar_yaw_var*(rand() / double(RAND_MAX));
                                 }else{
-                                    obj_or.yaw = obj_tar->getOr().yaw;
+                                    obj_or.yaw = obj_tar_or->getOr().yaw;
                                 }
                                 obj_tar->setPos(obj_pos,true);
                                 obj_tar->setOr(obj_or,true);

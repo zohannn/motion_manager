@@ -325,7 +325,7 @@ task_1_dataframe = pd.read_csv(data_file,sep=",")
 task_1_dataframe = task_1_dataframe.reindex(np.random.permutation(task_1_dataframe.index))
 
 
-(inputs_dataframe,inputs_cols) = preprocess_features(task_1_dataframe)
+(inputs_dataframe,inputs_cols,null_cols,id_null_cols) = preprocess_features(task_1_dataframe)
 normalized_inputs,normalized_inputs_max,normalized_inputs_min = normalize_linear_scale(inputs_dataframe)
 (outputs_dataframe, null_outputs) = preprocess_targets(task_1_dataframe)
 
