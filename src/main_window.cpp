@@ -326,8 +326,10 @@ void MainWindow::execPosControl()
                 Koeff(5,5) = coeff;
             }else{ Koeff(5,5) = 0.0;}
 
-            vector<double> r_posture; vector<double> r_hand_pos; vector<double> r_hand_or; vector<double> r_hand_vel;
+            vector<double> r_posture; vector<double> r_hand_posture;
+            vector<double> r_hand_pos; vector<double> r_hand_or; vector<double> r_hand_vel;
             this->curr_scene->getHumanoid()->getRightArmPosture(r_posture);
+            this->curr_scene->getHumanoid()->getRightHandPos(r_hand_posture);
             this->curr_scene->getHumanoid()->getHandPos(1,r_hand_pos,r_posture);
             this->curr_scene->getHumanoid()->getHandOr(1,r_hand_or,r_posture);
             this->handPosition_ctrl.push_back(r_hand_pos);
@@ -344,6 +346,23 @@ void MainWindow::execPosControl()
 
             vector<double> r_velocities;
             this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
+            vector<double> r_velocities_mes; vector<double> r_hand_velocities_mes;
+            this->curr_scene->getHumanoid()->getRightArmVelocities(r_velocities_mes);
+            this->curr_scene->getHumanoid()->getRightHandVelocities(r_hand_velocities_mes);
+
+            // record the positions of the joints
+            this->jointsPosition_ctrl.conservativeResize(this->jointsPosition_ctrl.rows()+1,11);
+            for(size_t jj=0; jj < r_posture.size(); ++jj)
+                this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,jj) = r_posture.at(jj);
+            for(size_t jj=0; jj < r_hand_posture.size(); ++jj)
+                this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,r_hand_posture.size()+jj) = r_hand_posture.at(jj);
+
+            // record the velocities of the joints
+            this->jointsVelocity_ctrl.conservativeResize(this->jointsVelocity_ctrl.rows()+1,11);
+            for(size_t jj=0; jj < r_velocities_mes.size(); ++jj)
+                this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,jj) = r_velocities_mes.at(jj);
+            for(size_t jj=0; jj < r_hand_velocities_mes.size(); ++jj)
+                this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,r_hand_velocities_mes.size()+jj) = r_hand_velocities_mes.at(jj);
 
             this->curr_scene->getHumanoid()->getHandVel(1,r_hand_vel,r_posture,r_velocities);
             vector<double> r_hand_lin_vel(r_hand_vel.begin(), r_hand_vel.begin()+3);
@@ -8925,9 +8944,8 @@ void MainWindow::check_des_right_hand_vel_wz(int state)
 
 void MainWindow::on_pushButton_control_plot_joints_clicked()
 {
-
-    //if(!this->jointsVelocity_ctrl.empty())
-        //this->mResultsCtrlJointsdlg->setupPlots(this->jointsPosition_ctrl,this->jointsVelocity_ctrl,this->sim_time);
+    if(this->jointsVelocity_ctrl.rows()!=0)
+        this->mResultsCtrlJointsdlg->setupPlots(this->jointsPosition_ctrl,this->jointsVelocity_ctrl,this->sim_time);
     this->mResultsCtrlJointsdlg->show();
 }
 
@@ -8965,6 +8983,8 @@ void MainWindow::on_pushButton_start_control_clicked()
     this->handLinearVelocity_ctrl.clear();
     this->handAngularVelocity_ctrl.clear();
     this->handVelocityNorm_ctrl.clear();
+    this->jointsPosition_ctrl.resize(0,0);
+    this->jointsVelocity_ctrl.resize(0,0);
     this->sim_time.clear();
     if(!this->ui.checkBox_const_vel_control->isChecked())
     {

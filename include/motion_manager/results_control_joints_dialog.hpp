@@ -43,11 +43,11 @@ public:
 
     /**
      * @brief setupPlots
-     * @param pos
-     * @param vel
+     * @param positions
+     * @param velocities
      * @param time
      */
-    void setupPlots(vector<MatrixXd> &pos,vector<MatrixXd> &vel,vector<double> &time);
+    void setupPlots(MatrixXd &positions,MatrixXd &velocities,vector<double> &time);
 
 
 private:
@@ -60,9 +60,8 @@ private:
      * @param time
      * @param pos
      * @param vel
-     * @param acc
      */
-    void plotJoint(QCustomPlot* plot, QString title, QVector<double>& time, QVector<double>& pos, QVector<double>& vel, QVector<double>& acc);
+    void plotJoint(QCustomPlot* plot, QString title, QVector<double>& time, QVector<double>& pos, QVector<double>& vel);
 };
 
 } // namespace motion_manager

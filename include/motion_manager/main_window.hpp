@@ -1125,8 +1125,8 @@ private:
         boost::thread execVelControl_thrd;
         void execVelControl();
 
-        vector< MatrixXd > jointsVelocity_ctrl; /**< trajectory of the joint velocity during control */
-        vector< MatrixXd > jointsPosition_ctrl; /**< trajectory of the joint position during control */
+        MatrixXd jointsVelocity_ctrl; /**< trajectory of the joint velocity during control */
+        MatrixXd jointsPosition_ctrl; /**< trajectory of the joint position during control */
         boost::shared_ptr<HandPosPlot> handPosPlot_ctrl_ptr; /**< pointer to the hand position plot during control */
         vector<vector<double>> handPosition_ctrl; /**< hand position during control. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_ctrl; /**< hand orientation during control. 0=roll,1=pitch,2=yaw */
