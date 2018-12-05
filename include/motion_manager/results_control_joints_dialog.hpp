@@ -11,9 +11,10 @@
 #include <unistd.h>
 #include <ui_results_control_joints_dialog.h>
 #include <eigen3/Eigen/Dense>
+#include <LowPassFilter.hpp>
 #include "config.hpp"
 
-namespace motion_manager {
+namespace motion_manager{
 
 using namespace std;
 using namespace Eigen;

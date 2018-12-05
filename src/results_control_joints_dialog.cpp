@@ -31,12 +31,17 @@ void ResultsCtrlJointsDialog::setupPlots(MatrixXd &positions, MatrixXd &velociti
     QVector<double> pos_joint10, vel_joint10;
     QVector<double> pos_joint11, vel_joint11;
 
+    double f_th = 0.1; // cutoff frequency in Hz
+    double timestep = 0.05; //discrete timestep in seconds
+    LowPassFilter lpf(f_th, timestep);
+
 
     for(int k=0;k<positions.rows();++k){
         for(int j=0;j < positions.cols();++j){
             if(j==0){// joint 1
                 pos_joint1.push_back(radtodeg*positions(k,j));
-                vel_joint1.push_back(radtodeg*velocities(k,j));
+                vel_joint1.push_back(lpf.update(radtodeg*velocities(k,j)));
+                //vel_joint1.push_back(radtodeg*velocities(k,j));
             }else if(j==1){//joint 2
                 pos_joint2.push_back(radtodeg*positions(k,j));
                 vel_joint2.push_back(radtodeg*velocities(k,j));
@@ -70,6 +75,8 @@ void ResultsCtrlJointsDialog::setupPlots(MatrixXd &positions, MatrixXd &velociti
             }
         }
     }
+
+
     QVector<double> qtime = QVector<double>::fromStdVector(time);
 
 

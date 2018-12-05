@@ -213,6 +213,12 @@ link_directories(
     ${PERSISTENCE1D_HOME}/${CMAKE_BUILD_TYPE}/lib
 )
 
+# ----- Low Pass Filter -------- #
+set(LPF_HOME /home/$ENV{USER}/LowPassFilter)
+include_directories(${LPF_HOME}/include)
+add_library(LPF STATIC IMPORTED)
+set_property(TARGET LPF PROPERTY IMPORTED_LOCATION ${LPF_HOME}/${CMAKE_BUILD_TYPE}/liblow_pass_filter.a)
+
 ##############################################################################
 # Binaries
 ##############################################################################
@@ -250,14 +256,14 @@ endif()
 target_link_libraries(${PROJECT_NAME} qwtplot3d)
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${QT_QTOPENGL_LIBRARY} GLU)
 
-
-
 # -- EigenPCA
 target_link_libraries(${PROJECT_NAME} EigenPCA)
 
 # -- Persistence1D
 target_link_libraries(${PROJECT_NAME} Persistence1D)
 
+# Low Pass Filter
+target_link_libraries(${PROJECT_NAME} LPF)
 
 
 ##############################################################################
