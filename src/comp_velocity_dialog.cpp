@@ -193,8 +193,8 @@ void CompVelocityDialog::on_pushButton_save_shoulder_clicked()
     ui->plot_shoulder_z->savePdf(path+QString("shoulder_vel_z.pdf"),true,0,0,QString(),QString("Shoulder Linear Velocity z"));
     ui->plot_shoulder_lin_vel->savePdf(path+QString("shoulder_lin_vel.pdf"),true,0,0,QString(),QString("Shoulder Linear Velocity Norm"));
     ui->plot_shoulder_wx->savePdf(path+QString("shoulder_vel_wx.pdf"),true,0,0,QString(),QString("Shoulder Angular Velocity x"));
-    ui->plot_shoulder_wy->savePdf(path+QString("shoulder_vel_wy.pdf"),true,0,0,QString(),QString("Shoulder Angular Velocity x"));
-    ui->plot_shoulder_wz->savePdf(path+QString("shoulder_vel_wz.pdf"),true,0,0,QString(),QString("Shoulder Angular Velocity x"));
+    ui->plot_shoulder_wy->savePdf(path+QString("shoulder_vel_wy.pdf"),true,0,0,QString(),QString("Shoulder Angular Velocity y"));
+    ui->plot_shoulder_wz->savePdf(path+QString("shoulder_vel_wz.pdf"),true,0,0,QString(),QString("Shoulder Angular Velocity z"));
     ui->plot_shoulder_ang_vel->savePdf(path+QString("shoulder_ang_vel.pdf"),true,0,0,QString(),QString("Shoulder Angular Velocity Norm"));
 
 }
@@ -249,8 +249,8 @@ void CompVelocityDialog::on_pushButton_save_elbow_clicked()
     ui->plot_elbow_z->savePdf(path+QString("elbow_vel_z.pdf"),true,0,0,QString(),QString("Elbow Linear Velocity z"));
     ui->plot_elbow_lin_vel->savePdf(path+QString("elbow_lin_vel.pdf"),true,0,0,QString(),QString("Elbow Linear Velocity Norm"));
     ui->plot_elbow_wx->savePdf(path+QString("elbow_vel_wx.pdf"),true,0,0,QString(),QString("Elbow Angular Velocity x"));
-    ui->plot_elbow_wy->savePdf(path+QString("elbow_vel_wy.pdf"),true,0,0,QString(),QString("Elbow Angular Velocity x"));
-    ui->plot_elbow_wz->savePdf(path+QString("elbow_vel_wz.pdf"),true,0,0,QString(),QString("Elbow Angular Velocity x"));
+    ui->plot_elbow_wy->savePdf(path+QString("elbow_vel_wy.pdf"),true,0,0,QString(),QString("Elbow Angular Velocity y"));
+    ui->plot_elbow_wz->savePdf(path+QString("elbow_vel_wz.pdf"),true,0,0,QString(),QString("Elbow Angular Velocity z"));
     ui->plot_elbow_ang_vel->savePdf(path+QString("elbow_ang_vel.pdf"),true,0,0,QString(),QString("Elbow Angular Velocity Norm"));
 }
 
@@ -304,8 +304,8 @@ void CompVelocityDialog::on_pushButton_save_wrist_clicked()
     ui->plot_wrist_z->savePdf(path+QString("wrist_vel_z.pdf"),true,0,0,QString(),QString("Wrist Linear Velocity z"));
     ui->plot_wrist_lin_vel->savePdf(path+QString("wrist_lin_vel.pdf"),true,0,0,QString(),QString("Wrist Linear Velocity Norm"));
     ui->plot_wrist_wx->savePdf(path+QString("wrist_vel_wx.pdf"),true,0,0,QString(),QString("Wrist Angular Velocity x"));
-    ui->plot_wrist_wy->savePdf(path+QString("wrist_vel_wy.pdf"),true,0,0,QString(),QString("Wrist Angular Velocity x"));
-    ui->plot_wrist_wz->savePdf(path+QString("wrist_vel_wz.pdf"),true,0,0,QString(),QString("Wrist Angular Velocity x"));
+    ui->plot_wrist_wy->savePdf(path+QString("wrist_vel_wy.pdf"),true,0,0,QString(),QString("Wrist Angular Velocity y"));
+    ui->plot_wrist_wz->savePdf(path+QString("wrist_vel_wz.pdf"),true,0,0,QString(),QString("Wrist Angular Velocity z"));
     ui->plot_wrist_ang_vel->savePdf(path+QString("wrist_ang_vel.pdf"),true,0,0,QString(),QString("Wrist Angular Velocity Norm"));
 }
 
@@ -361,8 +361,8 @@ void CompVelocityDialog::on_pushButton_save_hand_clicked()
     ui->plot_hand_z->savePdf(path+QString("hand_vel_z.pdf"),true,0,0,QString(),QString("Hand Linear Velocity z"));
     ui->plot_hand_lin_vel->savePdf(path+QString("hand_lin_vel.pdf"),true,0,0,QString(),QString("Hand Linear Velocity Norm"));
     ui->plot_hand_wx->savePdf(path+QString("hand_vel_wx.pdf"),true,0,0,QString(),QString("Hand Angular Velocity x"));
-    ui->plot_hand_wy->savePdf(path+QString("hand_vel_wy.pdf"),true,0,0,QString(),QString("Hand Angular Velocity x"));
-    ui->plot_hand_wz->savePdf(path+QString("hand_vel_wz.pdf"),true,0,0,QString(),QString("Hand Angular Velocity x"));
+    ui->plot_hand_wy->savePdf(path+QString("hand_vel_wy.pdf"),true,0,0,QString(),QString("Hand Angular Velocity y"));
+    ui->plot_hand_wz->savePdf(path+QString("hand_vel_wz.pdf"),true,0,0,QString(),QString("Hand Angular Velocity z"));
     ui->plot_hand_ang_vel->savePdf(path+QString("hand_ang_vel.pdf"),true,0,0,QString(),QString("Hand Angular Velocity Norm"));
 
 }

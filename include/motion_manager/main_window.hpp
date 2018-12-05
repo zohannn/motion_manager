@@ -34,6 +34,7 @@
 #include "power_law_dialog.hpp"
 #include "powerlaw3ddialog.hpp"
 #include "comp_velocity_dialog.hpp"
+#include "comp_control_dialog.hpp"
 #include "nat_coll_av_dialog.hpp"
 #include "handposplot.hpp"
 
@@ -656,26 +657,6 @@ public Q_SLOTS:
         // Controlling
 
         /**
-         * @brief on_pushButton_start_sim_pressed
-         */
-        void on_pushButton_start_sim_pressed();
-
-        /**
-         * @brief on_pushButton_start_sim_clicked
-         */
-        void on_pushButton_start_sim_clicked();
-
-        /**
-         * @brief on_pushButton_stop_sim_pressed
-         */
-        void on_pushButton_stop_sim_pressed();
-
-        /**
-         * @brief on_pushButton_stop_sim_clicked
-         */
-        void on_pushButton_stop_sim_clicked();
-
-        /**
          * @brief on_pushButton_start_control_pressed
          */
         void on_pushButton_start_control_pressed();
@@ -699,6 +680,11 @@ public Q_SLOTS:
          * @brief on_pushButton_control_plot_clicked
          */
         void on_pushButton_control_plot_clicked();
+
+        /**
+         * @brief on_pushButton_control_save_clicked
+         */
+        void on_pushButton_control_save_clicked();
 
         /**
          * @brief check_right_hand_status
@@ -789,6 +775,11 @@ public Q_SLOTS:
          */
         void on_pushButton_control_plot_joints_clicked();
 
+        /**
+         * @brief on_pushButton_control_plot_pos_vel_comps_clicked
+         */
+        void on_pushButton_control_plot_pos_vel_comps_clicked();
+
 
 private:
         Ui::MainWindowDesign ui; /**< handles of the main user interface */
@@ -812,6 +803,7 @@ private:
         NatCollAvDialog *mNatCollAvdlg; /**< handle of the natural collision avoidance dlg */
         WarmStartResultsDialog *mWarmdlg; /**< handle of the warm start results dialog */
         ResultsCtrlJointsDialog *mResultsCtrlJointsdlg;/**< handle of the results joints dlg during control*/
+        CompControlDialog *mCompCtrldlg; /** < handle of the components dlg during control */
         int scenario_id; /**< id of the current scenario */
         QVector<QString> scenarios;  /**< list of scenarios */
 
@@ -1128,11 +1120,28 @@ private:
         MatrixXd jointsVelocity_ctrl; /**< trajectory of the joint velocity during control */
         MatrixXd jointsPosition_ctrl; /**< trajectory of the joint position during control */
         boost::shared_ptr<HandPosPlot> handPosPlot_ctrl_ptr; /**< pointer to the hand position plot during control */
+        // hand
         vector<vector<double>> handPosition_ctrl; /**< hand position during control. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_ctrl; /**< hand orientation during control. 0=roll,1=pitch,2=yaw */
         vector<vector<double>> handLinearVelocity_ctrl; /**< hand linear velocity during control */
         vector<vector<double>> handAngularVelocity_ctrl;/**< hand angular velocity during control */
-        vector<double> handVelocityNorm_ctrl; /**< hand velocity norm during control */
+        vector<double> handVelocityNorm_ctrl; /**< hand linear velocity norm during control */
+        // wrist
+        vector<vector<double>> wristPosition_ctrl; /**< wrist position during control. 0=x,1=y,2=z */
+        vector<vector<double>> wristOrientation_ctrl; /**< wrist orientation during control. 0=roll,1=pitch,2=yaw */
+        vector<vector<double>> wristLinearVelocity_ctrl; /**< wrist linear velocity during control */
+        vector<vector<double>> wristAngularVelocity_ctrl;/**< wrist angular velocity during control */
+        // elbow
+        vector<vector<double>> elbowPosition_ctrl; /**< elbow position during control. 0=x,1=y,2=z */
+        vector<vector<double>> elbowOrientation_ctrl; /**< elbow orientation during control. 0=roll,1=pitch,2=yaw */
+        vector<vector<double>> elbowLinearVelocity_ctrl; /**< elbow linear velocity during control */
+        vector<vector<double>> elbowAngularVelocity_ctrl;/**< elbow angular velocity during control */
+        // shoulder
+        vector<vector<double>> shoulderPosition_ctrl; /**< shoulder position during control. 0=x,1=y,2=z */
+        vector<vector<double>> shoulderOrientation_ctrl; /**< shoulder orientation during control. 0=roll,1=pitch,2=yaw */
+        vector<vector<double>> shoulderLinearVelocity_ctrl; /**< shoulder linear velocity during control */
+        vector<vector<double>> shoulderAngularVelocity_ctrl;/**< shoulder angular velocity during control */
+
         vector<double> sim_time; /**< simulation time [s]*/
 
 

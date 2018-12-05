@@ -780,6 +780,22 @@ public:
     double getHandVelNorm(int arm, vector<double>& posture,vector<double>& velocities);
 
     /**
+     * @brief getWristPos
+     * @param arm
+     * @param pos
+     * @param posture
+     */
+    void getWristPos(int arm,vector<double>& pos,vector<double>& posture);
+
+    /**
+     * @brief getWristOr
+     * @param arm
+     * @param orr
+     * @param posture
+     */
+    void getWristOr(int arm,vector<double>& orr,vector<double>& posture);
+
+    /**
      * @brief getWristVel
      * @param arm
      * @param vel
@@ -798,6 +814,22 @@ public:
     double getWristVelNorm(int arm, vector<double>& posture,vector<double>& velocities);
 
     /**
+     * @brief getElbowPos
+     * @param arm
+     * @param pos
+     * @param posture
+     */
+    void getElbowPos(int arm,vector<double>& pos,vector<double>& posture);
+
+    /**
+     * @brief getElbowOr
+     * @param arm
+     * @param orr
+     * @param posture
+     */
+    void getElbowOr(int arm,vector<double>& orr,vector<double>& posture);
+
+    /**
      * @brief getElbowVel
      * @param arm
      * @param vel
@@ -814,6 +846,22 @@ public:
      * @return
      */
     double getElbowVelNorm(int arm,vector<double>& posture,vector<double>& velocities);
+
+    /**
+     * @brief getShoulderPos
+     * @param arm
+     * @param pos
+     * @param posture
+     */
+    void getShoulderPos(int arm,vector<double>& pos,vector<double>& posture);
+
+    /**
+     * @brief getShoulderOr
+     * @param arm
+     * @param orr
+     * @param posture
+     */
+    void getShoulderOr(int arm,vector<double>& orr,vector<double>& posture);
 
     /**
      * @brief getShoulderVel

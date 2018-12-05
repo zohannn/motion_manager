@@ -1580,6 +1580,202 @@ double Humanoid::getHandVelNorm(int arm, vector<double> &posture, vector<double>
     return sqrt(pow(hand_vel.at(0),2)+pow(hand_vel.at(1),2)+pow(hand_vel.at(2),2));
 }
 
+void Humanoid::getWristPos(int arm, vector<double> &pos, vector<double> &posture)
+{
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    vector<double> shoulderPos = vector<double>(6);
+    Matrix3d shoulderOr; vector<double> s_rpy;
+    vector<double> elbowPos = vector<double>(6);
+    Matrix3d elbowOr; vector<double> e_rpy;
+    vector<double> wristPos = vector<double>(6);
+    Matrix3d wristOr; vector<double> w_rpy;
+    vector<double> handPos = vector<double>(6);
+    Matrix3d handOr; vector<double> h_rpy;
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d v;
+        if (i==0){
+            // get the shoulder
+            shoulderOr = T.block(0,0,3,3);
+            this->getRPY(s_rpy,shoulderOr);
+            v = T.block(0,3,3,1);
+            shoulderPos[0] = v[0];
+            shoulderPos[1] = v[1];
+            shoulderPos[2] = v[2];
+            shoulderPos[3] = s_rpy.at(0);
+            shoulderPos[4] = s_rpy.at(1);
+            shoulderPos[5] = s_rpy.at(2);
+        }else if (i==2){
+            // get the elbow
+            elbowOr = T.block(0,0,3,3);
+            this->getRPY(e_rpy,elbowOr);
+            v = T.block(0,3,3,1);
+            elbowPos[0] = v[0];
+            elbowPos[1] = v[1];
+            elbowPos[2] = v[2];
+            elbowPos[3] = e_rpy.at(0);
+            elbowPos[4] = e_rpy.at(1);
+            elbowPos[5] = e_rpy.at(2);
+        }else if (i==4){
+            // get the wrist
+            wristOr = T.block(0,0,3,3);
+            this->getRPY(w_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            wristPos[0] = v[0];
+            wristPos[1] = v[1];
+            wristPos[2] = v[2];
+            wristPos[3] = w_rpy.at(0);
+            wristPos[4] = w_rpy.at(1);
+            wristPos[5] = w_rpy.at(2);
+        } else if (i==6){
+            //get the hand
+            T = T * mat_hand;
+            handOr = T.block(0,0,3,3);
+            this->getRPY(h_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            handPos[0] = v[0];
+            handPos[1] = v[1];
+            handPos[2] = v[2];
+            handPos[3] = h_rpy.at(0);
+            handPos[4] = h_rpy.at(1);
+            handPos[5] = h_rpy.at(2);
+        }
+
+    }
+
+    pos.clear();
+    pos.push_back(wristPos[0]);
+    pos.push_back(wristPos[1]);
+    pos.push_back(wristPos[2]);
+}
+
+void Humanoid::getWristOr(int arm, vector<double> &orr, vector<double> &posture)
+{
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    vector<double> shoulderPos = vector<double>(6);
+    Matrix3d shoulderOr; vector<double> s_rpy;
+    vector<double> elbowPos = vector<double>(6);
+    Matrix3d elbowOr; vector<double> e_rpy;
+    vector<double> wristPos = vector<double>(6);
+    Matrix3d wristOr; vector<double> w_rpy;
+    vector<double> handPos = vector<double>(6);
+    Matrix3d handOr; vector<double> h_rpy;
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d v;
+        if (i==0){
+            // get the shoulder
+            shoulderOr = T.block(0,0,3,3);
+            this->getRPY(s_rpy,shoulderOr);
+            v = T.block(0,3,3,1);
+            shoulderPos[0] = v[0];
+            shoulderPos[1] = v[1];
+            shoulderPos[2] = v[2];
+            shoulderPos[3] = s_rpy.at(0);
+            shoulderPos[4] = s_rpy.at(1);
+            shoulderPos[5] = s_rpy.at(2);
+        }else if (i==2){
+            // get the elbow
+            elbowOr = T.block(0,0,3,3);
+            this->getRPY(e_rpy,elbowOr);
+            v = T.block(0,3,3,1);
+            elbowPos[0] = v[0];
+            elbowPos[1] = v[1];
+            elbowPos[2] = v[2];
+            elbowPos[3] = e_rpy.at(0);
+            elbowPos[4] = e_rpy.at(1);
+            elbowPos[5] = e_rpy.at(2);
+        }else if (i==4){
+            // get the wrist
+            wristOr = T.block(0,0,3,3);
+            this->getRPY(w_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            wristPos[0] = v[0];
+            wristPos[1] = v[1];
+            wristPos[2] = v[2];
+            wristPos[3] = w_rpy.at(0);
+            wristPos[4] = w_rpy.at(1);
+            wristPos[5] = w_rpy.at(2);
+        } else if (i==6){
+            //get the hand
+            T = T * mat_hand;
+            handOr = T.block(0,0,3,3);
+            this->getRPY(h_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            handPos[0] = v[0];
+            handPos[1] = v[1];
+            handPos[2] = v[2];
+            handPos[3] = h_rpy.at(0);
+            handPos[4] = h_rpy.at(1);
+            handPos[5] = h_rpy.at(2);
+        }
+
+    }
+
+    orr.clear();
+    orr.push_back(wristPos[3]);
+    orr.push_back(wristPos[4]);
+    orr.push_back(wristPos[5]);
+}
+
 void Humanoid::getWristVel(int arm, vector<double> &vel, vector<double> &posture, vector<double> &velocities)
 {
     directDiffKinematicsSingleArm(arm,posture,velocities,vel,2);
@@ -1594,6 +1790,202 @@ double Humanoid::getWristVelNorm(int arm, vector<double> &posture, vector<double
     return sqrt(pow(wrist_vel.at(0),2)+pow(wrist_vel.at(1),2)+pow(wrist_vel.at(2),2));
 }
 
+void Humanoid::getElbowPos(int arm, vector<double> &pos, vector<double> &posture)
+{
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    vector<double> shoulderPos = vector<double>(6);
+    Matrix3d shoulderOr; vector<double> s_rpy;
+    vector<double> elbowPos = vector<double>(6);
+    Matrix3d elbowOr; vector<double> e_rpy;
+    vector<double> wristPos = vector<double>(6);
+    Matrix3d wristOr; vector<double> w_rpy;
+    vector<double> handPos = vector<double>(6);
+    Matrix3d handOr; vector<double> h_rpy;
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d v;
+        if (i==0){
+            // get the shoulder
+            shoulderOr = T.block(0,0,3,3);
+            this->getRPY(s_rpy,shoulderOr);
+            v = T.block(0,3,3,1);
+            shoulderPos[0] = v[0];
+            shoulderPos[1] = v[1];
+            shoulderPos[2] = v[2];
+            shoulderPos[3] = s_rpy.at(0);
+            shoulderPos[4] = s_rpy.at(1);
+            shoulderPos[5] = s_rpy.at(2);
+        }else if (i==2){
+            // get the elbow
+            elbowOr = T.block(0,0,3,3);
+            this->getRPY(e_rpy,elbowOr);
+            v = T.block(0,3,3,1);
+            elbowPos[0] = v[0];
+            elbowPos[1] = v[1];
+            elbowPos[2] = v[2];
+            elbowPos[3] = e_rpy.at(0);
+            elbowPos[4] = e_rpy.at(1);
+            elbowPos[5] = e_rpy.at(2);
+        }else if (i==4){
+            // get the wrist
+            wristOr = T.block(0,0,3,3);
+            this->getRPY(w_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            wristPos[0] = v[0];
+            wristPos[1] = v[1];
+            wristPos[2] = v[2];
+            wristPos[3] = w_rpy.at(0);
+            wristPos[4] = w_rpy.at(1);
+            wristPos[5] = w_rpy.at(2);
+        } else if (i==6){
+            //get the hand
+            T = T * mat_hand;
+            handOr = T.block(0,0,3,3);
+            this->getRPY(h_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            handPos[0] = v[0];
+            handPos[1] = v[1];
+            handPos[2] = v[2];
+            handPos[3] = h_rpy.at(0);
+            handPos[4] = h_rpy.at(1);
+            handPos[5] = h_rpy.at(2);
+        }
+
+    }
+
+    pos.clear();
+    pos.push_back(elbowPos[0]);
+    pos.push_back(elbowPos[1]);
+    pos.push_back(elbowPos[2]);
+}
+
+void Humanoid::getElbowOr(int arm, vector<double> &orr, vector<double> &posture)
+{
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    vector<double> shoulderPos = vector<double>(6);
+    Matrix3d shoulderOr; vector<double> s_rpy;
+    vector<double> elbowPos = vector<double>(6);
+    Matrix3d elbowOr; vector<double> e_rpy;
+    vector<double> wristPos = vector<double>(6);
+    Matrix3d wristOr; vector<double> w_rpy;
+    vector<double> handPos = vector<double>(6);
+    Matrix3d handOr; vector<double> h_rpy;
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d v;
+        if (i==0){
+            // get the shoulder
+            shoulderOr = T.block(0,0,3,3);
+            this->getRPY(s_rpy,shoulderOr);
+            v = T.block(0,3,3,1);
+            shoulderPos[0] = v[0];
+            shoulderPos[1] = v[1];
+            shoulderPos[2] = v[2];
+            shoulderPos[3] = s_rpy.at(0);
+            shoulderPos[4] = s_rpy.at(1);
+            shoulderPos[5] = s_rpy.at(2);
+        }else if (i==2){
+            // get the elbow
+            elbowOr = T.block(0,0,3,3);
+            this->getRPY(e_rpy,elbowOr);
+            v = T.block(0,3,3,1);
+            elbowPos[0] = v[0];
+            elbowPos[1] = v[1];
+            elbowPos[2] = v[2];
+            elbowPos[3] = e_rpy.at(0);
+            elbowPos[4] = e_rpy.at(1);
+            elbowPos[5] = e_rpy.at(2);
+        }else if (i==4){
+            // get the wrist
+            wristOr = T.block(0,0,3,3);
+            this->getRPY(w_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            wristPos[0] = v[0];
+            wristPos[1] = v[1];
+            wristPos[2] = v[2];
+            wristPos[3] = w_rpy.at(0);
+            wristPos[4] = w_rpy.at(1);
+            wristPos[5] = w_rpy.at(2);
+        } else if (i==6){
+            //get the hand
+            T = T * mat_hand;
+            handOr = T.block(0,0,3,3);
+            this->getRPY(h_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            handPos[0] = v[0];
+            handPos[1] = v[1];
+            handPos[2] = v[2];
+            handPos[3] = h_rpy.at(0);
+            handPos[4] = h_rpy.at(1);
+            handPos[5] = h_rpy.at(2);
+        }
+
+    }
+
+    orr.clear();
+    orr.push_back(elbowPos[3]);
+    orr.push_back(elbowPos[4]);
+    orr.push_back(elbowPos[5]);
+}
+
 void Humanoid::getElbowVel(int arm, vector<double> &vel, vector<double> &posture, vector<double> &velocities)
 {
     directDiffKinematicsSingleArm(arm,posture,velocities,vel,1);
@@ -1606,6 +1998,203 @@ double Humanoid::getElbowVelNorm(int arm, vector<double> &posture, vector<double
     this->getElbowVel(arm,elbow_vel,posture,velocities);
 
     return sqrt(pow(elbow_vel.at(0),2)+pow(elbow_vel.at(1),2)+pow(elbow_vel.at(2),2));
+}
+
+
+void Humanoid::getShoulderPos(int arm, vector<double> &pos, vector<double> &posture)
+{
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    vector<double> shoulderPos = vector<double>(6);
+    Matrix3d shoulderOr; vector<double> s_rpy;
+    vector<double> elbowPos = vector<double>(6);
+    Matrix3d elbowOr; vector<double> e_rpy;
+    vector<double> wristPos = vector<double>(6);
+    Matrix3d wristOr; vector<double> w_rpy;
+    vector<double> handPos = vector<double>(6);
+    Matrix3d handOr; vector<double> h_rpy;
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d v;
+        if (i==0){
+            // get the shoulder
+            shoulderOr = T.block(0,0,3,3);
+            this->getRPY(s_rpy,shoulderOr);
+            v = T.block(0,3,3,1);
+            shoulderPos[0] = v[0];
+            shoulderPos[1] = v[1];
+            shoulderPos[2] = v[2];
+            shoulderPos[3] = s_rpy.at(0);
+            shoulderPos[4] = s_rpy.at(1);
+            shoulderPos[5] = s_rpy.at(2);
+        }else if (i==2){
+            // get the elbow
+            elbowOr = T.block(0,0,3,3);
+            this->getRPY(e_rpy,elbowOr);
+            v = T.block(0,3,3,1);
+            elbowPos[0] = v[0];
+            elbowPos[1] = v[1];
+            elbowPos[2] = v[2];
+            elbowPos[3] = e_rpy.at(0);
+            elbowPos[4] = e_rpy.at(1);
+            elbowPos[5] = e_rpy.at(2);
+        }else if (i==4){
+            // get the wrist
+            wristOr = T.block(0,0,3,3);
+            this->getRPY(w_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            wristPos[0] = v[0];
+            wristPos[1] = v[1];
+            wristPos[2] = v[2];
+            wristPos[3] = w_rpy.at(0);
+            wristPos[4] = w_rpy.at(1);
+            wristPos[5] = w_rpy.at(2);
+        } else if (i==6){
+            //get the hand
+            T = T * mat_hand;
+            handOr = T.block(0,0,3,3);
+            this->getRPY(h_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            handPos[0] = v[0];
+            handPos[1] = v[1];
+            handPos[2] = v[2];
+            handPos[3] = h_rpy.at(0);
+            handPos[4] = h_rpy.at(1);
+            handPos[5] = h_rpy.at(2);
+        }
+
+    }
+
+    pos.clear();
+    pos.push_back(shoulderPos[0]);
+    pos.push_back(shoulderPos[1]);
+    pos.push_back(shoulderPos[2]);
+}
+
+void Humanoid::getShoulderOr(int arm, vector<double> &orr, vector<double> &posture)
+{
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    vector<double> shoulderPos = vector<double>(6);
+    Matrix3d shoulderOr; vector<double> s_rpy;
+    vector<double> elbowPos = vector<double>(6);
+    Matrix3d elbowOr; vector<double> e_rpy;
+    vector<double> wristPos = vector<double>(6);
+    Matrix3d wristOr; vector<double> w_rpy;
+    vector<double> handPos = vector<double>(6);
+    Matrix3d handOr; vector<double> h_rpy;
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d v;
+        if (i==0){
+            // get the shoulder
+            shoulderOr = T.block(0,0,3,3);
+            this->getRPY(s_rpy,shoulderOr);
+            v = T.block(0,3,3,1);
+            shoulderPos[0] = v[0];
+            shoulderPos[1] = v[1];
+            shoulderPos[2] = v[2];
+            shoulderPos[3] = s_rpy.at(0);
+            shoulderPos[4] = s_rpy.at(1);
+            shoulderPos[5] = s_rpy.at(2);
+        }else if (i==2){
+            // get the elbow
+            elbowOr = T.block(0,0,3,3);
+            this->getRPY(e_rpy,elbowOr);
+            v = T.block(0,3,3,1);
+            elbowPos[0] = v[0];
+            elbowPos[1] = v[1];
+            elbowPos[2] = v[2];
+            elbowPos[3] = e_rpy.at(0);
+            elbowPos[4] = e_rpy.at(1);
+            elbowPos[5] = e_rpy.at(2);
+        }else if (i==4){
+            // get the wrist
+            wristOr = T.block(0,0,3,3);
+            this->getRPY(w_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            wristPos[0] = v[0];
+            wristPos[1] = v[1];
+            wristPos[2] = v[2];
+            wristPos[3] = w_rpy.at(0);
+            wristPos[4] = w_rpy.at(1);
+            wristPos[5] = w_rpy.at(2);
+        } else if (i==6){
+            //get the hand
+            T = T * mat_hand;
+            handOr = T.block(0,0,3,3);
+            this->getRPY(h_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            handPos[0] = v[0];
+            handPos[1] = v[1];
+            handPos[2] = v[2];
+            handPos[3] = h_rpy.at(0);
+            handPos[4] = h_rpy.at(1);
+            handPos[5] = h_rpy.at(2);
+        }
+
+    }
+
+    orr.clear();
+    orr.push_back(shoulderPos[3]);
+    orr.push_back(shoulderPos[4]);
+    orr.push_back(shoulderPos[5]);
 }
 
 void Humanoid::getShoulderVel(int arm, vector<double> &vel, vector<double> &posture, vector<double> &velocities)

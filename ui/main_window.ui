@@ -2098,45 +2098,6 @@ p, li { white-space: pre-wrap; }
        <string>get current right hand status</string>
       </property>
      </widget>
-     <widget class="QGroupBox" name="groupBox_sim">
-      <property name="geometry">
-       <rect>
-        <x>1070</x>
-        <y>470</y>
-        <width>171</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>V-REP Simulation</string>
-      </property>
-      <widget class="QPushButton" name="pushButton_stop_sim">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>30</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Stop</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="pushButton_start_sim">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Start</string>
-       </property>
-      </widget>
-     </widget>
      <widget class="QCheckBox" name="checkBox_const_vel_control">
       <property name="geometry">
        <rect>

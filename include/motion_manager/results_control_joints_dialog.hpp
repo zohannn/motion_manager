@@ -26,6 +26,11 @@ class ResultsCtrlJointsDialog : public QDialog
 public Q_SLOTS:
 
     /**
+     * @brief on_pushButton_plot_clicked
+     */
+    void on_pushButton_plot_clicked();
+
+    /**
      * @brief on_pushButton_save_joints_plots_clicked
      */
     void on_pushButton_save_joints_plots_clicked();
@@ -48,11 +53,15 @@ public:
      * @param velocities
      * @param time
      */
-    void setupPlots(MatrixXd &positions,MatrixXd &velocities,vector<double> &time);
+    void setupPlots(MatrixXd &positions, MatrixXd &velocities, vector<double> &time);
 
 
 private:
     Ui::ResultsCtrlJointsDialog *ui; /**< handle of the user interface */
+
+    MatrixXd positions; /**< positions of the joints */
+    MatrixXd velocities; /**< velocities of the joints */
+    vector<double> time; /**< elapsed time */
 
     /**
      * @brief plotJoint

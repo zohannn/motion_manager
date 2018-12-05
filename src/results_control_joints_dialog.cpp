@@ -17,82 +17,9 @@ ResultsCtrlJointsDialog::~ResultsCtrlJointsDialog()
 
 void ResultsCtrlJointsDialog::setupPlots(MatrixXd &positions, MatrixXd &velocities, vector<double> &time)
 {
-    const double radtodeg = 180.0/static_cast<double>(M_PI);
-
-    QVector<double> pos_joint1, vel_joint1;
-    QVector<double> pos_joint2, vel_joint2;
-    QVector<double> pos_joint3, vel_joint3;
-    QVector<double> pos_joint4, vel_joint4;
-    QVector<double> pos_joint5, vel_joint5;
-    QVector<double> pos_joint6, vel_joint6;
-    QVector<double> pos_joint7, vel_joint7;
-    QVector<double> pos_joint8, vel_joint8;
-    QVector<double> pos_joint9, vel_joint9;
-    QVector<double> pos_joint10, vel_joint10;
-    QVector<double> pos_joint11, vel_joint11;
-
-    double f_th = 0.1; // cutoff frequency in Hz
-    double timestep = 0.05; //discrete timestep in seconds
-    LowPassFilter lpf(f_th, timestep);
-
-
-    for(int k=0;k<positions.rows();++k){
-        for(int j=0;j < positions.cols();++j){
-            if(j==0){// joint 1
-                pos_joint1.push_back(radtodeg*positions(k,j));
-                vel_joint1.push_back(lpf.update(radtodeg*velocities(k,j)));
-                //vel_joint1.push_back(radtodeg*velocities(k,j));
-            }else if(j==1){//joint 2
-                pos_joint2.push_back(radtodeg*positions(k,j));
-                vel_joint2.push_back(radtodeg*velocities(k,j));
-            }else if(j==2){//joint 3
-                pos_joint3.push_back(radtodeg*positions(k,j));
-                vel_joint3.push_back(radtodeg*velocities(k,j));
-            }else if(j==3){//joint 4
-                pos_joint4.push_back(radtodeg*positions(k,j));
-                vel_joint4.push_back(radtodeg*velocities(k,j));
-            }else if(j==4){//joint 5
-                pos_joint5.push_back(radtodeg*positions(k,j));
-                vel_joint5.push_back(radtodeg*velocities(k,j));
-            }else if(j==5){//joint 6
-                pos_joint6.push_back(radtodeg*positions(k,j));
-                vel_joint6.push_back(radtodeg*velocities(k,j));
-            }else if(j==6){//joint 7
-                pos_joint7.push_back(radtodeg*positions(k,j));
-                vel_joint7.push_back(radtodeg*velocities(k,j));
-            }else if(j==7){//joint 8
-                pos_joint8.push_back(radtodeg*positions(k,j));
-                vel_joint8.push_back(radtodeg*velocities(k,j));
-            }else if(j==8){//joint 9
-                pos_joint9.push_back(radtodeg*positions(k,j));
-                vel_joint9.push_back(radtodeg*velocities(k,j));
-            }else if(j==9){//joint 10
-                pos_joint10.push_back(radtodeg*positions(k,j));
-                vel_joint10.push_back(radtodeg*velocities(k,j));
-            }else if(j==10){//joint 11
-                pos_joint11.push_back(radtodeg*positions(k,j));
-                vel_joint11.push_back(radtodeg*velocities(k,j));
-            }
-        }
-    }
-
-
-    QVector<double> qtime = QVector<double>::fromStdVector(time);
-
-
-    plotJoint(ui->plot_joint_1,QString("Joint 1"),qtime,pos_joint1,vel_joint1); // plot joint 1
-    plotJoint(ui->plot_joint_2,QString("Joint 2"),qtime,pos_joint2,vel_joint2); // plot joint 2
-    plotJoint(ui->plot_joint_3,QString("Joint 3"),qtime,pos_joint3,vel_joint3); // plot joint 3
-    plotJoint(ui->plot_joint_4,QString("Joint 4"),qtime,pos_joint4,vel_joint4); // plot joint 4
-    plotJoint(ui->plot_joint_5,QString("Joint 5"),qtime,pos_joint5,vel_joint5); // plot joint 5
-    plotJoint(ui->plot_joint_6,QString("Joint 6"),qtime,pos_joint6,vel_joint6); // plot joint 6
-    plotJoint(ui->plot_joint_7,QString("Joint 7"),qtime,pos_joint7,vel_joint7); // plot joint 7
-    plotJoint(ui->plot_joint_8,QString("Joint 8"),qtime,pos_joint8,vel_joint8); // plot joint 8
-    plotJoint(ui->plot_joint_9,QString("Joint 9"),qtime,pos_joint9,vel_joint9); // plot joint 9
-    plotJoint(ui->plot_joint_10,QString("Joint 10"),qtime,pos_joint10,vel_joint10); // plot joint 10
-    plotJoint(ui->plot_joint_11,QString("Joint 11"),qtime,pos_joint11,vel_joint11); // plot joint 11
-
-
+    this->positions = positions.replicate(1,1);
+    this->velocities = velocities.replicate(1,1);
+    this->time = time;
 }
 
 void ResultsCtrlJointsDialog::plotJoint(QCustomPlot *plot, QString title, QVector<double> &time, QVector<double> &pos, QVector<double> &vel)
@@ -167,6 +94,94 @@ void ResultsCtrlJointsDialog::plotJoint(QCustomPlot *plot, QString title, QVecto
 
 // Q_SLOTS
 
+void ResultsCtrlJointsDialog::on_pushButton_plot_clicked()
+{
+    const double radtodeg = 180.0/static_cast<double>(M_PI);
+
+    double f_th = this->ui->lineEdit_f_cutoff->text().toDouble();
+    double timestep = this->ui->lineEdit_time_step->text().toDouble();
+
+    QVector<double> pos_joint1, vel_joint1;
+    QVector<double> pos_joint2, vel_joint2;
+    QVector<double> pos_joint3, vel_joint3;
+    QVector<double> pos_joint4, vel_joint4;
+    QVector<double> pos_joint5, vel_joint5;
+    QVector<double> pos_joint6, vel_joint6;
+    QVector<double> pos_joint7, vel_joint7;
+    QVector<double> pos_joint8, vel_joint8;
+    QVector<double> pos_joint9, vel_joint9;
+    QVector<double> pos_joint10, vel_joint10;
+    QVector<double> pos_joint11, vel_joint11;
+
+    LowPassFilter lpf_vel_1(f_th, timestep);
+    LowPassFilter lpf_vel_2(f_th, timestep);
+    LowPassFilter lpf_vel_3(f_th, timestep);
+    LowPassFilter lpf_vel_4(f_th, timestep);
+    LowPassFilter lpf_vel_5(f_th, timestep);
+    LowPassFilter lpf_vel_6(f_th, timestep);
+    LowPassFilter lpf_vel_7(f_th, timestep);
+    LowPassFilter lpf_vel_8(f_th, timestep);
+    LowPassFilter lpf_vel_9(f_th, timestep);
+    LowPassFilter lpf_vel_10(f_th, timestep);
+    LowPassFilter lpf_vel_11(f_th, timestep);
+
+
+    for(int k=0;k<positions.rows();++k){
+        for(int j=0;j < positions.cols();++j){
+            if(j==0){// joint 1
+                pos_joint1.push_back(radtodeg*positions(k,j));
+                vel_joint1.push_back(lpf_vel_1.update(radtodeg*velocities(k,j)));
+            }else if(j==1){//joint 2
+                pos_joint2.push_back(radtodeg*positions(k,j));
+                vel_joint2.push_back(lpf_vel_2.update(radtodeg*velocities(k,j)));
+            }else if(j==2){//joint 3
+                pos_joint3.push_back(radtodeg*positions(k,j));
+                vel_joint3.push_back(lpf_vel_3.update(radtodeg*velocities(k,j)));
+            }else if(j==3){//joint 4
+                pos_joint4.push_back(radtodeg*positions(k,j));
+                vel_joint4.push_back(lpf_vel_4.update(radtodeg*velocities(k,j)));
+            }else if(j==4){//joint 5
+                pos_joint5.push_back(radtodeg*positions(k,j));
+                vel_joint5.push_back(lpf_vel_5.update(radtodeg*velocities(k,j)));
+            }else if(j==5){//joint 6
+                pos_joint6.push_back(radtodeg*positions(k,j));
+                vel_joint6.push_back(lpf_vel_6.update(radtodeg*velocities(k,j)));
+            }else if(j==6){//joint 7
+                pos_joint7.push_back(radtodeg*positions(k,j));
+                vel_joint7.push_back(lpf_vel_7.update(radtodeg*velocities(k,j)));
+            }else if(j==7){//joint 8
+                pos_joint8.push_back(radtodeg*positions(k,j));
+                vel_joint8.push_back(lpf_vel_8.update(radtodeg*velocities(k,j)));
+            }else if(j==8){//joint 9
+                pos_joint9.push_back(radtodeg*positions(k,j));
+                vel_joint9.push_back(lpf_vel_9.update(radtodeg*velocities(k,j)));
+            }else if(j==9){//joint 10
+                pos_joint10.push_back(radtodeg*positions(k,j));
+                vel_joint10.push_back(lpf_vel_10.update(radtodeg*velocities(k,j)));
+            }else if(j==10){//joint 11
+                pos_joint11.push_back(radtodeg*positions(k,j));
+                vel_joint11.push_back(lpf_vel_11.update(radtodeg*velocities(k,j)));
+            }
+        }
+    }
+
+
+    QVector<double> qtime = QVector<double>::fromStdVector(time);
+
+
+    plotJoint(ui->plot_joint_1,QString("Joint 1"),qtime,pos_joint1,vel_joint1); // plot joint 1
+    plotJoint(ui->plot_joint_2,QString("Joint 2"),qtime,pos_joint2,vel_joint2); // plot joint 2
+    plotJoint(ui->plot_joint_3,QString("Joint 3"),qtime,pos_joint3,vel_joint3); // plot joint 3
+    plotJoint(ui->plot_joint_4,QString("Joint 4"),qtime,pos_joint4,vel_joint4); // plot joint 4
+    plotJoint(ui->plot_joint_5,QString("Joint 5"),qtime,pos_joint5,vel_joint5); // plot joint 5
+    plotJoint(ui->plot_joint_6,QString("Joint 6"),qtime,pos_joint6,vel_joint6); // plot joint 6
+    plotJoint(ui->plot_joint_7,QString("Joint 7"),qtime,pos_joint7,vel_joint7); // plot joint 7
+    plotJoint(ui->plot_joint_8,QString("Joint 8"),qtime,pos_joint8,vel_joint8); // plot joint 8
+    plotJoint(ui->plot_joint_9,QString("Joint 9"),qtime,pos_joint9,vel_joint9); // plot joint 9
+    plotJoint(ui->plot_joint_10,QString("Joint 10"),qtime,pos_joint10,vel_joint10); // plot joint 10
+    plotJoint(ui->plot_joint_11,QString("Joint 11"),qtime,pos_joint11,vel_joint11); // plot joint 11
+
+}
 
 void ResultsCtrlJointsDialog::on_pushButton_save_joints_plots_clicked()
 {
