@@ -1320,6 +1320,97 @@ double Humanoid::getLeftHandVelNorm()
     return sqrt(pow(hand_vel.at(0),2)+pow(hand_vel.at(1),2)+pow(hand_vel.at(2),2));
 }
 
+void Humanoid::getAllPos(int arm, vector<double> &hand_pos, vector<double> &wrist_pos, vector<double> &elbow_pos, vector<double> &shoulder_pos, vector<double> &posture)
+{
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    shoulder_pos.clear();
+    Matrix3d shoulderOr; vector<double> s_rpy;
+    elbow_pos.clear();
+    Matrix3d elbowOr; vector<double> e_rpy;
+    wrist_pos.clear();
+    Matrix3d wristOr; vector<double> w_rpy;
+    hand_pos.clear();
+    Matrix3d handOr; vector<double> h_rpy;
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d v;
+        if (i==0){
+            // get the shoulder
+            shoulderOr = T.block(0,0,3,3);
+            this->getRPY(s_rpy,shoulderOr);
+            v = T.block(0,3,3,1);
+            shoulder_pos.push_back(v[0]);
+            shoulder_pos.push_back(v[1]);
+            shoulder_pos.push_back(v[2]);
+            shoulder_pos.push_back(s_rpy.at(0));
+            shoulder_pos.push_back(s_rpy.at(1));
+            shoulder_pos.push_back(s_rpy.at(2));
+        }else if (i==2){
+            // get the elbow
+            elbowOr = T.block(0,0,3,3);
+            this->getRPY(e_rpy,elbowOr);
+            v = T.block(0,3,3,1);
+            elbow_pos.push_back(v[0]);
+            elbow_pos.push_back(v[1]);
+            elbow_pos.push_back(v[2]);
+            elbow_pos.push_back(e_rpy.at(0));
+            elbow_pos.push_back(e_rpy.at(1));
+            elbow_pos.push_back(e_rpy.at(2));
+        }else if (i==4){
+            // get the wrist
+            wristOr = T.block(0,0,3,3);
+            this->getRPY(w_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            wrist_pos.push_back(v[0]);
+            wrist_pos.push_back(v[1]);
+            wrist_pos.push_back(v[2]);
+            wrist_pos.push_back(w_rpy.at(0));
+            wrist_pos.push_back(w_rpy.at(1));
+            wrist_pos.push_back(w_rpy.at(2));
+        } else if (i==6){
+            //get the hand
+            T = T * mat_hand;
+            handOr = T.block(0,0,3,3);
+            this->getRPY(h_rpy,wristOr);
+            v = T.block(0,3,3,1);
+            hand_pos.push_back(v[0]);
+            hand_pos.push_back(v[1]);
+            hand_pos.push_back(v[2]);
+            hand_pos.push_back(h_rpy.at(0));
+            hand_pos.push_back(h_rpy.at(1));
+            hand_pos.push_back(h_rpy.at(2));
+        }
+    }
+}
 
 void Humanoid::getHandPos(int arm, vector<double> &pos, vector<double> &posture)
 {
@@ -1564,6 +1655,158 @@ void Humanoid::setHandVelMes(int arm, vector<double> &vel)
         this->leftHandVel_mes = vel;
         break;
     }
+}
+
+void Humanoid::getAllVel(int arm, vector<double> &hand_vel, vector<double> &wrist_vel, vector<double> &elbow_vel, vector<double> &shoulder_vel, vector<double> &posture, vector<double> &velocities)
+{
+    VectorXd joint_velocities;
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    MatrixXd JacobianArm(6,JOINTS_ARM);
+
+    Vector3d pos0;
+    Vector3d z0;
+    Vector3d pos1;
+    Vector3d z1;
+    Vector3d pos2;
+    Vector3d z2;
+    Vector3d pos3;
+    Vector3d z3;
+    Vector3d pos4;
+    Vector3d z4;
+    Vector3d pos5;
+    Vector3d z5;
+    Vector3d pos6;
+    Vector3d z6;
+
+    vector<double> handPos; Vector3d pos_hand;
+    this->getHandPos(arm,handPos,posture);
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+    pos_hand << handPos.at(0), handPos.at(1), handPos.at(2);
+    joint_velocities.resize(velocities.size());
+
+    for (int i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d diff;
+        Vector3d cross;
+        Vector3d zi;
+        switch(i){
+        case 0:
+            z0 = T.block(0,2,3,1);
+            pos0 = T.block(0,3,3,1);
+            diff = pos_hand - pos0;
+            cross = z0.cross(diff);
+            zi=z0;
+            break;
+        case 1:
+            z1 = T.block(0,2,3,1);
+            pos1 = T.block(0,3,3,1);
+            diff = pos_hand - pos1;
+            cross = z1.cross(diff);
+            zi=z1;
+            break;
+        case 2:
+            z2 = T.block(0,2,3,1);
+            pos2 = T.block(0,3,3,1);
+            diff = pos_hand - pos2;
+            cross = z2.cross(diff);
+            zi=z2;
+            break;
+        case 3:
+            z3 = T.block(0,2,3,1);
+            pos3 = T.block(0,3,3,1);
+            diff = pos_hand - pos3;
+            cross = z3.cross(diff);
+            zi=z3;
+            break;
+        case 4:
+            z4 = T.block(0,2,3,1);
+            pos4 = T.block(0,3,3,1);
+            diff = pos_hand - pos4;
+            cross = z4.cross(diff);
+            zi=z4;
+            break;
+        case 5:
+            z5 = T.block(0,2,3,1);
+            pos5 = T.block(0,3,3,1);
+            diff = pos_hand - pos5;
+            cross = z5.cross(diff);
+            zi=z5;
+            break;
+        case 6:
+            z6 = T.block(0,2,3,1);
+            pos6 = T.block(0,3,3,1);
+            diff = pos_hand - pos6;
+            cross = z6.cross(diff);
+            zi=z6;
+            break;
+        }
+        VectorXd column(6); column << cross, zi;
+        JacobianArm.col(i) = column;
+        joint_velocities(i) = velocities.at(i);
+    }
+
+    MatrixXd Jac_tmp; VectorXd joint_vel_tmp;
+    // shoulder velocity
+    Jac_tmp = JacobianArm.block<6,2>(0,0);
+    joint_vel_tmp = joint_velocities.block<2,1>(0,0);
+    VectorXd shoulder_vel_xd = Jac_tmp*joint_vel_tmp;
+    // elbow velocity
+    Jac_tmp = JacobianArm.block<6,4>(0,0);
+    joint_vel_tmp = joint_velocities.block<4,1>(0,0);
+    VectorXd elbow_vel_xd = Jac_tmp*joint_vel_tmp;
+    // wrist velocity
+    Jac_tmp = JacobianArm.block<6,6>(0,0);
+    joint_vel_tmp = joint_velocities.block<6,1>(0,0);
+    VectorXd wrist_vel_xd = Jac_tmp*joint_vel_tmp;
+    // hand velocity
+    VectorXd hand_vel_xd = JacobianArm*joint_velocities;
+
+    // shoulder
+    shoulder_vel.clear();
+    shoulder_vel.resize(shoulder_vel_xd.size());
+    VectorXd::Map(&shoulder_vel[0], shoulder_vel_xd.size()) = shoulder_vel_xd;
+
+    // elbow
+    elbow_vel.clear();
+    elbow_vel.resize(elbow_vel_xd.size());
+    VectorXd::Map(&elbow_vel[0], elbow_vel_xd.size()) = elbow_vel_xd;
+
+    // wrist
+    wrist_vel.clear();
+    wrist_vel.resize(wrist_vel_xd.size());
+    VectorXd::Map(&wrist_vel[0], wrist_vel_xd.size()) = wrist_vel_xd;
+
+    // hand
+    hand_vel.clear();
+    hand_vel.resize(hand_vel_xd.size());
+    VectorXd::Map(&hand_vel[0], hand_vel_xd.size()) = hand_vel_xd;
 }
 
 void Humanoid::getHandVel(int arm, vector<double> &vel, vector<double> &posture, vector<double> &velocities)

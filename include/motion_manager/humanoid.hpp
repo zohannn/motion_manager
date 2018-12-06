@@ -716,6 +716,16 @@ public:
      */
     double getLeftHandVelNorm();
 
+    /**
+     * @brief getAllPos
+     * @param arm
+     * @param hand_pos
+     * @param wrist_pos
+     * @param elbow_pos
+     * @param shoulder_pos
+     * @param posture
+     */
+    void getAllPos(int arm, vector<double>& hand_pos, vector<double>& wrist_pos, vector<double>& elbow_pos, vector<double>& shoulder_pos, vector<double>& posture);
 
     /**
      * @brief getHandPos
@@ -746,6 +756,18 @@ public:
      * @param ppos
      */
     void setHandPosMes(int arm, vector<double>& ppos);
+
+    /**
+     * @brief getAllVel
+     * @param arm
+     * @param hand_vel
+     * @param wrist_vel
+     * @param elbow_vel
+     * @param shoulder_vel
+     * @param posture
+     * @param velocities
+     */
+    void getAllVel(int arm, vector<double>& hand_vel, vector<double>& wrist_vel, vector<double>& elbow_vel, vector<double>& shoulder_vel, vector<double>& posture,vector<double>& velocities);
 
     /**
      * @brief getHandVel
