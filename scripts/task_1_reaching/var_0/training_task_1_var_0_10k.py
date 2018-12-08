@@ -855,11 +855,11 @@ if not outputs_xf_plan_df.empty:
                                                                 coeff=coeff_xf_plan,
                                                                 degree=degree_xf_plan,
                                                                 epsilon=epsilon_xf_plan,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_examples=training_examples,
                                                                 training_targets=training_targets.iloc[:,0:ldim],
                                                                 model_dir=dir_path_xf_plan + "/cluster"+repr(i)+"/svm")
 
-                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = svm_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -913,11 +913,11 @@ if not outputs_xf_plan_df.empty:
                     (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_xf_plan,
                                                                 weights = weights_xf_plan,
                                                                 algorithm = algorithm_xf_plan,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_examples=training_examples,
                                                                 training_targets=training_targets.iloc[:,0:ldim],
                                                                 model_dir=dir_path_xf_plan + "/cluster"+repr(i)+"/knn")
 
-                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = knn_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -1445,11 +1445,11 @@ if not outputs_zf_L_plan_df.empty:
                                                                 coeff=coeff_zf_L_plan,
                                                                 degree=degree_zf_L_plan,
                                                                 epsilon=epsilon_zf_L_plan,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_examples=training_examples,
                                                                 training_targets=training_targets.iloc[:,0:ldim],
                                                                 model_dir=dir_path_zf_L_plan + "/cluster"+repr(i)+"/svm")
 
-                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = svm_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -1507,11 +1507,11 @@ if not outputs_zf_L_plan_df.empty:
                     (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zf_L_plan,
                                                                 weights = weights_zf_L_plan,
                                                                 algorithm = algorithm_zf_L_plan,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_examples=training_examples,
                                                                 training_targets=training_targets.iloc[:,0:ldim],
                                                                 model_dir=dir_path_zf_L_plan + "/cluster"+repr(i)+"/knn")
 
-                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = knn_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -2045,11 +2045,11 @@ if not outputs_zf_U_plan_df.empty:
                                                                 coeff=coeff_zf_U_plan,
                                                                 degree=degree_zf_U_plan,
                                                                 epsilon=epsilon_zf_U_plan,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_examples=training_examples,
                                                                 training_targets=training_targets.iloc[:,0:ldim],
                                                                 model_dir=dir_path_zf_U_plan + "/cluster"+repr(i)+"/svm")
 
-                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = svm_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -2106,11 +2106,11 @@ if not outputs_zf_U_plan_df.empty:
                     (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zf_U_plan,
                                                                 weights = weights_zf_U_plan,
                                                                 algorithm = algorithm_zf_U_plan,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_examples=training_examples,
                                                                 training_targets=training_targets.iloc[:,0:ldim],
                                                                 model_dir=dir_path_zf_U_plan + "/cluster"+repr(i)+"/knn")
 
-                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = knn_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -2653,11 +2653,11 @@ if not outputs_dual_f_plan_df.empty:
                                                                     coeff=coeff_dual_f_plan,
                                                                     degree=degree_dual_f_plan,
                                                                     epsilon=epsilon_dual_f_plan,
-                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_examples=training_examples,
                                                                     training_targets=training_targets.iloc[:,0:ldim],
                                                                     model_dir=dir_path_dual_f_plan + "/cluster"+repr(i)+"/svm")
 
-                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = svm_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -2714,11 +2714,11 @@ if not outputs_dual_f_plan_df.empty:
                     (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_dual_f_plan,
                                                                 weights = weights_dual_f_plan,
                                                                 algorithm = algorithm_dual_f_plan,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_examples=training_examples,
                                                                 training_targets=training_targets.iloc[:,0:ldim],
                                                                 model_dir=dir_path_dual_f_plan + "/cluster"+repr(i)+"/knn")
 
-                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = knn_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -3256,11 +3256,11 @@ if not outputs_x_bounce_df.empty:
                                                                     coeff=coeff_x_bounce,
                                                                     degree=degree_x_bounce,
                                                                     epsilon=epsilon_x_bounce,
-                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_examples=training_examples,
                                                                     training_targets=training_targets.iloc[:,0:ldim],
                                                                     model_dir=dir_path_x_bounce + "/cluster"+repr(i)+"/svm")
 
-                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = svm_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -3314,11 +3314,11 @@ if not outputs_x_bounce_df.empty:
                     (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_x_bounce,
                                                                 weights = weights_x_bounce,
                                                                 algorithm = algorithm_x_bounce,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_examples=training_examples,
                                                                 training_targets=training_targets.iloc[:,0:ldim],
                                                                 model_dir=dir_path_x_bounce + "/cluster"+repr(i)+"/knn")
 
-                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = knn_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -3829,11 +3829,11 @@ if not outputs_zb_L_df.empty:
                                                                     coeff=coeff_zb_L,
                                                                     degree=degree_zb_L,
                                                                     epsilon=epsilon_zb_L,
-                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_examples=training_examples,
                                                                     training_targets=training_targets.iloc[:,0:ldim],
                                                                     model_dir=dir_path_zb_L + "/cluster"+repr(i)+"/svm")
 
-                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = svm_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -3890,11 +3890,11 @@ if not outputs_zb_L_df.empty:
                     (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zb_L,
                                                                 weights = weights_zb_L,
                                                                 algorithm = algorithm_zb_L,
-                                                                training_examples=training_examples.iloc[:,0:ldim],
+                                                                training_examples=training_examples,
                                                                 training_targets=training_targets.iloc[:,0:ldim],
                                                                 model_dir=dir_path_zb_L + "/cluster"+repr(i)+"/knn")
 
-                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = knn_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -4413,11 +4413,11 @@ if not outputs_zb_U_df.empty:
                                                                     coeff=coeff_zb_U,
                                                                     degree=degree_zb_U,
                                                                     epsilon=epsilon_zb_U,
-                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_examples=training_examples,
                                                                     training_targets=training_targets.iloc[:,0:ldim],
                                                                     model_dir=dir_path_zb_U + "/cluster"+repr(i)+"/svm")
 
-                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = svm_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -4473,11 +4473,11 @@ if not outputs_zb_U_df.empty:
                     (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_zb_U,
                                                                     weights = weights_zb_U,
                                                                     algorithm = algorithm_zb_U,
-                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_examples=training_examples,
                                                                     training_targets=training_targets.iloc[:,0:ldim],
                                                                     model_dir=dir_path_zb_U + "/cluster"+repr(i)+"/knn")
 
-                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = knn_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -5026,11 +5026,11 @@ if not outputs_dual_bounce_df.empty:
                                                                     coeff=coeff_dual_bounce,
                                                                     degree=degree_dual_bounce,
                                                                     epsilon=epsilon_dual_bounce,
-                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_examples=training_examples,
                                                                     training_targets=training_targets.iloc[:,0:ldim],
                                                                     model_dir=dir_path_dual_bounce + "/cluster"+repr(i)+"/svm")
 
-                    test_predictions_2 = svm_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = svm_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
@@ -5086,11 +5086,11 @@ if not outputs_dual_bounce_df.empty:
                     (knn_regressor, r2) = train_knn_regressor_model(n_neighbors = n_neighbors_dual_bounce,
                                                                     weights = weights_dual_bounce,
                                                                     algorithm = algorithm_dual_bounce,
-                                                                    training_examples=training_examples.iloc[:,0:ldim],
+                                                                    training_examples=training_examples,
                                                                     training_targets=training_targets.iloc[:,0:ldim],
                                                                     model_dir=dir_path_dual_bounce + "/cluster"+repr(i)+"/knn")
 
-                    test_predictions_2 = knn_regressor.predict(test_examples.iloc[:,0:ldim])
+                    test_predictions_2 = knn_regressor.predict(test_examples)
                     #print(test_predictions_2)
                     test_predictions_df_2 = pd.DataFrame(data=test_predictions_2[0:, 0:],  # values
                                                          index=test_examples.index,
