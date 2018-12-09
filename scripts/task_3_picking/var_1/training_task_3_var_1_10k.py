@@ -117,9 +117,9 @@ train_dual_f_retreat_class = False
 dir_path_dual_f_retreat = models_dir + "/dual_f_retreat"
 
 # bounce
-print_en_x_bounce = True
-train_x_bounce = True
-train_x_bounce_class = True
+print_en_x_bounce = False
+train_x_bounce = False
+train_x_bounce_class = False
 dir_path_x_bounce = models_dir + "/x_bounce"
 
 print_en_zb_L = False
@@ -132,8 +132,8 @@ train_zb_U = False
 train_zb_U_class = False
 dir_path_zb_U = models_dir + "/zb_U"
 
-print_en_dual_bounce = False
-train_dual_bounce = False
+print_en_dual_bounce = True
+train_dual_bounce = True
 train_dual_bounce_class = False
 dir_path_dual_bounce = models_dir + "/dual_bounce"
 

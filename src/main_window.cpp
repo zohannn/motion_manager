@@ -6670,6 +6670,11 @@ void MainWindow::on_pushButton_pred_plan_clicked()
             this->ui.tabWidget_learning_res->setTabEnabled(0,true);
             this->ui.tabWidget_learning_res->setTabEnabled(1,false);
             this->ui.tabWidget_learning_res->setTabEnabled(2,false);
+            this->ui.tabWidget_learning_res->setTabEnabled(3,true);        
+        }else{
+            this->ui.tabWidget_learning_res->setTabEnabled(0,true);
+            this->ui.tabWidget_learning_res->setTabEnabled(1,true);
+            this->ui.tabWidget_learning_res->setTabEnabled(2,true);
             this->ui.tabWidget_learning_res->setTabEnabled(3,true);
         }
 
@@ -6782,8 +6787,52 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                         // warm start with the k-nearest neighbors
                         pred_csv << "Success_f_ws_knn_pred,Iterations_f_plan_ws_knn_pred,Cpu_time_f_plan_ws_knn_pred,Obj_f_plan_ws_knn_pred,";
                         pred_csv << "Success_b_ws_knn_pred,Iterations_bounce_ws_knn_pred,Cpu_time_bounce_ws_knn_pred,Obj_bounce_ws_knn_pred";
+
+                    }else{
+
+                        // cold start
+                        pred_csv << ",Success_f_cold,Iterations_f_plan_cold,Cpu_time_f_plan_cold,Obj_f_plan_cold,";
+                        pred_csv << "Success_f_app_cold,Iterations_f_approach_cold,Cpu_time_f_approach_cold,Obj_f_approach_cold,";
+                        pred_csv << "Success_f_ret_cold,Iterations_f_retreat_cold,Cpu_time_f_retreat_cold,Obj_f_retreat_cold,";
+                        pred_csv << "Success_b_cold,Iterations_bounce_cold,Cpu_time_bounce_cold,Obj_bounce_cold,";
+
+                        // warm start with the original solution
+                        pred_csv << "Success_f_ws_or,Iterations_f_plan_ws_or,Cpu_time_f_plan_ws_or,Obj_f_plan_ws_or,";
+                        pred_csv << "Success_f_app_ws_or,Iterations_f_approach_ws_or,Cpu_time_f_approach_ws_or,Obj_f_approach_ws_or,";
+                        pred_csv << "Success_f_ret_ws_or,Iterations_f_retreat_ws_or,Cpu_time_f_retreat_ws_or,Obj_f_retreat_ws_or,";
+                        pred_csv << "Success_b_ws_or,Iterations_bounce_ws_or,Cpu_time_bounce_ws_or,Obj_bounce_ws_or,";
+
+                        // warm start with the random solution
+                        pred_csv << "Success_f_ws_rdm,Iterations_f_plan_ws_rdm,Cpu_time_f_plan_ws_rdm,Obj_f_plan_ws_rdm,";
+                        pred_csv << "Success_f_app_ws_rdm,Iterations_f_approach_ws_rdm,Cpu_time_f_approach_ws_rdm,Obj_f_approach_ws_rdm,";
+                        pred_csv << "Success_f_ret_ws_rdm,Iterations_f_retreat_ws_rdm,Cpu_time_f_retreat_ws_rdm,Obj_f_retreat_ws_rdm,";
+                        pred_csv << "Success_b_ws_rdm,Iterations_bounce_ws_rdm,Cpu_time_bounce_ws_rdm,Obj_bounce_ws_rdm";
+
+                        // warm start with the neural network
+                        pred_csv << "Success_f_ws_nn_pred,Iterations_f_plan_ws_nn_pred,Cpu_time_f_plan_ws_nn_pred,Obj_f_plan_ws_nn_pred,";
+                        pred_csv << "Success_f_app_ws_nn_pred,Iterations_f_approach_ws_nn_pred,Cpu_time_f_approach_ws_nn_pred,Obj_f_approach_ws_nn_pred,";
+                        pred_csv << "Success_f_ret_ws_nn_pred,Iterations_f_retreat_ws_nn_pred,Cpu_time_f_retreat_ws_nn_pred,Obj_f_retreat_ws_nn_pred,";
+                        pred_csv << "Success_b_ws_nn_pred,Iterations_bounce_ws_nn_pred,Cpu_time_bounce_ws_nn_pred,Obj_bounce_ws_nn_pred";
+
+                        // warm start with the support vector machines
+                        pred_csv << "Success_f_ws_svm_pred,Iterations_f_plan_ws_svm_pred,Cpu_time_f_plan_ws_svm_pred,Obj_f_plan_ws_svm_pred,";
+                        pred_csv << "Success_f_app_ws_svm_pred,Iterations_f_approach_ws_svm_pred,Cpu_time_f_approach_ws_svm_pred,Obj_f_approach_ws_svm_pred,";
+                        pred_csv << "Success_f_ret_ws_svm_pred,Iterations_f_retreat_ws_svm_pred,Cpu_time_f_retreat_ws_svm_pred,Obj_f_retreat_ws_svm_pred,";
+                        pred_csv << "Success_b_ws_svm_pred,Iterations_bounce_ws_svm_pred,Cpu_time_bounce_ws_svm_pred,Obj_bounce_ws_svm_pred";
+
+                        // warm start with the k-nearest neighbors
+                        pred_csv << "Success_f_ws_knn_pred,Iterations_f_plan_ws_knn_pred,Cpu_time_f_plan_ws_knn_pred,Obj_f_plan_ws_knn_pred,";
+                        pred_csv << "Success_f_app_ws_knn_pred,Iterations_f_approach_ws_knn_pred,Cpu_time_f_approach_ws_knn_pred,Obj_f_approach_ws_knn_pred,";
+                        pred_csv << "Success_f_ret_ws_knn_pred,Iterations_f_retreat_ws_knn_pred,Cpu_time_f_retreat_ws_knn_pred,Obj_f_retreat_ws_knn_pred,";
+                        pred_csv << "Success_b_ws_knn_pred,Iterations_bounce_ws_knn_pred,Cpu_time_bounce_ws_knn_pred,Obj_bounce_ws_knn_pred";
+
                     }
                     pred_csv << " \n";
+
+                    objectPtr obj_tar_or; // the original object involved in the movement
+                    if(mov_type==0){ // reach-to-grasp movement
+                        obj_tar_or = prob->getMovement()->getObject();
+                    }
 
                     for(int i=0;i<n_pred;++i){
 
@@ -6791,44 +6840,100 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                         qnode.log(QNode::Info,std::string("Prediction: ")+to_string(i));
                         std::srand(std::time(NULL));
 
-                        // modify target data (move_target)
-                        if(this->ui.lineEdit_tar_x_var->isEnabled()){
-                            move_target_mod.at(0) = move_target.at(0) - (tar_x_var/2) + tar_x_var*(rand() / double(RAND_MAX));
-                        }else{
-                            move_target_mod.at(0) = move_target.at(0);
+                        string tar_x_pos_str;
+                        string tar_y_pos_str;
+                        string tar_z_pos_str;
+                        string tar_roll_str;
+                        string tar_pitch_str;
+                        string tar_yaw_str;
+
+                        if(mov_type==0){ // reach-to-grasp movement
+                            objectPtr obj_tar = objectPtr(new Object(*(obj_tar_or.get())));
+                            motion_manager::pos obj_pos;
+                            motion_manager::orient obj_or;
+                            if(this->ui.lineEdit_tar_x_var->isEnabled()){
+                                obj_pos.Xpos = obj_tar_or->getPos().Xpos - (tar_x_var/2) + tar_x_var*(rand() / double(RAND_MAX));
+                            }else{
+                                obj_pos.Xpos = obj_tar_or->getPos().Xpos;
+                            }
+                            if(this->ui.lineEdit_tar_y_var->isEnabled()){
+                                obj_pos.Ypos = obj_tar_or->getPos().Ypos - (tar_y_var/2) + tar_y_var*(rand() / double(RAND_MAX));
+                            }else{
+                                obj_pos.Ypos = obj_tar_or->getPos().Ypos;
+                            }
+                            if(this->ui.lineEdit_tar_z_var->isEnabled()){
+                                obj_pos.Zpos = obj_tar_or->getPos().Zpos - (tar_z_var/2) + tar_z_var*(rand() / double(RAND_MAX));
+                            }else{
+                                obj_pos.Zpos = obj_tar_or->getPos().Zpos;
+                            }
+                            if(this->ui.lineEdit_tar_roll_var->isEnabled()){
+                                obj_or.roll = obj_tar_or->getOr().roll - (tar_roll_var/2) + tar_roll_var*(rand() / double(RAND_MAX));
+                            }else{
+                                obj_or.roll = obj_tar_or->getOr().roll;
+                            }
+                            if(this->ui.lineEdit_tar_pitch_var->isEnabled()){
+                                obj_or.pitch = obj_tar_or->getOr().pitch - (tar_pitch_var/2) + tar_pitch_var*(rand() / double(RAND_MAX));
+                            }else{
+                                obj_or.pitch = obj_tar_or->getOr().pitch;
+                            }
+                            if(this->ui.lineEdit_tar_yaw_var->isEnabled()){
+                                obj_or.yaw = obj_tar_or->getOr().yaw - (tar_yaw_var/2) + tar_yaw_var*(rand() / double(RAND_MAX));
+                            }else{
+                                obj_or.yaw = obj_tar_or->getOr().yaw;
+                            }
+                            obj_tar->setPos(obj_pos,true);
+                            obj_tar->setOr(obj_or,true);
+                            prob->getMovement()->setObject(obj_tar);
+
+                            tar_x_pos_str =  boost::str(boost::format("%.8f") % (obj_pos.Xpos)); boost::replace_all(tar_x_pos_str,",",".");
+                            tar_y_pos_str =  boost::str(boost::format("%.8f") % (obj_pos.Ypos)); boost::replace_all(tar_y_pos_str,",",".");
+                            tar_z_pos_str =  boost::str(boost::format("%.8f") % (obj_pos.Zpos)); boost::replace_all(tar_z_pos_str,",",".");
+                            tar_roll_str =  boost::str(boost::format("%.8f") % (obj_or.roll)); boost::replace_all(tar_roll_str,",",".");
+                            tar_pitch_str =  boost::str(boost::format("%.8f") % (obj_or.pitch)); boost::replace_all(tar_pitch_str,",",".");
+                            tar_yaw_str =  boost::str(boost::format("%.8f") % (obj_or.yaw)); boost::replace_all(tar_yaw_str,",",".");
+
+                        }else if(mov_type==1 || mov_type==5){ // move movement
+
+                            // modify target data (move_target)
+                            if(this->ui.lineEdit_tar_x_var->isEnabled()){
+                                move_target_mod.at(0) = move_target.at(0) - (tar_x_var/2) + tar_x_var*(rand() / double(RAND_MAX));
+                            }else{
+                                move_target_mod.at(0) = move_target.at(0);
+                            }
+                            if(this->ui.lineEdit_tar_y_var->isEnabled()){
+                                move_target_mod.at(1) = move_target.at(1) - (tar_y_var/2) + tar_y_var*(rand() / double(RAND_MAX));
+                            }else{
+                                move_target_mod.at(1) = move_target.at(1);
+                            }
+                            if(this->ui.lineEdit_tar_z_var->isEnabled()){
+                                move_target_mod.at(2) = move_target.at(2) - (tar_z_var/2) + tar_z_var*(rand() / double(RAND_MAX));
+                            }else{
+                                move_target_mod.at(2) = move_target.at(2);
+                            }
+                            if(this->ui.lineEdit_tar_roll_var->isEnabled()){
+                                move_target_mod.at(3) = move_target.at(3) - (tar_roll_var/2) + tar_roll_var*(rand() / double(RAND_MAX));
+                            }else{
+                                move_target_mod.at(3) = move_target.at(3);
+                            }
+                            if(this->ui.lineEdit_tar_pitch_var->isEnabled()){
+                                move_target_mod.at(4) = move_target.at(4) - (tar_pitch_var/2) + tar_pitch_var*(rand() / double(RAND_MAX));
+                            }else{
+                                move_target_mod.at(4) = move_target.at(4);
+                            }
+                            if(this->ui.lineEdit_tar_yaw_var->isEnabled()){
+                                move_target_mod.at(5) = move_target.at(5) - (tar_yaw_var/2) + tar_yaw_var*(rand() / double(RAND_MAX));
+                            }else{
+                                move_target_mod.at(5) = move_target.at(5);
+                            }
+                            prob->setMoveSettings(move_target_mod,move_final_hand,move_final_arm,use_final);
+
+                            tar_x_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(0))); boost::replace_all(tar_x_pos_str,",",".");
+                            tar_y_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(1))); boost::replace_all(tar_y_pos_str,",",".");
+                            tar_z_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(2))); boost::replace_all(tar_z_pos_str,",",".");
+                            tar_roll_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(3))); boost::replace_all(tar_roll_str,",",".");
+                            tar_pitch_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(4))); boost::replace_all(tar_pitch_str,",",".");
+                            tar_yaw_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(5))); boost::replace_all(tar_yaw_str,",",".");
                         }
-                        if(this->ui.lineEdit_tar_y_var->isEnabled()){
-                            move_target_mod.at(1) = move_target.at(1) - (tar_y_var/2) + tar_y_var*(rand() / double(RAND_MAX));
-                        }else{
-                            move_target_mod.at(1) = move_target.at(1);
-                        }
-                        if(this->ui.lineEdit_tar_z_var->isEnabled()){
-                            move_target_mod.at(2) = move_target.at(2) - (tar_z_var/2) + tar_z_var*(rand() / double(RAND_MAX));
-                        }else{
-                            move_target_mod.at(2) = move_target.at(2);
-                        }
-                        if(this->ui.lineEdit_tar_roll_var->isEnabled()){
-                            move_target_mod.at(3) = move_target.at(3) - (tar_roll_var/2) + tar_roll_var*(rand() / double(RAND_MAX));
-                        }else{
-                            move_target_mod.at(3) = move_target.at(3);
-                        }
-                        if(this->ui.lineEdit_tar_pitch_var->isEnabled()){
-                            move_target_mod.at(4) = move_target.at(4) - (tar_pitch_var/2) + tar_pitch_var*(rand() / double(RAND_MAX));
-                        }else{
-                            move_target_mod.at(4) = move_target.at(4);
-                        }
-                        if(this->ui.lineEdit_tar_yaw_var->isEnabled()){
-                            move_target_mod.at(5) = move_target.at(5) - (tar_yaw_var/2) + tar_yaw_var*(rand() / double(RAND_MAX));
-                        }else{
-                            move_target_mod.at(5) = move_target.at(5);
-                        }
-                        prob->setMoveSettings(move_target_mod,move_final_hand,move_final_arm,use_final);
-                        string tar_x_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(0))); boost::replace_all(tar_x_pos_str,",",".");
-                        string tar_y_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(1))); boost::replace_all(tar_y_pos_str,",",".");
-                        string tar_z_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(2))); boost::replace_all(tar_z_pos_str,",",".");
-                        string tar_roll_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(3))); boost::replace_all(tar_roll_str,",",".");
-                        string tar_pitch_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(4))); boost::replace_all(tar_pitch_str,",",".");
-                        string tar_yaw_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(5))); boost::replace_all(tar_yaw_str,",",".");
 
                         string input_data_str = tar_x_pos_str + string(",") +
                                                 tar_y_pos_str + string(",") +
@@ -7246,6 +7351,28 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                             final_plan.dual_vars = this->dual_plan;
                             tols.mov_specs.final_warm_start_params.push_back(final_plan);
                         }
+                        if(this->sol_approach)
+                        {
+                            HUMotion::warm_start_params final_app;
+                            final_app.valid = true;
+                            final_app.description = "approach";
+                            final_app.x = this->x_approach;
+                            final_app.zL = this->zL_approach;
+                            final_app.zU = this->zU_approac;
+                            final_app.dual_vars = this->dual_approach;
+                            tols.mov_specs.final_warm_start_params.push_back(final_app);
+                        }
+                        if(this->sol_retreat)
+                        {
+                            HUMotion::warm_start_params final_ret;
+                            final_ret.valid = true;
+                            final_ret.description = "retreat";
+                            final_ret.x = this->x_retreat;
+                            final_ret.zL = this->zL_retreat;
+                            final_ret.zU = this->zU_retreat;
+                            final_ret.dual_vars = this->dual_retreat;
+                            tols.mov_specs.final_warm_start_params.push_back(final_ret);
+                        }
                         if(this->sol_bounce)
                         {
                             HUMotion::warm_start_params bounce;
@@ -7272,6 +7399,28 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                             final_plan.zU = pred_zU_rdm_plan;
                             final_plan.dual_vars = pred_dual_rdm_plan;
                             tols.mov_specs.final_warm_start_params.push_back(final_plan);
+                        }
+                        if(pred_sol_rdm_app)
+                        {
+                            HUMotion::warm_start_params final_app;
+                            final_app.valid = true;
+                            final_app.description = "approach";
+                            final_app.x = pred_x_rdm_app;
+                            final_app.zL = pred_zL_rdm_app;
+                            final_app.zU = pred_zU_rdm_app;
+                            final_app.dual_vars = pred_dual_rdm_app;
+                            tols.mov_specs.final_warm_start_params.push_back(final_app);
+                        }
+                        if(pred_sol_rdm_ret)
+                        {
+                            HUMotion::warm_start_params final_ret;
+                            final_ret.valid = true;
+                            final_ret.description = "retreat";
+                            final_ret.x = pred_x_rdm_ret;
+                            final_ret.zL = pred_zL_rdm_ret;
+                            final_ret.zU = pred_zU_rdm_ret;
+                            final_ret.dual_vars = pred_dual_rdm_app;
+                            tols.mov_specs.final_warm_start_params.push_back(final_ret);
                         }
                         if(pred_sol_rdm_bounce)
                         {
@@ -7300,6 +7449,28 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                             final_plan.dual_vars = pred_dual_nn_plan;
                             tols.mov_specs.final_warm_start_params.push_back(final_plan);
                         }
+                        if(pred_sol_nn_app)
+                        {
+                            HUMotion::warm_start_params final_app;
+                            final_app.valid = true;
+                            final_app.description = "approach";
+                            final_app.x = pred_x_nn_app;
+                            final_app.zL = pred_zL_nn_app;
+                            final_app.zU = pred_zU_nn_app;
+                            final_app.dual_vars = pred_dual_nn_app;
+                            tols.mov_specs.final_warm_start_params.push_back(final_app);
+                        }
+                        if(pred_sol_nn_ret)
+                        {
+                            HUMotion::warm_start_params final_ret;
+                            final_ret.valid = true;
+                            final_ret.description = "retreat";
+                            final_ret.x = pred_x_nn_ret;
+                            final_ret.zL = pred_zL_nn_ret;
+                            final_ret.zU = pred_zU_nn_ret;
+                            final_ret.dual_vars = pred_dual_nn_ret;
+                            tols.mov_specs.final_warm_start_params.push_back(final_ret);
+                        }
                         if(pred_sol_nn_bounce)
                         {
                             HUMotion::warm_start_params bounce;
@@ -7327,6 +7498,28 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                             final_plan.dual_vars = pred_dual_svm_plan;
                             tols.mov_specs.final_warm_start_params.push_back(final_plan);
                         }
+                        if(pred_sol_svm_app)
+                        {
+                            HUMotion::warm_start_params final_app;
+                            final_app.valid = true;
+                            final_app.description = "approach";
+                            final_app.x = pred_x_svm_app;
+                            final_app.zL = pred_zL_svm_app;
+                            final_app.zU = pred_zU_svm_app;
+                            final_app.dual_vars = pred_dual_svm_app;
+                            tols.mov_specs.final_warm_start_params.push_back(final_app);
+                        }
+                        if(pred_sol_svm_ret)
+                        {
+                            HUMotion::warm_start_params final_ret;
+                            final_ret.valid = true;
+                            final_ret.description = "retreat";
+                            final_ret.x = pred_x_svm_ret;
+                            final_ret.zL = pred_zL_svm_ret;
+                            final_ret.zU = pred_zU_svm_ret;
+                            final_ret.dual_vars = pred_dual_svm_ret;
+                            tols.mov_specs.final_warm_start_params.push_back(final_ret);
+                        }
                         if(pred_sol_svm_bounce)
                         {
                             HUMotion::warm_start_params bounce;
@@ -7353,6 +7546,28 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                             final_plan.zU = pred_zU_knn_plan;
                             final_plan.dual_vars = pred_dual_knn_plan;
                             tols.mov_specs.final_warm_start_params.push_back(final_plan);
+                        }
+                        if(pred_sol_knn_app)
+                        {
+                            HUMotion::warm_start_params final_app;
+                            final_app.valid = true;
+                            final_app.description = "approach";
+                            final_app.x = pred_x_knn_app;
+                            final_app.zL = pred_zL_knn_app;
+                            final_app.zU = pred_zU_knn_app;
+                            final_app.dual_vars = pred_dual_knn_app;
+                            tols.mov_specs.final_warm_start_params.push_back(final_app);
+                        }
+                        if(pred_sol_knn_ret)
+                        {
+                            HUMotion::warm_start_params final_ret;
+                            final_ret.valid = true;
+                            final_ret.description = "retreat";
+                            final_ret.x = pred_x_knn_ret;
+                            final_ret.zL = pred_zL_knn_ret;
+                            final_ret.zU = pred_zU_knn_ret;
+                            final_ret.dual_vars = pred_dual_knn_ret;
+                            tols.mov_specs.final_warm_start_params.push_back(final_ret);
                         }
                         if(pred_sol_knn_bounce)
                         {
@@ -7401,6 +7616,8 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
                                     success_cold_plan.push_back(1); iter_cold_plan.push_back(plan_tar.iterations); cpu_cold_plan.push_back(plan_tar.cpu_time); obj_cold_plan.push_back(plan_tar.obj_value);
                                     success_cold_bounce.push_back(1); iter_cold_bounce.push_back(bounce_ws.iterations); cpu_cold_bounce.push_back(bounce_ws.cpu_time); obj_cold_bounce.push_back(bounce_ws.obj_value);
+                                }else{
+                                    // TO DO
                                 }
                             }else{
                                 pred_csv << ",0,nan,nan,nan,0,nan,nan,nan";
