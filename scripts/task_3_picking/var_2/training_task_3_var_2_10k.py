@@ -127,8 +127,8 @@ train_zb_L = False
 train_zb_L_class = False
 dir_path_zb_L = models_dir + "/zb_L"
 
-print_en_zb_U = False
-train_zb_U = False
+print_en_zb_U = True
+train_zb_U = True
 train_zb_U_class = False
 dir_path_zb_U = models_dir + "/zb_U"
 
@@ -258,7 +258,7 @@ algorithm_dual_f_plan = 'auto'
 
 n_clusters_xf_approach = 6
 min_cluster_size_xf_approach = 10
-th_xf_approach = 0.001
+th_xf_approach = 0.0001
 # NN
 periods_xf_approach = 20
 steps_xf_approach = 1000
@@ -342,7 +342,7 @@ algorithm_zf_U_approach = 'auto'
 
 n_clusters_dual_f_approach = 6
 min_cluster_size_dual_f_approach = 10
-th_dual_f_approach = 0.0001
+th_dual_f_approach = 0.00001
 # NN
 periods_dual_f_approach = 20
 steps_dual_f_approach = 1000
@@ -483,7 +483,7 @@ weights_dual_f_retreat = 'distance'
 algorithm_dual_f_retreat = 'auto'
 
 # ------------------------------ bounce ------------------------------- #
-n_clusters_x_bounce = 6
+n_clusters_x_bounce = 1
 min_cluster_size_x_bounce = 10
 th_x_bounce = 0.001
 # NN
@@ -539,7 +539,7 @@ n_neighbors_zb_L = 15
 weights_zb_L = 'distance'
 algorithm_zb_L = 'auto'
 
-n_clusters_zb_U = 2
+n_clusters_zb_U = 1
 min_cluster_size_zb_U = 10
 th_zb_U = 0.001
 # NN
@@ -9071,7 +9071,7 @@ if not outputs_zb_U_df.empty:
     if (print_en_zb_U):
         fig = plt.figure()
         ax_zb_U = fig.add_subplot(111)
-        ax_zb_U.scatter(zb_U[:,0],zb_U[:,1], s=10, c=labels_zb_U, marker="s")
+        ax_zb_U.scatter(normalized_inputs["target_x_mm"],zb_U[:,0], s=10, c=labels_zb_U, marker="s")
         plt.savefig(dir_path_zb_U + "/clusters.pdf")
         plt.clf()
         #plt.show()
@@ -9499,10 +9499,10 @@ if not outputs_zb_U_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(test_examples["target_x_mm"], denorm_test_targets["zb_U_3"], s=10, c='b', marker="s",label='test_targets')
-                ax1.scatter(test_examples["target_x_mm"], denorm_test_predictions_df["zb_U_3"], s=10, c='r', marker="o", label='test_predictions')
+                ax1.scatter(test_examples["target_x_mm"], denorm_test_targets["zb_U_9"], s=10, c='b', marker="s",label='test_targets')
+                ax1.scatter(test_examples["target_x_mm"], denorm_test_predictions_df["zb_U_9"], s=10, c='r', marker="o", label='test_predictions')
                 plt.xlabel("normalized target_x [mm]")
-                plt.ylabel("zb_U_3")
+                plt.ylabel("zb_U_9")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_zb_U+"/cluster"+repr(i)+"/nn/zb_U_pred.pdf")
                 plt.clf()
@@ -9562,10 +9562,10 @@ if not outputs_zb_U_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(test_examples["target_x_mm"], denorm_test_targets["zb_U_3"], s=10, c='b', marker="s",label='test_targets')
-                ax1.scatter(test_examples["target_x_mm"], denorm_test_predictions_df["zb_U_3"], s=10, c='r', marker="o", label='test_predictions')
+                ax1.scatter(test_examples["target_x_mm"], denorm_test_targets["zb_U_9"], s=10, c='b', marker="s",label='test_targets')
+                ax1.scatter(test_examples["target_x_mm"], denorm_test_predictions_df["zb_U_9"], s=10, c='r', marker="o", label='test_predictions')
                 plt.xlabel("normalized target_x [mm]")
-                plt.ylabel("zb_U_3")
+                plt.ylabel("zb_U_9")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_zb_U+"/cluster"+repr(i)+"/svm/zb_U_pred.pdf")
                 plt.clf()
@@ -9621,10 +9621,10 @@ if not outputs_zb_U_df.empty:
 
                 fig = plt.figure()
                 ax1 = fig.add_subplot(111)
-                ax1.scatter(test_examples["target_x_mm"], denorm_test_targets["zb_U_3"], s=10, c='b', marker="s",label='test_targets')
-                ax1.scatter(test_examples["target_x_mm"], denorm_test_predictions_df["zb_U_3"], s=10, c='r', marker="o", label='test_predictions')
+                ax1.scatter(test_examples["target_x_mm"], denorm_test_targets["zb_U_9"], s=10, c='b', marker="s",label='test_targets')
+                ax1.scatter(test_examples["target_x_mm"], denorm_test_predictions_df["zb_U_9"], s=10, c='r', marker="o", label='test_predictions')
                 plt.xlabel("normalized target_x [mm]")
-                plt.ylabel("zb_U_3")
+                plt.ylabel("zb_U_9")
                 plt.legend(loc='upper right')
                 plt.savefig(dir_path_zb_U+"/cluster"+repr(i)+"/knn/zb_U_pred.pdf")
                 plt.clf()

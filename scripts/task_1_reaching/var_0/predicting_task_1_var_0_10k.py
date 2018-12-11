@@ -28,21 +28,22 @@ data_file = str(sys.argv[1])
 models_dir = str(sys.argv[2])
 pred_file_path = str(sys.argv[3])
 data_pred = sys.argv[4].split(',')
-
+#print("DATA:")
+#print(data_file)
 # Target info
-target_x = float(data_pred[0])
-target_y = float(data_pred[1])
-target_z = float(data_pred[2])
-target_roll = float(data_pred[3])
-target_pitch = float(data_pred[4])
-target_yaw = float(data_pred[5])
+#target_x = float(data_pred[0])
+#target_y = float(data_pred[1])
+#target_z = float(data_pred[2])
+#target_roll = float(data_pred[3])
+#target_pitch = float(data_pred[4])
+#target_yaw = float(data_pred[5])
 # Obstacle 1 info
-obstacle_1_x = float(data_pred[6])
-obstacle_1_y = float(data_pred[7])
-obstacle_1_z = float(data_pred[8])
-obstacle_1_roll = float(data_pred[9])
-obstacle_1_pitch = float(data_pred[10])
-obstacle_1_yaw = float(data_pred[11])
+#obstacle_1_x = float(data_pred[6])
+#obstacle_1_y = float(data_pred[7])
+#obstacle_1_z = float(data_pred[8])
+#obstacle_1_roll = float(data_pred[9])
+#obstacle_1_pitch = float(data_pred[10])
+#obstacle_1_yaw = float(data_pred[11])
 
 # Settings
 pd.set_option('display.max_columns', 10)
@@ -182,7 +183,7 @@ cols_zb_U_tot = [col for col in task_1_dataframe if col.startswith('zb_U')]
 cols_dual_bounce_tot = [col for col in task_1_dataframe if col.startswith('dual_bounce')]
 task_1_dataframe = task_1_dataframe.reindex(np.random.permutation(task_1_dataframe.index))
 
-inputs_dataframe = preprocess_features(task_1_dataframe)
+(inputs_dataframe,in_cols,null_features,id_null_cols) = preprocess_features(task_1_dataframe)
 normalized_inputs,normalized_inputs_max,normalized_inputs_min = normalize_linear_scale(inputs_dataframe)
 (outputs_dataframe, null_outputs) = preprocess_targets(task_1_dataframe)
 

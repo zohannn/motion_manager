@@ -75,8 +75,8 @@ train_dual_f_plan_class = False
 dir_path_dual_f_plan = models_dir + "/dual_f_plan"
 
 # approach stage
-print_en_xf_approach = False
-train_xf_approach = False
+print_en_xf_approach = True
+train_xf_approach = True
 train_xf_approach_class = False
 dir_path_xf_approach = models_dir + "/xf_approach"
 
@@ -90,8 +90,8 @@ train_zf_U_approach = False
 train_zf_U_approach_class = False
 dir_path_zf_U_approach = models_dir + "/zf_U_approach"
 
-print_en_dual_f_approach = False
-train_dual_f_approach = False
+print_en_dual_f_approach = True
+train_dual_f_approach = True
 train_dual_f_approach_class = False
 dir_path_dual_f_approach = models_dir + "/dual_f_approach"
 
@@ -132,8 +132,8 @@ train_zb_U = False
 train_zb_U_class = False
 dir_path_zb_U = models_dir + "/zb_U"
 
-print_en_dual_bounce = True
-train_dual_bounce = True
+print_en_dual_bounce = False
+train_dual_bounce = False
 train_dual_bounce_class = False
 dir_path_dual_bounce = models_dir + "/dual_bounce"
 
@@ -258,7 +258,7 @@ algorithm_dual_f_plan = 'auto'
 
 n_clusters_xf_approach = 6
 min_cluster_size_xf_approach = 10
-th_xf_approach = 0.001
+th_xf_approach = 0.0001
 # NN
 periods_xf_approach = 20
 steps_xf_approach = 1000
@@ -342,7 +342,7 @@ algorithm_zf_U_approach = 'auto'
 
 n_clusters_dual_f_approach = 6
 min_cluster_size_dual_f_approach = 10
-th_dual_f_approach = 0.0001
+th_dual_f_approach = 0.00001
 # NN
 periods_dual_f_approach = 20
 steps_dual_f_approach = 1000
@@ -8156,7 +8156,7 @@ if not outputs_x_bounce_df.empty:
             cl_out_x_bounce_df = clusters_outputs_x_bounce[i]
             if (len(cl_out_x_bounce_df.index) > min_cluster_size_x_bounce):
                 if (len(cl_out_x_bounce_df.columns) > 4):
-                    n_comps = 8
+                    n_comps = 9
                     x_bounce = cl_out_x_bounce_df.values
                     pca_x_bounce = decomposition.PCA(n_components=n_comps)
                     pc = pca_x_bounce.fit_transform(x_bounce)
@@ -8178,7 +8178,8 @@ if not outputs_x_bounce_df.empty:
                         pc_file.write(df.iloc[4, 0] + ", ")
                         pc_file.write(df.iloc[5, 0] + ", ")
                         pc_file.write(df.iloc[6, 0] + ", ")
-                        pc_file.write(df.iloc[7, 0] + "\n")
+                        pc_file.write(df.iloc[7, 0] + ", ")
+                        pc_file.write(df.iloc[8, 0] + "\n")
                         pc_file.write("%.3f, " % df.iloc[0, 1])
                         pc_file.write("%.3f, " % df.iloc[1, 1])
                         pc_file.write("%.3f, " % df.iloc[2, 1])
@@ -8186,7 +8187,8 @@ if not outputs_x_bounce_df.empty:
                         pc_file.write("%.3f, " % df.iloc[4, 1])
                         pc_file.write("%.3f, " % df.iloc[5, 1])
                         pc_file.write("%.3f, " % df.iloc[6, 1])
-                        pc_file.write("%.3f\n " % df.iloc[7, 1])
+                        pc_file.write("%.3f, " % df.iloc[7, 1])
+                        pc_file.write("%.3f\n " % df.iloc[8, 1])
                         pc_file.close()
 
                         sns_plot = sns.barplot(x='PC', y="var", data=df, color="c")

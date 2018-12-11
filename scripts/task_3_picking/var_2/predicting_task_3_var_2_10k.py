@@ -186,7 +186,7 @@ units_dual_f_plan_class = [10,10,10]
 n_pca_comps_xf_approach = 7
 n_clusters_xf_approach = 6
 min_cluster_size_xf_approach = 10
-th_xf_approach = 0.001
+th_xf_approach = 0.0001
 periods_xf_approach = 20
 steps_xf_approach = 1000
 batch_size_xf_approach = 100
@@ -214,7 +214,7 @@ units_zf_U_approach_class = [10,10,10]
 n_pca_comps_dual_f_approach = 10
 n_clusters_dual_f_approach = 6
 min_cluster_size_dual_f_approach = 10
-th_dual_f_approach = 0.0001
+th_dual_f_approach = 0.00001
 periods_dual_f_approach = 20
 steps_dual_f_approach = 1000
 batch_size_dual_f_approach = 100
@@ -264,7 +264,7 @@ units_dual_f_retreat_class = [10,10,10]
 # ------------------ bounce stage ----------------- #
 
 n_pca_comps_x_bounce = 9
-n_clusters_x_bounce = 6
+n_clusters_x_bounce = 1
 min_cluster_size_x_bounce = 10
 th_x_bounce = 0.001
 periods_x_bounce = 20
@@ -282,7 +282,7 @@ batch_size_zb_L = 100
 units_zb_L = [10,10]
 units_zb_L_class = [10,10,10]
 
-n_clusters_zb_U = 2
+n_clusters_zb_U = 1
 min_cluster_size_zb_U = 10
 th_zb_U = 0.001
 periods_zb_U = 10
@@ -3586,6 +3586,7 @@ if predict_x_bounce:
             print(x_bounce_rdm_prediction)
 
         # ------------------------- Neural Network ---------------------------------------- #
+        '''
         nn_classifier = tf.estimator.DNNClassifier(
                                         feature_columns=construct_feature_columns(norm_inputs_test_df),
                                         optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate_class),
@@ -3602,6 +3603,8 @@ if predict_x_bounce:
         test_pred = np.array([item['class_ids'][0] for item in test_probabilities])
 
         n_cluster = test_pred[0] # the input belongs to this cluster
+        '''
+        n_cluster = 0
         selected_cl_in_x_bounce_df = pd.read_csv(dir_path_x_bounce+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_x_bounce_df = pd.read_csv(dir_path_x_bounce+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
@@ -3698,10 +3701,12 @@ if predict_x_bounce:
 
         norm_inputs_test_list = np.array(norm_inputs_test_df.values).tolist()
         # ------------------------- Support Vector Machines ---------------------------------------- #
+        '''
         svm_classifier = joblib.load(dir_path_x_bounce + "/classification/svm/svm_clf.joblib")
         test_pred = svm_classifier.predict(norm_inputs_test_list)
         n_cluster = test_pred[0]
-
+        '''
+        n_cluster = 0
         selected_cl_in_x_bounce_df = pd.read_csv(dir_path_x_bounce+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_x_bounce_df = pd.read_csv(dir_path_x_bounce+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
@@ -3773,10 +3778,12 @@ if predict_x_bounce:
             print(denorm_test_predictions_df)
 
         # ------------------------- K-Nearest Neighbors ---------------------------------------- #
+        '''
         knn_classifier = joblib.load(dir_path_x_bounce + "/classification/knn/knn_clf.joblib")
         test_pred = knn_classifier.predict(norm_inputs_test_list)
         n_cluster = test_pred[0]
-
+        '''
+        n_cluster = 0
         selected_cl_in_x_bounce_df = pd.read_csv(dir_path_x_bounce+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_x_bounce_df = pd.read_csv(dir_path_x_bounce+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
@@ -4106,6 +4113,7 @@ if predict_zb_U:
             print("Random zb_U: ")
             print(zb_U_rdm_prediction)
         # ------------------------- Neural Network ---------------------------------------- #
+        '''
         nn_classifier = tf.estimator.DNNClassifier(
                                         feature_columns=construct_feature_columns(norm_inputs_test_df),
                                         optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate_class),
@@ -4122,6 +4130,8 @@ if predict_zb_U:
         test_pred = np.array([item['class_ids'][0] for item in test_probabilities])
 
         n_cluster = test_pred[0] # the input belongs to this cluster
+        '''
+        n_cluster = 0
         selected_cl_in_zb_U_df = pd.read_csv(dir_path_zb_U+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_zb_U_df = pd.read_csv(dir_path_zb_U+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
@@ -4197,10 +4207,12 @@ if predict_zb_U:
 
         norm_inputs_test_list = np.array(norm_inputs_test_df.values).tolist()
         # ------------------------- Support Vector Machines ---------------------------------------- #
+        '''
         svm_classifier = joblib.load(dir_path_zb_U + "/classification/svm/svm_clf.joblib")
         test_pred = svm_classifier.predict(norm_inputs_test_list)
         n_cluster = test_pred[0]
-
+        '''
+        n_cluster = 0
         selected_cl_in_zb_U_df = pd.read_csv(dir_path_zb_U+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_zb_U_df = pd.read_csv(dir_path_zb_U+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
@@ -4264,10 +4276,12 @@ if predict_zb_U:
             print(denorm_test_predictions_tot_df)
 
         # ------------------------- K-Nearest Neighbors ---------------------------------------- #
+        '''
         knn_classifier = joblib.load(dir_path_zb_U + "/classification/knn/knn_clf.joblib")
         test_pred = knn_classifier.predict(norm_inputs_test_list)
         n_cluster = test_pred[0]
-
+        '''
+        n_cluster = 0
         selected_cl_in_zb_U_df = pd.read_csv(dir_path_zb_U+"/cluster"+repr(n_cluster)+"/inputs.csv",sep=',')
         selected_cl_out_zb_U_df = pd.read_csv(dir_path_zb_U+"/cluster"+repr(n_cluster)+"/outputs.csv",sep=',')
 
