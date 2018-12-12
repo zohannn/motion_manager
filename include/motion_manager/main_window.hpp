@@ -771,6 +771,30 @@ public Q_SLOTS:
         void check_des_right_hand_vel_wz(int state);
 
         /**
+         * @brief check_ctrl_joints_limits_av
+         * @param state
+         */
+        void check_ctrl_joints_limits_av(int state);
+
+        /**
+         * @brief check_ctrl_sing_av
+         * @param state
+         */
+        void check_ctrl_sing_av(int state);
+
+        /**
+         * @brief check_ctrl_obsts_av
+         * @param state
+         */
+        void check_ctrl_obsts_av(int state);
+
+        /**
+         * @brief check_ctrl_hl_add
+         * @param state
+         */
+        void check_ctrl_hl_add(int state);
+
+        /**
          * @brief on_pushButton_control_plot_joints_clicked
          */
         void on_pushButton_control_plot_joints_clicked();

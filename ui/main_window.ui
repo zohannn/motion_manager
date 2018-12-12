@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1744,8 +1744,8 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="geometry">
        <rect>
-        <x>430</x>
-        <y>10</y>
+        <x>10</x>
+        <y>20</y>
         <width>441</width>
         <height>131</height>
        </rect>
@@ -1903,8 +1903,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_des_right_hand_pos">
       <property name="geometry">
        <rect>
-        <x>430</x>
-        <y>150</y>
+        <x>10</x>
+        <y>160</y>
         <width>441</width>
         <height>161</height>
        </rect>
@@ -2088,8 +2088,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="checkBox_right_hand_status">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>260</y>
+        <x>830</x>
+        <y>270</y>
         <width>211</width>
         <height>21</height>
        </rect>
@@ -2101,8 +2101,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="checkBox_const_vel_control">
       <property name="geometry">
        <rect>
-        <x>430</x>
-        <y>330</y>
+        <x>10</x>
+        <y>340</y>
         <width>181</width>
         <height>21</height>
        </rect>
@@ -2117,8 +2117,8 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>10</y>
+        <x>830</x>
+        <y>20</y>
         <width>401</width>
         <height>241</height>
        </rect>
@@ -2366,7 +2366,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_control">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>1040</x>
         <y>470</y>
         <width>191</width>
         <height>61</height>
@@ -2402,6 +2402,71 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </widget>
+     <widget class="QGroupBox" name="groupBox_options">
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>20</y>
+        <width>191</width>
+        <height>151</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Control options</string>
+      </property>
+      <widget class="QCheckBox" name="checkBox_hl_add">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>120</y>
+         <width>171</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>human-likeness</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_joints_limits_av">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>171</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string> joints limits avoidance</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_sing_av">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>171</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>singularities avoidance</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox_obsts_av">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>90</y>
+         <width>171</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>obstacles avoidance</string>
+       </property>
+      </widget>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_results">
      <property name="enabled">
@@ -2420,7 +2485,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_results_plan">
        <attribute name="title">

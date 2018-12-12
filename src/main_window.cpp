@@ -140,6 +140,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(this->ui.checkBox_des_right_hand_vel_wy, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_vel_wy(int)));
     QObject::connect(this->ui.checkBox_des_right_hand_vel_wz, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_vel_wz(int)));
 
+    QObject::connect(this->ui.checkBox_joints_limits_av, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_joints_limits_av(int)));
+    QObject::connect(this->ui.checkBox_sing_av, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_sing_av(int)));
+    QObject::connect(this->ui.checkBox_obsts_av, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_obsts_av(int)));
+    QObject::connect(this->ui.checkBox_hl_add, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_hl_add(int)));
+
 
     ReadSettings();
     setWindowIcon(QIcon(":/images/motion_managerIcon.png"));
@@ -210,6 +215,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     scenarios.push_back(QString("Learning tasks: reaching with many obstacles"));
     scenarios.push_back(QString("Learning tasks: picking the blue column"));
     scenarios.push_back(QString("Controlling: scenario with no obstacles"));
+    scenarios.push_back(QString("Controlling: scenario with no obstacles for showing the effects of singularities"));
 
 #endif
 
@@ -770,6 +776,8 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              string path_vrep_learning_tasks_picking_1 = PATH_SCENARIOS+string("/vrep/Learning_Picking_1.ttt");
              // Controlling: scenario without objects
              string path_vrep_controlling_no_objs = PATH_SCENARIOS+string("/vrep/Controlling_no_objs.ttt");
+             // Controlling: scenario without objects for singularities
+             string path_vrep_controlling_no_objs_sing = PATH_SCENARIOS+string("/vrep/Controlling_no_objs_sing.ttt");
 
              switch(i){
              case 0: // Assembly scenario
@@ -1089,6 +1097,30 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 #endif
                  }else{
                      qnode.log(QNode::Error,std::string("Controlling: scenario without objects HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+#endif
+                 break;
+             case 12: // Controlling: scenario with no objects for showing singularities
+#if HAND==0
+
+#elif HAND==1
+                this->scenario_id = 13;
+                 if (qnode.loadScenario(path_vrep_controlling_no_objs_sing,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Controlling: scenario with no obstacles for showing the effects of singularities HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Controlling: scenario with no obstacles for showing the effects of singularities");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
+                     //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
+                 }else{
+                     qnode.log(QNode::Error,std::string("Controlling: scenario with no obstacles for showing the effects of singularities HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3796,6 +3828,9 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     // Controlling: scenario without objects
     string path_vrep_controlling_no_objs = PATH_SCENARIOS+string("/vrep/Controlling_no_objs.ttt");
 
+    // Controlling: scenario without objects for singularities
+    string path_vrep_controlling_no_objs_sing = PATH_SCENARIOS+string("/vrep/Controlling_no_objs_sing.ttt");
+
     switch(scene_id){
 
     case 0:
@@ -3889,7 +3924,13 @@ void MainWindow::on_pushButton_scene_reset_clicked()
         success = string("Controlling: scenario without objects HAS BEEN LOADED");
         failure = string("Controlling: scenario without objects HAS NOT BEEN LOADED");
         break;
-
+    case 13:
+        // Controlling: scenario with no objects for singularities
+        path = path_vrep_controlling_no_objs_sing;
+        title = string("Controlling: scenario with no obstacles for showing the effects of singularities");
+        success = string("Controlling: scenario with no obstacles for showing the effects of singularities HAS BEEN LOADED");
+        failure = string("Controlling: scenario with no obstacles for showing the effects of singularities HAS NOT BEEN LOADED");
+        break;
     }
 
     if (qnode.loadScenario(path,1)){
@@ -10306,6 +10347,26 @@ void MainWindow::check_des_right_hand_vel_wz(int state)
        // checked
        this->ui.lineEdit_des_right_hand_vel_wz->setEnabled(true);
     }
+}
+
+void MainWindow::check_ctrl_joints_limits_av(int state)
+{
+
+}
+
+void MainWindow::check_ctrl_sing_av(int state)
+{
+
+}
+
+void MainWindow::check_ctrl_obsts_av(int state)
+{
+
+}
+
+void MainWindow::check_ctrl_hl_add(int state)
+{
+
 }
 
 void MainWindow::on_pushButton_control_plot_joints_clicked()
