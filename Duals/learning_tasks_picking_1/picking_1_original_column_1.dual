@@ -1,7 +1,7 @@
 ### Dual variables and solutions of the optimization problems ###
 ## Plan target posture selection data ##
 Iterations_plan=1152
-Cpu_time_plan=11.0823
+Cpu_time_plan=6.28078
 Obj_plan=0.164702
 X_plan=-1.42871|-1.3263|1.8411|-1.12203|-0.788919|-0.396758|0.950699
 ZL_plan=7.75811e-08|2.8924e-07|2.67821e-08|1.11508e-07|4.38458e-08|5.4108e-08|3.63056e-08
@@ -9,7 +9,7 @@ ZU_plan=-3.04859e-08|-4.341e-08|-1.55428e-07|-4.12449e-08|-2.48983e-08|-3.67509e
 Dual_plan=-0.00171832|-2.81448|2.00604e-07|-4.34238e-07|1.26387e-07
 ## Approach target posture selection data ##
 Iterations_approach=571
-Cpu_time_approach=5.04395
+Cpu_time_approach=3.21422
 Obj_approach=0.952392
 X_approach=-1.72234|-1.32972|1.92894|-1.35656|-0.736267|-0.508389|0.960933
 ZL_approach=1.03522e-07|2.92427e-07|2.61065e-08|1.56541e-07|4.276e-08|5.79589e-08|3.61578e-08
@@ -17,7 +17,7 @@ ZU_approach=-2.77531e-08|-4.33391e-08|-1.82895e-07|-3.72782e-08|-2.52626e-08|-3.
 Dual_approach=-0.00252929|-14.0728|-4.07368e-08|5.33642e-08|2.60043e-09
 ## Retreat target posture selection data ##
 Iterations_retreat=1056
-Cpu_time_retreat=7.55315
+Cpu_time_retreat=6.08894
 Obj_retreat=0.157857
 X_retreat=-1.7142|-1.33875|1.93612|-1.34975|-0.744312|-0.512847|0.962781
 ZL_retreat=1.02571e-07|3.01176e-07|2.60528e-08|1.54727e-07|4.29224e-08|5.8124e-08|3.61312e-08
@@ -25,7 +25,7 @@ ZU_retreat=-2.78222e-08|-4.31533e-08|-1.85576e-07|-3.73826e-08|-2.52062e-08|-3.5
 Dual_retreat=-0.0015164|-3.3096|4.54321e-08|-9.07301e-08|6.44978e-08
 ## Bounce posture selection data ##
 Iterations_bounce=41
-Cpu_time_bounce=2.08034
+Cpu_time_bounce=1.09891
 Obj_bounce=0.000346857
 X_bounce=-2.41157|-1.36092|1.86324|-1.65728|-0.761439|-1.11396|0.840252|1.22024|1.21894
 ZL_bounce=4.51986e-05|3.10976e-05|2.65068e-06|3.09954e-05|4.28818e-06|9.32265e-06|3.76843e-06|7.46203e-06|7.46599e-06
