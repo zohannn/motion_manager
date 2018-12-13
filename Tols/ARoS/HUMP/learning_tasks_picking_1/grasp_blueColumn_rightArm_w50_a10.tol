@@ -35,11 +35,13 @@ Hand_tip_3=5
 
 # Joint Expanse factors
 lambda_1=1
+
 lambda_2=1
 
 lambda_3=1.0
 
 lambda_4=1
+
 lambda_5=1.0
 
 lambda_6=1.0
@@ -240,7 +242,7 @@ post_grasp_y=0
 
 post_grasp_z=-1
 
-post_grasp_dist=20
+post_grasp_dist=120
 
 # Place settings
 pre_place_x=0

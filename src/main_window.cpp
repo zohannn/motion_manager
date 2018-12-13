@@ -773,7 +773,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              // Learning tasks: reaching with many obstacles
              string path_vrep_learning_tasks_reaching_2 = PATH_SCENARIOS+string("/vrep/Learning_Reaching_2.ttt");
              // Learning tasks: picking the blue column
-             string path_vrep_learning_tasks_picking_1 = PATH_SCENARIOS+string("/vrep/Learning_Picking_1.ttt");
+             string path_vrep_learning_tasks_picking_1 = PATH_SCENARIOS+string("/vrep/Learning_Picking_column_1.ttt");
              // Controlling: scenario without objects
              string path_vrep_controlling_no_objs = PATH_SCENARIOS+string("/vrep/Controlling_no_objs.ttt");
              // Controlling: scenario without objects for singularities
@@ -1065,7 +1065,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      ui.groupBox_getElements->setEnabled(true);
                      ui.groupBox_homePosture->setEnabled(true);
                      //ui.pushButton_loadScenario->setEnabled(false);
-                     string title = string("Learning tasks: picking the blue column");
+                     string title = string("Learning tasks: picking the blue column of tea");
                      init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
                      curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
 #if MOVEIT==1
@@ -3823,7 +3823,7 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     string path_vrep_learning_tasks_reaching_2 = PATH_SCENARIOS+string("/vrep/Learning_Reaching_2.ttt");
 
     // Learning tasks: picking the blue column
-    string path_vrep_learning_tasks_picking_1 = PATH_SCENARIOS+string("/vrep/Learning_Picking_1.ttt");
+    string path_vrep_learning_tasks_picking_1 = PATH_SCENARIOS+string("/vrep/Learning_Picking_column_1.ttt");
 
     // Controlling: scenario without objects
     string path_vrep_controlling_no_objs = PATH_SCENARIOS+string("/vrep/Controlling_no_objs.ttt");

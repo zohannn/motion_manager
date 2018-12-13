@@ -253,7 +253,7 @@ bool  QNode::loadScenario(const std::string& path,int id)
             // BottleJuice (obj_id = 2)
             subBottleJuice = n.subscribe("/vrep/BottleJuice_pose",1,&QNode::BottleJuiceCallback,this);
 
-        case 11: // Learning Tasks: picking the Magenta Column
+        case 11: // Learning Tasks: picking the Blue Column
             // Blue Column (obj_id = 0)
             subBlueColumn = n.subscribe("/vrep/BlueColumn_pose",1,&QNode::BlueColumnCallback,this);
 
@@ -4975,7 +4975,7 @@ bool QNode::getElements(scenarioPtr scene)
         break;
 
     case 12:
-        // Learning tasks: picking the magenta column
+        // Learning tasks: picking the Blue Column
 
         // get the number of objects in the scenario
         add_client = n.serviceClient<vrep_common::simRosGetIntegerSignal>("/vrep/simRosGetIntegerSignal");
