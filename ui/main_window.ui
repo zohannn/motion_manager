@@ -2402,13 +2402,13 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </widget>
-     <widget class="QGroupBox" name="groupBox_options">
+     <widget class="QGroupBox" name="groupBox_ctrl_options">
       <property name="geometry">
        <rect>
-        <x>530</x>
+        <x>460</x>
         <y>20</y>
-        <width>191</width>
-        <height>151</height>
+        <width>351</width>
+        <height>331</height>
        </rect>
       </property>
       <property name="title">
@@ -2418,7 +2418,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>120</y>
+         <y>220</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2431,7 +2431,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>30</y>
+         <y>130</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2444,7 +2444,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>60</y>
+         <y>160</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2457,7 +2457,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>90</y>
+         <y>190</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2465,6 +2465,118 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>obstacles avoidance</string>
        </property>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_jlim_params">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>221</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Joint limits parameters</string>
+       </property>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>191</width>
+          <height>58</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_60">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_303">
+           <item>
+            <widget class="QLabel" name="label_jlim_th">
+             <property name="text">
+              <string>Joints Limit threshold </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_jlim_th">
+             <property name="text">
+              <string>0.4</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_304">
+           <item>
+            <widget class="QLabel" name="label_jlim_rate">
+             <property name="text">
+              <string>Joints Limits rate</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_jlim_rate">
+             <property name="text">
+              <string>0.05</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>260</y>
+         <width>251</width>
+         <height>58</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_59">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_301">
+          <item>
+           <widget class="QLabel" name="label_vel_max">
+            <property name="text">
+             <string>Max joint velocity [deg/s]</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_vel_max">
+            <property name="text">
+             <string>50.0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_302">
+          <item>
+           <widget class="QLabel" name="label_damping">
+            <property name="text">
+             <string>Dambing factor</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_damping">
+            <property name="text">
+             <string>0.2</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </widget>
     </widget>

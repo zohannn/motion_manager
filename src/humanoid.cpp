@@ -369,8 +369,13 @@ Humanoid::Humanoid(const Humanoid &hh)
     this->leftHandPos_mes=hh.leftHandPos_mes;
     this->leftHandVel_mes=hh.leftHandVel_mes;
 
+    this->rightPosture_prev = hh.rightPosture_prev;
+    this->leftPosture_prev = hh.leftPosture_prev;
 
-
+    this->H_jlim_av_prev = hh.H_jlim_av_prev;
+    this->H_sing_av_prev = hh.H_sing_av_prev;
+    this->H_obsts_av_prev = hh.H_obsts_av_prev;
+    this->H_hl_add_prev = hh.H_hl_add_prev;
 }
 
 
@@ -3391,14 +3396,271 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
     }
     MatrixXd JJk = (JJ+pow(k,2)*I);
     MatrixXd JJk_inv = JJk.inverse();
-    MatrixXd JT = JacobianArmT*JJk_inv;
+    MatrixXd J_plus = JacobianArmT*JJk_inv; // pseudo-inverse of the Jacobian
     VectorXd hand_vel_xd(6);
     hand_vel_xd << hand_vel.at(0),hand_vel.at(1),hand_vel.at(2),hand_vel.at(3),hand_vel.at(4),hand_vel.at(5);
-    VectorXd joint_velocities = JT*hand_vel_xd;
+    VectorXd joint_velocities = J_plus*hand_vel_xd;
     velocities.clear();
     velocities.resize(joint_velocities.size());
     VectorXd::Map(&velocities[0], joint_velocities.size()) = joint_velocities;
 
+}
+
+void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double> &velocities, bool jlim_en, bool sing_en, bool obsts_en, bool hl_en, double vel_max, double damping, double jlim_th, double jlim_rate)
+{
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    MatrixXd JacobianArm(6,JOINTS_ARM);
+    MatrixXd JacobianArm_prev(6,JOINTS_ARM);
+
+    Vector3d pos0;
+    Vector3d z0;
+    Vector3d pos1;
+    Vector3d z1;
+    Vector3d pos2;
+    Vector3d z2;
+    Vector3d pos3;
+    Vector3d z3;
+    Vector3d pos4;
+    Vector3d z4;
+    Vector3d pos5;
+    Vector3d z5;
+    Vector3d pos6;
+    Vector3d z6;
+
+    vector<double> handPos; Vector3d pos_hand;
+    this->getHandPos(arm,handPos,posture);
+
+    vector<double> max_limits;
+    vector<double> min_limits;
+    vector<double> mid_limits(JOINTS_ARM+JOINTS_HAND);
+    vector<double> posture_prev;
+    vector<double> posture_delta(JOINTS_ARM);
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        max_limits = this->max_rightLimits;
+        min_limits = this->min_rightLimits;
+        posture_prev = this->rightPosture_prev;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        max_limits = this->max_leftLimits;
+        min_limits = this->min_leftLimits;
+        posture_prev = this->leftPosture_prev;
+        break;
+    }
+
+
+    pos_hand << handPos.at(0), handPos.at(1), handPos.at(2);
+
+    // current Jacobian
+    T = mat_world;
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d diff;
+        Vector3d cross;
+        Vector3d zi;
+        switch(i){
+        case 0:
+            z0 = T.block(0,2,3,1);
+            pos0 = T.block(0,3,3,1);
+            diff = pos_hand - pos0;
+            cross = z0.cross(diff);
+            zi=z0;
+            break;
+        case 1:
+            z1 = T.block(0,2,3,1);
+            pos1 = T.block(0,3,3,1);
+            diff = pos_hand - pos1;
+            cross = z1.cross(diff);
+            zi=z1;
+            break;
+        case 2:
+            z2 = T.block(0,2,3,1);
+            pos2 = T.block(0,3,3,1);
+            diff = pos_hand - pos2;
+            cross = z2.cross(diff);
+            zi=z2;
+            break;
+        case 3:
+            z3 = T.block(0,2,3,1);
+            pos3 = T.block(0,3,3,1);
+            diff = pos_hand - pos3;
+            cross = z3.cross(diff);
+            zi=z3;
+            break;
+        case 4:
+            z4 = T.block(0,2,3,1);
+            pos4 = T.block(0,3,3,1);
+            diff = pos_hand - pos4;
+            cross = z4.cross(diff);
+            zi=z4;
+            break;
+        case 5:
+            z5 = T.block(0,2,3,1);
+            pos5 = T.block(0,3,3,1);
+            diff = pos_hand - pos5;
+            cross = z5.cross(diff);
+            zi=z5;
+            break;
+        case 6:
+            z6 = T.block(0,2,3,1);
+            pos6 = T.block(0,3,3,1);
+            diff = pos_hand - pos6;
+            cross = z6.cross(diff);
+            zi=z6;
+            break;
+        }
+        VectorXd column(6); column << cross, zi;
+        JacobianArm.col(i) = column;
+    }
+
+    // previous step Jacobian
+    T = mat_world;
+    for (size_t i = 0; i < posture_prev.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture_prev.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d diff;
+        Vector3d cross;
+        Vector3d zi;
+        switch(i){
+        case 0:
+            z0 = T.block(0,2,3,1);
+            pos0 = T.block(0,3,3,1);
+            diff = pos_hand - pos0;
+            cross = z0.cross(diff);
+            zi=z0;
+            break;
+        case 1:
+            z1 = T.block(0,2,3,1);
+            pos1 = T.block(0,3,3,1);
+            diff = pos_hand - pos1;
+            cross = z1.cross(diff);
+            zi=z1;
+            break;
+        case 2:
+            z2 = T.block(0,2,3,1);
+            pos2 = T.block(0,3,3,1);
+            diff = pos_hand - pos2;
+            cross = z2.cross(diff);
+            zi=z2;
+            break;
+        case 3:
+            z3 = T.block(0,2,3,1);
+            pos3 = T.block(0,3,3,1);
+            diff = pos_hand - pos3;
+            cross = z3.cross(diff);
+            zi=z3;
+            break;
+        case 4:
+            z4 = T.block(0,2,3,1);
+            pos4 = T.block(0,3,3,1);
+            diff = pos_hand - pos4;
+            cross = z4.cross(diff);
+            zi=z4;
+            break;
+        case 5:
+            z5 = T.block(0,2,3,1);
+            pos5 = T.block(0,3,3,1);
+            diff = pos_hand - pos5;
+            cross = z5.cross(diff);
+            zi=z5;
+            break;
+        case 6:
+            z6 = T.block(0,2,3,1);
+            pos6 = T.block(0,3,3,1);
+            diff = pos_hand - pos6;
+            cross = z6.cross(diff);
+            zi=z6;
+            break;
+        }
+        VectorXd column(6); column << cross, zi;
+        JacobianArm_prev.col(i) = column;
+    }
+
+    double k; // damping factor
+    MatrixXd I = MatrixXd::Identity(6,6);
+    MatrixXd JacobianArmT = JacobianArm.transpose();
+    MatrixXd JJ = JacobianArm*JacobianArmT;
+    if(abs(JJ.determinant())<0.001){
+        k = 0.01;
+    }else{
+        k=0.0;
+    }
+    MatrixXd JJk = (JJ+pow(k,2)*I);
+    MatrixXd JJk_inv = JJk.inverse();
+    MatrixXd J_plus = JacobianArmT*JJk_inv; // pseudo-inverse of the Jacobian
+    VectorXd hand_vel_xd(6);
+    hand_vel_xd << hand_vel.at(0),hand_vel.at(1),hand_vel.at(2),hand_vel.at(3),hand_vel.at(4),hand_vel.at(5);
+    VectorXd joint_velocities = J_plus*hand_vel_xd;
+
+    // Joints limits minimization function
+    double H_jlim_av = 0;
+    if(jlim_en && !posture_prev.empty()){
+        VectorXd delta_H_jlim(posture_prev.size());
+        VectorXd delta_H_jlim_mod(posture_prev.size());
+        std::transform(max_limits.begin(),max_limits.end(),min_limits.begin(),mid_limits.begin(),plus<double>());
+        std::transform(mid_limits.begin(), mid_limits.end(), mid_limits.begin(), std::bind1st(std::multiplies<double>(),0.5));
+        for (size_t i = 0; i < posture.size(); ++i){
+            H_jlim_av += 0.5*pow(((posture.at(i) - mid_limits.at(i))/(max_limits.at(i) - min_limits.at(i))),2);
+        }
+        std::transform(posture.begin(),posture.end(),posture_prev.begin(),posture_delta.begin(),minus<double>());
+        for (size_t i = 0; i < posture_delta.size(); ++i){
+            if(pow(posture_delta.at(i),2)<0.0001){
+                delta_H_jlim(i) = 0.0;
+                delta_H_jlim_mod(i) = 0.0;
+            }else{
+                delta_H_jlim(i) = (H_jlim_av - this->H_jlim_av_prev)/posture_delta.at(i);
+                delta_H_jlim_mod(i) = delta_H_jlim(i)*(1+exp((delta_H_jlim(i) - jlim_th)/jlim_rate));
+            }
+        }
+        MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
+        MatrixXd Jpp = J_plus*JacobianArm;
+        MatrixXd JpJ = Id - Jpp;
+        //VectorXd J_Null= JpJ*delta_H_jlim;
+        VectorXd J_Null= JpJ*delta_H_jlim_mod;
+        double k_jlim = 0;
+        if(J_Null.norm() > 0.0001){
+            k_jlim = - ((vel_max - (J_plus*hand_vel_xd).norm())/((JpJ.norm())*(J_Null.norm())));
+        }
+        double fd = 1 - exp(-damping*(J_Null.norm()));
+
+        joint_velocities +=  k_jlim*fd*J_Null;
+    }
+
+
+    velocities.clear();
+    velocities.resize(joint_velocities.size());
+    VectorXd::Map(&velocities[0], joint_velocities.size()) = joint_velocities;
+
+    // update the previous values
+    switch(arm){
+    case 1: // right arm
+        this->rightPosture_prev = posture;
+        break;
+    case 2:// left arm
+        this->leftPosture_prev = posture;
+        break;
+    }
+    this->H_jlim_av_prev = H_jlim_av;
 }
 
 void Humanoid::transfMatrix(double alpha, double a, double d, double theta, Matrix4d &T)

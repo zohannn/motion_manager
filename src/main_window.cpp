@@ -190,6 +190,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     **********************/    
     ui.tabWidget_main->setCurrentIndex(0);
     ui.tabWidget_sol->setCurrentIndex(0);
+    ui.groupBox_ctrl_options->setEnabled(true);
+    ui.groupBox_jlim_params->setEnabled(false);
 #if MOVEIT==0
     ui.pushButton_execMov_moveit->setEnabled(false);
     ui.comboBox_planner->clear();
@@ -311,6 +313,19 @@ void MainWindow::execPosControl()
             double des_hand_or_roll = this->ui.lineEdit_des_right_hand_or_roll->text().toDouble();
             double des_hand_or_pitch = this->ui.lineEdit_des_right_hand_or_pitch->text().toDouble();
             double des_hand_or_yaw = this->ui.lineEdit_des_right_hand_or_yaw->text().toDouble();
+
+            double vel_max = this->ui.lineEdit_vel_max->text().toDouble()*M_PI/180;
+            double damping = this->ui.lineEdit_damping->text().toDouble();
+            bool jlim_en = this->ui.checkBox_joints_limits_av->isChecked();
+            double jlim_th = 0; double jlim_rate = 1;
+            if(jlim_en){
+                jlim_th = this->ui.lineEdit_jlim_th->text().toDouble();
+                jlim_rate = this->ui.lineEdit_jlim_rate->text().toDouble();
+            }
+            bool sing_en = this->ui.checkBox_sing_av->isChecked();
+            bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
+            bool hl_en = this->ui.checkBox_hl_add->isChecked();
+
             VectorXd des_hand(6);
             des_hand << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z,
                         des_hand_or_roll,des_hand_or_pitch,des_hand_or_yaw;
@@ -371,7 +386,9 @@ void MainWindow::execPosControl()
             VectorXd::Map(&hand_vel_vec[0], hand_vel.size()) = hand_vel;
 
             vector<double> r_velocities;
-            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
+            //this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
+            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,damping,jlim_th,jlim_rate);
+
             vector<double> r_velocities_mes; vector<double> r_hand_velocities_mes;
             this->curr_scene->getHumanoid()->getRightArmVelocities(r_velocities_mes);
             this->curr_scene->getHumanoid()->getRightHandVelocities(r_hand_velocities_mes);
@@ -433,6 +450,19 @@ void MainWindow::execVelControl()
             double des_hand_vel_wx = this->ui.lineEdit_des_right_hand_vel_wx->text().toDouble();
             double des_hand_vel_wy = this->ui.lineEdit_des_right_hand_vel_wy->text().toDouble();
             double des_hand_vel_wz = this->ui.lineEdit_des_right_hand_vel_wz->text().toDouble();
+
+            double vel_max = this->ui.lineEdit_vel_max->text().toDouble()*M_PI/180;
+            double damping = this->ui.lineEdit_damping->text().toDouble();
+            bool jlim_en = this->ui.checkBox_joints_limits_av->isChecked();
+            double jlim_th = 0; double jlim_rate = 1;
+            if(jlim_en){
+                jlim_th = this->ui.lineEdit_jlim_th->text().toDouble();
+                jlim_rate = this->ui.lineEdit_jlim_rate->text().toDouble();
+            }
+            bool sing_en = this->ui.checkBox_sing_av->isChecked();
+            bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
+            bool hl_en = this->ui.checkBox_hl_add->isChecked();
+
             VectorXd hand_vel(6);
             hand_vel << des_hand_vel_x,des_hand_vel_y,des_hand_vel_z,
                         des_hand_vel_wx,des_hand_vel_wy,des_hand_vel_wz;
@@ -484,7 +514,8 @@ void MainWindow::execVelControl()
             VectorXd::Map(&hand_vel_vec[0], hand_vel.size()) = hand_vel;
 
             vector<double> r_velocities;
-            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
+            //this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
+            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,damping,jlim_th,jlim_rate);
             vector<double> r_velocities_mes; vector<double> r_hand_velocities_mes;
             this->curr_scene->getHumanoid()->getRightArmVelocities(r_velocities_mes);
             this->curr_scene->getHumanoid()->getRightHandVelocities(r_hand_velocities_mes);
@@ -10351,7 +10382,13 @@ void MainWindow::check_des_right_hand_vel_wz(int state)
 
 void MainWindow::check_ctrl_joints_limits_av(int state)
 {
-
+    if(state==0){
+        // unchecked
+        this->ui.groupBox_jlim_params->setEnabled(false);
+    }else{
+       // checked
+       this->ui.groupBox_jlim_params->setEnabled(true);
+    }
 }
 
 void MainWindow::check_ctrl_sing_av(int state)
@@ -10371,8 +10408,13 @@ void MainWindow::check_ctrl_hl_add(int state)
 
 void MainWindow::on_pushButton_control_plot_joints_clicked()
 {
-    if(this->jointsVelocity_ctrl.rows()!=0)
-        this->mResultsCtrlJointsdlg->setupPlots(this->jointsPosition_ctrl,this->jointsVelocity_ctrl,this->sim_time);
+    if(this->jointsVelocity_ctrl.rows()!=0){
+        vector<double> max_limits;
+        vector<double> min_limits;
+        this->curr_scene->getHumanoid()->getRightMaxLimits(max_limits);
+        this->curr_scene->getHumanoid()->getRightMinLimits(min_limits);
+        this->mResultsCtrlJointsdlg->setupPlots(this->jointsPosition_ctrl,this->jointsVelocity_ctrl,max_limits,min_limits,this->sim_time);
+    }
     this->mResultsCtrlJointsdlg->show();
 }
 

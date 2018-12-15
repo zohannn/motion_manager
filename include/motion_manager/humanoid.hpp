@@ -930,6 +930,24 @@ public:
      */
     void inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double>& velocities);
 
+    /**
+     * @brief inverseDiffKinematicsSingleArm
+     * @param arm
+     * @param posture
+     * @param hand_vel
+     * @param velocities
+     * @param jlim_en
+     * @param sing_en
+     * @param obsts_en
+     * @param hl_en
+     * @param vel_max
+     * @param damping
+     * @param jlim_th
+     * @param jlim_rate
+     */
+    void inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double>& velocities, bool jlim_en, bool sing_en, bool obsts_en, bool hl_en,
+                                        double vel_max, double damping, double jlim_th, double jlim_rate);
+
 //#if HEAD==1
   //  humanoid_part getHead();
 //#endif
@@ -1016,6 +1034,8 @@ private:
     // joints [rad]: 7 joints + 4 joints for each arm (total: 22 joints)
     vector<double> rightPosture; /**< right arm+hand current posture */
     vector<double> leftPosture; /**< left arm+hand current posture */
+    vector<double> rightPosture_prev; /**< right arm+hand previous posture */
+    vector<double> leftPosture_prev; /**< left arm+hand previous posture */
     vector<double> rightHomePosture; /**< right arm+hand home posture */
     vector<double> leftHomePosture; /**< left arm+hand home posture */
     vector<double> min_rightLimits; /**< minimum right limits */
@@ -1069,6 +1089,10 @@ private:
     //positions on the left hand
     MatrixXd leftFingers; /**< positions of the phalanges of the fingers on the left hand */
 
+    double H_jlim_av_prev; /**<  previous value of the joints limits minimization function */
+    double H_sing_av_prev; /**<  previous value of the singularities avoidance minimization function */
+    double H_obsts_av_prev; /**<  previous value of the obstacle avoidance minimization function */
+    double H_hl_add_prev; /**<  previous value of the human-likeness addition minimization function */
 
     /**
      * @brief This method computes the current D-H parameters of the right arm

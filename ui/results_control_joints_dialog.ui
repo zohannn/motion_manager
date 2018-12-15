@@ -152,10 +152,10 @@
   <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>1271</x>
-     <y>632</y>
+     <x>1270</x>
+     <y>633</y>
      <width>249</width>
-     <height>58</height>
+     <height>85</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -194,6 +194,13 @@
        </widget>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="checkBox_jlim">
+      <property name="text">
+       <string>show the joints limits</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
