@@ -148,6 +148,11 @@ public:
          */
         double getThirdQuartile(vector<int> v);
 
+        /**
+         * @brief init
+         */
+        void init();
+
 
 
 public Q_SLOTS:

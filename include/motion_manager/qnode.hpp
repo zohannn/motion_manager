@@ -21,15 +21,6 @@
 #include <vrep_common/ProximitySensorData.h>
 #include <algorithm>
 
-#include <boost/log/core.hpp>
-#include <boost/log/trivial.hpp>
-#include <boost/log/expressions.hpp>
-#include <boost/log/sinks/text_file_backend.hpp>
-#include <boost/log/utility/setup/file.hpp>
-#include <boost/log/utility/setup/common_attributes.hpp>
-#include <boost/log/sources/severity_logger.hpp>
-#include <boost/log/sources/record_ostream.hpp>
-
 #include "config.hpp"
 #include "task.hpp"
 #include "scenario.hpp"
@@ -40,13 +31,7 @@
 
 namespace motion_manager {
 
-namespace logging = boost::log;
-namespace src = boost::log::sources;
-namespace sinks = boost::log::sinks;
-namespace keywords = boost::log::keywords;
-
 using namespace std;
-using namespace logging::trivial;
 
 typedef boost::shared_ptr<Scenario> scenarioPtr;/**< shared pointer to the current scenario */
 typedef boost::shared_ptr<Task> taskPtr; /**< shared pointer to the current task */

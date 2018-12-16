@@ -2408,7 +2408,7 @@ p, li { white-space: pre-wrap; }
         <x>460</x>
         <y>20</y>
         <width>351</width>
-        <height>331</height>
+        <height>481</height>
        </rect>
       </property>
       <property name="title">
@@ -2418,7 +2418,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>220</y>
+         <y>340</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2444,7 +2444,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>160</y>
+         <y>260</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2457,7 +2457,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>190</y>
+         <y>310</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2474,14 +2474,14 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>10</x>
          <y>30</y>
-         <width>221</width>
+         <width>241</width>
          <height>91</height>
         </rect>
        </property>
        <property name="title">
         <string>Joint limits parameters</string>
        </property>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2530,54 +2530,101 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QGroupBox" name="groupBox_sing_av_params">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>260</y>
-         <width>251</width>
-         <height>58</height>
+         <y>160</y>
+         <width>241</width>
+         <height>91</height>
         </rect>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_59">
+       <property name="title">
+        <string>Singularities avoidance parameters</string>
+       </property>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>171</width>
+          <height>58</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_59">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_305">
+           <item>
+            <widget class="QLabel" name="label_sing_coeff">
+             <property name="text">
+              <string>Coefficient</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_sing_coeff">
+             <property name="text">
+              <string>0.2</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_302">
+           <item>
+            <widget class="QLabel" name="label_sing_damping">
+             <property name="text">
+              <string>Dambing </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_sing_damping">
+             <property name="text">
+              <string>0.01</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>390</y>
+         <width>249</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_301">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_301">
-          <item>
-           <widget class="QLabel" name="label_vel_max">
-            <property name="text">
-             <string>Max joint velocity [deg/s]</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="lineEdit_vel_max">
-            <property name="text">
-             <string>50.0</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QLabel" name="label_vel_max">
+          <property name="text">
+           <string>Max joint velocity [deg/s]</string>
+          </property>
+         </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_302">
-          <item>
-           <widget class="QLabel" name="label_damping">
-            <property name="text">
-             <string>Dambing factor</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="lineEdit_damping">
-            <property name="text">
-             <string>0.2</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QLineEdit" name="lineEdit_vel_max">
+          <property name="text">
+           <string>50.0</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
+      <zorder>checkBox_hl_add</zorder>
+      <zorder>checkBox_joints_limits_av</zorder>
+      <zorder>checkBox_sing_av</zorder>
+      <zorder>checkBox_obsts_av</zorder>
+      <zorder>groupBox_jlim_params</zorder>
+      <zorder>layoutWidget</zorder>
+      <zorder>label_vel_max</zorder>
+      <zorder>groupBox_sing_av_params</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_results">

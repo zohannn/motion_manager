@@ -192,6 +192,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     ui.tabWidget_sol->setCurrentIndex(0);
     ui.groupBox_ctrl_options->setEnabled(true);
     ui.groupBox_jlim_params->setEnabled(false);
+    ui.groupBox_sing_av_params->setEnabled(false);
+    // logging
+    init();
+    logging::add_common_attributes();
+
 #if MOVEIT==0
     ui.pushButton_execMov_moveit->setEnabled(false);
     ui.comboBox_planner->clear();
@@ -315,7 +320,7 @@ void MainWindow::execPosControl()
             double des_hand_or_yaw = this->ui.lineEdit_des_right_hand_or_yaw->text().toDouble();
 
             double vel_max = this->ui.lineEdit_vel_max->text().toDouble()*M_PI/180;
-            double damping = this->ui.lineEdit_damping->text().toDouble();
+
             bool jlim_en = this->ui.checkBox_joints_limits_av->isChecked();
             double jlim_th = 0; double jlim_rate = 1;
             if(jlim_en){
@@ -323,6 +328,11 @@ void MainWindow::execPosControl()
                 jlim_rate = this->ui.lineEdit_jlim_rate->text().toDouble();
             }
             bool sing_en = this->ui.checkBox_sing_av->isChecked();
+            double sing_coeff = 1; double sing_damping = 0.001;
+            if(sing_en){
+                sing_damping = this->ui.lineEdit_sing_damping->text().toDouble();
+                sing_coeff = this->ui.lineEdit_sing_coeff->text().toDouble();
+            }
             bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
 
@@ -387,7 +397,7 @@ void MainWindow::execPosControl()
 
             vector<double> r_velocities;
             //this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
-            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,damping,jlim_th,jlim_rate);
+            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,sing_coeff,sing_damping,jlim_th,jlim_rate);
 
             vector<double> r_velocities_mes; vector<double> r_hand_velocities_mes;
             this->curr_scene->getHumanoid()->getRightArmVelocities(r_velocities_mes);
@@ -452,7 +462,7 @@ void MainWindow::execVelControl()
             double des_hand_vel_wz = this->ui.lineEdit_des_right_hand_vel_wz->text().toDouble();
 
             double vel_max = this->ui.lineEdit_vel_max->text().toDouble()*M_PI/180;
-            double damping = this->ui.lineEdit_damping->text().toDouble();
+
             bool jlim_en = this->ui.checkBox_joints_limits_av->isChecked();
             double jlim_th = 0; double jlim_rate = 1;
             if(jlim_en){
@@ -460,6 +470,11 @@ void MainWindow::execVelControl()
                 jlim_rate = this->ui.lineEdit_jlim_rate->text().toDouble();
             }
             bool sing_en = this->ui.checkBox_sing_av->isChecked();
+            double sing_coeff = 1; double sing_damping = 0.001;
+            if(sing_en){
+                sing_damping = this->ui.lineEdit_sing_damping->text().toDouble();
+                sing_coeff = this->ui.lineEdit_sing_coeff->text().toDouble();
+            }
             bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
 
@@ -515,7 +530,7 @@ void MainWindow::execVelControl()
 
             vector<double> r_velocities;
             //this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
-            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,damping,jlim_th,jlim_rate);
+            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,sing_coeff,sing_damping,jlim_th,jlim_rate);
             vector<double> r_velocities_mes; vector<double> r_hand_velocities_mes;
             this->curr_scene->getHumanoid()->getRightArmVelocities(r_velocities_mes);
             this->curr_scene->getHumanoid()->getRightHandVelocities(r_hand_velocities_mes);
@@ -567,6 +582,23 @@ void MainWindow::execVelControl()
 ** Implementation [Slots]
 *****************************************************************************/
 
+void MainWindow::init()
+{
+
+    logging::add_file_log
+    (
+        keywords::file_name = "QNode_%N.log",                                        /*< file name pattern >*/
+        keywords::rotation_size = 10 * 1024 * 1024,                                   /*< rotate files every 10 MiB... >*/
+        keywords::time_based_rotation = boost::log::sinks::file::rotation_at_time_point(0,0,0), /*< ...or at midnight >*/
+        keywords::format = "[%TimeStamp%]: %Message%",                                 /*< log record format >*/
+        keywords::target = "Boost_logs"
+    );
+
+    logging::core::get()->set_filter
+    (
+        logging::trivial::severity >= logging::trivial::info
+    );
+}
 
 void MainWindow::updateLoggingView()
 {
@@ -10393,7 +10425,13 @@ void MainWindow::check_ctrl_joints_limits_av(int state)
 
 void MainWindow::check_ctrl_sing_av(int state)
 {
-
+    if(state==0){
+        // unchecked
+        this->ui.groupBox_sing_av_params->setEnabled(false);
+    }else{
+       // checked
+       this->ui.groupBox_sing_av_params->setEnabled(true);
+    }
 }
 
 void MainWindow::check_ctrl_obsts_av(int state)
@@ -10463,13 +10501,14 @@ void MainWindow::on_pushButton_start_control_clicked()
     this->jointsPosition_ctrl.resize(0,0);
     this->jointsVelocity_ctrl.resize(0,0);
     this->sim_time.clear();
-    if(!this->ui.checkBox_const_vel_control->isChecked())
+
+    if(this->ui.checkBox_const_vel_control->isChecked())
     {
-        pos_control = true;
-        vel_control = false;
-    }else{
         pos_control = false;
         vel_control = true;
+    }else{
+        pos_control = true;
+        vel_control = false;
     }
 }
 
@@ -10484,6 +10523,13 @@ void MainWindow::on_pushButton_stop_control_clicked()
     pos_control = false;
     vel_control = false;
     this->qnode.stopSim();
+    sleep(1);
+    // restore the home posture
+    vector<double> r_p; vector<double> l_p;
+    this->curr_scene->getHumanoid()->getRightHomePosture(r_p);
+    this->curr_scene->getHumanoid()->getLeftHomePosture(l_p);
+    this->curr_scene->getHumanoid()->setRightHomePosture(r_p);
+    this->curr_scene->getHumanoid()->setLeftHomePosture(l_p);
 }
 
 void MainWindow::on_pushButton_control_plot_clicked()

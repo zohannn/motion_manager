@@ -7381,7 +7381,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 
         ros::spinOnce(); // handle ROS messages
         pre_time = simulationTime - timeTot; // update the total time of the movement
-        //BOOST_LOG_SEV(lg, info) << "timeTot = " << timeTot ;
+        BOOST_LOG_SEV(lg, info) << "timeTot = " << timeTot ;
         //BOOST_LOG_SEV(lg, info) << "pre_time = " << pre_time ;
 
         tb = pre_time;
@@ -9514,7 +9514,6 @@ void QNode::init()
     (
         logging::trivial::severity >= logging::trivial::info
     );
-
 }
 
 
