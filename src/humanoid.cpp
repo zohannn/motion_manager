@@ -3399,7 +3399,7 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
 
 }
 
-void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double> &velocities, bool jlim_en, bool sing_en, bool obsts_en, bool hl_en, double vel_max, double sing_coeff, double sing_damping, double jlim_th, double jlim_rate)
+void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double> &velocities, bool jlim_en, bool sing_en, bool obsts_en, bool hl_en, double vel_max, double sing_coeff, double sing_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping)
 {
     Matrix4d T;
     Matrix4d T_aux;
@@ -3544,40 +3544,38 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
     hand_vel_xd << hand_vel.at(0),hand_vel.at(1),hand_vel.at(2),hand_vel.at(3),hand_vel.at(4),hand_vel.at(5);
     VectorXd joint_velocities = J_plus*hand_vel_xd;
 
+    double null_th = 0.001;
     // Joints limits minimization function
-    if(jlim_en){
-        /**
-        double H_jlim_av = 0;
-        VectorXd delta_H_jlim(posture_prev.size());
-        VectorXd delta_H_jlim_mod(posture_prev.size());
+    if(jlim_en){        
+        VectorXd delta_H_jlim(posture.size());
+        VectorXd delta_H_jlim_mod(posture.size());
         std::transform(max_limits.begin(),max_limits.end(),min_limits.begin(),mid_limits.begin(),plus<double>());
         std::transform(mid_limits.begin(), mid_limits.end(), mid_limits.begin(), std::bind1st(std::multiplies<double>(),0.5));
         for (size_t i = 0; i < posture.size(); ++i){
-            H_jlim_av += 0.5*pow(((posture.at(i) - mid_limits.at(i))/(max_limits.at(i) - min_limits.at(i))),2);
-        }
-        std::transform(posture.begin(),posture.end(),posture_prev.begin(),posture_delta.begin(),minus<double>());
-        for (size_t i = 0; i < posture_delta.size(); ++i){
-            if(pow(posture_delta.at(i),2)<0.0001){
-                delta_H_jlim(i) = 0.0;
-                delta_H_jlim_mod(i) = 0.0;
-            }else{
-                delta_H_jlim(i) = (H_jlim_av - this->H_jlim_av_prev)/posture_delta.at(i);
-                delta_H_jlim_mod(i) = delta_H_jlim(i)*(1+exp((delta_H_jlim(i) - jlim_th)/jlim_rate));
-            }
+            delta_H_jlim(i) = (posture.at(i) - mid_limits.at(i))/(max_limits.at(i) - min_limits.at(i));
+            delta_H_jlim_mod(i) = delta_H_jlim(i)*(1+exp((delta_H_jlim(i) - jlim_th)/jlim_rate));
         }
         MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
         MatrixXd Jpp = J_plus*JacobianArm;
-        MatrixXd JpJ = Id - Jpp;
-        //VectorXd J_Null= JpJ*delta_H_jlim;
-        VectorXd J_Null= JpJ*delta_H_jlim_mod;
+        MatrixXd J_Null = Id - Jpp;
+        //VectorXd J_jlim= J_Null*delta_H_jlim;
+        VectorXd J_jlim= J_Null*delta_H_jlim_mod;
         double k_jlim = 0;
-        if(J_Null.norm() > 0.0001){
-            k_jlim = - ((vel_max - (J_plus*hand_vel_xd).norm())/((JpJ.norm())*(J_Null.norm())));
+        if(J_Null.norm() > null_th){
+            k_jlim = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_jlim.norm())));
         }
-        double fd = 1 - exp(-damping*(J_Null.norm()));
+        double fd = jlim_coeff * (1 - exp(-jlim_damping*(J_jlim.norm())));
 
-        joint_velocities +=  k_jlim*fd*J_Null;
-        **/
+        joint_velocities +=  k_jlim*fd*J_jlim;
+
+        //BOOST_LOG_SEV(lg, info) << "# ----------------------------------- # ";
+        //BOOST_LOG_SEV(lg, info) << "k_jlim = " << k_jlim;
+        //BOOST_LOG_SEV(lg, info) << "joint 2 = " << J_Null(1);
+        //BOOST_LOG_SEV(lg, info) << "joint 3 = " << J_Null(2);
+        //BOOST_LOG_SEV(lg, info) << "joint 4 = " << J_Null(3);
+        //BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_Null(4);
+        //BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_Null(5);
+        //BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_Null(6);
     }
 
     // Manipulability measure minimization function (Avoidance of singularities)
@@ -3661,7 +3659,7 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         MatrixXd J_Null = Id - Jpp;
         VectorXd J_sing= J_Null*delta_H_sing;
         double k_sing = 0;
-        if(J_sing.norm() > 0.001){
+        if(J_sing.norm() > null_th){
             k_sing = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_sing.norm())));
         }
         double fd = sing_coeff * (1 - exp(-sing_damping*(J_sing.norm())));

@@ -193,6 +193,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     ui.groupBox_ctrl_options->setEnabled(true);
     ui.groupBox_jlim_params->setEnabled(false);
     ui.groupBox_sing_av_params->setEnabled(false);
+    ui.groupBox_obsts_av_params->setEnabled(false);
+    ui.groupBox_hl_add_params->setEnabled(false);
     // logging
     init();
     logging::add_common_attributes();
@@ -323,9 +325,12 @@ void MainWindow::execPosControl()
 
             bool jlim_en = this->ui.checkBox_joints_limits_av->isChecked();
             double jlim_th = 0; double jlim_rate = 1;
+            double jlim_coeff = 1; double jlim_damping = 0.001;
             if(jlim_en){
                 jlim_th = this->ui.lineEdit_jlim_th->text().toDouble();
                 jlim_rate = this->ui.lineEdit_jlim_rate->text().toDouble();
+                jlim_coeff = this->ui.lineEdit_jlim_coeff->text().toDouble();
+                jlim_damping = this->ui.lineEdit_jlim_damping->text().toDouble();
             }
             bool sing_en = this->ui.checkBox_sing_av->isChecked();
             double sing_coeff = 1; double sing_damping = 0.001;
@@ -334,7 +339,17 @@ void MainWindow::execPosControl()
                 sing_coeff = this->ui.lineEdit_sing_coeff->text().toDouble();
             }
             bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
+            double obsts_coeff = 1; double obsts_damping = 0.001;
+            if(obsts_en){
+                obsts_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
+                obsts_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
+            }
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
+            double hl_coeff = 1; double hl_damping = 0.001;
+            if(hl_en){
+                hl_coeff = this->ui.lineEdit_hl_coeff->text().toDouble();
+                hl_damping = this->ui.lineEdit_hl_damping->text().toDouble();
+            }
 
             VectorXd des_hand(6);
             des_hand << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z,
@@ -397,7 +412,7 @@ void MainWindow::execPosControl()
 
             vector<double> r_velocities;
             //this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
-            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,sing_coeff,sing_damping,jlim_th,jlim_rate);
+            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,sing_coeff,sing_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping);
 
             vector<double> r_velocities_mes; vector<double> r_hand_velocities_mes;
             this->curr_scene->getHumanoid()->getRightArmVelocities(r_velocities_mes);
@@ -465,9 +480,12 @@ void MainWindow::execVelControl()
 
             bool jlim_en = this->ui.checkBox_joints_limits_av->isChecked();
             double jlim_th = 0; double jlim_rate = 1;
+            double jlim_coeff = 1; double jlim_damping = 0.001;
             if(jlim_en){
                 jlim_th = this->ui.lineEdit_jlim_th->text().toDouble();
                 jlim_rate = this->ui.lineEdit_jlim_rate->text().toDouble();
+                jlim_coeff = this->ui.lineEdit_jlim_coeff->text().toDouble();
+                jlim_damping = this->ui.lineEdit_jlim_damping->text().toDouble();
             }
             bool sing_en = this->ui.checkBox_sing_av->isChecked();
             double sing_coeff = 1; double sing_damping = 0.001;
@@ -476,7 +494,17 @@ void MainWindow::execVelControl()
                 sing_coeff = this->ui.lineEdit_sing_coeff->text().toDouble();
             }
             bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
+            double obsts_coeff = 1; double obsts_damping = 0.001;
+            if(obsts_en){
+                obsts_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
+                obsts_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
+            }
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
+            double hl_coeff = 1; double hl_damping = 0.001;
+            if(hl_en){
+                hl_coeff = this->ui.lineEdit_hl_coeff->text().toDouble();
+                hl_damping = this->ui.lineEdit_hl_damping->text().toDouble();
+            }
 
             VectorXd hand_vel(6);
             hand_vel << des_hand_vel_x,des_hand_vel_y,des_hand_vel_z,
@@ -530,7 +558,7 @@ void MainWindow::execVelControl()
 
             vector<double> r_velocities;
             //this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
-            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,sing_coeff,sing_damping,jlim_th,jlim_rate);
+            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,sing_coeff,sing_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping);
             vector<double> r_velocities_mes; vector<double> r_hand_velocities_mes;
             this->curr_scene->getHumanoid()->getRightArmVelocities(r_velocities_mes);
             this->curr_scene->getHumanoid()->getRightHandVelocities(r_hand_velocities_mes);
@@ -10436,12 +10464,24 @@ void MainWindow::check_ctrl_sing_av(int state)
 
 void MainWindow::check_ctrl_obsts_av(int state)
 {
-
+    if(state==0){
+        // unchecked
+        this->ui.groupBox_obsts_av_params->setEnabled(false);
+    }else{
+       // checked
+       this->ui.groupBox_obsts_av_params->setEnabled(true);
+    }
 }
 
 void MainWindow::check_ctrl_hl_add(int state)
 {
-
+    if(state==0){
+        // unchecked
+        this->ui.groupBox_hl_add_params->setEnabled(false);
+    }else{
+       // checked
+       this->ui.groupBox_hl_add_params->setEnabled(true);
+    }
 }
 
 void MainWindow::on_pushButton_control_plot_joints_clicked()
@@ -10470,6 +10510,7 @@ void MainWindow::on_pushButton_control_plot_pos_vel_comps_clicked()
     this->mCompCtrldlg->show();
 
 }
+
 
 // -----------------------------------------------------------------------
 // Controlling
@@ -10601,6 +10642,116 @@ void MainWindow::on_pushButton_control_plot_clicked()
         ui.plot_control_hand_vel->clearGraphs();
     }
 
+}
+
+void MainWindow::on_pushButton_save_ctrl_params_clicked()
+{
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    tr("Save the file with the controlling parameters"),
+                                                    QString(MAIN_PATH)+"/Control",
+                                                    "All Files (*.*);;Tol Files (*.ctrl)");
+    QFile f( filename );
+    if(f.open( QIODevice::WriteOnly )){
+        QTextStream stream( &f );
+        stream << "### Parameters of controlling ###" << endl;
+        stream << "# Joints limits parameters #" << endl;
+        if (this->ui.checkBox_joints_limits_av->isChecked()){ stream << "Jlim_av=true"<< endl;}else{stream << "Jlim_av=false"<< endl;}
+        stream << "Jlim_th=" << this->ui.lineEdit_jlim_th->text().toStdString().c_str() << endl;
+        stream << "Jlim_rate=" << this->ui.lineEdit_jlim_rate->text().toStdString().c_str() << endl;
+        stream << "Jlim_coeff=" << this->ui.lineEdit_jlim_coeff->text().toStdString().c_str() << endl;
+        stream << "Jlim_damping=" << this->ui.lineEdit_jlim_damping->text().toStdString().c_str() << endl;
+        stream << "# Singularities avoidance parameters #" << endl;
+        if (this->ui.checkBox_sing_av->isChecked()){ stream << "Sing_av=true"<< endl;}else{stream << "Sing_av=false"<< endl;}
+        stream << "Sing_coeff=" << this->ui.lineEdit_sing_coeff->text().toStdString().c_str() << endl;
+        stream << "Sing_damping=" << this->ui.lineEdit_sing_damping->text().toStdString().c_str() << endl;
+        stream << "# Obstacle avoidance parameters #" << endl;
+        if (this->ui.checkBox_obsts_av->isChecked()){ stream << "Obsts_av=true"<< endl;}else{stream << "Obsts_av=false"<< endl;}
+        stream << "Obsts_coeff=" << this->ui.lineEdit_obsts_coeff->text().toStdString().c_str() << endl;
+        stream << "Obsts_damping=" << this->ui.lineEdit_obsts_damping->text().toStdString().c_str() << endl;
+        stream << "# Human-likeness addition parameters #" << endl;
+        if (this->ui.checkBox_hl_add->isChecked()){ stream << "Hl_add=true"<< endl;}else{stream << "Hl_add=false"<< endl;}
+        stream << "Hl_add_coeff=" << this->ui.lineEdit_hl_coeff->text().toStdString().c_str() << endl;
+        stream << "Hl_add_damping=" << this->ui.lineEdit_hl_damping->text().toStdString().c_str() << endl;
+        stream << "# Maximum allowed velocity of the joints #" << endl;
+        stream << "vel_max=" << this->ui.lineEdit_vel_max->text().toStdString().c_str() << endl;
+        f.close();
+    }
+}
+
+void MainWindow::on_pushButton_load_ctrl_params_clicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    tr("Load the file of warm start settings"),
+                                                    QString(MAIN_PATH)+"/Control",
+                                                    "All Files (*.*);; Tol Files (*.ctrl)");
+    QFile f( filename );
+    if(f.open( QIODevice::ReadOnly )){
+        QTextStream stream( &f );
+        QString line;
+        while(!stream.atEnd()){
+            line = f.readLine();
+            if(line.at(0)!=QChar('#')){
+                QStringList fields = line.split("=");
+                if (QString::compare(fields.at(0),QString("Jlim_av"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.checkBox_joints_limits_av->setChecked(true);
+                        this->ui.groupBox_jlim_params->setEnabled(true);
+                    }else{
+                        this->ui.checkBox_joints_limits_av->setChecked(false);
+                        this->ui.groupBox_jlim_params->setEnabled(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("Jlim_th"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_jlim_th->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Jlim_rate"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_jlim_rate->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Jlim_coeff"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_jlim_coeff->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Jlim_damping"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_jlim_damping->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Sing_av"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.checkBox_sing_av->setChecked(true);
+                        this->ui.groupBox_sing_av_params->setEnabled(true);
+                    }else{
+                        this->ui.checkBox_sing_av->setChecked(false);
+                        this->ui.groupBox_sing_av_params->setEnabled(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("Sing_coeff"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_sing_coeff->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Sing_damping"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_sing_damping->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Obsts_av"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.checkBox_obsts_av->setChecked(true);
+                        this->ui.groupBox_obsts_av_params->setEnabled(true);
+                    }else{
+                        this->ui.checkBox_obsts_av->setChecked(false);
+                        this->ui.groupBox_obsts_av_params->setEnabled(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("Obsts_coeff"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_obsts_coeff->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Obsts_damping"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_obsts_damping->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Hl_add"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.checkBox_hl_add->setChecked(true);
+                        this->ui.groupBox_hl_add_params->setEnabled(true);
+                    }else{
+                        this->ui.checkBox_hl_add->setChecked(false);
+                        this->ui.groupBox_hl_add_params->setEnabled(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("Hl_add_coeff"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_hl_coeff->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Hl_add_damping"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_hl_damping->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("vel_max"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_vel_max->setText(fields.at(1));
+                }
+            }
+        }
+
+        f.close();
+    }
 }
 
 void MainWindow::on_pushButton_control_save_clicked()

@@ -809,6 +809,16 @@ public Q_SLOTS:
          */
         void on_pushButton_control_plot_pos_vel_comps_clicked();
 
+        /**
+         * @brief on_pushButton_save_ctrl_params_clicked
+         */
+        void on_pushButton_save_ctrl_params_clicked();
+
+        /**
+         * @brief on_pushButton_load_ctrl_params_clicked
+         */
+        void on_pushButton_load_ctrl_params_clicked();
+
 
 private:
         Ui::MainWindowDesign ui; /**< handles of the main user interface */

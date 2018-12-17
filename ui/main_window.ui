@@ -1744,9 +1744,9 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>560</x>
         <y>20</y>
-        <width>441</width>
+        <width>331</width>
         <height>131</height>
        </rect>
       </property>
@@ -1758,7 +1758,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>10</x>
          <y>30</y>
-         <width>421</width>
+         <width>311</width>
          <height>91</height>
         </rect>
        </property>
@@ -1770,7 +1770,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_x">
               <property name="text">
-               <string>Velocity lin x [mm/s]:</string>
+               <string>x [mm/s]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1791,7 +1791,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_y">
               <property name="text">
-               <string>Velocity lin y [mm/s]:</string>
+               <string>y [mm/s]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1812,7 +1812,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_z">
               <property name="text">
-               <string>Velocity lin z [mm/s]:</string>
+               <string>z [mm/s]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1837,7 +1837,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_wx">
               <property name="text">
-               <string>Velocity wx [rad/s]:</string>
+               <string>wx [rad/s]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1858,7 +1858,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_wy">
               <property name="text">
-               <string>Velocity wy [rad/s]:</string>
+               <string>wy [rad/s]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1879,7 +1879,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_wz">
               <property name="text">
-               <string>Velocity wz [rad/s]:</string>
+               <string>wz [rad/s]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1903,9 +1903,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_des_right_hand_pos">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>560</x>
         <y>160</y>
-        <width>441</width>
+        <width>331</width>
         <height>161</height>
        </rect>
       </property>
@@ -1917,7 +1917,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>10</x>
          <y>30</y>
-         <width>421</width>
+         <width>311</width>
          <height>91</height>
         </rect>
        </property>
@@ -1929,7 +1929,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_pos_x">
               <property name="text">
-               <string>Position x [mm]:</string>
+               <string>x [mm]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1950,7 +1950,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_pos_y">
               <property name="text">
-               <string>Position y [mm]:</string>
+               <string>y [mm]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1971,7 +1971,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_pos_z">
               <property name="text">
-               <string>Position z [mm]:</string>
+               <string>z [mm]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1996,7 +1996,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_or_roll">
               <property name="text">
-               <string>Orientation roll [rad]:</string>
+               <string>roll [rad]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -2017,7 +2017,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_or_pitch">
               <property name="text">
-               <string>Orientation pitch [rad]:</string>
+               <string>pitch [rad]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -2038,7 +2038,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_or_yaw">
               <property name="text">
-               <string>Orientation yaw [rad]:</string>
+               <string>yaw [rad]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -2088,7 +2088,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="checkBox_right_hand_status">
       <property name="geometry">
        <rect>
-        <x>830</x>
+        <x>920</x>
         <y>270</y>
         <width>211</width>
         <height>21</height>
@@ -2101,7 +2101,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="checkBox_const_vel_control">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>560</x>
         <y>340</y>
         <width>181</width>
         <height>21</height>
@@ -2117,9 +2117,9 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="geometry">
        <rect>
-        <x>830</x>
+        <x>920</x>
         <y>20</y>
-        <width>401</width>
+        <width>311</width>
         <height>241</height>
        </rect>
       </property>
@@ -2131,7 +2131,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>10</x>
          <y>30</y>
-         <width>381</width>
+         <width>291</width>
          <height>201</height>
         </rect>
        </property>
@@ -2143,7 +2143,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLabel" name="label_comp_right_hand_pos_x">
               <property name="text">
-               <string>Position x [mm]:</string>
+               <string>x [mm]:</string>
               </property>
              </widget>
             </item>
@@ -2161,7 +2161,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLabel" name="label_comp_right_hand_pos_y">
               <property name="text">
-               <string>Position y [mm]:</string>
+               <string>y [mm]:</string>
               </property>
              </widget>
             </item>
@@ -2179,7 +2179,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLabel" name="label_comp_right_hand_pos_z">
               <property name="text">
-               <string>Position z [mm]:</string>
+               <string>z [mm]:</string>
               </property>
              </widget>
             </item>
@@ -2197,7 +2197,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLabel" name="label_comp_right_hand_or_roll">
               <property name="text">
-               <string>Orientation roll [rad]:</string>
+               <string>roll [rad]:</string>
               </property>
              </widget>
             </item>
@@ -2215,7 +2215,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLabel" name="label_comp_right_hand_or_pitch">
               <property name="text">
-               <string>Orientation pitch [rad]:</string>
+               <string>pitch [rad]:</string>
               </property>
              </widget>
             </item>
@@ -2233,7 +2233,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLabel" name="label_comp_right_hand_or_yaw">
               <property name="text">
-               <string>Orientation yaw [rad]:</string>
+               <string>yaw [rad]:</string>
               </property>
              </widget>
             </item>
@@ -2255,7 +2255,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLabel" name="label_comp_right_hand_vel_x">
               <property name="text">
-               <string>Velocity lin x [mm/s]:</string>
+               <string>x [mm/s]:</string>
               </property>
              </widget>
             </item>
@@ -2273,7 +2273,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLabel" name="label_comp_right_hand_vel_y">
               <property name="text">
-               <string>Velocity lin y [mm/s]:</string>
+               <string>y [mm/s]:</string>
               </property>
              </widget>
             </item>
@@ -2291,7 +2291,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLabel" name="label_comp_right_hand_vel_z">
               <property name="text">
-               <string>Velocity lin z [mm/s]:</string>
+               <string>z [mm/s]:</string>
               </property>
              </widget>
             </item>
@@ -2309,7 +2309,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLabel" name="label_comp_right_hand_vel_wx">
               <property name="text">
-               <string>Velocity wx [rad/s]:</string>
+               <string>wx [rad/s]:</string>
               </property>
              </widget>
             </item>
@@ -2327,7 +2327,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLabel" name="label_comp_right_hand_vel_wy">
               <property name="text">
-               <string>Velocity wy [rad/s]:</string>
+               <string>wy [rad/s]:</string>
               </property>
              </widget>
             </item>
@@ -2345,7 +2345,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLabel" name="label_comp_right_hand_vel_wz">
               <property name="text">
-               <string>Velocity wz [rad/s]:</string>
+               <string>wz [rad/s]:</string>
               </property>
              </widget>
             </item>
@@ -2405,33 +2405,33 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_ctrl_options">
       <property name="geometry">
        <rect>
-        <x>460</x>
+        <x>10</x>
         <y>20</y>
-        <width>351</width>
-        <height>481</height>
+        <width>521</width>
+        <height>511</height>
        </rect>
       </property>
       <property name="title">
-       <string>Control options</string>
+       <string>Control settings</string>
       </property>
       <widget class="QCheckBox" name="checkBox_hl_add">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>340</y>
+         <x>270</x>
+         <y>350</y>
          <width>171</width>
          <height>21</height>
         </rect>
        </property>
        <property name="text">
-        <string>human-likeness</string>
+        <string>add human-likeness</string>
        </property>
       </widget>
       <widget class="QCheckBox" name="checkBox_joints_limits_av">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>130</y>
+         <y>200</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2443,8 +2443,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QCheckBox" name="checkBox_sing_av">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>260</y>
+         <x>270</x>
+         <y>140</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2457,7 +2457,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>310</y>
+         <y>350</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2475,19 +2475,19 @@ p, li { white-space: pre-wrap; }
          <x>10</x>
          <y>30</y>
          <width>241</width>
-         <height>91</height>
+         <height>161</height>
         </rect>
        </property>
        <property name="title">
         <string>Joint limits parameters</string>
        </property>
-       <widget class="QWidget" name="layoutWidget">
+       <widget class="QWidget" name="">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>30</y>
-          <width>191</width>
-          <height>58</height>
+          <x>11</x>
+          <y>31</y>
+          <width>211</width>
+          <height>120</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_60">
@@ -2503,7 +2503,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QLineEdit" name="lineEdit_jlim_th">
              <property name="text">
-              <string>0.4</string>
+              <string>0.05</string>
              </property>
             </widget>
            </item>
@@ -2527,22 +2527,58 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_306">
+           <item>
+            <widget class="QLabel" name="label_jlim_coeff">
+             <property name="text">
+              <string>Coefficient</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_jlim_coeff">
+             <property name="text">
+              <string>0.3</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_307">
+           <item>
+            <widget class="QLabel" name="label_jlim_damping">
+             <property name="text">
+              <string>Dambing </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_jlim_damping">
+             <property name="text">
+              <string>0.02</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
         </layout>
        </widget>
       </widget>
       <widget class="QGroupBox" name="groupBox_sing_av_params">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>160</y>
-         <width>241</width>
-         <height>91</height>
+         <x>270</x>
+         <y>30</y>
+         <width>231</width>
+         <height>101</height>
         </rect>
        </property>
        <property name="title">
         <string>Singularities avoidance parameters</string>
        </property>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2591,11 +2627,11 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>390</y>
+         <x>260</x>
+         <y>480</y>
          <width>249</width>
          <height>25</height>
         </rect>
@@ -2617,14 +2653,165 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+      <widget class="QGroupBox" name="groupBox_obsts_av_params">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>240</y>
+         <width>241</width>
+         <height>101</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Obstacle avoidance parameters</string>
+       </property>
+       <widget class="QWidget" name="layoutWidget_56">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>171</width>
+          <height>58</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_103">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_308">
+           <item>
+            <widget class="QLabel" name="label_obsts_coeff">
+             <property name="text">
+              <string>Coefficient</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_obsts_coeff">
+             <property name="text">
+              <string>0.2</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_564">
+           <item>
+            <widget class="QLabel" name="label_obsts_damping">
+             <property name="text">
+              <string>Dambing </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_obsts_damping">
+             <property name="text">
+              <string>0.01</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_hl_add_params">
+       <property name="geometry">
+        <rect>
+         <x>270</x>
+         <y>240</y>
+         <width>231</width>
+         <height>101</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Human-likeness parameters</string>
+       </property>
+       <widget class="QWidget" name="layoutWidget_57">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>171</width>
+          <height>58</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_104">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_565">
+           <item>
+            <widget class="QLabel" name="label_hl_coeff">
+             <property name="text">
+              <string>Coefficient</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_hl_coeff">
+             <property name="text">
+              <string>0.2</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_566">
+           <item>
+            <widget class="QLabel" name="label_hl_damping">
+             <property name="text">
+              <string>Dambing </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_hl_damping">
+             <property name="text">
+              <string>0.01</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>480</y>
+         <width>168</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_567">
+        <item>
+         <widget class="QPushButton" name="pushButton_save_ctrl_params">
+          <property name="text">
+           <string>Save</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_load_ctrl_params">
+          <property name="text">
+           <string>Load</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <zorder>checkBox_hl_add</zorder>
       <zorder>checkBox_joints_limits_av</zorder>
       <zorder>checkBox_sing_av</zorder>
       <zorder>checkBox_obsts_av</zorder>
       <zorder>groupBox_jlim_params</zorder>
       <zorder>layoutWidget</zorder>
-      <zorder>label_vel_max</zorder>
       <zorder>groupBox_sing_av_params</zorder>
+      <zorder>groupBox_obsts_av_params</zorder>
+      <zorder>groupBox_hl_add_params</zorder>
+      <zorder>pushButton_save_ctrl_params</zorder>
+      <zorder>pushButton_load_ctrl_params</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_results">
