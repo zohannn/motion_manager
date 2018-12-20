@@ -314,7 +314,7 @@ data_pred_mod_new = np.delete(data_pred_mod,id_null_cols)
 #print("Modified data:")
 #print(data_pred_mod_new)
 
-r = randint(0,len(task_1_dataframe.index))
+r = randint(0,len(task_1_dataframe.index)-1)
 task_1_sample = task_1_dataframe.iloc[[r]]
 
 # plan final posture columns
