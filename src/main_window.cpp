@@ -143,7 +143,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(this->ui.checkBox_joints_limits_av, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_joints_limits_av(int)));
     QObject::connect(this->ui.checkBox_sing_av, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_sing_av(int)));
     QObject::connect(this->ui.checkBox_obsts_av, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_obsts_av(int)));
-    QObject::connect(this->ui.checkBox_hl_add, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_hl_add(int)));
+    QObject::connect(this->ui.checkBox_hl_add, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_hl_add(int)));    
+    QObject::connect(this->ui.checkBox_draw_ellipse, SIGNAL(stateChanged(int)), this, SLOT(check_draw_ellipse(int)));
 
 
     ReadSettings();
@@ -225,6 +226,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     scenarios.push_back(QString("Learning tasks: picking the blue column"));
     scenarios.push_back(QString("Controlling: scenario with no obstacles"));
     scenarios.push_back(QString("Controlling: scenario with no obstacles for showing the effects of singularities"));
+    scenarios.push_back(QString("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane"));
 
 #endif
 
@@ -469,12 +471,22 @@ void MainWindow::execVelControl()
         {
             boost::unique_lock<boost::mutex> lck(hh_control_mtx);
 
-            double des_hand_vel_x = this->ui.lineEdit_des_right_hand_vel_x->text().toDouble();
-            double des_hand_vel_y = this->ui.lineEdit_des_right_hand_vel_y->text().toDouble();
-            double des_hand_vel_z = this->ui.lineEdit_des_right_hand_vel_z->text().toDouble();
-            double des_hand_vel_wx = this->ui.lineEdit_des_right_hand_vel_wx->text().toDouble();
-            double des_hand_vel_wy = this->ui.lineEdit_des_right_hand_vel_wy->text().toDouble();
-            double des_hand_vel_wz = this->ui.lineEdit_des_right_hand_vel_wz->text().toDouble();
+            double des_hand_vel_x,des_hand_vel_y,des_hand_vel_z,des_hand_vel_wx,des_hand_vel_wy,des_hand_vel_wz;
+            if (this->ui.checkBox_draw_ellipse->isChecked()){
+                des_hand_vel_x = 40*cos(0.2*this->qnode.getSimTime()-M_PI/2);
+                des_hand_vel_y = -60*sin(0.2*this->qnode.getSimTime()-M_PI/2);
+                des_hand_vel_z = 0.0;
+                des_hand_vel_wx = 0.0;
+                des_hand_vel_wy = 0.0;
+                des_hand_vel_wz = 0.0;
+            }else{
+                des_hand_vel_x = this->ui.lineEdit_des_right_hand_vel_x->text().toDouble();
+                des_hand_vel_y = this->ui.lineEdit_des_right_hand_vel_y->text().toDouble();
+                des_hand_vel_z = this->ui.lineEdit_des_right_hand_vel_z->text().toDouble();
+                des_hand_vel_wx = this->ui.lineEdit_des_right_hand_vel_wx->text().toDouble();
+                des_hand_vel_wy = this->ui.lineEdit_des_right_hand_vel_wy->text().toDouble();
+                des_hand_vel_wz = this->ui.lineEdit_des_right_hand_vel_wz->text().toDouble();
+            }
 
             double vel_max = this->ui.lineEdit_vel_max->text().toDouble()*M_PI/180;
 
@@ -869,6 +881,8 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              string path_vrep_controlling_no_objs = PATH_SCENARIOS+string("/vrep/Controlling_no_objs.ttt");
              // Controlling: scenario without objects for singularities
              string path_vrep_controlling_no_objs_sing = PATH_SCENARIOS+string("/vrep/Controlling_no_objs_sing.ttt");
+             // Controlling: scenario with one obstacle and drawing an ellipse on the XY plane
+             string path_vrep_controlling_obsts_av_ellipse = PATH_SCENARIOS+string("/vrep/Controlling_obsts_av_ellipse.ttt");
 
              switch(i){
              case 0: // Assembly scenario
@@ -1212,6 +1226,30 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 #endif
                  }else{
                      qnode.log(QNode::Error,std::string("Controlling: scenario with no obstacles for showing the effects of singularities HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+#endif
+                 break;
+             case 13: // Controlling: scenario with one obstacle and drawing an ellipse on the XY plane
+#if HAND==0
+
+#elif HAND==1
+                this->scenario_id = 14;
+                 if (qnode.loadScenario(path_vrep_controlling_obsts_av_ellipse,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
+                     //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
+                 }else{
+                     qnode.log(QNode::Error,std::string("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3922,6 +3960,9 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     // Controlling: scenario without objects for singularities
     string path_vrep_controlling_no_objs_sing = PATH_SCENARIOS+string("/vrep/Controlling_no_objs_sing.ttt");
 
+    // Controlling: scenario with one obstacle and drawing an ellipse on the XY plane
+    string path_vrep_controlling_obsts_av_ellipse = PATH_SCENARIOS+string("/vrep/Controlling_obsts_av_ellipse.ttt");
+
     switch(scene_id){
 
     case 0:
@@ -4021,6 +4062,13 @@ void MainWindow::on_pushButton_scene_reset_clicked()
         title = string("Controlling: scenario with no obstacles for showing the effects of singularities");
         success = string("Controlling: scenario with no obstacles for showing the effects of singularities HAS BEEN LOADED");
         failure = string("Controlling: scenario with no obstacles for showing the effects of singularities HAS NOT BEEN LOADED");
+        break;
+    case 14:
+        // Controlling: scenario with one obstacle and drawing an ellipse on the XY plane
+        path = path_vrep_controlling_obsts_av_ellipse;
+        title = string("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane");
+        success = string("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane HAS BEEN LOADED");
+        failure = string("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane HAS NOT BEEN LOADED");
         break;
     }
 
@@ -10484,6 +10532,39 @@ void MainWindow::check_ctrl_hl_add(int state)
     }
 }
 
+void MainWindow::check_draw_ellipse(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.checkBox_des_right_hand_vel_x->setEnabled(true);
+        this->ui.checkBox_des_right_hand_vel_y->setEnabled(true);
+        this->ui.checkBox_des_right_hand_vel_z->setEnabled(true);
+        this->ui.checkBox_des_right_hand_vel_wx->setEnabled(true);
+        this->ui.checkBox_des_right_hand_vel_wy->setEnabled(true);
+        this->ui.checkBox_des_right_hand_vel_wz->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_vel_x->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_vel_y->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_vel_z->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_vel_wx->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_vel_wy->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_vel_wz->setEnabled(true);
+    }else{
+       // checked
+        this->ui.checkBox_des_right_hand_vel_x->setEnabled(false);
+        this->ui.checkBox_des_right_hand_vel_y->setEnabled(false);
+        this->ui.checkBox_des_right_hand_vel_z->setEnabled(false);
+        this->ui.checkBox_des_right_hand_vel_wx->setEnabled(false);
+        this->ui.checkBox_des_right_hand_vel_wy->setEnabled(false);
+        this->ui.checkBox_des_right_hand_vel_wz->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_vel_x->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_vel_y->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_vel_z->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_vel_wx->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_vel_wy->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_vel_wz->setEnabled(false);
+    }
+}
+
 void MainWindow::on_pushButton_control_plot_joints_clicked()
 {
     if(this->jointsVelocity_ctrl.rows()!=0){
@@ -10668,6 +10749,7 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         if (this->ui.checkBox_obsts_av->isChecked()){ stream << "Obsts_av=true"<< endl;}else{stream << "Obsts_av=false"<< endl;}
         stream << "Obsts_coeff=" << this->ui.lineEdit_obsts_coeff->text().toStdString().c_str() << endl;
         stream << "Obsts_damping=" << this->ui.lineEdit_obsts_damping->text().toStdString().c_str() << endl;
+        if (this->ui.checkBox_obsts_noise->isChecked()){ stream << "Obsts_noise=true"<< endl;}else{stream << "Obsts_noise=false"<< endl;}
         stream << "# Human-likeness addition parameters #" << endl;
         if (this->ui.checkBox_hl_add->isChecked()){ stream << "Hl_add=true"<< endl;}else{stream << "Hl_add=false"<< endl;}
         stream << "Hl_add_coeff=" << this->ui.lineEdit_hl_coeff->text().toStdString().c_str() << endl;
@@ -10732,6 +10814,12 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     this->ui.lineEdit_obsts_coeff->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Obsts_damping"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_obsts_damping->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Obsts_noise"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.checkBox_obsts_noise->setChecked(true);
+                    }else{
+                        this->ui.checkBox_obsts_noise->setChecked(false);
+                    }
                 }else if(QString::compare(fields.at(0),QString("Hl_add"),Qt::CaseInsensitive)==0){
                     if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
                         this->ui.checkBox_hl_add->setChecked(true);

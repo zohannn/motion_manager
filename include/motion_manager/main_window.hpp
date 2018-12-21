@@ -800,6 +800,12 @@ public Q_SLOTS:
         void check_ctrl_hl_add(int state);
 
         /**
+         * @brief check_draw_ellipse
+         * @param state
+         */
+        void check_draw_ellipse(int state);
+
+        /**
          * @brief on_pushButton_control_plot_joints_clicked
          */
         void on_pushButton_control_plot_joints_clicked();

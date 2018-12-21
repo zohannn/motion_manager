@@ -1747,7 +1747,7 @@ p, li { white-space: pre-wrap; }
         <x>560</x>
         <y>20</y>
         <width>331</width>
-        <height>131</height>
+        <height>171</height>
        </rect>
       </property>
       <property name="title">
@@ -1899,12 +1899,25 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+      <widget class="QCheckBox" name="checkBox_draw_ellipse">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>140</y>
+         <width>301</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Draw an Ellipse on the XY plane</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_des_right_hand_pos">
       <property name="geometry">
        <rect>
         <x>560</x>
-        <y>160</y>
+        <y>200</y>
         <width>331</width>
         <height>161</height>
        </rect>
@@ -2102,7 +2115,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>560</x>
-        <y>340</y>
+        <y>370</y>
         <width>181</width>
         <height>21</height>
        </rect>
@@ -2411,8 +2424,17 @@ p, li { white-space: pre-wrap; }
         <height>511</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+       </font>
+      </property>
       <property name="title">
        <string>Control settings</string>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
       </property>
       <widget class="QCheckBox" name="checkBox_hl_add">
        <property name="geometry">
@@ -2457,7 +2479,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>350</y>
+         <y>380</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2481,7 +2503,7 @@ p, li { white-space: pre-wrap; }
        <property name="title">
         <string>Joint limits parameters</string>
        </property>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>11</x>
@@ -2659,7 +2681,7 @@ p, li { white-space: pre-wrap; }
          <x>10</x>
          <y>240</y>
          <width>241</width>
-         <height>101</height>
+         <height>131</height>
         </rect>
        </property>
        <property name="title">
@@ -2712,6 +2734,19 @@ p, li { white-space: pre-wrap; }
           </layout>
          </item>
         </layout>
+       </widget>
+       <widget class="QCheckBox" name="checkBox_obsts_noise">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>85</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>add noise</string>
+        </property>
        </widget>
       </widget>
       <widget class="QGroupBox" name="groupBox_hl_add_params">
@@ -2775,7 +2810,7 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -2801,6 +2836,7 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+      <zorder>layoutWidget</zorder>
       <zorder>checkBox_hl_add</zorder>
       <zorder>checkBox_joints_limits_av</zorder>
       <zorder>checkBox_sing_av</zorder>
@@ -2810,8 +2846,6 @@ p, li { white-space: pre-wrap; }
       <zorder>groupBox_sing_av_params</zorder>
       <zorder>groupBox_obsts_av_params</zorder>
       <zorder>groupBox_hl_add_params</zorder>
-      <zorder>pushButton_save_ctrl_params</zorder>
-      <zorder>pushButton_load_ctrl_params</zorder>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_results">
