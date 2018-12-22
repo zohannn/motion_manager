@@ -3399,7 +3399,7 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
 
 }
 
-void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double> &velocities, bool jlim_en, bool sing_en, bool obsts_en, bool hl_en, double vel_max, double sing_coeff, double sing_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping)
+void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double> &velocities, bool jlim_en, bool sing_en, bool obsts_en, bool hl_en, double vel_max, double sing_coeff, double sing_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts)
 {
     Matrix4d T;
     Matrix4d T_aux;
@@ -3674,6 +3674,14 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         //BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_Null(4);
         //BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_Null(5);
         //BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_Null(6);
+    }
+
+    // Obstacles avoidance
+    if(obsts_en){
+        for(size_t i=0;i<obsts.size();++i){
+            objectPtr obst = obsts.at(i);
+            // TO DO
+        }
     }
 
 

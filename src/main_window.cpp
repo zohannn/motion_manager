@@ -341,10 +341,40 @@ void MainWindow::execPosControl()
                 sing_coeff = this->ui.lineEdit_sing_coeff->text().toDouble();
             }
             bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
+            bool obsts_noise = false;
             double obsts_coeff = 1; double obsts_damping = 0.001;
             if(obsts_en){
                 obsts_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
                 obsts_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
+                obsts_noise = this->ui.checkBox_obsts_noise->isChecked();
+                if(obsts_noise){
+                    vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
+                    objectPtr obs_new;
+                    double obsts_x_var = 10; // mm
+                    double obsts_y_var = 10; // mm
+                    double obsts_z_var = 10; // mm
+                    double obsts_roll_var = 0.1; // rad
+                    double obsts_pitch_var = 0.1; // rad
+                    double obsts_yaw_var = 0.1; // rad
+                    for(size_t i=0; i<obsts.size(); ++i){
+                        std::srand(std::time(NULL));
+                        objectPtr obs = obsts.at(i);
+                        string obs_name = obs->getName();
+                        obs_new.reset(new Object(obs_name));
+                        motion_manager::pos obs_pos;
+                        motion_manager::orient obs_or;
+                        obs_pos.Xpos = obs->getPos().Xpos - (obsts_x_var/2) + obsts_x_var*(rand() / double(RAND_MAX));
+                        obs_pos.Ypos = obs->getPos().Ypos - (obsts_y_var/2) + obsts_y_var*(rand() / double(RAND_MAX));
+                        obs_pos.Zpos = obs->getPos().Zpos - (obsts_z_var/2) + obsts_z_var*(rand() / double(RAND_MAX));
+                        obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
+                        obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
+                        obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
+                        obs_new->setPos(obs_pos,false);
+                        obs_new->setOr(obs_or,false);
+                        obs_new->setSize(obs->getSize());
+                        this->curr_scene->setObject(i,obs_new);
+                    }
+                }
             }
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
             double hl_coeff = 1; double hl_damping = 0.001;
@@ -413,8 +443,9 @@ void MainWindow::execPosControl()
             VectorXd::Map(&hand_vel_vec[0], hand_vel.size()) = hand_vel;
 
             vector<double> r_velocities;
+            vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
             //this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
-            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,sing_coeff,sing_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping);
+            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,sing_coeff,sing_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
 
             vector<double> r_velocities_mes; vector<double> r_hand_velocities_mes;
             this->curr_scene->getHumanoid()->getRightArmVelocities(r_velocities_mes);
@@ -506,10 +537,40 @@ void MainWindow::execVelControl()
                 sing_coeff = this->ui.lineEdit_sing_coeff->text().toDouble();
             }
             bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
+            bool obsts_noise = false;
             double obsts_coeff = 1; double obsts_damping = 0.001;
             if(obsts_en){
                 obsts_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
                 obsts_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
+                obsts_noise = this->ui.checkBox_obsts_noise->isChecked();
+                if(obsts_noise){
+                    vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
+                    objectPtr obs_new;
+                    double obsts_x_var = 10; // mm
+                    double obsts_y_var = 10; // mm
+                    double obsts_z_var = 10; // mm
+                    double obsts_roll_var = 0.1; // rad
+                    double obsts_pitch_var = 0.1; // rad
+                    double obsts_yaw_var = 0.1; // rad
+                    for(size_t i=0; i<obsts.size(); ++i){
+                        std::srand(std::time(NULL));
+                        objectPtr obs = obsts.at(i);
+                        string obs_name = obs->getName();
+                        obs_new.reset(new Object(obs_name));
+                        motion_manager::pos obs_pos;
+                        motion_manager::orient obs_or;
+                        obs_pos.Xpos = obs->getPos().Xpos - (obsts_x_var/2) + obsts_x_var*(rand() / double(RAND_MAX));
+                        obs_pos.Ypos = obs->getPos().Ypos - (obsts_y_var/2) + obsts_y_var*(rand() / double(RAND_MAX));
+                        obs_pos.Zpos = obs->getPos().Zpos - (obsts_z_var/2) + obsts_z_var*(rand() / double(RAND_MAX));
+                        obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
+                        obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
+                        obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
+                        obs_new->setPos(obs_pos,false);
+                        obs_new->setOr(obs_or,false);
+                        obs_new->setSize(obs->getSize());
+                        this->curr_scene->setObject(i,obs_new);
+                    }
+                }
             }
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
             double hl_coeff = 1; double hl_damping = 0.001;
@@ -569,8 +630,9 @@ void MainWindow::execVelControl()
             VectorXd::Map(&hand_vel_vec[0], hand_vel.size()) = hand_vel;
 
             vector<double> r_velocities;
+            vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
             //this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
-            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,sing_coeff,sing_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping);
+            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,sing_coeff,sing_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
             vector<double> r_velocities_mes; vector<double> r_hand_velocities_mes;
             this->curr_scene->getHumanoid()->getRightArmVelocities(r_velocities_mes);
             this->curr_scene->getHumanoid()->getRightHandVelocities(r_hand_velocities_mes);
