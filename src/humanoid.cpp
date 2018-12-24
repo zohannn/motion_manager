@@ -2987,7 +2987,6 @@ void Humanoid::directKinematicsSingleArm(int arm, std::vector<double>& posture)
 
         if (i==0){
             // get the shoulder
-
             shoulderOr = T.block(0,0,3,3);
             v = T.block(0,3,3,1);
             shoulderPos[0] = v[0];
@@ -3008,7 +3007,6 @@ void Humanoid::directKinematicsSingleArm(int arm, std::vector<double>& posture)
         }else if (i==2){
 
             // get the elbow
-
             elbowOr = T.block(0,0,3,3);
             v = T.block(0,3,3,1);
             elbowPos[0] = v[0];
@@ -3029,7 +3027,6 @@ void Humanoid::directKinematicsSingleArm(int arm, std::vector<double>& posture)
         }else if (i==4){
 
             // get the wrist
-
             wristOr = T.block(0,0,3,3);
             v = T.block(0,3,3,1);
             wristPos[0] = v[0];
@@ -3678,8 +3675,139 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
 
     // Obstacles avoidance
     if(obsts_en){
+        // current positions of the arm
+        vector<vector<double>> points_arm = vector<vector<double>>(5);
+        vector<double> shoulderPos = vector<double>(3);
+        vector<double> shoulder_elbowPos = vector<double>(3);
+        vector<double> elbowPos = vector<double>(3);
+        vector<double> elbow_wristPos = vector<double>(3);
+        vector<double> wristPos = vector<double>(3);
+        vector<double> wrist_handPos = vector<double>(3);
+        vector<double> handPos = vector<double>(3);
+        T = mat_world;
+        for (size_t i = 0; i < posture.size(); ++i){
+            this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+            T = T * T_aux;
+            Vector3d v;
+            switch(i){
+            case 0:
+                v = T.block(0,3,3,1);
+                shoulderPos[0] = v[0];
+                shoulderPos[1] = v[1];
+                shoulderPos[2] = v[2];
+                break;
+            case 2:
+                v = T.block(0,3,3,1);
+                elbowPos[0] = v[0];
+                elbowPos[1] = v[1];
+                elbowPos[2] = v[2];
+                break;
+            case 4:
+                v = T.block(0,3,3,1);
+                wristPos[0] = v[0];
+                wristPos[1] = v[1];
+                wristPos[2] = v[2];
+                break;
+            case 6:
+                v = T.block(0,3,3,1);
+                handPos[0] = v[0];
+                handPos[1] = v[1];
+                handPos[2] = v[2];
+                break;
+            default:
+                // do nothing
+                break;
+            }
+        }
+        //middle point between the shoulder and the elbow
+        std::transform(shoulderPos.begin(),shoulderPos.end(),elbowPos.begin(),shoulder_elbowPos.begin(),plus<double>());
+        std::transform(shoulder_elbowPos.begin(), shoulder_elbowPos.end(), shoulder_elbowPos.begin(), std::bind1st(std::multiplies<double>(),0.5));
+        //middle point between the elbow and the wrist
+        std::transform(elbowPos.begin(),elbowPos.end(),wristPos.begin(),elbow_wristPos.begin(),plus<double>());
+        std::transform(elbow_wristPos.begin(), elbow_wristPos.end(), elbow_wristPos.begin(), std::bind1st(std::multiplies<double>(),0.5));
+        //middle point between the wrist and the hand
+        std::transform(wristPos.begin(),wristPos.end(),handPos.begin(),wrist_handPos.begin(),plus<double>());
+        std::transform(wrist_handPos.begin(), wrist_handPos.end(), wrist_handPos.begin(), std::bind1st(std::multiplies<double>(),0.5));
+        // points on the arm
+        points_arm.at(0) = shoulder_elbowPos;
+        points_arm.at(1) = elbowPos;
+        points_arm.at(2) = elbow_wristPos;
+        points_arm.at(3) = wristPos;
+        points_arm.at(4) = wrist_handPos;
+
+        // perturbated positions of the arm
+        double delta_theta = 0.001; // rad = 0.57 deg
+        vector<double> posture_delta(posture.size());
+        std::transform(posture.begin(), posture.end(), posture_delta.begin(), std::bind1st(std::plus<double>(),delta_theta));
+        vector<vector<double>> points_arm_delta = vector<vector<double>>(5);
+        vector<double> shoulderPos_delta = vector<double>(3);
+        vector<double> shoulder_elbowPos_delta = vector<double>(3);
+        vector<double> elbowPos_delta = vector<double>(3);
+        vector<double> elbow_wristPos_delta = vector<double>(3);
+        vector<double> wristPos_delta = vector<double>(3);
+        vector<double> wrist_handPos_delta = vector<double>(3);
+        vector<double> handPos_delta = vector<double>(3);
+        T = mat_world;
+        for (size_t i = 0; i < posture_delta.size(); ++i){
+            this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture_delta.at(i),T_aux);
+            T = T * T_aux;
+            Vector3d v;
+            switch(i){
+            case 0:
+                v = T.block(0,3,3,1);
+                shoulderPos_delta[0] = v[0];
+                shoulderPos_delta[1] = v[1];
+                shoulderPos_delta[2] = v[2];
+                break;
+            case 2:
+                v = T.block(0,3,3,1);
+                elbowPos_delta[0] = v[0];
+                elbowPos_delta[1] = v[1];
+                elbowPos_delta[2] = v[2];
+                break;
+            case 4:
+                v = T.block(0,3,3,1);
+                wristPos_delta[0] = v[0];
+                wristPos_delta[1] = v[1];
+                wristPos_delta[2] = v[2];
+                break;
+            case 6:
+                v = T.block(0,3,3,1);
+                handPos_delta[0] = v[0];
+                handPos_delta[1] = v[1];
+                handPos_delta[2] = v[2];
+                break;
+            default:
+                // do nothing
+                break;
+            }
+        }
+        //middle point between the shoulder and the elbow
+        std::transform(shoulderPos_delta.begin(),shoulderPos_delta.end(),elbowPos_delta.begin(),shoulder_elbowPos_delta.begin(),plus<double>());
+        std::transform(shoulder_elbowPos_delta.begin(), shoulder_elbowPos_delta.end(), shoulder_elbowPos_delta.begin(), std::bind1st(std::multiplies<double>(),0.5));
+        //middle point between the elbow and the wrist
+        std::transform(elbowPos_delta.begin(),elbowPos_delta.end(),wristPos_delta.begin(),elbow_wristPos_delta.begin(),plus<double>());
+        std::transform(elbow_wristPos_delta.begin(), elbow_wristPos_delta.end(), elbow_wristPos_delta.begin(), std::bind1st(std::multiplies<double>(),0.5));
+        //middle point between the wrist and the hand
+        std::transform(wristPos_delta.begin(),wristPos_delta.end(),handPos_delta.begin(),wrist_handPos_delta.begin(),plus<double>());
+        std::transform(wrist_handPos_delta.begin(), wrist_handPos_delta.end(), wrist_handPos_delta.begin(), std::bind1st(std::multiplies<double>(),0.5));
+        // points on the arm
+        points_arm_delta.at(0) = shoulder_elbowPos_delta;
+        points_arm_delta.at(1) = elbowPos_delta;
+        points_arm_delta.at(2) = elbow_wristPos_delta;
+        points_arm_delta.at(3) = wristPos_delta;
+        points_arm_delta.at(4) = wrist_handPos_delta;
+
+        // current obstacles in the scenario
         for(size_t i=0;i<obsts.size();++i){
             objectPtr obst = obsts.at(i);
+            double x_pos = obst->getPos().Xpos;
+            double y_pos = obst->getPos().Ypos;
+            double z_pos = obst->getPos().Zpos;
+            MatrixXd Rot_obst; obst->RPY_matrix(Rot_obst);
+            double x_size = obst->getSize().Xsize;
+            double y_size = obst->getSize().Ysize;
+            double z_size = obst->getSize().Zsize;
             // TO DO
         }
     }

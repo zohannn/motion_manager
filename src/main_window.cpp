@@ -241,8 +241,6 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     execPosControl_thrd = boost::thread(boost::bind(&MainWindow::execPosControl, this));
     execVelControl_thrd = boost::thread(boost::bind(&MainWindow::execVelControl, this));
 
-
-
 }
 
 MainWindow::~MainWindow()
