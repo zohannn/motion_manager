@@ -955,6 +955,14 @@ public:
     void inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double>& velocities, bool jlim_en, bool sing_en, bool obsts_en, bool hl_en,
                                         double vel_max, double sing_coeff, double sing_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts);
 
+    /**
+     * @brief get_distances_arm_obstacles
+     * @param points_arm
+     * @param obst_pos
+     * @param L_obst
+     * @param dist_arm
+     */
+    void get_distances_arm_obstacles(vector<vector<double>>& points_arm,vector<double>& obst_pos, Matrix3d& L_obst,vector<double>& dist_arm);
 //#if HEAD==1
   //  humanoid_part getHead();
 //#endif

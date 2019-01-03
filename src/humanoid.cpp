@@ -3801,14 +3801,28 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         // current obstacles in the scenario
         for(size_t i=0;i<obsts.size();++i){
             objectPtr obst = obsts.at(i);
-            double x_pos = obst->getPos().Xpos;
-            double y_pos = obst->getPos().Ypos;
-            double z_pos = obst->getPos().Zpos;
-            MatrixXd Rot_obst; obst->RPY_matrix(Rot_obst);
+            vector<double> obst_pos = vector<double>(3);
+            obst_pos.at(0) = obst->getPos().Xpos;
+            obst_pos.at(1) = obst->getPos().Ypos;
+            obst_pos.at(2) = obst->getPos().Zpos;
+            Matrix3d Rot_obst; obst->RPY_matrix(Rot_obst);
+            Matrix3d Rot_obst_t = Rot_obst.transpose();
             double x_size = obst->getSize().Xsize;
             double y_size = obst->getSize().Ysize;
             double z_size = obst->getSize().Zsize;
-            // TO DO
+            Matrix3d A_obst;
+            A_obst(0,0) = pow(x_size,-2); A_obst(0,1) = 0.0; A_obst(0,2) = 0.0;
+            A_obst(1,0) = 0.0; A_obst(1,1) = pow(y_size,-2); A_obst(1,2) = 0.0;
+            A_obst(2,0) = 0.0; A_obst(2,1) = 0.0; A_obst(2,2) = pow(z_size,-2);
+            Matrix3d L_obst = Rot_obst_t*A_obst*Rot_obst;
+
+            // get the distances between the current obstacle and the points on the arm
+            vector<double> dist_arm = vector<double>(5);
+            this->get_distances_arm_obstacles(points_arm,obst_pos,L_obst,dist_arm);
+            // get the distances between the current obstacle and the points on the arm with perturbated posture
+            vector<double> dist_arm_delta = vector<double>(5);
+            this->get_distances_arm_obstacles(points_arm_delta,obst_pos,L_obst,dist_arm_delta);
+
         }
     }
 
@@ -3817,7 +3831,85 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
     velocities.resize(joint_velocities.size());
     VectorXd::Map(&velocities[0], joint_velocities.size()) = joint_velocities;
 
+}
 
+void Humanoid::get_distances_arm_obstacles(vector<vector<double>>& points_arm,vector<double>& obst_pos,Matrix3d& L_obst,vector<double>& dist_arm)
+{
+    // see octave workspace obstacle_avoidance
+    Vector3d sol_1; Vector3d sol_2;
+
+
+    double xc,yc,zc; // coordinates of the center of the obstacles
+    double l11,l12,l13,l21,l22,l23,l31,l32,l33; // elements of the matrix R^t*A*R
+    double xp,yp,zp; // coordinates of the point on the arm
+
+    xc = obst_pos.at(0); yc = obst_pos.at(1); zc = obst_pos.at(2);
+    l11 = L_obst(0,0); l12 = L_obst(0,1); l13 = L_obst(0,2);
+    l21 = L_obst(1,0); l22 = L_obst(1,1); l23 = L_obst(1,2);
+    l31 = L_obst(2,0); l32 = L_obst(2,1); l33 = L_obst(2,2);
+
+    for(size_t i=0;i<points_arm.size();++i){
+        vector<double> pt = points_arm.at(i);
+        xp = pt.at(0); yp = pt.at(1); zp = pt.at(2);
+
+        // sol 1: x
+        //    ╱       2                       2                                                                                                                                                         2
+        //xc⋅╲╱  l₁₁⋅xc  - 2⋅l₁₁⋅xc⋅xp + l₁₁⋅xp  + l₁₂⋅xc⋅yc - l₁₂⋅xc⋅yp - l₁₂⋅xp⋅yc + l₁₂⋅xp⋅yp + l₁₃⋅xc⋅zc - l₁₃⋅xc⋅zp - l₁₃⋅xp⋅zc + l₁₃⋅xp⋅zp + l₂₁⋅xc⋅yc - l₂₁⋅xc⋅yp - l₂₁⋅xp⋅yc + l₂₁⋅xp⋅yp + l₂₂⋅yc  - 2⋅l₂₂⋅yc⋅yp + l
+        //──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        //         ________________________________________________________________________________________________________________________________________________________________________________________________________
+        //        ╱       2                       2                                                                                                                                                         2
+        //      ╲╱  l₁₁⋅xc  - 2⋅l₁₁⋅xc⋅xp + l₁₁⋅xp  + l₁₂⋅xc⋅yc - l₁₂⋅xc⋅yp - l₁₂⋅xp⋅yc + l₁₂⋅xp⋅yp + l₁₃⋅xc⋅zc - l₁₃⋅xc⋅zp - l₁₃⋅xp⋅zc + l₁₃⋅xp⋅zp + l₂₁⋅xc⋅yc - l₂₁⋅xc⋅yp - l₂₁⋅xp⋅yc + l₂₁⋅xp⋅yp + l₂₂⋅yc  - 2⋅l₂₂⋅yc⋅yp
+
+        //_________________________________________________________________________________________________________________________________________________________________________________________
+        //    2                                                                                                                                                         2                       2
+        //₂₂⋅yp  + l₂₃⋅yc⋅zc - l₂₃⋅yc⋅zp - l₂₃⋅yp⋅zc + l₂₃⋅yp⋅zp + l₃₁⋅xc⋅zc - l₃₁⋅xc⋅zp - l₃₁⋅xp⋅zc + l₃₁⋅xp⋅zp + l₃₂⋅yc⋅zc - l₃₂⋅yc⋅zp - l₃₂⋅yp⋅zc + l₃₂⋅yp⋅zp + l₃₃⋅zc  - 2⋅l₃₃⋅zc⋅zp + l₃₃⋅zp   - xc + xp
+        //───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        //_____________________________________________________________________________________________________________________________________________________________________________________________
+        //        2                                                                                                                                                         2                       2
+        //+ l₂₂⋅yp  + l₂₃⋅yc⋅zc - l₂₃⋅yc⋅zp - l₂₃⋅yp⋅zc + l₂₃⋅yp⋅zp + l₃₁⋅xc⋅zc - l₃₁⋅xc⋅zp - l₃₁⋅xp⋅zc + l₃₁⋅xp⋅zp + l₃₂⋅yc⋅zc - l₃₂⋅yc⋅zp - l₃₂⋅yp⋅zc + l₃₂⋅yp⋅zp + l₃₃⋅zc  - 2⋅l₃₃⋅zc⋅zp + l₃₃⋅zp
+        sol_1(0) = (xc*sqrt(l11*pow(xc,2)-2*l11*xc*xp+l11*pow(xp,2)+l12*xc*yc-l12*xc*yp-l12*xp*yc+l12*xp*yp+l13*xc*zc-l13*xc*zp-l13*xp*zc+l13*xp*zp+l21*xc*yc-l21*xc*yp-l21*xp*yc+l21*xp*yp+l22*pow(yc,2)-2*l22*yc*yp+l22*pow(yp,2)+l23*yc*zc-l23*yc*zp-l23*yp*zc+l23*yp*zp+l31*xc*zc-l31*xc*zp-l31*xp*zc+l31*xp*zp+l32*yc*zc-l32*yc*zp-l32*yp*zc+l32*yp*zp+l33*pow(zc,2)-2*l33*zc*zp+l33*pow(zp,2))-xc+xp)/
+                (sqrt(l11*pow(xc,2)-2*l11*xc*xp +l11*pow(xp,2)+l12*xc*yc-l12*xc*yp-l12*xp*yc+l12*xp*yp+l13*xc*zc-l13*xc*zp-l13*xp*zc+l13*xp*zp+l21*xc*yc-l21*xc*yp-l21*xp*yc+l21*xp*yp+l22*pow(yc,2)-2*l22*yc*yp+l22*pow(yp,2)+l23*yc*zc-l23*yc*zp-l23*yp*zc+l23*yp*zp+l31*xc*zc-l31*xc*zp-l31*xp*zc+l31*xp*zp+l32*yc*zc-l32*yc*zp-l32*yp*zc+l32*yp*zp+l33*pow(zc,2)-2*l33*zc*zp+l33*pow(zp,2)));
+
+        // sol 1: y
+        //        -yc⋅zp + yp⋅zc + (yc - yp)⋅⎜zc - ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        //                                   ⎜        ______________________________________________________________________________________________________________________________________________________________________________
+        //                                   ⎜       ╱       2                       2
+        //                                   ⎝     ╲╱  l₁₁⋅xc  - 2⋅l₁₁⋅xc⋅xp + l₁₁⋅xp  + l₁₂⋅xc⋅yc - l₁₂⋅xc⋅yp - l₁₂⋅xp⋅yc + l₁₂⋅xp⋅yp + l₁₃⋅xc⋅zc - l₁₃⋅xc⋅zp - l₁₃⋅xp⋅zc + l₁₃⋅xp⋅zp + l₂₁⋅xc⋅yc - l₂₁⋅xc⋅yp - l₂₁⋅xp⋅yc + l₂₁⋅xp⋅
+        //        ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        //                                                                                                                                                                                                                         z
+
+        //                       zc - zp
+        //        ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        //        __________________________________________________________________________________________________________________________________________________________________________________________________________________
+        //                   2                       2                                                                                                                                                         2
+        //        yp + l₂₂⋅yc  - 2⋅l₂₂⋅yc⋅yp + l₂₂⋅yp  + l₂₃⋅yc⋅zc - l₂₃⋅yc⋅zp - l₂₃⋅yp⋅zc + l₂₃⋅yp⋅zp + l₃₁⋅xc⋅zc - l₃₁⋅xc⋅zp - l₃₁⋅xp⋅zc + l₃₁⋅xp⋅zp + l₃₂⋅yc⋅zc - l₃₂⋅yc⋅zp - l₃₂⋅yp⋅zc + l₃₂⋅yp⋅zp + l₃₃⋅zc  - 2⋅l₃₃⋅zc⋅zp + l₃₃
+        //        ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        //        c - zp
+
+        //             ⎞
+        //        ─────⎟
+        //        _____⎟
+        //           2 ⎟
+        //        ⋅zp  ⎠
+        //        ──────
+        sol_1(1) = 4;
+
+        // sol 1: z
+        //        zc - ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        //                __________________________________________________________________________________________________________________________________________________________________________________________________________
+        //               ╱       2                       2                                                                                                                                                         2
+        //             ╲╱  l₁₁⋅xc  - 2⋅l₁₁⋅xc⋅xp + l₁₁⋅xp  + l₁₂⋅xc⋅yc - l₁₂⋅xc⋅yp - l₁₂⋅xp⋅yc + l₁₂⋅xp⋅yp + l₁₃⋅xc⋅zc - l₁₃⋅xc⋅zp - l₁₃⋅xp⋅zc + l₁₃⋅xp⋅zp + l₂₁⋅xc⋅yc - l₂₁⋅xc⋅yp - l₂₁⋅xp⋅yc + l₂₁⋅xp⋅yp + l₂₂⋅yc  - 2⋅l₂₂⋅yc⋅yp +
+
+
+        //        ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        //        ___________________________________________________________________________________________________________________________________________________________________________________________
+        //               2                                                                                                                                                         2                       2
+        //         l₂₂⋅yp  + l₂₃⋅yc⋅zc - l₂₃⋅yc⋅zp - l₂₃⋅yp⋅zc + l₂₃⋅yp⋅zp + l₃₁⋅xc⋅zc - l₃₁⋅xc⋅zp - l₃₁⋅xp⋅zc + l₃₁⋅xp⋅zp + l₃₂⋅yc⋅zc - l₃₂⋅yc⋅zp - l₃₂⋅yp⋅zc + l₃₂⋅yp⋅zp + l₃₃⋅zc  - 2⋅l₃₃⋅zc⋅zp + l₃₃⋅zp
+        sol_1(2) = 4;
+
+
+
+    }// for loop points on the arm
 
 }
 
