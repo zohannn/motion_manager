@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -2111,7 +2111,7 @@ p, li { white-space: pre-wrap; }
        <string>get current right hand status</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="checkBox_const_vel_control">
+     <widget class="QCheckBox" name="checkBox_use_vel_control">
       <property name="geometry">
        <rect>
         <x>560</x>
@@ -2121,7 +2121,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>constant velocity control</string>
+       <string>use velocity control</string>
       </property>
      </widget>
      <widget class="QGroupBox" name="groupBox_right_hand_comp">

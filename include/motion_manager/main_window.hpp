@@ -698,10 +698,10 @@ public Q_SLOTS:
         void check_right_hand_status(int state);
 
         /**
-         * @brief check_const_vel_control
+         * @brief check_use_vel_control
          * @param state
          */
-        void check_const_vel_control(int state);
+        void check_use_vel_control(int state);
 
         /**
          * @brief check_des_right_hand_pos_x

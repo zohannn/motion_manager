@@ -124,7 +124,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(this->ui.checkBox_obsts_yaw_var, SIGNAL(stateChanged(int)), this, SLOT(check_obsts_yaw_var(int)));
 
     QObject::connect(this->ui.checkBox_right_hand_status, SIGNAL(stateChanged(int)), this, SLOT(check_right_hand_status(int)));
-    QObject::connect(this->ui.checkBox_const_vel_control, SIGNAL(stateChanged(int)), this, SLOT(check_const_vel_control(int)));
+    QObject::connect(this->ui.checkBox_use_vel_control, SIGNAL(stateChanged(int)), this, SLOT(check_use_vel_control(int)));
 
     QObject::connect(this->ui.checkBox_des_right_hand_pos_x, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_pos_x(int)));
     QObject::connect(this->ui.checkBox_des_right_hand_pos_y, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_pos_y(int)));
@@ -10403,7 +10403,7 @@ void MainWindow::check_right_hand_status(int state)
     }
 }
 
-void MainWindow::check_const_vel_control(int state)
+void MainWindow::check_use_vel_control(int state)
 {
     if(state==0){
         // unchecked
@@ -10684,7 +10684,7 @@ void MainWindow::on_pushButton_start_control_clicked()
     this->jointsVelocity_ctrl.resize(0,0);
     this->sim_time.clear();
 
-    if(this->ui.checkBox_const_vel_control->isChecked())
+    if(this->ui.checkBox_use_vel_control->isChecked())
     {
         pos_control = false;
         vel_control = true;
