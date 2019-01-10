@@ -946,6 +946,8 @@ public:
      * @param vel_max
      * @param sing_coeff
      * @param sing_damping
+     * @param obst_coeff
+     * @param obst_damping
      * @param jlim_th
      * @param jlim_rate
      * @param jlim_coeff
@@ -953,7 +955,7 @@ public:
      * @param obsts
      */
     void inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double>& velocities, bool jlim_en, bool sing_en, bool obsts_en, bool hl_en,
-                                        double vel_max, double sing_coeff, double sing_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts);
+                                        double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts);
 
     /**
      * @brief get_distances_arm_obstacles

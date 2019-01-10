@@ -339,21 +339,21 @@ void MainWindow::execPosControl()
                 sing_coeff = this->ui.lineEdit_sing_coeff->text().toDouble();
             }
             bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
-            bool obsts_noise = false;
-            double obsts_coeff = 1; double obsts_damping = 0.001;
+            bool obst_noise = false;
+            double obst_coeff = 1; double obst_damping = 0.001;
             if(obsts_en){
-                obsts_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
-                obsts_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
-                obsts_noise = this->ui.checkBox_obsts_noise->isChecked();
-                if(obsts_noise){
+                obst_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
+                obst_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
+                obst_noise = this->ui.checkBox_obsts_noise->isChecked();
+                if(obst_noise){
                     vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
                     objectPtr obs_new;
-                    double obsts_x_var = 10; // mm
-                    double obsts_y_var = 10; // mm
-                    double obsts_z_var = 10; // mm
-                    double obsts_roll_var = 0.1; // rad
-                    double obsts_pitch_var = 0.1; // rad
-                    double obsts_yaw_var = 0.1; // rad
+                    double obsts_x_var = 100; // mm
+                    double obsts_y_var = 100; // mm
+                    double obsts_z_var = 100; // mm
+                    double obsts_roll_var = 0.5; // rad
+                    double obsts_pitch_var = 0.5; // rad
+                    double obsts_yaw_var = 0.5; // rad
                     for(size_t i=0; i<obsts.size(); ++i){
                         std::srand(std::time(NULL));
                         objectPtr obs = obsts.at(i);
@@ -443,7 +443,8 @@ void MainWindow::execPosControl()
             vector<double> r_velocities;
             vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
             //this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
-            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,sing_coeff,sing_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
+            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,
+                                                                            vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
 
             vector<double> r_velocities_mes; vector<double> r_hand_velocities_mes;
             this->curr_scene->getHumanoid()->getRightArmVelocities(r_velocities_mes);
@@ -535,13 +536,13 @@ void MainWindow::execVelControl()
                 sing_coeff = this->ui.lineEdit_sing_coeff->text().toDouble();
             }
             bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
-            bool obsts_noise = false;
-            double obsts_coeff = 1; double obsts_damping = 0.001;
+            bool obst_noise = false;
+            double obst_coeff = 1; double obst_damping = 0.001;
             if(obsts_en){
-                obsts_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
-                obsts_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
-                obsts_noise = this->ui.checkBox_obsts_noise->isChecked();
-                if(obsts_noise){
+                obst_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
+                obst_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
+                obst_noise = this->ui.checkBox_obsts_noise->isChecked();
+                if(obst_noise){
                     vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
                     objectPtr obs_new;
                     double obsts_x_var = 10; // mm
@@ -630,7 +631,8 @@ void MainWindow::execVelControl()
             vector<double> r_velocities;
             vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
             //this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
-            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,vel_max,sing_coeff,sing_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
+            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,
+                                                                            vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
             vector<double> r_velocities_mes; vector<double> r_hand_velocities_mes;
             this->curr_scene->getHumanoid()->getRightArmVelocities(r_velocities_mes);
             this->curr_scene->getHumanoid()->getRightHandVelocities(r_hand_velocities_mes);
