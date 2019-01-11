@@ -91,6 +91,9 @@ using namespace logging::trivial;
     const double openingVel = -120.0f * static_cast<double>(M_PI) / 180.0f;/**< joint velocity of the fingers when they are opening */
 #endif
 
+const double RADTODEG = 180.0/static_cast<double>(M_PI);
+const double DEGTORAD = static_cast<double>(M_PI)/180.0;
+
 const int HAND_FINGERS = 3; /**< number of fingers per hand */
 const int JOINTS_ARM = 7; /**< number of joints per arm */
 const int JOINTS_HAND = 4; /**< number of joints per hand */

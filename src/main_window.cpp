@@ -143,6 +143,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(this->ui.checkBox_joints_limits_av, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_joints_limits_av(int)));
     QObject::connect(this->ui.checkBox_sing_av, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_sing_av(int)));
     QObject::connect(this->ui.checkBox_obsts_av, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_obsts_av(int)));
+    QObject::connect(this->ui.checkBox_obsts_filter_noise, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_obsts_filter_noise(int)));
     QObject::connect(this->ui.checkBox_hl_add, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_hl_add(int)));    
     QObject::connect(this->ui.checkBox_draw_ellipse, SIGNAL(stateChanged(int)), this, SLOT(check_draw_ellipse(int)));
 
@@ -234,6 +235,14 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
         ui.listWidget_scenario->addItem(scenarios.at(i));
     }
 
+    // controlling: low pass filter of obstacles' information
+    this->lpf_obsts_pos_x.reset(new LowPassFilter());
+    this->lpf_obsts_pos_y.reset(new LowPassFilter());
+    this->lpf_obsts_pos_z.reset(new LowPassFilter());
+    this->lpf_obsts_or_roll.reset(new LowPassFilter());
+    this->lpf_obsts_or_pitch.reset(new LowPassFilter());
+    this->lpf_obsts_or_yaw.reset(new LowPassFilter());
+
     // ---------- threads --------------------------- //
     get_right_hand_status = true;
     display_r_hand_status_thrd = boost::thread(boost::bind(&MainWindow::display_r_hand_status, this));
@@ -310,6 +319,19 @@ void MainWindow::execPosControl()
 
     while(exec_control)
     {
+        bool obst_filter_noise = this->ui.checkBox_obsts_filter_noise->isChecked();
+        double filter_cut_off_freq = 0.1; double filter_time_step = 0.05;
+        if(obst_filter_noise){
+            filter_cut_off_freq = this->ui.lineEdit_f_cutoff->text().toDouble();
+            filter_time_step = this->ui.lineEdit_time_step->text().toDouble();
+        }
+        this->lpf_obsts_pos_x->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_time_step);
+        this->lpf_obsts_pos_y->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_time_step);
+        this->lpf_obsts_pos_z->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_time_step);
+        this->lpf_obsts_or_roll->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_roll->setDeltaTime(filter_time_step);
+        this->lpf_obsts_or_pitch->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_time_step);
+        this->lpf_obsts_or_yaw->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_time_step);
+
         if(pos_control)
         {
             boost::unique_lock<boost::mutex> lck(hh_control_mtx);
@@ -367,13 +389,21 @@ void MainWindow::execPosControl()
                         obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
                         obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
                         obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
+                        if(obst_filter_noise){
+                            obs_pos.Xpos = this->lpf_obsts_pos_x->update(obs_pos.Xpos);
+                            obs_pos.Ypos = this->lpf_obsts_pos_y->update(obs_pos.Ypos);
+                            obs_pos.Zpos = this->lpf_obsts_pos_z->update(obs_pos.Zpos);
+                            obs_or.roll = DEGTORAD*this->lpf_obsts_or_roll->update(RADTODEG*obs_or.roll);
+                            obs_or.pitch = DEGTORAD*this->lpf_obsts_or_pitch->update(RADTODEG*obs_or.pitch);
+                            obs_or.yaw = DEGTORAD*this->lpf_obsts_or_yaw->update(RADTODEG*obs_or.yaw);
+                        }
                         obs_new->setPos(obs_pos,false);
                         obs_new->setOr(obs_or,false);
                         obs_new->setSize(obs->getSize());
                         this->curr_scene->setObject(i,obs_new);
-                    }
-                }
-            }
+                    } // for loop obstacles
+                }// noise on obstacles
+            }// enable obstacles avoidance
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
             double hl_coeff = 1; double hl_damping = 0.001;
             if(hl_en){
@@ -497,6 +527,19 @@ void MainWindow::execVelControl()
 {
     while(exec_control)
     {
+        bool obst_filter_noise = this->ui.checkBox_obsts_filter_noise->isChecked();
+        double filter_cut_off_freq = 0.1; double filter_time_step = 0.05;
+        if(obst_filter_noise){
+            filter_cut_off_freq = this->ui.lineEdit_f_cutoff->text().toDouble();
+            filter_time_step = this->ui.lineEdit_time_step->text().toDouble();
+        }
+        this->lpf_obsts_pos_x->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_time_step);
+        this->lpf_obsts_pos_y->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_time_step);
+        this->lpf_obsts_pos_z->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_time_step);
+        this->lpf_obsts_or_roll->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_roll->setDeltaTime(filter_time_step);
+        this->lpf_obsts_or_pitch->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_time_step);
+        this->lpf_obsts_or_yaw->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_time_step);
+
         if(vel_control)
         {
             boost::unique_lock<boost::mutex> lck(hh_control_mtx);
@@ -538,19 +581,20 @@ void MainWindow::execVelControl()
             bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
             bool obst_noise = false;
             double obst_coeff = 1; double obst_damping = 0.001;
+
             if(obsts_en){
                 obst_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
                 obst_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
-                obst_noise = this->ui.checkBox_obsts_noise->isChecked();
+                obst_noise = this->ui.checkBox_obsts_noise->isChecked();                
                 if(obst_noise){
                     vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
                     objectPtr obs_new;
-                    double obsts_x_var = 10; // mm
-                    double obsts_y_var = 10; // mm
-                    double obsts_z_var = 10; // mm
-                    double obsts_roll_var = 0.1; // rad
-                    double obsts_pitch_var = 0.1; // rad
-                    double obsts_yaw_var = 0.1; // rad
+                    double obsts_x_var = 100; // mm
+                    double obsts_y_var = 100; // mm
+                    double obsts_z_var = 100; // mm
+                    double obsts_roll_var = 0.5; // rad
+                    double obsts_pitch_var = 0.5; // rad
+                    double obsts_yaw_var = 0.5; // rad
                     for(size_t i=0; i<obsts.size(); ++i){
                         std::srand(std::time(NULL));
                         objectPtr obs = obsts.at(i);
@@ -564,13 +608,21 @@ void MainWindow::execVelControl()
                         obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
                         obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
                         obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
+                        if(obst_filter_noise){
+                            obs_pos.Xpos = this->lpf_obsts_pos_x->update(obs_pos.Xpos);
+                            obs_pos.Ypos = this->lpf_obsts_pos_y->update(obs_pos.Ypos);
+                            obs_pos.Zpos = this->lpf_obsts_pos_z->update(obs_pos.Zpos);
+                            obs_or.roll = DEGTORAD*this->lpf_obsts_or_roll->update(RADTODEG*obs_or.roll);
+                            obs_or.pitch = DEGTORAD*this->lpf_obsts_or_pitch->update(RADTODEG*obs_or.pitch);
+                            obs_or.yaw = DEGTORAD*this->lpf_obsts_or_yaw->update(RADTODEG*obs_or.yaw);
+                        }
                         obs_new->setPos(obs_pos,false);
                         obs_new->setOr(obs_or,false);
                         obs_new->setSize(obs->getSize());
                         this->curr_scene->setObject(i,obs_new);
-                    }
-                }
-            }
+                    }// for loop obstacles
+                }// noise on obstacles
+            }//obstacle avoidance enable
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
             double hl_coeff = 1; double hl_damping = 0.001;
             if(hl_en){
@@ -10583,6 +10635,17 @@ void MainWindow::check_ctrl_obsts_av(int state)
     }
 }
 
+void MainWindow::check_ctrl_obsts_filter_noise(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.groupBox_filter_noise->setEnabled(false);
+    }else{
+       // checked
+       this->ui.groupBox_filter_noise->setEnabled(true);
+    }
+}
+
 void MainWindow::check_ctrl_hl_add(int state)
 {
     if(state==0){
@@ -10686,6 +10749,7 @@ void MainWindow::on_pushButton_start_control_clicked()
     this->jointsVelocity_ctrl.resize(0,0);
     this->sim_time.clear();
 
+
     if(this->ui.checkBox_use_vel_control->isChecked())
     {
         pos_control = false;
@@ -10714,6 +10778,13 @@ void MainWindow::on_pushButton_stop_control_clicked()
     this->curr_scene->getHumanoid()->getLeftHomePosture(l_p);
     this->curr_scene->getHumanoid()->setRightHomePosture(r_p);
     this->curr_scene->getHumanoid()->setLeftHomePosture(l_p);
+
+    this->lpf_obsts_pos_x.reset(new LowPassFilter());
+    this->lpf_obsts_pos_y.reset(new LowPassFilter());
+    this->lpf_obsts_pos_z.reset(new LowPassFilter());
+    this->lpf_obsts_or_roll.reset(new LowPassFilter());
+    this->lpf_obsts_or_pitch.reset(new LowPassFilter());
+    this->lpf_obsts_or_yaw.reset(new LowPassFilter());
 }
 
 void MainWindow::on_pushButton_control_plot_clicked()
@@ -10812,6 +10883,9 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         stream << "Obsts_coeff=" << this->ui.lineEdit_obsts_coeff->text().toStdString().c_str() << endl;
         stream << "Obsts_damping=" << this->ui.lineEdit_obsts_damping->text().toStdString().c_str() << endl;
         if (this->ui.checkBox_obsts_noise->isChecked()){ stream << "Obsts_noise=true"<< endl;}else{stream << "Obsts_noise=false"<< endl;}
+        if (this->ui.checkBox_obsts_filter_noise->isChecked()){ stream << "Obsts_filter_noise=true"<< endl;}else{stream << "Obsts_filter_noise=false"<< endl;}
+        stream << "Obsts_f_cut_off=" << this->ui.lineEdit_f_cutoff->text().toStdString().c_str() << endl;
+        stream << "Obsts_f_timestep=" << this->ui.lineEdit_time_step->text().toStdString().c_str() << endl;
         stream << "# Human-likeness addition parameters #" << endl;
         if (this->ui.checkBox_hl_add->isChecked()){ stream << "Hl_add=true"<< endl;}else{stream << "Hl_add=false"<< endl;}
         stream << "Hl_add_coeff=" << this->ui.lineEdit_hl_coeff->text().toStdString().c_str() << endl;
@@ -10882,6 +10956,16 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     }else{
                         this->ui.checkBox_obsts_noise->setChecked(false);
                     }
+                }else if(QString::compare(fields.at(0),QString("Obsts_filter_noise"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.checkBox_obsts_filter_noise->setChecked(true);
+                    }else{
+                        this->ui.checkBox_obsts_filter_noise->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("Obsts_f_cut_off"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_f_cutoff->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Obsts_f_timestep"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_time_step->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Hl_add"),Qt::CaseInsensitive)==0){
                     if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
                         this->ui.checkBox_hl_add->setChecked(true);

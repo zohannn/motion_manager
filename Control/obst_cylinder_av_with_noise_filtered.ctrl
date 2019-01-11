@@ -1,0 +1,36 @@
+### Parameters of controlling ###
+# Joints limits parameters #
+Jlim_av=false
+Jlim_th=0.05
+
+Jlim_rate=0.05
+
+Jlim_coeff=0.3
+
+Jlim_damping=0.02
+
+# Singularities avoidance parameters #
+Sing_av=false
+Sing_coeff=0.2
+
+Sing_damping=0.01
+
+# Obstacle avoidance parameters #
+Obsts_av=true
+Obsts_coeff=4
+Obsts_damping=1
+Obsts_noise=true
+Obsts_filter_noise=true
+Obsts_f_cut_off=1
+
+Obsts_f_timestep=0.05
+
+# Human-likeness addition parameters #
+Hl_add=false
+Hl_add_coeff=0.2
+
+Hl_add_damping=0.01
+
+# Maximum allowed velocity of the joints #
+vel_max=50.0
+

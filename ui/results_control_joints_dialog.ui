@@ -149,7 +149,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>1270</x>
@@ -164,7 +164,7 @@
       <item>
        <widget class="QLabel" name="label_f_cutoff">
         <property name="text">
-         <string>CutOff Frequency :</string>
+         <string>CutOff Frequency [Hz]:</string>
         </property>
        </widget>
       </item>

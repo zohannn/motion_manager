@@ -274,7 +274,6 @@ Humanoid::Humanoid(string name, pos ppos, orient oor, dim ssize, arm aspecs, bar
     this->mat_r_hand = Matrix4d::Identity(4,4);
     this->mat_l_hand = Matrix4d::Identity(4,4);
 
-
 }
 #endif
 
@@ -3677,6 +3676,7 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
 
     // Obstacles avoidance
     if(obsts_en){
+
         // current positions of the arm
         vector<vector<double>> points_arm = vector<vector<double>>(5);
         vector<double> shoulderPos = vector<double>(3);
@@ -3803,14 +3803,20 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
 
         vector<double> e_arm = vector<double>(5,0.0);
         vector<double> e_arm_delta = vector<double>(5,0.0);
+        vector<double> e_arm_torso = vector<double>(5,0.0);
+        vector<double> e_arm_torso_delta = vector<double>(5,0.0);
         // current obstacles in the scenario
         for(size_t i=0;i<obsts.size();++i){
             objectPtr obst = obsts.at(i);
             vector<double> obst_pos = vector<double>(3);
+            vector<double> obst_or = vector<double>(3);
             obst_pos.at(0) = obst->getPos().Xpos;
             obst_pos.at(1) = obst->getPos().Ypos;
             obst_pos.at(2) = obst->getPos().Zpos;
-            Matrix3d Rot_obst; obst->RPY_matrix(Rot_obst);
+            obst_or.at(0) = obst->getOr().roll;
+            obst_or.at(1) = obst->getOr().pitch;
+            obst_or.at(2) = obst->getOr().yaw;
+            Matrix3d Rot_obst; this->RPY_matrix(Rot_obst,obst_or);
             Matrix3d Rot_obst_t = Rot_obst.transpose();
             double x_size = obst->getSize().Xsize;
             double y_size = obst->getSize().Ysize;
@@ -3821,29 +3827,108 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
             A_obst(2,0) = 0.0; A_obst(2,1) = 0.0; A_obst(2,2) = pow(z_size,-2);
             Matrix3d L_obst = Rot_obst_t*A_obst*Rot_obst;
 
+            // distances between the arm and the obstacles
             vector<double> dist_arm = vector<double>(5); vector<double> e_dist_arm = vector<double>(5);
             vector<double> dist_arm_delta = vector<double>(5); vector<double> e_dist_arm_delta = vector<double>(5);
             // get the distances between the current obstacle and the points on the arm            
             this->get_distances_arm_obstacles(points_arm,obst_pos,L_obst,dist_arm);
             // get the distances between the current obstacle and the points on the arm with perturbated posture
             this->get_distances_arm_obstacles(points_arm_delta,obst_pos,L_obst,dist_arm_delta);
+
+            // distances between the arm and the torso of the humanoid
+            vector<double> dist_arm_torso = vector<double>(5); vector<double> e_dist_arm_torso = vector<double>(5);
+            vector<double> dist_arm_torso_delta = vector<double>(5); vector<double> e_dist_arm_torso_delta = vector<double>(5);
+            this->get_distances_arm_torso(points_arm,dist_arm_torso);
+            this->get_distances_arm_torso(points_arm_delta,dist_arm_torso_delta);
+
             double k_off = 0.0001;// offset constant
             for (size_t i=0; i<dist_arm.size();++i){
                 e_dist_arm.at(i) = 1/(dist_arm.at(i)+k_off);
                 e_dist_arm_delta.at(i) = 1/(dist_arm_delta.at(i)+k_off);
+                e_dist_arm_torso.at(i) = 1/(dist_arm_torso.at(i)+k_off);
+                e_dist_arm_torso_delta.at(i) = 1/(dist_arm_torso_delta.at(i)+k_off);
             }
-            //std::transform(dist_arm.begin(),dist_arm.end(),e_dist_arm.begin(),std::bind(std::multiplies<double>(),std::placeholders::_1, -1));
-            //std::transform(dist_arm_delta.begin(),dist_arm_delta.end(),e_dist_arm_delta.begin(),std::bind(std::multiplies<double>(),std::placeholders::_1, -1));
 
             for(size_t i=0;i<e_arm.size();++i){
                 e_arm.at(i) += e_dist_arm.at(i);
                 e_arm_delta.at(i) += e_dist_arm_delta.at(i);
+                e_arm_torso.at(i) += e_dist_arm_torso.at(i);
+                e_arm_torso_delta.at(i) += e_dist_arm_torso_delta.at(i);
             }
         } //for loop obstacles
 
         MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
         MatrixXd Jpp = J_plus*JacobianArm;
         MatrixXd J_Null = Id - Jpp;
+
+        // ---------- torso ----------------------------------------
+
+        // shoulder - elbow
+        VectorXd delta_H_torso_SE(posture.size());
+        for(size_t i=0;i<delta_H_torso_SE.size();++i){
+            delta_H_torso_SE(i) = (e_arm_torso_delta.at(0) - e_arm_torso.at(0))/delta_theta;
+        }
+        VectorXd J_torso_SE= J_Null*delta_H_torso_SE;
+        double k_torso_SE = 0;
+        if(J_torso_SE.norm() > null_th){
+            k_torso_SE = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_SE.norm())));
+        }
+        double fd_torso_SE = obst_coeff * (1 - exp(-obst_damping*(J_torso_SE.norm())));
+        joint_velocities +=  (k_torso_SE*fd_torso_SE*J_torso_SE);
+
+        // elbow
+        VectorXd delta_H_torso_E(posture.size());
+        for(size_t i=0;i<delta_H_torso_E.size();++i){
+            delta_H_torso_E(i) = (e_arm_torso_delta.at(1) - e_arm_torso.at(1))/delta_theta;
+        }
+        VectorXd J_torso_E= J_Null*delta_H_torso_E;
+        double k_torso_E = 0;
+        if(J_torso_E.norm() > null_th){
+            k_torso_E = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_E.norm())));
+        }
+        double fd_torso_E = obst_coeff * (1 - exp(-obst_damping*(J_torso_E.norm())));
+        joint_velocities +=  (k_torso_E*fd_torso_E*J_torso_E);
+
+        // elbow - wrist
+        VectorXd delta_H_torso_EW(posture.size());
+        for(size_t i=0;i<delta_H_torso_EW.size();++i){
+            delta_H_torso_EW(i) = (e_arm_torso_delta.at(2) - e_arm_torso.at(2))/delta_theta;
+        }
+        VectorXd J_torso_EW= J_Null*delta_H_torso_EW;
+        double k_torso_EW = 0;
+        if(J_torso_EW.norm() > null_th){
+            k_torso_EW = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_EW.norm())));
+        }
+        double fd_torso_EW = obst_coeff * (1 - exp(-obst_damping*(J_torso_EW.norm())));
+        joint_velocities +=  (k_torso_EW*fd_torso_EW*J_torso_EW);
+
+        // wrist
+        VectorXd delta_H_torso_W(posture.size());
+        for(size_t i=0;i<delta_H_torso_W.size();++i){
+            delta_H_torso_W(i) = (e_arm_torso_delta.at(3) - e_arm_torso.at(3))/delta_theta;
+        }
+        VectorXd J_torso_W= J_Null*delta_H_torso_W;
+        double k_torso_W = 0;
+        if(J_torso_W.norm() > null_th){
+            k_torso_W = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_W.norm())));
+        }
+        double fd_torso_W = obst_coeff * (1 - exp(-obst_damping*(J_torso_W.norm())));
+        joint_velocities +=  (k_torso_W*fd_torso_W*J_torso_W);
+
+        // wrist - hand
+        VectorXd delta_H_torso_WH(posture.size());
+        for(size_t i=0;i<delta_H_torso_WH.size();++i){
+            delta_H_torso_WH(i) = (e_arm_torso_delta.at(4) - e_arm_torso.at(4))/delta_theta;
+        }
+        VectorXd J_torso_WH= J_Null*delta_H_torso_WH;
+        double k_torso_WH = 0;
+        if(J_torso_WH.norm() > null_th){
+            k_torso_WH = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_WH.norm())));
+        }
+        double fd_torso_WH = obst_coeff * (1 - exp(-obst_damping*(J_torso_WH.norm())));
+        joint_velocities +=  (k_torso_WH*fd_torso_WH*J_torso_WH);
+
+        // ---------- obstacles --------------------------------
 
         // shoulder - elbow
         VectorXd delta_H_obst_SE(posture.size());
@@ -3917,6 +4002,19 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
     velocities.resize(joint_velocities.size());
     VectorXd::Map(&velocities[0], joint_velocities.size()) = joint_velocities;
 
+}
+
+void Humanoid::get_distances_arm_torso(vector<vector<double>>& points_arm,vector<double>& dist_arm)
+{
+    // size of the torso
+    double torso_x_size = this->m_torso_size.Xsize;
+    double torso_y_size = this->m_torso_size.Ysize;
+
+    for(size_t i=0;i<points_arm.size();++i){
+        vector<double> pt = points_arm.at(i);
+        double x = pt.at(0); double y = pt.at(1);
+        dist_arm.at(i) = sqrt(pow(x-torso_x_size,2)+pow(y-torso_y_size,2));
+    }
 }
 
 void Humanoid::get_distances_arm_obstacles(vector<vector<double>>& points_arm,vector<double>& obst_pos,Matrix3d& L_obst,vector<double>& dist_arm)
@@ -4105,6 +4203,22 @@ bool Humanoid::getRPY(std::vector<double>& rpy, Matrix3d& Rot)
     }else{
         return false;
     }
+}
+
+void Humanoid::RPY_matrix(Matrix3d &Rot,std::vector<double>& rpy)
+{
+    Rot = Matrix3d::Zero();
+
+    double roll = rpy.at(0); // around z
+    double pitch = rpy.at(1); // around y
+    double yaw = rpy.at(2); // around x
+
+    // Rot = Rot_z * Rot_y * Rot_x
+
+    Rot(0,0) = cos(roll)*cos(pitch);  Rot(0,1) = cos(roll)*sin(pitch)*sin(yaw)-sin(roll)*cos(yaw); Rot(0,2) = sin(roll)*sin(yaw)+cos(roll)*sin(pitch)*cos(yaw);
+    Rot(1,0) = sin(roll)*cos(pitch);  Rot(1,1) = cos(roll)*cos(yaw)+sin(roll)*sin(pitch)*sin(yaw); Rot(1,2) = sin(roll)*sin(pitch)*cos(yaw)-cos(roll)*sin(yaw);
+    Rot(2,0) = -sin(pitch);           Rot(2,1) = cos(pitch)*sin(yaw);                              Rot(2,2) = cos(pitch)*cos(yaw);
+
 }
 
 

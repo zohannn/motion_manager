@@ -965,6 +965,13 @@ public:
      * @param dist_arm
      */
     void get_distances_arm_obstacles(vector<vector<double>>& points_arm,vector<double>& obst_pos, Matrix3d& L_obst,vector<double>& dist_arm);
+
+    /**
+     * @brief get_distances_arm_torso
+     * @param points_arm
+     * @param dist_arm
+     */
+    void get_distances_arm_torso(vector<vector<double>>& points_arm,vector<double>& dist_arm);
 //#if HEAD==1
   //  humanoid_part getHead();
 //#endif
@@ -1180,6 +1187,13 @@ private:
      * @return
      */
     bool getRPY(std::vector<double>& rpy, Matrix3d& Rot);
+
+    /**
+     * @brief RPY_matrix
+     * @param Rot
+     * @param rpy
+     */
+    void RPY_matrix(Matrix3d &Rot,std::vector<double>& rpy);
 
 };
 

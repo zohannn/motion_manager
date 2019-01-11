@@ -794,6 +794,12 @@ public Q_SLOTS:
         void check_ctrl_obsts_av(int state);
 
         /**
+         * @brief check_ctrl_obsts_filter_noise
+         * @param state
+         */
+        void check_ctrl_obsts_filter_noise(int state);
+
+        /**
          * @brief check_ctrl_hl_add
          * @param state
          */
@@ -1188,6 +1194,13 @@ private:
         vector<vector<double>> shoulderAngularVelocity_ctrl;/**< shoulder angular velocity during control */
 
         vector<double> sim_time; /**< simulation time [s]*/
+
+        boost::shared_ptr<LowPassFilter> lpf_obsts_pos_x;
+        boost::shared_ptr<LowPassFilter> lpf_obsts_pos_y;
+        boost::shared_ptr<LowPassFilter> lpf_obsts_pos_z;
+        boost::shared_ptr<LowPassFilter> lpf_obsts_or_roll;
+        boost::shared_ptr<LowPassFilter> lpf_obsts_or_pitch;
+        boost::shared_ptr<LowPassFilter> lpf_obsts_or_yaw;
 
 
 

@@ -2440,7 +2440,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>350</y>
+         <y>340</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2479,7 +2479,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>380</y>
+         <y>450</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2679,9 +2679,9 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>240</y>
+         <y>230</y>
          <width>241</width>
-         <height>131</height>
+         <height>211</height>
         </rect>
        </property>
        <property name="title">
@@ -2735,25 +2735,102 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
-       <widget class="QCheckBox" name="checkBox_obsts_noise">
+       <widget class="QGroupBox" name="groupBox_filter_noise">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>100</y>
-          <width>85</width>
-          <height>21</height>
+          <y>119</y>
+          <width>211</width>
+          <height>81</height>
          </rect>
         </property>
-        <property name="text">
-         <string>add noise</string>
+        <property name="title">
+         <string>Filtering Noise</string>
         </property>
+        <widget class="QWidget" name="">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>181</width>
+           <height>58</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_105">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_568">
+            <item>
+             <widget class="QLabel" name="label_f_cutoff">
+              <property name="text">
+               <string>CutOff Freq. [Hz] :</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_f_cutoff">
+              <property name="text">
+               <string>0.1</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_569">
+            <item>
+             <widget class="QLabel" name="label_time_step">
+              <property name="text">
+               <string> Time step [s] :</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_time_step">
+              <property name="text">
+               <string>0.05</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>90</y>
+          <width>211</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_570">
+         <item>
+          <widget class="QCheckBox" name="checkBox_obsts_noise">
+           <property name="text">
+            <string>add noise</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_obsts_filter_noise">
+           <property name="text">
+            <string>filter noise</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
       <widget class="QGroupBox" name="groupBox_hl_add_params">
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>240</y>
+         <y>230</y>
          <width>231</width>
          <height>101</height>
         </rect>
