@@ -740,6 +740,12 @@ public Q_SLOTS:
         void check_des_right_hand_or_yaw(int state);
 
         /**
+         * @brief check_use_plan_hand_pos
+         * @param state
+         */
+        void check_use_plan_hand_pos(int state);
+
+        /**
          * @brief check_des_right_hand_vel_x
          * @param state
          */

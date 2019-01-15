@@ -1917,9 +1917,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>560</x>
-        <y>200</y>
+        <y>230</y>
         <width>331</width>
-        <height>161</height>
+        <height>191</height>
        </rect>
       </property>
       <property name="title">
@@ -2075,7 +2075,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>130</y>
+         <y>160</y>
          <width>249</width>
          <height>25</height>
         </rect>
@@ -2097,6 +2097,19 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+      <widget class="QCheckBox" name="checkBox_use_plan_hand_pos">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>130</y>
+         <width>291</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>use the planned desired right hand position</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QCheckBox" name="checkBox_right_hand_status">
       <property name="geometry">
@@ -2115,7 +2128,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>560</x>
-        <y>370</y>
+        <y>200</y>
         <width>181</width>
         <height>21</height>
        </rect>
@@ -2420,7 +2433,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>10</x>
         <y>20</y>
-        <width>521</width>
+        <width>531</width>
         <height>511</height>
        </rect>
       </property>
@@ -2440,7 +2453,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>340</y>
+         <y>440</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2593,7 +2606,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>270</x>
          <y>30</y>
-         <width>231</width>
+         <width>251</width>
          <height>101</height>
         </rect>
        </property>
@@ -2750,7 +2763,7 @@ p, li { white-space: pre-wrap; }
         <property name="title">
          <string>Filtering Noise</string>
         </property>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -2799,7 +2812,7 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -2830,9 +2843,9 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>230</y>
-         <width>231</width>
-         <height>101</height>
+         <y>170</y>
+         <width>251</width>
+         <height>261</height>
         </rect>
        </property>
        <property name="title">
@@ -2885,6 +2898,85 @@ p, li { white-space: pre-wrap; }
           </layout>
          </item>
         </layout>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_time_mapping">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>110</y>
+          <width>231</width>
+          <height>131</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Time mapping</string>
+        </property>
+        <widget class="QWidget" name="">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>211</width>
+           <height>89</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_106">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_571">
+            <item>
+             <widget class="QLabel" name="label_tau">
+              <property name="text">
+               <string>Time constant [s]</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_tau">
+              <property name="text">
+               <string>0.01</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_572">
+            <item>
+             <widget class="QLabel" name="label_dec_rate">
+              <property name="text">
+               <string>Decreasing rate</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_dec_rate">
+              <property name="text">
+               <string>0.01</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_573">
+            <item>
+             <widget class="QLabel" name="label_diff_w">
+              <property name="text">
+               <string>Difference weight</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_diff_w">
+              <property name="text">
+               <string>0.1</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </widget>
       <widget class="QWidget" name="layoutWidget">
@@ -2942,7 +3034,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_results_plan">
        <attribute name="title">

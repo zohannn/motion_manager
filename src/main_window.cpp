@@ -132,6 +132,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(this->ui.checkBox_des_right_hand_or_roll, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_or_roll(int)));
     QObject::connect(this->ui.checkBox_des_right_hand_or_pitch, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_or_pitch(int)));
     QObject::connect(this->ui.checkBox_des_right_hand_or_yaw, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_or_yaw(int)));
+    QObject::connect(this->ui.checkBox_use_plan_hand_pos, SIGNAL(stateChanged(int)), this, SLOT(check_use_plan_hand_pos(int)));
 
     QObject::connect(this->ui.checkBox_des_right_hand_vel_x, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_vel_x(int)));
     QObject::connect(this->ui.checkBox_des_right_hand_vel_y, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_vel_y(int)));
@@ -228,6 +229,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     scenarios.push_back(QString("Controlling: scenario with no obstacles"));
     scenarios.push_back(QString("Controlling: scenario with no obstacles for showing the effects of singularities"));
     scenarios.push_back(QString("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane"));
+    scenarios.push_back(QString("Controlling: pick a red column"));
 
 #endif
 
@@ -336,12 +338,19 @@ void MainWindow::execPosControl()
         {
             boost::unique_lock<boost::mutex> lck(hh_control_mtx);
 
-            double des_hand_pos_x = this->ui.lineEdit_des_right_hand_pos_x->text().toDouble();
-            double des_hand_pos_y = this->ui.lineEdit_des_right_hand_pos_y->text().toDouble();
-            double des_hand_pos_z = this->ui.lineEdit_des_right_hand_pos_z->text().toDouble();
-            double des_hand_or_roll = this->ui.lineEdit_des_right_hand_or_roll->text().toDouble();
-            double des_hand_or_pitch = this->ui.lineEdit_des_right_hand_or_pitch->text().toDouble();
-            double des_hand_or_yaw = this->ui.lineEdit_des_right_hand_or_yaw->text().toDouble();
+            double des_hand_pos_x = 0.0; double des_hand_pos_y = 0.0; double des_hand_pos_z = 0.0;
+            double des_hand_or_roll = 0.0; double des_hand_or_pitch = 0.0; double des_hand_or_yaw = 0.0;
+
+            if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
+
+            }else{
+                des_hand_pos_x = this->ui.lineEdit_des_right_hand_pos_x->text().toDouble();
+                des_hand_pos_y = this->ui.lineEdit_des_right_hand_pos_y->text().toDouble();
+                des_hand_pos_z = this->ui.lineEdit_des_right_hand_pos_z->text().toDouble();
+                des_hand_or_roll = this->ui.lineEdit_des_right_hand_or_roll->text().toDouble();
+                des_hand_or_pitch = this->ui.lineEdit_des_right_hand_or_pitch->text().toDouble();
+                des_hand_or_yaw = this->ui.lineEdit_des_right_hand_or_yaw->text().toDouble();
+            }
 
             double vel_max = this->ui.lineEdit_vel_max->text().toDouble()*M_PI/180;
 
@@ -997,6 +1006,8 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              string path_vrep_controlling_no_objs_sing = PATH_SCENARIOS+string("/vrep/Controlling_no_objs_sing.ttt");
              // Controlling: scenario with one obstacle and drawing an ellipse on the XY plane
              string path_vrep_controlling_obsts_av_ellipse = PATH_SCENARIOS+string("/vrep/Controlling_obsts_av_ellipse.ttt");
+             // Controlling: pick a red column
+             string path_vrep_controlling_pick = PATH_SCENARIOS+string("/vrep/Controlling_pick_ToyVehicle_aros.ttt");
 
              switch(i){
              case 0: // Assembly scenario
@@ -1364,6 +1375,31 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 #endif
                  }else{
                      qnode.log(QNode::Error,std::string("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+#endif
+                 break;
+
+             case 14: // Controlling: pick a red column
+#if HAND==0
+
+#elif HAND==1
+                this->scenario_id = 15;
+                 if (qnode.loadScenario(path_vrep_controlling_pick,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Controlling: pick a red column HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Controlling: pick a red column");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
+                     //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
+                 }else{
+                     qnode.log(QNode::Error,std::string("Controlling: pick a red column HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -10533,6 +10569,39 @@ void MainWindow::check_des_right_hand_or_yaw(int state)
     }else{
        // checked
        this->ui.lineEdit_des_right_hand_or_yaw->setEnabled(true);
+    }
+}
+
+void MainWindow::check_use_plan_hand_pos(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.checkBox_des_right_hand_pos_x->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_pos_x->setEnabled(true);
+        this->ui.checkBox_des_right_hand_pos_y->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_pos_y->setEnabled(true);
+        this->ui.checkBox_des_right_hand_pos_z->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_pos_z->setEnabled(true);
+        this->ui.checkBox_des_right_hand_or_roll->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_or_roll->setEnabled(true);
+        this->ui.checkBox_des_right_hand_or_pitch->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_or_pitch->setEnabled(true);
+        this->ui.checkBox_des_right_hand_or_yaw->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_or_yaw->setEnabled(true);
+    }else{
+       // checked
+        this->ui.checkBox_des_right_hand_pos_x->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_pos_x->setEnabled(false);
+        this->ui.checkBox_des_right_hand_pos_y->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_pos_y->setEnabled(false);
+        this->ui.checkBox_des_right_hand_pos_z->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_pos_z->setEnabled(false);
+        this->ui.checkBox_des_right_hand_or_roll->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_or_roll->setEnabled(false);
+        this->ui.checkBox_des_right_hand_or_pitch->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_or_pitch->setEnabled(false);
+        this->ui.checkBox_des_right_hand_or_yaw->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_or_yaw->setEnabled(false);
     }
 }
 
