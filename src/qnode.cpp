@@ -270,6 +270,7 @@ bool  QNode::loadScenario(const std::string& path,int id)
             subCylinderSmall= n.subscribe("/vrep/Cylinder_small_pose",1,&QNode::Cylinder_small_Callback,this);
             break;
         case 15: // Controlling: pick a red column
+            pub_joints = n.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
             // Cylinder small  (obj_id = 0)
             subCylinderSmall= n.subscribe("/vrep/Cylinder_small_pose",1,&QNode::Cylinder_small_Callback,this);
             // Cylinder tall  (obj_id = 1)

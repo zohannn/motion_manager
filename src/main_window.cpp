@@ -198,6 +198,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     ui.groupBox_sing_av_params->setEnabled(false);
     ui.groupBox_obsts_av_params->setEnabled(false);
     ui.groupBox_hl_add_params->setEnabled(false);
+    this->i_ctrl = 0;
     // logging
     init();
     logging::add_common_attributes();
@@ -342,7 +343,14 @@ void MainWindow::execPosControl()
             double des_hand_or_roll = 0.0; double des_hand_or_pitch = 0.0; double des_hand_or_yaw = 0.0;
 
             if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
-
+                vector<double> des_hand_pos = this->des_handPosition.at(this->i_ctrl);
+                vector<double> des_hand_orr = this->des_handOrientation.at(this->i_ctrl);
+                des_hand_pos_x = des_hand_pos.at(0);
+                des_hand_pos_y = des_hand_pos.at(1);
+                des_hand_pos_z = des_hand_pos.at(2);
+                des_hand_or_roll = des_hand_orr.at(0);
+                des_hand_or_pitch = des_hand_orr.at(1);
+                des_hand_or_yaw = des_hand_orr.at(2);
             }else{
                 des_hand_pos_x = this->ui.lineEdit_des_right_hand_pos_x->text().toDouble();
                 des_hand_pos_y = this->ui.lineEdit_des_right_hand_pos_y->text().toDouble();
@@ -415,35 +423,21 @@ void MainWindow::execPosControl()
             }// enable obstacles avoidance
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
             double hl_coeff = 1; double hl_damping = 0.001;
+            double tau = 0.1; double dec_rate = 0.1; double diff_w = 0.1;
             if(hl_en){
                 hl_coeff = this->ui.lineEdit_hl_coeff->text().toDouble();
                 hl_damping = this->ui.lineEdit_hl_damping->text().toDouble();
+                tau = this->ui.lineEdit_tau->text().toDouble();
+                dec_rate = this->ui.lineEdit_dec_rate->text().toDouble();
+                diff_w = this->ui.lineEdit_diff_w->text().toDouble();
             }
 
             VectorXd des_hand(6);
             des_hand << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z,
                         des_hand_or_roll,des_hand_or_pitch,des_hand_or_yaw;
 
-            MatrixXd Koeff = MatrixXd::Identity(6,6);
-            double coeff = this->ui.lineEdit_coeff->text().toDouble();
-            if(this->ui.checkBox_des_right_hand_pos_x->isChecked()){
-                Koeff(0,0) = coeff;
-            }else{ Koeff(0,0) = 0.0;}
-            if(this->ui.checkBox_des_right_hand_pos_y->isChecked()){
-                Koeff(1,1) = coeff;
-            }else{ Koeff(1,1) = 0.0;}
-            if(this->ui.checkBox_des_right_hand_pos_z->isChecked()){
-                Koeff(2,2) = coeff;
-            }else{ Koeff(2,2) = 0.0;}
-            if(this->ui.checkBox_des_right_hand_or_roll->isChecked()){
-                Koeff(3,3) = coeff;
-            }else{ Koeff(3,3) = 0.0;}
-            if(this->ui.checkBox_des_right_hand_or_pitch->isChecked()){
-                Koeff(4,4) = coeff;
-            }else{ Koeff(4,4) = 0.0;}
-            if(this->ui.checkBox_des_right_hand_or_yaw->isChecked()){
-                Koeff(5,5) = coeff;
-            }else{ Koeff(5,5) = 0.0;}
+            double error_pos_th = this->ui.lineEdit_err_pos->text().toDouble();
+            double error_or_th = DEGTORAD*this->ui.lineEdit_err_or->text().toDouble();
 
             vector<double> r_posture; vector<double> r_hand_posture;
             this->curr_scene->getHumanoid()->getRightArmPosture(r_posture);
@@ -475,6 +469,48 @@ void MainWindow::execPosControl()
                       r_hand_ang_pos.at(0),r_hand_ang_pos.at(1),r_hand_ang_pos.at(2);
 
             VectorXd error = des_hand - r_hand;
+            Vector3d error_pos; error_pos << abs(des_hand(0) - r_hand(0)),abs(des_hand(1) - r_hand(1)),abs(des_hand(2) - r_hand(2));
+            Vector3d error_or; error_or << abs(des_hand(3) - r_hand(3)),abs(des_hand(4) - r_hand(4)),abs(des_hand(5) - r_hand(5));
+
+            double e_n_pos = error_pos.norm(); double e_n_or = error_or.norm();
+
+            MatrixXd Koeff = MatrixXd::Identity(6,6);
+            double coeff_pos = this->ui.lineEdit_coeff_pos->text().toDouble();
+            double coeff_or = this->ui.lineEdit_coeff_or->text().toDouble();
+            if((this->ui.checkBox_des_right_hand_pos_x->isChecked()) && (error_pos(0) > error_pos_th)){
+                Koeff(0,0) = coeff_pos;
+            }else{ Koeff(0,0) = 0.0;}
+            if((this->ui.checkBox_des_right_hand_pos_y->isChecked()) && (error_pos(1) > error_pos_th)){
+                Koeff(1,1) = coeff_pos;
+            }else{ Koeff(1,1) = 0.0;}
+            if((this->ui.checkBox_des_right_hand_pos_z->isChecked()) && (error_pos(2) > error_pos_th)){
+                Koeff(2,2) = coeff_pos;
+            }else{ Koeff(2,2) = 0.0;}
+            if((this->ui.checkBox_des_right_hand_or_roll->isChecked()) && (error_or(0) > error_or_th)){
+                Koeff(3,3) = coeff_or;
+            }else{ Koeff(3,3) = 0.0;}
+            if((this->ui.checkBox_des_right_hand_or_pitch->isChecked()) && (error_or(1) > error_or_th)){
+                Koeff(4,4) = coeff_or;
+            }else{ Koeff(4,4) = 0.0;}
+            if((this->ui.checkBox_des_right_hand_or_yaw->isChecked()) && (error_or(2) > error_or_th)){
+                Koeff(5,5) = coeff_or;
+            }else{ Koeff(5,5) = 0.0;}
+
+
+            // change desired hand pose
+            if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
+                int stages = this->des_handPosition.size();
+                if((e_n_pos < error_pos_th) && (e_n_or < error_or_th)){
+                    if(stages==3 && this->i_ctrl<2){
+                        this->i_ctrl++;
+                    }else if(stages==2 && this->i_ctrl<1){
+                        this->i_ctrl++;
+                    }
+                }
+            }
+            // for human-likeness
+            double g_map = 1 - exp((-dec_rate*this->qnode.getSimTime())/(tau*(1+diff_w*error.norm()))); // mapped time
+            // closed-loop control
             VectorXd hand_vel = Koeff * error;
             vector<double> hand_vel_vec; hand_vel_vec.resize(hand_vel.size());
             VectorXd::Map(&hand_vel_vec[0], hand_vel.size()) = hand_vel;
@@ -2668,7 +2704,9 @@ if(solved){
 
         // compute the hand values, positions and accelerations
         //hand
-        this->handPosition_mov.resize(tot_steps); this->handVelocityNorm_mov.resize(tot_steps);
+        this->des_handPosition.clear();
+        this->handPosition_mov.resize(tot_steps); this->handOrientation_mov.resize(tot_steps);
+        this->handVelocityNorm_mov.resize(tot_steps);
         this->handLinearVelocity_mov.resize(tot_steps); this->handAngularVelocity_mov.resize(tot_steps);
         // wrist
         this->wristVelocityNorm_mov.resize(tot_steps);
@@ -2692,6 +2730,7 @@ if(solved){
                 vector<double> posture; posture.resize(pos_row.size());
                 VectorXd::Map(&posture[0], pos_row.size()) = pos_row;
                 this->curr_scene->getHumanoid()->getHandPos(arm_code,this->handPosition_mov.at(step),posture);
+                this->curr_scene->getHumanoid()->getHandOr(arm_code,this->handOrientation_mov.at(step),posture);
                 // velocities
                 VectorXd vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
                 vector<double> velocities; velocities.resize(vel_row.size());
@@ -2718,8 +2757,10 @@ if(solved){
                 this->shoulderAngularVelocity_mov.at(step) = {shoulder_vel.at(3),shoulder_vel.at(4),shoulder_vel.at(5)};
 
                 step++;
-            }
-        }
+            }// loop steps in the stage
+            this->des_handPosition.push_back(this->handPosition_mov.at(step-1));
+            this->des_handOrientation.push_back(this->handOrientation_mov.at(step-1));
+        }// loop stages
         // -- normlized jerk cost of the hand -- //
         QVector<double> handPosition_mov_x; QVector<double> handPosition_mov_y; QVector<double> handPosition_mov_z;
         QVector<double> der_1_handPosition_mov_x; QVector<double> der_1_handPosition_mov_y; QVector<double> der_1_handPosition_mov_z;
@@ -10817,6 +10858,7 @@ void MainWindow::on_pushButton_start_control_clicked()
     this->jointsPosition_ctrl.resize(0,0);
     this->jointsVelocity_ctrl.resize(0,0);
     this->sim_time.clear();
+    this->i_ctrl=0;
 
 
     if(this->ui.checkBox_use_vel_control->isChecked())

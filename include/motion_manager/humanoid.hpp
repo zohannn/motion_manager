@@ -754,6 +754,21 @@ public:
     void getHandPosMes(int arm, vector<double>& ppos);
 
     /**
+     * @brief getSwivelAngle
+     * @param arm
+     * @param posture
+     * @return
+     */
+    double getSwivelAngle(int arm, vector<double>& posture);
+
+    /**
+     * @brief getSwivelAngle
+     * @param arm
+     * @return
+     */
+    double getSwivelAngle(int arm);
+
+    /**
      * @brief setHandPosMes
      * @param arm
      * @param ppos

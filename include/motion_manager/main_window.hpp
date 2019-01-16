@@ -1178,6 +1178,9 @@ private:
         MatrixXd jointsPosition_ctrl; /**< trajectory of the joint position during control */
         boost::shared_ptr<HandPosPlot> handPosPlot_ctrl_ptr; /**< pointer to the hand position plot during control */
         // hand
+        vector<vector<double>> des_handPosition; /**< vector of desired hand positions during control*/
+        vector<vector<double>> des_handOrientation; /**< vector of desired hand orientations during control*/
+        int i_ctrl; /**< index of the desired hand pose*/
         vector<vector<double>> handPosition_ctrl; /**< hand position during control. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_ctrl; /**< hand orientation during control. 0=roll,1=pitch,2=yaw */
         vector<vector<double>> handLinearVelocity_ctrl; /**< hand linear velocity during control */

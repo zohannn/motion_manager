@@ -1919,7 +1919,7 @@ p, li { white-space: pre-wrap; }
         <x>560</x>
         <y>230</y>
         <width>331</width>
-        <height>191</height>
+        <height>301</height>
        </rect>
       </property>
       <property name="title">
@@ -2071,32 +2071,6 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>160</y>
-         <width>249</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_296">
-        <item>
-         <widget class="QLabel" name="label_coeff">
-          <property name="text">
-           <string>Control Coefficient </string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_coeff">
-          <property name="text">
-           <string>0.001</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
       <widget class="QCheckBox" name="checkBox_use_plan_hand_pos">
        <property name="geometry">
         <rect>
@@ -2109,6 +2083,90 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>use the planned desired right hand position</string>
        </property>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>162</y>
+         <width>311</width>
+         <height>120</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_107">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_575">
+          <item>
+           <widget class="QLabel" name="label_coeff_pos">
+            <property name="text">
+             <string>Position Control Coefficient </string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_coeff_pos">
+            <property name="text">
+             <string>0.5</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_296">
+          <item>
+           <widget class="QLabel" name="label_err_pos">
+            <property name="text">
+             <string>Position error threshold [mm]</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_err_pos">
+            <property name="text">
+             <string>5.0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_576">
+          <item>
+           <widget class="QLabel" name="label_coeff_or">
+            <property name="text">
+             <string>Orientation Control Coefficient</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_coeff_or">
+            <property name="text">
+             <string>0.1</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_574">
+          <item>
+           <widget class="QLabel" name="label_err_or">
+            <property name="text">
+             <string>Orientation error threshold [deg]</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_err_or">
+            <property name="text">
+             <string>1.0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </widget>
      <widget class="QCheckBox" name="checkBox_right_hand_status">
@@ -2911,7 +2969,7 @@ p, li { white-space: pre-wrap; }
         <property name="title">
          <string>Time mapping</string>
         </property>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>10</x>
