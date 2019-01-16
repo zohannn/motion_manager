@@ -500,7 +500,7 @@ void MainWindow::execPosControl()
             // change desired hand pose
             if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
                 int stages = this->des_handPosition.size();
-                if((e_n_pos < error_pos_th) && (e_n_or < error_or_th)){
+                if((e_n_pos < 1.73*error_pos_th) && (e_n_or < 1.73*error_or_th)){
                     if(stages==3 && this->i_ctrl<2){
                         this->i_ctrl++;
                     }else if(stages==2 && this->i_ctrl<1){

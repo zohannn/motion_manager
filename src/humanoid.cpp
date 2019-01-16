@@ -4333,7 +4333,7 @@ bool Humanoid::getRPY(std::vector<double>& rpy, Matrix3d& Rot)
     if((Rot.cols()==3) && (Rot.rows()==3))
     {// the matrix is not empy
         rpy.resize(3,0);
-        Vector3d rpy_vec = Rot.eulerAngles(2,0,2);
+        Vector3d rpy_vec = Rot.eulerAngles(0,1,2);
         rpy.at(0) = rpy_vec(0); // roll
         rpy.at(1) = rpy_vec(1); // pitch
         rpy.at(2) = rpy_vec(2); // yaw
