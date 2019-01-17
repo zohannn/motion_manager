@@ -10380,6 +10380,57 @@ void QNode::log( const LogLevel &level, const std::string &msg)
     Q_EMIT loggingUpdated();
 }
 
+void QNode::checkProximityObject(movementPtr mov,string stage)
+{
+    this->curr_mov = mov;
+    ros::NodeHandle node;
+    int h_attach;
+    int arm = this->curr_mov->getArm();
+    int mov_type = this->curr_mov->getType();
+    switch (arm) {
+    case 0: // dual arm (TO DO)
+        break;
+    case 1: //right arm
+        //handles = right_handles;
+        //hand_handles = right_hand_handles;
+        h_attach = right_attach;
+        break;
+    case 2: // left arm
+        //handles = left_handles;
+        //hand_handles = left_hand_handles;
+        h_attach = left_attach;
+        break;
+    }
+
+    switch (mov_type){
+    case 0: // reach-to-grasp
+        if(stage.compare("retreat")==0){
+            if(obj_in_hand){
+                add_client = node.serviceClient<vrep_common::simRosSetObjectParent>("/vrep/simRosSetObjectParent");
+                vrep_common::simRosSetObjectParent srvset_parent; // service to set a parent object
+                //srvset_parent.request.handle = h_detobj;
+                srvset_parent.request.handle = this->curr_mov->getObject()->getHandle();
+                srvset_parent.request.parentHandle = h_attach;
+                srvset_parent.request.keepInPlace = 1; // the detected object must stay in the same place
+                add_client.call(srvset_parent);
+                if (srvset_parent.response.result != 1){
+                    log(QNode::Error,string("Error in grasping the object "));
+                }
+//#if HAND == 1 && OPEN_CLOSE_HAND ==1
+//                this->closeBarrettHand(arm_code);
+//#else
+//                MatrixXd tt = traj_mov.at(k); VectorXd init_h_posture = tt.block<1,JOINTS_HAND>(0,JOINTS_ARM);
+//                std::vector<double> hand_init_pos;
+//                hand_init_pos.resize(init_h_posture.size());
+//                VectorXd::Map(&hand_init_pos[0], init_h_posture.size()) = init_h_posture;
+//                this->closeBarrettHand_to_pos(arm_code,hand_init_pos);
+//#endif
+            }
+        break;
+        }
+    }
+}
+
 const std::string QNode::currentDateTime()
 {
     time_t     now = time(0);

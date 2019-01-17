@@ -129,9 +129,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(this->ui.checkBox_des_right_hand_pos_x, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_pos_x(int)));
     QObject::connect(this->ui.checkBox_des_right_hand_pos_y, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_pos_y(int)));
     QObject::connect(this->ui.checkBox_des_right_hand_pos_z, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_pos_z(int)));
-    QObject::connect(this->ui.checkBox_des_right_hand_or_roll, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_or_roll(int)));
-    QObject::connect(this->ui.checkBox_des_right_hand_or_pitch, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_or_pitch(int)));
-    QObject::connect(this->ui.checkBox_des_right_hand_or_yaw, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_or_yaw(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_q_x, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_q_x(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_q_y, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_q_y(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_q_z, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_q_z(int)));
+    QObject::connect(this->ui.checkBox_des_right_hand_q_w, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_q_w(int)));
     QObject::connect(this->ui.checkBox_use_plan_hand_pos, SIGNAL(stateChanged(int)), this, SLOT(check_use_plan_hand_pos(int)));
 
     QObject::connect(this->ui.checkBox_des_right_hand_vel_x, SIGNAL(stateChanged(int)), this, SLOT(check_des_right_hand_vel_x(int)));
@@ -340,24 +341,38 @@ void MainWindow::execPosControl()
             boost::unique_lock<boost::mutex> lck(hh_control_mtx);
 
             double des_hand_pos_x = 0.0; double des_hand_pos_y = 0.0; double des_hand_pos_z = 0.0;
-            double des_hand_or_roll = 0.0; double des_hand_or_pitch = 0.0; double des_hand_or_yaw = 0.0;
+            //double des_hand_or_roll = 0.0; double des_hand_or_pitch = 0.0; double des_hand_or_yaw = 0.0;
+            double des_hand_q_x = 0.0; double des_hand_q_y = 0.0; double des_hand_q_z = 0.0; double des_hand_q_w = 0.0;
+
+            string stage_descr = "plan"; MatrixXd jointsPosition;
 
             if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
+                stage_descr = this->h_results->trajectory_descriptions.at(this->i_ctrl);
+                jointsPosition = this->jointsPosition_mov.at(this->i_ctrl);
                 vector<double> des_hand_pos = this->des_handPosition.at(this->i_ctrl);
-                vector<double> des_hand_orr = this->des_handOrientation.at(this->i_ctrl);
+                //vector<double> des_hand_orr = this->des_handOrientation.at(this->i_ctrl);
+                vector<double> des_hand_orr_q = this->des_handOrientation_q.at(this->i_ctrl);
                 des_hand_pos_x = des_hand_pos.at(0);
                 des_hand_pos_y = des_hand_pos.at(1);
                 des_hand_pos_z = des_hand_pos.at(2);
-                des_hand_or_roll = des_hand_orr.at(0);
-                des_hand_or_pitch = des_hand_orr.at(1);
-                des_hand_or_yaw = des_hand_orr.at(2);
+//                des_hand_or_roll = des_hand_orr.at(0);
+//                des_hand_or_pitch = des_hand_orr.at(1);
+//                des_hand_or_yaw = des_hand_orr.at(2);
+                des_hand_q_x = des_hand_orr_q.at(0);
+                des_hand_q_y = des_hand_orr_q.at(1);
+                des_hand_q_z = des_hand_orr_q.at(2);
+                des_hand_q_w = des_hand_orr_q.at(3);
             }else{
                 des_hand_pos_x = this->ui.lineEdit_des_right_hand_pos_x->text().toDouble();
                 des_hand_pos_y = this->ui.lineEdit_des_right_hand_pos_y->text().toDouble();
                 des_hand_pos_z = this->ui.lineEdit_des_right_hand_pos_z->text().toDouble();
-                des_hand_or_roll = this->ui.lineEdit_des_right_hand_or_roll->text().toDouble();
-                des_hand_or_pitch = this->ui.lineEdit_des_right_hand_or_pitch->text().toDouble();
-                des_hand_or_yaw = this->ui.lineEdit_des_right_hand_or_yaw->text().toDouble();
+//                des_hand_or_roll = this->ui.lineEdit_des_right_hand_or_roll->text().toDouble();
+//                des_hand_or_pitch = this->ui.lineEdit_des_right_hand_or_pitch->text().toDouble();
+//                des_hand_or_yaw = this->ui.lineEdit_des_right_hand_or_yaw->text().toDouble();
+                des_hand_q_x = this->ui.lineEdit_des_right_hand_q_x->text().toDouble();
+                des_hand_q_y = this->ui.lineEdit_des_right_hand_q_y->text().toDouble();
+                des_hand_q_z = this->ui.lineEdit_des_right_hand_q_z->text().toDouble();
+                des_hand_q_w = this->ui.lineEdit_des_right_hand_q_w->text().toDouble();
             }
 
             double vel_max = this->ui.lineEdit_vel_max->text().toDouble()*M_PI/180;
@@ -432,12 +447,12 @@ void MainWindow::execPosControl()
                 diff_w = this->ui.lineEdit_diff_w->text().toDouble();
             }
 
-            VectorXd des_hand(6);
-            des_hand << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z,
-                        des_hand_or_roll,des_hand_or_pitch,des_hand_or_yaw;
+            Vector3d des_hand_pos; Vector3d des_hand_or_e;
+            des_hand_pos << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z;
+            des_hand_or_e << des_hand_q_x,des_hand_q_y,des_hand_q_z;
 
             double error_pos_th = this->ui.lineEdit_err_pos->text().toDouble();
-            double error_or_th = DEGTORAD*this->ui.lineEdit_err_or->text().toDouble();
+            double error_or_th = this->ui.lineEdit_err_or->text().toDouble();
 
             vector<double> r_posture; vector<double> r_hand_posture;
             this->curr_scene->getHumanoid()->getRightArmPosture(r_posture);
@@ -445,9 +460,12 @@ void MainWindow::execPosControl()
 
             vector<double> r_hand_pos; vector<double> r_wrist_pos; vector<double> r_elbow_pos; vector<double> r_shoulder_pos;
             this->curr_scene->getHumanoid()->getAllPos(1,r_hand_pos,r_wrist_pos,r_elbow_pos,r_shoulder_pos,r_posture);
+            vector<double> r_hand_pos_q; vector<double> r_wrist_pos_q; vector<double> r_elbow_pos_q; vector<double> r_shoulder_pos_q;
+            this->curr_scene->getHumanoid()->getAllPos_q(1,r_hand_pos_q,r_wrist_pos_q,r_elbow_pos_q,r_shoulder_pos_q,r_posture);
 
             vector<double> r_hand_lin_pos(r_hand_pos.begin(), r_hand_pos.begin()+3);
             vector<double> r_hand_ang_pos(r_hand_pos.begin()+3, r_hand_pos.begin()+6);
+            vector<double> r_hand_q(r_hand_pos_q.begin()+3, r_hand_pos_q.begin()+7);
             vector<double> r_wrist_lin_pos(r_wrist_pos.begin(), r_wrist_pos.begin()+3);
             vector<double> r_wrist_ang_pos(r_wrist_pos.begin()+3, r_wrist_pos.begin()+6);
             vector<double> r_elbow_lin_pos(r_elbow_pos.begin(), r_elbow_pos.begin()+3);
@@ -464,35 +482,39 @@ void MainWindow::execPosControl()
             this->shoulderPosition_ctrl.push_back(r_shoulder_lin_pos);
             this->shoulderOrientation_ctrl.push_back(r_shoulder_ang_pos);
 
-            VectorXd r_hand(6);
-            r_hand << r_hand_lin_pos.at(0),r_hand_lin_pos.at(1),r_hand_lin_pos.at(2),
-                      r_hand_ang_pos.at(0),r_hand_ang_pos.at(1),r_hand_ang_pos.at(2);
+            Vector3d r_hand_pos_vec; Vector3d r_hand_or_e; double r_hand_q_w = r_hand_q.at(3);
+            r_hand_pos_vec << r_hand_lin_pos.at(0),r_hand_lin_pos.at(1),r_hand_lin_pos.at(2);
+            r_hand_or_e << r_hand_q.at(0),r_hand_q.at(1),r_hand_q.at(2);
 
-            VectorXd error = des_hand - r_hand;
-            Vector3d error_pos; error_pos << abs(des_hand(0) - r_hand(0)),abs(des_hand(1) - r_hand(1)),abs(des_hand(2) - r_hand(2));
-            Vector3d error_or; error_or << abs(des_hand(3) - r_hand(3)),abs(des_hand(4) - r_hand(4)),abs(des_hand(5) - r_hand(5));
+            Vector3d error_pos = des_hand_pos - r_hand_pos_vec;
+            Vector3d error_or = r_hand_q_w*des_hand_or_e - des_hand_q_w*r_hand_or_e - des_hand_or_e.cross(r_hand_or_e);
+            VectorXd error_tot(6); error_tot << error_pos(0),error_pos(1),error_pos(2),
+                                                error_or(0),error_or(1),error_or(2);
+
+            Vector3d error_abs_pos; error_abs_pos << abs(error_pos(0)),abs(error_pos(1)),abs(error_pos(2));
+            Vector3d error_abs_or; error_abs_or << abs(error_or(0)),abs(error_or(1)),abs(error_or(2));
 
             double e_n_pos = error_pos.norm(); double e_n_or = error_or.norm();
 
             MatrixXd Koeff = MatrixXd::Identity(6,6);
             double coeff_pos = this->ui.lineEdit_coeff_pos->text().toDouble();
             double coeff_or = this->ui.lineEdit_coeff_or->text().toDouble();
-            if((this->ui.checkBox_des_right_hand_pos_x->isChecked()) && (error_pos(0) > error_pos_th)){
+            if((this->ui.checkBox_des_right_hand_pos_x->isChecked()) && (error_abs_pos(0) > error_pos_th)){
                 Koeff(0,0) = coeff_pos;
             }else{ Koeff(0,0) = 0.0;}
-            if((this->ui.checkBox_des_right_hand_pos_y->isChecked()) && (error_pos(1) > error_pos_th)){
+            if((this->ui.checkBox_des_right_hand_pos_y->isChecked()) && (error_abs_pos(1) > error_pos_th)){
                 Koeff(1,1) = coeff_pos;
             }else{ Koeff(1,1) = 0.0;}
-            if((this->ui.checkBox_des_right_hand_pos_z->isChecked()) && (error_pos(2) > error_pos_th)){
+            if((this->ui.checkBox_des_right_hand_pos_z->isChecked()) && (error_abs_pos(2) > error_pos_th)){
                 Koeff(2,2) = coeff_pos;
             }else{ Koeff(2,2) = 0.0;}
-            if((this->ui.checkBox_des_right_hand_or_roll->isChecked()) && (error_or(0) > error_or_th)){
+            if((this->ui.checkBox_des_right_hand_q_x->isChecked()) && (error_abs_or(0) > error_or_th)){
                 Koeff(3,3) = coeff_or;
             }else{ Koeff(3,3) = 0.0;}
-            if((this->ui.checkBox_des_right_hand_or_pitch->isChecked()) && (error_or(1) > error_or_th)){
+            if((this->ui.checkBox_des_right_hand_q_y->isChecked()) && (error_abs_or(1) > error_or_th)){
                 Koeff(4,4) = coeff_or;
             }else{ Koeff(4,4) = 0.0;}
-            if((this->ui.checkBox_des_right_hand_or_yaw->isChecked()) && (error_or(2) > error_or_th)){
+            if((this->ui.checkBox_des_right_hand_q_z->isChecked()) && (error_abs_or(2) > error_or_th)){
                 Koeff(5,5) = coeff_or;
             }else{ Koeff(5,5) = 0.0;}
 
@@ -503,20 +525,63 @@ void MainWindow::execPosControl()
                 if((e_n_pos < 1.73*error_pos_th) && (e_n_or < 1.73*error_or_th)){
                     if(stages==3 && this->i_ctrl<2){
                         this->i_ctrl++;
+                        stage_descr = this->h_results->trajectory_descriptions.at(this->i_ctrl);
                     }else if(stages==2 && this->i_ctrl<1){
                         this->i_ctrl++;
+                        stage_descr = this->h_results->trajectory_descriptions.at(this->i_ctrl);
                     }
                 }
             }
             // for human-likeness
-            double g_map = 1 - exp((-dec_rate*this->qnode.getSimTime())/(tau*(1+diff_w*error.norm()))); // mapped time
+            VectorXd h_arm_posture(JOINTS_ARM);VectorXd h_hand_posture(JOINTS_HAND);
+            if(this->ui.checkBox_use_plan_hand_pos->isChecked())
+            {
+                double g_map = 1 - exp((-dec_rate*this->qnode.getSimTime())/(tau*(1+diff_w*error_tot.norm()))); // normalized mapped time
+                int n_steps = jointsPosition.rows();
+                int index = static_cast<int>((n_steps-1)*g_map);
+                VectorXd h_posture = jointsPosition.row(index); // current human-like posture
+                h_arm_posture = h_posture.head<JOINTS_ARM>();
+                h_hand_posture = h_posture.tail<JOINTS_HAND>();
+            }
             // closed-loop control
-            VectorXd hand_vel = Koeff * error;
+            VectorXd hand_vel = Koeff * error_tot;
             vector<double> hand_vel_vec; hand_vel_vec.resize(hand_vel.size());
             VectorXd::Map(&hand_vel_vec[0], hand_vel.size()) = hand_vel;
 
             vector<double> r_velocities;
             vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
+            if(this->ui.checkBox_use_plan_hand_pos->isChecked())
+            {
+                int mov_type = this->curr_mov->getType();
+                if(mov_type==0){
+                    // pick
+                    string obj_tar_name = this->curr_mov->getObject()->getName();
+                    if(stage_descr.compare("plan")!=0){
+                        //not the plan stage (approach or retreat)
+                        for(size_t i=0;i<obsts.size();++i)
+                        {
+                            if(obj_tar_name.compare(obsts.at(i)->getName())==0)
+                            {
+                                obsts.erase(obsts.begin()+i);
+                            }
+                        }
+                    }
+                }else if((mov_type==2) || (mov_type==3) || (mov_type==4)){
+                    // place
+                    string obj_tar_name = this->curr_mov->getObject()->getName();
+                    if(stage_descr.compare("retreat")!=0){
+                        //not the retreat stage (plan or approach)
+                        for(size_t i=0;i<obsts.size();++i)
+                        {
+                            if(obj_tar_name.compare(obsts.at(i)->getName())==0)
+                            {
+                                obsts.erase(obsts.begin()+i);
+                            }
+                        }
+                    }
+                }
+                this->qnode.checkProximityObject(this->curr_mov,stage_descr);
+            }
             //this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
             this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,
                                                                             vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
@@ -564,6 +629,7 @@ void MainWindow::execPosControl()
 
             this->handVelocityNorm_ctrl.push_back(this->curr_scene->getHumanoid()->getHandVelNorm(1,r_posture,r_velocities));
             this->sim_time.push_back(this->qnode.getSimTime());
+
         }
     }
 }
@@ -2704,8 +2770,8 @@ if(solved){
 
         // compute the hand values, positions and accelerations
         //hand
-        this->des_handPosition.clear();
-        this->handPosition_mov.resize(tot_steps); this->handOrientation_mov.resize(tot_steps);
+        this->des_handPosition.clear(); this->des_handOrientation.clear(); this->des_handOrientation_q.clear();
+        this->handPosition_mov.resize(tot_steps); this->handOrientation_mov.resize(tot_steps); this->handOrientation_q_mov.resize(tot_steps);
         this->handVelocityNorm_mov.resize(tot_steps);
         this->handLinearVelocity_mov.resize(tot_steps); this->handAngularVelocity_mov.resize(tot_steps);
         // wrist
@@ -2731,6 +2797,7 @@ if(solved){
                 VectorXd::Map(&posture[0], pos_row.size()) = pos_row;
                 this->curr_scene->getHumanoid()->getHandPos(arm_code,this->handPosition_mov.at(step),posture);
                 this->curr_scene->getHumanoid()->getHandOr(arm_code,this->handOrientation_mov.at(step),posture);
+                this->curr_scene->getHumanoid()->getHandOr_q(arm_code,this->handOrientation_q_mov.at(step),posture);
                 // velocities
                 VectorXd vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
                 vector<double> velocities; velocities.resize(vel_row.size());
@@ -2760,6 +2827,7 @@ if(solved){
             }// loop steps in the stage
             this->des_handPosition.push_back(this->handPosition_mov.at(step-1));
             this->des_handOrientation.push_back(this->handOrientation_mov.at(step-1));
+            this->des_handOrientation_q.push_back(this->handOrientation_q_mov.at(step-1));
         }// loop stages
         // -- normlized jerk cost of the hand -- //
         QVector<double> handPosition_mov_x; QVector<double> handPosition_mov_y; QVector<double> handPosition_mov_z;
@@ -10580,36 +10648,47 @@ void MainWindow::check_des_right_hand_pos_z(int state)
     }
 }
 
-void MainWindow::check_des_right_hand_or_roll(int state)
+void MainWindow::check_des_right_hand_q_x(int state)
 {
     if(state==0){
         // unchecked
-        this->ui.lineEdit_des_right_hand_or_roll->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_q_x->setEnabled(false);
     }else{
        // checked
-       this->ui.lineEdit_des_right_hand_or_roll->setEnabled(true);
+       this->ui.lineEdit_des_right_hand_q_x->setEnabled(true);
     }
 }
 
-void MainWindow::check_des_right_hand_or_pitch(int state)
+void MainWindow::check_des_right_hand_q_y(int state)
 {
     if(state==0){
         // unchecked
-        this->ui.lineEdit_des_right_hand_or_pitch->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_q_y->setEnabled(false);
     }else{
        // checked
-       this->ui.lineEdit_des_right_hand_or_pitch->setEnabled(true);
+       this->ui.lineEdit_des_right_hand_q_y->setEnabled(true);
     }
 }
 
-void MainWindow::check_des_right_hand_or_yaw(int state)
+void MainWindow::check_des_right_hand_q_z(int state)
 {
     if(state==0){
         // unchecked
-        this->ui.lineEdit_des_right_hand_or_yaw->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_q_z->setEnabled(false);
     }else{
        // checked
-       this->ui.lineEdit_des_right_hand_or_yaw->setEnabled(true);
+       this->ui.lineEdit_des_right_hand_q_z->setEnabled(true);
+    }
+}
+
+void MainWindow::check_des_right_hand_q_w(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.lineEdit_des_right_hand_q_w->setEnabled(false);
+    }else{
+       // checked
+       this->ui.lineEdit_des_right_hand_q_w->setEnabled(true);
     }
 }
 
@@ -10623,12 +10702,14 @@ void MainWindow::check_use_plan_hand_pos(int state)
         this->ui.lineEdit_des_right_hand_pos_y->setEnabled(true);
         this->ui.checkBox_des_right_hand_pos_z->setEnabled(true);
         this->ui.lineEdit_des_right_hand_pos_z->setEnabled(true);
-        this->ui.checkBox_des_right_hand_or_roll->setEnabled(true);
-        this->ui.lineEdit_des_right_hand_or_roll->setEnabled(true);
-        this->ui.checkBox_des_right_hand_or_pitch->setEnabled(true);
-        this->ui.lineEdit_des_right_hand_or_pitch->setEnabled(true);
-        this->ui.checkBox_des_right_hand_or_yaw->setEnabled(true);
-        this->ui.lineEdit_des_right_hand_or_yaw->setEnabled(true);
+        this->ui.checkBox_des_right_hand_q_x->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_q_x->setEnabled(true);
+        this->ui.checkBox_des_right_hand_q_y->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_q_y->setEnabled(true);
+        this->ui.checkBox_des_right_hand_q_z->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_q_z->setEnabled(true);
+        this->ui.checkBox_des_right_hand_q_w->setEnabled(true);
+        this->ui.lineEdit_des_right_hand_q_w->setEnabled(true);
     }else{
        // checked
         this->ui.checkBox_des_right_hand_pos_x->setEnabled(false);
@@ -10637,12 +10718,14 @@ void MainWindow::check_use_plan_hand_pos(int state)
         this->ui.lineEdit_des_right_hand_pos_y->setEnabled(false);
         this->ui.checkBox_des_right_hand_pos_z->setEnabled(false);
         this->ui.lineEdit_des_right_hand_pos_z->setEnabled(false);
-        this->ui.checkBox_des_right_hand_or_roll->setEnabled(false);
-        this->ui.lineEdit_des_right_hand_or_roll->setEnabled(false);
-        this->ui.checkBox_des_right_hand_or_pitch->setEnabled(false);
-        this->ui.lineEdit_des_right_hand_or_pitch->setEnabled(false);
-        this->ui.checkBox_des_right_hand_or_yaw->setEnabled(false);
-        this->ui.lineEdit_des_right_hand_or_yaw->setEnabled(false);
+        this->ui.checkBox_des_right_hand_q_x->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_q_x->setEnabled(false);
+        this->ui.checkBox_des_right_hand_q_y->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_q_y->setEnabled(false);
+        this->ui.checkBox_des_right_hand_q_z->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_q_z->setEnabled(false);
+        this->ui.checkBox_des_right_hand_q_w->setEnabled(false);
+        this->ui.lineEdit_des_right_hand_q_w->setEnabled(false);
     }
 }
 

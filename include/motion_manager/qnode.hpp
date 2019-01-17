@@ -223,6 +223,13 @@ public:
          */
         void log( const LogLevel &level, const string &msg);
 
+        /**
+         * @brief checkProximityObject
+         * @param mov
+         * @param stage
+         */
+        void checkProximityObject(movementPtr mov, string stage);
+
 
 
 Q_SIGNALS:

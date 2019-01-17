@@ -722,22 +722,28 @@ public Q_SLOTS:
         void check_des_right_hand_pos_z(int state);
 
         /**
-         * @brief check_des_right_hand_or_roll
+         * @brief check_des_right_hand_q_x
          * @param state
          */
-        void check_des_right_hand_or_roll(int state);
+        void check_des_right_hand_q_x(int state);
 
         /**
-         * @brief check_des_right_hand_or_pitch
+         * @brief check_des_right_hand_q_y
          * @param state
          */
-        void check_des_right_hand_or_pitch(int state);
+        void check_des_right_hand_q_y(int state);
 
         /**
-         * @brief check_des_right_hand_or_yaw
+         * @brief check_des_right_hand_q_z
          * @param state
          */
-        void check_des_right_hand_or_yaw(int state);
+        void check_des_right_hand_q_z(int state);
+
+        /**
+         * @brief check_des_right_hand_q_w
+         * @param state
+         */
+        void check_des_right_hand_q_w(int state);
 
         /**
          * @brief check_use_plan_hand_pos
@@ -887,7 +893,8 @@ private:
         double prob_time_mov;/**< time taken to solve the problem */
 
         vector<vector<double>> handPosition_mov; /**< hand position during the movement. 0=x,1=y,2=z */
-        vector<vector<double>> handOrientation_mov; /**< hand orientation during the movement. */
+        vector<vector<double>> handOrientation_mov; /**< hand orientation (rpy) during the movement. */
+        vector<vector<double>> handOrientation_q_mov; /**< hand orientation (quaternion) during the movement. */
         vector<vector<double>> handLinearVelocity_mov; /**< hand linear velocity during the movement */
         vector<vector<double>> handAngularVelocity_mov;/**< hand angular velocity during the movement */
         vector<vector<double>> wristLinearVelocity_mov; /**< wrist linear velocity during the movement */
@@ -1179,7 +1186,8 @@ private:
         boost::shared_ptr<HandPosPlot> handPosPlot_ctrl_ptr; /**< pointer to the hand position plot during control */
         // hand
         vector<vector<double>> des_handPosition; /**< vector of desired hand positions during control*/
-        vector<vector<double>> des_handOrientation; /**< vector of desired hand orientations during control*/
+        vector<vector<double>> des_handOrientation; /**< vector of desired hand orientation (rpy) during control*/
+        vector<vector<double>> des_handOrientation_q; /**< vector of desired hand orientation (quaternion) during control*/
         int i_ctrl; /**< index of the desired hand pose*/
         vector<vector<double>> handPosition_ctrl; /**< hand position during control. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_ctrl; /**< hand orientation during control. 0=roll,1=pitch,2=yaw */

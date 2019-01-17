@@ -731,6 +731,17 @@ public:
     void getAllPos(int arm, vector<double>& hand_pos, vector<double>& wrist_pos, vector<double>& elbow_pos, vector<double>& shoulder_pos, vector<double>& posture);
 
     /**
+     * @brief getAllPos_q
+     * @param arm
+     * @param hand_pos
+     * @param wrist_pos
+     * @param elbow_pos
+     * @param shoulder_pos
+     * @param posture
+     */
+    void getAllPos_q(int arm, vector<double>& hand_pos, vector<double>& wrist_pos, vector<double>& elbow_pos, vector<double>& shoulder_pos, vector<double>& posture);
+
+    /**
      * @brief getHandPos
      * @param arm
      * @param pos
@@ -745,6 +756,14 @@ public:
      * @param posture
      */
     void getHandOr(int arm, vector<double>& orr, vector<double>& posture);
+
+    /**
+     * @brief getHandOr_q
+     * @param arm
+     * @param orr_q
+     * @param posture
+     */
+    void getHandOr_q(int arm, vector<double>& orr_q, vector<double>& posture);
 
     /**
      * @brief getHandPosMes
@@ -836,6 +855,14 @@ public:
     void getWristOr(int arm,vector<double>& orr,vector<double>& posture);
 
     /**
+     * @brief getWristOr_q
+     * @param arm
+     * @param orr_q
+     * @param posture
+     */
+    void getWristOr_q(int arm,vector<double>& orr_q,vector<double>& posture);
+
+    /**
      * @brief getWristVel
      * @param arm
      * @param vel
@@ -870,6 +897,14 @@ public:
     void getElbowOr(int arm,vector<double>& orr,vector<double>& posture);
 
     /**
+     * @brief getElbowOr_q
+     * @param arm
+     * @param orr_q
+     * @param posture
+     */
+    void getElbowOr_q(int arm,vector<double>& orr_q,vector<double>& posture);
+
+    /**
      * @brief getElbowVel
      * @param arm
      * @param vel
@@ -902,6 +937,14 @@ public:
      * @param posture
      */
     void getShoulderOr(int arm,vector<double>& orr,vector<double>& posture);
+
+    /**
+     * @brief getShoulderOr_q
+     * @param arm
+     * @param orr_q
+     * @param posture
+     */
+    void getShoulderOr_q(int arm,vector<double>& orr_q,vector<double>& posture);
 
     /**
      * @brief getShoulderVel
@@ -1204,11 +1247,25 @@ private:
     bool getRPY(std::vector<double>& rpy, Matrix3d& Rot);
 
     /**
-     * @brief RPY_matrix
+     * @brief getQuaternion
+     * @param q
+     * @param Rot
+     */
+    void getQuaternion(std::vector<double>& q, Matrix3d& Rot);
+
+    /**
+     * @brief Rot_matrix
      * @param Rot
      * @param rpy
      */
-    void RPY_matrix(Matrix3d &Rot,std::vector<double>& rpy);
+    void Rot_matrix(Matrix3d &Rot,std::vector<double>& rpy);
+
+    /**
+     * @brief Rot_matrix_q
+     * @param Rot
+     * @param qq
+     */
+    void Rot_matrix_q(Matrix3d &Rot,std::vector<double>& qq);
 
 };
 

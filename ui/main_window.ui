@@ -1745,9 +1745,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>560</x>
-        <y>20</y>
+        <y>10</y>
         <width>331</width>
-        <height>171</height>
+        <height>161</height>
        </rect>
       </property>
       <property name="title">
@@ -1903,7 +1903,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>140</y>
+         <y>130</y>
          <width>301</width>
          <height>21</height>
         </rect>
@@ -1917,165 +1917,19 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>560</x>
-        <y>230</y>
+        <y>210</y>
         <width>331</width>
-        <height>301</height>
+        <height>321</height>
        </rect>
       </property>
       <property name="title">
        <string>Desired right hand position</string>
       </property>
-      <widget class="QWidget" name="layoutWidget_54">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>311</width>
-         <height>91</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_544">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_99">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_545">
-            <item>
-             <widget class="QCheckBox" name="checkBox_des_right_hand_pos_x">
-              <property name="text">
-               <string>x [mm]:</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEdit_des_right_hand_pos_x">
-              <property name="text">
-               <string>0.0</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_546">
-            <item>
-             <widget class="QCheckBox" name="checkBox_des_right_hand_pos_y">
-              <property name="text">
-               <string>y [mm]:</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEdit_des_right_hand_pos_y">
-              <property name="text">
-               <string>0.0</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_547">
-            <item>
-             <widget class="QCheckBox" name="checkBox_des_right_hand_pos_z">
-              <property name="text">
-               <string>z [mm]:</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEdit_des_right_hand_pos_z">
-              <property name="text">
-               <string>0.0</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_100">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_548">
-            <item>
-             <widget class="QCheckBox" name="checkBox_des_right_hand_or_roll">
-              <property name="text">
-               <string>roll [rad]:</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEdit_des_right_hand_or_roll">
-              <property name="text">
-               <string>0.0</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_549">
-            <item>
-             <widget class="QCheckBox" name="checkBox_des_right_hand_or_pitch">
-              <property name="text">
-               <string>pitch [rad]:</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEdit_des_right_hand_or_pitch">
-              <property name="text">
-               <string>0.0</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_550">
-            <item>
-             <widget class="QCheckBox" name="checkBox_des_right_hand_or_yaw">
-              <property name="text">
-               <string>yaw [rad]:</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEdit_des_right_hand_or_yaw">
-              <property name="text">
-               <string>0.0</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
       <widget class="QCheckBox" name="checkBox_use_plan_hand_pos">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>130</y>
+         <y>160</y>
          <width>291</width>
          <height>21</height>
         </rect>
@@ -2084,11 +1938,11 @@ p, li { white-space: pre-wrap; }
         <string>use the planned desired right hand position</string>
        </property>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>162</y>
+         <y>190</y>
          <width>311</width>
          <height>120</height>
         </rect>
@@ -2124,7 +1978,7 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QLineEdit" name="lineEdit_err_pos">
             <property name="text">
-             <string>5.0</string>
+             <string>1.0</string>
             </property>
            </widget>
           </item>
@@ -2142,7 +1996,7 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QLineEdit" name="lineEdit_coeff_or">
             <property name="text">
-             <string>0.1</string>
+             <string>1</string>
             </property>
            </widget>
           </item>
@@ -2153,14 +2007,185 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QLabel" name="label_err_or">
             <property name="text">
-             <string>Orientation error threshold [deg]</string>
+             <string>Orientation error threshold </string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLineEdit" name="lineEdit_err_or">
             <property name="text">
-             <string>1.0</string>
+             <string>0.01</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>141</width>
+         <height>89</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_99">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_545">
+          <item>
+           <widget class="QCheckBox" name="checkBox_des_right_hand_pos_x">
+            <property name="text">
+             <string>x [mm]:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_des_right_hand_pos_x">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_546">
+          <item>
+           <widget class="QCheckBox" name="checkBox_des_right_hand_pos_y">
+            <property name="text">
+             <string>y [mm]:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_des_right_hand_pos_y">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_547">
+          <item>
+           <widget class="QCheckBox" name="checkBox_des_right_hand_pos_z">
+            <property name="text">
+             <string>z [mm]:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_des_right_hand_pos_z">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>160</x>
+         <y>32</y>
+         <width>161</width>
+         <height>120</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_100">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_548">
+          <item>
+           <widget class="QCheckBox" name="checkBox_des_right_hand_q_x">
+            <property name="text">
+             <string>Quaternion x:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_des_right_hand_q_x">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_549">
+          <item>
+           <widget class="QCheckBox" name="checkBox_des_right_hand_q_y">
+            <property name="text">
+             <string>Quaternion y:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_des_right_hand_q_y">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_550">
+          <item>
+           <widget class="QCheckBox" name="checkBox_des_right_hand_q_z">
+            <property name="text">
+             <string>Quaternion z:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_des_right_hand_q_z">
+            <property name="text">
+             <string>0.0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_544">
+          <item>
+           <widget class="QCheckBox" name="checkBox_des_right_hand_q_w">
+            <property name="text">
+             <string>Quaternion w:</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_des_right_hand_q_w">
+            <property name="text">
+             <string>0.0</string>
             </property>
            </widget>
           </item>
@@ -2173,7 +2198,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>920</x>
-        <y>270</y>
+        <y>260</y>
         <width>211</width>
         <height>21</height>
        </rect>
@@ -2186,7 +2211,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>560</x>
-        <y>200</y>
+        <y>180</y>
         <width>181</width>
         <height>21</height>
        </rect>
@@ -2202,7 +2227,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>920</x>
-        <y>20</y>
+        <y>10</y>
         <width>311</width>
         <height>241</height>
        </rect>
