@@ -168,6 +168,17 @@ public:
         bool execKinControl(int arm, vector<double> &r_posture, vector<double>& r_velocities);
 
         /**
+         * @brief execKinControl
+         * @param arm
+         * @param r_posture
+         * @param r_velocities
+         * @param r_hand_posture
+         * @param r_hand_velocities
+         * @return
+         */
+        bool execKinControl(int arm, vector<double> &r_posture, vector<double>& r_velocities, vector<double> &r_hand_posture, vector<double> &r_hand_velocities);
+
+        /**
          * @brief This method sets to zero the time of simulation
          */
         void resetSimTime();

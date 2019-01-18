@@ -345,19 +345,25 @@ void MainWindow::execPosControl()
             double des_hand_q_x = 0.0; double des_hand_q_y = 0.0; double des_hand_q_z = 0.0; double des_hand_q_w = 0.0;
 
             string stage_descr = "plan"; MatrixXd jointsPosition;
+            VectorXd jointsPosition_max(JOINTS_ARM+JOINTS_HAND); VectorXd jointsPosition_min(JOINTS_ARM+JOINTS_HAND);
+            VectorXd jointsPosition_hand_max(JOINTS_HAND); VectorXd jointsPosition_hand_min(JOINTS_HAND);
 
             if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
                 stage_descr = this->h_results->trajectory_descriptions.at(this->i_ctrl);
                 jointsPosition = this->jointsPosition_mov.at(this->i_ctrl);
+                for (int i=0;i<jointsPosition.cols();++i){
+                    VectorXd col_i = jointsPosition.col(i);
+                    jointsPosition_max(i) = col_i.maxCoeff();
+                    jointsPosition_min(i) = col_i.minCoeff();
+                }
+                jointsPosition_hand_max = jointsPosition_max.tail<4>();
+                jointsPosition_hand_min = jointsPosition_min.tail<4>();
                 vector<double> des_hand_pos = this->des_handPosition.at(this->i_ctrl);
                 //vector<double> des_hand_orr = this->des_handOrientation.at(this->i_ctrl);
                 vector<double> des_hand_orr_q = this->des_handOrientation_q.at(this->i_ctrl);
                 des_hand_pos_x = des_hand_pos.at(0);
                 des_hand_pos_y = des_hand_pos.at(1);
                 des_hand_pos_z = des_hand_pos.at(2);
-//                des_hand_or_roll = des_hand_orr.at(0);
-//                des_hand_or_pitch = des_hand_orr.at(1);
-//                des_hand_or_yaw = des_hand_orr.at(2);
                 des_hand_q_x = des_hand_orr_q.at(0);
                 des_hand_q_y = des_hand_orr_q.at(1);
                 des_hand_q_z = des_hand_orr_q.at(2);
@@ -366,9 +372,6 @@ void MainWindow::execPosControl()
                 des_hand_pos_x = this->ui.lineEdit_des_right_hand_pos_x->text().toDouble();
                 des_hand_pos_y = this->ui.lineEdit_des_right_hand_pos_y->text().toDouble();
                 des_hand_pos_z = this->ui.lineEdit_des_right_hand_pos_z->text().toDouble();
-//                des_hand_or_roll = this->ui.lineEdit_des_right_hand_or_roll->text().toDouble();
-//                des_hand_or_pitch = this->ui.lineEdit_des_right_hand_or_pitch->text().toDouble();
-//                des_hand_or_yaw = this->ui.lineEdit_des_right_hand_or_yaw->text().toDouble();
                 des_hand_q_x = this->ui.lineEdit_des_right_hand_q_x->text().toDouble();
                 des_hand_q_y = this->ui.lineEdit_des_right_hand_q_y->text().toDouble();
                 des_hand_q_z = this->ui.lineEdit_des_right_hand_q_z->text().toDouble();
@@ -439,12 +442,14 @@ void MainWindow::execPosControl()
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
             double hl_coeff = 1; double hl_damping = 0.001;
             double tau = 0.1; double dec_rate = 0.1; double diff_w = 0.1;
+            double fing_coeff = 0.1;
             if(hl_en){
                 hl_coeff = this->ui.lineEdit_hl_coeff->text().toDouble();
                 hl_damping = this->ui.lineEdit_hl_damping->text().toDouble();
                 tau = this->ui.lineEdit_tau->text().toDouble();
                 dec_rate = this->ui.lineEdit_dec_rate->text().toDouble();
                 diff_w = this->ui.lineEdit_diff_w->text().toDouble();
+                fing_coeff = this->ui.lineEdit_fing_coeff->text().toDouble();
             }
 
             Vector3d des_hand_pos; Vector3d des_hand_or_e;
@@ -534,6 +539,10 @@ void MainWindow::execPosControl()
             }
             // for human-likeness
             VectorXd h_arm_posture(JOINTS_ARM);VectorXd h_hand_posture(JOINTS_HAND);
+            VectorXd r_hand_velocities_vec(JOINTS_HAND); r_hand_velocities_vec << 0.0,0.0,0.0,0.0;
+            vector<double> r_hand_velocities; r_hand_velocities.resize(r_hand_velocities_vec.size());
+            VectorXd::Map(&r_hand_velocities[0], r_hand_velocities_vec.size()) = r_hand_velocities_vec;
+
             if(this->ui.checkBox_use_plan_hand_pos->isChecked())
             {
                 double g_map = 1 - exp((-dec_rate*this->qnode.getSimTime())/(tau*(1+diff_w*error_tot.norm()))); // normalized mapped time
@@ -542,6 +551,13 @@ void MainWindow::execPosControl()
                 VectorXd h_posture = jointsPosition.row(index); // current human-like posture
                 h_arm_posture = h_posture.head<JOINTS_ARM>();
                 h_hand_posture = h_posture.tail<JOINTS_HAND>();
+                if(hl_en){
+                    VectorXd hand_posture(4);
+                    hand_posture << r_hand_posture.at(0),r_hand_posture.at(1),r_hand_posture.at(2),r_hand_posture.at(3);
+                    r_hand_velocities_vec = -fing_coeff * (hand_posture - h_hand_posture).cwiseQuotient(jointsPosition_hand_max - jointsPosition_hand_min);
+                    r_hand_velocities_vec(0) = 0.0; // the spread does not move
+                    VectorXd::Map(&r_hand_velocities[0], r_hand_velocities_vec.size()) = r_hand_velocities_vec;
+                }
             }
             // closed-loop control
             VectorXd hand_vel = Koeff * error_tot;
@@ -625,7 +641,7 @@ void MainWindow::execPosControl()
             this->shoulderLinearVelocity_ctrl.push_back(r_shoulder_lin_vel);
             this->shoulderAngularVelocity_ctrl.push_back(r_shoulder_ang_vel);
 
-            this->qnode.execKinControl(1,r_posture,r_velocities);
+            this->qnode.execKinControl(1,r_posture,r_velocities,r_hand_posture,r_hand_velocities);
 
             this->handVelocityNorm_ctrl.push_back(this->curr_scene->getHumanoid()->getHandVelNorm(1,r_posture,r_velocities));
             this->sim_time.push_back(this->qnode.getSimTime());

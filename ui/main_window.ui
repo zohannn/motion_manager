@@ -2515,9 +2515,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>20</y>
+        <y>10</y>
         <width>531</width>
-        <height>511</height>
+        <height>521</height>
        </rect>
       </property>
       <property name="font">
@@ -2536,7 +2536,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>440</y>
+         <y>460</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2575,7 +2575,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>450</y>
+         <y>460</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2749,7 +2749,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>260</x>
-         <y>480</y>
+         <y>490</y>
          <width>249</width>
          <height>25</height>
         </rect>
@@ -2775,7 +2775,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>230</y>
+         <y>240</y>
          <width>241</width>
          <height>211</height>
         </rect>
@@ -2928,7 +2928,7 @@ p, li { white-space: pre-wrap; }
          <x>270</x>
          <y>170</y>
          <width>251</width>
-         <height>261</height>
+         <height>281</height>
         </rect>
        </property>
        <property name="title">
@@ -2986,7 +2986,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>110</y>
+          <y>140</y>
           <width>231</width>
           <height>131</height>
          </rect>
@@ -3061,12 +3061,38 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>100</y>
+          <width>211</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_577">
+         <item>
+          <widget class="QLabel" name="label_fing_coeff">
+           <property name="text">
+            <string>Finger Control Coefficient</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_fing_coeff">
+           <property name="text">
+            <string>0.2</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>480</y>
+         <y>490</y>
          <width>168</width>
          <height>25</height>
         </rect>
