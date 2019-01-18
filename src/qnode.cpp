@@ -10099,22 +10099,29 @@ bool QNode::execKinControl(int arm, vector<double> &r_posture, vector<double> &r
     }
 }
 
-bool QNode::execKinControl(int arm, vector<double> &r_posture, vector<double> &r_velocities, vector<double> &r_hand_posture, vector<double> &r_hand_velocities)
+bool QNode::execKinControl(int arm, vector<double> &r_arm_posture, vector<double> &r_arm_velocities, vector<double> &r_hand_posture, vector<double> &r_hand_velocities)
 {
 
+    vector<double> r_posture; r_posture.reserve( r_arm_posture.size() + r_hand_posture.size() );
+    r_posture.insert( r_posture.end(), r_arm_posture.begin(), r_arm_posture.end() );
+    r_posture.insert( r_posture.end(), r_hand_posture.begin(), r_hand_posture.end() );
+    vector<double> r_velocities; r_velocities.reserve( r_arm_velocities.size()+r_hand_velocities.size() );
+    r_velocities.insert( r_velocities.end(), r_arm_velocities.begin(), r_arm_velocities.end() );
+    r_velocities.insert( r_velocities.end(), r_hand_velocities.begin(), r_hand_velocities.end() );
+
     std::vector<int> handles;
-    MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
+    //MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
     switch (arm) {
     case 0: // dual arm
         // TO DO
         break;
     case 1: //right arm
         handles = right_handles;
-        hand_handles = right_hand_handles;
+        //hand_handles = right_hand_handles;
         break;
     case 2: // left arm
         handles = left_handles;
-        hand_handles = left_hand_handles;
+        //hand_handles = left_hand_handles;
         break;
     }
 
@@ -10146,19 +10153,22 @@ bool QNode::execKinControl(int arm, vector<double> &r_posture, vector<double> &r
         ros::spinOnce();
 
         vrep_common::JointSetStateData data;
-        int exec_mode = 0;
-        //int exec_mode = 2;
+        int exec_arm_mode = 0; // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+        int exec_hand_mode = 1; // 0 to set the position, 1 to set the target position, 2 to set the target velocity
         double exec_value;
-        //double time_step = simulationTime - timetot;
+
         for (int i = 0; i < r_velocities.size(); ++i)
         {
             exec_value = r_posture.at(i) + (r_velocities.at(i)) * simulationTimeStep;
-            //exec_value = r_velocities.at(i);
 
             if(arm!=0){
-                // single-arm
+                // single-arm                
+                if(i>=r_arm_posture.size()){
+                    data.setModes.data.push_back(exec_hand_mode);
+                }else{
+                    data.setModes.data.push_back(exec_arm_mode);
+                }
                 data.handles.data.push_back(handles.at(i));
-                data.setModes.data.push_back(exec_mode); // 0 to set the position, 1 to set the target position, 2 to set the target velocity
                 data.values.data.push_back(exec_value);
             }else{
                 // dual-arm (TO DO)

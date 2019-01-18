@@ -1978,7 +1978,7 @@ p, li { white-space: pre-wrap; }
           <item>
            <widget class="QLineEdit" name="lineEdit_err_pos">
             <property name="text">
-             <string>1.0</string>
+             <string>5.0</string>
             </property>
            </widget>
           </item>
@@ -3016,7 +3016,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_tau">
               <property name="text">
-               <string>0.01</string>
+               <string>0.05</string>
               </property>
              </widget>
             </item>
@@ -3034,7 +3034,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLineEdit" name="lineEdit_dec_rate">
               <property name="text">
-               <string>0.01</string>
+               <string>5</string>
               </property>
              </widget>
             </item>
@@ -3061,7 +3061,7 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>10</x>
