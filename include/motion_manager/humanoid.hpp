@@ -1014,35 +1014,9 @@ public:
     void inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double>& velocities, bool jlim_en, bool sing_en, bool obsts_en,
                                         double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts);
 
-    /**
-     * @brief inverseDiffKinematicsSingleArm
-     * @param arm
-     * @param posture
-     * @param hand_vel
-     * @param velocities
-     * @param jlim_en
-     * @param sing_en
-     * @param obsts_en
-     * @param hl_en
-     * @param vel_max
-     * @param sing_coeff
-     * @param sing_damping
-     * @param obst_coeff
-     * @param obst_damping
-     * @param jlim_th
-     * @param jlim_rate
-     * @param jlim_coeff
-     * @param jlim_damping
-     * @param obsts
-     * @param hl_coeff
-     * @param hl_damping
-     * @param posture_max
-     * @param posture_min
-     * @param h_posture
-     */
+
     void inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double>& velocities, bool jlim_en, bool sing_en, bool obsts_en, bool hl_en,
-                                        double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts,
-                                        double hl_coeff, double hl_damping, vector<double> posture_max, vector<double> posture_min, vector<double> h_posture);
+                                        double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts, vector<double> &h_ref_hand_vel);
 
 
     /**

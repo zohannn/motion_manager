@@ -845,6 +845,8 @@ public Q_SLOTS:
 
 
 private:
+        src::severity_logger< severity_level > lg; /**< logger */
+
         Ui::MainWindowDesign ui; /**< handles of the main user interface */
         QNode qnode; /**< ROS node handle */
         RosCommDialog *mrosCommdlg; /**< handle of the ROS communication dialog */
@@ -893,10 +895,14 @@ private:
         double prob_time_mov;/**< time taken to solve the problem */
 
         vector<vector<double>> handPosition_mov; /**< hand position during the movement. 0=x,1=y,2=z */
+        vector<vector<vector<double>>> handPosition_mov_stages; /**< hand position during the movement divided in stages. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_mov; /**< hand orientation (rpy) during the movement. */
         vector<vector<double>> handOrientation_q_mov; /**< hand orientation (quaternion) during the movement. */
+        vector<vector<vector<double>>> handOrientation_q_mov_stages; /**< hand orientation (quaternion) during the movement divided in stages. */
         vector<vector<double>> handLinearVelocity_mov; /**< hand linear velocity during the movement */
         vector<vector<double>> handAngularVelocity_mov;/**< hand angular velocity during the movement */
+        vector<vector<vector<double>>> handLinearVelocity_mov_stages; /**< hand linear velocity during the movement divided in stages.*/
+        vector<vector<vector<double>>> handAngularVelocity_mov_stages; /**< hand angular velocity during the movement divided in stages.*/
         vector<vector<double>> wristLinearVelocity_mov; /**< wrist linear velocity during the movement */
         vector<vector<double>> wristAngularVelocity_mov;/**< wrist angular velocity during the movement */
         vector<vector<double>> elbowLinearVelocity_mov; /**< elbow linear velocity during the movement */
@@ -1189,6 +1195,7 @@ private:
         vector<vector<double>> des_handOrientation; /**< vector of desired hand orientation (rpy) during control*/
         vector<vector<double>> des_handOrientation_q; /**< vector of desired hand orientation (quaternion) during control*/
         int i_ctrl; /**< index of the desired hand pose*/
+
         vector<vector<double>> handPosition_ctrl; /**< hand position during control. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_ctrl; /**< hand orientation during control. 0=roll,1=pitch,2=yaw */
         vector<vector<double>> handLinearVelocity_ctrl; /**< hand linear velocity during control */

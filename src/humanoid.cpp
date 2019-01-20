@@ -4682,7 +4682,7 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
 
 void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double>& velocities, bool jlim_en, bool sing_en, bool obsts_en, bool hl_en,
                                     double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts,
-                                    double hl_coeff,double hl_damping, vector<double> posture_max, vector<double> posture_min, vector<double> h_posture)
+                                    vector<double>& h_ref_hand_vel)
 {
     Matrix4d T;
     Matrix4d T_aux;
@@ -4824,7 +4824,12 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
     MatrixXd JJk_inv = JJ.inverse();
     MatrixXd J_plus = JacobianArmT*JJk_inv; // pseudo-inverse of the Jacobian
     VectorXd hand_vel_xd(6);
-    hand_vel_xd << hand_vel.at(0),hand_vel.at(1),hand_vel.at(2),hand_vel.at(3),hand_vel.at(4),hand_vel.at(5);
+    if(hl_en){
+        hand_vel_xd << h_ref_hand_vel.at(0),h_ref_hand_vel.at(1),h_ref_hand_vel.at(2),h_ref_hand_vel.at(3),h_ref_hand_vel.at(4),h_ref_hand_vel.at(5);
+    }else{
+        hand_vel_xd << hand_vel.at(0),hand_vel.at(1),hand_vel.at(2),hand_vel.at(3),hand_vel.at(4),hand_vel.at(5);
+    }
+
     VectorXd joint_velocities = J_plus*hand_vel_xd;
 
     double null_th = 0.001;
@@ -5285,32 +5290,46 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
     // human-likeness
     if(hl_en)
     {
-        double delta_theta = 0.001; // rad = 0.57 deg
-        vector<double> posture_delta(posture.size());
-        std::transform(posture.begin(), posture.end(), posture_delta.begin(), std::bind1st(std::plus<double>(),delta_theta));
-        double curr_alpha = this->getSwivelAngle(arm,posture);
-        double curr_alpha_delta = this->getSwivelAngle(arm,posture_delta);
-        double h_alpha = this->getSwivelAngle(arm,h_posture);
-        double alpha_max = this->getSwivelAngle(arm,posture_max);
-        double alpha_min = this->getSwivelAngle(arm,posture_min);
+//        MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
+//        MatrixXd Jpp = J_plus*JacobianArm;
+//        MatrixXd J_Null = Id - Jpp;
+//        VectorXd h_hand_vel_xd(6); h_hand_vel_xd << h_ref_hand_vel.at(0),h_ref_hand_vel.at(1),h_ref_hand_vel.at(2),h_ref_hand_vel.at(3),h_ref_hand_vel.at(4),h_ref_hand_vel.at(5);
+//        joint_velocities +=  J_Null*J_plus*h_hand_vel_xd;
 
-        VectorXd delta_H_hl(posture.size());
-        for (int i = 0; i < delta_H_hl.size(); ++i){
-            delta_H_hl(i) = ((curr_alpha-h_alpha)/(alpha_max-alpha_min)) * ((curr_alpha_delta - curr_alpha_delta)/delta_theta);
-            //delta_H_hl(i) = ((posture.at(i)-h_posture.at(i))/(posture_max.at(i)-posture_min.at(i)));
-        }
+//        double delta_theta = 0.001; // rad = 0.57 deg
+//        vector<double> posture_delta(posture.size());
+//        std::transform(posture.begin(), posture.end(), posture_delta.begin(), std::bind1st(std::plus<double>(),delta_theta));
+//        double curr_alpha = this->getSwivelAngle(arm,posture);
+//        double curr_alpha_delta = this->getSwivelAngle(arm,posture_delta);
+//        double h_alpha = this->getSwivelAngle(arm,h_posture);
+//        double alpha_max = this->getSwivelAngle(arm,posture_max);
+//        double alpha_min = this->getSwivelAngle(arm,posture_min);
 
-        MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
-        MatrixXd Jpp = J_plus*JacobianArm;
-        MatrixXd J_Null = Id - Jpp;
-        VectorXd J_hl= J_Null*delta_H_hl;
-        double k_hl = 0;
-        if(J_hl.norm() > null_th){
-            k_hl = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_hl.norm())));
-        }
-        double fd = hl_coeff * (1 - exp(-hl_damping*(J_hl.norm())));
+//        VectorXd delta_H_hl(posture.size());
+//        for (int i = 0; i < delta_H_hl.size(); ++i){
+//            delta_H_hl(i) = ((curr_alpha-h_alpha)/(alpha_max-alpha_min)) * ((curr_alpha_delta - curr_alpha)/delta_theta);
+//            //delta_H_hl(i) = ((posture.at(i)-h_posture.at(i))/(posture_max.at(i)-posture_min.at(i)));
+//        }
 
-        joint_velocities +=  (k_hl*fd*J_hl);
+        BOOST_LOG_SEV(lg, info) << "# ----------------HUMAN-LIKE OPTION------------------- # ";
+        BOOST_LOG_SEV(lg, info) << "h_hand_vel_xd_0 = " << hand_vel_xd(0);
+        BOOST_LOG_SEV(lg, info) << "h_hand_vel_xd_1 = " << hand_vel_xd(1);
+        BOOST_LOG_SEV(lg, info) << "h_hand_vel_xd_2 = " << hand_vel_xd(2);
+        BOOST_LOG_SEV(lg, info) << "h_hand_vel_xd_3 = " << hand_vel_xd(3);
+        BOOST_LOG_SEV(lg, info) << "h_hand_vel_xd_4 = " << hand_vel_xd(4);
+        BOOST_LOG_SEV(lg, info) << "h_hand_vel_xd_5 = " << hand_vel_xd(5);
+
+//        MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
+//        MatrixXd Jpp = J_plus*JacobianArm;
+//        MatrixXd J_Null = Id - Jpp;
+//        VectorXd J_hl= J_Null*delta_H_hl;
+//        double k_hl = 0;
+//        if(J_hl.norm() > null_th){
+//            k_hl = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_hl.norm())));
+//        }
+//        double fd = hl_coeff * (1 - exp(-hl_damping*(J_hl.norm())));
+
+//        joint_velocities +=  (k_hl*fd*J_hl);
     }
 
 

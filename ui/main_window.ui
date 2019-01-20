@@ -2939,7 +2939,7 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>10</x>
           <y>30</y>
-          <width>171</width>
+          <width>211</width>
           <height>58</height>
          </rect>
         </property>
@@ -2947,16 +2947,16 @@ p, li { white-space: pre-wrap; }
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_565">
            <item>
-            <widget class="QLabel" name="label_hl_coeff">
+            <widget class="QLabel" name="label_hl_pos_coeff">
              <property name="text">
-              <string>Coefficient</string>
+              <string>Position Coefficient</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_hl_coeff">
+            <widget class="QLineEdit" name="lineEdit_hl_pos_coeff">
              <property name="text">
-              <string>0.2</string>
+              <string>0.5</string>
              </property>
             </widget>
            </item>
@@ -2965,16 +2965,16 @@ p, li { white-space: pre-wrap; }
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_566">
            <item>
-            <widget class="QLabel" name="label_hl_damping">
+            <widget class="QLabel" name="label_hl_or_coeff">
              <property name="text">
-              <string>Dambing </string>
+              <string>Orientation Coefficient</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_hl_damping">
+            <widget class="QLineEdit" name="lineEdit_hl_or_coeff">
              <property name="text">
-              <string>0.01</string>
+              <string>1</string>
              </property>
             </widget>
            </item>
