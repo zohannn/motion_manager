@@ -878,6 +878,7 @@ private:
         vector< MatrixXd > jointsAcceleration_mov; /**< trajectory of the joint acceleration of the movement */
         vector< MatrixXd > jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
         vector< MatrixXd > jointsPosition_mov; /**< trajectory of the joint position of the movement */
+        vector< MatrixXd > jointsPosition_mov_ctrl; /**< trajectory of the joint position of the movement for controlling */
         vector< string > traj_descr_mov; /**< description of the trajectories */
         vector<HUMotion::warm_start_params> final_warm_start_res_mov; /**< warm start results of the target posture selections solved for the movement */
         HUMotion::warm_start_params bounce_warm_start_res_mov; /**< warm start results of the bounce posture selection solved for the movement */
@@ -1041,6 +1042,22 @@ private:
          * @return
          */
         double median(std::vector<double>& len);
+
+        /**
+         * @brief add_microsteps
+         * @param h_func
+         * @param h_micro_func
+         * @param microsteps
+         */
+        void add_microsteps(std::vector<vector<double>>& h_func, std::vector<vector<double>>& h_micro_func, int microsteps);
+
+        /**
+         * @brief add_microsteps
+         * @param h_func
+         * @param h_micro_func
+         * @param microsteps
+         */
+        void add_microsteps(MatrixXd& h_func, MatrixXd& h_micro_func, int microsteps);
 
         // solution of the given problems
         bool sol_loaded;/**< loaded solution flag */

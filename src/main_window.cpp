@@ -199,7 +199,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     ui.groupBox_sing_av_params->setEnabled(false);
     ui.groupBox_obsts_av_params->setEnabled(false);
     ui.groupBox_hl_add_params->setEnabled(false);
-    this->i_ctrl = 0;
+    this->i_ctrl=0;
+    this->qnode.resetSimTime();
     // logging
     init();
     logging::add_common_attributes();
@@ -336,6 +337,7 @@ void MainWindow::execPosControl()
         this->lpf_obsts_or_pitch->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_time_step);
         this->lpf_obsts_or_yaw->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_time_step);
 
+
         if(pos_control)
         {
             boost::unique_lock<boost::mutex> lck(hh_control_mtx);
@@ -344,9 +346,9 @@ void MainWindow::execPosControl()
             double des_hand_q_x = 0.0; double des_hand_q_y = 0.0; double des_hand_q_z = 0.0; double des_hand_q_w = 0.0;
 
             std::string stage_descr = "plan"; int mov_type = 0;
-            vector<double> h_ref_hand_vel(6,0.0); // human-like hand ref velocities
+//            vector<double> h_ref_hand_vel(6,0.0); // human-like hand reference velocities
             MatrixXd jointsPosition;
-            vector<vector<double>> hand_h_positions; vector<vector<double>> hand_h_orientations_q;
+            vector<vector<double>> hand_h_positions; int n_steps; vector<vector<double>> hand_h_orientations_q;
             vector<vector<double>> hand_h_lin_velocities; vector<vector<double>> hand_h_ang_velocities;
             VectorXd jointsPosition_max(JOINTS_ARM+JOINTS_HAND); VectorXd jointsPosition_min(JOINTS_ARM+JOINTS_HAND);
 //            VectorXd jointsPosition_arm_max(JOINTS_ARM); vector<double> posture_arm_max(JOINTS_ARM,0.0);
@@ -360,13 +362,14 @@ void MainWindow::execPosControl()
             VectorXd::Map(&r_hand_velocities[0], r_hand_velocities_vec.size()) = r_hand_velocities_vec;
 
             if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
-                stage_descr = this->h_results->trajectory_descriptions.at(this->i_ctrl);
-                mov_type = this->curr_mov->getType();
+                 stage_descr = this->h_results->trajectory_descriptions.at(this->i_ctrl);
+                 mov_type = this->curr_mov->getType();
                  hand_h_positions = this->handPosition_mov_stages.at(this->i_ctrl);
+                 n_steps = hand_h_positions.size();
                  hand_h_orientations_q = this->handOrientation_q_mov_stages.at(this->i_ctrl);
                  hand_h_lin_velocities = this->handLinearVelocity_mov_stages.at(this->i_ctrl);
                  hand_h_ang_velocities = this->handAngularVelocity_mov_stages.at(this->i_ctrl);
-                jointsPosition = this->jointsPosition_mov.at(this->i_ctrl);
+                jointsPosition = this->jointsPosition_mov_ctrl.at(this->i_ctrl);
                 for (int i=0;i<jointsPosition.cols();++i){
                     VectorXd col_i = jointsPosition.col(i);
                     jointsPosition_max(i) = col_i.maxCoeff();
@@ -462,14 +465,10 @@ void MainWindow::execPosControl()
             }// enable obstacles avoidance
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
             double hl_pos_coeff = 1; double hl_or_coeff = 1;
-            double tau = 0.1; double dec_rate = 0.1; double diff_w = 0.1;
             double fing_coeff = 0.1;
             if(hl_en){
                 hl_pos_coeff = this->ui.lineEdit_hl_pos_coeff->text().toDouble();
                 hl_or_coeff = this->ui.lineEdit_hl_or_coeff->text().toDouble();
-                tau = this->ui.lineEdit_tau->text().toDouble();
-                dec_rate = this->ui.lineEdit_dec_rate->text().toDouble();
-                diff_w = this->ui.lineEdit_diff_w->text().toDouble();
                 fing_coeff = this->ui.lineEdit_fing_coeff->text().toDouble();
             }
 
@@ -517,18 +516,25 @@ void MainWindow::execPosControl()
             VectorXd error_tot(6); error_tot << error_pos(0),error_pos(1),error_pos(2),
                                                 error_or(0),error_or(1),error_or(2);
 
+            double coeff_pos = this->ui.lineEdit_coeff_pos->text().toDouble();
+            double coeff_or = this->ui.lineEdit_coeff_or->text().toDouble();
             // human-likeness
+            MatrixXd h_Koeff = MatrixXd::Identity(6,6);
+            double g_map = 0.0; double tau = 0.1; double dec_rate = 0.1; double diff_w = 0.1;
             if(this->ui.checkBox_use_plan_hand_pos->isChecked() && hl_en)
             {
-                double g_map = 1 - exp((-dec_rate*this->qnode.getSimTime())/(tau*(1+diff_w*error_tot.norm()))); // normalized mapped time
-                int n_steps = hand_h_positions.size();
+                tau = this->ui.lineEdit_tau->text().toDouble();
+                dec_rate = this->ui.lineEdit_dec_rate->text().toDouble();
+                diff_w = this->ui.lineEdit_diff_w->text().toDouble();
+                g_map = 1 - exp((-dec_rate)/(tau*(1+diff_w*error_tot.norm()))); // normalized mapped time
                 int index = static_cast<int>(0.5+(n_steps-1)*g_map);
 
-                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
-                BOOST_LOG_SEV(lg, info) << "g_map = " << g_map;
-                BOOST_LOG_SEV(lg, info) << "index = " << index;
-                BOOST_LOG_SEV(lg, info) << "sim_time = " << this->qnode.getSimTime();
-                BOOST_LOG_SEV(lg, info) << "n_steps = " << n_steps;
+//                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
+//                BOOST_LOG_SEV(lg, info) << "g_map = " << g_map;
+//                BOOST_LOG_SEV(lg, info) << "index = " << index;
+//                //BOOST_LOG_SEV(lg, info) << "sim_time = " << this->qnode.getSimTime();
+//                BOOST_LOG_SEV(lg, info) << "n_steps = " << n_steps;
+//                BOOST_LOG_SEV(lg, info) << "error_tot_norm = " << error_tot.norm();
 
                 // positions
                 vector<double> h_hand_pos = hand_h_positions.at(index); // current human-like hand position
@@ -544,20 +550,16 @@ void MainWindow::execPosControl()
                 VectorXd h_hand_vels(6); h_hand_vels << h_hand_lin_vel.at(0),h_hand_lin_vel.at(1),h_hand_lin_vel.at(2),
                                                         h_hand_ang_vel.at(0),h_hand_ang_vel.at(1),h_hand_ang_vel.at(2);
 
-                MatrixXd h_Koeff = MatrixXd::Identity(6,6);
-                h_Koeff(0,0) = hl_pos_coeff; h_Koeff(1,1) = hl_pos_coeff; h_Koeff(2,2) = hl_pos_coeff;
-                h_Koeff(3,3) = hl_or_coeff; h_Koeff(4,4) = hl_or_coeff; h_Koeff(5,5) = hl_or_coeff;
+                h_Koeff(0,0) = coeff_pos+hl_pos_coeff*abs(h_hand_vels(0)); h_Koeff(1,1) = coeff_pos+hl_pos_coeff*abs(h_hand_vels(1)); h_Koeff(2,2) = coeff_pos+hl_pos_coeff*abs(h_hand_vels(2));
+                h_Koeff(3,3) = coeff_or+hl_or_coeff*abs(h_hand_vels(3)); h_Koeff(4,4) = coeff_or+hl_or_coeff*abs(h_hand_vels(4)); h_Koeff(5,5) = coeff_or+hl_or_coeff*abs(h_hand_vels(5));
 
-                VectorXd h_ref_hand_vel_vec = h_hand_vels + h_Koeff*h_error_tot;
+                //VectorXd h_ref_hand_vel_vec = h_hand_vels + h_Koeff*h_error_tot;
                 //VectorXd h_ref_hand_vel_vec = h_Koeff*h_error_tot;
                 //VectorXd h_ref_hand_vel_vec = h_hand_vels;
-                VectorXd::Map(&h_ref_hand_vel[0], h_ref_hand_vel_vec.size()) = h_ref_hand_vel_vec;
+                //VectorXd::Map(&h_ref_hand_vel[0], h_ref_hand_vel_vec.size()) = h_ref_hand_vel_vec;
 
                 VectorXd h_posture = jointsPosition.row(index); // current human-like posture
-//                h_arm_posture = h_posture.head<JOINTS_ARM>(); // current human-like arm posture
                 h_hand_posture = h_posture.tail<JOINTS_HAND>(); // current human-like hand posture
-//                VectorXd::Map(&h_posture_arm[0], h_arm_posture.size()) = h_arm_posture;
-
                 VectorXd hand_posture(4);
                 hand_posture << r_hand_posture.at(0),r_hand_posture.at(1),r_hand_posture.at(2),r_hand_posture.at(3);
                 r_hand_velocities_vec = -fing_coeff * (hand_posture - h_hand_posture).cwiseQuotient(jointsPosition_hand_max - jointsPosition_hand_min);
@@ -579,25 +581,47 @@ void MainWindow::execPosControl()
             double e_n_pos = error_pos.norm(); double e_n_or = error_or.norm();
 
             MatrixXd Koeff = MatrixXd::Identity(6,6);
-            double coeff_pos = this->ui.lineEdit_coeff_pos->text().toDouble();
-            double coeff_or = this->ui.lineEdit_coeff_or->text().toDouble();
             if((this->ui.checkBox_des_right_hand_pos_x->isChecked()) && (error_abs_pos(0) > error_pos_th)){
-                Koeff(0,0) = coeff_pos;
+                if(hl_en){
+                    Koeff(0,0) = h_Koeff(0,0);
+                }else{
+                    Koeff(0,0) = coeff_pos;
+                }
             }else{ Koeff(0,0) = 0.0;}
             if((this->ui.checkBox_des_right_hand_pos_y->isChecked()) && (error_abs_pos(1) > error_pos_th)){
-                Koeff(1,1) = coeff_pos;
+                if(hl_en){
+                    Koeff(1,1) = h_Koeff(1,1);
+                }else{
+                    Koeff(1,1) = coeff_pos;
+                }
             }else{ Koeff(1,1) = 0.0;}
             if((this->ui.checkBox_des_right_hand_pos_z->isChecked()) && (error_abs_pos(2) > error_pos_th)){
-                Koeff(2,2) = coeff_pos;
+                if(hl_en){
+                    Koeff(2,2) = h_Koeff(2,2);
+                }else{
+                    Koeff(2,2) = coeff_pos;
+                }
             }else{ Koeff(2,2) = 0.0;}
             if((this->ui.checkBox_des_right_hand_q_x->isChecked()) && (error_abs_or(0) > error_or_th)){
-                Koeff(3,3) = coeff_or;
+                if(hl_en){
+                    Koeff(3,3) = h_Koeff(3,3);
+                }else{
+                    Koeff(3,3) = coeff_or;
+                }
             }else{ Koeff(3,3) = 0.0;}
             if((this->ui.checkBox_des_right_hand_q_y->isChecked()) && (error_abs_or(1) > error_or_th)){
-                Koeff(4,4) = coeff_or;
+                if(hl_en){
+                    Koeff(4,4) = h_Koeff(4,4);
+                }else{
+                    Koeff(4,4) = coeff_or;
+                }
             }else{ Koeff(4,4) = 0.0;}
             if((this->ui.checkBox_des_right_hand_q_z->isChecked()) && (error_abs_or(2) > error_or_th)){
-                Koeff(5,5) = coeff_or;
+                if(hl_en){
+                    Koeff(5,5) = h_Koeff(5,5);
+                }else{
+                    Koeff(5,5) = coeff_or;
+                }
             }else{ Koeff(5,5) = 0.0;}
 
 
@@ -645,7 +669,12 @@ void MainWindow::execPosControl()
             // change desired hand pose
             if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
                 int stages = this->des_handPosition.size();
-                if((e_n_pos < 1.73*error_pos_th) && (e_n_or < 1.73*error_or_th)){
+                double pos_mult = 1.73; double or_mult = 1.73;
+//                if(stage_descr.compare("plan")==0 || stage_descr.compare("retreat")==0){
+//                    pos_mult = this->ui.lineEdit_pos_error_mult->text().toDouble();
+//                }
+                if((e_n_pos < pos_mult*error_pos_th) && (e_n_or < or_mult*error_or_th)){
+//                if(g_map >= 0.99){
                     if(stages==3 && this->i_ctrl<2){
                         this->i_ctrl++;
                     }else if(stages==2 && this->i_ctrl<1){
@@ -655,9 +684,8 @@ void MainWindow::execPosControl()
             }
 
             //this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
-            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,hl_en,
-                                                                            vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts,
-                                                                            h_ref_hand_vel);
+            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,
+                                                                            vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
 
             vector<double> r_velocities_mes; vector<double> r_hand_velocities_mes;
             this->curr_scene->getHumanoid()->getRightArmVelocities(r_velocities_mes);
@@ -2843,6 +2871,7 @@ if(solved){
 
         // compute the hand values, positions and accelerations
         //hand
+        this->jointsPosition_mov_ctrl.resize(this->jointsPosition_mov.size());
         this->des_handPosition.clear(); this->des_handOrientation.clear(); this->des_handOrientation_q.clear();
         this->handPosition_mov.resize(tot_steps); this->handPosition_mov_stages.resize(this->jointsPosition_mov.size());
         this->handOrientation_mov.resize(tot_steps); this->handOrientation_q_mov.resize(tot_steps); this->handOrientation_q_mov_stages.resize(this->jointsPosition_mov.size());
@@ -2908,13 +2937,27 @@ if(solved){
 
                 step++;
             }// loop steps in the stage
-            this->handPosition_mov_stages.at(k) = h_pos;
-            this->handOrientation_q_mov_stages.at(k) = h_or_q;
-            this->handLinearVelocity_mov_stages.at(k) = h_lin_vel;
-            this->handAngularVelocity_mov_stages.at(k) = h_ang_vel;
+            // add microsteps for controlling
+            vector<vector<double>> h_micro_pos;
+            vector<vector<double>> h_micro_or_q;
+            vector<vector<double>> h_micro_lin_vel;
+            vector<vector<double>> h_micro_ang_vel;
+            MatrixXd pos_micro_stage(0,JOINTS_ARM+JOINTS_HAND);
+            this->add_microsteps(h_pos,h_micro_pos,MICROSTEPS_CTRL);
+            this->add_microsteps(h_or_q,h_micro_or_q,MICROSTEPS_CTRL);
+            this->add_microsteps(h_lin_vel,h_micro_lin_vel,MICROSTEPS_CTRL);
+            this->add_microsteps(h_ang_vel,h_micro_ang_vel,MICROSTEPS_CTRL);
+            this->add_microsteps(pos_stage,pos_micro_stage,MICROSTEPS_CTRL);
+
+            this->jointsPosition_mov_ctrl.at(k) = pos_micro_stage;
+            this->handPosition_mov_stages.at(k) = h_micro_pos;
+            this->handOrientation_q_mov_stages.at(k) = h_micro_or_q;
+            this->handLinearVelocity_mov_stages.at(k) = h_micro_lin_vel;
+            this->handAngularVelocity_mov_stages.at(k) = h_micro_ang_vel;
             this->des_handPosition.push_back(this->handPosition_mov.at(step-1));
             this->des_handOrientation.push_back(this->handOrientation_mov.at(step-1));
             this->des_handOrientation_q.push_back(this->handOrientation_q_mov.at(step-1));
+
         }// loop stages
         // -- normlized jerk cost of the hand -- //
         QVector<double> handPosition_mov_x; QVector<double> handPosition_mov_y; QVector<double> handPosition_mov_z;
@@ -10546,6 +10589,54 @@ double MainWindow::median(std::vector<double>& len)
     }
 }
 
+void MainWindow::add_microsteps(std::vector<vector<double>>& h_func, std::vector<vector<double>>& h_micro_func, int microsteps)
+{
+    h_micro_func.push_back(h_func.at(0));
+    for(size_t i=0;i<h_func.size()-1;++i)
+    {// for loop steps
+        vector<double> func_i = h_func.at(i);
+        vector<double> func_i1 = h_func.at(i+1);
+        for(int k=1;k<=microsteps;++k)
+        {// for loop microsteps
+            vector<double> func_k(func_i.size());
+            for(size_t j=0;j<func_i.size();++j)
+            {// for loop variables
+                double y_a = func_i.at(j);
+                double y_b = func_i1.at(j);
+                func_k.at(j) = y_a + (y_b-y_a)*k/(microsteps+1);
+            }// for loop variables
+            h_micro_func.push_back(func_k);
+        }// for loop microsteps
+        h_micro_func.push_back(func_i1);
+    }// for loop steps
+}
+
+void MainWindow::add_microsteps(MatrixXd& h_func, MatrixXd& h_micro_func, int microsteps)
+{
+    VectorXd joint_0 = h_func.row(0);
+    h_micro_func.conservativeResize(h_micro_func.rows() + 1, Eigen::NoChange);
+    h_micro_func.row(h_micro_func.rows()-1) = joint_0;
+
+    for(int i=0;i<h_func.rows()-1;++i)
+    {// for loop steps
+        VectorXd joint_i = h_func.row(i);
+        VectorXd joint_i1 = h_func.row(i+1);
+        for(int k=1;k<=microsteps;++k)
+        {// for loop microsteps
+            VectorXd func_k(joint_i.size());
+            for(int j=0;j<joint_i.size();++j)
+            {// for loop joints
+                double y_a = joint_i(j); double y_b = joint_i1(j);
+                func_k(j) = y_a + (y_b-y_a)*k/(microsteps+1);
+            }// for loop joints
+            h_micro_func.conservativeResize(h_micro_func.rows() + 1, Eigen::NoChange);
+            h_micro_func.row(h_micro_func.rows()-1) = func_k;
+        }// for loop microsteps
+        h_micro_func.conservativeResize(h_micro_func.rows() + 1, Eigen::NoChange);
+        h_micro_func.row(h_micro_func.rows()-1) = joint_i1;
+    }// for loop steps
+}
+
 void MainWindow::check_tar_x_pos_var(int state)
 {
     if(state==0){
@@ -11005,10 +11096,8 @@ void MainWindow::on_pushButton_start_control_pressed()
 {
     qnode.log(QNode::Info,string("Simulation Started"));
     qnode.log(QNode::Info,string("Control Started"));
-}
+    BOOST_LOG_SEV(lg, info) << "# ---------------- Control started ------------------- # ";
 
-void MainWindow::on_pushButton_start_control_clicked()
-{
     this->handPosition_ctrl.clear();
     this->handLinearVelocity_ctrl.clear();
     this->handAngularVelocity_ctrl.clear();
@@ -11029,8 +11118,11 @@ void MainWindow::on_pushButton_start_control_clicked()
     this->jointsVelocity_ctrl.resize(0,0);
     this->sim_time.clear();
     this->i_ctrl=0;
+    this->qnode.resetSimTime();
+}
 
-
+void MainWindow::on_pushButton_start_control_clicked()
+{
     if(this->ui.checkBox_use_vel_control->isChecked())
     {
         pos_control = false;
@@ -11045,14 +11137,16 @@ void MainWindow::on_pushButton_stop_control_pressed()
 {
     qnode.log(QNode::Info,string("Control Stopped"));
     qnode.log(QNode::Info,string("Simulation Stopped"));
+
+    pos_control = false;
+    vel_control = false;
+    this->qnode.stopSim();
+
 }
 
 void MainWindow::on_pushButton_stop_control_clicked()
 {
-    pos_control = false;
-    vel_control = false;
-    this->qnode.stopSim();
-    sleep(1);
+
     // restore the home posture
     vector<double> r_p; vector<double> l_p;
     this->curr_scene->getHumanoid()->getRightHomePosture(r_p);
@@ -11066,6 +11160,8 @@ void MainWindow::on_pushButton_stop_control_clicked()
     this->lpf_obsts_or_roll.reset(new LowPassFilter());
     this->lpf_obsts_or_pitch.reset(new LowPassFilter());
     this->lpf_obsts_or_yaw.reset(new LowPassFilter());
+
+    this->qnode.resetSimTime();
 }
 
 void MainWindow::on_pushButton_control_plot_clicked()

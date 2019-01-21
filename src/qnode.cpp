@@ -382,6 +382,7 @@ void QNode::resetSimTime()
 {
 
     this->TotalTime=0.0;
+    this->simulationTime = 0.0;
 }
 
 void QNode::resetGlobals()
@@ -10206,6 +10207,7 @@ void QNode::stopSim()
     add_client = node.serviceClient<vrep_common::simRosStopSimulation>("/vrep/simRosStopSimulation");
     vrep_common::simRosStopSimulation srvstop;
     add_client.call(srvstop);
+    this->simulationTime=0.0;
 
 
 }

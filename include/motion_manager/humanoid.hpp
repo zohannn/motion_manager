@@ -121,6 +121,11 @@ public:
     ~Humanoid();
 
     /**
+     * @brief init
+     */
+    void init();
+
+    /**
      * @brief This method sets the name of the humanoid
      * @param name
      */
@@ -1013,10 +1018,6 @@ public:
      */
     void inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double>& velocities, bool jlim_en, bool sing_en, bool obsts_en,
                                         double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts);
-
-
-    void inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double>& velocities, bool jlim_en, bool sing_en, bool obsts_en, bool hl_en,
-                                        double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts, vector<double> &h_ref_hand_vel);
 
 
     /**
