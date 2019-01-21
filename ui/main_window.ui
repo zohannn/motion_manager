@@ -1917,9 +1917,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>560</x>
-        <y>190</y>
+        <y>210</y>
         <width>331</width>
-        <height>341</height>
+        <height>321</height>
        </rect>
       </property>
       <property name="title">
@@ -1929,7 +1929,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>170</y>
+         <y>160</y>
          <width>291</width>
          <height>21</height>
         </rect>
@@ -2109,11 +2109,11 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>210</y>
+         <y>190</y>
          <width>301</width>
          <height>120</height>
         </rect>
@@ -2211,7 +2211,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>560</x>
-        <y>160</y>
+        <y>170</y>
         <width>181</width>
         <height>21</height>
        </rect>
@@ -2536,7 +2536,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>460</y>
+         <y>500</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2562,7 +2562,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>140</y>
+         <y>130</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2668,7 +2668,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QLabel" name="label_jlim_damping">
              <property name="text">
-              <string>Dambing </string>
+              <string>Damping </string>
              </property>
             </widget>
            </item>
@@ -2689,8 +2689,8 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>270</x>
          <y>30</y>
-         <width>251</width>
-         <height>101</height>
+         <width>241</width>
+         <height>91</height>
         </rect>
        </property>
        <property name="title">
@@ -2729,7 +2729,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QLabel" name="label_sing_damping">
              <property name="text">
-              <string>Dambing </string>
+              <string>Damping </string>
              </property>
             </widget>
            </item>
@@ -2744,32 +2744,6 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>260</x>
-         <y>490</y>
-         <width>249</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_301">
-        <item>
-         <widget class="QLabel" name="label_vel_max">
-          <property name="text">
-           <string>Max joint velocity [deg/s]</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_vel_max">
-          <property name="text">
-           <string>50.0</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
       </widget>
       <widget class="QGroupBox" name="groupBox_obsts_av_params">
        <property name="geometry">
@@ -2816,7 +2790,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QLabel" name="label_obsts_damping">
              <property name="text">
-              <string>Dambing </string>
+              <string>Damping </string>
              </property>
             </widget>
            </item>
@@ -2926,9 +2900,9 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>170</y>
+         <y>160</y>
          <width>251</width>
-         <height>281</height>
+         <height>331</height>
         </rect>
        </property>
        <property name="title">
@@ -2938,7 +2912,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>130</y>
+          <y>190</y>
           <width>221</width>
           <height>131</height>
          </rect>
@@ -3017,9 +2991,9 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>31</y>
-          <width>221</width>
-          <height>89</height>
+          <y>30</y>
+          <width>231</width>
+          <height>151</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_104">
@@ -3042,6 +3016,24 @@ p, li { white-space: pre-wrap; }
           </layout>
          </item>
          <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_578">
+           <item>
+            <widget class="QLabel" name="label_hl_pos_damping">
+             <property name="text">
+              <string>Position Damping</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_hl_pos_damping">
+             <property name="text">
+              <string>0.01</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
           <layout class="QHBoxLayout" name="horizontalLayout_566">
            <item>
             <widget class="QLabel" name="label_hl_or_coeff">
@@ -3054,6 +3046,24 @@ p, li { white-space: pre-wrap; }
             <widget class="QLineEdit" name="lineEdit_hl_or_coeff">
              <property name="text">
               <string>15</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_579">
+           <item>
+            <widget class="QLabel" name="label_hl_or_damping">
+             <property name="text">
+              <string>Orientation Damping</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_hl_or_damping">
+             <property name="text">
+              <string>0.01</string>
              </property>
             </widget>
            </item>
@@ -3106,7 +3116,6 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-      <zorder>layoutWidget</zorder>
       <zorder>checkBox_hl_add</zorder>
       <zorder>checkBox_joints_limits_av</zorder>
       <zorder>checkBox_sing_av</zorder>
@@ -3116,6 +3125,32 @@ p, li { white-space: pre-wrap; }
       <zorder>groupBox_sing_av_params</zorder>
       <zorder>groupBox_obsts_av_params</zorder>
       <zorder>groupBox_hl_add_params</zorder>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>920</x>
+        <y>290</y>
+        <width>249</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_301">
+       <item>
+        <widget class="QLabel" name="label_vel_max">
+         <property name="text">
+          <string>Max joint velocity [deg/s]</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_vel_max">
+         <property name="text">
+          <string>50.0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_results">

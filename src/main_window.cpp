@@ -464,11 +464,14 @@ void MainWindow::execPosControl()
                 }// noise on obstacles
             }// enable obstacles avoidance
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
-            double hl_pos_coeff = 1; double hl_or_coeff = 1;
+            double hl_pos_coeff = 1; double hl_pos_damp = 0.01;
+            double hl_or_coeff = 1; double hl_or_damp = 0.01;
             double fing_coeff = 0.1;
             if(hl_en){
                 hl_pos_coeff = this->ui.lineEdit_hl_pos_coeff->text().toDouble();
                 hl_or_coeff = this->ui.lineEdit_hl_or_coeff->text().toDouble();
+                hl_pos_damp = this->ui.lineEdit_hl_pos_damping->text().toDouble();
+                hl_or_damp = this->ui.lineEdit_hl_or_damping->text().toDouble();
                 fing_coeff = this->ui.lineEdit_fing_coeff->text().toDouble();
             }
 
@@ -526,13 +529,14 @@ void MainWindow::execPosControl()
                 tau = this->ui.lineEdit_tau->text().toDouble();
                 dec_rate = this->ui.lineEdit_dec_rate->text().toDouble();
                 diff_w = this->ui.lineEdit_diff_w->text().toDouble();
-                g_map = 1 - exp((-dec_rate)/(tau*(1+diff_w*error_tot.norm()))); // normalized mapped time
+                g_map = 1 - exp((-dec_rate*this->qnode.getSimTime())/(tau*(1+diff_w*error_tot.norm()))); // normalized mapped time
                 int index = static_cast<int>(0.5+(n_steps-1)*g_map);
 
 //                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
 //                BOOST_LOG_SEV(lg, info) << "g_map = " << g_map;
 //                BOOST_LOG_SEV(lg, info) << "index = " << index;
-//                //BOOST_LOG_SEV(lg, info) << "sim_time = " << this->qnode.getSimTime();
+//                BOOST_LOG_SEV(lg, info) << "sim_time = " << this->qnode.getSimTime();
+//                BOOST_LOG_SEV(lg, info) << "error_norm = " << error_tot.norm();
 //                BOOST_LOG_SEV(lg, info) << "n_steps = " << n_steps;
 //                BOOST_LOG_SEV(lg, info) << "error_tot_norm = " << error_tot.norm();
 
@@ -550,8 +554,12 @@ void MainWindow::execPosControl()
                 VectorXd h_hand_vels(6); h_hand_vels << h_hand_lin_vel.at(0),h_hand_lin_vel.at(1),h_hand_lin_vel.at(2),
                                                         h_hand_ang_vel.at(0),h_hand_ang_vel.at(1),h_hand_ang_vel.at(2);
 
-                h_Koeff(0,0) = coeff_pos+hl_pos_coeff*abs(h_hand_vels(0)); h_Koeff(1,1) = coeff_pos+hl_pos_coeff*abs(h_hand_vels(1)); h_Koeff(2,2) = coeff_pos+hl_pos_coeff*abs(h_hand_vels(2));
-                h_Koeff(3,3) = coeff_or+hl_or_coeff*abs(h_hand_vels(3)); h_Koeff(4,4) = coeff_or+hl_or_coeff*abs(h_hand_vels(4)); h_Koeff(5,5) = coeff_or+hl_or_coeff*abs(h_hand_vels(5));
+                h_Koeff(0,0) = coeff_pos*g_map+hl_pos_coeff*(1-exp(-hl_pos_damp*abs(h_hand_vels(0))))*abs(h_hand_vels(0));
+                h_Koeff(1,1) = coeff_pos*g_map+hl_pos_coeff*(1-exp(-hl_pos_damp*abs(h_hand_vels(1))))*abs(h_hand_vels(1));
+                h_Koeff(2,2) = coeff_pos*g_map+hl_pos_coeff*(1-exp(-hl_pos_damp*abs(h_hand_vels(2))))*abs(h_hand_vels(2));
+                h_Koeff(3,3) = coeff_or*g_map+hl_or_coeff*(1-exp(-hl_or_damp*abs(h_hand_vels(3))))*abs(h_hand_vels(3));
+                h_Koeff(4,4) = coeff_or*g_map+hl_or_coeff*(1-exp(-hl_or_damp*abs(h_hand_vels(4))))*abs(h_hand_vels(4));
+                h_Koeff(5,5) = coeff_or*g_map+hl_or_coeff*(1-exp(-hl_or_damp*abs(h_hand_vels(5))))*abs(h_hand_vels(5));
 
                 //VectorXd h_ref_hand_vel_vec = h_hand_vels + h_Koeff*h_error_tot;
                 //VectorXd h_ref_hand_vel_vec = h_Koeff*h_error_tot;
@@ -11096,7 +11104,7 @@ void MainWindow::on_pushButton_start_control_pressed()
 {
     qnode.log(QNode::Info,string("Simulation Started"));
     qnode.log(QNode::Info,string("Control Started"));
-    BOOST_LOG_SEV(lg, info) << "# ---------------- Control started ------------------- # ";
+//    BOOST_LOG_SEV(lg, info) << "# ---------------- Control started ------------------- # ";
 
     this->handPosition_ctrl.clear();
     this->handLinearVelocity_ctrl.clear();
@@ -11266,7 +11274,9 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         stream << "# Human-likeness addition parameters #" << endl;
         if (this->ui.checkBox_hl_add->isChecked()){ stream << "Hl_add=true"<< endl;}else{stream << "Hl_add=false"<< endl;}
         stream << "Hl_add_pos_coeff=" << this->ui.lineEdit_hl_pos_coeff->text().toStdString().c_str() << endl;
+        stream << "Hl_add_pos_damping=" << this->ui.lineEdit_hl_pos_damping->text().toStdString().c_str() << endl;
         stream << "Hl_add_or_coeff=" << this->ui.lineEdit_hl_or_coeff->text().toStdString().c_str() << endl;
+        stream << "Hl_add_or_damping=" << this->ui.lineEdit_hl_or_damping->text().toStdString().c_str() << endl;
         stream << "Hl_fing_coeff=" << this->ui.lineEdit_fing_coeff->text().toStdString().c_str() << endl;
         stream << "Hl_tau=" << this->ui.lineEdit_tau->text().toStdString().c_str() << endl;
         stream << "Hl_dec_rate=" << this->ui.lineEdit_dec_rate->text().toStdString().c_str() << endl;
@@ -11364,8 +11374,12 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     }
                 }else if(QString::compare(fields.at(0),QString("Hl_add_pos_coeff"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_hl_pos_coeff->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Hl_add_pos_damping"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_hl_pos_damping->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Hl_add_or_coeff"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_hl_or_coeff->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Hl_add_or_damping"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_hl_or_damping->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Hl_fing_coeff"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_fing_coeff->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Hl_tau"),Qt::CaseInsensitive)==0){
