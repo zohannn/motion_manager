@@ -89,6 +89,12 @@ public:
     string getPlannerName();
 
     /**
+     * @brief getHUMPlanner
+     * @return
+     */
+    h_plannerPtr getHUMPlanner();
+
+    /**
      * @brief This method sets the axis of the target that during the movement has to be approached
      * @param a
      */

@@ -309,6 +309,11 @@ string Problem::getPlannerName()
     return this->planner_name;
 }
 
+h_plannerPtr Problem::getHUMPlanner()
+{
+    return this->h_planner;
+}
+
 int Problem::getErrLog()
 {
     return this->err_log;

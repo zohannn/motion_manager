@@ -205,6 +205,12 @@ public:
         double getSimTime();
 
         /**
+         * @brief isSimulationRunning
+         * @return
+         */
+        bool isSimulationRunning();
+
+        /**
          * @brief This is the run() method of the thread
          */
 	void run();

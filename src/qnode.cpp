@@ -10139,9 +10139,7 @@ bool QNode::execKinControl(int arm, vector<double> &r_arm_posture, vector<double
         client_enableSubscriber.call(srv_enableSubscriber);
 
         // start the simulation
-        add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
-        vrep_common::simRosStartSimulation srvstart;
-        add_client.call(srvstart);
+        this->startSim();
 
         ros::spinOnce(); // first handle ROS messages
     }
@@ -10196,6 +10194,7 @@ void QNode::startSim()
     add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
     vrep_common::simRosStartSimulation srvstart;
     add_client.call(srvstart);
+    this->simulationRunning=true;
 }
 
 void QNode::stopSim()
@@ -10208,13 +10207,17 @@ void QNode::stopSim()
     vrep_common::simRosStopSimulation srvstop;
     add_client.call(srvstop);
     this->simulationTime=0.0;
-
-
+    this->simulationRunning=false;
 }
 
 double QNode::getSimTime()
 {
     return this->simulationTime;
+}
+
+bool QNode::isSimulationRunning()
+{
+    return this->simulationRunning;
 }
 
 

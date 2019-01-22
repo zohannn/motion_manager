@@ -99,6 +99,22 @@ public:
         void getDerivative(QVector<double> &function, QVector<double> &step_values, QVector<double> &derFunction);
 
         /**
+         * @brief getDerivative
+         * @param function
+         * @param step_values
+         * @param derFunction
+         */
+        void getDerivative(vector<double> &function, vector<double> &step_values, vector<double> &derFunction);
+
+        /**
+         * @brief getDerivative
+         * @param function
+         * @param step_values
+         * @param derFunction
+         */
+        void getDerivative(vector<vector<double>> &function, vector<double> &step_values, vector<vector<double>> &derFunction);
+
+        /**
          * @brief getNumberMovementUnits
          * @param function
          * @param time
@@ -878,6 +894,8 @@ private:
         vector< MatrixXd > jointsAcceleration_mov; /**< trajectory of the joint acceleration of the movement */
         vector< MatrixXd > jointsVelocity_mov; /**< trajectory of the joint velocity of the movement */
         vector< MatrixXd > jointsPosition_mov; /**< trajectory of the joint position of the movement */
+        vector< MatrixXd > jacobian_mov; /**< trajectory of the jacobian of the movement */
+        vector< MatrixXd > der_jacobian_mov; /**< trajectory of the derivative of the jacobian of the movement */
         vector< MatrixXd > jointsPosition_mov_ctrl; /**< trajectory of the joint position of the movement for controlling */
         vector< string > traj_descr_mov; /**< description of the trajectories */
         vector<HUMotion::warm_start_params> final_warm_start_res_mov; /**< warm start results of the target posture selections solved for the movement */
@@ -904,6 +922,8 @@ private:
         vector<vector<double>> handAngularVelocity_mov;/**< hand angular velocity during the movement */
         vector<vector<vector<double>>> handLinearVelocity_mov_stages; /**< hand linear velocity during the movement divided in stages.*/
         vector<vector<vector<double>>> handAngularVelocity_mov_stages; /**< hand angular velocity during the movement divided in stages.*/
+        vector<vector<vector<double>>> handLinearAcceleration_mov_stages; /**< hand linear acceleration during the movement divided in stages */
+        vector<vector<vector<double>>> handAngularAcceleration_mov_stages;/**< hand angular acceleration during the movement divided in stages */
         vector<vector<double>> wristLinearVelocity_mov; /**< wrist linear velocity during the movement */
         vector<vector<double>> wristAngularVelocity_mov;/**< wrist angular velocity during the movement */
         vector<vector<double>> elbowLinearVelocity_mov; /**< elbow linear velocity during the movement */
@@ -1211,7 +1231,23 @@ private:
         vector<vector<double>> des_handPosition; /**< vector of desired hand positions during control*/
         vector<vector<double>> des_handOrientation; /**< vector of desired hand orientation (rpy) during control*/
         vector<vector<double>> des_handOrientation_q; /**< vector of desired hand orientation (quaternion) during control*/
+        vector<double> bounce_handPosition; /**< bounce hand positions during control*/
+        vector<double> bounce_handOrientation; /**< bounce hand orientation (rpy) during control*/
+        vector<double> bounce_handOrientation_q; /**< bounce hand orientation (quaternion) during control*/
         int i_ctrl; /**< index of the desired hand pose*/
+        double t_past; /**< time past in previous stages during control */
+        vector<double> h_hand_pos_end; /**< end hand position during control */
+        vector<double> h_hand_or_q_end; /**< end hand orientation (quaternion) during control */
+        vector<double> h_hand_pos_init; /**< initial hand position during control */
+        vector<double> h_hand_or_q_init; /**< initial hand orientation (quaternion) during control */
+        vector<double> h_hand_lin_vel_end; /**< end hand linear velocity during control */
+        vector<double> h_hand_ang_vel_end; /**< end hand angular velocity during control */
+        vector<double> h_hand_lin_vel_init; /**< initial hand linear velocity during control */
+        vector<double> h_hand_ang_vel_init; /**< initial hand angular velocity during control */
+        vector<double> h_hand_lin_acc_end; /**< end hand linear acceleration during control */
+        vector<double> h_hand_ang_acc_end; /**< end hand angular acceleration during control */
+        vector<double> h_hand_lin_acc_init; /**< initial hand linear acceleration during control */
+        vector<double> h_hand_ang_acc_init; /**< initial hand angular acceleration during control */
 
         vector<vector<double>> handPosition_ctrl; /**< hand position during control. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_ctrl; /**< hand orientation during control. 0=roll,1=pitch,2=yaw */

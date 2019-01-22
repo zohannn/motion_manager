@@ -3641,6 +3641,248 @@ void Humanoid::computeLeftHandDHparams()
 
 }
 
+void Humanoid::getJacobian(int arm,std::vector<double>& posture,MatrixXd& Jacobian)
+{
+
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    Jacobian.resize(6,JOINTS_ARM);
+
+    Vector3d pos0;
+    Vector3d z0;
+    Vector3d pos1;
+    Vector3d z1;
+    Vector3d pos2;
+    Vector3d z2;
+    Vector3d pos3;
+    Vector3d z3;
+    Vector3d pos4;
+    Vector3d z4;
+    Vector3d pos5;
+    Vector3d z5;
+    Vector3d pos6;
+    Vector3d z6;
+
+    vector<double> handPos; Vector3d pos_hand;
+    this->getHandPos(arm,handPos,posture);
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+    pos_hand << handPos.at(0), handPos.at(1), handPos.at(2);
+
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i),posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d diff;
+        Vector3d cross;
+        Vector3d zi;
+        switch(i){
+        case 0:
+            z0 = T.block(0,2,3,1);
+            pos0 = T.block(0,3,3,1);
+            diff = pos_hand - pos0;
+            cross = z0.cross(diff);
+            zi=z0;
+            break;
+        case 1:
+            z1 = T.block(0,2,3,1);
+            pos1 = T.block(0,3,3,1);
+            diff = pos_hand - pos1;
+            cross = z1.cross(diff);
+            zi=z1;
+            break;
+        case 2:
+            z2 = T.block(0,2,3,1);
+            pos2 = T.block(0,3,3,1);
+            diff = pos_hand - pos2;
+            cross = z2.cross(diff);
+            zi=z2;
+            break;
+        case 3:
+            z3 = T.block(0,2,3,1);
+            pos3 = T.block(0,3,3,1);
+            diff = pos_hand - pos3;
+            cross = z3.cross(diff);
+            zi=z3;
+            break;
+        case 4:
+            z4 = T.block(0,2,3,1);
+            pos4 = T.block(0,3,3,1);
+            diff = pos_hand - pos4;
+            cross = z4.cross(diff);
+            zi=z4;
+            break;
+        case 5:
+            z5 = T.block(0,2,3,1);
+            pos5 = T.block(0,3,3,1);
+            diff = pos_hand - pos5;
+            cross = z5.cross(diff);
+            zi=z5;
+            break;
+        case 6:
+            z6 = T.block(0,2,3,1);
+            pos6 = T.block(0,3,3,1);
+            diff = pos_hand - pos6;
+            cross = z6.cross(diff);
+            zi=z6;
+            break;
+        }
+        VectorXd column(6); column << cross, zi;
+        Jacobian.col(i) = column;
+    }
+}
+
+void Humanoid::getDerivative(vector<MatrixXd> &matrix, vector<double> &step_values, vector<MatrixXd> &der_matrix)
+{
+    der_matrix.resize(matrix.size());
+    vector<vector<vector<double>>> elements(matrix.at(0).rows());
+    for(size_t h=0; h<elements.size();++h)
+    {
+        elements.at(h).resize(matrix.at(0).cols());
+    }
+
+    for(size_t i=0;i<matrix.size();++i)
+    {
+        MatrixXd mat = matrix.at(i);
+        der_matrix.at(i).resize(mat.rows(),mat.cols());
+        for(int r=0; r<mat.rows();++r){
+            for(int c=0; c< mat.cols();++c){
+                elements.at(r).at(c).push_back(mat(r,c));
+            }
+
+        }
+    }
+    //
+    for(size_t h=0; h<elements.size();++h)
+    { // rows
+        for(size_t k=0; k<elements.at(h).size();++k)
+        { // columns
+            vector<double> el = elements.at(h).at(k);
+            vector<double> der_el;
+            this->getDerivative(el,step_values,der_el);
+            for(size_t ii=0;ii<der_el.size();++ii)
+            {
+                der_matrix.at(ii)(h,k) = der_el.at(ii);
+            }
+        }
+    }
+}
+
+void Humanoid::getDerivative(vector<double> &function, vector<double> &step_values, vector<double> &derFunction)
+{
+       const double MIN_STEP_VALUE = 0.1;
+
+       // Formula of the numarical differentiation with 5 points
+          // f'0 = (-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h) + h^4/5*f^(5)(c_0)
+          // f'1 = ( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h) - h^4/20*f^(5)(c_1)
+          // f'2 = (  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h) + h^4/30*f^(5)(c_2)
+          // f'3 = ( -1*f0 +  6*f1 - 18*f2 + 10*f3 +  3*f4)/(12*h) - h^4/20*f^(5)(c_3)
+          // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
+
+
+          int h = 1;
+          int tnsample;
+          double f0;
+          double f1;
+          double f2;
+          double f3;
+          double f4;
+          double step_value;
+
+          // 1st point
+          // f'0 = (-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h) + h^4/5*f^(5)(c_0)
+          tnsample = 0;
+          f0 = function.at(tnsample);
+          f1 = function.at(tnsample+1);
+          f2 = function.at(tnsample+2);
+          f3 = function.at(tnsample+3);
+          f4 = function.at(tnsample+4);
+          step_value = step_values.at(tnsample);
+          if(step_value==0)
+              step_value=MIN_STEP_VALUE;
+          derFunction.push_back((double)(-25*f0 + 48*f1 - 36*f2 + 16*f3 -  3*f4)/(12*h*step_value));
+
+          // 2nd point
+          // f'1 = ( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h) - h^4/20*f^(5)(c_1)
+          tnsample = 1;
+          f0 = function.at(tnsample-1);
+          f1 = function.at(tnsample);
+          f2 = function.at(tnsample+1);
+          f3 = function.at(tnsample+2);
+          f4 = function.at(tnsample+3);
+          step_value = step_values.at(tnsample);
+          if(step_value==0)
+              step_value=MIN_STEP_VALUE;
+          derFunction.push_back((double)( -3*f0 - 10*f1 + 18*f2 -  6*f3 +  1*f4)/(12*h*step_value));
+
+          // 3rd point
+          // f'2 = (  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h) + h^4/30*f^(5)(c_2)
+          for (size_t i=2; i< function.size() -2;++i){     // centered
+              f0 = function.at(i-2);
+              f1 = function.at(i-1);
+              f2 = function.at(i);
+              f3 = function.at(i+1);
+              f4 = function.at(i+2);
+              step_value = step_values.at(i);
+              if(step_value==0)
+                  step_value=0.01;
+              derFunction.push_back((double)(  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h*step_value));
+          }
+
+          // 4th point
+          // f'3 = ( -1*f0 +  6*f1 - 18*f2 + 10*f3 +  3*f4)/(12*h) - h^4/20*f^(5)(c_3)
+          tnsample = function.size()-2;
+          f0 = function.at(tnsample-3);
+          f1 = function.at(tnsample-2);
+          f2 = function.at(tnsample-1);
+          f3 = function.at(tnsample);
+          f4 = function.at(tnsample+1);
+          step_value = step_values.at(tnsample);
+          if(step_value==0)
+              step_value=MIN_STEP_VALUE;
+          derFunction.push_back((double)( -f0+6*f1-18*f2+10*f3+3*f4)/(12*h*step_value));
+
+          // 5th point
+          // f'4 = (  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h) + h^4/5*f^(5)(c_4)
+          tnsample = function.size()-1;
+          f0 = function.at(tnsample-4);
+          f1 = function.at(tnsample-3);
+          f2 = function.at(tnsample-2);
+          f3 = function.at(tnsample-1);
+          f4 = function.at(tnsample);
+          step_value = step_values.at(tnsample);
+          if(step_value==0)
+              step_value=MIN_STEP_VALUE;
+          derFunction.push_back((double)(  3*f0 - 16*f1 + 36*f2 - 48*f3 + 25*f4)/(12*h*step_value));
+
+
+
+}
+
+
 
 void Humanoid::directKinematicsSingleArm(int arm, std::vector<double>& posture)
 {
@@ -4707,6 +4949,24 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
     velocities.clear();
     velocities.resize(joint_velocities.size());
     VectorXd::Map(&velocities[0], joint_velocities.size()) = joint_velocities;
+
+}
+
+void Humanoid::getHandAcceleration(int arm,MatrixXd &joint_traj_pos,MatrixXd &joint_traj_vel,MatrixXd &joint_traj_acc,vector<double> timesteps,vector<vector<double>> &hand_lin_acc,vector<vector<double>> &hand_ang_acc)
+{
+    vector<MatrixXd> jac_vec(joint_traj_pos.rows());
+    vector<MatrixXd> der_jac_vec(joint_traj_pos.rows());
+    for(int r=0;r<joint_traj_pos.rows();++r)
+    {
+        VectorXd posture_tot = joint_traj_pos.row(r);
+        VectorXd arm_posture_vec = posture_tot.head<JOINTS_ARM>();
+        vector<double> arm_posture;  arm_posture.resize(arm_posture_vec.size());
+        VectorXd::Map(&arm_posture[0], arm_posture_vec.size()) = arm_posture_vec;
+        this->getJacobian(arm,arm_posture,jac_vec.at(r));
+    }
+    this->getDerivative(jac_vec,timesteps,der_jac_vec);
+
+    //TO DO
 
 }
 

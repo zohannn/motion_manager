@@ -1035,6 +1035,21 @@ public:
      * @param dist_arm
      */
     void get_distances_arm_torso(vector<vector<double>>& points_arm,vector<double>& dist_arm);
+
+
+    /**
+     * @brief getHandAcceleration
+     * @param arm
+     * @param joint_traj_pos
+     * @param joint_traj_vel
+     * @param joint_traj_acc
+     * @param timesteps
+     * @param hand_lin_acc
+     * @param hand_ang_acc
+     */
+    void getHandAcceleration(int arm, MatrixXd &joint_traj_pos, MatrixXd &joint_traj_vel, MatrixXd &joint_traj_acc, vector<double> timesteps, vector<vector<double>> &hand_lin_acc, vector<vector<double>> &hand_ang_acc);
+
+
 //#if HEAD==1
   //  humanoid_part getHead();
 //#endif
@@ -1195,6 +1210,30 @@ private:
      * @brief This method computes the current D-H parameters of the left hand
      */
     void computeLeftHandDHparams();
+
+    /**
+     * @brief getJacobian
+     * @param arm
+     * @param posture
+     * @param Jacobian
+     */
+    void getJacobian(int arm,std::vector<double>& posture,MatrixXd& Jacobian);
+
+    /**
+     * @brief getDerivative
+     * @param function
+     * @param step_values
+     * @param derFunction
+     */
+    void getDerivative(vector<double> &function, vector<double> &step_values, vector<double> &derFunction);
+
+    /**
+     * @brief getDerivative
+     * @param matrix
+     * @param step_values
+     * @param der_matrix
+     */
+    void getDerivative(vector<MatrixXd> &matrix, vector<double> &step_values, vector<MatrixXd> &der_matrix);
 
     /**
      * @brief This method computes the direct kinematic of the arm
