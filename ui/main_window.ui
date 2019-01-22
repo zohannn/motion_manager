@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -2536,7 +2536,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>500</y>
+         <y>450</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2896,13 +2896,65 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </widget>
-      <widget class="QGroupBox" name="groupBox_hl_add_params">
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>490</y>
+         <width>168</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_567">
+        <item>
+         <widget class="QPushButton" name="pushButton_save_ctrl_params">
+          <property name="text">
+           <string>Save</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_load_ctrl_params">
+          <property name="text">
+           <string>Load</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>160</y>
+         <y>480</y>
+         <width>249</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_301">
+        <item>
+         <widget class="QLabel" name="label_vel_max">
+          <property name="text">
+           <string>Max joint velocity [deg/s]</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_vel_max">
+          <property name="text">
+           <string>50.0</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_hl_add_params">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>170</y>
          <width>251</width>
-         <height>331</height>
+         <height>271</height>
         </rect>
        </property>
        <property name="title">
@@ -2912,7 +2964,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>190</y>
+          <y>130</y>
           <width>221</width>
           <height>131</height>
          </rect>
@@ -2992,8 +3044,8 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>10</x>
           <y>30</y>
-          <width>231</width>
-          <height>151</height>
+          <width>221</width>
+          <height>89</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_104">
@@ -3016,24 +3068,6 @@ p, li { white-space: pre-wrap; }
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_578">
-           <item>
-            <widget class="QLabel" name="label_hl_pos_damping">
-             <property name="text">
-              <string>Position Damping</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_hl_pos_damping">
-             <property name="text">
-              <string>0.01</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
           <layout class="QHBoxLayout" name="horizontalLayout_566">
            <item>
             <widget class="QLabel" name="label_hl_or_coeff">
@@ -3046,24 +3080,6 @@ p, li { white-space: pre-wrap; }
             <widget class="QLineEdit" name="lineEdit_hl_or_coeff">
              <property name="text">
               <string>15</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_579">
-           <item>
-            <widget class="QLabel" name="label_hl_or_damping">
-             <property name="text">
-              <string>Orientation Damping</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_hl_or_damping">
-             <property name="text">
-              <string>0.01</string>
              </property>
             </widget>
            </item>
@@ -3090,32 +3106,6 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>490</y>
-         <width>168</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_567">
-        <item>
-         <widget class="QPushButton" name="pushButton_save_ctrl_params">
-          <property name="text">
-           <string>Save</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_load_ctrl_params">
-          <property name="text">
-           <string>Load</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
       <zorder>checkBox_hl_add</zorder>
       <zorder>checkBox_joints_limits_av</zorder>
       <zorder>checkBox_sing_av</zorder>
@@ -3124,33 +3114,8 @@ p, li { white-space: pre-wrap; }
       <zorder>layoutWidget</zorder>
       <zorder>groupBox_sing_av_params</zorder>
       <zorder>groupBox_obsts_av_params</zorder>
+      <zorder>layoutWidget</zorder>
       <zorder>groupBox_hl_add_params</zorder>
-     </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>920</x>
-        <y>290</y>
-        <width>249</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_301">
-       <item>
-        <widget class="QLabel" name="label_vel_max">
-         <property name="text">
-          <string>Max joint velocity [deg/s]</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEdit_vel_max">
-         <property name="text">
-          <string>50.0</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_results">
