@@ -352,7 +352,8 @@ void MainWindow::execPosControl()
             std::string stage_descr = "plan"; int stages = 1; int mov_type = 0;
 //            vector<double> h_ref_hand_vel(6,0.0); // human-like hand reference velocities
             MatrixXd jointsPosition;            
-            vector<vector<double>> hand_h_positions; int n_steps; double period_T; vector<vector<double>> hand_h_orientations_q;
+            vector<vector<double>> hand_h_positions; int n_steps; double period_T;
+            vector<vector<double>> hand_h_orientations; vector<vector<double>> hand_h_orientations_q;
             vector<vector<double>> hand_h_lin_velocities; vector<vector<double>> hand_h_ang_velocities;
             vector<vector<double>> hand_h_lin_accelerations; vector<vector<double>> hand_h_ang_accelerations;
             VectorXd jointsPosition_max(JOINTS_ARM+JOINTS_HAND); VectorXd jointsPosition_min(JOINTS_ARM+JOINTS_HAND);
@@ -370,6 +371,7 @@ void MainWindow::execPosControl()
                  stage_descr = this->h_results->trajectory_descriptions.at(this->i_ctrl);
                  mov_type = this->curr_mov->getType();
                  hand_h_positions = this->handPosition_mov_stages.at(this->i_ctrl);
+                 hand_h_orientations = this->handOrientation_mov_stages.at(this->i_ctrl);
                  hand_h_orientations_q = this->handOrientation_q_mov_stages.at(this->i_ctrl);
                  hand_h_lin_velocities = this->handLinearVelocity_mov_stages.at(this->i_ctrl);
                  hand_h_ang_velocities = this->handAngularVelocity_mov_stages.at(this->i_ctrl);
@@ -380,7 +382,8 @@ void MainWindow::execPosControl()
                  n_steps = hand_h_positions.size();
 
                  this->h_hand_pos_init = hand_h_positions.at(0); // initial human-like hand position
-                 this->h_hand_or_q_init = hand_h_orientations_q.at(0); // initial human-like hand orientation
+                 this->h_hand_or_init = hand_h_orientations.at(0); // initial human-like hand orientation (rpy)
+                 this->h_hand_or_q_init = hand_h_orientations_q.at(0); // initial human-like hand orientation (quaternion)
                  this->h_hand_pos_end = hand_h_positions.at(n_steps-1); // end human-like hand linear position
                  this->h_hand_or_q_end = hand_h_orientations_q.at(n_steps-1); // end human-like hand angular orientation
                  this->h_hand_lin_vel_init = hand_h_lin_velocities.at(0); // initial human-like hand linear velocities
@@ -486,11 +489,14 @@ void MainWindow::execPosControl()
                     } // for loop obstacles
                 }// noise on obstacles
             }// enable obstacles avoidance
+
+            // human-likeness
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
             double hl_pos_coeff = 1;
             double hl_or_coeff = 1;
             double fing_coeff = 0.1;
             double phi = 0.0; double tb = 0.0;
+            MatrixXd h_Koeff = MatrixXd::Identity(6,6);
             if(hl_en){
                 hl_pos_coeff = this->ui.lineEdit_hl_pos_coeff->text().toDouble();
                 hl_or_coeff = this->ui.lineEdit_hl_or_coeff->text().toDouble();
@@ -506,6 +512,13 @@ void MainWindow::execPosControl()
                 bounce_hand_q_y = bounce_hand_orr_q.at(1);
                 bounce_hand_q_z = bounce_hand_orr_q.at(2);
                 bounce_hand_q_w = bounce_hand_orr_q.at(3);
+
+                h_Koeff(0,0) = hl_pos_coeff;
+                h_Koeff(1,1) = hl_pos_coeff;
+                h_Koeff(2,2) = hl_pos_coeff;
+                h_Koeff(3,3) = hl_or_coeff;
+                h_Koeff(4,4) = hl_or_coeff;
+                h_Koeff(5,5) = hl_or_coeff;
             }
 
             Vector3d des_hand_pos; Vector3d des_hand_or_e;
@@ -554,9 +567,9 @@ void MainWindow::execPosControl()
 
             double coeff_pos = this->ui.lineEdit_coeff_pos->text().toDouble();
             double coeff_or = this->ui.lineEdit_coeff_or->text().toDouble();
-            // human-likeness
-            MatrixXd h_Koeff = MatrixXd::Identity(6,6);
+
             double g_map = 0.0; double tau = 0.1; double dec_rate = 0.1; double diff_w = 0.1;
+            double g_map_th = 0.0;
             double s_time = 0.0;
             if(this->qnode.isSimulationRunning())
             {
@@ -568,12 +581,30 @@ void MainWindow::execPosControl()
 //                    s_time=this->qnode.getSimTime() - this->t_past;
 //                }
             }
+
+            VectorXd h_hand_pose(6); // human-like desired hand pose
+            VectorXd h_hand_vel(6);  // human-like desired hand velocity
+            Vector3d hand_pos_init; Vector3d hand_or_init; Vector3d hand_or_q_init; double hand_or_q_w_init = this->h_hand_or_q_init.at(3);
+            hand_pos_init << this->h_hand_pos_init.at(0),this->h_hand_pos_init.at(1),this->h_hand_pos_init.at(2);
+            hand_or_init << this->h_hand_or_init.at(0),this->h_hand_or_init.at(1),this->h_hand_or_init.at(2);
+            hand_or_q_init << this->h_hand_or_q_init.at(0),this->h_hand_or_q_init.at(1),this->h_hand_or_q_init.at(2);
+            Vector3d hand_pos_end; Vector3d hand_or_q_end; double hand_or_q_w_end = des_hand_q_w;
+            hand_pos_end << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z;
+            hand_or_q_end << des_hand_q_x,des_hand_q_y,des_hand_q_z;
+            // error between the end hand pose and the initial hand pose
+            Vector3d error_f_pos = hand_pos_end - hand_pos_init;
+            Vector3d error_f_or = hand_or_q_w_init*hand_or_q_end - hand_or_q_w_end*hand_or_q_init - hand_or_q_end.cross(hand_or_q_init);
+            VectorXd error_f_tot(6); error_f_tot << error_f_pos(0),error_f_pos(1),error_f_pos(2),error_f_or(0),error_f_or(1),error_f_or(2);
+
+            VectorXd error_h_tot(6); // error with the human-like pose
+
             if(this->ui.checkBox_use_plan_hand_pos->isChecked() && hl_en)
             {
                 tau = this->ui.lineEdit_tau->text().toDouble();
                 dec_rate = this->ui.lineEdit_dec_rate->text().toDouble();
                 diff_w = this->ui.lineEdit_diff_w->text().toDouble();
-                g_map = 1 - exp((-dec_rate*s_time)/(tau*(1+diff_w*error_tot.norm()))); // normalized mapped time
+                g_map = 1 - exp((-dec_rate*s_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
+                g_map_th = 1 - exp((-dec_rate*period_T)/tau);
                 int index = static_cast<int>(0.5+(n_steps-1)*g_map);
 
 //                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
@@ -603,66 +634,99 @@ void MainWindow::execPosControl()
 
                     Vector3d bounce_hand_pos; Vector3d bounce_hand_or_e;
                     bounce_hand_pos << bounce_hand_pos_x,bounce_hand_pos_y,bounce_hand_pos_z;
-                    bounce_hand_or_e << bounce_hand_q_x,bounce_hand_q_y,bounce_hand_q_z;
-                    Vector3d hand_pos_init; Vector3d hand_or_q_init; double hand_or_q_w_init = this->h_hand_or_q_init.at(3);
-                    hand_pos_init << this->h_hand_pos_init.at(0),this->h_hand_pos_init.at(1),this->h_hand_pos_init.at(2);
-                    hand_or_q_init << this->h_hand_or_q_init.at(0),this->h_hand_or_q_init.at(1),this->h_hand_or_q_init.at(2);
-                    Vector3d hand_pos_end; Vector3d hand_or_q_end; double hand_or_q_w_end = this->h_hand_or_q_end.at(3);
-                    hand_pos_end << this->h_hand_pos_end.at(0),this->h_hand_pos_end.at(1),this->h_hand_pos_end.at(2);
-                    hand_or_q_end << this->h_hand_or_q_end.at(0),this->h_hand_or_q_end.at(1),this->h_hand_or_q_end.at(2);
-
-                    // error between the end hand pose and the initial hand pose
-                    Vector3d error_f_pos = hand_pos_end - hand_pos_init;
-                    Vector3d error_f_or = hand_or_q_w_init*hand_or_q_end - hand_or_q_w_end*hand_or_q_init - hand_or_q_end.cross(hand_or_q_init);
-                    VectorXd error_f_tot(6); error_f_tot << error_f_pos(0),error_f_pos(1),error_f_pos(2),error_f_or(0),error_f_or(1),error_f_or(2);
-
+                    bounce_hand_or_e << bounce_hand_q_x,bounce_hand_q_y,bounce_hand_q_z;                                       
                     // error between the bounce hand pose and the initial hand pose
                     Vector3d error_b_pos = bounce_hand_pos - hand_pos_init;
                     Vector3d error_b_or = hand_or_q_w_init*bounce_hand_or_e - bounce_hand_q_w*hand_or_q_init - bounce_hand_or_e.cross(hand_or_q_init);
                     VectorXd error_b_tot(6); error_b_tot << error_b_pos(0),error_b_pos(1),error_b_pos(2),error_b_or(0),error_b_or(1),error_b_or(2);
 
+                    // human-like desired hand pose
+                    h_hand_pose(0) = hand_pos_init(0) + error_f_tot(0)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                                     +h_hand_lin_vel_init.at(0)*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
+                                     +h_hand_lin_vel_end.at(0)*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
+                                     +0.5*h_hand_lin_acc_init.at(0)*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
+                                     +0.5*h_hand_lin_acc_end.at(0)*pow(period_T,2)*(pow(g_map,3)-2*pow(g_map,4)+pow(g_map,5))
+                                     +error_b_tot(0)*((g_map*(1-g_map))/(tb*(1-tb)))*pow(sin(M_PI*pow(g_map,phi)),2);
 
-                    h_Koeff(0,0) = hl_pos_coeff*((30/period_T)*abs(error_f_tot(0)/error_tot(0))*abs(pow(g_map,2)-2*pow(g_map,3)+pow(g_map,4))
-                                    +abs(h_hand_lin_vel_init.at(0)/error_tot(0))*abs(1-18*pow(g_map,2)+32*pow(g_map,3)-15*pow(g_map,4))
-                                    +abs(h_hand_lin_vel_end.at(0)/error_tot(0))*abs(-12*pow(g_map,2)+28*pow(g_map,3)-15*pow(g_map,4))
-                                    +abs(0.5*h_hand_lin_acc_init.at(0)*period_T/error_tot(0))*abs(2*g_map-9*pow(g_map,2)+12*pow(g_map,3)-5*pow(g_map,4))
-                                    +abs(0.5*h_hand_lin_acc_end.at(0)*period_T/error_tot(0))*abs(3*pow(g_map,3)-8*pow(g_map,3)+5*pow(g_map,4))
-                                    +(1/(period_T*tb*(1-tb)))*abs(error_b_tot(0)/error_tot(0))*abs((1-2*g_map)*pow(sin(M_PI*pow(g_map,phi)),2)+(1-g_map)*M_PI*phi*pow(g_map,phi)*sin(2*M_PI*pow(g_map,phi))));
+                    h_hand_pose(1) = hand_pos_init(1) + error_f_tot(1)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                                     +h_hand_lin_vel_init.at(1)*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
+                                     +h_hand_lin_vel_end.at(1)*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
+                                     +0.5*h_hand_lin_acc_init.at(1)*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
+                                     +0.5*h_hand_lin_acc_end.at(1)*pow(period_T,2)*(pow(g_map,3)-2*pow(g_map,4)+pow(g_map,5))
+                                     +error_b_tot(1)*((g_map*(1-g_map))/(tb*(1-tb)))*pow(sin(M_PI*pow(g_map,phi)),2);
 
-                    h_Koeff(1,1) = hl_pos_coeff*((30/period_T)*abs(error_f_tot(1)/error_tot(1))*abs(pow(g_map,2)-2*pow(g_map,3)+pow(g_map,4))
-                                    +abs(h_hand_lin_vel_init.at(1)/error_tot(1))*abs(1-18*pow(g_map,2)+32*pow(g_map,3)-15*pow(g_map,4))
-                                    +abs(h_hand_lin_vel_end.at(1)/error_tot(1))*abs(-12*pow(g_map,2)+28*pow(g_map,3)-15*pow(g_map,4))
-                                    +abs(0.5*h_hand_lin_acc_init.at(1)*period_T/error_tot(1))*abs(2*g_map-9*pow(g_map,2)+12*pow(g_map,3)-5*pow(g_map,4))
-                                    +abs(0.5*h_hand_lin_acc_end.at(1)*period_T/error_tot(1))*abs(3*pow(g_map,3)-8*pow(g_map,3)+5*pow(g_map,4))
-                                    +(1/(period_T*tb*(1-tb)))*abs(error_b_tot(1)/error_tot(1))*abs((1-2*g_map)*pow(sin(M_PI*pow(g_map,phi)),2)+(1-g_map)*M_PI*phi*pow(g_map,phi)*sin(2*M_PI*pow(g_map,phi))));
+                    h_hand_pose(2) = hand_pos_init(2) +error_f_tot(2)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                                     +h_hand_lin_vel_init.at(2)*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
+                                     +h_hand_lin_vel_end.at(2)*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
+                                     +0.5*h_hand_lin_acc_init.at(2)*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
+                                     +0.5*h_hand_lin_acc_end.at(2)*pow(period_T,2)*(pow(g_map,3)-2*pow(g_map,4)+pow(g_map,5))
+                                     +error_b_tot(2)*((g_map*(1-g_map))/(tb*(1-tb)))*pow(sin(M_PI*pow(g_map,phi)),2);
 
-                    h_Koeff(2,2) = hl_pos_coeff*((30/period_T)*abs(error_f_tot(2)/error_tot(2))*abs(pow(g_map,2)-2*pow(g_map,3)+pow(g_map,4))
-                                    +abs(h_hand_lin_vel_init.at(2)/error_tot(2))*abs(1-18*pow(g_map,2)+32*pow(g_map,3)-15*pow(g_map,4))
-                                    +abs(h_hand_lin_vel_end.at(2)/error_tot(2))*abs(-12*pow(g_map,2)+28*pow(g_map,3)-15*pow(g_map,4))
-                                    +abs(0.5*h_hand_lin_acc_init.at(2)*period_T/error_tot(2))*abs(2*g_map-9*pow(g_map,2)+12*pow(g_map,3)-5*pow(g_map,4))
-                                    +abs(0.5*h_hand_lin_acc_end.at(2)*period_T/error_tot(2))*abs(3*pow(g_map,3)-8*pow(g_map,3)+5*pow(g_map,4))
-                                    +(1/(period_T*tb*(1-tb)))*abs(error_b_tot(2)/error_tot(2))*abs((1-2*g_map)*pow(sin(M_PI*pow(g_map,phi)),2)+(1-g_map)*M_PI*phi*pow(g_map,phi)*sin(2*M_PI*pow(g_map,phi))));
+                    h_hand_pose(3) = hand_or_init(0) + error_f_tot(3)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                                     +h_hand_ang_vel_init.at(0)*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
+                                     +h_hand_ang_vel_end.at(0)*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
+                                     +0.5*h_hand_ang_acc_init.at(0)*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
+                                     +0.5*h_hand_ang_acc_end.at(0)*pow(period_T,2)*(pow(g_map,3)-2*pow(g_map,4)+pow(g_map,5))
+                                     +error_b_tot(3)*((g_map*(1-g_map))/(tb*(1-tb)))*pow(sin(M_PI*pow(g_map,phi)),2);
 
-                    h_Koeff(3,3) = hl_or_coeff*((30/period_T)*abs(error_f_tot(3)/error_tot(3))*abs(pow(g_map,2)-2*pow(g_map,3)+pow(g_map,4))
-                                    +abs(h_hand_ang_vel_init.at(0)/error_tot(3))*abs(1-18*pow(g_map,2)+32*pow(g_map,3)-15*pow(g_map,4))
-                                    +abs(h_hand_ang_vel_end.at(0)/error_tot(3))*abs(-12*pow(g_map,2)+28*pow(g_map,3)-15*pow(g_map,4))
-                                    +abs(0.5*h_hand_ang_acc_init.at(0)*period_T/error_tot(3))*abs(2*g_map-9*pow(g_map,2)+12*pow(g_map,3)-5*pow(g_map,4))
-                                    +abs(0.5*h_hand_ang_acc_end.at(0)*period_T/error_tot(3))*abs(3*pow(g_map,3)-8*pow(g_map,3)+5*pow(g_map,4))
-                                    +(1/(period_T*tb*(1-tb)))*abs(error_b_tot(3)/error_tot(3))*abs((1-2*g_map)*pow(sin(M_PI*pow(g_map,phi)),2)+(1-g_map)*M_PI*phi*pow(g_map,phi)*sin(2*M_PI*pow(g_map,phi))));
+                    h_hand_pose(4) = hand_or_init(1) + error_f_tot(4)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                                     +h_hand_ang_vel_init.at(2)*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
+                                     +h_hand_ang_vel_end.at(2)*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
+                                     +0.5*h_hand_ang_acc_init.at(2)*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
+                                     +0.5*h_hand_ang_acc_end.at(2)*pow(period_T,2)*(pow(g_map,3)-2*pow(g_map,4)+pow(g_map,5))
+                                     +error_b_tot(4)*((g_map*(1-g_map))/(tb*(1-tb)))*pow(sin(M_PI*pow(g_map,phi)),2);
 
-                    h_Koeff(4,4) = hl_or_coeff*((30/period_T)*abs(error_f_tot(4)/error_tot(4))*abs(pow(g_map,2)-2*pow(g_map,3)+pow(g_map,4))
-                                    +abs(h_hand_ang_vel_init.at(1)/error_tot(4))*abs(1-18*pow(g_map,2)+32*pow(g_map,3)-15*pow(g_map,4))
-                                    +abs(h_hand_ang_vel_end.at(1)/error_tot(4))*abs(-12*pow(g_map,2)+28*pow(g_map,3)-15*pow(g_map,4))
-                                    +abs(0.5*h_hand_ang_acc_init.at(1)*period_T/error_tot(4))*abs(2*g_map-9*pow(g_map,2)+12*pow(g_map,3)-5*pow(g_map,4))
-                                    +abs(0.5*h_hand_ang_acc_end.at(1)*period_T/error_tot(4))*abs(3*pow(g_map,3)-8*pow(g_map,3)+5*pow(g_map,4))
-                                    +(1/(period_T*tb*(1-tb)))*abs(error_b_tot(4)/error_tot(4))*abs((1-2*g_map)*pow(sin(M_PI*pow(g_map,phi)),2)+(1-g_map)*M_PI*phi*pow(g_map,phi)*sin(2*M_PI*pow(g_map,phi))));
+                    h_hand_pose(5) = hand_or_init(2) + error_f_tot(5)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                                     +h_hand_ang_vel_init.at(3)*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
+                                     +h_hand_ang_vel_end.at(3)*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
+                                     +0.5*h_hand_ang_acc_init.at(3)*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
+                                     +0.5*h_hand_ang_acc_end.at(3)*pow(period_T,2)*(pow(g_map,3)-2*pow(g_map,4)+pow(g_map,5))
+                                     +error_b_tot(5)*((g_map*(1-g_map))/(tb*(1-tb)))*pow(sin(M_PI*pow(g_map,phi)),2);
 
-                    h_Koeff(5,5) = hl_or_coeff*((30/period_T)*abs(error_f_tot(5)/error_tot(5))*abs(pow(g_map,2)-2*pow(g_map,3)+pow(g_map,4))
-                                    +abs(h_hand_ang_vel_init.at(2)/error_tot(5))*abs(1-18*pow(g_map,2)+32*pow(g_map,3)-15*pow(g_map,4))
-                                    +abs(h_hand_ang_vel_end.at(2)/error_tot(5))*abs(-12*pow(g_map,2)+28*pow(g_map,3)-15*pow(g_map,4))
-                                    +abs(0.5*h_hand_ang_acc_init.at(2)*period_T/error_tot(5))*abs(2*g_map-9*pow(g_map,2)+12*pow(g_map,3)-5*pow(g_map,4))
-                                    +abs(0.5*h_hand_ang_acc_end.at(2)*period_T/error_tot(5))*abs(3*pow(g_map,3)-8*pow(g_map,3)+5*pow(g_map,4))
-                                    +(1/(period_T*tb*(1-tb)))*abs(error_b_tot(5)/error_tot(5))*abs((1-2*g_map)*pow(sin(M_PI*pow(g_map,phi)),2)+(1-g_map)*M_PI*phi*pow(g_map,phi)*sin(2*M_PI*pow(g_map,phi))));
+
+                    // human-like desired hand velocity
+                    h_hand_vel(0) = (30/period_T)*error_f_tot(0)*(pow(g_map,2)-2*pow(g_map,3)+pow(g_map,4))
+                                    +h_hand_lin_vel_init.at(0)*(1-18*pow(g_map,2)+32*pow(g_map,3)-15*pow(g_map,4))
+                                    +h_hand_lin_vel_end.at(0)*(-12*pow(g_map,2)+28*pow(g_map,3)-15*pow(g_map,4))
+                                    +(0.5*h_hand_lin_acc_init.at(0)*period_T)*(2*g_map-9*pow(g_map,2)+12*pow(g_map,3)-5*pow(g_map,4))
+                                    +(0.5*h_hand_lin_acc_end.at(0)*period_T)*(3*pow(g_map,3)-8*pow(g_map,3)+5*pow(g_map,4))
+                                    +(1/(period_T*tb*(1-tb)))*error_b_tot(0)*((1-2*g_map)*pow(sin(M_PI*pow(g_map,phi)),2)+(1-g_map)*M_PI*phi*pow(g_map,phi)*sin(2*M_PI*pow(g_map,phi)));
+
+                    h_hand_vel(1) = (30/period_T)*error_f_tot(1)*(pow(g_map,2)-2*pow(g_map,3)+pow(g_map,4))
+                                    +h_hand_lin_vel_init.at(1)*(1-18*pow(g_map,2)+32*pow(g_map,3)-15*pow(g_map,4))
+                                    +h_hand_lin_vel_end.at(1)*(-12*pow(g_map,2)+28*pow(g_map,3)-15*pow(g_map,4))
+                                    +(0.5*h_hand_lin_acc_init.at(1)*period_T)*(2*g_map-9*pow(g_map,2)+12*pow(g_map,3)-5*pow(g_map,4))
+                                    +(0.5*h_hand_lin_acc_end.at(1)*period_T)*(3*pow(g_map,3)-8*pow(g_map,3)+5*pow(g_map,4))
+                                    +(1/(period_T*tb*(1-tb)))*error_b_tot(1)*((1-2*g_map)*pow(sin(M_PI*pow(g_map,phi)),2)+(1-g_map)*M_PI*phi*pow(g_map,phi)*sin(2*M_PI*pow(g_map,phi)));
+
+                    h_hand_vel(2) = (30/period_T)*error_f_tot(2)*(pow(g_map,2)-2*pow(g_map,3)+pow(g_map,4))
+                                    +h_hand_lin_vel_init.at(2)*(1-18*pow(g_map,2)+32*pow(g_map,3)-15*pow(g_map,4))
+                                    +h_hand_lin_vel_end.at(2)*(-12*pow(g_map,2)+28*pow(g_map,3)-15*pow(g_map,4))
+                                    +(0.5*h_hand_lin_acc_init.at(2)*period_T)*(2*g_map-9*pow(g_map,2)+12*pow(g_map,3)-5*pow(g_map,4))
+                                    +(0.5*h_hand_lin_acc_end.at(2)*period_T)*(3*pow(g_map,3)-8*pow(g_map,3)+5*pow(g_map,4))
+                                    +(1/(period_T*tb*(1-tb)))*error_b_tot(2)*((1-2*g_map)*pow(sin(M_PI*pow(g_map,phi)),2)+(1-g_map)*M_PI*phi*pow(g_map,phi)*sin(2*M_PI*pow(g_map,phi)));
+
+                    h_hand_vel(3) = (30/period_T)*error_f_tot(3)*(pow(g_map,2)-2*pow(g_map,3)+pow(g_map,4))
+                                    +h_hand_ang_vel_init.at(0)*(1-18*pow(g_map,2)+32*pow(g_map,3)-15*pow(g_map,4))
+                                    +h_hand_ang_vel_end.at(0)*(-12*pow(g_map,2)+28*pow(g_map,3)-15*pow(g_map,4))
+                                    +(0.5*h_hand_ang_acc_init.at(0)*period_T)*(2*g_map-9*pow(g_map,2)+12*pow(g_map,3)-5*pow(g_map,4))
+                                    +(0.5*h_hand_ang_acc_end.at(0)*period_T)*(3*pow(g_map,3)-8*pow(g_map,3)+5*pow(g_map,4))
+                                    +(1/(period_T*tb*(1-tb)))*error_b_tot(3)*((1-2*g_map)*pow(sin(M_PI*pow(g_map,phi)),2)+(1-g_map)*M_PI*phi*pow(g_map,phi)*sin(2*M_PI*pow(g_map,phi)));
+
+                    h_hand_vel(4) = (30/period_T)*error_f_tot(4)*(pow(g_map,2)-2*pow(g_map,3)+pow(g_map,4))
+                                    +h_hand_ang_vel_init.at(1)*(1-18*pow(g_map,2)+32*pow(g_map,3)-15*pow(g_map,4))
+                                    +h_hand_ang_vel_end.at(1)*(-12*pow(g_map,2)+28*pow(g_map,3)-15*pow(g_map,4))
+                                    +(0.5*h_hand_ang_acc_init.at(1)*period_T)*(2*g_map-9*pow(g_map,2)+12*pow(g_map,3)-5*pow(g_map,4))
+                                    +(0.5*h_hand_ang_acc_end.at(1)*period_T)*(3*pow(g_map,3)-8*pow(g_map,3)+5*pow(g_map,4))
+                                    +(1/(period_T*tb*(1-tb)))*error_b_tot(4)*((1-2*g_map)*pow(sin(M_PI*pow(g_map,phi)),2)+(1-g_map)*M_PI*phi*pow(g_map,phi)*sin(2*M_PI*pow(g_map,phi)));
+
+                    h_hand_vel(5) = (30/period_T)*error_f_tot(5)*(pow(g_map,2)-2*pow(g_map,3)+pow(g_map,4))
+                                    +h_hand_ang_vel_init.at(2)*(1-18*pow(g_map,2)+32*pow(g_map,3)-15*pow(g_map,4))
+                                    +h_hand_ang_vel_end.at(2)*(-12*pow(g_map,2)+28*pow(g_map,3)-15*pow(g_map,4))
+                                    +(0.5*h_hand_ang_acc_init.at(2)*period_T)*(2*g_map-9*pow(g_map,2)+12*pow(g_map,3)-5*pow(g_map,4))
+                                    +(0.5*h_hand_ang_acc_end.at(2)*period_T)*(3*pow(g_map,3)-8*pow(g_map,3)+5*pow(g_map,4))
+                                    +(1/(period_T*tb*(1-tb)))*error_b_tot(5)*((1-2*g_map)*pow(sin(M_PI*pow(g_map,phi)),2)+(1-g_map)*M_PI*phi*pow(g_map,phi)*sin(2*M_PI*pow(g_map,phi)));
+
 
 
 //                BOOST_LOG_SEV(lg, info) << "# ---------------- h coeff ------------------- # ";
@@ -675,35 +739,49 @@ void MainWindow::execPosControl()
 
                 }else if(stage_descr.compare("approach")==0){
 
-                    h_Koeff(0,0) = abs(h_hand_lin_vel_init.at(0)/error_tot(0))*abs(1-pow(g_map,4));
-                    h_Koeff(1,1) = abs(h_hand_lin_vel_init.at(1)/error_tot(1))*abs(1-pow(g_map,4));
-                    h_Koeff(2,2) = abs(h_hand_lin_vel_init.at(2)/error_tot(2))*abs(1-pow(g_map,4));
-                    h_Koeff(3,3) = abs(h_hand_ang_vel_init.at(0)/error_tot(3))*abs(1-pow(g_map,4));
-                    h_Koeff(4,4) = abs(h_hand_ang_vel_init.at(1)/error_tot(4))*abs(1-pow(g_map,4));
-                    h_Koeff(5,5) = abs(h_hand_ang_vel_init.at(2)/error_tot(5))*abs(1-pow(g_map,4));
+                    // human-like desired hand pose
+                    h_hand_pose(0) = hand_pos_init(0) + 0.25*error_f_tot(0)*(5*g_map-pow(g_map,5));
+                    h_hand_pose(1) = hand_pos_init(1) + 0.25*error_f_tot(1)*(5*g_map-pow(g_map,5));
+                    h_hand_pose(2) = hand_pos_init(2) + 0.25*error_f_tot(2)*(5*g_map-pow(g_map,5));
+                    h_hand_pose(3) = hand_or_init(0) + 0.25*error_f_tot(3)*(5*g_map-pow(g_map,5));
+                    h_hand_pose(4) = hand_or_init(1) + 0.25*error_f_tot(4)*(5*g_map-pow(g_map,5));
+                    h_hand_pose(5) = hand_or_init(2) + 0.25*error_f_tot(5)*(5*g_map-pow(g_map,5));
 
-//                    h_Koeff(0,0) = coeff_pos*g_map+abs(this->h_hand_lin_vel_plan_end.at(0)/error_tot(0))*(1-pow(g_map,4));
-//                    h_Koeff(1,1) = coeff_pos*g_map+abs(this->h_hand_lin_vel_plan_end.at(1)/error_tot(1))*(1-pow(g_map,4));
-//                    h_Koeff(2,2) = coeff_pos*g_map+abs(this->h_hand_lin_vel_plan_end.at(2)/error_tot(2))*(1-pow(g_map,4));
-//                    h_Koeff(3,3) = coeff_or*g_map+abs(this->h_hand_ang_vel_plan_end.at(0)/error_tot(3))*(1-pow(g_map,4));
-//                    h_Koeff(4,4) = coeff_or*g_map+abs(this->h_hand_ang_vel_plan_end.at(1)/error_tot(4))*(1-pow(g_map,4));
-//                    h_Koeff(5,5) = coeff_or*g_map+abs(this->h_hand_ang_vel_plan_end.at(2)/error_tot(5))*(1-pow(g_map,4));
+                    // human-like desired hand velocity
+                    h_hand_vel(0) = (5/(4*period_T))*error_f_tot(0)*(1-pow(g_map,4));
+                    h_hand_vel(1) = (5/(4*period_T))*error_f_tot(1)*(1-pow(g_map,4));
+                    h_hand_vel(2) = (5/(4*period_T))*error_f_tot(2)*(1-pow(g_map,4));
+                    h_hand_vel(3) = (5/(4*period_T))*error_f_tot(3)*(1-pow(g_map,4));
+                    h_hand_vel(4) = (5/(4*period_T))*error_f_tot(4)*(1-pow(g_map,4));
+                    h_hand_vel(5) = (5/(4*period_T))*error_f_tot(5)*(1-pow(g_map,4));
 
-//                    h_Koeff(0,0) = coeff_pos*pow(g_map,4)+abs(this->h_hand_lin_vel_plan_end.at(0)/error_tot(0))*(1-pow(g_map,4));
-//                    h_Koeff(1,1) = coeff_pos*pow(g_map,4)+abs(this->h_hand_lin_vel_plan_end.at(1)/error_tot(1))*(1-pow(g_map,4));
-//                    h_Koeff(2,2) = coeff_pos*pow(g_map,4)+abs(this->h_hand_lin_vel_plan_end.at(2)/error_tot(2))*(1-pow(g_map,4));
-//                    h_Koeff(3,3) = coeff_or*pow(g_map,4)+abs(this->h_hand_ang_vel_plan_end.at(0)/error_tot(3))*(1-pow(g_map,4));
-//                    h_Koeff(4,4) = coeff_or*pow(g_map,4)+abs(this->h_hand_ang_vel_plan_end.at(1)/error_tot(4))*(1-pow(g_map,4));
-//                    h_Koeff(5,5) = coeff_or*pow(g_map,4)+abs(this->h_hand_ang_vel_plan_end.at(2)/error_tot(5))*(1-pow(g_map,4));
+
+
                 }else if(stage_descr.compare("retreat")==0){
 
-                    h_Koeff(0,0) = 0.0;
-                    h_Koeff(1,1) = 0.0;
-                    h_Koeff(2,2) = 0.0;
-                    h_Koeff(3,3) = 0.0;
-                    h_Koeff(4,4) = 0.0;
-                    h_Koeff(5,5) = 0.0;
+                    // human-like desired hand pose
+                    h_hand_pose(0) = hand_pos_init(0) + 0.33*error_f_tot(0)*(5*pow(g_map,4)-2*pow(g_map,5));
+                    h_hand_pose(1) = hand_pos_init(0) + 0.33*error_f_tot(1)*(5*pow(g_map,4)-2*pow(g_map,5));
+                    h_hand_pose(2) = hand_pos_init(0) + 0.33*error_f_tot(2)*(5*pow(g_map,4)-2*pow(g_map,5));
+                    h_hand_pose(3) = hand_pos_init(0) + 0.33*error_f_tot(3)*(5*pow(g_map,4)-2*pow(g_map,5));
+                    h_hand_pose(4) = hand_pos_init(0) + 0.33*error_f_tot(4)*(5*pow(g_map,4)-2*pow(g_map,5));
+                    h_hand_pose(5) = hand_pos_init(0) + 0.33*error_f_tot(5)*(5*pow(g_map,4)-2*pow(g_map,5));
+
+                    // human-like desired hand velocity
+                    h_hand_vel(0) = (10/(3*period_T))*error_f_tot(0)*(2*pow(g_map,3)-pow(g_map,4));
+                    h_hand_vel(1) = (10/(3*period_T))*error_f_tot(1)*(2*pow(g_map,3)-pow(g_map,4));
+                    h_hand_vel(2) = (10/(3*period_T))*error_f_tot(2)*(2*pow(g_map,3)-pow(g_map,4));
+                    h_hand_vel(3) = (10/(3*period_T))*error_f_tot(3)*(2*pow(g_map,3)-pow(g_map,4));
+                    h_hand_vel(4) = (10/(3*period_T))*error_f_tot(4)*(2*pow(g_map,3)-pow(g_map,4));
+                    h_hand_vel(5) = (10/(3*period_T))*error_f_tot(5)*(2*pow(g_map,3)-pow(g_map,4));
+
+
                 }
+
+                // TO DO ----------------------------
+                Vector3d error_h_pos = des_hand_pos - r_hand_pos_vec;
+                Vector3d error_h_or = r_hand_q_w*des_hand_or_e - des_hand_q_w*r_hand_or_e - des_hand_or_e.cross(r_hand_or_e);
+                error_h_tot << error_h_pos(0),error_h_pos(1),error_h_pos(2), error_h_or(0),error_h_or(1),error_h_or(2);
 
                 //VectorXd h_ref_hand_vel_vec = h_hand_vels + h_Koeff*h_error_tot;
                 //VectorXd h_ref_hand_vel_vec = h_Koeff*h_error_tot;
@@ -778,7 +856,13 @@ void MainWindow::execPosControl()
 
 
             // closed-loop control
-            VectorXd hand_vel = Koeff * error_tot;
+            VectorXd hand_vel;
+            if(hl_en){
+                hand_vel = h_hand_vel + Koeff * error_h_tot;
+            }else{
+                hand_vel = Koeff * error_tot;
+            }
+
             vector<double> hand_vel_vec; hand_vel_vec.resize(hand_vel.size());
             VectorXd::Map(&hand_vel_vec[0], hand_vel.size()) = hand_vel;
 
@@ -823,7 +907,7 @@ void MainWindow::execPosControl()
                 bool condition = (e_n_pos < 1.73*error_pos_th) && (e_n_or < 1.73*error_or_th);
                 if(stages==3 && stage_descr.compare("plan")==0)
                 {
-                    condition = g_map >= 0.99;
+                    condition = g_map >= g_map_th;
                 }else{
                     //TO DO
                 }
@@ -3029,7 +3113,9 @@ if(solved){
         this->jointsPosition_mov_ctrl.resize(this->jointsPosition_mov.size());
         this->des_handPosition.clear(); this->des_handOrientation.clear(); this->des_handOrientation_q.clear();
         this->handPosition_mov.resize(tot_steps); this->handPosition_mov_stages.resize(this->jointsPosition_mov.size());
-        this->handOrientation_mov.resize(tot_steps); this->handOrientation_q_mov.resize(tot_steps); this->handOrientation_q_mov_stages.resize(this->jointsPosition_mov.size());
+        this->handOrientation_mov.resize(tot_steps); this->handOrientation_q_mov.resize(tot_steps);
+        this->handOrientation_mov_stages.resize(this->jointsPosition_mov.size());
+        this->handOrientation_q_mov_stages.resize(this->jointsPosition_mov.size());
         this->handVelocityNorm_mov.resize(tot_steps);
         this->handLinearVelocity_mov.resize(tot_steps); this->handLinearVelocity_mov_stages.resize(this->jointsPosition_mov.size());
         this->handAngularVelocity_mov.resize(tot_steps); this->handAngularVelocity_mov_stages.resize(this->jointsPosition_mov.size());
@@ -3060,6 +3146,7 @@ if(solved){
             MatrixXd acc_stage = this->jointsAcceleration_mov.at(k);
             //this->curr_scene->getHumanoid()->getHandAcceleration(arm_code,pos_stage,vel_stage,acc_stage,this->timesteps_mov.at(k),this->handLinearAcceleration_mov_stages.at(k),this->handAngularAcceleration_mov_stages.at(k));
             vector<vector<double>> h_pos(pos_stage.rows());
+            vector<vector<double>> h_or(pos_stage.rows());
             vector<vector<double>> h_or_q(pos_stage.rows());
             vector<vector<double>> h_lin_vel(pos_stage.rows());
             vector<vector<double>> h_ang_vel(pos_stage.rows());
@@ -3071,6 +3158,7 @@ if(solved){
                 this->curr_scene->getHumanoid()->getHandPos(arm_code,this->handPosition_mov.at(step),posture);
                 this->curr_scene->getHumanoid()->getHandPos(arm_code,h_pos.at(i),posture);
                 this->curr_scene->getHumanoid()->getHandOr(arm_code,this->handOrientation_mov.at(step),posture);
+                this->curr_scene->getHumanoid()->getHandOr(arm_code,h_or.at(i),posture);
                 this->curr_scene->getHumanoid()->getHandOr_q(arm_code,h_or_q.at(i),posture);
                 this->curr_scene->getHumanoid()->getHandOr_q(arm_code,this->handOrientation_q_mov.at(step),posture);
                 // velocities
@@ -3119,8 +3207,10 @@ if(solved){
 //            this->handOrientation_q_mov_stages.at(k) = h_micro_or_q;
 //            this->handLinearVelocity_mov_stages.at(k) = h_micro_lin_vel;
 //            this->handAngularVelocity_mov_stages.at(k) = h_micro_ang_vel;
+
             this->jointsPosition_mov_ctrl.at(k) = pos_stage;
             this->handPosition_mov_stages.at(k) = h_pos;
+            this->handOrientation_mov_stages.at(k) = h_or;
             this->handOrientation_q_mov_stages.at(k) = h_or_q;
             this->handLinearVelocity_mov_stages.at(k) = h_lin_vel;
             this->handAngularVelocity_mov_stages.at(k) = h_ang_vel;

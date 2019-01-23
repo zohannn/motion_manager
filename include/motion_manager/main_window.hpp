@@ -916,6 +916,7 @@ private:
         vector<vector<double>> handPosition_mov; /**< hand position during the movement. 0=x,1=y,2=z */
         vector<vector<vector<double>>> handPosition_mov_stages; /**< hand position during the movement divided in stages. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_mov; /**< hand orientation (rpy) during the movement. */
+        vector<vector<vector<double>>> handOrientation_mov_stages; /**< hand orientation (rpy) during the movement divided in stages. */
         vector<vector<double>> handOrientation_q_mov; /**< hand orientation (quaternion) during the movement. */
         vector<vector<vector<double>>> handOrientation_q_mov_stages; /**< hand orientation (quaternion) during the movement divided in stages. */
         vector<vector<double>> handLinearVelocity_mov; /**< hand linear velocity during the movement */
@@ -1239,6 +1240,7 @@ private:
         vector<double> h_hand_pos_end; /**< end hand position during control */
         vector<double> h_hand_or_q_end; /**< end hand orientation (quaternion) during control */
         vector<double> h_hand_pos_init; /**< initial hand position during control */
+        vector<double> h_hand_or_init; /**< initial hand orientation (rpy) during control */
         vector<double> h_hand_or_q_init; /**< initial hand orientation (quaternion) during control */
         vector<double> h_hand_lin_vel_end; /**< end hand linear velocity during control */
         vector<double> h_hand_ang_vel_end; /**< end hand angular velocity during control */

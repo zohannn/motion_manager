@@ -29,27 +29,23 @@ Obsts_f_timestep=0.05
 
 # Human-likeness addition parameters #
 Hl_add=true
-Hl_add_pos_coeff=0.8
-
-Hl_add_pos_damping=0.0001
-
-Hl_add_or_coeff=2
-
-Hl_add_or_damping=0.01
+Hl_add_pos_coeff=1
+Hl_add_or_coeff=5
 
 Hl_fing_coeff=0.5
 
-Hl_tau=0.05
+Hl_tau=0.15
 
-Hl_dec_rate=0.09
+Hl_dec_rate=200
 
-Hl_diff_w=0.02
+Hl_diff_w=0.05
+
 # Control coefficients and error threshold #
-Pos_control_coeff=0.9
+Pos_control_coeff=0
 
 Pos_error_th=5.0
 
-Or_control_coeff=7
+Or_control_coeff=0
 
 Or_error_th=0.01
 
