@@ -1080,6 +1080,20 @@ private:
          */
         void add_microsteps(MatrixXd& h_func, MatrixXd& h_micro_func, int microsteps);
 
+        /**
+         * @brief getQuaternion
+         * @param q
+         * @param Rot
+         */
+        void getQuaternion(std::vector<double>& q, Matrix3d& Rot);
+
+        /**
+         * @brief Rot_matrix
+         * @param Rot
+         * @param rpy
+         */
+        void Rot_matrix(Matrix3d &Rot,std::vector<double>& rpy);
+
         // solution of the given problems
         bool sol_loaded;/**< loaded solution flag */
         // plan
