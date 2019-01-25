@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1744,7 +1744,7 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="geometry">
        <rect>
-        <x>560</x>
+        <x>580</x>
         <y>10</y>
         <width>331</width>
         <height>151</height>
@@ -1916,7 +1916,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_des_right_hand_pos">
       <property name="geometry">
        <rect>
-        <x>560</x>
+        <x>580</x>
         <y>210</y>
         <width>331</width>
         <height>321</height>
@@ -2197,7 +2197,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="checkBox_right_hand_status">
       <property name="geometry">
        <rect>
-        <x>920</x>
+        <x>930</x>
         <y>260</y>
         <width>211</width>
         <height>21</height>
@@ -2210,7 +2210,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="checkBox_use_vel_control">
       <property name="geometry">
        <rect>
-        <x>560</x>
+        <x>580</x>
         <y>170</y>
         <width>181</width>
         <height>21</height>
@@ -2226,7 +2226,7 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="geometry">
        <rect>
-        <x>920</x>
+        <x>930</x>
         <y>10</y>
         <width>311</width>
         <height>241</height>
@@ -2516,7 +2516,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>531</width>
+        <width>561</width>
         <height>521</height>
        </rect>
       </property>
@@ -2535,8 +2535,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QCheckBox" name="checkBox_hl_add">
        <property name="geometry">
         <rect>
-         <x>270</x>
-         <y>450</y>
+         <x>260</x>
+         <y>490</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2689,7 +2689,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>270</x>
          <y>30</y>
-         <width>241</width>
+         <width>231</width>
          <height>91</height>
         </rect>
        </property>
@@ -2922,39 +2922,13 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>270</x>
-         <y>480</y>
-         <width>249</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_301">
-        <item>
-         <widget class="QLabel" name="label_vel_max">
-          <property name="text">
-           <string>Max joint velocity [deg/s]</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_vel_max">
-          <property name="text">
-           <string>50.0</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
       <widget class="QGroupBox" name="groupBox_hl_add_params">
        <property name="geometry">
         <rect>
          <x>260</x>
-         <y>170</y>
-         <width>251</width>
-         <height>271</height>
+         <y>150</y>
+         <width>281</width>
+         <height>331</height>
         </rect>
        </property>
        <property name="title">
@@ -2964,8 +2938,8 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>130</y>
-          <width>221</width>
+          <y>190</y>
+          <width>261</width>
           <height>131</height>
          </rect>
         </property>
@@ -3042,62 +3016,202 @@ p, li { white-space: pre-wrap; }
        <widget class="QWidget" name="">
         <property name="geometry">
          <rect>
+          <x>11</x>
+          <y>160</y>
+          <width>261</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_577">
+         <item>
+          <widget class="QLabel" name="label_fing_coeff">
+           <property name="text">
+            <string>Finger Control Coefficient</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_fing_coeff">
+           <property name="text">
+            <string>0.2</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
           <x>10</x>
           <y>30</y>
-          <width>221</width>
-          <height>89</height>
+          <width>261</width>
+          <height>95</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_104">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_565">
+          <layout class="QHBoxLayout" name="horizontalLayout_578">
            <item>
-            <widget class="QLabel" name="label_hl_pos_coeff">
+            <layout class="QHBoxLayout" name="horizontalLayout_565">
+             <item>
+              <widget class="QLabel" name="label_hl_pos_coeff_plan">
+               <property name="text">
+                <string>Kpos plan</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_hl_pos_coeff_plan">
+               <property name="text">
+                <string>0.001</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_566">
+             <item>
+              <widget class="QLabel" name="label_hl_or_coeff_plan">
+               <property name="text">
+                <string>Kor plan</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_hl_or_coeff_plan">
+               <property name="text">
+                <string>15</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_581">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_579">
+             <item>
+              <widget class="QLabel" name="label_hl_pos_coeff_app">
+               <property name="text">
+                <string>Kpos app</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_hl_pos_coeff_app">
+               <property name="text">
+                <string>0.001</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_580">
+             <item>
+              <widget class="QLabel" name="label_hl_or_coeff_app">
+               <property name="text">
+                <string>Kor app</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_hl_or_coeff_app">
+               <property name="text">
+                <string>15</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_582">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_583">
+             <item>
+              <widget class="QLabel" name="label_hl_pos_coeff_ret">
+               <property name="text">
+                <string>Kpos ret</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_hl_pos_coeff_ret">
+               <property name="text">
+                <string>0.001</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_584">
+             <item>
+              <widget class="QLabel" name="label_hl_or_coeff_ret">
+               <property name="text">
+                <string>Kor ret</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_hl_or_coeff_ret">
+               <property name="text">
+                <string>15</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>130</y>
+          <width>261</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_587">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_585">
+           <item>
+            <widget class="QLabel" name="label_g_th_pa">
              <property name="text">
-              <string>Position Coefficient</string>
+              <string>g_th_pa</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_hl_pos_coeff">
+            <widget class="QLineEdit" name="lineEdit_g_th_plan_app">
              <property name="text">
-              <string>0.001</string>
+              <string>0.95</string>
              </property>
             </widget>
            </item>
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_566">
+          <layout class="QHBoxLayout" name="horizontalLayout_586">
            <item>
-            <widget class="QLabel" name="label_hl_or_coeff">
+            <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>Orientation Coefficient</string>
+              <string>g_th_rp</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_hl_or_coeff">
+            <widget class="QLineEdit" name="lineEdit_g_th_ret_plan">
              <property name="text">
-              <string>15</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_577">
-           <item>
-            <widget class="QLabel" name="label_fing_coeff">
-             <property name="text">
-              <string>Finger Control Coefficient</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_fing_coeff">
-             <property name="text">
-              <string>0.2</string>
+              <string>0.95</string>
              </property>
             </widget>
            </item>
@@ -3114,8 +3228,33 @@ p, li { white-space: pre-wrap; }
       <zorder>layoutWidget</zorder>
       <zorder>groupBox_sing_av_params</zorder>
       <zorder>groupBox_obsts_av_params</zorder>
-      <zorder>layoutWidget</zorder>
       <zorder>groupBox_hl_add_params</zorder>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>930</x>
+        <y>290</y>
+        <width>249</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_301">
+       <item>
+        <widget class="QLabel" name="label_vel_max">
+         <property name="text">
+          <string>Max joint velocity [deg/s]</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_vel_max">
+         <property name="text">
+          <string>50.0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_results">

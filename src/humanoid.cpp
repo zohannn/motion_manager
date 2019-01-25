@@ -3755,6 +3755,244 @@ void Humanoid::getJacobian(int arm,std::vector<double>& posture,MatrixXd& Jacobi
     }
 }
 
+void Humanoid::getTimeDerivativeJacobian(int arm,std::vector<double>& posture,std::vector<double>& velocities,MatrixXd& TimeDerivativeJacobian)
+{
+
+    TimeDerivativeJacobian.resize(6,JOINTS_ARM);
+    VectorXd joint_velocities;joint_velocities << velocities.at(0),velocities.at(1),velocities.at(2),velocities.at(3),velocities.at(4),velocities.at(5),velocities.at(6);
+    MatrixXd Jacobian; this->getJacobian(arm,posture,Jacobian);
+    vector<double> handPos; Vector3d pos_hand; Vector3d pos_hand_vel;
+    this->getHandPos(arm,handPos,posture);
+    pos_hand << handPos.at(0), handPos.at(1), handPos.at(2);
+    pos_hand_vel = Jacobian*joint_velocities;
+    Vector3d pos_hand_lin_vel = pos_hand_vel.block<3,1>(0,0);
+
+    MatrixXd Jac_tmp; VectorXd joint_vel_tmp;
+    // p0 velocity
+    Jac_tmp = Jacobian.block<6,1>(0,0);
+    joint_vel_tmp = joint_velocities.block<1,1>(0,0);
+    VectorXd pos_0_vel = Jac_tmp*joint_vel_tmp;
+    VectorXd pos_0_lin_vel = pos_0_vel.block<3,1>(0,0);
+    VectorXd pos_0_ang_vel = pos_0_vel.block<3,1>(3,0);
+    Matrix3d S_0;
+    S_0(0,0) = 0.0;                 S_0(0,1) = -pos_0_ang_vel(2); S_0(0,2) = pos_0_ang_vel(1);
+    S_0(1,0) = pos_0_ang_vel(2);    S_0(1,1) = 0.0;               S_0(1,2) = -pos_0_ang_vel(0);
+    S_0(2,0) = -pos_0_ang_vel(1);   S_0(2,1) = pos_0_ang_vel(0);  S_0(2,2) = 0.0;
+    // p1 velocity
+    Jac_tmp = Jacobian.block<6,2>(0,0);
+    joint_vel_tmp = joint_velocities.block<2,1>(0,0);
+    VectorXd pos_1_vel = Jac_tmp*joint_vel_tmp;
+    VectorXd pos_1_lin_vel = pos_1_vel.block<3,1>(0,0);
+    VectorXd pos_1_ang_vel = pos_1_vel.block<3,1>(3,0);
+    Matrix3d S_1;
+    S_1(0,0) = 0.0;                 S_1(0,1) = -pos_1_ang_vel(2); S_1(0,2) = pos_1_ang_vel(1);
+    S_1(1,0) = pos_1_ang_vel(2);    S_1(1,1) = 0.0;               S_1(1,2) = -pos_1_ang_vel(0);
+    S_1(2,0) = -pos_1_ang_vel(1);   S_1(2,1) = pos_1_ang_vel(0);  S_1(2,2) = 0.0;
+    // p2 velocity
+    Jac_tmp = Jacobian.block<6,3>(0,0);
+    joint_vel_tmp = joint_velocities.block<3,1>(0,0);
+    VectorXd pos_2_vel = Jac_tmp*joint_vel_tmp;
+    VectorXd pos_2_lin_vel = pos_2_vel.block<3,1>(0,0);
+    VectorXd pos_2_ang_vel = pos_2_vel.block<3,1>(3,0);
+    Matrix3d S_2;
+    S_2(0,0) = 0.0;                 S_2(0,1) = -pos_2_ang_vel(2); S_2(0,2) = pos_2_ang_vel(1);
+    S_2(1,0) = pos_2_ang_vel(2);    S_2(1,1) = 0.0;               S_2(1,2) = -pos_2_ang_vel(0);
+    S_2(2,0) = -pos_2_ang_vel(1);   S_2(2,1) = pos_2_ang_vel(0);  S_2(2,2) = 0.0;
+    // p3 velocity
+    Jac_tmp = Jacobian.block<6,4>(0,0);
+    joint_vel_tmp = joint_velocities.block<4,1>(0,0);
+    VectorXd pos_3_vel = Jac_tmp*joint_vel_tmp;
+    VectorXd pos_3_lin_vel = pos_3_vel.block<3,1>(0,0);
+    VectorXd pos_3_ang_vel = pos_3_vel.block<3,1>(3,0);
+    Matrix3d S_3;
+    S_3(0,0) = 0.0;                 S_0(0,1) = -pos_3_ang_vel(2); S_3(0,2) = pos_3_ang_vel(1);
+    S_3(1,0) = pos_3_ang_vel(2);    S_0(1,1) = 0.0;               S_3(1,2) = -pos_3_ang_vel(0);
+    S_3(2,0) = -pos_3_ang_vel(1);   S_0(2,1) = pos_3_ang_vel(0);  S_3(2,2) = 0.0;
+    // p4 velocity
+    Jac_tmp = Jacobian.block<6,5>(0,0);
+    joint_vel_tmp = joint_velocities.block<5,1>(0,0);
+    VectorXd pos_4_vel = Jac_tmp*joint_vel_tmp;
+    VectorXd pos_4_lin_vel = pos_4_vel.block<3,1>(0,0);
+    VectorXd pos_4_ang_vel = pos_4_vel.block<3,1>(3,0);
+    Matrix3d S_4;
+    S_4(0,0) = 0.0;                 S_4(0,1) = -pos_4_ang_vel(2); S_4(0,2) = pos_4_ang_vel(1);
+    S_4(1,0) = pos_4_ang_vel(2);    S_4(1,1) = 0.0;               S_4(1,2) = -pos_4_ang_vel(0);
+    S_4(2,0) = -pos_4_ang_vel(1);   S_4(2,1) = pos_4_ang_vel(0);  S_4(2,2) = 0.0;
+    // p5 velocity
+    Jac_tmp = Jacobian.block<6,6>(0,0);
+    joint_vel_tmp = joint_velocities.block<6,1>(0,0);
+    VectorXd pos_5_vel = Jac_tmp*joint_vel_tmp;
+    VectorXd pos_5_lin_vel = pos_5_vel.block<3,1>(0,0);
+    VectorXd pos_5_ang_vel = pos_5_vel.block<3,1>(3,0);
+    Matrix3d S_5;
+    S_5(0,0) = 0.0;                 S_5(0,1) = -pos_5_ang_vel(2); S_5(0,2) = pos_5_ang_vel(1);
+    S_5(1,0) = pos_5_ang_vel(2);    S_5(1,1) = 0.0;               S_5(1,2) = -pos_5_ang_vel(0);
+    S_5(2,0) = -pos_5_ang_vel(1);   S_5(2,1) = pos_5_ang_vel(0);  S_5(2,2) = 0.0;
+    // p6 velocity
+    VectorXd pos_6_vel = Jacobian*joint_velocities;
+    VectorXd pos_6_lin_vel = pos_6_vel.block<3,1>(0,0);
+    VectorXd pos_6_ang_vel = pos_6_vel.block<3,1>(3,0);
+    Matrix3d S_6;
+    S_6(0,0) = 0.0;                 S_6(0,1) = -pos_6_ang_vel(2); S_6(0,2) = pos_6_ang_vel(1);
+    S_6(1,0) = pos_6_ang_vel(2);    S_6(1,1) = 0.0;               S_6(1,2) = -pos_6_ang_vel(0);
+    S_6(2,0) = -pos_6_ang_vel(1);   S_6(2,1) = pos_6_ang_vel(0);  S_6(2,2) = 0.0;
+
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    Vector3d pos0;
+    Vector3d z0;
+    Vector3d z0_der;
+    Matrix3d Rot_0;
+    Matrix3d Rot_der_0;
+    Vector3d pos1;
+    Vector3d z1;
+    Vector3d z1_der;
+    Matrix3d Rot_1;
+    Matrix3d Rot_der_1;
+    Vector3d pos2;
+    Vector3d z2;
+    Vector3d z2_der;
+    Matrix3d Rot_2;
+    Matrix3d Rot_der_2;
+    Vector3d pos3;
+    Vector3d z3;
+    Vector3d z3_der;
+    Matrix3d Rot_3;
+    Matrix3d Rot_der_3;
+    Vector3d pos4;
+    Vector3d z4;
+    Vector3d z4_der;
+    Matrix3d Rot_4;
+    Matrix3d Rot_der_4;
+    Vector3d pos5;
+    Vector3d z5;
+    Vector3d z5_der;
+    Matrix3d Rot_5;
+    Matrix3d Rot_der_5;
+    Vector3d pos6;
+    Vector3d z6;
+    Vector3d z6_der;
+    Matrix3d Rot_6;
+    Matrix3d Rot_der_6;
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i),posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d diff;
+        Vector3d diff_der;
+        Vector3d cross;
+        Vector3d zi_der;
+        switch(i){
+        case 0:
+            Rot_0 = T.block(0,0,3,3);
+            Rot_der_0 = S_0*Rot_0;
+            z0_der = Rot_der_0.block(0,2,3,1);
+            z0 = T.block(0,2,3,1);
+            pos0 = T.block(0,3,3,1);
+            diff = pos_hand - pos0;
+            diff_der = pos_hand_lin_vel - pos_0_lin_vel;
+            cross = z0_der.cross(diff) + z0.cross(diff_der);
+            zi_der=z0_der;
+            break;
+        case 1:
+            Rot_1 = T.block(0,0,3,3);
+            Rot_der_1 = S_1*Rot_1;
+            z1_der = Rot_der_1.block(0,2,3,1);
+            z1 = T.block(0,2,3,1);
+            pos1 = T.block(0,3,3,1);
+            diff = pos_hand - pos1;
+            diff_der = pos_hand_lin_vel - pos_1_lin_vel;
+            cross = z1_der.cross(diff) + z1.cross(diff_der);
+            zi_der=z1_der;
+            break;
+        case 2:
+            Rot_2 = T.block(0,0,3,3);
+            Rot_der_2 = S_2*Rot_2;
+            z2_der = Rot_der_2.block(0,2,3,1);
+            z2 = T.block(0,2,3,1);
+            pos2 = T.block(0,3,3,1);
+            diff = pos_hand - pos2;
+            diff_der = pos_hand_lin_vel - pos_2_lin_vel;
+            cross = z2_der.cross(diff) + z2.cross(diff_der);
+            zi_der=z2_der;
+            break;
+        case 3:
+            Rot_3 = T.block(0,0,3,3);
+            Rot_der_3 = S_3*Rot_3;
+            z3_der = Rot_der_3.block(0,2,3,1);
+            z3 = T.block(0,2,3,1);
+            pos3 = T.block(0,3,3,1);
+            diff = pos_hand - pos3;
+            diff_der = pos_hand_lin_vel - pos_3_lin_vel;
+            cross = z3_der.cross(diff) + z3.cross(diff_der);
+            zi_der=z3_der;
+            break;
+        case 4:
+            Rot_4 = T.block(0,0,3,3);
+            Rot_der_4 = S_4*Rot_4;
+            z4_der = Rot_der_4.block(0,2,3,1);
+            z4 = T.block(0,2,3,1);
+            pos4 = T.block(0,3,3,1);
+            diff = pos_hand - pos4;
+            diff_der = pos_hand_lin_vel - pos_4_lin_vel;
+            cross = z4_der.cross(diff) + z4.cross(diff_der);
+            zi_der=z4_der;
+            break;
+        case 5:
+            Rot_5 = T.block(0,0,3,3);
+            Rot_der_5 = S_5*Rot_5;
+            z5_der = Rot_der_5.block(0,2,3,1);
+            z5 = T.block(0,2,3,1);
+            pos5 = T.block(0,3,3,1);
+            diff = pos_hand - pos5;
+            diff_der = pos_hand_lin_vel - pos_5_lin_vel;
+            cross = z5_der.cross(diff) + z5.cross(diff_der);
+            zi_der=z5_der;
+            break;
+        case 6:
+            Rot_6 = T.block(0,0,3,3);
+            Rot_der_6 = S_0*Rot_0;
+            z6_der = Rot_der_6.block(0,2,3,1);
+            z6 = T.block(0,2,3,1);
+            pos6 = T.block(0,3,3,1);
+            diff = pos_hand - pos6;
+            diff_der = pos_hand_lin_vel - pos_6_lin_vel;
+            cross = z6_der.cross(diff) + z6.cross(diff_der);
+            zi_der=z6_der;
+            break;
+        }
+        VectorXd column(6); column << cross, zi_der;
+        TimeDerivativeJacobian.col(i) = column;
+    }
+
+
+}
+
 void Humanoid::getDerivative(vector<MatrixXd> &matrix, vector<double> &step_values, vector<MatrixXd> &der_matrix)
 {
     der_matrix.resize(matrix.size());

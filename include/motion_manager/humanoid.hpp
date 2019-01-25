@@ -1220,6 +1220,15 @@ private:
     void getJacobian(int arm,std::vector<double>& posture,MatrixXd& Jacobian);
 
     /**
+     * @brief getTimeDerivativeJacobian
+     * @param arm
+     * @param posture
+     * @param velocities
+     * @param TimeDerivativeJacobian
+     */
+    void getTimeDerivativeJacobian(int arm,std::vector<double>& posture,std::vector<double>& velocities,MatrixXd& TimeDerivativeJacobian);
+
+    /**
      * @brief getDerivative
      * @param function
      * @param step_values
