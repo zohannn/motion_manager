@@ -1021,6 +1021,30 @@ public:
 
 
     /**
+     * @brief inverseDiffKinematicsSingleArm2
+     * @param arm
+     * @param posture
+     * @param hand_acc
+     * @param accelerations
+     * @param jlim_en
+     * @param sing_en
+     * @param obsts_en
+     * @param vel_max
+     * @param sing_coeff
+     * @param sing_damping
+     * @param obst_coeff
+     * @param obst_damping
+     * @param jlim_th
+     * @param jlim_rate
+     * @param jlim_coeff
+     * @param jlim_damping
+     * @param obsts
+     */
+    void inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, vector<double> hand_acc, vector<double>& accelerations, bool jlim_en, bool sing_en, bool obsts_en,
+                                        double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts);
+
+
+    /**
      * @brief get_distances_arm_obstacles
      * @param points_arm
      * @param obst_pos
@@ -1049,6 +1073,14 @@ public:
      */
     void getHandAcceleration(int arm, MatrixXd &joint_traj_pos, MatrixXd &joint_traj_vel, MatrixXd &joint_traj_acc, vector<double> timesteps, vector<vector<double>> &hand_lin_acc, vector<vector<double>> &hand_ang_acc);
 
+    /**
+     * @brief getTimeDerivativeJacobian
+     * @param arm
+     * @param posture
+     * @param velocities
+     * @param TimeDerivativeJacobian
+     */
+    void getTimeDerivativeJacobian(int arm,std::vector<double>& posture,std::vector<double>& velocities,MatrixXd& TimeDerivativeJacobian);
 
 //#if HEAD==1
   //  humanoid_part getHead();
@@ -1219,14 +1251,6 @@ private:
      */
     void getJacobian(int arm,std::vector<double>& posture,MatrixXd& Jacobian);
 
-    /**
-     * @brief getTimeDerivativeJacobian
-     * @param arm
-     * @param posture
-     * @param velocities
-     * @param TimeDerivativeJacobian
-     */
-    void getTimeDerivativeJacobian(int arm,std::vector<double>& posture,std::vector<double>& velocities,MatrixXd& TimeDerivativeJacobian);
 
     /**
      * @brief getDerivative

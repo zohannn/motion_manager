@@ -10177,6 +10177,95 @@ bool QNode::execKinControl(int arm, vector<double> &r_arm_posture, vector<double
     }
 }
 
+bool QNode::execKinControl2(int arm, vector<double> &r_arm_posture, vector<double> &r_arm_accelerations, vector<double> &r_hand_posture, vector<double> &r_hand_velocities)
+{
+
+//    vector<double> r_posture; r_posture.reserve( r_arm_posture.size() + r_hand_posture.size() );
+//    r_posture.insert( r_posture.end(), r_arm_posture.begin(), r_arm_posture.end() );
+//    r_posture.insert( r_posture.end(), r_hand_posture.begin(), r_hand_posture.end() );
+//    vector<double> r_velocities; r_velocities.reserve( r_arm_velocities.size()+r_hand_velocities.size() );
+//    r_velocities.insert( r_velocities.end(), r_arm_velocities.begin(), r_arm_velocities.end() );
+//    r_velocities.insert( r_velocities.end(), r_hand_velocities.begin(), r_hand_velocities.end() );
+
+
+
+    std::vector<int> handles;
+    //MatrixXi hand_handles = MatrixXi::Constant(HAND_FINGERS,N_PHALANGE+1,1);
+    switch (arm) {
+    case 0: // dual arm
+        // TO DO
+        break;
+    case 1: //right arm
+        handles = right_handles;
+        //hand_handles = right_hand_handles;
+        break;
+    case 2: // left arm
+        handles = left_handles;
+        //hand_handles = left_hand_handles;
+        break;
+    }
+
+
+    if(!simulationRunning)
+    {
+        ros::NodeHandle node;
+        // set joints position or velocity (it depends on the settings)
+        ros::ServiceClient client_enableSubscriber=node.serviceClient<vrep_common::simRosEnableSubscriber>("/vrep/simRosEnableSubscriber");
+        vrep_common::simRosEnableSubscriber srv_enableSubscriber;
+        srv_enableSubscriber.request.topicName="/"+nodeName+"/set_joints"; // the topic name
+        srv_enableSubscriber.request.queueSize=1; // the subscriber queue size (on V-REP side)
+        srv_enableSubscriber.request.streamCmd=simros_strmcmd_set_joint_state; // the subscriber type
+        client_enableSubscriber.call(srv_enableSubscriber);
+
+        // start the simulation
+        this->startSim();
+
+        ros::spinOnce(); // first handle ROS messages
+    }
+
+    if(ros::ok() && simulationRunning)
+    {// ros is running, simulation is running
+
+
+        // handle ROS messages:
+        ros::spinOnce();
+
+        vrep_common::JointSetStateData data;
+        int exec_arm_mode = 0; // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+        int exec_hand_mode = 1; // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+        double exec_value;
+
+        for (size_t i = 0; i < r_arm_accelerations.size(); ++i)
+        {
+            exec_value = r_arm_posture.at(i) + (r_arm_accelerations.at(i)) * pow(simulationTimeStep,2);
+
+            if(arm!=0){
+                // single-arm
+                data.setModes.data.push_back(exec_arm_mode);
+                data.handles.data.push_back(handles.at(i));
+                data.values.data.push_back(exec_value);
+            }else{
+                // dual-arm (TO DO)
+            }
+        }// for loop arm joints
+
+        for (size_t i = 0; i < r_hand_velocities.size(); ++i)
+        {
+            exec_value = r_hand_posture.at(i) + (r_hand_velocities.at(i)) * simulationTimeStep;
+
+            if(arm!=0){
+                // single-arm
+                data.setModes.data.push_back(exec_hand_mode);
+                data.handles.data.push_back(handles.at(i+r_arm_accelerations.size()));
+                data.values.data.push_back(exec_value);
+            }else{
+                // dual-arm (TO DO)
+            }
+        }// for loop hand joints
+        pub_joints.publish(data);
+    }
+}
+
 
 double QNode::interpolate(double ya, double yb, double m)
 {

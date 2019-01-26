@@ -3759,9 +3759,9 @@ void Humanoid::getTimeDerivativeJacobian(int arm,std::vector<double>& posture,st
 {
 
     TimeDerivativeJacobian.resize(6,JOINTS_ARM);
-    VectorXd joint_velocities;joint_velocities << velocities.at(0),velocities.at(1),velocities.at(2),velocities.at(3),velocities.at(4),velocities.at(5),velocities.at(6);
+    VectorXd joint_velocities(7);joint_velocities << velocities.at(0),velocities.at(1),velocities.at(2),velocities.at(3),velocities.at(4),velocities.at(5),velocities.at(6);
     MatrixXd Jacobian; this->getJacobian(arm,posture,Jacobian);
-    vector<double> handPos; Vector3d pos_hand; Vector3d pos_hand_vel;
+    vector<double> handPos; Vector3d pos_hand; VectorXd pos_hand_vel(6);
     this->getHandPos(arm,handPos,posture);
     pos_hand << handPos.at(0), handPos.at(1), handPos.at(2);
     pos_hand_vel = Jacobian*joint_velocities;
@@ -5189,6 +5189,616 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
     VectorXd::Map(&velocities[0], joint_velocities.size()) = joint_velocities;
 
 }
+
+
+void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, vector<double> hand_acc, vector<double> &accelerations, bool jlim_en, bool sing_en, bool obsts_en,
+                                              double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping,
+                                              double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts)
+{
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    MatrixXd JacobianArm(6,JOINTS_ARM);
+
+    VectorXd vel_max_vec(JOINTS_ARM);
+    for(size_t i=0; i < vel_max_vec.size(); ++i){
+        vel_max_vec(i) = vel_max;
+    }
+    double vel_max_norm = vel_max_vec.norm();
+
+    Vector3d pos0;
+    Vector3d z0;
+    Vector3d pos1;
+    Vector3d z1;
+    Vector3d pos2;
+    Vector3d z2;
+    Vector3d pos3;
+    Vector3d z3;
+    Vector3d pos4;
+    Vector3d z4;
+    Vector3d pos5;
+    Vector3d z5;
+    Vector3d pos6;
+    Vector3d z6;
+
+    vector<double> handPos; Vector3d pos_hand;
+    this->getHandPos(arm,handPos,posture);
+
+    vector<double> max_limits;
+    vector<double> min_limits;
+    vector<double> mid_limits(JOINTS_ARM+JOINTS_HAND);
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        max_limits = this->max_rightLimits;
+        min_limits = this->min_rightLimits;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        max_limits = this->max_leftLimits;
+        min_limits = this->min_leftLimits;
+        break;
+    }
+
+
+    pos_hand << handPos.at(0), handPos.at(1), handPos.at(2);
+
+    // current Jacobian
+    T = mat_world;
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d diff;
+        Vector3d cross;
+        Vector3d zi;
+        switch(i){
+        case 0:
+            z0 = T.block(0,2,3,1);
+            pos0 = T.block(0,3,3,1);
+            diff = pos_hand - pos0;
+            cross = z0.cross(diff);
+            zi=z0;
+            break;
+        case 1:
+            z1 = T.block(0,2,3,1);
+            pos1 = T.block(0,3,3,1);
+            diff = pos_hand - pos1;
+            cross = z1.cross(diff);
+            zi=z1;
+            break;
+        case 2:
+            z2 = T.block(0,2,3,1);
+            pos2 = T.block(0,3,3,1);
+            diff = pos_hand - pos2;
+            cross = z2.cross(diff);
+            zi=z2;
+            break;
+        case 3:
+            z3 = T.block(0,2,3,1);
+            pos3 = T.block(0,3,3,1);
+            diff = pos_hand - pos3;
+            cross = z3.cross(diff);
+            zi=z3;
+            break;
+        case 4:
+            z4 = T.block(0,2,3,1);
+            pos4 = T.block(0,3,3,1);
+            diff = pos_hand - pos4;
+            cross = z4.cross(diff);
+            zi=z4;
+            break;
+        case 5:
+            z5 = T.block(0,2,3,1);
+            pos5 = T.block(0,3,3,1);
+            diff = pos_hand - pos5;
+            cross = z5.cross(diff);
+            zi=z5;
+            break;
+        case 6:
+            z6 = T.block(0,2,3,1);
+            pos6 = T.block(0,3,3,1);
+            diff = pos_hand - pos6;
+            cross = z6.cross(diff);
+            zi=z6;
+            break;
+        }
+        VectorXd column(6); column << cross, zi;
+        JacobianArm.col(i) = column;
+    }
+
+    //double k; // damping factor
+    //MatrixXd I = MatrixXd::Identity(6,6);
+    MatrixXd JacobianArmT = JacobianArm.transpose();
+    MatrixXd JJ = JacobianArm*JacobianArmT;
+    //if(abs(JJ.determinant()) < 0.01){
+    //    k = 0.01;
+    //}else{
+    //    k=0.0;
+    //}
+    //MatrixXd JJk = (JJ+pow(k,2)*I);
+    //MatrixXd JJk_inv = JJk.inverse();
+    MatrixXd JJk_inv = JJ.inverse();
+    MatrixXd J_plus = JacobianArmT*JJk_inv; // pseudo-inverse of the Jacobian
+    VectorXd hand_acc_xd(6);
+    hand_acc_xd << hand_acc.at(0),hand_acc.at(1),hand_acc.at(2),hand_acc.at(3),hand_acc.at(4),hand_acc.at(5);
+    VectorXd joint_accelerations = J_plus*hand_acc_xd;
+
+    double null_th = 0.001;
+    // Joints limits minimization function
+    if(jlim_en){
+//        VectorXd delta_H_jlim(posture.size());
+//        VectorXd delta_H_jlim_mod(posture.size());
+//        std::transform(max_limits.begin(),max_limits.end(),min_limits.begin(),mid_limits.begin(),plus<double>());
+//        std::transform(mid_limits.begin(), mid_limits.end(), mid_limits.begin(), std::bind1st(std::multiplies<double>(),0.5));
+//        for (size_t i = 0; i < posture.size(); ++i){
+//            delta_H_jlim(i) = (posture.at(i) - mid_limits.at(i))/(max_limits.at(i) - min_limits.at(i));
+//            delta_H_jlim_mod(i) = delta_H_jlim(i)*(1+exp((delta_H_jlim(i) - jlim_th)/jlim_rate));
+//        }
+//        MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
+//        MatrixXd Jpp = J_plus*JacobianArm;
+//        MatrixXd J_Null = Id - Jpp;
+//        //VectorXd J_jlim= J_Null*delta_H_jlim;
+//        VectorXd J_jlim= J_Null*delta_H_jlim_mod;
+//        double k_jlim = 0;
+//        if(J_Null.norm() > null_th){
+//            k_jlim = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_jlim.norm())));
+//        }
+//        double fd = jlim_coeff * (1 - exp(-jlim_damping*(J_jlim.norm())));
+
+//        joint_velocities +=  k_jlim*fd*J_jlim;
+
+//        //BOOST_LOG_SEV(lg, info) << "# ----------------------------------- # ";
+//        //BOOST_LOG_SEV(lg, info) << "k_jlim = " << k_jlim;
+//        //BOOST_LOG_SEV(lg, info) << "joint 2 = " << J_Null(1);
+//        //BOOST_LOG_SEV(lg, info) << "joint 3 = " << J_Null(2);
+//        //BOOST_LOG_SEV(lg, info) << "joint 4 = " << J_Null(3);
+//        //BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_Null(4);
+//        //BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_Null(5);
+//        //BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_Null(6);
+    }
+
+    // Manipulability measure minimization function (Avoidance of singularities)
+    if(sing_en){
+//        double delta_theta = 0.001; // rad = 0.57 deg
+//        vector<double> posture_delta(posture.size());
+//        MatrixXd JacobianArm_delta(6,JOINTS_ARM);
+//        std::transform(posture.begin(), posture.end(), posture_delta.begin(), std::bind1st(std::plus<double>(),delta_theta));
+//        T = mat_world;
+//        for (size_t i = 0; i < posture_delta.size(); ++i){
+//            this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture_delta.at(i),T_aux);
+//            T = T * T_aux;
+//            Vector3d diff;
+//            Vector3d cross;
+//            Vector3d zi;
+//            switch(i){
+//            case 0:
+//                z0 = T.block(0,2,3,1);
+//                pos0 = T.block(0,3,3,1);
+//                diff = pos_hand - pos0;
+//                cross = z0.cross(diff);
+//                zi=z0;
+//                break;
+//            case 1:
+//                z1 = T.block(0,2,3,1);
+//                pos1 = T.block(0,3,3,1);
+//                diff = pos_hand - pos1;
+//                cross = z1.cross(diff);
+//                zi=z1;
+//                break;
+//            case 2:
+//                z2 = T.block(0,2,3,1);
+//                pos2 = T.block(0,3,3,1);
+//                diff = pos_hand - pos2;
+//                cross = z2.cross(diff);
+//                zi=z2;
+//                break;
+//            case 3:
+//                z3 = T.block(0,2,3,1);
+//                pos3 = T.block(0,3,3,1);
+//                diff = pos_hand - pos3;
+//                cross = z3.cross(diff);
+//                zi=z3;
+//                break;
+//            case 4:
+//                z4 = T.block(0,2,3,1);
+//                pos4 = T.block(0,3,3,1);
+//                diff = pos_hand - pos4;
+//                cross = z4.cross(diff);
+//                zi=z4;
+//                break;
+//            case 5:
+//                z5 = T.block(0,2,3,1);
+//                pos5 = T.block(0,3,3,1);
+//                diff = pos_hand - pos5;
+//                cross = z5.cross(diff);
+//                zi=z5;
+//                break;
+//            case 6:
+//                z6 = T.block(0,2,3,1);
+//                pos6 = T.block(0,3,3,1);
+//                diff = pos_hand - pos6;
+//                cross = z6.cross(diff);
+//                zi=z6;
+//                break;
+//            }
+//            VectorXd column(6); column << cross, zi;
+//            JacobianArm_delta.col(i) = column;
+//        }
+
+//        MatrixXd JacobianArm_deltaT = JacobianArm_delta.transpose();
+//        MatrixXd JJ_delta = JacobianArm_delta*JacobianArm_deltaT;
+//        VectorXd delta_H_sing(posture_delta.size());
+//        double H_sing_av = -sqrt(JJ.determinant()); // minimize H to maximize the manipulability measure
+//        double H_sing_av_delta = -sqrt(JJ_delta.determinant()); // minimize H to maximize the manipulability measure
+//        for (int i = 0; i < delta_H_sing.size(); ++i){
+//            delta_H_sing(i) = (H_sing_av_delta - H_sing_av)/delta_theta;
+//        }
+//        MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
+//        MatrixXd Jpp = J_plus*JacobianArm;
+//        MatrixXd J_Null = Id - Jpp;
+//        VectorXd J_sing= J_Null*delta_H_sing;
+//        double k_sing = 0;
+//        if(J_sing.norm() > null_th){
+//            k_sing = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_sing.norm())));
+//        }
+//        double fd = sing_coeff * (1 - exp(-sing_damping*(J_sing.norm())));
+
+//        joint_velocities +=  (k_sing*fd*J_sing);
+
+//        //BOOST_LOG_SEV(lg, info) << "# ----------------------------------- # ";
+//        //BOOST_LOG_SEV(lg, info) << "k_sing = " << k_sing;
+//        //BOOST_LOG_SEV(lg, info) << "joint 2 = " << J_Null(1);
+//        //BOOST_LOG_SEV(lg, info) << "joint 3 = " << J_Null(2);
+//        //BOOST_LOG_SEV(lg, info) << "joint 4 = " << J_Null(3);
+//        //BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_Null(4);
+//        //BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_Null(5);
+//        //BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_Null(6);
+    }
+
+    // Obstacles avoidance
+    if(obsts_en){
+
+//        // current positions of the arm
+//        vector<vector<double>> points_arm = vector<vector<double>>(5);
+//        vector<double> shoulderPos = vector<double>(3);
+//        vector<double> shoulder_elbowPos = vector<double>(3);
+//        vector<double> elbowPos = vector<double>(3);
+//        vector<double> elbow_wristPos = vector<double>(3);
+//        vector<double> wristPos = vector<double>(3);
+//        vector<double> wrist_handPos = vector<double>(3);
+//        vector<double> handPos = vector<double>(3);
+//        T = mat_world;
+//        for (size_t i = 0; i < posture.size(); ++i){
+//            this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
+//            T = T * T_aux;
+//            Vector3d v;
+//            switch(i){
+//            case 0:
+//                v = T.block(0,3,3,1);
+//                shoulderPos[0] = v[0];
+//                shoulderPos[1] = v[1];
+//                shoulderPos[2] = v[2];
+//                break;
+//            case 2:
+//                v = T.block(0,3,3,1);
+//                elbowPos[0] = v[0];
+//                elbowPos[1] = v[1];
+//                elbowPos[2] = v[2];
+//                break;
+//            case 4:
+//                v = T.block(0,3,3,1);
+//                wristPos[0] = v[0];
+//                wristPos[1] = v[1];
+//                wristPos[2] = v[2];
+//                break;
+//            case 6:
+//                v = T.block(0,3,3,1);
+//                handPos[0] = v[0];
+//                handPos[1] = v[1];
+//                handPos[2] = v[2];
+//                break;
+//            default:
+//                // do nothing
+//                break;
+//            }
+//        }
+//        //middle point between the shoulder and the elbow
+//        std::transform(shoulderPos.begin(),shoulderPos.end(),elbowPos.begin(),shoulder_elbowPos.begin(),plus<double>());
+//        std::transform(shoulder_elbowPos.begin(), shoulder_elbowPos.end(), shoulder_elbowPos.begin(), std::bind1st(std::multiplies<double>(),0.5));
+//        //middle point between the elbow and the wrist
+//        std::transform(elbowPos.begin(),elbowPos.end(),wristPos.begin(),elbow_wristPos.begin(),plus<double>());
+//        std::transform(elbow_wristPos.begin(), elbow_wristPos.end(), elbow_wristPos.begin(), std::bind1st(std::multiplies<double>(),0.5));
+//        //middle point between the wrist and the hand
+//        std::transform(wristPos.begin(),wristPos.end(),handPos.begin(),wrist_handPos.begin(),plus<double>());
+//        std::transform(wrist_handPos.begin(), wrist_handPos.end(), wrist_handPos.begin(), std::bind1st(std::multiplies<double>(),0.5));
+//        // points on the arm
+//        points_arm.at(0) = shoulder_elbowPos;
+//        points_arm.at(1) = elbowPos;
+//        points_arm.at(2) = elbow_wristPos;
+//        points_arm.at(3) = wristPos;
+//        points_arm.at(4) = wrist_handPos;
+
+//        // perturbated positions of the arm
+//        double delta_theta = 0.001; // rad = 0.57 deg
+//        vector<double> posture_delta(posture.size());
+//        std::transform(posture.begin(), posture.end(), posture_delta.begin(), std::bind1st(std::plus<double>(),delta_theta));
+//        vector<vector<double>> points_arm_delta = vector<vector<double>>(5);
+//        vector<double> shoulderPos_delta = vector<double>(3);
+//        vector<double> shoulder_elbowPos_delta = vector<double>(3);
+//        vector<double> elbowPos_delta = vector<double>(3);
+//        vector<double> elbow_wristPos_delta = vector<double>(3);
+//        vector<double> wristPos_delta = vector<double>(3);
+//        vector<double> wrist_handPos_delta = vector<double>(3);
+//        vector<double> handPos_delta = vector<double>(3);
+//        T = mat_world;
+//        for (size_t i = 0; i < posture_delta.size(); ++i){
+//            this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture_delta.at(i),T_aux);
+//            T = T * T_aux;
+//            Vector3d v;
+//            switch(i){
+//            case 0:
+//                v = T.block(0,3,3,1);
+//                shoulderPos_delta[0] = v[0];
+//                shoulderPos_delta[1] = v[1];
+//                shoulderPos_delta[2] = v[2];
+//                break;
+//            case 2:
+//                v = T.block(0,3,3,1);
+//                elbowPos_delta[0] = v[0];
+//                elbowPos_delta[1] = v[1];
+//                elbowPos_delta[2] = v[2];
+//                break;
+//            case 4:
+//                v = T.block(0,3,3,1);
+//                wristPos_delta[0] = v[0];
+//                wristPos_delta[1] = v[1];
+//                wristPos_delta[2] = v[2];
+//                break;
+//            case 6:
+//                v = T.block(0,3,3,1);
+//                handPos_delta[0] = v[0];
+//                handPos_delta[1] = v[1];
+//                handPos_delta[2] = v[2];
+//                break;
+//            default:
+//                // do nothing
+//                break;
+//            }
+//        }
+//        //middle point between the shoulder and the elbow
+//        std::transform(shoulderPos_delta.begin(),shoulderPos_delta.end(),elbowPos_delta.begin(),shoulder_elbowPos_delta.begin(),plus<double>());
+//        std::transform(shoulder_elbowPos_delta.begin(), shoulder_elbowPos_delta.end(), shoulder_elbowPos_delta.begin(), std::bind1st(std::multiplies<double>(),0.5));
+//        //middle point between the elbow and the wrist
+//        std::transform(elbowPos_delta.begin(),elbowPos_delta.end(),wristPos_delta.begin(),elbow_wristPos_delta.begin(),plus<double>());
+//        std::transform(elbow_wristPos_delta.begin(), elbow_wristPos_delta.end(), elbow_wristPos_delta.begin(), std::bind1st(std::multiplies<double>(),0.5));
+//        //middle point between the wrist and the hand
+//        std::transform(wristPos_delta.begin(),wristPos_delta.end(),handPos_delta.begin(),wrist_handPos_delta.begin(),plus<double>());
+//        std::transform(wrist_handPos_delta.begin(), wrist_handPos_delta.end(), wrist_handPos_delta.begin(), std::bind1st(std::multiplies<double>(),0.5));
+//        // points on the arm
+//        points_arm_delta.at(0) = shoulder_elbowPos_delta;
+//        points_arm_delta.at(1) = elbowPos_delta;
+//        points_arm_delta.at(2) = elbow_wristPos_delta;
+//        points_arm_delta.at(3) = wristPos_delta;
+//        points_arm_delta.at(4) = wrist_handPos_delta;
+
+
+//        vector<double> e_arm = vector<double>(5,0.0);
+//        vector<double> e_arm_delta = vector<double>(5,0.0);
+//        vector<double> e_arm_torso = vector<double>(5,0.0);
+//        vector<double> e_arm_torso_delta = vector<double>(5,0.0);
+//        // current obstacles in the scenario
+//        for(size_t i=0;i<obsts.size();++i){
+//            objectPtr obst = obsts.at(i);
+//            vector<double> obst_pos = vector<double>(3);
+//            vector<double> obst_or = vector<double>(3);
+//            obst_pos.at(0) = obst->getPos().Xpos;
+//            obst_pos.at(1) = obst->getPos().Ypos;
+//            obst_pos.at(2) = obst->getPos().Zpos;
+//            obst_or.at(0) = obst->getOr().roll;
+//            obst_or.at(1) = obst->getOr().pitch;
+//            obst_or.at(2) = obst->getOr().yaw;
+//            Matrix3d Rot_obst; this->Rot_matrix(Rot_obst,obst_or);
+//            Matrix3d Rot_obst_t = Rot_obst.transpose();
+//            double x_size = obst->getSize().Xsize;
+//            double y_size = obst->getSize().Ysize;
+//            double z_size = obst->getSize().Zsize;
+//            Matrix3d A_obst;
+//            A_obst(0,0) = pow(x_size,-2); A_obst(0,1) = 0.0; A_obst(0,2) = 0.0;
+//            A_obst(1,0) = 0.0; A_obst(1,1) = pow(y_size,-2); A_obst(1,2) = 0.0;
+//            A_obst(2,0) = 0.0; A_obst(2,1) = 0.0; A_obst(2,2) = pow(z_size,-2);
+//            Matrix3d L_obst = Rot_obst_t*A_obst*Rot_obst;
+
+//            // distances between the arm and the obstacles
+//            vector<double> dist_arm = vector<double>(5); vector<double> e_dist_arm = vector<double>(5);
+//            vector<double> dist_arm_delta = vector<double>(5); vector<double> e_dist_arm_delta = vector<double>(5);
+//            // get the distances between the current obstacle and the points on the arm
+//            this->get_distances_arm_obstacles(points_arm,obst_pos,L_obst,dist_arm);
+//            // get the distances between the current obstacle and the points on the arm with perturbated posture
+//            this->get_distances_arm_obstacles(points_arm_delta,obst_pos,L_obst,dist_arm_delta);
+
+//            // distances between the arm and the torso of the humanoid
+//            vector<double> dist_arm_torso = vector<double>(5); vector<double> e_dist_arm_torso = vector<double>(5);
+//            vector<double> dist_arm_torso_delta = vector<double>(5); vector<double> e_dist_arm_torso_delta = vector<double>(5);
+//            this->get_distances_arm_torso(points_arm,dist_arm_torso);
+//            this->get_distances_arm_torso(points_arm_delta,dist_arm_torso_delta);
+
+//            double k_off = 0.0001;// offset constant
+//            for (size_t i=0; i<dist_arm.size();++i){
+//                e_dist_arm.at(i) = 1/(dist_arm.at(i)+k_off);
+//                e_dist_arm_delta.at(i) = 1/(dist_arm_delta.at(i)+k_off);
+//                e_dist_arm_torso.at(i) = 1/(dist_arm_torso.at(i)+k_off);
+//                e_dist_arm_torso_delta.at(i) = 1/(dist_arm_torso_delta.at(i)+k_off);
+//            }
+
+//            for(size_t i=0;i<e_arm.size();++i){
+//                e_arm.at(i) += e_dist_arm.at(i);
+//                e_arm_delta.at(i) += e_dist_arm_delta.at(i);
+//                e_arm_torso.at(i) += e_dist_arm_torso.at(i);
+//                e_arm_torso_delta.at(i) += e_dist_arm_torso_delta.at(i);
+//            }
+//        } //for loop obstacles
+
+//        MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
+//        MatrixXd Jpp = J_plus*JacobianArm;
+//        MatrixXd J_Null = Id - Jpp;
+
+//        // ---------- torso ----------------------------------------
+
+//        // shoulder - elbow
+//        VectorXd delta_H_torso_SE(posture.size());
+//        for(size_t i=0;i<delta_H_torso_SE.size();++i){
+//            delta_H_torso_SE(i) = (e_arm_torso_delta.at(0) - e_arm_torso.at(0))/delta_theta;
+//        }
+//        VectorXd J_torso_SE= J_Null*delta_H_torso_SE;
+//        double k_torso_SE = 0;
+//        if(J_torso_SE.norm() > null_th){
+//            k_torso_SE = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_SE.norm())));
+//        }
+//        double fd_torso_SE = obst_coeff * (1 - exp(-obst_damping*(J_torso_SE.norm())));
+//        joint_velocities +=  (k_torso_SE*fd_torso_SE*J_torso_SE);
+
+//        // elbow
+//        VectorXd delta_H_torso_E(posture.size());
+//        for(size_t i=0;i<delta_H_torso_E.size();++i){
+//            delta_H_torso_E(i) = (e_arm_torso_delta.at(1) - e_arm_torso.at(1))/delta_theta;
+//        }
+//        VectorXd J_torso_E= J_Null*delta_H_torso_E;
+//        double k_torso_E = 0;
+//        if(J_torso_E.norm() > null_th){
+//            k_torso_E = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_E.norm())));
+//        }
+//        double fd_torso_E = obst_coeff * (1 - exp(-obst_damping*(J_torso_E.norm())));
+//        joint_velocities +=  (k_torso_E*fd_torso_E*J_torso_E);
+
+//        // elbow - wrist
+//        VectorXd delta_H_torso_EW(posture.size());
+//        for(size_t i=0;i<delta_H_torso_EW.size();++i){
+//            delta_H_torso_EW(i) = (e_arm_torso_delta.at(2) - e_arm_torso.at(2))/delta_theta;
+//        }
+//        VectorXd J_torso_EW= J_Null*delta_H_torso_EW;
+//        double k_torso_EW = 0;
+//        if(J_torso_EW.norm() > null_th){
+//            k_torso_EW = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_EW.norm())));
+//        }
+//        double fd_torso_EW = obst_coeff * (1 - exp(-obst_damping*(J_torso_EW.norm())));
+//        joint_velocities +=  (k_torso_EW*fd_torso_EW*J_torso_EW);
+
+//        // wrist
+//        VectorXd delta_H_torso_W(posture.size());
+//        for(size_t i=0;i<delta_H_torso_W.size();++i){
+//            delta_H_torso_W(i) = (e_arm_torso_delta.at(3) - e_arm_torso.at(3))/delta_theta;
+//        }
+//        VectorXd J_torso_W= J_Null*delta_H_torso_W;
+//        double k_torso_W = 0;
+//        if(J_torso_W.norm() > null_th){
+//            k_torso_W = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_W.norm())));
+//        }
+//        double fd_torso_W = obst_coeff * (1 - exp(-obst_damping*(J_torso_W.norm())));
+//        joint_velocities +=  (k_torso_W*fd_torso_W*J_torso_W);
+
+//        // wrist - hand
+//        VectorXd delta_H_torso_WH(posture.size());
+//        for(size_t i=0;i<delta_H_torso_WH.size();++i){
+//            delta_H_torso_WH(i) = (e_arm_torso_delta.at(4) - e_arm_torso.at(4))/delta_theta;
+//        }
+//        VectorXd J_torso_WH= J_Null*delta_H_torso_WH;
+//        double k_torso_WH = 0;
+//        if(J_torso_WH.norm() > null_th){
+//            k_torso_WH = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_WH.norm())));
+//        }
+//        double fd_torso_WH = obst_coeff * (1 - exp(-obst_damping*(J_torso_WH.norm())));
+//        joint_velocities +=  (k_torso_WH*fd_torso_WH*J_torso_WH);
+
+//        // ---------- obstacles --------------------------------
+
+//        // shoulder - elbow
+//        VectorXd delta_H_obst_SE(posture.size());
+//        for(size_t i=0;i<delta_H_obst_SE.size();++i){
+//            delta_H_obst_SE(i) = (e_arm_delta.at(0) - e_arm.at(0))/delta_theta;
+//        }
+//        VectorXd J_obst_SE= J_Null*delta_H_obst_SE;
+//        double k_obst_SE = 0;
+//        if(J_obst_SE.norm() > null_th){
+//            k_obst_SE = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_obst_SE.norm())));
+//        }
+//        double fd_SE = obst_coeff * (1 - exp(-obst_damping*(J_obst_SE.norm())));
+//        joint_velocities +=  (k_obst_SE*fd_SE*J_obst_SE);
+
+//        // elbow
+//        VectorXd delta_H_obst_E(posture.size());
+//        for(size_t i=0;i<delta_H_obst_E.size();++i){
+//            delta_H_obst_E(i) = (e_arm_delta.at(1) - e_arm.at(1))/delta_theta;
+//        }
+//        VectorXd J_obst_E= J_Null*delta_H_obst_E;
+//        double k_obst_E = 0;
+//        if(J_obst_E.norm() > null_th){
+//            k_obst_E = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_obst_E.norm())));
+//        }
+//        double fd_E = obst_coeff * (1 - exp(-obst_damping*(J_obst_E.norm())));
+//        joint_velocities +=  (k_obst_E*fd_E*J_obst_E);
+
+//        // elbow - wrist
+//        VectorXd delta_H_obst_EW(posture.size());
+//        for(size_t i=0;i<delta_H_obst_EW.size();++i){
+//            delta_H_obst_EW(i) = (e_arm_delta.at(2) - e_arm.at(2))/delta_theta;
+//        }
+//        VectorXd J_obst_EW= J_Null*delta_H_obst_EW;
+//        double k_obst_EW = 0;
+//        if(J_obst_EW.norm() > null_th){
+//            k_obst_EW = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_obst_EW.norm())));
+//        }
+//        double fd_EW = obst_coeff * (1 - exp(-obst_damping*(J_obst_EW.norm())));
+//        joint_velocities +=  (k_obst_EW*fd_EW*J_obst_EW);
+
+//        // wrist
+//        VectorXd delta_H_obst_W(posture.size());
+//        for(size_t i=0;i<delta_H_obst_W.size();++i){
+//            delta_H_obst_W(i) = (e_arm_delta.at(3) - e_arm.at(3))/delta_theta;
+//        }
+//        VectorXd J_obst_W= J_Null*delta_H_obst_W;
+//        double k_obst_W = 0;
+//        if(J_obst_W.norm() > null_th){
+//            k_obst_W = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_obst_W.norm())));
+//        }
+//        double fd_W = obst_coeff * (1 - exp(-obst_damping*(J_obst_W.norm())));
+//        joint_velocities +=  (k_obst_W*fd_W*J_obst_W);
+
+//        // wrist - hand
+//        VectorXd delta_H_obst_WH(posture.size());
+//        for(size_t i=0;i<delta_H_obst_WH.size();++i){
+//            delta_H_obst_WH(i) = (e_arm_delta.at(4) - e_arm.at(4))/delta_theta;
+//        }
+//        VectorXd J_obst_WH= J_Null*delta_H_obst_WH;
+//        double k_obst_WH = 0;
+//        if(J_obst_WH.norm() > null_th){
+//            k_obst_WH = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_obst_WH.norm())));
+//        }
+//        double fd_WH = obst_coeff * (1 - exp(-obst_damping*(J_obst_WH.norm())));
+//        joint_velocities +=  (k_obst_WH*fd_WH*J_obst_WH);
+
+    }
+
+
+    accelerations.clear();
+    accelerations.resize(joint_accelerations.size());
+    VectorXd::Map(&accelerations[0], joint_accelerations.size()) = joint_accelerations;
+}
+
 
 void Humanoid::getHandAcceleration(int arm,MatrixXd &joint_traj_pos,MatrixXd &joint_traj_vel,MatrixXd &joint_traj_acc,vector<double> timesteps,vector<vector<double>> &hand_lin_acc,vector<vector<double>> &hand_ang_acc)
 {
