@@ -36,6 +36,7 @@
 #include "comp_velocity_dialog.hpp"
 #include "comp_control_dialog.hpp"
 #include "nat_coll_av_dialog.hpp"
+#include "errors_control_dialog.hpp"
 #include "handposplot.hpp"
 
 #include <boost/atomic.hpp>
@@ -850,6 +851,11 @@ public Q_SLOTS:
         void on_pushButton_control_plot_pos_vel_comps_clicked();
 
         /**
+         * @brief on_pushButton_errors_ctrl_clicked
+         */
+        void on_pushButton_errors_ctrl_clicked();
+
+        /**
          * @brief on_pushButton_save_ctrl_params_clicked
          */
         void on_pushButton_save_ctrl_params_clicked();
@@ -881,10 +887,12 @@ private:
         PowerLawDialog *mPowerLawdlg; /**< handle of the 2/3 power law dialog*/
         PowerLaw3DDialog *mPowerLaw3Ddlg; /**< handle of the 1/6 power law dialog*/
         CompVelocityDialog *mCompVeldlg; /**< handle of the velocity components dlg */
+
         NatCollAvDialog *mNatCollAvdlg; /**< handle of the natural collision avoidance dlg */
         WarmStartResultsDialog *mWarmdlg; /**< handle of the warm start results dialog */
         ResultsCtrlJointsDialog *mResultsCtrlJointsdlg;/**< handle of the results joints dlg during control*/
         CompControlDialog *mCompCtrldlg; /** < handle of the components dlg during control */
+        ErrorsControlDialog *mErrCtrldlg; /** < handle of the errors dlg during control */
         int scenario_id; /**< id of the current scenario */
         QVector<QString> scenarios;  /**< list of scenarios */
 
@@ -1285,6 +1293,11 @@ private:
         vector<vector<double>> shoulderOrientation_ctrl; /**< shoulder orientation during control. 0=roll,1=pitch,2=yaw */
         vector<vector<double>> shoulderLinearVelocity_ctrl; /**< shoulder linear velocity during control */
         vector<vector<double>> shoulderAngularVelocity_ctrl;/**< shoulder angular velocity during control */
+
+        vector<double> error_pos_tot_norm; /**< norm of the total error in position */
+        vector<double> error_or_tot_norm; /**< norm of the total error in orientation */
+        vector<double> error_lin_vel_tot_norm; /**< norm of the total error in linear velocity */
+        vector<double> error_ang_vel_tot_norm; /**< norm of the total error in angular velocity */
 
         vector<double> sim_time; /**< simulation time [s]*/
 

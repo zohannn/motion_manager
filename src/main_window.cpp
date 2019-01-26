@@ -108,6 +108,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mCompCtrldlg = new CompControlDialog(this);
     mCompCtrldlg->setModal(false);
 
+    // create the errors control dialog
+    mErrCtrldlg = new ErrorsControlDialog(this);
+    mErrCtrldlg->setModal(false);
+
     // check boxes
     QObject::connect(this->ui.checkBox_tar_x_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_tar_x_pos_var(int)));
     QObject::connect(this->ui.checkBox_tar_y_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_tar_y_pos_var(int)));
@@ -678,6 +682,7 @@ void MainWindow::execPosControl()
             this->shoulderLinearVelocity_ctrl.push_back(r_shoulder_lin_vel);
             this->shoulderAngularVelocity_ctrl.push_back(r_shoulder_ang_vel);
             this->handVelocityNorm_ctrl.push_back(this->curr_scene->getHumanoid()->getHandVelNorm(1,r_posture,r_velocities_mes));
+            this->sim_time.push_back(this->qnode.getSimTime());
 
             Vector3d r_hand_pos_vec; Vector3d r_hand_or_q_e; double r_hand_q_w = r_hand_q.at(3);
             Vector3d r_hand_lin_vel_vec; Vector3d r_hand_ang_vel_vec;
@@ -1121,6 +1126,18 @@ void MainWindow::execPosControl()
                 }
                 VectorXd::Map(&r_hand_velocities[0], r_hand_velocities_vec.size()) = r_hand_velocities_vec;
             }
+            // errors
+            if(hl_en){
+                this->error_pos_tot_norm.push_back(error_h_tot.block<3,1>(0,0).norm());
+                this->error_or_tot_norm.push_back(error_h_tot.block<3,1>(3,0).norm());
+                this->error_lin_vel_tot_norm.push_back(der_error_h_tot.block<3,1>(0,0).norm());
+                this->error_ang_vel_tot_norm.push_back(der_error_h_tot.block<3,1>(3,0).norm());
+            }else{
+                this->error_pos_tot_norm.push_back(error_tot.block<3,1>(0,0).norm());
+                this->error_or_tot_norm.push_back(error_tot.block<3,1>(3,0).norm());
+                this->error_lin_vel_tot_norm.push_back(der_error_tot.block<3,1>(0,0).norm());
+                this->error_ang_vel_tot_norm.push_back(der_error_tot.block<3,1>(3,0).norm());
+            }
 
             // Time derivative of the Jacobian
             MatrixXd timeDerJacobian; this->curr_scene->getHumanoid()->getTimeDerivativeJacobian(1,r_posture,r_velocities_mes,timeDerJacobian);
@@ -1309,9 +1326,6 @@ void MainWindow::execPosControl()
 
 
             this->qnode.execKinControl2(1,r_posture,r_accelerations,r_hand_posture,r_hand_velocities);
-
-
-            this->sim_time.push_back(this->qnode.getSimTime());
 
         }
     }
@@ -11822,6 +11836,13 @@ void MainWindow::on_pushButton_control_plot_pos_vel_comps_clicked()
 
 }
 
+void MainWindow::on_pushButton_errors_ctrl_clicked()
+{
+    if(!this->error_pos_tot_norm.empty())
+        this->mErrCtrldlg->setupPlots(this->error_pos_tot_norm,this->error_or_tot_norm,this->error_lin_vel_tot_norm,this->error_ang_vel_tot_norm,this->sim_time);
+    this->mErrCtrldlg->show();
+}
+
 
 // -----------------------------------------------------------------------
 // Controlling
@@ -11851,6 +11872,10 @@ void MainWindow::on_pushButton_start_control_pressed()
     this->jointsPosition_ctrl.resize(0,0);
     this->jointsVelocity_ctrl.resize(0,0);
     this->sim_time.clear();
+    this->error_pos_tot_norm.clear();
+    this->error_or_tot_norm.clear();
+    this->error_lin_vel_tot_norm.clear();
+    this->error_ang_vel_tot_norm.clear();
     this->i_ctrl=0;
     this->t_past=0.0;
     this->qnode.resetSimTime();
