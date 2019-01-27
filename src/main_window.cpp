@@ -877,7 +877,7 @@ void MainWindow::execPosControl()
                                     +(12/period_T)*h_hand_lin_vel_init.at(0)*(-3*g_map+8*pow(g_map,2)-5*pow(g_map,3))
                                     +(12/period_T)*h_hand_lin_vel_end.at(0)*(-2*g_map+7*pow(g_map,2)-5*pow(g_map,3))
                                     +h_hand_lin_acc_init.at(0)*(1-9*g_map+18*pow(g_map,2)-10*pow(g_map,3))
-                                    +h_hand_lin_acc_end.at(0)*(-3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
+                                    +h_hand_lin_acc_end.at(0)*(3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
                                     +(2/(pow(period_T,2)*tb*(1-tb)))*error_b_tot(0)*(-pow(sin(M_PI*pow(g_map,phi)),2)+pow(M_PI,2)*pow(phi,2)*(1-g_map)*pow(g_map,2*phi-1)*cos(2*M_PI*pow(g_map,phi))
                                                                                      +(1-2*g_map)*M_PI*phi*pow(g_map,phi-1)*sin(2*M_PI*pow(g_map,phi)));
 
@@ -885,7 +885,7 @@ void MainWindow::execPosControl()
                                     +(12/period_T)*h_hand_lin_vel_init.at(1)*(-3*g_map+8*pow(g_map,2)-5*pow(g_map,3))
                                     +(12/period_T)*h_hand_lin_vel_end.at(1)*(-2*g_map+7*pow(g_map,2)-5*pow(g_map,3))
                                     +h_hand_lin_acc_init.at(1)*(1-9*g_map+18*pow(g_map,2)-10*pow(g_map,3))
-                                    +h_hand_lin_acc_end.at(1)*(-3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
+                                    +h_hand_lin_acc_end.at(1)*(3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
                                     +(2/(pow(period_T,2)*tb*(1-tb)))*error_b_tot(1)*(-pow(sin(M_PI*pow(g_map,phi)),2)+pow(M_PI,2)*pow(phi,2)*(1-g_map)*pow(g_map,2*phi-1)*cos(2*M_PI*pow(g_map,phi))
                                                                                      +(1-2*g_map)*M_PI*phi*pow(g_map,phi-1)*sin(2*M_PI*pow(g_map,phi)));
 
@@ -893,7 +893,7 @@ void MainWindow::execPosControl()
                                     +(12/period_T)*h_hand_lin_vel_init.at(2)*(-3*g_map+8*pow(g_map,2)-5*pow(g_map,3))
                                     +(12/period_T)*h_hand_lin_vel_end.at(2)*(-2*g_map+7*pow(g_map,2)-5*pow(g_map,3))
                                     +h_hand_lin_acc_init.at(2)*(1-9*g_map+18*pow(g_map,2)-10*pow(g_map,3))
-                                    +h_hand_lin_acc_end.at(2)*(-3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
+                                    +h_hand_lin_acc_end.at(2)*(3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
                                     +(2/(pow(period_T,2)*tb*(1-tb)))*error_b_tot(2)*(-pow(sin(M_PI*pow(g_map,phi)),2)+pow(M_PI,2)*pow(phi,2)*(1-g_map)*pow(g_map,2*phi-1)*cos(2*M_PI*pow(g_map,phi))
                                                                                      +(1-2*g_map)*M_PI*phi*pow(g_map,phi-1)*sin(2*M_PI*pow(g_map,phi)));
 
@@ -901,7 +901,7 @@ void MainWindow::execPosControl()
                                     +(12/period_T)*h_hand_ang_vel_q_e_init(0)*(-3*g_map+8*pow(g_map,2)-5*pow(g_map,3))
                                     +(12/period_T)*h_hand_ang_vel_q_e_end(0)*(-2*g_map+7*pow(g_map,2)-5*pow(g_map,3))
                                     +h_hand_ang_acc_q_e_init(0)*(1-9*g_map+18*pow(g_map,2)-10*pow(g_map,3))
-                                    +h_hand_ang_acc_q_e_end(0)*(-3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
+                                    +h_hand_ang_acc_q_e_end(0)*(3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
                                     +(2/(pow(period_T,2)*tb*(1-tb)))*error_b_tot(3)*(-pow(sin(M_PI*pow(g_map,phi)),2)+pow(M_PI,2)*pow(phi,2)*(1-g_map)*pow(g_map,2*phi-1)*cos(2*M_PI*pow(g_map,phi))
                                                                                      +(1-2*g_map)*M_PI*phi*pow(g_map,phi-1)*sin(2*M_PI*pow(g_map,phi)));
 
@@ -909,7 +909,7 @@ void MainWindow::execPosControl()
                                     +(12/period_T)*h_hand_ang_vel_q_e_init(1)*(-3*g_map+8*pow(g_map,2)-5*pow(g_map,3))
                                     +(12/period_T)*h_hand_ang_vel_q_e_end(1)*(-2*g_map+7*pow(g_map,2)-5*pow(g_map,3))
                                     +h_hand_ang_acc_q_e_init(1)*(1-9*g_map+18*pow(g_map,2)-10*pow(g_map,3))
-                                    +h_hand_ang_acc_q_e_end(1)*(-3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
+                                    +h_hand_ang_acc_q_e_end(1)*(3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
                                     +(2/(pow(period_T,2)*tb*(1-tb)))*error_b_tot(4)*(-pow(sin(M_PI*pow(g_map,phi)),2)+pow(M_PI,2)*pow(phi,2)*(1-g_map)*pow(g_map,2*phi-1)*cos(2*M_PI*pow(g_map,phi))
                                                                                      +(1-2*g_map)*M_PI*phi*pow(g_map,phi-1)*sin(2*M_PI*pow(g_map,phi)));
 
@@ -917,7 +917,7 @@ void MainWindow::execPosControl()
                                     +(12/period_T)*h_hand_ang_vel_q_e_init(0)*(-3*g_map+8*pow(g_map,2)-5*pow(g_map,3))
                                     +(12/period_T)*h_hand_ang_vel_q_e_end(0)*(-2*g_map+7*pow(g_map,2)-5*pow(g_map,3))
                                     +h_hand_ang_acc_q_e_init(0)*(1-9*g_map+18*pow(g_map,2)-10*pow(g_map,3))
-                                    +h_hand_ang_acc_q_e_end(0)*(-3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
+                                    +h_hand_ang_acc_q_e_end(0)*(3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
                                     +(2/(pow(period_T,2)*tb*(1-tb)))*error_b_tot(5)*(-pow(sin(M_PI*pow(g_map,phi)),2)+pow(M_PI,2)*pow(phi,2)*(1-g_map)*pow(g_map,2*phi-1)*cos(2*M_PI*pow(g_map,phi))
                                                                                      +(1-2*g_map)*M_PI*phi*pow(g_map,phi-1)*sin(2*M_PI*pow(g_map,phi)));
 
@@ -925,7 +925,7 @@ void MainWindow::execPosControl()
                                     +(12/period_T)*h_hand_ang_vel_q_w_init*(-3*g_map+8*pow(g_map,2)-5*pow(g_map,3))
                                     +(12/period_T)*h_hand_ang_vel_q_w_end*(-2*g_map+7*pow(g_map,2)-5*pow(g_map,3))
                                     +h_hand_ang_acc_q_w_init*(1-9*g_map+18*pow(g_map,2)-10*pow(g_map,3))
-                                    +h_hand_ang_acc_q_w_end*(-3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
+                                    +h_hand_ang_acc_q_w_end*(3*g_map-12*pow(g_map,2)+10*pow(g_map,3))
                                     +(2/(pow(period_T,2)*tb*(1-tb)))*error_b_tot(6)*(-pow(sin(M_PI*pow(g_map,phi)),2)+pow(M_PI,2)*pow(phi,2)*(1-g_map)*pow(g_map,2*phi-1)*cos(2*M_PI*pow(g_map,phi))
                                                                                      +(1-2*g_map)*M_PI*phi*pow(g_map,phi-1)*sin(2*M_PI*pow(g_map,phi)));
 
