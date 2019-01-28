@@ -3993,6 +3993,19 @@ void Humanoid::getTimeDerivativeJacobian(int arm,std::vector<double>& posture,st
 
 }
 
+void Humanoid::getTimeDerivativeJacobian(MatrixXd &currJacobian, MatrixXd &pastJacobian, double timestep, MatrixXd &TimeDerivativeJacobian)
+{
+    TimeDerivativeJacobian.resize(currJacobian.rows(),currJacobian.cols());
+
+    for(int i=0; i<currJacobian.rows();++i)
+    {
+        for(int j=0; j<currJacobian.cols();++j)
+        {
+            TimeDerivativeJacobian(i,j) = (currJacobian(i,j) - pastJacobian(i,j)) / timestep;
+        }
+    }
+}
+
 void Humanoid::getDerivative(vector<MatrixXd> &matrix, vector<double> &step_values, vector<MatrixXd> &der_matrix)
 {
     der_matrix.resize(matrix.size());
@@ -5990,7 +6003,7 @@ void Humanoid::transfMatrix(double alpha, double a, double d, double theta, Matr
     T = Matrix4d::Zero();
 
     T(0,0) = cos(theta);            T(0,1) = -sin(theta);            T(0,2) = 0.0;         T(0,3) = a;
-    T(1,0) = sin(theta)*cos(alpha); T(1,1) = -cos(theta)*cos(alpha); T(1,2) = -sin(alpha); T(1,3) = -sin(alpha)*d;
+    T(1,0) = sin(theta)*cos(alpha); T(1,1) = cos(theta)*cos(alpha); T(1,2) = -sin(alpha); T(1,3) = -sin(alpha)*d;
     T(2,0) = sin(theta)*sin(alpha); T(2,1) = cos(theta)*sin(alpha);  T(2,2) = cos(alpha);  T(2,3) = cos(alpha)*d;
     T(3,0) = 0.0;                   T(3,1) = 0.0;                    T(3,2) = 0.0;         T(3,3) = 1.0;
 

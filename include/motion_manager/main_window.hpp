@@ -1247,6 +1247,10 @@ private:
         boost::thread execVelControl_thrd;
         void execVelControl();
 
+        // Jacobians
+        MatrixXd Jacobian; /**< current Jacobian matrix */
+        MatrixXd TimeDerJacobian; /**< current time derivative of the Jacobian matrix */
+
         MatrixXd jointsVelocity_ctrl; /**< trajectory of the joint velocity during control */
         MatrixXd jointsPosition_ctrl; /**< trajectory of the joint position during control */
         boost::shared_ptr<HandPosPlot> handPosPlot_ctrl_ptr; /**< pointer to the hand position plot during control */
@@ -1259,6 +1263,8 @@ private:
         vector<double> bounce_handOrientation_q; /**< bounce hand orientation (quaternion) during control*/
         int i_ctrl; /**< index of the desired hand pose*/
         double t_past; /**< time past in previous stages during control */
+        double t_j_past; /**< time past in previous calculus of the time derivative of the jacobian during control */
+        VectorXd hand_j_acc; /**< time derivative Jacobian dependant part of the hand accelearion */
         vector<double> h_hand_pos_end; /**< end hand position during control */
         vector<double> h_hand_or_q_end; /**< end hand orientation (quaternion) during control */
         vector<double> h_hand_pos_init; /**< initial hand position during control */
@@ -1278,6 +1284,9 @@ private:
         vector<vector<double>> handLinearVelocity_ctrl; /**< hand linear velocity during control */
         vector<vector<double>> handAngularVelocity_ctrl;/**< hand angular velocity during control */
         vector<double> handVelocityNorm_ctrl; /**< hand linear velocity norm during control */
+        vector<vector<double>> handLinearAcceleration_ctrl; /**< hand linear acceleration during control */
+        vector<vector<double>> handAngularAcceleration_ctrl;/**< hand angular acceleration during control */
+        vector<double> handAccelerationNorm_ctrl; /**< hand linear acceleration norm during control */
         // wrist
         vector<vector<double>> wristPosition_ctrl; /**< wrist position during control. 0=x,1=y,2=z */
         vector<vector<double>> wristOrientation_ctrl; /**< wrist orientation during control. 0=roll,1=pitch,2=yaw */
@@ -1296,8 +1305,10 @@ private:
 
         vector<double> error_pos_tot_norm; /**< norm of the total error in position */
         vector<double> error_or_tot_norm; /**< norm of the total error in orientation */
+        vector<double> error_pos_or_tot_norm; /**< norm of the total error in position + orientation */
         vector<double> error_lin_vel_tot_norm; /**< norm of the total error in linear velocity */
         vector<double> error_ang_vel_tot_norm; /**< norm of the total error in angular velocity */
+        vector<double> error_vel_tot_norm; /**< norm of the total error in velocity */
 
         vector<double> sim_time; /**< simulation time [s]*/
 

@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1917,9 +1917,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>610</x>
-        <y>280</y>
+        <y>200</y>
         <width>391</width>
-        <height>381</height>
+        <height>461</height>
        </rect>
       </property>
       <property name="title">
@@ -2113,7 +2113,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>200</y>
+         <y>180</y>
          <width>181</width>
          <height>161</height>
         </rect>
@@ -2210,7 +2210,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>200</y>
+         <y>180</y>
          <width>181</width>
          <height>161</height>
         </rect>
@@ -2303,11 +2303,98 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </widget>
+      <widget class="QGroupBox" name="groupBox_trap_vel">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>350</y>
+         <width>371</width>
+         <height>101</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Trapezoidal velocity profile</string>
+       </property>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>270</x>
+          <y>30</y>
+          <width>91</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_602">
+         <item>
+          <widget class="QLabel" name="label_g_c_trap">
+           <property name="text">
+            <string>g_c</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_g_c_trap">
+           <property name="text">
+            <string>0.33</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>251</width>
+          <height>58</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_110">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_601">
+           <item>
+            <widget class="QLabel" name="label_acc_trap_pos">
+             <property name="text">
+              <string>Acceleration position [mm/s²]</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_acc_trap_pos">
+             <property name="text">
+              <string>10</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_603">
+           <item>
+            <widget class="QLabel" name="label_acc_trap_or">
+             <property name="text">
+              <string>Acceleration orientation</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_acc_trap_or">
+             <property name="text">
+              <string>0.1</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
      </widget>
      <widget class="QCheckBox" name="checkBox_right_hand_status">
       <property name="geometry">
        <rect>
-        <x>970</x>
+        <x>1020</x>
         <y>260</y>
         <width>211</width>
         <height>21</height>
@@ -2321,7 +2408,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>610</x>
-        <y>180</y>
+        <y>170</y>
         <width>181</width>
         <height>21</height>
        </rect>
@@ -2336,9 +2423,9 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="geometry">
        <rect>
-        <x>970</x>
+        <x>1020</x>
         <y>10</y>
-        <width>311</width>
+        <width>251</width>
         <height>241</height>
        </rect>
       </property>
@@ -2350,7 +2437,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>10</x>
          <y>30</y>
-         <width>291</width>
+         <width>231</width>
          <height>201</height>
         </rect>
        </property>
@@ -2970,85 +3057,6 @@ p, li { white-space: pre-wrap; }
        <property name="title">
         <string>Human-likeness parameters</string>
        </property>
-       <widget class="QGroupBox" name="groupBox_time_mapping">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>400</y>
-          <width>281</width>
-          <height>131</height>
-         </rect>
-        </property>
-        <property name="title">
-         <string>Time mapping</string>
-        </property>
-        <widget class="QWidget" name="layoutWidget">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>30</y>
-           <width>201</width>
-           <height>89</height>
-          </rect>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_106">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_571">
-            <item>
-             <widget class="QLabel" name="label_tau">
-              <property name="text">
-               <string>Time constant [s]</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEdit_tau">
-              <property name="text">
-               <string>0.05</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_572">
-            <item>
-             <widget class="QLabel" name="label_dec_rate">
-              <property name="text">
-               <string>Decreasing rate</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEdit_dec_rate">
-              <property name="text">
-               <string>0.001</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_573">
-            <item>
-             <widget class="QLabel" name="label_diff_w">
-              <property name="text">
-               <string>Difference weight</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEdit_diff_w">
-              <property name="text">
-               <string>1</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-       </widget>
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
@@ -3524,6 +3532,85 @@ p, li { white-space: pre-wrap; }
       <zorder>checkBox_sing_av</zorder>
       <zorder>groupBox_sing_av_params</zorder>
       <zorder>layoutWidget</zorder>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_time_mapping">
+      <property name="geometry">
+       <rect>
+        <x>1050</x>
+        <y>460</y>
+        <width>221</width>
+        <height>131</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Time mapping</string>
+      </property>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>201</width>
+         <height>89</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_106">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_571">
+          <item>
+           <widget class="QLabel" name="label_tau">
+            <property name="text">
+             <string>Time constant [s]</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_tau">
+            <property name="text">
+             <string>0.05</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_572">
+          <item>
+           <widget class="QLabel" name="label_dec_rate">
+            <property name="text">
+             <string>Decreasing rate</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_dec_rate">
+            <property name="text">
+             <string>0.001</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_573">
+          <item>
+           <widget class="QLabel" name="label_diff_w">
+            <property name="text">
+             <string>Difference weight</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_diff_w">
+            <property name="text">
+             <string>1</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_results">

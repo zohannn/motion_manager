@@ -14,25 +14,28 @@ ErrorsControlDialog::~ErrorsControlDialog()
     delete ui;
 }
 
-void ErrorsControlDialog::setupPlots(vector<double> &errors_pos, vector<double> &errors_or, vector<double> &errors_lin_vel, vector<double> &errors_ang_vel, vector<double> &time)
+void ErrorsControlDialog::setupPlots(vector<double> &errors_pos, vector<double> &errors_or, vector<double> &errors_pos_or_tot, vector<double> &errors_lin_vel, vector<double> &errors_ang_vel, vector<double> &errors_vel_tot, vector<double> &time)
 {
-    //const double radtodeg = 180.0/static_cast<double>(M_PI);
 
     QVector<double> qtime = QVector<double>::fromStdVector(time);
     QVector<double> qerrors_pos = QVector<double>::fromStdVector(errors_pos);
     QVector<double> qerrors_or = QVector<double>::fromStdVector(errors_or);
+    QVector<double> qerrors_pos_or_tot = QVector<double>::fromStdVector(errors_pos_or_tot);
     QVector<double> qerrors_lin_vel = QVector<double>::fromStdVector(errors_lin_vel);
     QVector<double> qerrors_ang_vel = QVector<double>::fromStdVector(errors_ang_vel);
+    QVector<double> qerrors_vel_tot = QVector<double>::fromStdVector(errors_vel_tot);
 
-    plotError(ui->plot_error_pos,QString("Error in position"),qtime,qerrors_pos,true,true);
-    plotError(ui->plot_error_or,QString("Error in orientation"),qtime,qerrors_or,false,true);
-    plotError(ui->plot_error_lin_vel,QString("Error in linear velocity"),qtime,qerrors_lin_vel,true,false);
-    plotError(ui->plot_error_ang_vel,QString("Error in angular velocity"),qtime,qerrors_ang_vel,false,false);
+    plotError(ui->plot_error_pos,QString("Error in position"),qtime,qerrors_pos,true,true,false);
+    plotError(ui->plot_error_or,QString("Error in orientation"),qtime,qerrors_or,false,true,false);
+    plotError(ui->plot_error_pos_or_tot,QString("Error in position + orientation"),qtime,qerrors_pos_or_tot,false,true,true);
+    plotError(ui->plot_error_lin_vel,QString("Error in linear velocity"),qtime,qerrors_lin_vel,true,false,false);
+    plotError(ui->plot_error_ang_vel,QString("Error in angular velocity"),qtime,qerrors_ang_vel,false,false,false);
+    plotError(ui->plot_error_vel_tot,QString("Error in velocity"),qtime,qerrors_vel_tot,false,false,true);
 
 }
 
 
-void ErrorsControlDialog::plotError(QCustomPlot *plot, QString title, QVector<double> &time, QVector<double> &error,bool lin,bool pos)
+void ErrorsControlDialog::plotError(QCustomPlot *plot, QString title, QVector<double> &time, QVector<double> &error,bool lin,bool pos,bool tot)
 {
     plot->plotLayout()->clear();
     plot->clearGraphs();
@@ -55,14 +58,16 @@ void ErrorsControlDialog::plotError(QCustomPlot *plot, QString title, QVector<do
     plot->plotLayout()->addElement(1, 0, wideAxisRect);
 
     QString name;
-    if(lin && pos){
+    if(lin && pos && !tot){
         name="[mm]";
-    }else if(lin && !pos){
+    }else if(lin && !pos && !tot){
         name="[mm/s]";
-    }else if(!lin && pos){
+    }else if(!lin && pos && !tot){
         name = "q error";
-    }else if(!lin && !pos){
+    }else if(!lin && !pos && !tot){
         name = "q prog error";
+    }else{
+        name = "total error";
     }
 
 

@@ -1074,6 +1074,14 @@ public:
     void getHandAcceleration(int arm, MatrixXd &joint_traj_pos, MatrixXd &joint_traj_vel, MatrixXd &joint_traj_acc, vector<double> timesteps, vector<vector<double>> &hand_lin_acc, vector<vector<double>> &hand_ang_acc);
 
     /**
+     * @brief getJacobian
+     * @param arm
+     * @param posture
+     * @param Jacobian
+     */
+    void getJacobian(int arm,std::vector<double>& posture,MatrixXd& Jacobian);
+
+    /**
      * @brief getTimeDerivativeJacobian
      * @param arm
      * @param posture
@@ -1081,6 +1089,15 @@ public:
      * @param TimeDerivativeJacobian
      */
     void getTimeDerivativeJacobian(int arm,std::vector<double>& posture,std::vector<double>& velocities,MatrixXd& TimeDerivativeJacobian);
+
+    /**
+     * @brief getTimeDerivativeJacobian
+     * @param currJacobian
+     * @param pastJacobian
+     * @param timestep
+     * @param TimeDerivativeJacobian
+     */
+    void getTimeDerivativeJacobian(MatrixXd& currJacobian,MatrixXd& pastJacobian,double timestep,MatrixXd& TimeDerivativeJacobian);
 
 //#if HEAD==1
   //  humanoid_part getHead();
@@ -1242,14 +1259,6 @@ private:
      * @brief This method computes the current D-H parameters of the left hand
      */
     void computeLeftHandDHparams();
-
-    /**
-     * @brief getJacobian
-     * @param arm
-     * @param posture
-     * @param Jacobian
-     */
-    void getJacobian(int arm,std::vector<double>& posture,MatrixXd& Jacobian);
 
 
     /**

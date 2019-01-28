@@ -10177,16 +10177,8 @@ bool QNode::execKinControl(int arm, vector<double> &r_arm_posture, vector<double
     }
 }
 
-bool QNode::execKinControl2(int arm, vector<double> &r_arm_posture, vector<double> &r_arm_accelerations, vector<double> &r_hand_posture, vector<double> &r_hand_velocities)
+bool QNode::execKinControlAcc(int arm, vector<double> &r_arm_posture, vector<double> &r_arm_velocities, vector<double> &r_arm_accelerations, vector<double> &r_hand_posture, vector<double> &r_hand_velocities)
 {
-
-//    vector<double> r_posture; r_posture.reserve( r_arm_posture.size() + r_hand_posture.size() );
-//    r_posture.insert( r_posture.end(), r_arm_posture.begin(), r_arm_posture.end() );
-//    r_posture.insert( r_posture.end(), r_hand_posture.begin(), r_hand_posture.end() );
-//    vector<double> r_velocities; r_velocities.reserve( r_arm_velocities.size()+r_hand_velocities.size() );
-//    r_velocities.insert( r_velocities.end(), r_arm_velocities.begin(), r_arm_velocities.end() );
-//    r_velocities.insert( r_velocities.end(), r_hand_velocities.begin(), r_hand_velocities.end() );
-
 
 
     std::vector<int> handles;
@@ -10237,7 +10229,8 @@ bool QNode::execKinControl2(int arm, vector<double> &r_arm_posture, vector<doubl
 
         for (size_t i = 0; i < r_arm_accelerations.size(); ++i)
         {
-            exec_value = r_arm_posture.at(i) + (r_arm_accelerations.at(i)) * pow(simulationTimeStep,2);
+            //exec_value = r_arm_posture.at(i) + r_arm_velocities.at(i) * simulationTimeStep +0.5 * (r_arm_accelerations.at(i)) * pow(simulationTimeStep,2);
+            exec_value = r_arm_posture.at(i) + 0.5 * (r_arm_accelerations.at(i)) * pow(simulationTimeStep,2);
 
             if(arm!=0){
                 // single-arm
@@ -10302,6 +10295,11 @@ void QNode::stopSim()
 double QNode::getSimTime()
 {
     return this->simulationTime;
+}
+
+double QNode::getSimTimeStep()
+{
+    return this->simulationTimeStep;
 }
 
 bool QNode::isSimulationRunning()
