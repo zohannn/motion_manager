@@ -10177,7 +10177,7 @@ bool QNode::execKinControl(int arm, vector<double> &r_arm_posture, vector<double
     }
 }
 
-bool QNode::execKinControlAcc(int arm, vector<double> &r_arm_posture, vector<double> &r_arm_accelerations, vector<double> &r_hand_posture, vector<double> &r_hand_velocities)
+bool QNode::execKinControlAcc(int arm, vector<double> &r_arm_posture, vector<double> &r_arm_velocities, vector<double> &r_arm_accelerations, vector<double> &r_hand_posture, vector<double> &r_hand_velocities)
 {
 
 
@@ -10198,22 +10198,22 @@ bool QNode::execKinControlAcc(int arm, vector<double> &r_arm_posture, vector<dou
     }
 
 
-    if(!simulationRunning)
-    {
-        ros::NodeHandle node;
-        // set joints position or velocity (it depends on the settings)
-        ros::ServiceClient client_enableSubscriber=node.serviceClient<vrep_common::simRosEnableSubscriber>("/vrep/simRosEnableSubscriber");
-        vrep_common::simRosEnableSubscriber srv_enableSubscriber;
-        srv_enableSubscriber.request.topicName="/"+nodeName+"/set_joints"; // the topic name
-        srv_enableSubscriber.request.queueSize=1; // the subscriber queue size (on V-REP side)
-        srv_enableSubscriber.request.streamCmd=simros_strmcmd_set_joint_state; // the subscriber type
-        client_enableSubscriber.call(srv_enableSubscriber);
+//    if(!simulationRunning)
+//    {
+//        ros::NodeHandle node;
+//        // set joints position or velocity (it depends on the settings)
+//        ros::ServiceClient client_enableSubscriber=node.serviceClient<vrep_common::simRosEnableSubscriber>("/vrep/simRosEnableSubscriber");
+//        vrep_common::simRosEnableSubscriber srv_enableSubscriber;
+//        srv_enableSubscriber.request.topicName="/"+nodeName+"/set_joints"; // the topic name
+//        srv_enableSubscriber.request.queueSize=1; // the subscriber queue size (on V-REP side)
+//        srv_enableSubscriber.request.streamCmd=simros_strmcmd_set_joint_state; // the subscriber type
+//        client_enableSubscriber.call(srv_enableSubscriber);
 
-        // start the simulation
-        this->startSim();
+//        // start the simulation
+//        this->startSim();
 
-        ros::spinOnce(); // first handle ROS messages
-    }
+//        ros::spinOnce(); // first handle ROS messages
+//    }
 
     if(ros::ok() && simulationRunning)
     {// ros is running, simulation is running
@@ -10229,8 +10229,7 @@ bool QNode::execKinControlAcc(int arm, vector<double> &r_arm_posture, vector<dou
 
         for (size_t i = 0; i < r_arm_accelerations.size(); ++i)
         {
-            //exec_value = r_arm_posture.at(i) + r_arm_velocities.at(i) * simulationTimeStep +0.5 * (r_arm_accelerations.at(i)) * pow(simulationTimeStep,2);
-            exec_value = r_arm_posture.at(i) + 0.5 * (r_arm_accelerations.at(i)) * pow(simulationTimeStep,2);
+            exec_value = r_arm_posture.at(i) + r_arm_velocities.at(i) * simulationTimeStep + 0.5 * (r_arm_accelerations.at(i)) * pow(simulationTimeStep,2);
 
             if(arm!=0){
                 // single-arm
@@ -10302,9 +10301,26 @@ double QNode::getSimTimeStep()
     return this->simulationTimeStep;
 }
 
+string QNode::getNodeName()
+{
+    return this->nodeName;
+}
+
 bool QNode::isSimulationRunning()
 {
     return this->simulationRunning;
+}
+
+void QNode::enableSetJoints()
+{
+    ros::NodeHandle node;
+    // set joints position or velocity (it depends on the settings)
+    ros::ServiceClient client_enableSubscriber=node.serviceClient<vrep_common::simRosEnableSubscriber>("/vrep/simRosEnableSubscriber");
+    vrep_common::simRosEnableSubscriber srv_enableSubscriber;
+    srv_enableSubscriber.request.topicName="/"+this->nodeName+"/set_joints"; // the topic name
+    srv_enableSubscriber.request.queueSize=1; // the subscriber queue size (on V-REP side)
+    srv_enableSubscriber.request.streamCmd=simros_strmcmd_set_joint_state; // the subscriber type
+    client_enableSubscriber.call(srv_enableSubscriber);
 }
 
 

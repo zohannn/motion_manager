@@ -38,6 +38,7 @@
 #include "nat_coll_av_dialog.hpp"
 #include "errors_control_dialog.hpp"
 #include "handposplot.hpp"
+#include "circular_vector_buffer.hpp"
 
 #include <boost/atomic.hpp>
 #include <boost/thread.hpp>
@@ -50,6 +51,7 @@ using namespace p1d;
 /** This is the main namespace of the program */
 namespace motion_manager {
 
+typedef boost::shared_ptr< CircularBuffers<double> > bufferPtr;
 
 
 //! The MainWindow class
@@ -1246,13 +1248,16 @@ private:
         void execPosControl();
         boost::thread execVelControl_thrd;
         void execVelControl();
+        bufferPtr arm_vel_buff; /**< buffer of arm velocities for derivation */
+        bufferPtr hand_vel_buff; /**< buffer of hand velocities for drivation */
 
         // Jacobians
         MatrixXd Jacobian; /**< current Jacobian matrix */
         MatrixXd TimeDerJacobian; /**< current time derivative of the Jacobian matrix */
 
-        MatrixXd jointsVelocity_ctrl; /**< trajectory of the joint velocity during control */
         MatrixXd jointsPosition_ctrl; /**< trajectory of the joint position during control */
+        MatrixXd jointsVelocity_ctrl; /**< trajectory of the joint velocity during control */
+        MatrixXd jointsAcceleration_ctrl; /**< trajectory of the joint acceleration during control */
         boost::shared_ptr<HandPosPlot> handPosPlot_ctrl_ptr; /**< pointer to the hand position plot during control */
         // hand
         vector<vector<double>> des_handPosition; /**< vector of desired hand positions during control*/
@@ -1292,16 +1297,22 @@ private:
         vector<vector<double>> wristOrientation_ctrl; /**< wrist orientation during control. 0=roll,1=pitch,2=yaw */
         vector<vector<double>> wristLinearVelocity_ctrl; /**< wrist linear velocity during control */
         vector<vector<double>> wristAngularVelocity_ctrl;/**< wrist angular velocity during control */
+        vector<vector<double>> wristLinearAcceleration_ctrl; /**< wrist linear acceleration during control */
+        vector<vector<double>> wristAngularAcceleration_ctrl;/**< wrist angular acceleration during control */
         // elbow
         vector<vector<double>> elbowPosition_ctrl; /**< elbow position during control. 0=x,1=y,2=z */
         vector<vector<double>> elbowOrientation_ctrl; /**< elbow orientation during control. 0=roll,1=pitch,2=yaw */
         vector<vector<double>> elbowLinearVelocity_ctrl; /**< elbow linear velocity during control */
         vector<vector<double>> elbowAngularVelocity_ctrl;/**< elbow angular velocity during control */
+        vector<vector<double>> elbowLinearAcceleration_ctrl; /**< elbow linear acceleration during control */
+        vector<vector<double>> elbowAngularAcceleration_ctrl;/**< elbow angular acceleration during control */
         // shoulder
         vector<vector<double>> shoulderPosition_ctrl; /**< shoulder position during control. 0=x,1=y,2=z */
         vector<vector<double>> shoulderOrientation_ctrl; /**< shoulder orientation during control. 0=roll,1=pitch,2=yaw */
         vector<vector<double>> shoulderLinearVelocity_ctrl; /**< shoulder linear velocity during control */
         vector<vector<double>> shoulderAngularVelocity_ctrl;/**< shoulder angular velocity during control */
+        vector<vector<double>> shoulderLinearAcceleration_ctrl; /**< shoulder linear acceleration during control */
+        vector<vector<double>> shoulderAngularAcceleration_ctrl;/**< shoulder angular acceleration during control */
 
         vector<double> error_pos_tot_norm; /**< norm of the total error in position */
         vector<double> error_or_tot_norm; /**< norm of the total error in orientation */
@@ -1309,15 +1320,29 @@ private:
         vector<double> error_lin_vel_tot_norm; /**< norm of the total error in linear velocity */
         vector<double> error_ang_vel_tot_norm; /**< norm of the total error in angular velocity */
         vector<double> error_vel_tot_norm; /**< norm of the total error in velocity */
+        vector<double> error_lin_acc_tot_norm; /**< norm of the total error in linear acceleration */
+        vector<double> error_ang_acc_tot_norm; /**< norm of the total error in angular acceleration */
+        vector<double> error_acc_tot_norm; /**< norm of the total error in acceleration */
 
         vector<double> sim_time; /**< simulation time [s]*/
 
+        // low pass filter for obstacles data
         boost::shared_ptr<LowPassFilter> lpf_obsts_pos_x;
         boost::shared_ptr<LowPassFilter> lpf_obsts_pos_y;
         boost::shared_ptr<LowPassFilter> lpf_obsts_pos_z;
         boost::shared_ptr<LowPassFilter> lpf_obsts_or_roll;
         boost::shared_ptr<LowPassFilter> lpf_obsts_or_pitch;
         boost::shared_ptr<LowPassFilter> lpf_obsts_or_yaw;
+
+        // low pass filter for arm velocities
+        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_1;
+        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_2;
+        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_3;
+        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_4;
+        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_5;
+        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_6;
+        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_7;
+
 
 
 

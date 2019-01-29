@@ -51,11 +51,12 @@ public:
      * @brief setupPlots
      * @param positions
      * @param velocities
+     * @param accelerations
      * @param max_limits
      * @param min_limits
      * @param time
      */
-    void setupPlots(MatrixXd &positions, MatrixXd &velocities, vector<double> &max_limits, vector<double> &min_limits, vector<double> &time);
+    void setupPlots(MatrixXd &positions, MatrixXd &velocities, MatrixXd &accelerations, vector<double> &max_limits, vector<double> &min_limits, vector<double> &time);
 
 
 public Q_SLOTS:
@@ -71,6 +72,7 @@ private:
 
     MatrixXd positions; /**< positions of the joints */
     MatrixXd velocities; /**< velocities of the joints */
+    MatrixXd accelerations; /**< accelerations of the joints */
     vector<double> max_pos_limits; /**< maximum limits of the joints */
     vector<double> min_pos_limits; /**< minimum limits of the joints */
     vector<double> time; /**< elapsed time */
@@ -82,10 +84,11 @@ private:
      * @param time
      * @param pos
      * @param vel
+     * @param acc
      * @param max_pos
      * @param min_pos
      */
-    void plotJoint(QCustomPlot* plot, QString title, QVector<double>& time, QVector<double>& pos, QVector<double>& vel, QVector<double> &max_pos, QVector<double> &min_pos);
+    void plotJoint(QCustomPlot* plot, QString title, QVector<double>& time, QVector<double>& pos, QVector<double>& vel, QVector<double> &acc, QVector<double> &max_pos, QVector<double> &min_pos);
 };
 
 } // namespace motion_manager

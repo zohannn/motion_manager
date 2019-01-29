@@ -126,7 +126,7 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>1360</x>
+     <x>1370</x>
      <y>740</y>
      <width>168</width>
      <height>25</height>
@@ -149,60 +149,140 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QGroupBox" name="groupBox_low_pass_vel">
    <property name="geometry">
     <rect>
-     <x>1270</x>
-     <y>633</y>
-     <width>249</width>
-     <height>85</height>
+     <x>1170</x>
+     <y>540</y>
+     <width>191</width>
+     <height>101</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="label_f_cutoff">
-        <property name="text">
-         <string>CutOff Frequency [Hz]:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="lineEdit_f_cutoff">
-        <property name="text">
-         <string>0.1</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QLabel" name="label_time_step">
-        <property name="text">
-         <string> Time step [s] :</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="lineEdit_time_step">
-        <property name="text">
-         <string>0.05</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="QCheckBox" name="checkBox_jlim">
-      <property name="text">
-       <string>show the joints limits</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
+   <property name="title">
+    <string>Velocities Low Pass Filter </string>
+   </property>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>161</width>
+      <height>58</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="label_f_cutoff_vel">
+         <property name="text">
+          <string>CutOff Freq. [Hz]:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_f_cutoff_vel">
+         <property name="text">
+          <string>0.1</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_time_step_vel">
+         <property name="text">
+          <string> Time step [s] :</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_time_step_vel">
+         <property name="text">
+          <string>0.05</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_low_pass_vel_2">
+   <property name="geometry">
+    <rect>
+     <x>1170</x>
+     <y>660</y>
+     <width>191</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Accelerations Low Pass Filter </string>
+   </property>
+   <widget class="QWidget" name="layoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>161</width>
+      <height>58</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_f_cutoff_acc">
+         <property name="text">
+          <string>CutOff Freq. [Hz]:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_f_cutoff_acc">
+         <property name="text">
+          <string>0.1</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <item>
+        <widget class="QLabel" name="label_time_step_acc">
+         <property name="text">
+          <string> Time step [s] :</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_time_step_acc">
+         <property name="text">
+          <string>0.05</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_jlim">
+   <property name="geometry">
+    <rect>
+     <x>1380</x>
+     <y>700</y>
+     <width>153</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>show the joints limits</string>
+   </property>
   </widget>
  </widget>
  <customwidgets>
