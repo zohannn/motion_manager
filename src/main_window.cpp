@@ -478,9 +478,7 @@ void MainWindow::execPosControl()
 
 
             double vel_max = this->ui.lineEdit_vel_max->text().toDouble()*M_PI/180;
-            double acc_trap_pos = this->ui.lineEdit_acc_trap_pos->text().toDouble();
-            double acc_trap_or = this->ui.lineEdit_acc_trap_or->text().toDouble();
-            double g_c_trap = this->ui.lineEdit_g_c_trap->text().toDouble();
+            double t_f_trap = this->ui.lineEdit_t_f_trap->text().toDouble();
 
             bool jlim_en = this->ui.checkBox_joints_limits_av->isChecked();
             double jlim_th = 0; double jlim_rate = 1;
@@ -1127,48 +1125,73 @@ void MainWindow::execPosControl()
 
                 }else{
                     // trapezoidal velocity profile
-                    if(g_map<=g_c_trap){
+                    double curr_time = this->qnode.getSimTime();
+                    VectorXd vel_trap(7);
+                    vel_trap(0) = 2*(hand_pos_end(0)-hand_pos_init(0))/t_f_trap;
+                    vel_trap(1) = 2*(hand_pos_end(1)-hand_pos_init(1))/t_f_trap;
+                    vel_trap(2) = 2*(hand_pos_end(2)-hand_pos_init(2))/t_f_trap;
+                    vel_trap(3) = 2*(des_hand_or_q_e(0)-hand_or_q_e_init(0))/t_f_trap;
+                    vel_trap(4) = 2*(des_hand_or_q_e(1)-hand_or_q_e_init(1))/t_f_trap;
+                    vel_trap(5) = 2*(des_hand_or_q_e(2)-hand_or_q_e_init(2))/t_f_trap;
+                    vel_trap(6) = 2*(des_hand_or_q_w-hand_or_q_w_init)/t_f_trap;
+                    VectorXd acc_trap(7);
+                    acc_trap(0) = pow(vel_trap(0),2)/(hand_pos_init(0)-hand_pos_end(0)+vel_trap(0)*t_f_trap);
+                    acc_trap(1) = pow(vel_trap(1),2)/(hand_pos_init(1)-hand_pos_end(1)+vel_trap(1)*t_f_trap);
+                    acc_trap(2) = pow(vel_trap(2),2)/(hand_pos_init(2)-hand_pos_end(2)+vel_trap(2)*t_f_trap);
+                    acc_trap(3) = pow(vel_trap(3),2)/(hand_or_q_e_init(0)-des_hand_or_q_e(0)+vel_trap(3)*t_f_trap);
+                    acc_trap(4) = pow(vel_trap(4),2)/(hand_or_q_e_init(1)-des_hand_or_q_e(1)+vel_trap(4)*t_f_trap);
+                    acc_trap(5) = pow(vel_trap(5),2)/(hand_or_q_e_init(2)-des_hand_or_q_e(2)+vel_trap(5)*t_f_trap);
+                    acc_trap(6) = pow(vel_trap(6),2)/(hand_or_q_w_init-des_hand_or_q_w+vel_trap(6)*t_f_trap);
+
+                    double t_c_trap = t_f_trap/2;
+                    if(curr_time<=t_c_trap)
+                    {
                         // hand pose
-                        trap_hand_pose(0) = hand_pos_init(0) + 0.5*acc_trap_pos*pow(g_map,2);
-                        trap_hand_pose(1) = hand_pos_init(1) + 0.5*acc_trap_pos*pow(g_map,2);
-                        trap_hand_pose(2) = hand_pos_init(2) + 0.5*acc_trap_pos*pow(g_map,2);
-                        trap_hand_pose(3) = hand_or_q_e_init(0) + 0.5*acc_trap_or*pow(g_map,2);
-                        trap_hand_pose(4) = hand_or_q_e_init(1) + 0.5*acc_trap_or*pow(g_map,2);
-                        trap_hand_pose(5) = hand_or_q_e_init(2) + 0.5*acc_trap_or*pow(g_map,2);
-                        trap_hand_pose(6) = hand_or_q_w_init + 0.5*acc_trap_or*pow(g_map,2);
+                        trap_hand_pose(0) = hand_pos_init(0) + 0.5*acc_trap(0)*pow(curr_time,2);
+                        trap_hand_pose(1) = hand_pos_init(1) + 0.5*acc_trap(1)*pow(curr_time,2);
+                        trap_hand_pose(2) = hand_pos_init(2) + 0.5*acc_trap(2)*pow(curr_time,2);
+                        trap_hand_pose(3) = hand_or_q_e_init(0) + 0.5*acc_trap(3)*pow(curr_time,2);
+                        trap_hand_pose(4) = hand_or_q_e_init(1) + 0.5*acc_trap(4)*pow(curr_time,2);
+                        trap_hand_pose(5) = hand_or_q_e_init(2) + 0.5*acc_trap(5)*pow(curr_time,2);
+                        trap_hand_pose(6) = hand_or_q_w_init + 0.5*acc_trap(6)*pow(curr_time,2);
+
                         // hand velocity
-                        trap_hand_vel(0) = acc_trap_pos*g_map;
-                        trap_hand_vel(1) = acc_trap_pos*g_map;
-                        trap_hand_vel(2) = acc_trap_pos*g_map;
-                        trap_hand_vel(3) = acc_trap_or*g_map;
-                        trap_hand_vel(4) = acc_trap_or*g_map;
-                        trap_hand_vel(5) = acc_trap_or*g_map;
-                        trap_hand_vel(6) = acc_trap_or*g_map;
+                        trap_hand_vel(0) = acc_trap(0)*curr_time;
+                        trap_hand_vel(1) = acc_trap(1)*curr_time;
+                        trap_hand_vel(2) = acc_trap(2)*curr_time;
+                        trap_hand_vel(3) = acc_trap(3)*curr_time;
+                        trap_hand_vel(4) = acc_trap(4)*curr_time;
+                        trap_hand_vel(5) = acc_trap(5)*curr_time;
+                        trap_hand_vel(6) = acc_trap(6)*curr_time;
+
                         // hand acceleration
-                        trap_hand_acc(0) = acc_trap_pos;
-                        trap_hand_acc(1) = acc_trap_pos;
-                        trap_hand_acc(2) = acc_trap_pos;
-                        trap_hand_acc(3) = acc_trap_or;
-                        trap_hand_acc(4) = acc_trap_or;
-                        trap_hand_acc(5) = acc_trap_or;
-                        trap_hand_acc(6) = acc_trap_or;
-                    }else if((g_map>g_c_trap) && (g_map<=(1-g_c_trap))){
+                        trap_hand_acc(0) = acc_trap(0);
+                        trap_hand_acc(1) = acc_trap(1);
+                        trap_hand_acc(2) = acc_trap(2);
+                        trap_hand_acc(3) = acc_trap(3);
+                        trap_hand_acc(4) = acc_trap(4);
+                        trap_hand_acc(5) = acc_trap(5);
+                        trap_hand_acc(6) = acc_trap(6);
+
+                    }else if((curr_time>t_c_trap) && (curr_time<=(t_f_trap-t_c_trap))){
                         // hand pose
-                        trap_hand_pose(0) = hand_pos_init(0) + acc_trap_pos*g_c_trap*(g_map-(g_c_trap/2));
-                        trap_hand_pose(1) = hand_pos_init(1) + acc_trap_pos*g_c_trap*(g_map-(g_c_trap/2));
-                        trap_hand_pose(2) = hand_pos_init(2) + acc_trap_pos*g_c_trap*(g_map-(g_c_trap/2));
-                        trap_hand_pose(3) = hand_or_q_e_init(0) + acc_trap_or*g_c_trap*(g_map-(g_c_trap/2));
-                        trap_hand_pose(4) = hand_or_q_e_init(1) + acc_trap_or*g_c_trap*(g_map-(g_c_trap/2));
-                        trap_hand_pose(5) = hand_or_q_e_init(2) + acc_trap_or*g_c_trap*(g_map-(g_c_trap/2));
-                        trap_hand_pose(6) = hand_or_q_w_init + acc_trap_or*g_c_trap*(g_map-(g_c_trap/2));
+                        trap_hand_pose(0) = hand_pos_init(0) + acc_trap(0)*t_c_trap*(curr_time-t_c_trap/2);
+                        trap_hand_pose(1) = hand_pos_init(1) + acc_trap(1)*t_c_trap*(curr_time-t_c_trap/2);
+                        trap_hand_pose(2) = hand_pos_init(2) + acc_trap(2)*t_c_trap*(curr_time-t_c_trap/2);
+                        trap_hand_pose(3) = hand_or_q_e_init(0) + acc_trap(3)*t_c_trap*(curr_time-t_c_trap/2);
+                        trap_hand_pose(4) = hand_or_q_e_init(1) + acc_trap(4)*t_c_trap*(curr_time-t_c_trap/2);
+                        trap_hand_pose(5) = hand_or_q_e_init(2) + acc_trap(5)*t_c_trap*(curr_time-t_c_trap/2);
+                        trap_hand_pose(6) = hand_or_q_w_init + acc_trap(6)*t_c_trap*(curr_time-t_c_trap/2);
+
                         //hand velocity
-                        trap_hand_vel(0) = acc_trap_pos*g_c_trap;
-                        trap_hand_vel(1) = acc_trap_pos*g_c_trap;
-                        trap_hand_vel(2) = acc_trap_pos*g_c_trap;
-                        trap_hand_vel(3) = acc_trap_or*g_c_trap;
-                        trap_hand_vel(4) = acc_trap_or*g_c_trap;
-                        trap_hand_vel(5) = acc_trap_or*g_c_trap;
-                        trap_hand_vel(6) = acc_trap_or*g_c_trap;
+                        trap_hand_vel(0) = acc_trap(0)*t_c_trap;
+                        trap_hand_vel(1) = acc_trap(1)*t_c_trap;
+                        trap_hand_vel(2) = acc_trap(2)*t_c_trap;
+                        trap_hand_vel(3) = acc_trap(3)*t_c_trap;
+                        trap_hand_vel(4) = acc_trap(4)*t_c_trap;
+                        trap_hand_vel(5) = acc_trap(5)*t_c_trap;
+                        trap_hand_vel(6) = acc_trap(6)*t_c_trap;
+
                         //hand acceleration
                         trap_hand_acc(0) = 0.0;
                         trap_hand_acc(1) = 0.0;
@@ -1177,32 +1200,66 @@ void MainWindow::execPosControl()
                         trap_hand_acc(4) = 0.0;
                         trap_hand_acc(5) = 0.0;
                         trap_hand_acc(6) = 0.0;
+
+                    }else if((curr_time > (t_f_trap - t_c_trap)) && (curr_time <= t_f_trap)){
+
+                        //hand pose
+                        trap_hand_pose(0) = hand_pos_end(0) - 0.5*acc_trap(0)*pow((t_f_trap-curr_time),2);
+                        trap_hand_pose(1) = hand_pos_end(1) - 0.5*acc_trap(1)*pow((t_f_trap-curr_time),2);
+                        trap_hand_pose(2) = hand_pos_end(2) - 0.5*acc_trap(2)*pow((t_f_trap-curr_time),2);
+                        trap_hand_pose(3) = des_hand_or_q_e(0) - 0.5*acc_trap(3)*pow((t_f_trap-curr_time),2);
+                        trap_hand_pose(4) = des_hand_or_q_e(1) - 0.5*acc_trap(4)*pow((t_f_trap-curr_time),2);
+                        trap_hand_pose(5) = des_hand_or_q_e(2) - 0.5*acc_trap(5)*pow((t_f_trap-curr_time),2);
+                        trap_hand_pose(6) = des_hand_or_q_w - 0.5*acc_trap(6)*pow((t_f_trap-curr_time),2);
+
+                        // hand velocity
+                        trap_hand_vel(0) = -acc_trap(0)*(t_f_trap-curr_time);
+                        trap_hand_vel(1) = -acc_trap(1)*(t_f_trap-curr_time);
+                        trap_hand_vel(2) = -acc_trap(2)*(t_f_trap-curr_time);
+                        trap_hand_vel(3) = -acc_trap(3)*(t_f_trap-curr_time);
+                        trap_hand_vel(4) = -acc_trap(4)*(t_f_trap-curr_time);
+                        trap_hand_vel(5) = -acc_trap(5)*(t_f_trap-curr_time);
+                        trap_hand_vel(6) = -acc_trap(6)*(t_f_trap-curr_time);
+
+                        // hand acceleration
+                        trap_hand_acc(0) = -acc_trap(0);
+                        trap_hand_acc(1) = -acc_trap(1);
+                        trap_hand_acc(2) = -acc_trap(2);
+                        trap_hand_acc(3) = -acc_trap(3);
+                        trap_hand_acc(4) = -acc_trap(4);
+                        trap_hand_acc(5) = -acc_trap(5);
+                        trap_hand_acc(6) = -acc_trap(6);
+
                     }else{
                         //hand pose
-                        trap_hand_pose(0) = hand_pos_end(0) - 0.5*acc_trap_pos*pow((1-g_map),2);
-                        trap_hand_pose(1) = hand_pos_end(1) - 0.5*acc_trap_pos*pow((1-g_map),2);
-                        trap_hand_pose(2) = hand_pos_end(2) - 0.5*acc_trap_pos*pow((1-g_map),2);
-                        trap_hand_pose(3) = des_hand_or_q_e(0) - 0.5*acc_trap_or*pow((1-g_map),2);
-                        trap_hand_pose(4) = des_hand_or_q_e(1) - 0.5*acc_trap_or*pow((1-g_map),2);
-                        trap_hand_pose(5) = des_hand_or_q_e(2) - 0.5*acc_trap_or*pow((1-g_map),2);
-                        trap_hand_pose(6) = des_hand_or_q_w - 0.5*acc_trap_or*pow((1-g_map),2);
+                        trap_hand_pose(0) = hand_pos_end(0);
+                        trap_hand_pose(1) = hand_pos_end(1);
+                        trap_hand_pose(2) = hand_pos_end(2);
+                        trap_hand_pose(3) = des_hand_or_q_e(0);
+                        trap_hand_pose(4) = des_hand_or_q_e(1);
+                        trap_hand_pose(5) = des_hand_or_q_e(2);
+                        trap_hand_pose(6) = des_hand_or_q_w;
+
                         // hand velocity
-                        trap_hand_vel(0) = -acc_trap_pos*g_map;
-                        trap_hand_vel(1) = -acc_trap_pos*g_map;
-                        trap_hand_vel(2) = -acc_trap_pos*g_map;
-                        trap_hand_vel(3) = -acc_trap_or*g_map;
-                        trap_hand_vel(4) = -acc_trap_or*g_map;
-                        trap_hand_vel(5) = -acc_trap_or*g_map;
-                        trap_hand_vel(6) = -acc_trap_or*g_map;
+                        trap_hand_vel(0) = 0.0;
+                        trap_hand_vel(1) = 0.0;
+                        trap_hand_vel(2) = 0.0;
+                        trap_hand_vel(3) = 0.0;
+                        trap_hand_vel(4) = 0.0;
+                        trap_hand_vel(5) = 0.0;
+                        trap_hand_vel(6) = 0.0;
+
                         // hand acceleration
-                        trap_hand_acc(0) = -acc_trap_pos;
-                        trap_hand_acc(1) = -acc_trap_pos;
-                        trap_hand_acc(2) = -acc_trap_pos;
-                        trap_hand_acc(3) = -acc_trap_or;
-                        trap_hand_acc(4) = -acc_trap_or;
-                        trap_hand_acc(5) = -acc_trap_or;
-                        trap_hand_acc(6) = -acc_trap_or;
+                        trap_hand_acc(0) = 0.0;
+                        trap_hand_acc(1) = 0.0;
+                        trap_hand_acc(2) = 0.0;
+                        trap_hand_acc(3) = 0.0;
+                        trap_hand_acc(4) = 0.0;
+                        trap_hand_acc(5) = 0.0;
+                        trap_hand_acc(6) = 0.0;
                     }
+
+
                     // error in position
                     Vector3d error_trap_pos;
                     error_trap_pos(0) = trap_hand_pose(0) - r_hand_pos_vec(0);
@@ -1259,13 +1316,18 @@ void MainWindow::execPosControl()
             }
 
             // Time derivative of the Jacobian
-            if(this->qnode.isSimulationRunning() && ((this->qnode.getSimTime()-this->t_j_past)>this->qnode.getSimTimeStep())){
-                MatrixXd curr_Jacobian; this->curr_scene->getHumanoid()->getJacobian(1,r_posture,curr_Jacobian);
-                MatrixXd curr_timeDerJacobian; this->curr_scene->getHumanoid()->getTimeDerivativeJacobian(curr_Jacobian,this->Jacobian,this->qnode.getSimTimeStep(),curr_timeDerJacobian);
-                this->Jacobian = curr_Jacobian; this->TimeDerJacobian = curr_timeDerJacobian;
-                this->hand_j_acc = curr_timeDerJacobian*r_velocities_mes_vec;
-                this->t_j_past=this->qnode.getSimTime();
-            }
+//            if(this->qnode.isSimulationRunning() && ((this->qnode.getSimTime()-this->t_j_past)>this->qnode.getSimTimeStep())){
+//                MatrixXd curr_Jacobian; this->curr_scene->getHumanoid()->getJacobian(1,r_posture,curr_Jacobian);
+//                MatrixXd curr_timeDerJacobian; this->curr_scene->getHumanoid()->getTimeDerivativeJacobian(curr_Jacobian,this->Jacobian,this->qnode.getSimTimeStep(),curr_timeDerJacobian);
+//                this->Jacobian = curr_Jacobian; this->TimeDerJacobian = curr_timeDerJacobian;
+//                this->hand_j_acc = curr_timeDerJacobian*r_velocities_mes_vec;
+//                this->t_j_past=this->qnode.getSimTime();
+//            }
+
+             MatrixXd timeDerJacobian; this->curr_scene->getHumanoid()->getTimeDerivativeJacobian(1,r_posture,r_velocities_mes,timeDerJacobian);
+             this->hand_j_acc = timeDerJacobian*r_velocities_mes_vec;
+
+
 
 
 //            BOOST_LOG_SEV(lg, info) << "# ---------------- der_J and joint velocities ------------------- # ";
@@ -1468,7 +1530,7 @@ void MainWindow::execPosControl()
                                                                             vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
 
 
-            this->qnode.execKinControlAcc(1,r_posture,r_velocities_mes,r_accelerations,r_hand_posture,r_hand_velocities);
+            this->qnode.execKinControlAcc(1,r_posture,r_accelerations,r_hand_posture,r_hand_velocities);
 
         }
     }
@@ -12205,9 +12267,7 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         stream << "Pos_d_error_th=" << this->ui.lineEdit_err_d_pos->text().toStdString().c_str() << endl;
         stream << "Or_d_control_coeff=" << this->ui.lineEdit_coeff_d_or->text().toStdString().c_str() << endl;
         stream << "Or_d_error_th=" << this->ui.lineEdit_err_d_or->text().toStdString().c_str() << endl;
-        stream << "acc_trap_pos=" << this->ui.lineEdit_acc_trap_pos->text().toStdString().c_str() << endl;
-        stream << "acc_trap_or=" << this->ui.lineEdit_acc_trap_or->text().toStdString().c_str() << endl;
-        stream << "g_c_trap=" << this->ui.lineEdit_g_c_trap->text().toStdString().c_str() << endl;
+        stream << "t_f_trap=" << this->ui.lineEdit_t_f_trap->text().toStdString().c_str() << endl;
 
         stream << "# Maximum allowed velocity of the joints #" << endl;
         stream << "vel_max=" << this->ui.lineEdit_vel_max->text().toStdString().c_str() << endl;
@@ -12347,12 +12407,8 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     this->ui.lineEdit_err_d_or->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("vel_max"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_vel_max->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("acc_trap_pos"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_acc_trap_pos->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("acc_trap_or"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_acc_trap_or->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("g_c_trap"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_g_c_trap->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("t_f_trap"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_t_f_trap->setText(fields.at(1));
                 }
             }
         }

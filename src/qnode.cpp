@@ -10177,7 +10177,7 @@ bool QNode::execKinControl(int arm, vector<double> &r_arm_posture, vector<double
     }
 }
 
-bool QNode::execKinControlAcc(int arm, vector<double> &r_arm_posture, vector<double> &r_arm_velocities, vector<double> &r_arm_accelerations, vector<double> &r_hand_posture, vector<double> &r_hand_velocities)
+bool QNode::execKinControlAcc(int arm, vector<double> &r_arm_posture, vector<double> &r_arm_accelerations, vector<double> &r_hand_posture, vector<double> &r_hand_velocities)
 {
 
 

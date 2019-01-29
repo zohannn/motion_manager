@@ -2309,7 +2309,7 @@ p, li { white-space: pre-wrap; }
          <x>10</x>
          <y>350</y>
          <width>371</width>
-         <height>101</height>
+         <height>71</height>
         </rect>
        </property>
        <property name="title">
@@ -2318,74 +2318,26 @@ p, li { white-space: pre-wrap; }
        <widget class="QWidget" name="">
         <property name="geometry">
          <rect>
-          <x>270</x>
-          <y>30</y>
-          <width>91</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_602">
-         <item>
-          <widget class="QLabel" name="label_g_c_trap">
-           <property name="text">
-            <string>g_c</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_g_c_trap">
-           <property name="text">
-            <string>0.33</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="">
-        <property name="geometry">
-         <rect>
           <x>10</x>
           <y>30</y>
           <width>251</width>
-          <height>58</height>
+          <height>25</height>
          </rect>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_110">
+        <layout class="QHBoxLayout" name="horizontalLayout_604">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_601">
-           <item>
-            <widget class="QLabel" name="label_acc_trap_pos">
-             <property name="text">
-              <string>Acceleration position [mm/s²]</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_acc_trap_pos">
-             <property name="text">
-              <string>10</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="QLabel" name="label_t_f_trap">
+           <property name="text">
+            <string>Duration of the movement [s]</string>
+           </property>
+          </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_603">
-           <item>
-            <widget class="QLabel" name="label_acc_trap_or">
-             <property name="text">
-              <string>Acceleration orientation</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_acc_trap_or">
-             <property name="text">
-              <string>0.1</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="QLineEdit" name="lineEdit_t_f_trap">
+           <property name="text">
+            <string>10.0</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

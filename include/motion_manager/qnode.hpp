@@ -182,13 +182,12 @@ public:
          * @brief execKinControlAcc
          * @param arm
          * @param r_arm_posture
-         * @param r_arm_velocities
          * @param r_arm_accelerations
          * @param r_hand_posture
          * @param r_hand_velocities
          * @return
          */
-        bool execKinControlAcc(int arm, vector<double> &r_arm_posture, vector<double> &r_arm_velocities, vector<double>& r_arm_accelerations, vector<double> &r_hand_posture, vector<double> &r_hand_velocities);
+        bool execKinControlAcc(int arm, vector<double> &r_arm_posture, vector<double>& r_arm_accelerations, vector<double> &r_hand_posture, vector<double> &r_hand_velocities);
 
         /**
          * @brief This method sets to zero the time of simulation
