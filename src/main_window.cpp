@@ -709,15 +709,15 @@ void MainWindow::execPosControl()
                 vector<double> r_shoulder_ang_vel(r_shoulder_vel.begin()+3, r_shoulder_vel.begin()+6);
 
                 // Time Derivative of the Jacobian
-//                this->curr_scene->getHumanoid()->getTimeDerivativeJacobian(1,r_arm_posture,r_arm_velocities,this->TimeDerJacobian);
-//                this->hand_j_acc = this->TimeDerJacobian*r_arm_velocities_vec;
-
-                MatrixXd curr_Jacobian; this->curr_scene->getHumanoid()->getJacobian(1,r_arm_posture,curr_Jacobian);
-                this->curr_scene->getHumanoid()->getTimeDerivativeJacobian(curr_Jacobian,this->Jacobian,this->qnode.getSimTimeStep(),this->TimeDerJacobian);
+                this->curr_scene->getHumanoid()->getTimeDerivativeJacobian(1,r_arm_posture,r_arm_velocities,this->TimeDerJacobian);
                 this->hand_j_acc = this->TimeDerJacobian*r_arm_velocities_vec;
+
+//                MatrixXd curr_Jacobian; this->curr_scene->getHumanoid()->getJacobian(1,r_arm_posture,curr_Jacobian);
+//                this->curr_scene->getHumanoid()->getTimeDerivativeJacobian(curr_Jacobian,this->Jacobian,this->qnode.getSimTimeStep(),this->TimeDerJacobian);
+//                this->hand_j_acc = this->TimeDerJacobian*r_arm_velocities_vec;
                 // Jacobian
-                this->Jacobian = curr_Jacobian;
-//                this->curr_scene->getHumanoid()->getJacobian(1,r_arm_posture,this->Jacobian);
+                //this->Jacobian = curr_Jacobian;
+                this->curr_scene->getHumanoid()->getJacobian(1,r_arm_posture,this->Jacobian);
 
 
 
@@ -3780,6 +3780,9 @@ if(solved){
         this->handOrientation_mov.resize(tot_steps); this->handOrientation_q_mov.resize(tot_steps);
         this->handOrientation_mov_stages.resize(this->jointsPosition_mov.size());
         this->handOrientation_q_mov_stages.resize(this->jointsPosition_mov.size());
+        this->wristPosition_mov.resize(tot_steps); this->wristOrientation_mov.resize(tot_steps);
+        this->elbowPosition_mov.resize(tot_steps); this->elbowOrientation_mov.resize(tot_steps);
+        this->shoulderPosition_mov.resize(tot_steps); this->shoulderOrientation_mov.resize(tot_steps);
         this->handVelocityNorm_mov.resize(tot_steps);
         this->handLinearVelocity_mov.resize(tot_steps); this->handLinearVelocity_mov_stages.resize(this->jointsPosition_mov.size());
         this->handAngularVelocity_mov.resize(tot_steps); this->handAngularVelocity_mov_stages.resize(this->jointsPosition_mov.size());
@@ -3795,6 +3798,7 @@ if(solved){
         this->shoulderVelocityNorm_mov.resize(tot_steps);
         this->shoulderLinearVelocity_mov.resize(tot_steps); this->shoulderAngularVelocity_mov.resize(tot_steps);
 
+        vector<double> timesteps_mov_tot(tot_steps,0.0);
         int step = 0;
         int arm_code = prob->getMovement()->getArm();
         // bounce posture data
@@ -3808,6 +3812,7 @@ if(solved){
             MatrixXd pos_stage = this->jointsPosition_mov.at(k);
             MatrixXd vel_stage = this->jointsVelocity_mov.at(k);
             MatrixXd acc_stage = this->jointsAcceleration_mov.at(k);
+            vector<double> timesteps_mov_stage = this->timesteps_mov.at(k);
             //this->curr_scene->getHumanoid()->getHandAcceleration(arm_code,pos_stage,vel_stage,acc_stage,this->timesteps_mov.at(k),this->handLinearAcceleration_mov_stages.at(k),this->handAngularAcceleration_mov_stages.at(k));
             vector<vector<double>> h_pos(pos_stage.rows());
             vector<vector<double>> h_or(pos_stage.rows());
@@ -3815,16 +3820,27 @@ if(solved){
             vector<vector<double>> h_lin_vel(pos_stage.rows());
             vector<vector<double>> h_ang_vel(pos_stage.rows());
             for(int i=0;i<pos_stage.rows();++i){
+                timesteps_mov_tot.at(step) = timesteps_mov_stage.at(i);
                 // position
                 VectorXd pos_row = pos_stage.block<1,JOINTS_ARM>(i,0);
                 vector<double> posture; posture.resize(pos_row.size());
                 VectorXd::Map(&posture[0], pos_row.size()) = pos_row;
+                // hand
                 this->curr_scene->getHumanoid()->getHandPos(arm_code,this->handPosition_mov.at(step),posture);
                 this->curr_scene->getHumanoid()->getHandPos(arm_code,h_pos.at(i),posture);
                 this->curr_scene->getHumanoid()->getHandOr(arm_code,this->handOrientation_mov.at(step),posture);
                 this->curr_scene->getHumanoid()->getHandOr(arm_code,h_or.at(i),posture);
                 this->curr_scene->getHumanoid()->getHandOr_q(arm_code,h_or_q.at(i),posture);
                 this->curr_scene->getHumanoid()->getHandOr_q(arm_code,this->handOrientation_q_mov.at(step),posture);
+                // wrist
+                this->curr_scene->getHumanoid()->getWristPos(arm_code,this->wristPosition_mov.at(step),posture);
+                this->curr_scene->getHumanoid()->getWristOr(arm_code,this->wristOrientation_mov.at(step),posture);
+                // elbow
+                this->curr_scene->getHumanoid()->getElbowPos(arm_code,this->elbowPosition_mov.at(step),posture);
+                this->curr_scene->getHumanoid()->getElbowOr(arm_code,this->elbowOrientation_mov.at(step),posture);
+                // shoulder
+                this->curr_scene->getHumanoid()->getShoulderPos(arm_code,this->shoulderPosition_mov.at(step),posture);
+                this->curr_scene->getHumanoid()->getShoulderOr(arm_code,this->shoulderOrientation_mov.at(step),posture);
                 // velocities
                 VectorXd vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
                 vector<double> velocities; velocities.resize(vel_row.size());
@@ -3885,6 +3901,17 @@ if(solved){
             this->des_handOrientation_q.push_back(this->handOrientation_q_mov.at(step-1));
 
         }// loop stages
+
+        // accelerations
+        this->getDerivative(this->handLinearVelocity_mov,timesteps_mov_tot,this->handLinearAcceleration_mov);
+        this->getDerivative(this->handAngularVelocity_mov,timesteps_mov_tot,this->handAngularAcceleration_mov);
+        this->getDerivative(this->wristLinearVelocity_mov,timesteps_mov_tot,this->wristLinearAcceleration_mov);
+        this->getDerivative(this->wristAngularVelocity_mov,timesteps_mov_tot,this->wristAngularAcceleration_mov);
+        this->getDerivative(this->elbowLinearVelocity_mov,timesteps_mov_tot,this->elbowLinearAcceleration_mov);
+        this->getDerivative(this->elbowAngularVelocity_mov,timesteps_mov_tot,this->elbowAngularAcceleration_mov);
+        this->getDerivative(this->shoulderLinearVelocity_mov,timesteps_mov_tot,this->shoulderLinearAcceleration_mov);
+        this->getDerivative(this->shoulderAngularVelocity_mov,timesteps_mov_tot,this->shoulderAngularAcceleration_mov);
+
         // -- normlized jerk cost of the hand -- //
         QVector<double> handPosition_mov_x; QVector<double> handPosition_mov_y; QVector<double> handPosition_mov_z;
         QVector<double> der_1_handPosition_mov_x; QVector<double> der_1_handPosition_mov_y; QVector<double> der_1_handPosition_mov_z;
@@ -6392,13 +6419,25 @@ void MainWindow::on_pushButton_nat_coll_av_clicked()
 void MainWindow::on_pushButton_comp_vel_mov_clicked()
 {
     if(!this->shoulderLinearVelocity_mov.empty())
-        this->mCompVeldlg->setupPlots(this->shoulderLinearVelocity_mov,this->shoulderAngularVelocity_mov,this->qtime_mov,0);
+        this->mCompVeldlg->setupPlots(this->shoulderPosition_mov,this->shoulderOrientation_mov,
+                                      this->shoulderLinearVelocity_mov,this->shoulderAngularVelocity_mov,
+                                      this->shoulderLinearAcceleration_mov,this->shoulderAngularAcceleration_mov,
+                                      this->qtime_mov,0);
     if(!this->elbowLinearVelocity_mov.empty())
-        this->mCompVeldlg->setupPlots(this->elbowLinearVelocity_mov,this->elbowAngularVelocity_mov,this->qtime_mov,1);
+        this->mCompVeldlg->setupPlots(this->elbowPosition_mov,this->elbowOrientation_mov,
+                                      this->elbowLinearVelocity_mov,this->elbowAngularVelocity_mov,
+                                      this->elbowLinearAcceleration_mov,this->elbowAngularAcceleration_mov,
+                                      this->qtime_mov,1);
     if(!this->wristLinearVelocity_mov.empty())
-        this->mCompVeldlg->setupPlots(this->wristLinearVelocity_mov,this->wristAngularVelocity_mov,this->qtime_mov,2);
+        this->mCompVeldlg->setupPlots(this->wristPosition_mov,this->wristOrientation_mov,
+                                      this->wristLinearVelocity_mov,this->wristAngularVelocity_mov,
+                                      this->wristLinearAcceleration_mov,this->wristAngularAcceleration_mov,
+                                      this->qtime_mov,2);
     if(!this->handLinearVelocity_mov.empty())
-        this->mCompVeldlg->setupPlots(this->handLinearVelocity_mov,this->handAngularVelocity_mov,this->qtime_mov,3);
+        this->mCompVeldlg->setupPlots(this->handPosition_mov,this->handOrientation_mov,
+                                      this->handLinearVelocity_mov,this->handAngularVelocity_mov,
+                                      this->handLinearAcceleration_mov,this->handAngularAcceleration_mov,
+                                      this->qtime_mov,3);
 
     this->mCompVeldlg->setDual(false); this->mCompVeldlg->setRight(true);
     this->mCompVeldlg->show();
@@ -6474,13 +6513,25 @@ void MainWindow::on_pushButton_warm_start_res_clicked()
 void MainWindow::on_pushButton_comp_vel_mov_right_clicked()
 {
     if(!this->shoulderLinearVelocity_mov.empty())
-        this->mCompVeldlg->setupPlots(this->shoulderLinearVelocity_mov,this->shoulderAngularVelocity_mov,this->qtime_mov,0);
+        this->mCompVeldlg->setupPlots(this->shoulderPosition_mov,this->shoulderOrientation_mov,
+                                      this->shoulderLinearVelocity_mov,this->shoulderAngularVelocity_mov,
+                                      this->shoulderLinearAcceleration_mov,this->shoulderAngularAcceleration_mov,
+                                      this->qtime_mov,0);
     if(!this->elbowLinearVelocity_mov.empty())
-        this->mCompVeldlg->setupPlots(this->elbowLinearVelocity_mov,this->elbowAngularVelocity_mov,this->qtime_mov,1);
+        this->mCompVeldlg->setupPlots(this->elbowPosition_mov,this->elbowOrientation_mov,
+                                      this->elbowLinearVelocity_mov,this->elbowAngularVelocity_mov,
+                                      this->elbowLinearAcceleration_mov,this->elbowAngularAcceleration_mov,
+                                      this->qtime_mov,1);
     if(!this->wristLinearVelocity_mov.empty())
-        this->mCompVeldlg->setupPlots(this->wristLinearVelocity_mov,this->wristAngularVelocity_mov,this->qtime_mov,2);
+        this->mCompVeldlg->setupPlots(this->wristPosition_mov,this->wristOrientation_mov,
+                                      this->wristLinearVelocity_mov,this->wristAngularVelocity_mov,
+                                      this->wristLinearAcceleration_mov,this->wristAngularAcceleration_mov,
+                                      this->qtime_mov,2);
     if(!this->handLinearVelocity_mov.empty())
-        this->mCompVeldlg->setupPlots(this->handLinearVelocity_mov,this->handAngularVelocity_mov,this->qtime_mov,3);
+        this->mCompVeldlg->setupPlots(this->handPosition_mov,this->handOrientation_mov,
+                                      this->handLinearVelocity_mov,this->handAngularVelocity_mov,
+                                      this->handLinearAcceleration_mov,this->handAngularAcceleration_mov,
+                                      this->qtime_mov,3);
 
     this->mCompVeldlg->setDual(true); this->mCompVeldlg->setRight(true);
     this->mCompVeldlg->show();
@@ -6488,17 +6539,18 @@ void MainWindow::on_pushButton_comp_vel_mov_right_clicked()
 
 void MainWindow::on_pushButton_comp_vel_mov_left_clicked()
 {
-    if(!this->shoulderLinearVelocity_mov_left.empty())
-        this->mCompVeldlg->setupPlots(this->shoulderLinearVelocity_mov_left,this->shoulderAngularVelocity_mov_left,this->qtime_mov,0);
-    if(!this->elbowLinearVelocity_mov_left.empty())
-        this->mCompVeldlg->setupPlots(this->elbowLinearVelocity_mov_left,this->elbowAngularVelocity_mov_left,this->qtime_mov,1);
-    if(!this->wristLinearVelocity_mov_left.empty())
-        this->mCompVeldlg->setupPlots(this->wristLinearVelocity_mov_left,this->wristAngularVelocity_mov_left,this->qtime_mov,2);
-    if(!this->handLinearVelocity_mov_left.empty())
-        this->mCompVeldlg->setupPlots(this->handLinearVelocity_mov_left,this->handAngularVelocity_mov_left,this->qtime_mov,3);
+    // TO DO
+//    if(!this->shoulderLinearVelocity_mov_left.empty())
+//        this->mCompVeldlg->setupPlots(this->shoulderLinearVelocity_mov_left,this->shoulderAngularVelocity_mov_left,this->qtime_mov,0);
+//    if(!this->elbowLinearVelocity_mov_left.empty())
+//        this->mCompVeldlg->setupPlots(this->elbowLinearVelocity_mov_left,this->elbowAngularVelocity_mov_left,this->qtime_mov,1);
+//    if(!this->wristLinearVelocity_mov_left.empty())
+//        this->mCompVeldlg->setupPlots(this->wristLinearVelocity_mov_left,this->wristAngularVelocity_mov_left,this->qtime_mov,2);
+//    if(!this->handLinearVelocity_mov_left.empty())
+//        this->mCompVeldlg->setupPlots(this->handLinearVelocity_mov_left,this->handAngularVelocity_mov_left,this->qtime_mov,3);
 
-    this->mCompVeldlg->setDual(true); this->mCompVeldlg->setRight(false);
-    this->mCompVeldlg->show();
+//    this->mCompVeldlg->setDual(true); this->mCompVeldlg->setRight(false);
+//    this->mCompVeldlg->show();
 }
 
 
@@ -11314,7 +11366,7 @@ void MainWindow::getDerivative(vector<double> &function, vector<double> &step_va
            f4 = function.at(i+2);
            step_value = step_values.at(i);
            if(step_value==0)
-               step_value=0.01;
+               step_value=step_values.at(i-1);
            derFunction.push_back((double)(  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h*step_value));
        }
 
@@ -11402,7 +11454,7 @@ void MainWindow::getDerivative(QVector<double> &function, QVector<double> &step_
               f4 = function.at(i+2);
               step_value = step_values.at(i);
               if(step_value==0)
-                  step_value=0.01;
+                  step_value=step_values.at(i-1);
               derFunction.push_back((double)(  1*f0 -  8*f1         +  8*f3 -  1*f4)/(12*h*step_value));
           }
 
@@ -12137,13 +12189,25 @@ void MainWindow::on_pushButton_control_plot_joints_clicked()
 void MainWindow::on_pushButton_control_plot_pos_vel_comps_clicked()
 {
     if(!this->shoulderLinearVelocity_ctrl.empty())
-        this->mCompCtrldlg->setupPlots(this->shoulderPosition_ctrl,this->shoulderOrientation_ctrl,this->shoulderLinearVelocity_ctrl,this->shoulderAngularVelocity_ctrl,this->sim_time,0);
+        this->mCompCtrldlg->setupPlots(this->shoulderPosition_ctrl,this->shoulderOrientation_ctrl,
+                                       this->shoulderLinearVelocity_ctrl,this->shoulderAngularVelocity_ctrl,
+                                       this->shoulderLinearAcceleration_ctrl,this->shoulderAngularAcceleration_ctrl,
+                                       this->sim_time,0);
     if(!this->elbowLinearVelocity_ctrl.empty())
-        this->mCompCtrldlg->setupPlots(this->elbowPosition_ctrl,this->elbowOrientation_ctrl,this->elbowLinearVelocity_ctrl,this->elbowAngularVelocity_ctrl,this->sim_time,1);
+        this->mCompCtrldlg->setupPlots(this->elbowPosition_ctrl,this->elbowOrientation_ctrl,
+                                       this->elbowLinearVelocity_ctrl,this->elbowAngularVelocity_ctrl,
+                                       this->elbowLinearAcceleration_ctrl,this->elbowAngularAcceleration_ctrl,
+                                       this->sim_time,1);
     if(!this->wristLinearVelocity_ctrl.empty())
-        this->mCompCtrldlg->setupPlots(this->wristPosition_ctrl,this->wristOrientation_ctrl,this->wristLinearVelocity_ctrl,this->wristAngularVelocity_ctrl,this->sim_time,2);
+        this->mCompCtrldlg->setupPlots(this->wristPosition_ctrl,this->wristOrientation_ctrl,
+                                       this->wristLinearVelocity_ctrl,this->wristAngularVelocity_ctrl,
+                                       this->wristLinearAcceleration_ctrl,this->wristAngularAcceleration_ctrl,
+                                       this->sim_time,2);
     if(!this->handLinearVelocity_ctrl.empty())
-        this->mCompCtrldlg->setupPlots(this->handPosition_ctrl,this->handOrientation_ctrl,this->handLinearVelocity_ctrl,this->handAngularVelocity_ctrl,this->sim_time,3);
+        this->mCompCtrldlg->setupPlots(this->handPosition_ctrl,this->handOrientation_ctrl,
+                                       this->handLinearVelocity_ctrl,this->handAngularVelocity_ctrl,
+                                       this->handLinearAcceleration_ctrl,this->handAngularAcceleration_ctrl,
+                                       this->sim_time,3);
 
     this->mCompCtrldlg->show();
 

@@ -929,6 +929,12 @@ private:
         vector<vector<vector<double>>> handOrientation_mov_stages; /**< hand orientation (rpy) during the movement divided in stages. */
         vector<vector<double>> handOrientation_q_mov; /**< hand orientation (quaternion) during the movement. */
         vector<vector<vector<double>>> handOrientation_q_mov_stages; /**< hand orientation (quaternion) during the movement divided in stages. */
+        vector<vector<double>> wristPosition_mov; /**< wrist position during the movement. 0=x,1=y,2=z */
+        vector<vector<double>> wristOrientation_mov; /**< wrist orientation (rpy) during the movement. */
+        vector<vector<double>> elbowPosition_mov; /**< elbow position during the movement. 0=x,1=y,2=z */
+        vector<vector<double>> elbowOrientation_mov; /**< elbow orientation (rpy) during the movement. */
+        vector<vector<double>> shoulderPosition_mov; /**< shoulder position during the movement. 0=x,1=y,2=z */
+        vector<vector<double>> shoulderOrientation_mov; /**< shoulder orientation (rpy) during the movement. */
         vector<vector<double>> handLinearVelocity_mov; /**< hand linear velocity during the movement */
         vector<vector<double>> handAngularVelocity_mov;/**< hand angular velocity during the movement */
         vector<vector<vector<double>>> handLinearVelocity_mov_stages; /**< hand linear velocity during the movement divided in stages.*/
@@ -945,6 +951,14 @@ private:
         vector<double> wristVelocityNorm_mov; /**< wrist velocity norm during the movement */
         vector<double> elbowVelocityNorm_mov; /**< elbow velocity norm during the movement */
         vector<double> shoulderVelocityNorm_mov; /**< shoulder velocity norm during the movement */
+        vector<vector<double>> handLinearAcceleration_mov; /**< hand linear acceleration during the movement */
+        vector<vector<double>> handAngularAcceleration_mov;/**< hand angular acceleration during the movement */
+        vector<vector<double>> wristLinearAcceleration_mov; /**< wrist linear acceleration during the movement */
+        vector<vector<double>> wristAngularAcceleration_mov;/**< wrist angular acceleration during the movement */
+        vector<vector<double>> elbowLinearAcceleration_mov; /**< elbow linear acceleration during the movement */
+        vector<vector<double>> elbowAngularAcceleration_mov;/**< elbow angular acceleration during the movement */
+        vector<vector<double>> shoulderLinearAcceleration_mov; /**< shoulder linear acceleration during the movement */
+        vector<vector<double>> shoulderAngularAcceleration_mov;/**< shoulder angular acceleration during the movement */
         double njs_mov;/**< normalized jerk score of the movement */
         int nmu_mov;/**< number of the movement units */
 

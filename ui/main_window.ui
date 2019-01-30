@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -2307,13 +2307,13 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>350</y>
+         <y>380</y>
          <width>371</width>
          <height>71</height>
         </rect>
        </property>
        <property name="title">
-        <string>Trapezoidal velocity profile</string>
+        <string>Triangular velocity profile</string>
        </property>
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
@@ -3827,7 +3827,7 @@ p, li { white-space: pre-wrap; }
              <item>
               <widget class="QPushButton" name="pushButton_comp_vel_mov">
                <property name="text">
-                <string>show the components of the velocities</string>
+                <string>show operational space components </string>
                </property>
               </widget>
              </item>
@@ -13219,7 +13219,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QPushButton" name="pushButton_control_plot_pos_vel_comps">
            <property name="text">
-            <string>show position and velocity components</string>
+            <string>show operational space components</string>
            </property>
           </widget>
          </item>

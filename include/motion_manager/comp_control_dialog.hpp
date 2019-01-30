@@ -62,10 +62,12 @@ public:
      * @param orientations
      * @param linear_velocity
      * @param angular_velocity
+     * @param linear_acceleration
+     * @param angular_acceleration
      * @param time
-     * @param mod: 0=shoulder, 1=elbow, 2=wrist, 3=hand
+     * @param mod
      */
-    void setupPlots(vector<vector<double>> &positions, vector<vector<double>> &orientations, vector<vector<double>> &linear_velocity, vector<vector<double>> &angular_velocity, vector<double> &time, int mod);
+    void setupPlots(vector<vector<double>> &positions, vector<vector<double>> &orientations, vector<vector<double>> &linear_velocity, vector<vector<double>> &angular_velocity, vector<vector<double> > &linear_acceleration, vector<vector<double> > &angular_acceleration, vector<double> &time, int mod);
 
 
 private:
@@ -78,9 +80,10 @@ private:
      * @param time
      * @param var_pos
      * @param var_vel
+     * @param var_acc
      * @param lin
      */
-    void plotComp(QCustomPlot* plot, QString title, QVector<double>& time, QVector<double>& var_pos, QVector<double> &var_vel, bool lin);
+    void plotComp(QCustomPlot* plot, QString title, QVector<double>& time, QVector<double>& var_pos, QVector<double> &var_vel, QVector<double> &var_acc, bool lin);
 
 };
 
