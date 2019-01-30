@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -2113,7 +2113,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>180</y>
+         <y>200</y>
          <width>181</width>
          <height>161</height>
         </rect>
@@ -2210,7 +2210,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>180</y>
+         <y>200</y>
          <width>181</width>
          <height>161</height>
         </rect>
@@ -2685,7 +2685,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>460</y>
+         <y>580</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -3003,7 +3003,7 @@ p, li { white-space: pre-wrap; }
          <x>260</x>
          <y>30</y>
          <width>311</width>
-         <height>421</height>
+         <height>541</height>
         </rect>
        </property>
        <property name="title">
@@ -3448,82 +3448,6 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </widget>
-      <widget class="QGroupBox" name="groupBox_filter_noise_vel">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>270</x>
-         <y>500</y>
-         <width>251</width>
-         <height>101</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Filtering Noise from arm velocities</string>
-       </property>
-       <widget class="QWidget" name="layoutWidget_106">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>30</y>
-          <width>181</width>
-          <height>58</height>
-         </rect>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_110">
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_601">
-           <item>
-            <widget class="QLabel" name="label_f_cutoff_vel">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>CutOff Freq. [Hz] :</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_f_cutoff_vel">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>0.1</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_602">
-           <item>
-            <widget class="QLabel" name="label_time_step_vel">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string> Time step [s] :</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_time_step_vel">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>0.05</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-      </widget>
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
@@ -3559,7 +3483,6 @@ p, li { white-space: pre-wrap; }
       <zorder>groupBox_hl_add_params</zorder>
       <zorder>checkBox_sing_av</zorder>
       <zorder>groupBox_sing_av_params</zorder>
-      <zorder>groupBox_filter_noise_vel</zorder>
       <zorder>layoutWidget</zorder>
      </widget>
      <widget class="QGroupBox" name="groupBox_time_mapping">

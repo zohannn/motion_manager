@@ -51,9 +51,12 @@ public:
      * @param errors_lin_vel
      * @param errors_ang_vel
      * @param errors_vel_tot
+     * @param errors_lin_acc
+     * @param errors_ang_acc
+     * @param errors_acc_tot
      * @param time
      */
-    void setupPlots(vector<double> &errors_pos, vector<double> &errors_or, vector<double> &errors_pos_or_tot, vector<double> &errors_lin_vel, vector<double> &errors_ang_vel, vector<double> &errors_vel_tot, vector<double> &time);
+    void setupPlots(vector<double> &errors_pos, vector<double> &errors_or, vector<double> &errors_pos_or_tot, vector<double> &errors_lin_vel, vector<double> &errors_ang_vel, vector<double> &errors_vel_tot, vector<double> &errors_lin_acc, vector<double> &errors_ang_acc, vector<double> &errors_acc_tot, vector<double> &time);
 
 
 private:
@@ -65,11 +68,10 @@ private:
      * @param title
      * @param time
      * @param error
-     * @param lin
-     * @param pos
-     * @param tot
+     * @param name
+     * @param color
      */
-    void plotError(QCustomPlot* plot, QString title, QVector<double>& time, QVector<double>& error, bool lin, bool pos, bool tot);
+    void plotError(QCustomPlot* plot, QString title, QVector<double>& time, QVector<double>& error, QString name, Qt::GlobalColor color);
 
 };
 

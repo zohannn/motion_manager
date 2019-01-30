@@ -963,19 +963,37 @@ private:
         int nmu_mov;/**< number of the movement units */
 
         vector<vector<double>> handPosition_mov_left; /**< hand position during the movement. 0=x,1=y,2=z */
-        vector<vector<double>> handOrientation_mov_left; /**< hand orientation during the movement. */
+        vector<vector<double>> handOrientation_mov_left; /**< hand orientation (rpy) during the movement. */
         vector<vector<double>> handLinearVelocity_mov_left; /**< hand linear velocity during the movement */
         vector<vector<double>> handAngularVelocity_mov_left;/**< hand angular velocity during the movement */
+        vector<vector<double>> handLinearAcceleration_mov_left; /**< hand linear acceleration during the movement */
+        vector<vector<double>> handAngularAcceleration_mov_left;/**< hand angular acceleration during the movement */
+        vector<vector<double>> wristPosition_mov_left; /**< wrist position during the movement. 0=x,1=y,2=z */
+        vector<vector<double>> wristOrientation_mov_left; /**< wrist orientation (rpy) during the movement. */
         vector<vector<double>> wristLinearVelocity_mov_left; /**< wrist linear velocity during the movement */
         vector<vector<double>> wristAngularVelocity_mov_left;/**< wrist angular velocity during the movement */
+        vector<vector<double>> wristLinearAcceleration_mov_left; /**< wrist linear acceleration during the movement */
+        vector<vector<double>> wristAngularAcceleration_mov_left;/**< wrist angular acceleration during the movement */
+        vector<vector<double>> elbowPosition_mov_left; /**< elbow position during the movement. 0=x,1=y,2=z */
+        vector<vector<double>> elbowOrientation_mov_left; /**< elbow orientation (rpy) during the movement. */
         vector<vector<double>> elbowLinearVelocity_mov_left; /**< elbow linear velocity during the movement */
         vector<vector<double>> elbowAngularVelocity_mov_left;/**< elbow angular velocity during the movement */
+        vector<vector<double>> elbowLinearAcceleration_mov_left; /**< elbow linear acceleration during the movement */
+        vector<vector<double>> elbowAngularAcceleration_mov_left;/**< elbow angular acceleration during the movement */
+        vector<vector<double>> shoulderPosition_mov_left; /**< shoulder position during the movement. 0=x,1=y,2=z */
+        vector<vector<double>> shoulderOrientation_mov_left; /**< shoulder orientation (rpy) during the movement. */
         vector<vector<double>> shoulderLinearVelocity_mov_left; /**< shoulder linear velocity during the movement */
         vector<vector<double>> shoulderAngularVelocity_mov_left;/**< shoulder angular velocity during the movement */
+        vector<vector<double>> shoulderLinearAcceleration_mov_left; /**< shoulder linear acceleration during the movement */
+        vector<vector<double>> shoulderAngularAcceleration_mov_left;/**< shoulder angular acceleration during the movement */
         vector<double> handVelocityNorm_mov_left; /**< hand velocity norm during the movement */
         vector<double> wristVelocityNorm_mov_left; /**< wrist velocity norm during the movement */
         vector<double> elbowVelocityNorm_mov_left; /**< elbow velocity norm during the movement */
         vector<double> shoulderVelocityNorm_mov_left; /**< shoulder velocity norm during the movement */
+        vector<double> handAccelerationNorm_mov_left; /**< hand acceleration norm during the movement */
+        vector<double> wristAccelerationNorm_mov_left; /**< wrist acceleration norm during the movement */
+        vector<double> elbowAccelerationNorm_mov_left; /**< elbow acceleration norm during the movement */
+        vector<double> shoulderAccelerationNorm_mov_left; /**< shoulder velocity norm during the movement */
         double njs_mov_left;/**< normalized jerk score of the movement */
         int nmu_mov_left;/**< number of the movement units */
 
@@ -1262,12 +1280,24 @@ private:
         void execPosControl();
         boost::thread execVelControl_thrd;
         void execVelControl();
+        // derivetion parameters
+        int samples_pos; /**< counter to count 5 points for derivation of position */
+        int samples_vel; /**< counter to count 5 points for derivation of velocity */
+        int samples_h_vel; /**< counter to count 5 points for derivation of hand velocity */
+        int samples_w_vel; /**< counter to count 5 points for derivation of wrist velocity */
+        int samples_e_vel; /**< counter to count 5 points for derivation of elbow velocity */
+        int samples_s_vel; /**< counter to count 5 points for derivation of shoulder velocity */
+        bufferPtr arm_pos_buff; /**< buffer of arm positions for derivation */
+        bufferPtr hand_pos_buff; /**< buffer of finger positions for drivation */
         bufferPtr arm_vel_buff; /**< buffer of arm velocities for derivation */
-        bufferPtr hand_vel_buff; /**< buffer of hand velocities for drivation */
+        bufferPtr hand_vel_buff; /**< buffer of finger velocities for drivation */
+        bufferPtr r_hand_vel_buff; /**< buffer of task space hand velocities for drivation */
+        bufferPtr r_wrist_vel_buff; /**< buffer of task space wrist velocities for drivation */
+        bufferPtr r_elbow_vel_buff; /**< buffer of task space elbow velocities for drivation */
+        bufferPtr r_shoulder_vel_buff; /**< buffer of task space shoulder velocities for drivation */
 
         // Jacobians
         MatrixXd Jacobian; /**< current Jacobian matrix */
-        MatrixXd TimeDerJacobian; /**< current time derivative of the Jacobian matrix */
 
         MatrixXd jointsPosition_ctrl; /**< trajectory of the joint position during control */
         MatrixXd jointsVelocity_ctrl; /**< trajectory of the joint velocity during control */
@@ -1347,16 +1377,6 @@ private:
         boost::shared_ptr<LowPassFilter> lpf_obsts_or_roll;
         boost::shared_ptr<LowPassFilter> lpf_obsts_or_pitch;
         boost::shared_ptr<LowPassFilter> lpf_obsts_or_yaw;
-
-        // low pass filter for arm velocities
-        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_1;
-        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_2;
-        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_3;
-        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_4;
-        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_5;
-        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_6;
-        boost::shared_ptr<LowPassFilter> lpf_r_arm_vel_7;
-
 
 
 

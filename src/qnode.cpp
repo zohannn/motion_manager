@@ -10230,6 +10230,7 @@ bool QNode::execKinControlAcc(int arm, vector<double> &r_arm_posture, vector<dou
         for (size_t i = 0; i < r_arm_accelerations.size(); ++i)
         {
             exec_value = r_arm_posture.at(i) + r_arm_velocities.at(i) * simulationTimeStep + 0.5 * (r_arm_accelerations.at(i)) * pow(simulationTimeStep,2);
+            //exec_value = r_arm_posture.at(i) + 0.5 * (r_arm_accelerations.at(i)) * pow(simulationTimeStep,2);
 
             if(arm!=0){
                 // single-arm
