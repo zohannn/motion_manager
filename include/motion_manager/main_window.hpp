@@ -172,6 +172,23 @@ public:
          */
         void init();
 
+        /**
+         * @brief binomialCoeff
+         * @param n
+         * @param k
+         * @return
+         */
+        int binomialCoeff(int n, int k);
+
+        /**
+         * @brief getNoiseRobustDerivate
+         * @param N
+         * @param h
+         * @param buff
+         * @return
+         */
+        double getNoiseRobustDerivate(int N, double h, std::deque<double> &buff);
+
 
 
 public Q_SLOTS:
@@ -867,6 +884,51 @@ public Q_SLOTS:
          */
         void on_pushButton_load_ctrl_params_clicked();
 
+        /**
+         * @brief on_radioButton_N_5_clicked
+         */
+        void on_radioButton_N_5_clicked();
+
+        /**
+         * @brief on_radioButton_N_7_clicked
+         */
+        void on_radioButton_N_7_clicked();
+
+        /**
+         * @brief on_radioButton_N_9_clicked
+         */
+        void on_radioButton_N_9_clicked();
+
+        /**
+         * @brief on_radioButton_N_11_clicked
+         */
+        void on_radioButton_N_11_clicked();
+
+        /**
+         * @brief on_radioButton_N_19_clicked
+         */
+        void on_radioButton_N_19_clicked();
+
+        /**
+         * @brief on_radioButton_N_25_clicked
+         */
+        void on_radioButton_N_25_clicked();
+
+        /**
+         * @brief on_radioButton_N_35_clicked
+         */
+        void on_radioButton_N_35_clicked();
+
+        /**
+         * @brief on_radioButton_N_45_clicked
+         */
+        void on_radioButton_N_45_clicked();
+
+        /**
+         * @brief on_radioButton_N_55_clicked
+         */
+        void on_radioButton_N_55_clicked();
+
 
 private:
         src::severity_logger< severity_level > lg; /**< logger */
@@ -1287,6 +1349,7 @@ private:
         int samples_w_vel; /**< counter to count 5 points for derivation of wrist velocity */
         int samples_e_vel; /**< counter to count 5 points for derivation of elbow velocity */
         int samples_s_vel; /**< counter to count 5 points for derivation of shoulder velocity */
+        int N_filter_length; /**< length of the filter of noise */
         bufferPtr arm_pos_buff; /**< buffer of arm positions for derivation */
         bufferPtr hand_pos_buff; /**< buffer of finger positions for drivation */
         bufferPtr arm_vel_buff; /**< buffer of arm velocities for derivation */
@@ -1377,6 +1440,20 @@ private:
         boost::shared_ptr<LowPassFilter> lpf_obsts_or_roll;
         boost::shared_ptr<LowPassFilter> lpf_obsts_or_pitch;
         boost::shared_ptr<LowPassFilter> lpf_obsts_or_yaw;
+
+        // low pass filter for the position of the joints
+        boost::shared_ptr<LowPassFilter> lpf_joint_pos_1;
+        boost::shared_ptr<LowPassFilter> lpf_joint_pos_2;
+        boost::shared_ptr<LowPassFilter> lpf_joint_pos_3;
+        boost::shared_ptr<LowPassFilter> lpf_joint_pos_4;
+        boost::shared_ptr<LowPassFilter> lpf_joint_pos_5;
+        boost::shared_ptr<LowPassFilter> lpf_joint_pos_6;
+        boost::shared_ptr<LowPassFilter> lpf_joint_pos_7;
+        boost::shared_ptr<LowPassFilter> lpf_joint_pos_8;
+        boost::shared_ptr<LowPassFilter> lpf_joint_pos_9;
+        boost::shared_ptr<LowPassFilter> lpf_joint_pos_10;
+        boost::shared_ptr<LowPassFilter> lpf_joint_pos_11;
+
 
 
 

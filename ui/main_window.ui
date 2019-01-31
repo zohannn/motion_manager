@@ -2382,7 +2382,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="title">
-       <string>Right Hand Status (Direct kinematics)</string>
+       <string>Right Hand Status</string>
       </property>
       <widget class="QWidget" name="layoutWidget_55">
        <property name="geometry">
@@ -2685,7 +2685,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>580</y>
+         <y>450</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -3003,7 +3003,7 @@ p, li { white-space: pre-wrap; }
          <x>260</x>
          <y>30</y>
          <width>311</width>
-         <height>541</height>
+         <height>411</height>
         </rect>
        </property>
        <property name="title">
@@ -3474,6 +3474,145 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+      <widget class="QGroupBox" name="groupBox_noise_filter">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>480</y>
+         <width>311</width>
+         <height>131</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Noise filtering</string>
+       </property>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>30</y>
+          <width>131</width>
+          <height>96</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_110">
+         <item>
+          <widget class="QLabel" name="label_cutOff_freq_joint_pos">
+           <property name="text">
+            <string>CutOff Freq. [Hz]</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_cutoff_freq_joint_pos">
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_timestep_joint_pos">
+           <property name="text">
+            <string>Time step [s]</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_timestep_joint_pos">
+           <property name="text">
+            <string>0.05</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>131</width>
+          <height>100</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_111">
+         <item>
+          <widget class="QLabel" name="label_filter_length">
+           <property name="text">
+            <string>Length of the filter</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="0">
+            <widget class="QRadioButton" name="radioButton_N_5">
+             <property name="text">
+              <string>5</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QRadioButton" name="radioButton_N_11">
+             <property name="text">
+              <string>11</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QRadioButton" name="radioButton_N_35">
+             <property name="text">
+              <string>35</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QRadioButton" name="radioButton_N_7">
+             <property name="text">
+              <string>7</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QRadioButton" name="radioButton_N_19">
+             <property name="text">
+              <string>19</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QRadioButton" name="radioButton_N_45">
+             <property name="text">
+              <string>45</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QRadioButton" name="radioButton_N_9">
+             <property name="text">
+              <string>9</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QRadioButton" name="radioButton_N_25">
+             <property name="text">
+              <string>25</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QRadioButton" name="radioButton_N_55">
+             <property name="text">
+              <string>55</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
       <zorder>checkBox_hl_add</zorder>
       <zorder>checkBox_joints_limits_av</zorder>
       <zorder>checkBox_obsts_av</zorder>
@@ -3484,6 +3623,7 @@ p, li { white-space: pre-wrap; }
       <zorder>checkBox_sing_av</zorder>
       <zorder>groupBox_sing_av_params</zorder>
       <zorder>layoutWidget</zorder>
+      <zorder>groupBox_noise_filter</zorder>
      </widget>
      <widget class="QGroupBox" name="groupBox_time_mapping">
       <property name="geometry">
@@ -3564,6 +3704,15 @@ p, li { white-space: pre-wrap; }
        </layout>
       </widget>
      </widget>
+     <zorder>groupBox_des_right_hand_vel</zorder>
+     <zorder>groupBox_des_right_hand_pos</zorder>
+     <zorder>checkBox_right_hand_status</zorder>
+     <zorder>checkBox_use_vel_control</zorder>
+     <zorder>groupBox_right_hand_comp</zorder>
+     <zorder>groupBox_control</zorder>
+     <zorder>groupBox_ctrl_options</zorder>
+     <zorder>groupBox_time_mapping</zorder>
+     <zorder>groupBox_noise_filter</zorder>
     </widget>
     <widget class="QWidget" name="tab_results">
      <property name="enabled">

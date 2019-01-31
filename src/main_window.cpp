@@ -199,6 +199,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     ui.tabWidget_main->setCurrentIndex(0);
     ui.tabWidget_sol->setCurrentIndex(0);
     ui.groupBox_ctrl_options->setEnabled(true);
+    ui.groupBox_noise_filter->setEnabled(true);
+    ui.radioButton_N_5->setChecked(true);
     ui.groupBox_jlim_params->setEnabled(false);
     ui.groupBox_sing_av_params->setEnabled(false);
     ui.groupBox_obsts_av_params->setEnabled(false);
@@ -213,14 +215,15 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     this->samples_w_vel=0;
     this->samples_e_vel=0;
     this->samples_s_vel=0;
-    this->arm_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, 11);
-    this->hand_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, 11);
-    this->arm_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, 11);
-    this->hand_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, 11);
-    this->r_hand_vel_buff = boost::make_shared<CircularBuffers<double>>(6, 11);
-    this->r_wrist_vel_buff = boost::make_shared<CircularBuffers<double>>(6, 11);
-    this->r_elbow_vel_buff = boost::make_shared<CircularBuffers<double>>(6, 11);
-    this->r_shoulder_vel_buff = boost::make_shared<CircularBuffers<double>>(6, 11);
+    this->N_filter_length=5;
+    this->arm_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
+    this->hand_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, this->N_filter_length);
+    this->arm_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
+    this->hand_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, this->N_filter_length);
+    this->r_hand_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
+    this->r_wrist_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
+    this->r_elbow_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
+    this->r_shoulder_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
     // logging
     init();
     logging::add_common_attributes();
@@ -267,6 +270,19 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     this->lpf_obsts_or_roll.reset(new LowPassFilter());
     this->lpf_obsts_or_pitch.reset(new LowPassFilter());
     this->lpf_obsts_or_yaw.reset(new LowPassFilter());
+
+    // controlling: low pass filter of the position of the joints
+    this->lpf_joint_pos_1.reset(new LowPassFilter());
+    this->lpf_joint_pos_2.reset(new LowPassFilter());
+    this->lpf_joint_pos_3.reset(new LowPassFilter());
+    this->lpf_joint_pos_4.reset(new LowPassFilter());
+    this->lpf_joint_pos_5.reset(new LowPassFilter());
+    this->lpf_joint_pos_6.reset(new LowPassFilter());
+    this->lpf_joint_pos_7.reset(new LowPassFilter());
+    this->lpf_joint_pos_8.reset(new LowPassFilter());
+    this->lpf_joint_pos_9.reset(new LowPassFilter());
+    this->lpf_joint_pos_10.reset(new LowPassFilter());
+    this->lpf_joint_pos_11.reset(new LowPassFilter());
 
 
     // ---------- threads --------------------------- //
@@ -345,22 +361,38 @@ void MainWindow::execPosControl()
 
     while(exec_control)
     {
-        bool obst_filter_noise = this->ui.checkBox_obsts_filter_noise->isChecked();
-        double filter_cut_off_freq = 0.1; double filter_time_step = 0.05;
-        if(obst_filter_noise){
-            filter_cut_off_freq = this->ui.lineEdit_f_cutoff->text().toDouble();
-            filter_time_step = this->ui.lineEdit_time_step->text().toDouble();
-        }
-        this->lpf_obsts_pos_x->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_time_step);
-        this->lpf_obsts_pos_y->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_time_step);
-        this->lpf_obsts_pos_z->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_time_step);
-        this->lpf_obsts_or_roll->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_roll->setDeltaTime(filter_time_step);
-        this->lpf_obsts_or_pitch->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_time_step);
-        this->lpf_obsts_or_yaw->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_time_step);
 
         if(pos_control)
         {
             boost::unique_lock<boost::mutex> lck(hh_control_mtx);
+
+            // noise filtering
+            bool obst_filter_noise = this->ui.checkBox_obsts_filter_noise->isChecked();
+            double filter_cut_off_freq = 0.1; double filter_time_step = 0.05;
+            if(obst_filter_noise){
+                filter_cut_off_freq = this->ui.lineEdit_f_cutoff->text().toDouble();
+                filter_time_step = this->ui.lineEdit_time_step->text().toDouble();
+            }
+            this->lpf_obsts_pos_x->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_time_step);
+            this->lpf_obsts_pos_y->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_time_step);
+            this->lpf_obsts_pos_z->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_time_step);
+            this->lpf_obsts_or_roll->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_roll->setDeltaTime(filter_time_step);
+            this->lpf_obsts_or_pitch->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_time_step);
+            this->lpf_obsts_or_yaw->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_time_step);
+
+            double filter_cut_off_freq_j_pos = this->ui.lineEdit_cutoff_freq_joint_pos->text().toDouble();
+            double filter_time_step_j_pos = this->ui.lineEdit_timestep_joint_pos->text().toDouble();
+            this->lpf_joint_pos_1->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_1->setDeltaTime(filter_time_step_j_pos);
+            this->lpf_joint_pos_2->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_2->setDeltaTime(filter_time_step_j_pos);
+            this->lpf_joint_pos_3->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_3->setDeltaTime(filter_time_step_j_pos);
+            this->lpf_joint_pos_4->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_4->setDeltaTime(filter_time_step_j_pos);
+            this->lpf_joint_pos_5->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_5->setDeltaTime(filter_time_step_j_pos);
+            this->lpf_joint_pos_6->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_6->setDeltaTime(filter_time_step_j_pos);
+            this->lpf_joint_pos_7->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_7->setDeltaTime(filter_time_step_j_pos);
+            this->lpf_joint_pos_8->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_8->setDeltaTime(filter_time_step_j_pos);
+            this->lpf_joint_pos_9->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_9->setDeltaTime(filter_time_step_j_pos);
+            this->lpf_joint_pos_10->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_10->setDeltaTime(filter_time_step_j_pos);
+            this->lpf_joint_pos_11->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_11->setDeltaTime(filter_time_step_j_pos);
 
             // desired pose
             double des_hand_pos_x = 0.0; double des_hand_pos_y = 0.0; double des_hand_pos_z = 0.0;
@@ -380,7 +412,8 @@ void MainWindow::execPosControl()
 
 
             std::string stage_descr = "plan"; int stages = 1; int mov_type = 0;
-            MatrixXd jointsPosition; Matrix3d I_3 = Matrix3d::Identity();
+            MatrixXd jointsPosition;
+            Matrix3d I_3 = Matrix3d::Identity();
             vector<vector<double>> hand_h_positions; int n_steps; double period_T;
             vector<vector<double>> hand_h_orientations; vector<vector<double>> hand_h_orientations_q;
             vector<vector<double>> hand_h_lin_velocities; vector<vector<double>> hand_h_ang_velocities;
@@ -388,13 +421,14 @@ void MainWindow::execPosControl()
             VectorXd jointsPosition_max(JOINTS_ARM+JOINTS_HAND); VectorXd jointsPosition_min(JOINTS_ARM+JOINTS_HAND);
             Vector3d h_hand_ang_vel_q_e_init; double h_hand_ang_vel_q_w_init; Vector3d h_hand_ang_vel_q_e_end; double h_hand_ang_vel_q_w_end;
             Vector3d h_hand_ang_acc_q_e_init; double h_hand_ang_acc_q_w_init; Vector3d h_hand_ang_acc_q_e_end; double h_hand_ang_acc_q_w_end;
+            VectorXd jointsPosition_hand(JOINTS_HAND); vector<double> jointsPosition_hand_vec(JOINTS_HAND);
             VectorXd jointsPosition_hand_max(JOINTS_HAND); VectorXd jointsPosition_hand_min(JOINTS_HAND);
 
             // hand
-            VectorXd h_hand_posture(JOINTS_HAND);
-            VectorXd r_hand_velocities_vec(JOINTS_HAND); r_hand_velocities_vec << 0.0,0.0,0.0,0.0;
-            vector<double> r_hand_velocities; r_hand_velocities.resize(r_hand_velocities_vec.size());
-            VectorXd::Map(&r_hand_velocities[0], r_hand_velocities_vec.size()) = r_hand_velocities_vec;
+//            VectorXd h_hand_posture(JOINTS_HAND);
+//            VectorXd r_hand_velocities_vec(JOINTS_HAND); r_hand_velocities_vec << 0.0,0.0,0.0,0.0;
+//            vector<double> r_hand_velocities; r_hand_velocities.resize(r_hand_velocities_vec.size());
+//            VectorXd::Map(&r_hand_velocities[0], r_hand_velocities_vec.size()) = r_hand_velocities_vec;
 
             if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
                  stage_descr = this->h_results->trajectory_descriptions.at(this->i_ctrl);
@@ -463,6 +497,8 @@ void MainWindow::execPosControl()
 
 
                 jointsPosition = this->jointsPosition_mov_ctrl.at(this->i_ctrl);
+                jointsPosition_hand = jointsPosition.row(jointsPosition.rows()-1).tail<JOINTS_HAND>();
+                VectorXd::Map(&jointsPosition_hand_vec[0], jointsPosition_hand.size()) = jointsPosition_hand;
                 for (int i=0;i<jointsPosition.cols();++i){
                     VectorXd col_i = jointsPosition.col(i);
                     jointsPosition_max(i) = col_i.maxCoeff();
@@ -652,9 +688,10 @@ void MainWindow::execPosControl()
                 // every time step of the simulator (0.05 sec)
 
                 // posture
+                vector<double> r_arm_posture_mes(JOINTS_ARM,0.0); vector<double> r_hand_posture_mes(JOINTS_HAND,0.0);
                 vector<double> r_arm_posture(JOINTS_ARM,0.0); vector<double> r_hand_posture(JOINTS_HAND,0.0);
                 // velocities
-                vector<double> r_arm_velocities(JOINTS_ARM,0.0);
+                vector<double> r_arm_velocities(JOINTS_ARM,0.0); vector<double> r_hand_velocities(JOINTS_HAND,0.0);
                 // accelerations
                 vector<double> r_arm_accelerations(JOINTS_ARM,0.0);
                 vector<double> r_arm_accelerations_read(JOINTS_ARM,0.0); vector<double> r_hand_accelerations_read(JOINTS_HAND,0.0);
@@ -663,8 +700,21 @@ void MainWindow::execPosControl()
                 vector<double> r_elbow_acc_read(6,0.0);
                 vector<double> r_shoulder_acc_read(6,0.0);
 
-                this->curr_scene->getHumanoid()->getRightArmPosture(r_arm_posture);
-                this->curr_scene->getHumanoid()->getRightHandPosture(r_hand_posture);
+
+                this->curr_scene->getHumanoid()->getRightArmPosture(r_arm_posture_mes);
+                this->curr_scene->getHumanoid()->getRightHandPosture(r_hand_posture_mes);
+                // filtering the joint positions
+                r_arm_posture.at(0) = this->lpf_joint_pos_1->update(r_arm_posture_mes.at(0));
+                r_arm_posture.at(1) = this->lpf_joint_pos_2->update(r_arm_posture_mes.at(1));
+                r_arm_posture.at(2) = this->lpf_joint_pos_3->update(r_arm_posture_mes.at(2));
+                r_arm_posture.at(3) = this->lpf_joint_pos_4->update(r_arm_posture_mes.at(3));
+                r_arm_posture.at(4) = this->lpf_joint_pos_5->update(r_arm_posture_mes.at(4));
+                r_arm_posture.at(5) = this->lpf_joint_pos_6->update(r_arm_posture_mes.at(5));
+                r_arm_posture.at(6) = this->lpf_joint_pos_7->update(r_arm_posture_mes.at(6));
+                r_hand_posture.at(0) = this->lpf_joint_pos_8->update(r_hand_posture_mes.at(0));
+                r_hand_posture.at(1) = this->lpf_joint_pos_9->update(r_hand_posture_mes.at(1));
+                r_hand_posture.at(2) = this->lpf_joint_pos_10->update(r_hand_posture_mes.at(2));
+                r_hand_posture.at(3) = this->lpf_joint_pos_11->update(r_hand_posture_mes.at(3));
 
                 vector<double> r_hand_pos; vector<double> r_wrist_pos; vector<double> r_elbow_pos; vector<double> r_shoulder_pos;
                 this->curr_scene->getHumanoid()->getAllPos(1,r_hand_pos,r_wrist_pos,r_elbow_pos,r_shoulder_pos,r_arm_posture);
@@ -683,7 +733,7 @@ void MainWindow::execPosControl()
 
 
 //                vector<double> r_arm_velocities_mes;
-                vector<double> r_hand_velocities_mes(JOINTS_HAND,0.0);
+//                vector<double> r_hand_velocities_mes(JOINTS_HAND,0.0);
 //                this->curr_scene->getHumanoid()->getRightArmVelocities(r_arm_velocities);
 //                this->curr_scene->getHumanoid()->getRightHandVelocities(r_hand_velocities_mes);
 //                // filter noise from arm velocities
@@ -698,29 +748,17 @@ void MainWindow::execPosControl()
                 // get the joint velocities
                 this->arm_pos_buff->push(r_arm_posture);
                 this->hand_pos_buff->push(r_hand_posture);
-                if(this->samples_pos==10 && this->arm_pos_buff->full() && this->hand_pos_buff->full()){
+                if(this->samples_pos==this->N_filter_length-1 && this->arm_pos_buff->full() && this->hand_pos_buff->full()){
                     for(size_t i=0; i< r_arm_posture.size();++i)
                     {
-                        //http://www.holoborodko.com/pavel/numerical-methods/numerical-derivative/smooth-low-noise-differentiators/#noiserobust_2
-                        // N=11
-                        r_arm_velocities.at(i) = (42*(arm_pos_buff->at(i)[4]-arm_pos_buff->at(i)[6])+
-                                                    48*(arm_pos_buff->at(i)[3]-arm_pos_buff->at(i)[7])+
-                                                    27*(arm_pos_buff->at(i)[2]-arm_pos_buff->at(i)[8])+
-                                                    8*(arm_pos_buff->at(i)[1]-arm_pos_buff->at(i)[9])+
-                                                    arm_pos_buff->at(i)[0]-arm_pos_buff->at(i)[10])/(512*time_step);
-
+                        r_arm_velocities.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_pos_buff->at(i));
                     }
-                    for(size_t i=0; i< r_hand_velocities_mes.size();++i)
+                    for(size_t i=0; i< r_hand_velocities.size();++i)
                     {
-
-                        r_hand_velocities_mes.at(i) = (42*(hand_pos_buff->at(i)[4]-hand_pos_buff->at(i)[6])+
-                                                    48*(hand_pos_buff->at(i)[3]-hand_pos_buff->at(i)[7])+
-                                                    27*(hand_pos_buff->at(i)[2]-hand_pos_buff->at(i)[8])+
-                                                    8*(hand_pos_buff->at(i)[1]-hand_pos_buff->at(i)[9])+
-                                                    hand_pos_buff->at(i)[0]-hand_pos_buff->at(i)[10])/(512*time_step);
+                        r_hand_velocities.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_pos_buff->at(i));
                     }
                 }else{this->samples_pos++;}
-                VectorXd r_arm_velocities_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_arm_velocities.data(), r_arm_velocities.size());
+//                VectorXd r_arm_velocities_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_arm_velocities.data(), r_arm_velocities.size());
 
                 vector<double> r_hand_vel; vector<double> r_wrist_vel; vector<double> r_elbow_vel; vector<double> r_shoulder_vel;
                 this->curr_scene->getHumanoid()->getAllVel(1,r_hand_vel,r_wrist_vel,r_elbow_vel,r_shoulder_vel,r_arm_posture,r_arm_velocities);
@@ -736,83 +774,53 @@ void MainWindow::execPosControl()
 
                 // get the joint accelerations
                 this->arm_vel_buff->push(r_arm_velocities);
-                this->hand_vel_buff->push(r_hand_velocities_mes);
-                if(this->samples_vel==10 && this->arm_vel_buff->full() && this->hand_vel_buff->full()){
+                this->hand_vel_buff->push(r_hand_velocities);
+                if(this->samples_vel==this->N_filter_length-1 && this->arm_vel_buff->full() && this->hand_vel_buff->full()){
                     for(size_t i=0; i< r_arm_velocities.size();++i)
                     {
-
-                        r_arm_accelerations_read.at(i) = (42*(arm_vel_buff->at(i)[4]-arm_vel_buff->at(i)[6])+
-                                                    48*(arm_vel_buff->at(i)[3]-arm_vel_buff->at(i)[7])+
-                                                    27*(arm_vel_buff->at(i)[2]-arm_vel_buff->at(i)[8])+
-                                                    8*(arm_vel_buff->at(i)[1]-arm_vel_buff->at(i)[9])+
-                                                    arm_vel_buff->at(i)[0]-arm_vel_buff->at(i)[10])/(512*time_step);
+                        r_arm_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_vel_buff->at(i));
                     }
-                    for(size_t i=0; i< r_hand_velocities_mes.size();++i)
+                    for(size_t i=0; i< r_hand_velocities.size();++i)
                     {
-
-                        r_hand_accelerations_read.at(i) = (42*(hand_vel_buff->at(i)[4]-hand_vel_buff->at(i)[6])+
-                                                    48*(hand_vel_buff->at(i)[3]-hand_vel_buff->at(i)[7])+
-                                                    27*(hand_vel_buff->at(i)[2]-hand_vel_buff->at(i)[8])+
-                                                    8*(hand_vel_buff->at(i)[1]-hand_vel_buff->at(i)[9])+
-                                                    hand_vel_buff->at(i)[0]-hand_vel_buff->at(i)[10])/(512*time_step);
+                        r_hand_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_vel_buff->at(i));
                     }
                 }else{this->samples_vel++;}
                 VectorXd r_arm_accelerations_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_arm_accelerations_read.data(), r_arm_accelerations_read.size());
 
                 // get the hand acceleration
                 this->r_hand_vel_buff->push(r_hand_vel);
-                if(this->samples_h_vel==10 && this->r_hand_vel_buff->full()){
+                if(this->samples_h_vel==this->N_filter_length-1 && this->r_hand_vel_buff->full()){
                     for(size_t i=0; i< r_hand_vel.size();++i)
                     {
-
-                        r_hand_acc_read.at(i) = (42*(r_hand_vel_buff->at(i)[4]-r_hand_vel_buff->at(i)[6])+
-                                                    48*(r_hand_vel_buff->at(i)[3]-r_hand_vel_buff->at(i)[7])+
-                                                    27*(r_hand_vel_buff->at(i)[2]-r_hand_vel_buff->at(i)[8])+
-                                                    8*(r_hand_vel_buff->at(i)[1]-r_hand_vel_buff->at(i)[9])+
-                                                    r_hand_vel_buff->at(i)[0]-r_hand_vel_buff->at(i)[10])/(512*time_step);
+                        r_hand_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_hand_vel_buff->at(i));
                     }
                 }else{this->samples_h_vel++;}
                 VectorXd r_hand_acc_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_hand_acc_read.data(), r_hand_acc_read.size());
 
                 // get the wrist acceleration
                 this->r_wrist_vel_buff->push(r_wrist_vel);
-                if(this->samples_w_vel==10 && this->r_wrist_vel_buff->full()){
+                if(this->samples_w_vel==this->N_filter_length-1 && this->r_wrist_vel_buff->full()){
                     for(size_t i=0; i< r_wrist_vel.size();++i)
                     {
-
-                        r_wrist_acc_read.at(i) = (42*(r_wrist_vel_buff->at(i)[4]-r_wrist_vel_buff->at(i)[6])+
-                                                    48*(r_wrist_vel_buff->at(i)[3]-r_wrist_vel_buff->at(i)[7])+
-                                                    27*(r_wrist_vel_buff->at(i)[2]-r_wrist_vel_buff->at(i)[8])+
-                                                    8*(r_wrist_vel_buff->at(i)[1]-r_wrist_vel_buff->at(i)[9])+
-                                                    r_wrist_vel_buff->at(i)[0]-r_wrist_vel_buff->at(i)[10])/(512*time_step);
+                        r_wrist_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_wrist_vel_buff->at(i));
                     }
                 }else{this->samples_w_vel++;}
 
                 // get the elbow acceleration
                 this->r_elbow_vel_buff->push(r_elbow_vel);
-                if(this->samples_e_vel==10 && this->r_elbow_vel_buff->full()){
+                if(this->samples_e_vel==this->N_filter_length-1 && this->r_elbow_vel_buff->full()){
                     for(size_t i=0; i< r_elbow_vel.size();++i)
                     {
-
-                        r_elbow_acc_read.at(i) = (42*(r_elbow_vel_buff->at(i)[4]-r_elbow_vel_buff->at(i)[6])+
-                                                    48*(r_elbow_vel_buff->at(i)[3]-r_elbow_vel_buff->at(i)[7])+
-                                                    27*(r_elbow_vel_buff->at(i)[2]-r_elbow_vel_buff->at(i)[8])+
-                                                    8*(r_elbow_vel_buff->at(i)[1]-r_elbow_vel_buff->at(i)[9])+
-                                                    r_elbow_vel_buff->at(i)[0]-r_elbow_vel_buff->at(i)[10])/(512*time_step);
+                        r_elbow_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_elbow_vel_buff->at(i));
                     }
                 }else{this->samples_e_vel++;}
 
                 // get the shoulder acceleration
                 this->r_shoulder_vel_buff->push(r_shoulder_vel);
-                if(this->samples_s_vel==10 && this->r_shoulder_vel_buff->full()){
+                if(this->samples_s_vel==this->N_filter_length-1 && this->r_shoulder_vel_buff->full()){
                     for(size_t i=0; i< r_shoulder_vel.size();++i)
                     {
-
-                        r_shoulder_acc_read.at(i) = (42*(r_shoulder_vel_buff->at(i)[4]-r_shoulder_vel_buff->at(i)[6])+
-                                                    48*(r_shoulder_vel_buff->at(i)[3]-r_shoulder_vel_buff->at(i)[7])+
-                                                    27*(r_shoulder_vel_buff->at(i)[2]-r_shoulder_vel_buff->at(i)[8])+
-                                                    8*(r_shoulder_vel_buff->at(i)[1]-r_shoulder_vel_buff->at(i)[9])+
-                                                    r_shoulder_vel_buff->at(i)[0]-r_shoulder_vel_buff->at(i)[10])/(512*time_step);
+                        r_shoulder_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_shoulder_vel_buff->at(i));
                     }
                 }else{this->samples_s_vel++;}
 
@@ -854,11 +862,7 @@ void MainWindow::execPosControl()
 
 
                 double g_map = 0.0; double tau = 0.1; double dec_rate = 0.1; double diff_w = 0.1;
-                double s_time = 0.0;
-                if(this->qnode.isSimulationRunning())
-                {
-                    s_time=this->qnode.getSimTime() - this->t_past;
-                }
+                double s_time = this->qnode.getSimTime() - this->t_past;
 
                 VectorXd trap_hand_pose(JOINTS_ARM); // trapezoidal desired hand pose
                 VectorXd trap_hand_vel(JOINTS_ARM);  // trapezoidal desired hand velocity
@@ -1248,25 +1252,25 @@ void MainWindow::execPosControl()
     //                BOOST_LOG_SEV(lg, info) << "error or qz = " << error_h_tot(5);
 
 
-                    VectorXd h_posture = jointsPosition.row(index); // current human-like posture
-                    h_hand_posture = h_posture.tail<JOINTS_HAND>(); // current human-like hand posture
-                    VectorXd hand_posture(4);
-                    hand_posture << r_hand_posture.at(0),r_hand_posture.at(1),r_hand_posture.at(2),r_hand_posture.at(3);
-                    r_hand_velocities_vec = -fing_coeff * (hand_posture - h_hand_posture).cwiseQuotient(jointsPosition_hand_max - jointsPosition_hand_min);
-                    r_hand_velocities_vec(0) = 0.0; // the spread does not move
-                    if(((mov_type==0) && (stage_descr.compare("retreat")==0)) // pick in retreat stage
-                            || ((mov_type==2 || mov_type==3 || mov_type==4) && ((stage_descr.compare("plan")==0) || (stage_descr.compare("approach")==0)))) // place in plan or approach stages
-                    {
-                        // the hand is holding an object
-                        r_hand_velocities_vec(1) = 0.0;
-                        r_hand_velocities_vec(2) = 0.0;
-                        r_hand_velocities_vec(3) = 0.0;
-                    }
-                    VectorXd::Map(&r_hand_velocities[0], r_hand_velocities_vec.size()) = r_hand_velocities_vec;
+//                    VectorXd h_posture = jointsPosition.row(index); // current human-like posture
+//                    h_hand_posture = h_posture.tail<JOINTS_HAND>(); // current human-like hand posture
+//                    VectorXd hand_posture(4);
+//                    hand_posture << r_hand_posture.at(0),r_hand_posture.at(1),r_hand_posture.at(2),r_hand_posture.at(3);
+//                    r_hand_velocities_vec = -fing_coeff * (hand_posture - h_hand_posture).cwiseQuotient(jointsPosition_hand_max - jointsPosition_hand_min);
+//                    r_hand_velocities_vec(0) = 0.0; // the spread does not move
+//                    if(((mov_type==0) && (stage_descr.compare("retreat")==0)) // pick in retreat stage
+//                            || ((mov_type==2 || mov_type==3 || mov_type==4) && ((stage_descr.compare("plan")==0) || (stage_descr.compare("approach")==0)))) // place in plan or approach stages
+//                    {
+//                        // the hand is holding an object
+//                        r_hand_velocities_vec(1) = 0.0;
+//                        r_hand_velocities_vec(2) = 0.0;
+//                        r_hand_velocities_vec(3) = 0.0;
+//                    }
+//                    VectorXd::Map(&r_hand_velocities[0], r_hand_velocities_vec.size()) = r_hand_velocities_vec;
 
                     }else{
                         // trapezoidal velocity profile
-                        double curr_time = this->qnode.getSimTime();
+                        double curr_time = this->qnode.getSimTime() - this->t_past;
                         VectorXd vel_trap(JOINTS_ARM);
                         vel_trap(0) = 2*(hand_pos_end(0)-hand_pos_init(0))/t_f_trap;
                         vel_trap(1) = 2*(hand_pos_end(1)-hand_pos_init(1))/t_f_trap;
@@ -1592,38 +1596,46 @@ void MainWindow::execPosControl()
     //                    //TO DO
     //                }
                     if(condition){
+                        this->t_past=s_time;
                         if(stages==3 && this->i_ctrl<2){
+                            if(!hl_en){
+                                if(stage_descr.compare("plan")==0){
+                                    this->qnode.openBarrettHand_to_pos(1,jointsPosition_hand_vec);
+                                }
+                                if(stage_descr.compare("approach")==0){
+                                    this->qnode.closeBarrettHand_to_pos(1,jointsPosition_hand_vec);
+                                }
+                            }
                             this->i_ctrl++;
-                            this->t_past=s_time;
                         }else if(stages==2 && this->i_ctrl<1){
+                            // TO DO
                             this->i_ctrl++;
-                            this->t_past=s_time;
                         }
                     }
                 }
 
                 // inverse algorithm
-                this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture,hand_acc_vec,r_arm_accelerations,jlim_en,sing_en,obsts_en,
+                this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,r_arm_accelerations,jlim_en,sing_en,obsts_en,
                                                                                 vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
 
                 // execute the control
-                this->qnode.execKinControlAcc(1,r_arm_posture,r_arm_velocities,r_arm_accelerations,r_hand_posture,r_hand_velocities);
+                this->qnode.execKinControlAcc(1,r_arm_posture_mes,r_arm_velocities,r_arm_accelerations,r_hand_posture_mes,r_hand_velocities);
 
                 // ------------- Recording ------------------------------- //
 
                 // record the positions of the joints
                 this->jointsPosition_ctrl.conservativeResize(this->jointsPosition_ctrl.rows()+1,JOINTS_ARM+JOINTS_HAND);
-                for(size_t jj=0; jj < r_arm_posture.size(); ++jj)
-                    this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,jj) = r_arm_posture.at(jj);
-                for(size_t jj=0; jj < r_hand_posture.size(); ++jj)
-                    this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,r_arm_posture.size()+jj) = r_hand_posture.at(jj);
+                for(size_t jj=0; jj < r_arm_posture_mes.size(); ++jj)
+                    this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,jj) = r_arm_posture_mes.at(jj);
+                for(size_t jj=0; jj < r_hand_posture_mes.size(); ++jj)
+                    this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,r_arm_posture_mes.size()+jj) = r_hand_posture_mes.at(jj);
 
                 // record the velocities of the joints
                 this->jointsVelocity_ctrl.conservativeResize(this->jointsVelocity_ctrl.rows()+1,JOINTS_ARM+JOINTS_HAND);
                 for(size_t jj=0; jj < r_arm_velocities.size(); ++jj)
                     this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,jj) = r_arm_velocities.at(jj);
-                for(size_t jj=0; jj < r_hand_velocities_mes.size(); ++jj)
-                    this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,r_arm_velocities.size()+jj) = r_hand_velocities_mes.at(jj);
+                for(size_t jj=0; jj < r_hand_velocities.size(); ++jj)
+                    this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,r_arm_velocities.size()+jj) = r_hand_velocities.at(jj);
 
 
                 // record the acceleration of the joints
@@ -1715,6 +1727,20 @@ void MainWindow::execVelControl()
         this->lpf_obsts_or_roll->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_roll->setDeltaTime(filter_time_step);
         this->lpf_obsts_or_pitch->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_time_step);
         this->lpf_obsts_or_yaw->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_time_step);
+
+        double filter_cut_off_freq_j_pos = this->ui.lineEdit_cutoff_freq_joint_pos->text().toDouble();
+        double filter_time_step_j_pos = this->ui.lineEdit_timestep_joint_pos->text().toDouble();
+        this->lpf_joint_pos_1->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_1->setDeltaTime(filter_time_step_j_pos);
+        this->lpf_joint_pos_2->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_2->setDeltaTime(filter_time_step_j_pos);
+        this->lpf_joint_pos_3->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_3->setDeltaTime(filter_time_step_j_pos);
+        this->lpf_joint_pos_4->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_4->setDeltaTime(filter_time_step_j_pos);
+        this->lpf_joint_pos_5->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_5->setDeltaTime(filter_time_step_j_pos);
+        this->lpf_joint_pos_6->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_6->setDeltaTime(filter_time_step_j_pos);
+        this->lpf_joint_pos_7->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_7->setDeltaTime(filter_time_step_j_pos);
+        this->lpf_joint_pos_8->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_8->setDeltaTime(filter_time_step_j_pos);
+        this->lpf_joint_pos_9->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_9->setDeltaTime(filter_time_step_j_pos);
+        this->lpf_joint_pos_10->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_10->setDeltaTime(filter_time_step_j_pos);
+        this->lpf_joint_pos_11->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_11->setDeltaTime(filter_time_step_j_pos);
 
 
         if(vel_control)
@@ -11768,6 +11794,69 @@ double MainWindow::getThirdQuartile(vector<int> v)
     return third_quartile;
 }
 
+int MainWindow::binomialCoeff(int n, int k)
+{
+    // https://www.geeksforgeeks.org/binomial-coefficient-dp-9/
+
+    if (k>=0 && k<=n)
+    {
+        int C[n + 1][k + 1];
+        int i, j;
+
+        // Caculate value of Binomial Coefficient
+        // in bottom up manner
+        for (i = 0; i <= n; i++)
+        {
+            for (j = 0; j <= min(i, k); j++)
+            {
+                // Base Cases
+                if (j == 0 || j == i)
+                    C[i][j] = 1;
+
+                // Calculate value using previosly
+                // stored values
+                else
+                    C[i][j] = C[i - 1][j - 1] +
+                              C[i - 1][j];
+            }
+        }
+
+        return C[n][k];
+    }else{
+        return 0;
+    }
+}
+
+double MainWindow::getNoiseRobustDerivate(int N, double h, std::deque<double>& buff)
+{
+    // http://www.holoborodko.com/pavel/numerical-methods/numerical-derivative/smooth-low-noise-differentiators/#noiserobust_2
+    static const std::runtime_error ex_cap(std::string("The capacity of the buffer differs the given filter length"));
+    static const std::runtime_error ex_length(std::string("The filter length must be greater or equal to 5"));
+    if(N>=5)
+    {
+        if(N==buff.size())
+        {
+            int M = (N-1)/2;
+            int m = (N-3)/2;
+            double sum=0.0;
+            for(int k=1;k<=M;++k)
+            {
+                double c1 = this->binomialCoeff(2*m,(m-k+1));
+                double c2 = this->binomialCoeff(2*m,(m-k-1));
+                double ck = (1/pow(2,((2*m)+1)))*(c1-c2);
+                sum+=ck*(buff[M+k]-buff[M-k]);
+            }
+            double der = sum/h;
+            return der;
+        }else{
+            throw ex_cap;
+        }
+    }else{
+        throw ex_length;
+    }
+}
+
+
 void MainWindow::count_occurrence(std::unordered_map<int,int>& m, std::vector<int>& v){
     m.clear();
     for (auto itr = v.begin(); itr != v.end(); ++itr){
@@ -12405,15 +12494,15 @@ void MainWindow::on_pushButton_start_control_pressed()
     this->samples_h_vel=0;
     this->samples_w_vel=0;
     this->samples_e_vel=0;
-    this->samples_s_vel=0;
-    this->arm_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, 11);
-    this->hand_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, 11);
-    this->arm_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, 11);
-    this->hand_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, 11);
-    this->r_hand_vel_buff = boost::make_shared<CircularBuffers<double>>(6, 11);
-    this->r_wrist_vel_buff = boost::make_shared<CircularBuffers<double>>(6, 11);
-    this->r_elbow_vel_buff = boost::make_shared<CircularBuffers<double>>(6, 11);
-    this->r_shoulder_vel_buff = boost::make_shared<CircularBuffers<double>>(6, 11);
+    this->samples_s_vel=0;  
+    this->arm_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
+    this->hand_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, this->N_filter_length);
+    this->arm_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
+    this->hand_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, this->N_filter_length);
+    this->r_hand_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
+    this->r_wrist_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
+    this->r_elbow_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
+    this->r_shoulder_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
     this->hand_j_acc = VectorXd::Zero(6);
     this->Jacobian = MatrixXd::Zero(6,JOINTS_ARM);
     this->qnode.resetSimTime();
@@ -12459,6 +12548,18 @@ void MainWindow::on_pushButton_stop_control_clicked()
     this->lpf_obsts_or_pitch.reset(new LowPassFilter());
     this->lpf_obsts_or_yaw.reset(new LowPassFilter());
 
+    this->lpf_joint_pos_1.reset(new LowPassFilter());
+    this->lpf_joint_pos_2.reset(new LowPassFilter());
+    this->lpf_joint_pos_3.reset(new LowPassFilter());
+    this->lpf_joint_pos_4.reset(new LowPassFilter());
+    this->lpf_joint_pos_5.reset(new LowPassFilter());
+    this->lpf_joint_pos_6.reset(new LowPassFilter());
+    this->lpf_joint_pos_7.reset(new LowPassFilter());
+    this->lpf_joint_pos_8.reset(new LowPassFilter());
+    this->lpf_joint_pos_9.reset(new LowPassFilter());
+    this->lpf_joint_pos_10.reset(new LowPassFilter());
+    this->lpf_joint_pos_11.reset(new LowPassFilter());
+
     this->qnode.resetSimTime();
 }
 
@@ -12482,19 +12583,19 @@ void MainWindow::on_pushButton_control_plot_clicked()
     // plot the hand velocity norm
     if(!this->handVelocityNorm_ctrl.empty()){
 
-        int inc_vel = round(this->handVelocityNorm_ctrl.size()/n_samples);
+//        int inc_vel = round(this->handVelocityNorm_ctrl.size()/n_samples);
 
-        vector<double> hand_vel(n_samples);
-        this->sim_time.at(0) = 0.0;
-        vector<double> time(n_samples);
-        for(size_t i=0, j = 0; (i < this->handVelocityNorm_ctrl.size() && j < n_samples); i += inc_vel,++j)
-        {
-            hand_vel.at(j) = this->handVelocityNorm_ctrl.at(i);
-            time.at(j) = this->sim_time.at(i);
-        }
+//        vector<double> hand_vel(n_samples);
+//        this->sim_time.at(0) = 0.0;
+//        vector<double> time(n_samples);
+//        for(size_t i=0, j = 0; (i < this->handVelocityNorm_ctrl.size() && j < n_samples); i += inc_vel,++j)
+//        {
+//            hand_vel.at(j) = this->handVelocityNorm_ctrl.at(i);
+//            time.at(j) = this->sim_time.at(i);
+//        }
 
-        QVector<double> qhand_vel = QVector<double>::fromStdVector(hand_vel);
-        QVector<double> qtime = QVector<double>::fromStdVector(time);
+        QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_ctrl);
+        QVector<double> qtime = QVector<double>::fromStdVector(this->sim_time);
         ui.plot_control_hand_vel->plotLayout()->clear();
         ui.plot_control_hand_vel->clearGraphs();
         ui.plot_control_hand_vel->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
@@ -12592,7 +12693,17 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         stream << "Or_d_control_coeff=" << this->ui.lineEdit_coeff_d_or->text().toStdString().c_str() << endl;
         stream << "Or_d_error_th=" << this->ui.lineEdit_err_d_or->text().toStdString().c_str() << endl;
         stream << "t_f_trap=" << this->ui.lineEdit_t_f_trap->text().toStdString().c_str() << endl;
-
+        stream << "# Noise filtering #" << endl;
+        if (this->ui.radioButton_N_5->isChecked()){stream << "N_5=true"<< endl;}else{stream << "N_5=false"<< endl;}
+        if (this->ui.radioButton_N_7->isChecked()){stream << "N_7=true"<< endl;}else{stream << "N_7=false"<< endl;}
+        if (this->ui.radioButton_N_9->isChecked()){stream << "N_9=true"<< endl;}else{stream << "N_9=false"<< endl;}
+        if (this->ui.radioButton_N_11->isChecked()){stream << "N_11=true"<< endl;}else{stream << "N_11=false"<< endl;}
+        if (this->ui.radioButton_N_19->isChecked()){stream << "N_19=true"<< endl;}else{stream << "N_19=false"<< endl;}
+        if (this->ui.radioButton_N_25->isChecked()){stream << "N_25=true"<< endl;}else{stream << "N_25=false"<< endl;}
+        if (this->ui.radioButton_N_35->isChecked()){stream << "N_35=true"<< endl;}else{stream << "N_35=false"<< endl;}
+        if (this->ui.radioButton_N_45->isChecked()){stream << "N_45=true"<< endl;}else{stream << "N_45=false"<< endl;}
+        stream << "freq_cutoff_joint_pos=" << this->ui.lineEdit_cutoff_freq_joint_pos->text().toStdString().c_str() << endl;
+        stream << "timestep_joint_pos=" << this->ui.lineEdit_timestep_joint_pos->text().toStdString().c_str() << endl;
         stream << "# Maximum allowed velocity of the joints #" << endl;
         stream << "vel_max=" << this->ui.lineEdit_vel_max->text().toStdString().c_str() << endl;
         f.close();
@@ -12733,10 +12844,61 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     this->ui.lineEdit_vel_max->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("t_f_trap"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_t_f_trap->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("N_5"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.radioButton_N_5->setChecked(true);
+                    }else{
+                        this->ui.radioButton_N_5->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("N_7"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.radioButton_N_7->setChecked(true);
+                    }else{
+                        this->ui.radioButton_N_7->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("N_9"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.radioButton_N_9->setChecked(true);
+                    }else{
+                        this->ui.radioButton_N_9->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("N_11"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.radioButton_N_11->setChecked(true);
+                    }else{
+                        this->ui.radioButton_N_11->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("N_19"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.radioButton_N_19->setChecked(true);
+                    }else{
+                        this->ui.radioButton_N_19->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("N_25"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.radioButton_N_25->setChecked(true);
+                    }else{
+                        this->ui.radioButton_N_25->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("N_35"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.radioButton_N_35->setChecked(true);
+                    }else{
+                        this->ui.radioButton_N_35->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("N_45"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.radioButton_N_45->setChecked(true);
+                    }else{
+                        this->ui.radioButton_N_45->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("freq_cutoff_joint_pos"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_cutoff_freq_joint_pos->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("timestep_joint_pos"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_timestep_joint_pos->setText(fields.at(1));
                 }
             }
-        }
-
+        }// while
         f.close();
     }
 }
@@ -12819,7 +12981,50 @@ void MainWindow::on_pushButton_control_save_clicked()
 
 }
 
+void MainWindow::on_radioButton_N_5_clicked()
+{
+    this->N_filter_length=5;
+}
 
+void MainWindow::on_radioButton_N_7_clicked()
+{
+    this->N_filter_length=7;
+}
+
+void MainWindow::on_radioButton_N_9_clicked()
+{
+    this->N_filter_length=9;
+}
+
+void MainWindow::on_radioButton_N_11_clicked()
+{
+    this->N_filter_length=11;
+}
+
+void MainWindow::on_radioButton_N_19_clicked()
+{
+    this->N_filter_length=19;
+}
+
+void MainWindow::on_radioButton_N_25_clicked()
+{
+    this->N_filter_length=25;
+}
+
+void MainWindow::on_radioButton_N_35_clicked()
+{
+    this->N_filter_length=35;
+}
+
+void MainWindow::on_radioButton_N_45_clicked()
+{
+    this->N_filter_length=45;
+}
+
+void MainWindow::on_radioButton_N_55_clicked()
+{
+    this->N_filter_length=55;
+}
 
 
 }  // namespace motion_manager

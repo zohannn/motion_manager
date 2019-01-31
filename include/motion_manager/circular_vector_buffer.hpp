@@ -63,6 +63,7 @@ public:
 
     void push(const std::vector<T> &item);
     bool full();
+    size_t getCapacity();
 
 private:
     std::vector< std::deque<T> > m_buffers;
@@ -142,11 +143,19 @@ void CircularBuffers<T>::push(const std::vector<T> &items)
     if(m_buffers.size() != items.size())
         throw ex;
 
+//    for(size_t i=0; i<items.size(); ++i) {
+//        m_buffers.at(i).push_front(items.at(i));
+
+//        while(m_buffers.at(i).size() > m_capacity) {
+//            m_buffers.at(i).pop_back();
+//        }
+//    }
+
     for(size_t i=0; i<items.size(); ++i) {
-        m_buffers.at(i).push_front(items.at(i));
+        m_buffers.at(i).push_back(items.at(i));
 
         while(m_buffers.at(i).size() > m_capacity) {
-            m_buffers.at(i).pop_back();
+            m_buffers.at(i).pop_front();
         }
     }
 }
@@ -159,6 +168,12 @@ bool CircularBuffers<T>::full()
         full &= dq.size() == m_capacity;
     }
     return full;
+}
+
+template<typename T>
+size_t CircularBuffers<T>::getCapacity()
+{
+    return this->m_capacity;
 }
 
 #endif //CIRCULAR_VECTOR_BUFFER_HPP

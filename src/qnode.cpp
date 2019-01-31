@@ -10223,14 +10223,14 @@ bool QNode::execKinControlAcc(int arm, vector<double> &r_arm_posture, vector<dou
         ros::spinOnce();
 
         vrep_common::JointSetStateData data;
-        int exec_arm_mode = 0; // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+        int exec_arm_mode = 2; // 0 to set the position, 1 to set the target position, 2 to set the target velocity
         int exec_hand_mode = 1; // 0 to set the position, 1 to set the target position, 2 to set the target velocity
         double exec_value;
 
         for (size_t i = 0; i < r_arm_accelerations.size(); ++i)
         {
-            exec_value = r_arm_posture.at(i) + r_arm_velocities.at(i) * simulationTimeStep + 0.5 * (r_arm_accelerations.at(i)) * pow(simulationTimeStep,2);
-            //exec_value = r_arm_posture.at(i) + 0.5 * (r_arm_accelerations.at(i)) * pow(simulationTimeStep,2);
+            //exec_value = r_arm_posture.at(i) +  0.5 * r_arm_accelerations.at(i))* pow(simulationTimeStep,2); // pos
+            exec_value =  r_arm_accelerations.at(i) * simulationTimeStep; // vel
 
             if(arm!=0){
                 // single-arm
@@ -10248,9 +10248,9 @@ bool QNode::execKinControlAcc(int arm, vector<double> &r_arm_posture, vector<dou
 
             if(arm!=0){
                 // single-arm
-                data.setModes.data.push_back(exec_hand_mode);
-                data.handles.data.push_back(handles.at(i+r_arm_accelerations.size()));
-                data.values.data.push_back(exec_value);
+//                data.setModes.data.push_back(exec_hand_mode);
+//                data.handles.data.push_back(handles.at(i+r_arm_accelerations.size()));
+//                data.values.data.push_back(exec_value);
             }else{
                 // dual-arm (TO DO)
             }
