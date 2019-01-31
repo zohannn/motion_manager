@@ -88,13 +88,14 @@ t_f_trap=10
 N_5=false
 N_7=false
 N_9=false
-N_11=false
+N_11=true
 N_19=false
-N_25=true
+N_25=false
 N_35=false
 N_45=false
-freq_cutoff_joint_pos=1000
+freq_cutoff_joint_pos=100
 timestep_joint_pos=0.05
+
 # Maximum allowed velocity of the joints #
 vel_max=50.0
 

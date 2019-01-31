@@ -366,34 +366,6 @@ void MainWindow::execPosControl()
         {
             boost::unique_lock<boost::mutex> lck(hh_control_mtx);
 
-            // noise filtering
-            bool obst_filter_noise = this->ui.checkBox_obsts_filter_noise->isChecked();
-            double filter_cut_off_freq = 0.1; double filter_time_step = 0.05;
-            if(obst_filter_noise){
-                filter_cut_off_freq = this->ui.lineEdit_f_cutoff->text().toDouble();
-                filter_time_step = this->ui.lineEdit_time_step->text().toDouble();
-            }
-            this->lpf_obsts_pos_x->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_time_step);
-            this->lpf_obsts_pos_y->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_time_step);
-            this->lpf_obsts_pos_z->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_time_step);
-            this->lpf_obsts_or_roll->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_roll->setDeltaTime(filter_time_step);
-            this->lpf_obsts_or_pitch->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_time_step);
-            this->lpf_obsts_or_yaw->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_time_step);
-
-            double filter_cut_off_freq_j_pos = this->ui.lineEdit_cutoff_freq_joint_pos->text().toDouble();
-            double filter_time_step_j_pos = this->ui.lineEdit_timestep_joint_pos->text().toDouble();
-            this->lpf_joint_pos_1->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_1->setDeltaTime(filter_time_step_j_pos);
-            this->lpf_joint_pos_2->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_2->setDeltaTime(filter_time_step_j_pos);
-            this->lpf_joint_pos_3->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_3->setDeltaTime(filter_time_step_j_pos);
-            this->lpf_joint_pos_4->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_4->setDeltaTime(filter_time_step_j_pos);
-            this->lpf_joint_pos_5->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_5->setDeltaTime(filter_time_step_j_pos);
-            this->lpf_joint_pos_6->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_6->setDeltaTime(filter_time_step_j_pos);
-            this->lpf_joint_pos_7->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_7->setDeltaTime(filter_time_step_j_pos);
-            this->lpf_joint_pos_8->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_8->setDeltaTime(filter_time_step_j_pos);
-            this->lpf_joint_pos_9->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_9->setDeltaTime(filter_time_step_j_pos);
-            this->lpf_joint_pos_10->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_10->setDeltaTime(filter_time_step_j_pos);
-            this->lpf_joint_pos_11->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_11->setDeltaTime(filter_time_step_j_pos);
-
             // desired pose
             double des_hand_pos_x = 0.0; double des_hand_pos_y = 0.0; double des_hand_pos_z = 0.0;
             double des_hand_or_q_x = 0.0; double des_hand_or_q_y = 0.0; double des_hand_or_q_z = 0.0; double des_hand_or_q_w = 0.0;
@@ -575,7 +547,7 @@ void MainWindow::execPosControl()
                         obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
                         obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
                         obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
-                        if(obst_filter_noise){
+                        if(this->ui.checkBox_obsts_filter_noise->isChecked()){
                             obs_pos.Xpos = this->lpf_obsts_pos_x->update(obs_pos.Xpos);
                             obs_pos.Ypos = this->lpf_obsts_pos_y->update(obs_pos.Ypos);
                             obs_pos.Zpos = this->lpf_obsts_pos_z->update(obs_pos.Zpos);
@@ -862,7 +834,7 @@ void MainWindow::execPosControl()
 
 
                 double g_map = 0.0; double tau = 0.1; double dec_rate = 0.1; double diff_w = 0.1;
-                double s_time = this->qnode.getSimTime() - this->t_past;
+                double curr_time = this->qnode.getSimTime() - this->t_past;
 
                 VectorXd trap_hand_pose(JOINTS_ARM); // trapezoidal desired hand pose
                 VectorXd trap_hand_vel(JOINTS_ARM);  // trapezoidal desired hand velocity
@@ -897,7 +869,7 @@ void MainWindow::execPosControl()
                     tau = this->ui.lineEdit_tau->text().toDouble();
                     dec_rate = this->ui.lineEdit_dec_rate->text().toDouble();
                     diff_w = this->ui.lineEdit_diff_w->text().toDouble();
-                    g_map = 1 - exp((-dec_rate*s_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
+                    g_map = 1 - exp((-dec_rate*curr_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
                     int index = static_cast<int>(0.5+(n_steps-1)*g_map);
 
     //                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
@@ -1270,7 +1242,6 @@ void MainWindow::execPosControl()
 
                     }else{
                         // trapezoidal velocity profile
-                        double curr_time = this->qnode.getSimTime() - this->t_past;
                         VectorXd vel_trap(JOINTS_ARM);
                         vel_trap(0) = 2*(hand_pos_end(0)-hand_pos_init(0))/t_f_trap;
                         vel_trap(1) = 2*(hand_pos_end(1)-hand_pos_init(1))/t_f_trap;
@@ -1317,34 +1288,6 @@ void MainWindow::execPosControl()
                             trap_hand_acc(4) = acc_trap(4);
                             trap_hand_acc(5) = acc_trap(5);
                             trap_hand_acc(6) = acc_trap(6);
-
-    //                        }else if((curr_time>t_c_trap) && (curr_time<=(t_f_trap-t_c_trap))){
-    //                            // hand pose
-    //                            trap_hand_pose(0) = hand_pos_init(0) + acc_trap(0)*t_c_trap*(curr_time-t_c_trap/2);
-    //                            trap_hand_pose(1) = hand_pos_init(1) + acc_trap(1)*t_c_trap*(curr_time-t_c_trap/2);
-    //                            trap_hand_pose(2) = hand_pos_init(2) + acc_trap(2)*t_c_trap*(curr_time-t_c_trap/2);
-    //                            trap_hand_pose(3) = hand_or_q_e_init(0) + acc_trap(3)*t_c_trap*(curr_time-t_c_trap/2);
-    //                            trap_hand_pose(4) = hand_or_q_e_init(1) + acc_trap(4)*t_c_trap*(curr_time-t_c_trap/2);
-    //                            trap_hand_pose(5) = hand_or_q_e_init(2) + acc_trap(5)*t_c_trap*(curr_time-t_c_trap/2);
-    //                            trap_hand_pose(6) = hand_or_q_w_init + acc_trap(6)*t_c_trap*(curr_time-t_c_trap/2);
-
-    //                            //hand velocity
-    //                            trap_hand_vel(0) = acc_trap(0)*t_c_trap;
-    //                            trap_hand_vel(1) = acc_trap(1)*t_c_trap;
-    //                            trap_hand_vel(2) = acc_trap(2)*t_c_trap;
-    //                            trap_hand_vel(3) = acc_trap(3)*t_c_trap;
-    //                            trap_hand_vel(4) = acc_trap(4)*t_c_trap;
-    //                            trap_hand_vel(5) = acc_trap(5)*t_c_trap;
-    //                            trap_hand_vel(6) = acc_trap(6)*t_c_trap;
-
-    //                            //hand acceleration
-    //                            trap_hand_acc(0) = 0.0;
-    //                            trap_hand_acc(1) = 0.0;
-    //                            trap_hand_acc(2) = 0.0;
-    //                            trap_hand_acc(3) = 0.0;
-    //                            trap_hand_acc(4) = 0.0;
-    //                            trap_hand_acc(5) = 0.0;
-    //                            trap_hand_acc(6) = 0.0;
 
                         }else if((curr_time > t_c_trap) && (curr_time <= t_f_trap)){
 
@@ -1589,14 +1532,14 @@ void MainWindow::execPosControl()
                 // change desired hand pose
                 if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
                     bool condition = (e_n_pos < 1.73*error_pos_th) && (e_n_or < 1.73*error_or_th);
-    //                if(stages==3 && stage_descr.compare("plan")==0)
-    //                {
-    //                    condition = (g_map >= g_map_th_pa);
-    //                }else{
-    //                    //TO DO
-    //                }
+                    if(stages==3 && hl_en && stage_descr.compare("plan")==0)
+                    {
+                        condition = (g_map >= g_map_th_pa);
+                    }else{
+                        //TO DO
+                    }
                     if(condition){
-                        this->t_past=s_time;
+                        this->t_past=curr_time;
                         if(stages==3 && this->i_ctrl<2){
                             if(!hl_en){
                                 if(stage_descr.compare("plan")==0){
@@ -12506,6 +12449,7 @@ void MainWindow::on_pushButton_start_control_pressed()
     this->hand_j_acc = VectorXd::Zero(6);
     this->Jacobian = MatrixXd::Zero(6,JOINTS_ARM);
     this->qnode.resetSimTime();
+
 }
 
 void MainWindow::on_pushButton_start_control_clicked()
@@ -12559,6 +12503,34 @@ void MainWindow::on_pushButton_stop_control_clicked()
     this->lpf_joint_pos_9.reset(new LowPassFilter());
     this->lpf_joint_pos_10.reset(new LowPassFilter());
     this->lpf_joint_pos_11.reset(new LowPassFilter());
+
+    // noise filtering
+    bool obst_filter_noise = this->ui.checkBox_obsts_filter_noise->isChecked();
+    double filter_cut_off_freq = 0.1; double filter_time_step = 0.05;
+    if(obst_filter_noise){
+        filter_cut_off_freq = this->ui.lineEdit_f_cutoff->text().toDouble();
+        filter_time_step = this->ui.lineEdit_time_step->text().toDouble();
+    }
+    this->lpf_obsts_pos_x->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_time_step);
+    this->lpf_obsts_pos_y->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_time_step);
+    this->lpf_obsts_pos_z->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_time_step);
+    this->lpf_obsts_or_roll->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_roll->setDeltaTime(filter_time_step);
+    this->lpf_obsts_or_pitch->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_time_step);
+    this->lpf_obsts_or_yaw->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_time_step);
+
+    double filter_cut_off_freq_j_pos = this->ui.lineEdit_cutoff_freq_joint_pos->text().toDouble();
+    double filter_time_step_j_pos = this->ui.lineEdit_timestep_joint_pos->text().toDouble();
+    this->lpf_joint_pos_1->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_1->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_2->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_2->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_3->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_3->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_4->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_4->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_5->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_5->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_6->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_6->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_7->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_7->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_8->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_8->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_9->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_9->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_10->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_10->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_11->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_11->setDeltaTime(filter_time_step_j_pos);
 
     this->qnode.resetSimTime();
 }

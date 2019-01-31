@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -745,7 +745,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>570</x>
         <y>10</y>
-        <width>651</width>
+        <width>701</width>
         <height>161</height>
        </rect>
       </property>
@@ -757,7 +757,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>0</x>
          <y>20</y>
-         <width>641</width>
+         <width>691</width>
          <height>101</height>
         </rect>
        </property>
@@ -791,7 +791,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="pushButton_plan_trials">
        <property name="geometry">
         <rect>
-         <x>520</x>
+         <x>570</x>
          <y>131</y>
          <width>121</width>
          <height>23</height>
@@ -807,7 +807,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>570</x>
         <y>170</y>
-        <width>651</width>
+        <width>701</width>
         <height>491</height>
        </rect>
       </property>
@@ -823,7 +823,7 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>0</x>
           <y>10</y>
-          <width>641</width>
+          <width>691</width>
           <height>441</height>
          </rect>
         </property>
@@ -833,7 +833,7 @@ p, li { white-space: pre-wrap; }
         <widget class="QWidget" name="layoutWidget_time_mov">
          <property name="geometry">
           <rect>
-           <x>470</x>
+           <x>520</x>
            <y>0</y>
            <width>166</width>
            <height>17</height>
@@ -861,7 +861,7 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>10</x>
            <y>21</y>
-           <width>631</width>
+           <width>681</width>
            <height>381</height>
           </rect>
          </property>
@@ -869,7 +869,7 @@ p, li { white-space: pre-wrap; }
         <widget class="QWidget" name="layoutWidget_tol_stop">
          <property name="geometry">
           <rect>
-           <x>510</x>
+           <x>560</x>
            <y>410</y>
            <width>131</width>
            <height>27</height>
@@ -2341,6 +2341,9 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
+       <zorder>layoutWidget</zorder>
+       <zorder>groupBox_k_pos</zorder>
+       <zorder>groupBox_k_vel</zorder>
       </widget>
      </widget>
      <widget class="QCheckBox" name="checkBox_right_hand_status">
@@ -3486,7 +3489,7 @@ p, li { white-space: pre-wrap; }
        <property name="title">
         <string>Noise filtering</string>
        </property>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>170</x>
@@ -3526,7 +3529,7 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -3712,7 +3715,11 @@ p, li { white-space: pre-wrap; }
      <zorder>groupBox_control</zorder>
      <zorder>groupBox_ctrl_options</zorder>
      <zorder>groupBox_time_mapping</zorder>
-     <zorder>groupBox_noise_filter</zorder>
+     <zorder></zorder>
+     <zorder></zorder>
+     <zorder></zorder>
+     <zorder></zorder>
+     <zorder>groupBox_k_vel</zorder>
     </widget>
     <widget class="QWidget" name="tab_results">
      <property name="enabled">

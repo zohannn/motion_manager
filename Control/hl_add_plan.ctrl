@@ -29,29 +29,64 @@ Obsts_f_timestep=0.05
 
 # Human-likeness addition parameters #
 Hl_add=true
-Hl_add_pos_coeff_plan=0.1
-Hl_add_or_coeff_plan=4
-Hl_add_pos_coeff_app=0.1
-Hl_add_or_coeff_app=4
-Hl_add_pos_coeff_ret=0.1
-Hl_add_or_coeff_ret=4
+Hl_add_p_pos_coeff_plan=5
+Hl_add_p_or_coeff_plan=50
+Hl_add_p_pos_coeff_app=15
+Hl_add_p_or_coeff_app=0.1
+Hl_add_p_pos_coeff_ret=0.001
+
+Hl_add_p_or_coeff_ret=15
+
+Hl_add_d_pos_coeff_plan=10
+Hl_add_d_or_coeff_plan=0.1
+Hl_add_d_pos_coeff_app=15
+Hl_add_d_or_coeff_app=0.1
+Hl_add_d_pos_coeff_ret=0.001
+
+Hl_add_d_or_coeff_ret=15
+
 Hl_add_g_th_pa=0.95
+
 Hl_add_g_th_rp=0.95
+
 Hl_fing_coeff=0.4
+
 Hl_tau=0.05
 
 Hl_dec_rate=7
 
-Hl_diff_w=0.005
+Hl_diff_w=0.0005
 
 # Control coefficients and error threshold #
-Pos_control_coeff=0
+Pos_p_control_coeff=20
 
-Pos_error_th=5.0
+Pos_p_error_th=5.0
 
-Or_control_coeff=0
+Or_p_control_coeff=20
 
-Or_error_th=0.01
+Or_p_error_th=0.01
+
+Pos_d_control_coeff=0.8
+
+Pos_d_error_th=5.0
+
+Or_d_control_coeff=5
+
+Or_d_error_th=0.01
+
+t_f_trap=10
+
+# Noise filtering #
+N_5=false
+N_7=false
+N_9=false
+N_11=true
+N_19=false
+N_25=false
+N_35=false
+N_45=false
+freq_cutoff_joint_pos=100
+timestep_joint_pos=0.05
 
 # Maximum allowed velocity of the joints #
 vel_max=50.0
