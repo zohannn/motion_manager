@@ -1,0 +1,21 @@
+### Parameters of the Time mapping ###
+# Plan stage #
+tau_plan=0.006
+dec_rate_plan=10
+
+diff_w_plan=0.05
+
+# Approach stage #
+tau_app=0.01
+
+dec_rate_app=10
+
+diff_w_app=0.05
+
+# Retreat stage #
+tau_ret=0.01
+
+dec_rate_ret=10
+
+diff_w_ret=0.05
+

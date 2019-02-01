@@ -36,17 +36,14 @@ Hl_add_p_pos_coeff_plan=7
 Hl_add_p_or_coeff_plan=50
 
 Hl_add_p_pos_coeff_app=1
-
 Hl_add_p_or_coeff_app=50
 
 Hl_add_p_pos_coeff_ret=0.001
 
 Hl_add_p_or_coeff_ret=15
 
-Hl_add_d_pos_coeff_plan=1
-
-Hl_add_d_or_coeff_plan=3
-
+Hl_add_d_pos_coeff_plan=0.5
+Hl_add_d_or_coeff_plan=10
 Hl_add_d_pos_coeff_app=1
 
 Hl_add_d_or_coeff_app=1
@@ -80,12 +77,13 @@ Or_d_error_th=0.01
 
 t_f_trap=10
 
+use_vel_based_control=false
 # Noise filtering #
 N_5=false
 N_7=false
 N_9=false
-N_11=false
-N_19=true
+N_11=true
+N_19=false
 N_25=false
 N_35=false
 N_45=false

@@ -39,6 +39,7 @@
 #include "errors_control_dialog.hpp"
 #include "handposplot.hpp"
 #include "circular_vector_buffer.hpp"
+#include "time_map_dialog.hpp"
 
 #include <boost/atomic.hpp>
 #include <boost/thread.hpp>
@@ -929,6 +930,11 @@ public Q_SLOTS:
          */
         void on_radioButton_N_55_clicked();
 
+        /**
+         * @brief on_pushButton_time_map_clicked
+         */
+        void on_pushButton_time_map_clicked();
+
 
 private:
         src::severity_logger< severity_level > lg; /**< logger */
@@ -951,6 +957,7 @@ private:
         PowerLawDialog *mPowerLawdlg; /**< handle of the 2/3 power law dialog*/
         PowerLaw3DDialog *mPowerLaw3Ddlg; /**< handle of the 1/6 power law dialog*/
         CompVelocityDialog *mCompVeldlg; /**< handle of the velocity components dlg */
+        TimeMapDialog *mTimeMapdlg; /**< handle of the time mapping dlg */
 
         NatCollAvDialog *mNatCollAvdlg; /**< handle of the natural collision avoidance dlg */
         WarmStartResultsDialog *mWarmdlg; /**< handle of the warm start results dialog */
@@ -1375,7 +1382,8 @@ private:
         vector<double> bounce_handOrientation_q; /**< bounce hand orientation (quaternion) during control*/
         int i_ctrl; /**< index of the desired hand pose*/
         double t_past; /**< time past in previous stages during control */
-        double t_j_past; /**< time past in previous calculus of the time derivative of the jacobian during control */
+        double t_j_past; /**< time past in previous timestep during control */
+        double t_der_past; /**< time past in previous calculus of the derivatives during control */
         VectorXd hand_j_acc; /**< time derivative Jacobian dependant part of the hand accelearion */
         vector<double> h_hand_pos_end; /**< end hand position during control */
         vector<double> h_hand_or_q_end; /**< end hand orientation (quaternion) during control */

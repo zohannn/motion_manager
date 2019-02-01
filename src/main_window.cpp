@@ -112,6 +112,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mErrCtrldlg = new ErrorsControlDialog(this);
     mErrCtrldlg->setModal(false);
 
+    // create the time mapping dialog
+    mTimeMapdlg = new TimeMapDialog(this);
+    mTimeMapdlg->setModal(false);
+
     // check boxes
     QObject::connect(this->ui.checkBox_tar_x_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_tar_x_pos_var(int)));
     QObject::connect(this->ui.checkBox_tar_y_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_tar_y_pos_var(int)));
@@ -207,6 +211,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     ui.groupBox_hl_add_params->setEnabled(false);
     this->i_ctrl=0;
     this->t_j_past=0.0;
+    this->t_der_past=0.0;
     this->t_past=0.0;
     this->qnode.resetSimTime();
     this->samples_pos=0;
@@ -664,6 +669,7 @@ void MainWindow::execPosControl()
                 vector<double> r_arm_posture(JOINTS_ARM,0.0); vector<double> r_hand_posture(JOINTS_HAND,0.0);
                 // velocities
                 vector<double> r_arm_velocities(JOINTS_ARM,0.0); vector<double> r_hand_velocities(JOINTS_HAND,0.0);
+                vector<double> r_arm_velocities_read(JOINTS_ARM,0.0); vector<double> r_hand_velocities_read(JOINTS_HAND,0.0);
                 // accelerations
                 vector<double> r_arm_accelerations(JOINTS_ARM,0.0);
                 vector<double> r_arm_accelerations_read(JOINTS_ARM,0.0); vector<double> r_hand_accelerations_read(JOINTS_HAND,0.0);
@@ -706,8 +712,10 @@ void MainWindow::execPosControl()
 
 //                vector<double> r_arm_velocities_mes;
 //                vector<double> r_hand_velocities_mes(JOINTS_HAND,0.0);
-//                this->curr_scene->getHumanoid()->getRightArmVelocities(r_arm_velocities);
-//                this->curr_scene->getHumanoid()->getRightHandVelocities(r_hand_velocities_mes);
+                if(this->ui.checkBox_use_velocity_based_ctrl->isChecked())
+                {
+                    this->curr_scene->getHumanoid()->getRightArmVelocities(r_arm_velocities_read);
+                    this->curr_scene->getHumanoid()->getRightHandVelocities(r_hand_velocities_read);
 //                // filter noise from arm velocities
 //                r_arm_velocities.at(0) = this->lpf_r_arm_vel_1->update(r_arm_velocities_mes.at(0));
 //                r_arm_velocities.at(1) = this->lpf_r_arm_vel_2->update(r_arm_velocities_mes.at(1));
@@ -716,24 +724,26 @@ void MainWindow::execPosControl()
 //                r_arm_velocities.at(4) = this->lpf_r_arm_vel_5->update(r_arm_velocities_mes.at(4));
 //                r_arm_velocities.at(5) = this->lpf_r_arm_vel_6->update(r_arm_velocities_mes.at(5));
 //                r_arm_velocities.at(6) = this->lpf_r_arm_vel_7->update(r_arm_velocities_mes.at(6));
+                }else{
+                    // get the joint velocities
+                    this->arm_pos_buff->push(r_arm_posture);
+                    this->hand_pos_buff->push(r_hand_posture);
+                    if(this->samples_pos==this->N_filter_length-1 && this->arm_pos_buff->full() && this->hand_pos_buff->full()){
+                        for(size_t i=0; i< r_arm_posture.size();++i)
+                        {
+                            r_arm_velocities_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_pos_buff->at(i));
+                        }
+                        for(size_t i=0; i< r_hand_velocities_read.size();++i)
+                        {
+                            r_hand_velocities_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_pos_buff->at(i));
+                        }
+                    }else{this->samples_pos++;}
 
-                // get the joint velocities
-                this->arm_pos_buff->push(r_arm_posture);
-                this->hand_pos_buff->push(r_hand_posture);
-                if(this->samples_pos==this->N_filter_length-1 && this->arm_pos_buff->full() && this->hand_pos_buff->full()){
-                    for(size_t i=0; i< r_arm_posture.size();++i)
-                    {
-                        r_arm_velocities.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_pos_buff->at(i));
-                    }
-                    for(size_t i=0; i< r_hand_velocities.size();++i)
-                    {
-                        r_hand_velocities.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_pos_buff->at(i));
-                    }
-                }else{this->samples_pos++;}
+                }
 //                VectorXd r_arm_velocities_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_arm_velocities.data(), r_arm_velocities.size());
 
                 vector<double> r_hand_vel; vector<double> r_wrist_vel; vector<double> r_elbow_vel; vector<double> r_shoulder_vel;
-                this->curr_scene->getHumanoid()->getAllVel(1,r_hand_vel,r_wrist_vel,r_elbow_vel,r_shoulder_vel,r_arm_posture,r_arm_velocities);
+                this->curr_scene->getHumanoid()->getAllVel(1,r_hand_vel,r_wrist_vel,r_elbow_vel,r_shoulder_vel,r_arm_posture,r_arm_velocities_read);
 
                 vector<double> r_hand_lin_vel(r_hand_vel.begin(), r_hand_vel.begin()+3);
                 vector<double> r_hand_ang_vel(r_hand_vel.begin()+3, r_hand_vel.begin()+6);
@@ -744,57 +754,68 @@ void MainWindow::execPosControl()
                 vector<double> r_shoulder_lin_vel(r_shoulder_vel.begin(), r_shoulder_vel.begin()+3);
                 vector<double> r_shoulder_ang_vel(r_shoulder_vel.begin()+3, r_shoulder_vel.begin()+6);
 
-                // get the joint accelerations
-                this->arm_vel_buff->push(r_arm_velocities);
-                this->hand_vel_buff->push(r_hand_velocities);
-                if(this->samples_vel==this->N_filter_length-1 && this->arm_vel_buff->full() && this->hand_vel_buff->full()){
-                    for(size_t i=0; i< r_arm_velocities.size();++i)
-                    {
-                        r_arm_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_vel_buff->at(i));
+                if(!this->ui.checkBox_use_velocity_based_ctrl->isChecked())
+                {
+                    // get the joint accelerations
+                    this->arm_vel_buff->push(r_arm_velocities_read);
+                    this->hand_vel_buff->push(r_hand_velocities_read);
+                    if(this->samples_vel==this->N_filter_length-1 && this->arm_vel_buff->full() && this->hand_vel_buff->full()){
+                        for(size_t i=0; i< r_arm_velocities_read.size();++i)
+                        {
+                            r_arm_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_vel_buff->at(i));
+                        }
+                        for(size_t i=0; i< r_hand_velocities_read.size();++i)
+                        {
+                            r_hand_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_vel_buff->at(i));
+                        }
+                    }else{this->samples_vel++;}
+
+
+                    // get the hand acceleration
+                    this->r_hand_vel_buff->push(r_hand_vel);
+                    if(this->samples_h_vel==this->N_filter_length-1 && this->r_hand_vel_buff->full()){
+                        for(size_t i=0; i< r_hand_vel.size();++i)
+                        {
+                            r_hand_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_hand_vel_buff->at(i));
+                        }
+                    }else{this->samples_h_vel++;}
+
+
+                    // get the wrist acceleration
+                    this->r_wrist_vel_buff->push(r_wrist_vel);
+                    if(this->samples_w_vel==this->N_filter_length-1 && this->r_wrist_vel_buff->full()){
+                        for(size_t i=0; i< r_wrist_vel.size();++i)
+                        {
+                            r_wrist_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_wrist_vel_buff->at(i));
+                        }
+                    }else{this->samples_w_vel++;}
+
+                    // get the elbow acceleration
+                    this->r_elbow_vel_buff->push(r_elbow_vel);
+                    if(this->samples_e_vel==this->N_filter_length-1 && this->r_elbow_vel_buff->full()){
+                        for(size_t i=0; i< r_elbow_vel.size();++i)
+                        {
+                            r_elbow_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_elbow_vel_buff->at(i));
+                        }
+                    }else{this->samples_e_vel++;}
+
+                    // get the shoulder acceleration
+                    this->r_shoulder_vel_buff->push(r_shoulder_vel);
+                    if(this->samples_s_vel==this->N_filter_length-1 && this->r_shoulder_vel_buff->full()){
+                        for(size_t i=0; i< r_shoulder_vel.size();++i)
+                        {
+                            r_shoulder_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_shoulder_vel_buff->at(i));
+                        }
+                    }else{
+                        this->samples_s_vel++;
+                        this->t_der_past = this->qnode.getSimTime();
                     }
-                    for(size_t i=0; i< r_hand_velocities.size();++i)
-                    {
-                        r_hand_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_vel_buff->at(i));
-                    }
-                }else{this->samples_vel++;}
+                }
                 VectorXd r_arm_accelerations_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_arm_accelerations_read.data(), r_arm_accelerations_read.size());
-
-                // get the hand acceleration
-                this->r_hand_vel_buff->push(r_hand_vel);
-                if(this->samples_h_vel==this->N_filter_length-1 && this->r_hand_vel_buff->full()){
-                    for(size_t i=0; i< r_hand_vel.size();++i)
-                    {
-                        r_hand_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_hand_vel_buff->at(i));
-                    }
-                }else{this->samples_h_vel++;}
                 VectorXd r_hand_acc_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_hand_acc_read.data(), r_hand_acc_read.size());
-
-                // get the wrist acceleration
-                this->r_wrist_vel_buff->push(r_wrist_vel);
-                if(this->samples_w_vel==this->N_filter_length-1 && this->r_wrist_vel_buff->full()){
-                    for(size_t i=0; i< r_wrist_vel.size();++i)
-                    {
-                        r_wrist_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_wrist_vel_buff->at(i));
-                    }
-                }else{this->samples_w_vel++;}
-
-                // get the elbow acceleration
-                this->r_elbow_vel_buff->push(r_elbow_vel);
-                if(this->samples_e_vel==this->N_filter_length-1 && this->r_elbow_vel_buff->full()){
-                    for(size_t i=0; i< r_elbow_vel.size();++i)
-                    {
-                        r_elbow_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_elbow_vel_buff->at(i));
-                    }
-                }else{this->samples_e_vel++;}
-
-                // get the shoulder acceleration
-                this->r_shoulder_vel_buff->push(r_shoulder_vel);
-                if(this->samples_s_vel==this->N_filter_length-1 && this->r_shoulder_vel_buff->full()){
-                    for(size_t i=0; i< r_shoulder_vel.size();++i)
-                    {
-                        r_shoulder_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_shoulder_vel_buff->at(i));
-                    }
-                }else{this->samples_s_vel++;}
+                // Jacobian
+                this->curr_scene->getHumanoid()->getJacobian(1,r_arm_posture,this->Jacobian);
+                this->hand_j_acc = r_hand_acc_read_vec - this->Jacobian*r_arm_accelerations_read_vec;
 
                 vector<double> r_hand_lin_acc(r_hand_acc_read.begin(), r_hand_acc_read.begin()+3);
                 vector<double> r_hand_ang_acc(r_hand_acc_read.begin()+3, r_hand_acc_read.begin()+6);
@@ -804,10 +825,6 @@ void MainWindow::execPosControl()
                 vector<double> r_elbow_ang_acc(r_elbow_acc_read.begin()+3, r_elbow_acc_read.begin()+6);
                 vector<double> r_shoulder_lin_acc(r_shoulder_acc_read.begin(), r_shoulder_acc_read.begin()+3);
                 vector<double> r_shoulder_ang_acc(r_shoulder_acc_read.begin()+3, r_shoulder_acc_read.begin()+6);
-
-                // Jacobian
-                this->curr_scene->getHumanoid()->getJacobian(1,r_arm_posture,this->Jacobian);
-                this->hand_j_acc = r_hand_acc_read_vec - this->Jacobian*r_arm_accelerations_read_vec;
 
 
                 Vector3d r_hand_pos_vec; Vector3d r_hand_or_q_e; double r_hand_q_w = r_hand_q.at(3);
@@ -833,8 +850,7 @@ void MainWindow::execPosControl()
                 VectorXd der_error_tot(6); der_error_tot << error_lin_vel(0),error_lin_vel(1),error_lin_vel(2),error_ang_vel(0),error_ang_vel(1),error_ang_vel(2);
 
 
-                double g_map = 0.0; double tau = 0.1; double dec_rate = 0.1; double diff_w = 0.1;
-                double curr_time = this->qnode.getSimTime() - this->t_past;
+                double curr_time = this->qnode.getSimTime() - this->t_past - this->t_der_past;
 
                 VectorXd trap_hand_pose(JOINTS_ARM); // trapezoidal desired hand pose
                 VectorXd trap_hand_vel(JOINTS_ARM);  // trapezoidal desired hand velocity
@@ -861,28 +877,37 @@ void MainWindow::execPosControl()
                 VectorXd der_error_trap_tot(6); // time derivative of the error with the trapezoidal pose
                 VectorXd error_h_tot(6); // error with the human-like pose
                 VectorXd der_error_h_tot(6); // time derivative of the error with the human-like pose
+                VectorXd trap_hand_ref_vel(6); // trapezoidal reference velocity
+                VectorXd h_hand_ref_vel(6); // human-like reference velocity
                 VectorXd trap_hand_ref_acc(6); // trapezoidal reference acceleration
                 VectorXd h_hand_ref_acc(6); // human-like reference acceleration
 
+                double g_map = 0.0; int index = 0;// normalized mapped time
                 if(this->ui.checkBox_use_plan_hand_pos->isChecked())
                 {
-                    tau = this->ui.lineEdit_tau->text().toDouble();
-                    dec_rate = this->ui.lineEdit_dec_rate->text().toDouble();
-                    diff_w = this->ui.lineEdit_diff_w->text().toDouble();
-                    g_map = 1 - exp((-dec_rate*curr_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
-                    int index = static_cast<int>(0.5+(n_steps-1)*g_map);
+//                    tau = this->ui.lineEdit_tau->text().toDouble();
+//                    dec_rate = this->ui.lineEdit_dec_rate->text().toDouble();
+//                    diff_w = this->ui.lineEdit_diff_w->text().toDouble();
+//                    int index = static_cast<int>(0.5+(n_steps-1)*g_map);
 
-    //                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
-    //                BOOST_LOG_SEV(lg, info) << "g_map = " << g_map;
-    //                BOOST_LOG_SEV(lg, info) << "index = " << index;
-    //                BOOST_LOG_SEV(lg, info) << "sim_time = " << this->qnode.getSimTime();
-    //                BOOST_LOG_SEV(lg, info) << "n_steps = " << n_steps;
-    //                BOOST_LOG_SEV(lg, info) << "error_tot_squared_norm = " << error_tot.squaredNorm();
 
                     if(hl_en)
                     { // human-like velocity profile
+                        double tau = 0.1; double dec_rate = 0.1; double diff_w = 0.1;
+
                         if(stage_descr.compare("plan")==0)
                         {
+                            this->mTimeMapdlg->getPlanTimeMapping(tau,dec_rate,diff_w);
+                            g_map = 1 - exp((-dec_rate*curr_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
+                            index = static_cast<int>(0.5+(n_steps-1)*g_map);
+
+                            //                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
+                            //                BOOST_LOG_SEV(lg, info) << "g_map = " << g_map;
+                            //                BOOST_LOG_SEV(lg, info) << "index = " << index;
+                            //                BOOST_LOG_SEV(lg, info) << "sim_time = " << this->qnode.getSimTime();
+                            //                BOOST_LOG_SEV(lg, info) << "n_steps = " << n_steps;
+                            //                BOOST_LOG_SEV(lg, info) << "error_tot_squared_norm = " << error_tot.squaredNorm();
+
                             hl_p_pos_coeff = hl_p_pos_coeff_plan; hl_p_or_coeff = hl_p_or_coeff_plan;
                             hl_d_pos_coeff = hl_d_pos_coeff_plan; hl_d_or_coeff = hl_d_or_coeff_plan;
 
@@ -1076,6 +1101,17 @@ void MainWindow::execPosControl()
 
                         }else if(stage_descr.compare("approach")==0){
 
+                            this->mTimeMapdlg->getApproachTimeMapping(tau,dec_rate,diff_w);
+                            g_map = 1 - exp((-dec_rate*curr_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
+                            index = static_cast<int>(0.5+(n_steps-1)*g_map);
+
+                            //                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
+                            //                BOOST_LOG_SEV(lg, info) << "g_map = " << g_map;
+                            //                BOOST_LOG_SEV(lg, info) << "index = " << index;
+                            //                BOOST_LOG_SEV(lg, info) << "sim_time = " << this->qnode.getSimTime();
+                            //                BOOST_LOG_SEV(lg, info) << "n_steps = " << n_steps;
+                            //                BOOST_LOG_SEV(lg, info) << "error_tot_squared_norm = " << error_tot.squaredNorm();
+
                             hl_p_pos_coeff = hl_p_pos_coeff_app; hl_p_or_coeff = hl_p_or_coeff_app;
                             hl_d_pos_coeff = hl_d_pos_coeff_app; hl_d_or_coeff = hl_d_or_coeff_app;
 
@@ -1122,6 +1158,17 @@ void MainWindow::execPosControl()
     //                    BOOST_LOG_SEV(lg, info) << "h hand ang vel z = " << h_hand_vel(5);
 
                         }else if(stage_descr.compare("retreat")==0){
+
+                            this->mTimeMapdlg->getRetreatTimeMapping(tau,dec_rate,diff_w);
+                            g_map = 1 - exp((-dec_rate*curr_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
+                            index = static_cast<int>(0.5+(n_steps-1)*g_map);
+
+                            //                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
+                            //                BOOST_LOG_SEV(lg, info) << "g_map = " << g_map;
+                            //                BOOST_LOG_SEV(lg, info) << "index = " << index;
+                            //                BOOST_LOG_SEV(lg, info) << "sim_time = " << this->qnode.getSimTime();
+                            //                BOOST_LOG_SEV(lg, info) << "n_steps = " << n_steps;
+                            //                BOOST_LOG_SEV(lg, info) << "error_tot_squared_norm = " << error_tot.squaredNorm();
 
                             hl_p_pos_coeff = hl_p_pos_coeff_ret; hl_p_or_coeff = hl_p_or_coeff_ret;
                             hl_d_pos_coeff = hl_d_pos_coeff_ret; hl_d_or_coeff = hl_d_or_coeff_ret;
@@ -1196,6 +1243,16 @@ void MainWindow::execPosControl()
                     // total error in velocity
                     der_error_h_tot << error_h_lin_vel(0),error_h_lin_vel(1),error_h_lin_vel(2),error_h_der_or(0),error_h_der_or(1),error_h_der_or(2);
 
+                    // human-like reference velocity
+                    h_hand_ref_vel(0) = h_hand_vel(0);
+                    h_hand_ref_vel(1) = h_hand_vel(1);
+                    h_hand_ref_vel(2) = h_hand_vel(2);
+                    Vector3d h_hand_vel_q_e; h_hand_vel_q_e << h_hand_vel(3), h_hand_vel(4), h_hand_vel(5); double h_hand_vel_q_w = h_hand_vel(6);
+                    Vector3d des_omega = 2*h_hand_or_q_e.cross(h_hand_vel_q_e)+2*h_hand_or_q_w*h_hand_vel_q_e-2*h_hand_vel_q_w*h_hand_or_q_e;
+                    h_hand_ref_vel(3) = des_omega(0);
+                    h_hand_ref_vel(4) = des_omega(1);
+                    h_hand_ref_vel(5) = des_omega(2);
+
                     // human-like reference acceleration
                     h_hand_ref_acc(0) = h_hand_acc(0);
                     h_hand_ref_acc(1) = h_hand_acc(1);
@@ -1224,21 +1281,20 @@ void MainWindow::execPosControl()
     //                BOOST_LOG_SEV(lg, info) << "error or qz = " << error_h_tot(5);
 
 
-//                    VectorXd h_posture = jointsPosition.row(index); // current human-like posture
-//                    h_hand_posture = h_posture.tail<JOINTS_HAND>(); // current human-like hand posture
-//                    VectorXd hand_posture(4);
-//                    hand_posture << r_hand_posture.at(0),r_hand_posture.at(1),r_hand_posture.at(2),r_hand_posture.at(3);
-//                    r_hand_velocities_vec = -fing_coeff * (hand_posture - h_hand_posture).cwiseQuotient(jointsPosition_hand_max - jointsPosition_hand_min);
-//                    r_hand_velocities_vec(0) = 0.0; // the spread does not move
-//                    if(((mov_type==0) && (stage_descr.compare("retreat")==0)) // pick in retreat stage
-//                            || ((mov_type==2 || mov_type==3 || mov_type==4) && ((stage_descr.compare("plan")==0) || (stage_descr.compare("approach")==0)))) // place in plan or approach stages
-//                    {
-//                        // the hand is holding an object
-//                        r_hand_velocities_vec(1) = 0.0;
-//                        r_hand_velocities_vec(2) = 0.0;
-//                        r_hand_velocities_vec(3) = 0.0;
-//                    }
-//                    VectorXd::Map(&r_hand_velocities[0], r_hand_velocities_vec.size()) = r_hand_velocities_vec;
+                    VectorXd h_posture = jointsPosition.row(index); // current human-like posture
+                    VectorXd h_hand_posture = h_posture.tail<JOINTS_HAND>(); // current human-like hand posture
+                    VectorXd hand_posture(JOINTS_HAND); hand_posture << r_hand_posture.at(0),r_hand_posture.at(1),r_hand_posture.at(2),r_hand_posture.at(3);
+                    VectorXd r_hand_velocities_vec = -fing_coeff * (hand_posture - h_hand_posture).cwiseQuotient(jointsPosition_hand_max - jointsPosition_hand_min);
+                    r_hand_velocities_vec(0) = 0.0; // the spread does not move
+                    if(((mov_type==0) && (stage_descr.compare("retreat")==0)) // pick in retreat stage
+                            || ((mov_type==2 || mov_type==3 || mov_type==4) && ((stage_descr.compare("plan")==0) || (stage_descr.compare("approach")==0)))) // place in plan or approach stages
+                    {
+                        // the hand is holding an object
+                        r_hand_velocities_vec(1) = 0.0;
+                        r_hand_velocities_vec(2) = 0.0;
+                        r_hand_velocities_vec(3) = 0.0;
+                    }
+                    VectorXd::Map(&r_hand_velocities[0], r_hand_velocities_vec.size()) = r_hand_velocities_vec;
 
                     }else{
                         // trapezoidal velocity profile
@@ -1373,7 +1429,17 @@ void MainWindow::execPosControl()
                         // total error in velocity
                         der_error_trap_tot << error_trap_lin_vel(0),error_trap_lin_vel(1),error_trap_lin_vel(2),error_trap_der_or(0),error_trap_der_or(1),error_trap_der_or(2);
 
-                        // trapezoidal reference acceleration
+                        // triangular reference velocity
+                        trap_hand_ref_vel(0) = trap_hand_vel(0);
+                        trap_hand_ref_vel(1) = trap_hand_vel(1);
+                        trap_hand_ref_vel(2) = trap_hand_vel(2);
+                        Vector3d trap_hand_vel_q_e; trap_hand_vel_q_e << trap_hand_vel(3), trap_hand_vel(4), trap_hand_vel(5); double trap_hand_vel_q_w = trap_hand_vel(6);
+                        Vector3d des_omega = 2*trap_hand_or_q_e.cross(trap_hand_vel_q_e)+2*trap_hand_or_q_w*trap_hand_vel_q_e-2*trap_hand_vel_q_w*trap_hand_or_q_e;
+                        trap_hand_ref_vel(3) = des_omega(0);
+                        trap_hand_ref_vel(4) = des_omega(1);
+                        trap_hand_ref_vel(5) = des_omega(2);
+
+                        // triangular reference acceleration
                         trap_hand_ref_acc(0) = trap_hand_acc(0);
                         trap_hand_ref_acc(1) = trap_hand_acc(1);
                         trap_hand_ref_acc(2) = trap_hand_acc(2);
@@ -1485,12 +1551,23 @@ void MainWindow::execPosControl()
 
 
                 // closed-loop control
-                VectorXd hand_acc_xd_vec(6);
-                if(hl_en){
-                    hand_acc_xd_vec = h_hand_ref_acc + Koeff_d*der_error_h_tot + Koeff_p*error_h_tot - this->hand_j_acc;
+                VectorXd hand_vel_xd_vec(6); VectorXd hand_acc_xd_vec(6);
+                if(this->ui.checkBox_use_velocity_based_ctrl->isChecked())
+                {
+                    if(hl_en){
+                        hand_vel_xd_vec = h_hand_ref_vel +  Koeff_p*error_h_tot;
+                    }else{
+                        hand_vel_xd_vec = trap_hand_ref_vel + Koeff_p*error_trap_tot;
+                    }
                 }else{
-                    hand_acc_xd_vec = trap_hand_ref_acc + Koeff_d*der_error_trap_tot + Koeff_p*error_trap_tot - this->hand_j_acc;
+                    if(hl_en){
+                        hand_acc_xd_vec = h_hand_ref_acc + Koeff_d*der_error_h_tot + Koeff_p*error_h_tot - this->hand_j_acc;
+                    }else{
+                        hand_acc_xd_vec = trap_hand_ref_acc + Koeff_d*der_error_trap_tot + Koeff_p*error_trap_tot - this->hand_j_acc;
+                    }
                 }
+                vector<double> hand_vel_vec; hand_vel_vec.resize(hand_vel_xd_vec.size());
+                VectorXd::Map(&hand_vel_vec[0], hand_vel_xd_vec.size()) = hand_vel_xd_vec;
                 vector<double> hand_acc_vec; hand_acc_vec.resize(hand_acc_xd_vec.size());
                 VectorXd::Map(&hand_acc_vec[0], hand_acc_xd_vec.size()) = hand_acc_xd_vec;
 
@@ -1535,8 +1612,8 @@ void MainWindow::execPosControl()
                     if(stages==3 && hl_en && stage_descr.compare("plan")==0)
                     {
                         condition = (g_map >= g_map_th_pa);
-                    }else{
-                        //TO DO
+                    }else if(stages==3 && hl_en && stage_descr.compare("approach")==0){
+                        condition = (g_map >= g_map_th_rp);
                     }
                     if(condition){
                         this->t_past=curr_time;
@@ -1557,12 +1634,23 @@ void MainWindow::execPosControl()
                     }
                 }
 
-                // inverse algorithm
-                this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,r_arm_accelerations,jlim_en,sing_en,obsts_en,
-                                                                                vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
+                if(this->ui.checkBox_use_velocity_based_ctrl->isChecked())
+                {
+                    // inverse algorithm
+                    this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_arm_posture_mes,hand_vel_vec,r_arm_velocities,jlim_en,sing_en,obsts_en,
+                                                                                    vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
 
-                // execute the control
-                this->qnode.execKinControlAcc(1,r_arm_posture_mes,r_arm_velocities,r_arm_accelerations,r_hand_posture_mes,r_hand_velocities);
+                    // execute the control
+                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities);
+                }else{
+
+                    // inverse algorithm
+                    this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,r_arm_accelerations,jlim_en,sing_en,obsts_en,
+                                                                                    vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
+
+                    // execute the control
+                    this->qnode.execKinControlAcc(1,r_arm_posture_mes,r_arm_velocities,r_arm_accelerations,r_hand_posture_mes,r_hand_velocities_read);
+                }
 
                 // ------------- Recording ------------------------------- //
 
@@ -1575,10 +1663,10 @@ void MainWindow::execPosControl()
 
                 // record the velocities of the joints
                 this->jointsVelocity_ctrl.conservativeResize(this->jointsVelocity_ctrl.rows()+1,JOINTS_ARM+JOINTS_HAND);
-                for(size_t jj=0; jj < r_arm_velocities.size(); ++jj)
-                    this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,jj) = r_arm_velocities.at(jj);
-                for(size_t jj=0; jj < r_hand_velocities.size(); ++jj)
-                    this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,r_arm_velocities.size()+jj) = r_hand_velocities.at(jj);
+                for(size_t jj=0; jj < r_arm_velocities_read.size(); ++jj)
+                    this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,jj) = r_arm_velocities_read.at(jj);
+                for(size_t jj=0; jj < r_hand_velocities_read.size(); ++jj)
+                    this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,r_arm_velocities_read.size()+jj) = r_hand_velocities_read.at(jj);
 
 
                 // record the acceleration of the joints
@@ -12332,6 +12420,11 @@ void MainWindow::check_draw_ellipse(int state)
     }
 }
 
+void MainWindow::on_pushButton_time_map_clicked()
+{
+    this->mTimeMapdlg->show();
+}
+
 void MainWindow::on_pushButton_control_plot_joints_clicked()
 {
     if(this->jointsVelocity_ctrl.rows()!=0){
@@ -12432,6 +12525,7 @@ void MainWindow::on_pushButton_start_control_pressed()
     this->i_ctrl=0;
     this->t_past=0.0;
     this->t_j_past=0.0;
+    this->t_der_past=0.0;
     this->samples_pos=0;
     this->samples_vel=0;
     this->samples_h_vel=0;
@@ -12611,7 +12705,7 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
     QString filename = QFileDialog::getSaveFileName(this,
                                                     tr("Save the file with the controlling parameters"),
                                                     QString(MAIN_PATH)+"/Control",
-                                                    "All Files (*.*);;Tol Files (*.ctrl)");
+                                                    "ctrl Files (*.ctrl)");
     QFile f( filename );
     if(f.open( QIODevice::WriteOnly )){
         QTextStream stream( &f );
@@ -12634,6 +12728,8 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         if (this->ui.checkBox_obsts_filter_noise->isChecked()){ stream << "Obsts_filter_noise=true"<< endl;}else{stream << "Obsts_filter_noise=false"<< endl;}
         stream << "Obsts_f_cut_off=" << this->ui.lineEdit_f_cutoff->text().toStdString().c_str() << endl;
         stream << "Obsts_f_timestep=" << this->ui.lineEdit_time_step->text().toStdString().c_str() << endl;
+        if (this->ui.checkBox_use_plan_hand_pos->isChecked()){ stream << "use_plan_hand_pos=true"<< endl;}else{stream << "use_plan_hand_pos=false"<< endl;}
+        if (this->ui.checkBox_use_vel_control->isChecked()){ stream << "use_vel_control=true"<< endl;}else{stream << "use_vel_control=false"<< endl;}
         stream << "# Human-likeness addition parameters #" << endl;
         if (this->ui.checkBox_hl_add->isChecked()){ stream << "Hl_add=true"<< endl;}else{stream << "Hl_add=false"<< endl;}
         stream << "Hl_add_p_pos_coeff_plan=" << this->ui.lineEdit_hl_p_pos_coeff_plan->text().toStdString().c_str() << endl;
@@ -12651,10 +12747,6 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         stream << "Hl_add_g_th_pa=" << this->ui.lineEdit_g_th_plan_app->text().toStdString().c_str() << endl;
         stream << "Hl_add_g_th_rp=" << this->ui.lineEdit_g_th_ret_plan->text().toStdString().c_str() << endl;
         stream << "Hl_fing_coeff=" << this->ui.lineEdit_fing_coeff->text().toStdString().c_str() << endl;
-        stream << "Hl_tau=" << this->ui.lineEdit_tau->text().toStdString().c_str() << endl;
-        stream << "Hl_dec_rate=" << this->ui.lineEdit_dec_rate->text().toStdString().c_str() << endl;
-        stream << "Hl_diff_w=" << this->ui.lineEdit_diff_w->text().toStdString().c_str() << endl;
-
         stream << "# Control coefficients and error threshold #" << endl;
         stream << "Pos_p_control_coeff=" << this->ui.lineEdit_coeff_p_pos->text().toStdString().c_str() << endl;
         stream << "Pos_p_error_th=" << this->ui.lineEdit_err_p_pos->text().toStdString().c_str() << endl;
@@ -12665,6 +12757,7 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         stream << "Or_d_control_coeff=" << this->ui.lineEdit_coeff_d_or->text().toStdString().c_str() << endl;
         stream << "Or_d_error_th=" << this->ui.lineEdit_err_d_or->text().toStdString().c_str() << endl;
         stream << "t_f_trap=" << this->ui.lineEdit_t_f_trap->text().toStdString().c_str() << endl;
+        if (this->ui.checkBox_use_velocity_based_ctrl->isChecked()){ stream << "use_vel_based_control=true"<< endl;}else{stream << "use_vel_based_control=false"<< endl;}
         stream << "# Noise filtering #" << endl;
         if (this->ui.radioButton_N_5->isChecked()){stream << "N_5=true"<< endl;}else{stream << "N_5=false"<< endl;}
         if (this->ui.radioButton_N_7->isChecked()){stream << "N_7=true"<< endl;}else{stream << "N_7=false"<< endl;}
@@ -12687,7 +12780,7 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
     QString filename = QFileDialog::getOpenFileName(this,
                                                     tr("Load the file of warm start settings"),
                                                     QString(MAIN_PATH)+"/Control",
-                                                    "All Files (*.*);; Tol Files (*.ctrl)");
+                                                    "ctrl Files (*.ctrl)");
     QFile f( filename );
     if(f.open( QIODevice::ReadOnly )){
         QTextStream stream( &f );
@@ -12752,6 +12845,18 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     this->ui.lineEdit_f_cutoff->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Obsts_f_timestep"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_time_step->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("use_plan_hand_pos"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.checkBox_use_plan_hand_pos->setChecked(true);
+                    }else{
+                        this->ui.checkBox_use_plan_hand_pos->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("use_vel_control"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.checkBox_use_vel_control->setChecked(true);
+                    }else{
+                        this->ui.checkBox_use_vel_control->setChecked(false);
+                    }
                 }else if(QString::compare(fields.at(0),QString("Hl_add"),Qt::CaseInsensitive)==0){
                     if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
                         this->ui.checkBox_hl_add->setChecked(true);
@@ -12790,12 +12895,6 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     this->ui.lineEdit_g_th_ret_plan->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Hl_fing_coeff"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_fing_coeff->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_tau"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_tau->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_dec_rate"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_dec_rate->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_diff_w"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_diff_w->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Pos_p_control_coeff"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_coeff_p_pos->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Pos_p_error_th"),Qt::CaseInsensitive)==0){
@@ -12868,6 +12967,12 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     this->ui.lineEdit_cutoff_freq_joint_pos->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("timestep_joint_pos"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_timestep_joint_pos->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("use_vel_based_control"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.checkBox_use_velocity_based_ctrl->setChecked(true);
+                    }else{
+                        this->ui.checkBox_use_velocity_based_ctrl->setChecked(false);
+                    }
                 }
             }
         }// while
