@@ -1649,7 +1649,7 @@ void MainWindow::execPosControl()
                                                                                     vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
 
                     // execute the control
-                    this->qnode.execKinControlAcc(1,r_arm_posture_mes,r_arm_velocities,r_arm_accelerations,r_hand_posture_mes,r_hand_velocities_read);
+                    this->qnode.execKinControlAcc(1,r_arm_posture_mes,r_arm_velocities,r_arm_accelerations,r_hand_posture_mes,r_hand_velocities);
                 }
 
                 // ------------- Recording ------------------------------- //

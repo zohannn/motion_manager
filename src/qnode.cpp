@@ -10235,9 +10235,9 @@ bool QNode::execKinControlAcc(int arm, vector<double> &r_arm_posture, vector<dou
 
             if(arm!=0){
                 // single-arm
-//                data.setModes.data.push_back(exec_hand_mode);
-//                data.handles.data.push_back(handles.at(i+r_arm_accelerations.size()));
-//                data.values.data.push_back(exec_value);
+                data.setModes.data.push_back(exec_hand_mode);
+                data.handles.data.push_back(handles.at(i+r_arm_accelerations.size()));
+                data.values.data.push_back(exec_value);
             }else{
                 // dual-arm (TO DO)
             }
