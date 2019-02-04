@@ -156,6 +156,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(this->ui.checkBox_obsts_filter_noise, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_obsts_filter_noise(int)));
     QObject::connect(this->ui.checkBox_hl_add, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_hl_add(int)));    
     QObject::connect(this->ui.checkBox_draw_ellipse, SIGNAL(stateChanged(int)), this, SLOT(check_draw_ellipse(int)));
+    QObject::connect(this->ui.checkBox_tar_filter_noise, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_tar_filter_noise(int)));
 
 
     ReadSettings();
@@ -267,6 +268,14 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     for (size_t i=0; i< scenarios.size();++i){
         ui.listWidget_scenario->addItem(scenarios.at(i));
     }
+
+    // controlling: low pass filter of target's information
+    this->lpf_tar_pos_x.reset(new LowPassFilter());
+    this->lpf_tar_pos_y.reset(new LowPassFilter());
+    this->lpf_tar_pos_z.reset(new LowPassFilter());
+    this->lpf_tar_or_roll.reset(new LowPassFilter());
+    this->lpf_tar_or_pitch.reset(new LowPassFilter());
+    this->lpf_tar_or_yaw.reset(new LowPassFilter());
 
     // controlling: low pass filter of obstacles' information
     this->lpf_obsts_pos_x.reset(new LowPassFilter());
@@ -387,6 +396,14 @@ void MainWindow::execPosControl()
             double bounce_hand_pos_x = 0.0; double bounce_hand_pos_y = 0.0; double bounce_hand_pos_z = 0.0;
             double bounce_hand_q_x = 0.0; double bounce_hand_q_y = 0.0; double bounce_hand_q_z = 0.0; double bounce_hand_q_w = 0.0;
 
+            // simulating noise of the vision system
+            double obj_x_var = 100; // mm
+            double obj_y_var = 100; // mm
+            double obj_z_var = 100; // mm
+            double obj_roll_var = 0.5; // rad
+            double obj_pitch_var = 0.5; // rad
+            double obj_yaw_var = 0.5; // rad
+
 
             std::string stage_descr = "plan"; int stages = 1; int mov_type = 0;
             MatrixXd jointsPosition;
@@ -401,15 +418,53 @@ void MainWindow::execPosControl()
             VectorXd jointsPosition_hand(JOINTS_HAND); vector<double> jointsPosition_hand_vec(JOINTS_HAND);
             VectorXd jointsPosition_hand_max(JOINTS_HAND); VectorXd jointsPosition_hand_min(JOINTS_HAND);
 
-            // hand
-//            VectorXd h_hand_posture(JOINTS_HAND);
-//            VectorXd r_hand_velocities_vec(JOINTS_HAND); r_hand_velocities_vec << 0.0,0.0,0.0,0.0;
-//            vector<double> r_hand_velocities; r_hand_velocities.resize(r_hand_velocities_vec.size());
-//            VectorXd::Map(&r_hand_velocities[0], r_hand_velocities_vec.size()) = r_hand_velocities_vec;
 
             if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
+                 stages = this->des_handPosition.size();
                  stage_descr = this->h_results->trajectory_descriptions.at(this->i_ctrl);
                  mov_type = this->curr_mov->getType();
+                 Vector3d tar_pos; Vector3d tar_rpy;
+                 //vector<double> xt; vector<double> yt;
+                 vector<double> zt;
+                 double dist_app = 0.0; Vector3d vv_app; double dist_ret = 0.0; Vector3d vv_ret;
+                 if(mov_type==0 || mov_type==2 || mov_type==3 || mov_type==4){
+                     tar_pos(0) = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getPos().Xpos;
+                     tar_pos(1) = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getPos().Ypos;
+                     tar_pos(2) = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getPos().Zpos;
+                     tar_rpy(0) = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getOr().roll;
+                     tar_rpy(1) = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getOr().pitch;
+                     tar_rpy(2) = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getOr().yaw;
+                     dist_app = this->approach_ctrl.at(3);
+                     vv_app << this->approach_ctrl.at(0),this->approach_ctrl.at(1),this->approach_ctrl.at(2);
+                     dist_ret = this->retreat_ctrl.at(3);
+                     vv_ret << this->retreat_ctrl.at(0),this->retreat_ctrl.at(1),this->retreat_ctrl.at(2);
+                     //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getXt(xt);
+                     //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getYt(yt);
+                     this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getZt(zt);
+                     if(this->ui.checkBox_tar_noise->isChecked()){
+                         tar_pos(0) = tar_pos(0) - (obj_x_var/2) + obj_x_var*(rand() / double(RAND_MAX));
+                         tar_pos(1) = tar_pos(1) - (obj_y_var/2) + obj_y_var*(rand() / double(RAND_MAX));
+                         tar_pos(2) = tar_pos(2) - (obj_z_var/2) + obj_z_var*(rand() / double(RAND_MAX));
+                         tar_rpy(0) = tar_rpy(0) - (obj_roll_var/2) + obj_roll_var*(rand() / double(RAND_MAX));
+                         tar_rpy(1) = tar_rpy(1) - (obj_pitch_var/2) + obj_pitch_var*(rand() / double(RAND_MAX));
+                         tar_rpy(2) = tar_rpy(2) - (obj_yaw_var/2) + obj_yaw_var*(rand() / double(RAND_MAX));
+                         if(this->ui.checkBox_tar_filter_noise->isChecked()){
+                             tar_pos(0) = this->lpf_tar_pos_x->update(tar_pos(0));
+                             tar_pos(1) = this->lpf_tar_pos_y->update(tar_pos(1));
+                             tar_pos(2) = this->lpf_tar_pos_z->update(tar_pos(2));
+                             tar_rpy(0) = DEGTORAD*this->lpf_tar_or_roll->update(RADTODEG*tar_rpy(0));
+                             tar_rpy(1) = DEGTORAD*this->lpf_tar_or_pitch->update(RADTODEG*tar_rpy(1));
+                             tar_rpy(2) = DEGTORAD*this->lpf_tar_or_yaw->update(RADTODEG*tar_rpy(2));
+                         }
+                     }
+                 }
+                 //Vector3d xt_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(xt.data(), xt.size());
+                 //Vector3d yt_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(yt.data(), yt.size());
+                 Vector3d zt_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(zt.data(), zt.size());
+                 vector<double> tar_rpy_vec(tar_rpy.size()); VectorXd::Map(&tar_rpy_vec[0], tar_rpy.size()) = tar_rpy;
+                 Matrix3d Rot_tar; this->Rot_matrix(Rot_tar,tar_rpy_vec); //Rot_tar.col(0) = xt_vec; Rot_tar.col(1) = yt_vec; Rot_tar.col(2) = zt_vec;
+                 Vector3d vv_app_w = Rot_tar*vv_app; Vector3d vv_ret_w = Rot_tar*vv_ret;
+
                  hand_h_positions = this->handPosition_mov_stages.at(this->i_ctrl);
                  hand_h_orientations = this->handOrientation_mov_stages.at(this->i_ctrl);
                  hand_h_orientations_q = this->handOrientation_q_mov_stages.at(this->i_ctrl);
@@ -431,15 +486,34 @@ void MainWindow::execPosControl()
                  h_hand_or_q_init_vec.w() = this->h_hand_or_q_init.at(3);
                  Vector3d h_hand_or_q_e_init; h_hand_or_q_e_init << this->h_hand_or_q_init.at(0), this->h_hand_or_q_init.at(1), this->h_hand_or_q_init.at(2);
                  double h_hand_or_q_w_init = this->h_hand_or_q_init.at(3);
-                 this->h_hand_pos_end = hand_h_positions.at(n_steps-1); // end human-like hand linear position
-                 this->h_hand_or_q_end = hand_h_orientations_q.at(n_steps-1); // end human-like hand angular orientation (quaternion)
-                 Quaterniond h_hand_or_q_end_vec;
-                 h_hand_or_q_end_vec.x() = this->h_hand_or_q_end.at(0);
-                 h_hand_or_q_end_vec.y() = this->h_hand_or_q_end.at(1);
-                 h_hand_or_q_end_vec.z() = this->h_hand_or_q_end.at(2);
-                 h_hand_or_q_end_vec.w() = this->h_hand_or_q_end.at(3);
+
+                 // end hand pose
+                 // position
+                 Vector3d hand_pos_vec;
+                 if(stage_descr.compare("plan")==0){
+                    if(stages>1){
+                        string stage_succ = this->h_results->trajectory_descriptions.at(this->i_ctrl+1);
+                        if(stage_succ.compare("approach")==0){
+                            hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                        }
+                    }else{
+                        hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;
+                    }
+                 }else if(stage_descr.compare("approach")==0){
+                    hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;
+                 }else if(stage_descr.compare("retreat")==0){
+                    hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_ret*vv_ret_w;
+                 }
+                 this->h_hand_pos_end.resize(hand_pos_vec.size()); VectorXd::Map(&this->h_hand_pos_end[0], hand_pos_vec.size()) = hand_pos_vec;
+                 // orientation
+                 Quaterniond h_hand_or_q_end_vec(Rot_tar); this->h_hand_or_q_end.resize(4);
+                 this->h_hand_or_q_end.at(0) = h_hand_or_q_end_vec.x();
+                 this->h_hand_or_q_end.at(1) = h_hand_or_q_end_vec.y();
+                 this->h_hand_or_q_end.at(2) = h_hand_or_q_end_vec.z();
+                 this->h_hand_or_q_end.at(3) = h_hand_or_q_end_vec.w();
                  Vector3d h_hand_or_q_e_end; h_hand_or_q_e_end << this->h_hand_or_q_end.at(0), this->h_hand_or_q_end.at(1), this->h_hand_or_q_end.at(2);
                  double h_hand_or_q_w_end = this->h_hand_or_q_end.at(3);
+
                  this->h_hand_lin_vel_init = hand_h_lin_velocities.at(0); // initial human-like hand linear velocities
                  this->h_hand_ang_vel_init = hand_h_ang_velocities.at(0); // initial human-like hand angular velocities
                  Vector3d h_hand_ang_vel_init_vec; h_hand_ang_vel_init_vec << this->h_hand_ang_vel_init.at(0), this->h_hand_ang_vel_init.at(1), this->h_hand_ang_vel_init.at(2);
@@ -483,16 +557,14 @@ void MainWindow::execPosControl()
                 }
                 jointsPosition_hand_max = jointsPosition_max.tail<JOINTS_HAND>();
                 jointsPosition_hand_min = jointsPosition_min.tail<JOINTS_HAND>();
-                stages = this->des_handPosition.size();
-                vector<double> des_hand_pos = this->des_handPosition.at(this->i_ctrl);
-                vector<double> des_hand_orr_q = this->des_handOrientation_q.at(this->i_ctrl);
-                des_hand_pos_x = des_hand_pos.at(0);
-                des_hand_pos_y = des_hand_pos.at(1);
-                des_hand_pos_z = des_hand_pos.at(2);
-                des_hand_or_q_x = des_hand_orr_q.at(0);
-                des_hand_or_q_y = des_hand_orr_q.at(1);
-                des_hand_or_q_z = des_hand_orr_q.at(2);
-                des_hand_or_q_w = des_hand_orr_q.at(3);
+
+                des_hand_pos_x = this->h_hand_pos_end.at(0);
+                des_hand_pos_y = this->h_hand_pos_end.at(1);
+                des_hand_pos_z = this->h_hand_pos_end.at(2);
+                des_hand_or_q_x = this->h_hand_or_q_end.at(0);
+                des_hand_or_q_y = this->h_hand_or_q_end.at(1);
+                des_hand_or_q_z = this->h_hand_or_q_end.at(2);
+                des_hand_or_q_w = this->h_hand_or_q_end.at(3);
 
             }else{
                 des_hand_pos_x = this->ui.lineEdit_des_right_hand_pos_x->text().toDouble();
@@ -533,12 +605,6 @@ void MainWindow::execPosControl()
                 if(obst_noise){
                     vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
                     objectPtr obs_new;
-                    double obsts_x_var = 100; // mm
-                    double obsts_y_var = 100; // mm
-                    double obsts_z_var = 100; // mm
-                    double obsts_roll_var = 0.5; // rad
-                    double obsts_pitch_var = 0.5; // rad
-                    double obsts_yaw_var = 0.5; // rad
                     for(size_t i=0; i<obsts.size(); ++i){
                         std::srand(std::time(NULL));
                         objectPtr obs = obsts.at(i);
@@ -546,12 +612,12 @@ void MainWindow::execPosControl()
                         obs_new.reset(new Object(obs_name));
                         motion_manager::pos obs_pos;
                         motion_manager::orient obs_or;
-                        obs_pos.Xpos = obs->getPos().Xpos - (obsts_x_var/2) + obsts_x_var*(rand() / double(RAND_MAX));
-                        obs_pos.Ypos = obs->getPos().Ypos - (obsts_y_var/2) + obsts_y_var*(rand() / double(RAND_MAX));
-                        obs_pos.Zpos = obs->getPos().Zpos - (obsts_z_var/2) + obsts_z_var*(rand() / double(RAND_MAX));
-                        obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
-                        obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
-                        obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
+                        obs_pos.Xpos = obs->getPos().Xpos - (obj_x_var/2) + obj_x_var*(rand() / double(RAND_MAX));
+                        obs_pos.Ypos = obs->getPos().Ypos - (obj_y_var/2) + obj_y_var*(rand() / double(RAND_MAX));
+                        obs_pos.Zpos = obs->getPos().Zpos - (obj_z_var/2) + obj_z_var*(rand() / double(RAND_MAX));
+                        obs_or.roll = obs->getOr().roll - (obj_roll_var/2) + obj_roll_var*(rand() / double(RAND_MAX));
+                        obs_or.pitch = obs->getOr().pitch - (obj_pitch_var/2) + obj_pitch_var*(rand() / double(RAND_MAX));
+                        obs_or.yaw = obs->getOr().yaw - (obj_yaw_var/2) + obj_yaw_var*(rand() / double(RAND_MAX));
                         if(this->ui.checkBox_obsts_filter_noise->isChecked()){
                             obs_pos.Xpos = this->lpf_obsts_pos_x->update(obs_pos.Xpos);
                             obs_pos.Ypos = this->lpf_obsts_pos_y->update(obs_pos.Ypos);
@@ -671,7 +737,7 @@ void MainWindow::execPosControl()
                 vector<double> r_arm_velocities(JOINTS_ARM,0.0); vector<double> r_hand_velocities(JOINTS_HAND,0.0);
                 vector<double> r_arm_velocities_read(JOINTS_ARM,0.0); vector<double> r_hand_velocities_read(JOINTS_HAND,0.0);
                 // accelerations
-                vector<double> r_arm_accelerations(JOINTS_ARM,0.0);
+                //vector<double> r_arm_accelerations(JOINTS_ARM,0.0);
                 vector<double> r_arm_accelerations_read(JOINTS_ARM,0.0); vector<double> r_hand_accelerations_read(JOINTS_HAND,0.0);
                 vector<double> r_hand_acc_read(6,0.0);
                 vector<double> r_wrist_acc_read(6,0.0);
@@ -858,19 +924,18 @@ void MainWindow::execPosControl()
                 VectorXd h_hand_pose(JOINTS_ARM); // human-like desired hand pose
                 VectorXd h_hand_vel(JOINTS_ARM);  // human-like desired hand velocity
                 VectorXd h_hand_acc(JOINTS_ARM);  // human-like desired hand acceleration
-                Vector3d hand_pos_init;
-                Vector3d hand_or_q_e_init; double hand_or_q_w_init = this->h_hand_or_q_init.at(3);
-                hand_pos_init << this->h_hand_pos_init.at(0),this->h_hand_pos_init.at(1),this->h_hand_pos_init.at(2);
-                hand_or_q_e_init << this->h_hand_or_q_init.at(0),this->h_hand_or_q_init.at(1),this->h_hand_or_q_init.at(2);
+                Vector3d hand_pos_init_vec;
+                Vector3d hand_or_q_e_init_vec; double hand_or_q_w_init_vec = this->h_hand_or_q_init.at(3);
+                hand_pos_init_vec << this->h_hand_pos_init.at(0),this->h_hand_pos_init.at(1),this->h_hand_pos_init.at(2);
+                hand_or_q_e_init_vec << this->h_hand_or_q_init.at(0),this->h_hand_or_q_init.at(1),this->h_hand_or_q_init.at(2);
 
-                Vector3d hand_pos_end; hand_pos_end << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z;
-                Vector3d error_f_pos = hand_pos_end - hand_pos_init;
+                Vector3d error_f_pos = des_hand_pos - hand_pos_init_vec;
 
                 VectorXd error_f_orr(4);
-                error_f_orr(0) = des_hand_or_q_x - hand_or_q_e_init(0);
-                error_f_orr(1) = des_hand_or_q_y - hand_or_q_e_init(1);
-                error_f_orr(2) = des_hand_or_q_z - hand_or_q_e_init(2);
-                error_f_orr(3) = des_hand_or_q_w - hand_or_q_w_init;
+                error_f_orr(0) = des_hand_or_q_x - hand_or_q_e_init_vec(0);
+                error_f_orr(1) = des_hand_or_q_y - hand_or_q_e_init_vec(1);
+                error_f_orr(2) = des_hand_or_q_z - hand_or_q_e_init_vec(2);
+                error_f_orr(3) = des_hand_or_q_w - hand_or_q_w_init_vec;
                 VectorXd error_f_tot(7); error_f_tot << error_f_pos(0),error_f_pos(1),error_f_pos(2),error_f_orr(0),error_f_orr(1),error_f_orr(2),error_f_orr(3);
 
                 VectorXd error_trap_tot(6); // error with the trapezoidal pose
@@ -885,11 +950,6 @@ void MainWindow::execPosControl()
                 double g_map = 0.0; int index = 0;// normalized mapped time
                 if(this->ui.checkBox_use_plan_hand_pos->isChecked())
                 {
-//                    tau = this->ui.lineEdit_tau->text().toDouble();
-//                    dec_rate = this->ui.lineEdit_dec_rate->text().toDouble();
-//                    diff_w = this->ui.lineEdit_diff_w->text().toDouble();
-//                    int index = static_cast<int>(0.5+(n_steps-1)*g_map);
-
 
                     if(hl_en)
                     { // human-like velocity profile
@@ -912,60 +972,60 @@ void MainWindow::execPosControl()
                             hl_d_pos_coeff = hl_d_pos_coeff_plan; hl_d_or_coeff = hl_d_or_coeff_plan;
 
                             Vector3d bounce_hand_pos; bounce_hand_pos << bounce_hand_pos_x,bounce_hand_pos_y,bounce_hand_pos_z;
-                            Vector3d error_b_pos = bounce_hand_pos - hand_pos_init;
+                            Vector3d error_b_pos = bounce_hand_pos - hand_pos_init_vec;
 
                             VectorXd error_b_orr(4);
-                            error_b_orr(0) = bounce_hand_q_x - hand_or_q_e_init(0);
-                            error_b_orr(1) = bounce_hand_q_y - hand_or_q_e_init(1);
-                            error_b_orr(2) = bounce_hand_q_z - hand_or_q_e_init(2);
-                            error_b_orr(3) = bounce_hand_q_w - hand_or_q_w_init;
+                            error_b_orr(0) = bounce_hand_q_x - hand_or_q_e_init_vec(0);
+                            error_b_orr(1) = bounce_hand_q_y - hand_or_q_e_init_vec(1);
+                            error_b_orr(2) = bounce_hand_q_z - hand_or_q_e_init_vec(2);
+                            error_b_orr(3) = bounce_hand_q_w - hand_or_q_w_init_vec;
                             VectorXd error_b_tot(7); error_b_tot << error_b_pos(0),error_b_pos(1),error_b_pos(2),
                                                     error_b_orr(0),error_b_orr(1),error_b_orr(2),error_b_orr(3);
 
                             // human-like desired hand pose
-                            h_hand_pose(0) = hand_pos_init(0) + error_f_tot(0)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                            h_hand_pose(0) = hand_pos_init_vec(0) + error_f_tot(0)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
                                              +h_hand_lin_vel_init.at(0)*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
                                              +h_hand_lin_vel_end.at(0)*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
                                              +0.5*h_hand_lin_acc_init.at(0)*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
                                              +0.5*h_hand_lin_acc_end.at(0)*pow(period_T,2)*(pow(g_map,3)-2*pow(g_map,4)+pow(g_map,5))
                                              +error_b_tot(0)*((g_map*(1-g_map))/(tb*(1-tb)))*pow(sin(M_PI*pow(g_map,phi)),2);
 
-                            h_hand_pose(1) = hand_pos_init(1) + error_f_tot(1)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                            h_hand_pose(1) = hand_pos_init_vec(1) + error_f_tot(1)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
                                              +h_hand_lin_vel_init.at(1)*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
                                              +h_hand_lin_vel_end.at(1)*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
                                              +0.5*h_hand_lin_acc_init.at(1)*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
                                              +0.5*h_hand_lin_acc_end.at(1)*pow(period_T,2)*(pow(g_map,3)-2*pow(g_map,4)+pow(g_map,5))
                                              +error_b_tot(1)*((g_map*(1-g_map))/(tb*(1-tb)))*pow(sin(M_PI*pow(g_map,phi)),2);
 
-                            h_hand_pose(2) = hand_pos_init(2) +error_f_tot(2)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                            h_hand_pose(2) = hand_pos_init_vec(2) +error_f_tot(2)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
                                              +h_hand_lin_vel_init.at(2)*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
                                              +h_hand_lin_vel_end.at(2)*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
                                              +0.5*h_hand_lin_acc_init.at(2)*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
                                              +0.5*h_hand_lin_acc_end.at(2)*pow(period_T,2)*(pow(g_map,3)-2*pow(g_map,4)+pow(g_map,5))
                                              +error_b_tot(2)*((g_map*(1-g_map))/(tb*(1-tb)))*pow(sin(M_PI*pow(g_map,phi)),2);
 
-                            h_hand_pose(3) = hand_or_q_e_init(0) + error_f_tot(3)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                            h_hand_pose(3) = hand_or_q_e_init_vec(0) + error_f_tot(3)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
                                              +h_hand_ang_vel_q_e_init(0)*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
                                              +h_hand_ang_vel_q_e_end(0)*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
                                              +0.5*h_hand_ang_acc_q_e_init(0)*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
                                              +0.5*h_hand_ang_acc_q_e_end(0)*pow(period_T,2)*(pow(g_map,3)-2*pow(g_map,4)+pow(g_map,5))
                                              +error_b_tot(3)*((g_map*(1-g_map))/(tb*(1-tb)))*pow(sin(M_PI*pow(g_map,phi)),2);
 
-                            h_hand_pose(4) = hand_or_q_e_init(1) + error_f_tot(4)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                            h_hand_pose(4) = hand_or_q_e_init_vec(1) + error_f_tot(4)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
                                              +h_hand_ang_vel_q_e_init(1)*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
                                              +h_hand_ang_vel_q_e_end(1)*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
                                              +0.5*h_hand_ang_acc_q_e_init(1)*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
                                              +0.5*h_hand_ang_acc_q_e_end(1)*pow(period_T,2)*(pow(g_map,3)-2*pow(g_map,4)+pow(g_map,5))
                                              +error_b_tot(4)*((g_map*(1-g_map))/(tb*(1-tb)))*pow(sin(M_PI*pow(g_map,phi)),2);
 
-                            h_hand_pose(5) = hand_or_q_e_init(2) + error_f_tot(5)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                            h_hand_pose(5) = hand_or_q_e_init_vec(2) + error_f_tot(5)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
                                              +h_hand_ang_vel_q_e_init(2)*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
                                              +h_hand_ang_vel_q_e_end(2)*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
                                              +0.5*h_hand_ang_acc_q_e_init(2)*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
                                              +0.5*h_hand_ang_acc_q_e_end(2)*pow(period_T,2)*(pow(g_map,3)-2*pow(g_map,4)+pow(g_map,5))
                                              +error_b_tot(5)*((g_map*(1-g_map))/(tb*(1-tb)))*pow(sin(M_PI*pow(g_map,phi)),2);
 
-                            h_hand_pose(6) = hand_or_q_w_init + error_f_tot(6)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                            h_hand_pose(6) = hand_or_q_w_init_vec + error_f_tot(6)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
                                              +h_hand_ang_vel_q_w_init*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
                                              +h_hand_ang_vel_q_w_end*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
                                              +0.5*h_hand_ang_acc_q_w_init*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
@@ -1105,24 +1165,24 @@ void MainWindow::execPosControl()
                             g_map = 1 - exp((-dec_rate*curr_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
                             index = static_cast<int>(0.5+(n_steps-1)*g_map);
 
-                            //                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
-                            //                BOOST_LOG_SEV(lg, info) << "g_map = " << g_map;
-                            //                BOOST_LOG_SEV(lg, info) << "index = " << index;
-                            //                BOOST_LOG_SEV(lg, info) << "sim_time = " << this->qnode.getSimTime();
-                            //                BOOST_LOG_SEV(lg, info) << "n_steps = " << n_steps;
-                            //                BOOST_LOG_SEV(lg, info) << "error_tot_squared_norm = " << error_tot.squaredNorm();
+//                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
+//                BOOST_LOG_SEV(lg, info) << "g_map = " << g_map;
+//                BOOST_LOG_SEV(lg, info) << "index = " << index;
+//                BOOST_LOG_SEV(lg, info) << "sim_time = " << this->qnode.getSimTime();
+//                BOOST_LOG_SEV(lg, info) << "n_steps = " << n_steps;
+//                BOOST_LOG_SEV(lg, info) << "error_tot_squared_norm = " << error_tot.squaredNorm();
 
                             hl_p_pos_coeff = hl_p_pos_coeff_app; hl_p_or_coeff = hl_p_or_coeff_app;
                             hl_d_pos_coeff = hl_d_pos_coeff_app; hl_d_or_coeff = hl_d_or_coeff_app;
 
                             // human-like desired hand pose
-                            h_hand_pose(0) = hand_pos_init(0) + 0.25*error_f_tot(0)*(5*g_map-pow(g_map,5));
-                            h_hand_pose(1) = hand_pos_init(1) + 0.25*error_f_tot(1)*(5*g_map-pow(g_map,5));
-                            h_hand_pose(2) = hand_pos_init(2) + 0.25*error_f_tot(2)*(5*g_map-pow(g_map,5));
-                            h_hand_pose(3) = hand_or_q_e_init(0) + 0.25*error_f_tot(3)*(5*g_map-pow(g_map,5));
-                            h_hand_pose(4) = hand_or_q_e_init(1) + 0.25*error_f_tot(4)*(5*g_map-pow(g_map,5));
-                            h_hand_pose(5) = hand_or_q_e_init(2) + 0.25*error_f_tot(5)*(5*g_map-pow(g_map,5));
-                            h_hand_pose(6) = hand_or_q_w_init + 0.25*error_f_tot(6)*(5*g_map-pow(g_map,5));
+                            h_hand_pose(0) = hand_pos_init_vec(0) + 0.25*error_f_tot(0)*(5*g_map-pow(g_map,5));
+                            h_hand_pose(1) = hand_pos_init_vec(1) + 0.25*error_f_tot(1)*(5*g_map-pow(g_map,5));
+                            h_hand_pose(2) = hand_pos_init_vec(2) + 0.25*error_f_tot(2)*(5*g_map-pow(g_map,5));
+                            h_hand_pose(3) = hand_or_q_e_init_vec(0) + 0.25*error_f_tot(3)*(5*g_map-pow(g_map,5));
+                            h_hand_pose(4) = hand_or_q_e_init_vec(1) + 0.25*error_f_tot(4)*(5*g_map-pow(g_map,5));
+                            h_hand_pose(5) = hand_or_q_e_init_vec(2) + 0.25*error_f_tot(5)*(5*g_map-pow(g_map,5));
+                            h_hand_pose(6) = hand_or_q_w_init_vec + 0.25*error_f_tot(6)*(5*g_map-pow(g_map,5));
 
                             // human-like desired hand velocity
                             h_hand_vel(0) = (5/(4*period_T))*error_f_tot(0)*(1-pow(g_map,4));
@@ -1174,13 +1234,13 @@ void MainWindow::execPosControl()
                             hl_d_pos_coeff = hl_d_pos_coeff_ret; hl_d_or_coeff = hl_d_or_coeff_ret;
 
                             // human-like desired hand pose
-                            h_hand_pose(0) = hand_pos_init(0) + 0.33*error_f_tot(0)*(5*pow(g_map,4)-2*pow(g_map,5));
-                            h_hand_pose(1) = hand_pos_init(1) + 0.33*error_f_tot(1)*(5*pow(g_map,4)-2*pow(g_map,5));
-                            h_hand_pose(2) = hand_pos_init(2) + 0.33*error_f_tot(2)*(5*pow(g_map,4)-2*pow(g_map,5));
-                            h_hand_pose(3) = hand_or_q_e_init(0) + 0.33*error_f_tot(3)*(5*pow(g_map,4)-2*pow(g_map,5));
-                            h_hand_pose(4) = hand_or_q_e_init(1) + 0.33*error_f_tot(4)*(5*pow(g_map,4)-2*pow(g_map,5));
-                            h_hand_pose(5) = hand_or_q_e_init(2) + 0.33*error_f_tot(5)*(5*pow(g_map,4)-2*pow(g_map,5));
-                            h_hand_pose(6) = hand_or_q_w_init + 0.33*error_f_tot(6)*(5*pow(g_map,4)-2*pow(g_map,5));
+                            h_hand_pose(0) = hand_pos_init_vec(0) + 0.33*error_f_tot(0)*(5*pow(g_map,4)-2*pow(g_map,5));
+                            h_hand_pose(1) = hand_pos_init_vec(1) + 0.33*error_f_tot(1)*(5*pow(g_map,4)-2*pow(g_map,5));
+                            h_hand_pose(2) = hand_pos_init_vec(2) + 0.33*error_f_tot(2)*(5*pow(g_map,4)-2*pow(g_map,5));
+                            h_hand_pose(3) = hand_or_q_e_init_vec(0) + 0.33*error_f_tot(3)*(5*pow(g_map,4)-2*pow(g_map,5));
+                            h_hand_pose(4) = hand_or_q_e_init_vec(1) + 0.33*error_f_tot(4)*(5*pow(g_map,4)-2*pow(g_map,5));
+                            h_hand_pose(5) = hand_or_q_e_init_vec(2) + 0.33*error_f_tot(5)*(5*pow(g_map,4)-2*pow(g_map,5));
+                            h_hand_pose(6) = hand_or_q_w_init_vec + 0.33*error_f_tot(6)*(5*pow(g_map,4)-2*pow(g_map,5));
 
                             // human-like desired hand velocity
                             h_hand_vel(0) = (10/(3*period_T))*error_f_tot(0)*(2*pow(g_map,3)-pow(g_map,4));
@@ -1299,33 +1359,33 @@ void MainWindow::execPosControl()
                     }else{
                         // trapezoidal velocity profile
                         VectorXd vel_trap(JOINTS_ARM);
-                        vel_trap(0) = 2*(hand_pos_end(0)-hand_pos_init(0))/t_f_trap;
-                        vel_trap(1) = 2*(hand_pos_end(1)-hand_pos_init(1))/t_f_trap;
-                        vel_trap(2) = 2*(hand_pos_end(2)-hand_pos_init(2))/t_f_trap;
-                        vel_trap(3) = 2*(des_hand_or_q_e(0)-hand_or_q_e_init(0))/t_f_trap;
-                        vel_trap(4) = 2*(des_hand_or_q_e(1)-hand_or_q_e_init(1))/t_f_trap;
-                        vel_trap(5) = 2*(des_hand_or_q_e(2)-hand_or_q_e_init(2))/t_f_trap;
-                        vel_trap(6) = 2*(des_hand_or_q_w-hand_or_q_w_init)/t_f_trap;
+                        vel_trap(0) = 2*(des_hand_pos(0)-hand_pos_init_vec(0))/t_f_trap;
+                        vel_trap(1) = 2*(des_hand_pos(1)-hand_pos_init_vec(1))/t_f_trap;
+                        vel_trap(2) = 2*(des_hand_pos(2)-hand_pos_init_vec(2))/t_f_trap;
+                        vel_trap(3) = 2*(des_hand_or_q_e(0)-hand_or_q_e_init_vec(0))/t_f_trap;
+                        vel_trap(4) = 2*(des_hand_or_q_e(1)-hand_or_q_e_init_vec(1))/t_f_trap;
+                        vel_trap(5) = 2*(des_hand_or_q_e(2)-hand_or_q_e_init_vec(2))/t_f_trap;
+                        vel_trap(6) = 2*(des_hand_or_q_w-hand_or_q_w_init_vec)/t_f_trap;
                         VectorXd acc_trap(JOINTS_ARM);
-                        acc_trap(0) = pow(vel_trap(0),2)/(hand_pos_init(0)-hand_pos_end(0)+vel_trap(0)*t_f_trap);
-                        acc_trap(1) = pow(vel_trap(1),2)/(hand_pos_init(1)-hand_pos_end(1)+vel_trap(1)*t_f_trap);
-                        acc_trap(2) = pow(vel_trap(2),2)/(hand_pos_init(2)-hand_pos_end(2)+vel_trap(2)*t_f_trap);
-                        acc_trap(3) = pow(vel_trap(3),2)/(hand_or_q_e_init(0)-des_hand_or_q_e(0)+vel_trap(3)*t_f_trap);
-                        acc_trap(4) = pow(vel_trap(4),2)/(hand_or_q_e_init(1)-des_hand_or_q_e(1)+vel_trap(4)*t_f_trap);
-                        acc_trap(5) = pow(vel_trap(5),2)/(hand_or_q_e_init(2)-des_hand_or_q_e(2)+vel_trap(5)*t_f_trap);
-                        acc_trap(6) = pow(vel_trap(6),2)/(hand_or_q_w_init-des_hand_or_q_w+vel_trap(6)*t_f_trap);
+                        acc_trap(0) = pow(vel_trap(0),2)/(hand_pos_init_vec(0)-des_hand_pos(0)+vel_trap(0)*t_f_trap);
+                        acc_trap(1) = pow(vel_trap(1),2)/(hand_pos_init_vec(1)-des_hand_pos(1)+vel_trap(1)*t_f_trap);
+                        acc_trap(2) = pow(vel_trap(2),2)/(hand_pos_init_vec(2)-des_hand_pos(2)+vel_trap(2)*t_f_trap);
+                        acc_trap(3) = pow(vel_trap(3),2)/(hand_or_q_e_init_vec(0)-des_hand_or_q_e(0)+vel_trap(3)*t_f_trap);
+                        acc_trap(4) = pow(vel_trap(4),2)/(hand_or_q_e_init_vec(1)-des_hand_or_q_e(1)+vel_trap(4)*t_f_trap);
+                        acc_trap(5) = pow(vel_trap(5),2)/(hand_or_q_e_init_vec(2)-des_hand_or_q_e(2)+vel_trap(5)*t_f_trap);
+                        acc_trap(6) = pow(vel_trap(6),2)/(hand_or_q_w_init_vec-des_hand_or_q_w+vel_trap(6)*t_f_trap);
 
                         double t_c_trap = t_f_trap/2;
                         if(curr_time<=t_c_trap)
                         {
                             // hand pose
-                            trap_hand_pose(0) = hand_pos_init(0) + 0.5*acc_trap(0)*pow(curr_time,2);
-                            trap_hand_pose(1) = hand_pos_init(1) + 0.5*acc_trap(1)*pow(curr_time,2);
-                            trap_hand_pose(2) = hand_pos_init(2) + 0.5*acc_trap(2)*pow(curr_time,2);
-                            trap_hand_pose(3) = hand_or_q_e_init(0) + 0.5*acc_trap(3)*pow(curr_time,2);
-                            trap_hand_pose(4) = hand_or_q_e_init(1) + 0.5*acc_trap(4)*pow(curr_time,2);
-                            trap_hand_pose(5) = hand_or_q_e_init(2) + 0.5*acc_trap(5)*pow(curr_time,2);
-                            trap_hand_pose(6) = hand_or_q_w_init + 0.5*acc_trap(6)*pow(curr_time,2);
+                            trap_hand_pose(0) = hand_pos_init_vec(0) + 0.5*acc_trap(0)*pow(curr_time,2);
+                            trap_hand_pose(1) = hand_pos_init_vec(1) + 0.5*acc_trap(1)*pow(curr_time,2);
+                            trap_hand_pose(2) = hand_pos_init_vec(2) + 0.5*acc_trap(2)*pow(curr_time,2);
+                            trap_hand_pose(3) = hand_or_q_e_init_vec(0) + 0.5*acc_trap(3)*pow(curr_time,2);
+                            trap_hand_pose(4) = hand_or_q_e_init_vec(1) + 0.5*acc_trap(4)*pow(curr_time,2);
+                            trap_hand_pose(5) = hand_or_q_e_init_vec(2) + 0.5*acc_trap(5)*pow(curr_time,2);
+                            trap_hand_pose(6) = hand_or_q_w_init_vec + 0.5*acc_trap(6)*pow(curr_time,2);
 
                             // hand velocity
                             trap_hand_vel(0) = acc_trap(0)*curr_time;
@@ -1348,9 +1408,9 @@ void MainWindow::execPosControl()
                         }else if((curr_time > t_c_trap) && (curr_time <= t_f_trap)){
 
                             //hand pose
-                            trap_hand_pose(0) = hand_pos_end(0) - 0.5*acc_trap(0)*pow((t_f_trap-curr_time),2);
-                            trap_hand_pose(1) = hand_pos_end(1) - 0.5*acc_trap(1)*pow((t_f_trap-curr_time),2);
-                            trap_hand_pose(2) = hand_pos_end(2) - 0.5*acc_trap(2)*pow((t_f_trap-curr_time),2);
+                            trap_hand_pose(0) = des_hand_pos(0) - 0.5*acc_trap(0)*pow((t_f_trap-curr_time),2);
+                            trap_hand_pose(1) = des_hand_pos(1) - 0.5*acc_trap(1)*pow((t_f_trap-curr_time),2);
+                            trap_hand_pose(2) = des_hand_pos(2) - 0.5*acc_trap(2)*pow((t_f_trap-curr_time),2);
                             trap_hand_pose(3) = des_hand_or_q_e(0) - 0.5*acc_trap(3)*pow((t_f_trap-curr_time),2);
                             trap_hand_pose(4) = des_hand_or_q_e(1) - 0.5*acc_trap(4)*pow((t_f_trap-curr_time),2);
                             trap_hand_pose(5) = des_hand_or_q_e(2) - 0.5*acc_trap(5)*pow((t_f_trap-curr_time),2);
@@ -1376,9 +1436,9 @@ void MainWindow::execPosControl()
 
                         }else if(curr_time > t_f_trap){
                             //hand pose
-                            trap_hand_pose(0) = hand_pos_end(0);
-                            trap_hand_pose(1) = hand_pos_end(1);
-                            trap_hand_pose(2) = hand_pos_end(2);
+                            trap_hand_pose(0) = des_hand_pos(0);
+                            trap_hand_pose(1) = des_hand_pos(1);
+                            trap_hand_pose(2) = des_hand_pos(2);
                             trap_hand_pose(3) = des_hand_or_q_e(0);
                             trap_hand_pose(4) = des_hand_or_q_e(1);
                             trap_hand_pose(5) = des_hand_or_q_e(2);
@@ -1640,17 +1700,15 @@ void MainWindow::execPosControl()
                     this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_arm_posture_mes,hand_vel_vec,r_arm_velocities,jlim_en,sing_en,obsts_en,
                                                                                     vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
 
-                    // execute the control
-                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities);
                 }else{
 
                     // inverse algorithm
-                    this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,r_arm_accelerations,jlim_en,sing_en,obsts_en,
+                    this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,r_arm_velocities,time_step,jlim_en,sing_en,obsts_en,
                                                                                     vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
-
-                    // execute the control
-                    this->qnode.execKinControlAcc(1,r_arm_posture_mes,r_arm_velocities,r_arm_accelerations,r_hand_posture_mes,r_hand_velocities);
                 }
+
+                // execute the control
+                this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities);
 
                 // ------------- Recording ------------------------------- //
 
@@ -1746,32 +1804,32 @@ void MainWindow::execVelControl()
 {
     while(exec_control)
     {
-        bool obst_filter_noise = this->ui.checkBox_obsts_filter_noise->isChecked();
-        double filter_cut_off_freq = 0.1; double filter_time_step = 0.05;
-        if(obst_filter_noise){
-            filter_cut_off_freq = this->ui.lineEdit_f_cutoff->text().toDouble();
-            filter_time_step = this->ui.lineEdit_time_step->text().toDouble();
-        }
-        this->lpf_obsts_pos_x->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_time_step);
-        this->lpf_obsts_pos_y->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_time_step);
-        this->lpf_obsts_pos_z->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_time_step);
-        this->lpf_obsts_or_roll->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_roll->setDeltaTime(filter_time_step);
-        this->lpf_obsts_or_pitch->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_time_step);
-        this->lpf_obsts_or_yaw->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_time_step);
+//        bool obst_filter_noise = this->ui.checkBox_obsts_filter_noise->isChecked();
+//        double filter_cut_off_freq = 0.1; double filter_time_step = 0.05;
+//        if(obst_filter_noise){
+//            filter_cut_off_freq = this->ui.lineEdit_f_cutoff->text().toDouble();
+//            filter_time_step = this->ui.lineEdit_time_step->text().toDouble();
+//        }
+//        this->lpf_obsts_pos_x->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_time_step);
+//        this->lpf_obsts_pos_y->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_time_step);
+//        this->lpf_obsts_pos_z->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_time_step);
+//        this->lpf_obsts_or_roll->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_roll->setDeltaTime(filter_time_step);
+//        this->lpf_obsts_or_pitch->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_time_step);
+//        this->lpf_obsts_or_yaw->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_time_step);
 
-        double filter_cut_off_freq_j_pos = this->ui.lineEdit_cutoff_freq_joint_pos->text().toDouble();
-        double filter_time_step_j_pos = this->ui.lineEdit_timestep_joint_pos->text().toDouble();
-        this->lpf_joint_pos_1->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_1->setDeltaTime(filter_time_step_j_pos);
-        this->lpf_joint_pos_2->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_2->setDeltaTime(filter_time_step_j_pos);
-        this->lpf_joint_pos_3->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_3->setDeltaTime(filter_time_step_j_pos);
-        this->lpf_joint_pos_4->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_4->setDeltaTime(filter_time_step_j_pos);
-        this->lpf_joint_pos_5->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_5->setDeltaTime(filter_time_step_j_pos);
-        this->lpf_joint_pos_6->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_6->setDeltaTime(filter_time_step_j_pos);
-        this->lpf_joint_pos_7->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_7->setDeltaTime(filter_time_step_j_pos);
-        this->lpf_joint_pos_8->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_8->setDeltaTime(filter_time_step_j_pos);
-        this->lpf_joint_pos_9->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_9->setDeltaTime(filter_time_step_j_pos);
-        this->lpf_joint_pos_10->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_10->setDeltaTime(filter_time_step_j_pos);
-        this->lpf_joint_pos_11->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_11->setDeltaTime(filter_time_step_j_pos);
+//        double filter_cut_off_freq_j_pos = this->ui.lineEdit_cutoff_freq_joint_pos->text().toDouble();
+//        double filter_time_step_j_pos = this->ui.lineEdit_timestep_joint_pos->text().toDouble();
+//        this->lpf_joint_pos_1->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_1->setDeltaTime(filter_time_step_j_pos);
+//        this->lpf_joint_pos_2->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_2->setDeltaTime(filter_time_step_j_pos);
+//        this->lpf_joint_pos_3->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_3->setDeltaTime(filter_time_step_j_pos);
+//        this->lpf_joint_pos_4->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_4->setDeltaTime(filter_time_step_j_pos);
+//        this->lpf_joint_pos_5->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_5->setDeltaTime(filter_time_step_j_pos);
+//        this->lpf_joint_pos_6->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_6->setDeltaTime(filter_time_step_j_pos);
+//        this->lpf_joint_pos_7->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_7->setDeltaTime(filter_time_step_j_pos);
+//        this->lpf_joint_pos_8->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_8->setDeltaTime(filter_time_step_j_pos);
+//        this->lpf_joint_pos_9->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_9->setDeltaTime(filter_time_step_j_pos);
+//        this->lpf_joint_pos_10->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_10->setDeltaTime(filter_time_step_j_pos);
+//        this->lpf_joint_pos_11->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_11->setDeltaTime(filter_time_step_j_pos);
 
 
         if(vel_control)
@@ -1842,7 +1900,7 @@ void MainWindow::execVelControl()
                         obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
                         obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
                         obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
-                        if(obst_filter_noise){
+                        if(this->ui.checkBox_obsts_noise->isChecked()){
                             obs_pos.Xpos = this->lpf_obsts_pos_x->update(obs_pos.Xpos);
                             obs_pos.Ypos = this->lpf_obsts_pos_y->update(obs_pos.Ypos);
                             obs_pos.Zpos = this->lpf_obsts_pos_z->update(obs_pos.Zpos);
@@ -3008,12 +3066,10 @@ void MainWindow::on_pushButton_plan_clicked()
     problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
     int planner_id = prob->getPlannerID();
     int arm_sel = prob->getMovement()->getArm();
-    HUMotion::hump_params  tols;
-    HUMotion::hump_dual_params  dual_tols;
+
     std::vector<double> move_target;
     std::vector<double> move_final_hand;
     std::vector<double> move_final_arm;
-
     std::vector<double> move_target_right;
     std::vector<double> move_target_left;
     std::vector<double> move_final_hand_right;
@@ -12369,10 +12425,21 @@ void MainWindow::check_ctrl_obsts_filter_noise(int state)
 {
     if(state==0){
         // unchecked
-        this->ui.groupBox_filter_noise->setEnabled(false);
+        this->ui.groupBox_obsts_filter_noise->setEnabled(false);
     }else{
        // checked
-       this->ui.groupBox_filter_noise->setEnabled(true);
+       this->ui.groupBox_obsts_filter_noise->setEnabled(true);
+    }
+}
+
+void MainWindow::check_ctrl_tar_filter_noise(int state)
+{
+    if(state==0){
+        // unchecked
+        this->ui.groupBox_tar_filter_noise->setEnabled(false);
+    }else{
+       // checked
+       this->ui.groupBox_tar_filter_noise->setEnabled(true);
     }
 }
 
@@ -12544,6 +12611,96 @@ void MainWindow::on_pushButton_start_control_pressed()
     this->Jacobian = MatrixXd::Zero(6,JOINTS_ARM);
     this->qnode.resetSimTime();
 
+    this->mov_type_ctrl = this->curr_mov->getType();
+    this->dHO_ctrl = this->tols.mov_specs.dHO;
+    if(this->mov_type_ctrl==0){
+        // pick
+        this->approach_ctrl = this->tols.mov_specs.pre_grasp_approach;
+        this->retreat_ctrl = this->tols.mov_specs.post_grasp_retreat;
+    }else if(this->mov_type_ctrl==2 || this->mov_type_ctrl==3 || this->mov_type_ctrl==4){
+        // place
+        this->approach_ctrl = this->tols.mov_specs.pre_place_approach;
+        this->retreat_ctrl = this->tols.mov_specs.post_place_retreat;
+    }
+
+    vector<objectPtr> objs; this->curr_scene->getObjects(objs);
+    string obj_tar_name = this->curr_mov->getObject()->getName();
+    for(size_t i=0;i<objs.size();++i)
+    {
+        if(obj_tar_name.compare(objs.at(i)->getName())==0)
+        {
+            this->i_tar_ctrl = i;
+            break;
+        }
+    }
+
+    this->lpf_tar_pos_x.reset(new LowPassFilter());
+    this->lpf_tar_pos_y.reset(new LowPassFilter());
+    this->lpf_tar_pos_z.reset(new LowPassFilter());
+    this->lpf_tar_or_roll.reset(new LowPassFilter());
+    this->lpf_tar_or_pitch.reset(new LowPassFilter());
+    this->lpf_tar_or_yaw.reset(new LowPassFilter());
+
+    this->lpf_obsts_pos_x.reset(new LowPassFilter());
+    this->lpf_obsts_pos_y.reset(new LowPassFilter());
+    this->lpf_obsts_pos_z.reset(new LowPassFilter());
+    this->lpf_obsts_or_roll.reset(new LowPassFilter());
+    this->lpf_obsts_or_pitch.reset(new LowPassFilter());
+    this->lpf_obsts_or_yaw.reset(new LowPassFilter());
+
+    this->lpf_joint_pos_1.reset(new LowPassFilter());
+    this->lpf_joint_pos_2.reset(new LowPassFilter());
+    this->lpf_joint_pos_3.reset(new LowPassFilter());
+    this->lpf_joint_pos_4.reset(new LowPassFilter());
+    this->lpf_joint_pos_5.reset(new LowPassFilter());
+    this->lpf_joint_pos_6.reset(new LowPassFilter());
+    this->lpf_joint_pos_7.reset(new LowPassFilter());
+    this->lpf_joint_pos_8.reset(new LowPassFilter());
+    this->lpf_joint_pos_9.reset(new LowPassFilter());
+    this->lpf_joint_pos_10.reset(new LowPassFilter());
+    this->lpf_joint_pos_11.reset(new LowPassFilter());
+
+    // noise filtering
+    bool obsts_filter_noise = this->ui.checkBox_obsts_filter_noise->isChecked();
+    double filter_obsts_cut_off_freq = 0.1; double filter_obsts_timestep = 0.05;
+    bool tar_filter_noise = this->ui.checkBox_tar_filter_noise->isChecked();
+    double filter_tar_cut_off_freq = 0.1; double filter_tar_timestep = 0.05;
+    if(obsts_filter_noise){
+        filter_obsts_cut_off_freq = this->ui.lineEdit_obsts_f_cutoff->text().toDouble();
+        filter_obsts_timestep = this->ui.lineEdit_obsts_timestep->text().toDouble();
+    }
+    if(tar_filter_noise){
+        filter_tar_cut_off_freq = this->ui.lineEdit_tar_f_cutoff->text().toDouble();
+        filter_tar_timestep = this->ui.lineEdit_tar_timestep->text().toDouble();
+    }
+
+    this->lpf_tar_pos_x->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_pos_x->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_pos_y->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_pos_y->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_pos_z->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_pos_z->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_or_roll->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_roll->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_or_pitch->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_pitch->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_or_yaw->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_yaw->setDeltaTime(filter_tar_timestep);
+
+    this->lpf_obsts_pos_x->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_pos_y->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_pos_z->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_or_roll->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_roll->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_or_pitch->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_or_yaw->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_obsts_timestep);
+
+    double filter_cut_off_freq_j_pos = this->ui.lineEdit_cutoff_freq_joint_pos->text().toDouble();
+    double filter_time_step_j_pos = this->ui.lineEdit_timestep_joint_pos->text().toDouble();
+    this->lpf_joint_pos_1->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_1->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_2->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_2->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_3->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_3->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_4->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_4->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_5->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_5->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_6->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_6->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_7->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_7->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_8->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_8->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_9->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_9->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_10->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_10->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_11->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_11->setDeltaTime(filter_time_step_j_pos);
 }
 
 void MainWindow::on_pushButton_start_control_clicked()
@@ -12579,52 +12736,7 @@ void MainWindow::on_pushButton_stop_control_clicked()
     this->curr_scene->getHumanoid()->setRightHomePosture(r_p);
     this->curr_scene->getHumanoid()->setLeftHomePosture(l_p);
 
-    this->lpf_obsts_pos_x.reset(new LowPassFilter());
-    this->lpf_obsts_pos_y.reset(new LowPassFilter());
-    this->lpf_obsts_pos_z.reset(new LowPassFilter());
-    this->lpf_obsts_or_roll.reset(new LowPassFilter());
-    this->lpf_obsts_or_pitch.reset(new LowPassFilter());
-    this->lpf_obsts_or_yaw.reset(new LowPassFilter());
 
-    this->lpf_joint_pos_1.reset(new LowPassFilter());
-    this->lpf_joint_pos_2.reset(new LowPassFilter());
-    this->lpf_joint_pos_3.reset(new LowPassFilter());
-    this->lpf_joint_pos_4.reset(new LowPassFilter());
-    this->lpf_joint_pos_5.reset(new LowPassFilter());
-    this->lpf_joint_pos_6.reset(new LowPassFilter());
-    this->lpf_joint_pos_7.reset(new LowPassFilter());
-    this->lpf_joint_pos_8.reset(new LowPassFilter());
-    this->lpf_joint_pos_9.reset(new LowPassFilter());
-    this->lpf_joint_pos_10.reset(new LowPassFilter());
-    this->lpf_joint_pos_11.reset(new LowPassFilter());
-
-    // noise filtering
-    bool obst_filter_noise = this->ui.checkBox_obsts_filter_noise->isChecked();
-    double filter_cut_off_freq = 0.1; double filter_time_step = 0.05;
-    if(obst_filter_noise){
-        filter_cut_off_freq = this->ui.lineEdit_f_cutoff->text().toDouble();
-        filter_time_step = this->ui.lineEdit_time_step->text().toDouble();
-    }
-    this->lpf_obsts_pos_x->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_time_step);
-    this->lpf_obsts_pos_y->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_time_step);
-    this->lpf_obsts_pos_z->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_time_step);
-    this->lpf_obsts_or_roll->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_roll->setDeltaTime(filter_time_step);
-    this->lpf_obsts_or_pitch->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_time_step);
-    this->lpf_obsts_or_yaw->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_time_step);
-
-    double filter_cut_off_freq_j_pos = this->ui.lineEdit_cutoff_freq_joint_pos->text().toDouble();
-    double filter_time_step_j_pos = this->ui.lineEdit_timestep_joint_pos->text().toDouble();
-    this->lpf_joint_pos_1->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_1->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_2->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_2->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_3->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_3->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_4->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_4->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_5->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_5->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_6->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_6->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_7->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_7->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_8->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_8->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_9->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_9->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_10->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_10->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_11->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_11->setDeltaTime(filter_time_step_j_pos);
 
     this->qnode.resetSimTime();
 }
@@ -12648,17 +12760,6 @@ void MainWindow::on_pushButton_control_plot_clicked()
 
     // plot the hand velocity norm
     if(!this->handVelocityNorm_ctrl.empty()){
-
-//        int inc_vel = round(this->handVelocityNorm_ctrl.size()/n_samples);
-
-//        vector<double> hand_vel(n_samples);
-//        this->sim_time.at(0) = 0.0;
-//        vector<double> time(n_samples);
-//        for(size_t i=0, j = 0; (i < this->handVelocityNorm_ctrl.size() && j < n_samples); i += inc_vel,++j)
-//        {
-//            hand_vel.at(j) = this->handVelocityNorm_ctrl.at(i);
-//            time.at(j) = this->sim_time.at(i);
-//        }
 
         QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_ctrl);
         QVector<double> qtime = QVector<double>::fromStdVector(this->sim_time);
@@ -12726,8 +12827,8 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         stream << "Obsts_damping=" << this->ui.lineEdit_obsts_damping->text().toStdString().c_str() << endl;
         if (this->ui.checkBox_obsts_noise->isChecked()){ stream << "Obsts_noise=true"<< endl;}else{stream << "Obsts_noise=false"<< endl;}
         if (this->ui.checkBox_obsts_filter_noise->isChecked()){ stream << "Obsts_filter_noise=true"<< endl;}else{stream << "Obsts_filter_noise=false"<< endl;}
-        stream << "Obsts_f_cut_off=" << this->ui.lineEdit_f_cutoff->text().toStdString().c_str() << endl;
-        stream << "Obsts_f_timestep=" << this->ui.lineEdit_time_step->text().toStdString().c_str() << endl;
+        stream << "Obsts_f_cut_off=" << this->ui.lineEdit_obsts_f_cutoff->text().toStdString().c_str() << endl;
+        stream << "Obsts_f_timestep=" << this->ui.lineEdit_obsts_timestep->text().toStdString().c_str() << endl;
         if (this->ui.checkBox_use_plan_hand_pos->isChecked()){ stream << "use_plan_hand_pos=true"<< endl;}else{stream << "use_plan_hand_pos=false"<< endl;}
         if (this->ui.checkBox_use_vel_control->isChecked()){ stream << "use_vel_control=true"<< endl;}else{stream << "use_vel_control=false"<< endl;}
         stream << "# Human-likeness addition parameters #" << endl;
@@ -12769,6 +12870,10 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         if (this->ui.radioButton_N_45->isChecked()){stream << "N_45=true"<< endl;}else{stream << "N_45=false"<< endl;}
         stream << "freq_cutoff_joint_pos=" << this->ui.lineEdit_cutoff_freq_joint_pos->text().toStdString().c_str() << endl;
         stream << "timestep_joint_pos=" << this->ui.lineEdit_timestep_joint_pos->text().toStdString().c_str() << endl;
+        if (this->ui.checkBox_tar_noise->isChecked()){ stream << "Tar_noise=true"<< endl;}else{stream << "Tar_noise=false"<< endl;}
+        if (this->ui.checkBox_tar_filter_noise->isChecked()){ stream << "Tar_filter_noise=true"<< endl;}else{stream << "Tar_filter_noise=false"<< endl;}
+        stream << "Tar_f_cut_off=" << this->ui.lineEdit_tar_f_cutoff->text().toStdString().c_str() << endl;
+        stream << "Tar_f_timestep=" << this->ui.lineEdit_tar_timestep->text().toStdString().c_str() << endl;
         stream << "# Maximum allowed velocity of the joints #" << endl;
         stream << "vel_max=" << this->ui.lineEdit_vel_max->text().toStdString().c_str() << endl;
         f.close();
@@ -12842,9 +12947,9 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                         this->ui.checkBox_obsts_filter_noise->setChecked(false);
                     }
                 }else if(QString::compare(fields.at(0),QString("Obsts_f_cut_off"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_f_cutoff->setText(fields.at(1));
+                    this->ui.lineEdit_obsts_f_cutoff->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Obsts_f_timestep"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_time_step->setText(fields.at(1));
+                    this->ui.lineEdit_obsts_timestep->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("use_plan_hand_pos"),Qt::CaseInsensitive)==0){
                     if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
                         this->ui.checkBox_use_plan_hand_pos->setChecked(true);
@@ -12973,6 +13078,22 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     }else{
                         this->ui.checkBox_use_velocity_based_ctrl->setChecked(false);
                     }
+                }else if(QString::compare(fields.at(0),QString("Tar_noise"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.checkBox_tar_noise->setChecked(true);
+                    }else{
+                        this->ui.checkBox_tar_noise->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("Tar_filter_noise"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.checkBox_tar_filter_noise->setChecked(true);
+                    }else{
+                        this->ui.checkBox_tar_filter_noise->setChecked(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("Tar_f_cut_off"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_tar_f_cutoff->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Tar_f_timestep"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_tar_timestep->setText(fields.at(1));
                 }
             }
         }// while

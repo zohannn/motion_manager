@@ -2698,7 +2698,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>270</x>
-         <y>580</y>
+         <y>600</y>
          <width>171</width>
          <height>21</height>
         </rect>
@@ -2893,7 +2893,7 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
-       <widget class="QGroupBox" name="groupBox_filter_noise">
+       <widget class="QGroupBox" name="groupBox_obsts_filter_noise">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -2906,7 +2906,7 @@ p, li { white-space: pre-wrap; }
          </rect>
         </property>
         <property name="title">
-         <string>Filtering Noise</string>
+         <string>Filtering noise</string>
         </property>
         <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
@@ -2921,14 +2921,14 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_568">
             <item>
-             <widget class="QLabel" name="label_f_cutoff">
+             <widget class="QLabel" name="label_obsts_f_cutoff">
               <property name="text">
                <string>CutOff Freq. [Hz] :</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_f_cutoff">
+             <widget class="QLineEdit" name="lineEdit_obsts_f_cutoff">
               <property name="text">
                <string>0.1</string>
               </property>
@@ -2939,14 +2939,14 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_569">
             <item>
-             <widget class="QLabel" name="label_time_step">
+             <widget class="QLabel" name="label_obsts_timestep">
               <property name="text">
                <string> Time step [s] :</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_time_step">
+             <widget class="QLineEdit" name="lineEdit_obsts_timestep">
               <property name="text">
                <string>0.05</string>
               </property>
@@ -3015,8 +3015,8 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>260</x>
          <y>30</y>
-         <width>311</width>
-         <height>541</height>
+         <width>301</width>
+         <height>571</height>
         </rect>
        </property>
        <property name="title">
@@ -3026,8 +3026,8 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>11</x>
-          <y>370</y>
-          <width>281</width>
+          <y>360</y>
+          <width>271</width>
           <height>25</height>
          </rect>
         </property>
@@ -3390,7 +3390,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>510</y>
+          <y>540</y>
           <width>131</width>
           <height>23</height>
          </rect>
@@ -3398,6 +3398,96 @@ p, li { white-space: pre-wrap; }
         <property name="text">
          <string>Time Mapping</string>
         </property>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_tar_filter_noise">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>450</y>
+          <width>211</width>
+          <height>81</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Filtering noise of the target</string>
+        </property>
+        <widget class="QWidget" name="layoutWidget_106">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>181</width>
+           <height>58</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_106">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_571">
+            <item>
+             <widget class="QLabel" name="label_tar_f_cutoff">
+              <property name="text">
+               <string>CutOff Freq. [Hz] :</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_tar_f_cutoff">
+              <property name="text">
+               <string>0.1</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_572">
+            <item>
+             <widget class="QLabel" name="label_tar_timestep">
+              <property name="text">
+               <string> Time step [s] :</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_tar_timestep">
+              <property name="text">
+               <string>0.05</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>390</y>
+          <width>211</width>
+          <height>50</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_112">
+         <item>
+          <widget class="QCheckBox" name="checkBox_tar_noise">
+           <property name="text">
+            <string>add noise to target</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_tar_filter_noise">
+           <property name="text">
+            <string>filter noise of the target</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
       <widget class="QCheckBox" name="checkBox_sing_av">

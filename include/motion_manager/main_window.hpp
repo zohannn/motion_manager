@@ -849,6 +849,12 @@ public Q_SLOTS:
         void check_ctrl_obsts_filter_noise(int state);
 
         /**
+         * @brief check_ctrl_tar_filter_noise
+         * @param state
+         */
+        void check_ctrl_tar_filter_noise(int state);
+
+        /**
          * @brief check_ctrl_hl_add
          * @param state
          */
@@ -1086,6 +1092,8 @@ private:
 
         bool moveit_mov; /**< true if the movement has been planned by the moveit planner, false otherwise */
         bool moveit_task; /**< true if at least one movement in the task has been planned by the moveit planner, false otherwise */
+        HUMotion::hump_params  tols; /**< human-like parameters for single-arm planning */
+        HUMotion::hump_dual_params  dual_tols;/**< human-like parameters for dual-arm planning */
         HUMotion::planning_result_ptr h_results; /**< single-arm results of the HUMP planner */
         HUMotion::planning_dual_result_ptr h_dual_results; /**< dual-arm results of the HUMP planner */
 #if MOVEIT==1
@@ -1384,6 +1392,11 @@ private:
         double t_past; /**< time past in previous stages during control */
         double t_j_past; /**< time past in previous timestep during control */
         double t_der_past; /**< time past in previous calculus of the derivatives during control */
+        int mov_type_ctrl; /**<  movement type during control */
+        int dHO_ctrl; /**< distance between the hand and the object being manipulated during control*/
+        std::vector<double> approach_ctrl; /**< approach vector during control */
+        std::vector<double> retreat_ctrl; /**< retreat vector during control */
+        size_t i_tar_ctrl; /**< index of the object being manipulated */
         VectorXd hand_j_acc; /**< time derivative Jacobian dependant part of the hand accelearion */
         vector<double> h_hand_pos_end; /**< end hand position during control */
         vector<double> h_hand_or_q_end; /**< end hand orientation (quaternion) during control */
@@ -1440,6 +1453,14 @@ private:
         vector<double> error_acc_tot_norm; /**< norm of the total error in acceleration */
 
         vector<double> sim_time; /**< simulation time [s]*/
+
+        // low pass filter for the target object data
+        boost::shared_ptr<LowPassFilter> lpf_tar_pos_x;
+        boost::shared_ptr<LowPassFilter> lpf_tar_pos_y;
+        boost::shared_ptr<LowPassFilter> lpf_tar_pos_z;
+        boost::shared_ptr<LowPassFilter> lpf_tar_or_roll;
+        boost::shared_ptr<LowPassFilter> lpf_tar_or_pitch;
+        boost::shared_ptr<LowPassFilter> lpf_tar_or_yaw;
 
         // low pass filter for obstacles data
         boost::shared_ptr<LowPassFilter> lpf_obsts_pos_x;

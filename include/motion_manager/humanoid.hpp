@@ -1025,7 +1025,8 @@ public:
      * @param arm
      * @param posture
      * @param hand_acc
-     * @param accelerations
+     * @param velocities
+     * @param timestep
      * @param jlim_en
      * @param sing_en
      * @param obsts_en
@@ -1040,7 +1041,7 @@ public:
      * @param jlim_damping
      * @param obsts
      */
-    void inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, vector<double> hand_acc, vector<double>& accelerations, bool jlim_en, bool sing_en, bool obsts_en,
+    void inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, vector<double> hand_acc, vector<double>& velocities, double timestep, bool jlim_en, bool sing_en, bool obsts_en,
                                         double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts);
 
 
