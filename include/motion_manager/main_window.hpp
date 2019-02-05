@@ -280,6 +280,11 @@ public Q_SLOTS:
         /**
          * @brief This method plans the selected movement
          */
+        void on_pushButton_plan_pressed();
+
+        /**
+         * @brief This method plans the selected movement
+         */
         void on_pushButton_plan_clicked();
 
         /**
@@ -296,11 +301,6 @@ public Q_SLOTS:
          * @brief on_pushButton_plan_2d_power_law_clicked
          */
         void on_pushButton_plan_2d_power_law_clicked();
-
-        /**
-         * @brief This method plans the selected movement
-         */
-        void on_pushButton_plan_pressed();
 
         /**
          * @brief This method executes the selected movement
@@ -1009,6 +1009,10 @@ private:
         vector<vector<double>> elbowPosition_mov; /**< elbow position during the movement. 0=x,1=y,2=z */
         vector<vector<double>> elbowOrientation_mov; /**< elbow orientation (rpy) during the movement. */
         vector<vector<double>> shoulderPosition_mov; /**< shoulder position during the movement. 0=x,1=y,2=z */
+        vector<double> swivel_angle_mov; /**< swivel angle of the trajectory of the movement */
+        double swivel_angle_mov_max; /**< max swivel angle of the trajectory of the movement */
+        double swivel_angle_mov_min; /**< min swivel angle of the trajectory of the movement */
+        double swivel_angle_mov_average; /**< average swivel angle of the trajectory of the movement */
         vector<vector<double>> shoulderOrientation_mov; /**< shoulder orientation (rpy) during the movement. */
         vector<vector<double>> handLinearVelocity_mov; /**< hand linear velocity during the movement */
         vector<vector<double>> handAngularVelocity_mov;/**< hand angular velocity during the movement */
@@ -1394,9 +1398,12 @@ private:
         double t_der_past; /**< time past in previous calculus of the derivatives during control */
         int mov_type_ctrl; /**<  movement type during control */
         int dHO_ctrl; /**< distance between the hand and the object being manipulated during control*/
+        HUMotion::hump_params tols_ctrl; /**< human-like parameters for single-arm planning during control */
+        problemPtr prob_ctrl; /**< problem to solve in re-planning during control */
         std::vector<double> approach_ctrl; /**< approach vector during control */
         std::vector<double> retreat_ctrl; /**< retreat vector during control */
         size_t i_tar_ctrl; /**< index of the object being manipulated */
+        bool exec_command_ctrl; /**< true to execute the command control, false otherwise */
         VectorXd hand_j_acc; /**< time derivative Jacobian dependant part of the hand accelearion */
         vector<double> h_hand_pos_end; /**< end hand position during control */
         vector<double> h_hand_or_q_end; /**< end hand orientation (quaternion) during control */

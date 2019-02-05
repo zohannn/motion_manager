@@ -204,6 +204,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     ui.tabWidget_main->setCurrentIndex(0);
     ui.tabWidget_sol->setCurrentIndex(0);
     ui.groupBox_ctrl_options->setEnabled(true);
+    ui.pushButton_time_map->setEnabled(true);
     ui.groupBox_noise_filter->setEnabled(true);
     ui.radioButton_N_5->setChecked(true);
     ui.groupBox_jlim_params->setEnabled(false);
@@ -495,7 +496,7 @@ void MainWindow::execPosControl()
                         string stage_succ = this->h_results->trajectory_descriptions.at(this->i_ctrl+1);
                         if(stage_succ.compare("approach")==0){
                             hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
-                        }
+                        }else{hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;}
                     }else{
                         hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;
                     }
@@ -595,18 +596,31 @@ void MainWindow::execPosControl()
                 sing_damping = this->ui.lineEdit_sing_damping->text().toDouble();
                 sing_coeff = this->ui.lineEdit_sing_coeff->text().toDouble();
             }
+
             bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
-            bool obst_noise = false;
             double obst_coeff = 1; double obst_damping = 0.001;
+            // get the obstacles in the scenario
+            vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
+            if(this->ui.checkBox_use_plan_hand_pos->isChecked())
+            {
+                if((mov_type==0) || (mov_type==2) || (mov_type==3) || (mov_type==4)){
+                    // pick or place
+                    string obj_tar_name = this->curr_mov->getObject()->getName();
+                    for(size_t i=0;i<obsts.size();++i)
+                    {
+                        if(obj_tar_name.compare(obsts.at(i)->getName())==0)
+                        {
+                            obsts.erase(obsts.begin()+i);
+                        }
+                    }
+                }
+            }
             if(obsts_en){
                 obst_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
                 obst_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
-                obst_noise = this->ui.checkBox_obsts_noise->isChecked();
-                if(obst_noise){
-                    vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
+                if(this->ui.checkBox_obsts_noise->isChecked()){
                     objectPtr obs_new;
                     for(size_t i=0; i<obsts.size(); ++i){
-                        std::srand(std::time(NULL));
                         objectPtr obs = obsts.at(i);
                         string obs_name = obs->getName();
                         obs_new.reset(new Object(obs_name));
@@ -629,7 +643,7 @@ void MainWindow::execPosControl()
                         obs_new->setPos(obs_pos,false);
                         obs_new->setOr(obs_or,false);
                         obs_new->setSize(obs->getSize());
-                        this->curr_scene->setObject(i,obs_new);
+                        obsts.at(i) = obs_new;
                     } // for loop obstacles
                 }// noise on obstacles
             }// enable obstacles avoidance
@@ -1202,20 +1216,20 @@ void MainWindow::execPosControl()
                             h_hand_acc(5) = -(5/pow(period_T,2))*error_f_tot(5)*pow(g_map,3);
                             h_hand_acc(6) = -(5/pow(period_T,2))*error_f_tot(6)*pow(g_map,3);
 
-    //                    BOOST_LOG_SEV(lg, info) << "# ---------------- approach ------------------- # ";
-    //                    BOOST_LOG_SEV(lg, info) << "h hand pos x = " << h_hand_pose(0);
-    //                    BOOST_LOG_SEV(lg, info) << "h hand pos y = " << h_hand_pose(1);
-    //                    BOOST_LOG_SEV(lg, info) << "h hand pos z = " << h_hand_pose(2);
-    //                    BOOST_LOG_SEV(lg, info) << "h hand or qx = " << h_hand_pose(3);
-    //                    BOOST_LOG_SEV(lg, info) << "h hand or qy = " << h_hand_pose(4);
-    //                    BOOST_LOG_SEV(lg, info) << "h hand or qz = " << h_hand_pose(5);
-    //                    BOOST_LOG_SEV(lg, info) << "h hand or qw = " << h_hand_pose(6);
-    //                    BOOST_LOG_SEV(lg, info) << "h hand lin vel x = " << h_hand_vel(0);
-    //                    BOOST_LOG_SEV(lg, info) << "h hand lin vel y = " << h_hand_vel(1);
-    //                    BOOST_LOG_SEV(lg, info) << "h hand lin vel z = " << h_hand_vel(2);
-    //                    BOOST_LOG_SEV(lg, info) << "h hand ang vel x = " << h_hand_vel(3);
-    //                    BOOST_LOG_SEV(lg, info) << "h hand ang vel y = " << h_hand_vel(4);
-    //                    BOOST_LOG_SEV(lg, info) << "h hand ang vel z = " << h_hand_vel(5);
+//                    BOOST_LOG_SEV(lg, info) << "# ---------------- approach ------------------- # ";
+//                    BOOST_LOG_SEV(lg, info) << "h hand pos x = " << h_hand_pose(0);
+//                    BOOST_LOG_SEV(lg, info) << "h hand pos y = " << h_hand_pose(1);
+//                    BOOST_LOG_SEV(lg, info) << "h hand pos z = " << h_hand_pose(2);
+//                    BOOST_LOG_SEV(lg, info) << "h hand or qx = " << h_hand_pose(3);
+//                    BOOST_LOG_SEV(lg, info) << "h hand or qy = " << h_hand_pose(4);
+//                    BOOST_LOG_SEV(lg, info) << "h hand or qz = " << h_hand_pose(5);
+//                    BOOST_LOG_SEV(lg, info) << "h hand or qw = " << h_hand_pose(6);
+//                    BOOST_LOG_SEV(lg, info) << "h hand lin vel x = " << h_hand_vel(0);
+//                    BOOST_LOG_SEV(lg, info) << "h hand lin vel y = " << h_hand_vel(1);
+//                    BOOST_LOG_SEV(lg, info) << "h hand lin vel z = " << h_hand_vel(2);
+//                    BOOST_LOG_SEV(lg, info) << "h hand ang vel x = " << h_hand_vel(3);
+//                    BOOST_LOG_SEV(lg, info) << "h hand ang vel y = " << h_hand_vel(4);
+//                    BOOST_LOG_SEV(lg, info) << "h hand ang vel z = " << h_hand_vel(5);
 
                         }else if(stage_descr.compare("retreat")==0){
 
@@ -1512,6 +1526,43 @@ void MainWindow::execPosControl()
                     }
                 }
 
+                // ------------------- RE-PLANNING STRATEGY ---------------------------------------- //
+                // swivel angle
+                double curr_swivel_angle = this->curr_scene->getHumanoid()->getSwivelAngle(1,r_arm_posture);
+                double swivel_tol = this->ui.lineEdit_swivel_tol->text().toDouble();
+                double g_map_th_replan = this->ui.lineEdit_g_th_replan->text().toDouble();
+                if(g_map<g_map_th_replan && (curr_swivel_angle<(this->swivel_angle_mov_min-swivel_tol)  || curr_swivel_angle>(this->swivel_angle_mov_max+swivel_tol)))
+                {
+                    // stop the movement
+                    this->exec_command_ctrl = false;
+                    vector<double> r_arm_velocities_0(JOINTS_ARM,0.0);vector<double> r_hand_velocities_0(JOINTS_HAND,0.0);
+                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities_0,r_hand_posture_mes,r_hand_velocities_0);
+                    // solve the new problem
+                    objectPtr obj_man = this->curr_scene->getObject(this->i_tar_ctrl);
+                    bool prec = this->ui.radioButton_prec->isChecked();
+                    this->prob_ctrl.reset(new Problem(0,new Movement(mov_type,1,obj_man,prec),new Scenario(*(this->curr_scene.get()))));
+                    if(stage_descr.compare("approach")==0){
+                        this->tols_ctrl.mov_specs.approach = false;
+                    }else if(stage_descr.compare("retreat")==0){
+                        this->tols_ctrl.mov_specs.approach = false;
+                        this->tols_ctrl.mov_specs.retreat = false;
+                    }
+                    HUMotion::planning_result_ptr results_ptr;
+                    try{
+                        results_ptr = this->prob_ctrl->solve(this->tols_ctrl);
+                    }catch( ... ){}
+                    if(results_ptr==nullptr || results_ptr->status!=0){
+                        // the planning failed
+                        this->exec_command_ctrl = true;
+                    }else{
+                        // the planning succeed: update the results
+                        // TO DO
+
+                    }
+                }else{
+                    this->exec_command_ctrl = true;
+                }
+
                 // position Koeff
                 Vector3d error_abs_pos; Vector3d error_abs_or;
                 error_abs_pos << abs(error_pos(0)),abs(error_pos(1)),abs(error_pos(2));
@@ -1631,38 +1682,9 @@ void MainWindow::execPosControl()
                 vector<double> hand_acc_vec; hand_acc_vec.resize(hand_acc_xd_vec.size());
                 VectorXd::Map(&hand_acc_vec[0], hand_acc_xd_vec.size()) = hand_acc_xd_vec;
 
-                // obstacles
-                vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
+                // check proximity
                 if(this->ui.checkBox_use_plan_hand_pos->isChecked())
                 {
-
-                    if(mov_type==0){
-                        // pick
-                        string obj_tar_name = this->curr_mov->getObject()->getName();
-                        if(stage_descr.compare("plan")!=0){
-                            //not the plan stage (approach or retreat)
-                            for(size_t i=0;i<obsts.size();++i)
-                            {
-                                if(obj_tar_name.compare(obsts.at(i)->getName())==0)
-                                {
-                                    obsts.erase(obsts.begin()+i);
-                                }
-                            }
-                        }
-                    }else if((mov_type==2) || (mov_type==3) || (mov_type==4)){
-                        // place
-                        string obj_tar_name = this->curr_mov->getObject()->getName();
-                        if(stage_descr.compare("retreat")!=0){
-                            //not the retreat stage (plan or approach)
-                            for(size_t i=0;i<obsts.size();++i)
-                            {
-                                if(obj_tar_name.compare(obsts.at(i)->getName())==0)
-                                {
-                                    obsts.erase(obsts.begin()+i);
-                                }
-                            }
-                        }
-                    }
                     this->qnode.checkProximityObject(this->curr_mov,stage_descr);
                 }
 
@@ -1708,7 +1730,9 @@ void MainWindow::execPosControl()
                 }
 
                 // execute the control
-                this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities);
+                if(this->exec_command_ctrl){
+                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities);
+                }
 
                 // ------------- Recording ------------------------------- //
 
@@ -1804,33 +1828,6 @@ void MainWindow::execVelControl()
 {
     while(exec_control)
     {
-//        bool obst_filter_noise = this->ui.checkBox_obsts_filter_noise->isChecked();
-//        double filter_cut_off_freq = 0.1; double filter_time_step = 0.05;
-//        if(obst_filter_noise){
-//            filter_cut_off_freq = this->ui.lineEdit_f_cutoff->text().toDouble();
-//            filter_time_step = this->ui.lineEdit_time_step->text().toDouble();
-//        }
-//        this->lpf_obsts_pos_x->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_time_step);
-//        this->lpf_obsts_pos_y->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_time_step);
-//        this->lpf_obsts_pos_z->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_time_step);
-//        this->lpf_obsts_or_roll->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_roll->setDeltaTime(filter_time_step);
-//        this->lpf_obsts_or_pitch->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_time_step);
-//        this->lpf_obsts_or_yaw->setCutOffFrequency(filter_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_time_step);
-
-//        double filter_cut_off_freq_j_pos = this->ui.lineEdit_cutoff_freq_joint_pos->text().toDouble();
-//        double filter_time_step_j_pos = this->ui.lineEdit_timestep_joint_pos->text().toDouble();
-//        this->lpf_joint_pos_1->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_1->setDeltaTime(filter_time_step_j_pos);
-//        this->lpf_joint_pos_2->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_2->setDeltaTime(filter_time_step_j_pos);
-//        this->lpf_joint_pos_3->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_3->setDeltaTime(filter_time_step_j_pos);
-//        this->lpf_joint_pos_4->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_4->setDeltaTime(filter_time_step_j_pos);
-//        this->lpf_joint_pos_5->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_5->setDeltaTime(filter_time_step_j_pos);
-//        this->lpf_joint_pos_6->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_6->setDeltaTime(filter_time_step_j_pos);
-//        this->lpf_joint_pos_7->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_7->setDeltaTime(filter_time_step_j_pos);
-//        this->lpf_joint_pos_8->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_8->setDeltaTime(filter_time_step_j_pos);
-//        this->lpf_joint_pos_9->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_9->setDeltaTime(filter_time_step_j_pos);
-//        this->lpf_joint_pos_10->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_10->setDeltaTime(filter_time_step_j_pos);
-//        this->lpf_joint_pos_11->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_11->setDeltaTime(filter_time_step_j_pos);
-
 
         if(vel_control)
         {
@@ -1870,15 +1867,13 @@ void MainWindow::execVelControl()
                 sing_damping = this->ui.lineEdit_sing_damping->text().toDouble();
                 sing_coeff = this->ui.lineEdit_sing_coeff->text().toDouble();
             }
-            bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
-            bool obst_noise = false;
-            double obst_coeff = 1; double obst_damping = 0.001;
 
+            double obst_coeff = 1; double obst_damping = 0.001;
+            bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
             if(obsts_en){
                 obst_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
-                obst_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
-                obst_noise = this->ui.checkBox_obsts_noise->isChecked();                
-                if(obst_noise){
+                obst_damping = this->ui.lineEdit_obsts_damping->text().toDouble();              
+                if(this->ui.checkBox_obsts_noise->isChecked()){
                     vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
                     objectPtr obs_new;
                     double obsts_x_var = 100; // mm
@@ -3226,6 +3221,13 @@ void MainWindow::on_pushButton_plan_clicked()
                 ui.tableWidget_sol_mov->clear();
                 qnode.log(QNode::Error,std::string("The planning has failed: unknown status"));
             }
+
+            // make a copy of the human-like parameters for controlling
+            this->tols_ctrl = this->tols;
+            this->tols_ctrl.mov_specs.warm_start = true;
+            this->tols_ctrl.mov_specs.final_warm_start_params = this->final_warm_start_res_mov;
+            this->tols_ctrl.mov_specs.bounce_warm_start_params = this->bounce_warm_start_res_mov;
+
         }else{
             // dual-arm movement
 
@@ -3966,6 +3968,8 @@ if(solved){
         //shoulder
         this->shoulderVelocityNorm_mov.resize(tot_steps);
         this->shoulderLinearVelocity_mov.resize(tot_steps); this->shoulderAngularVelocity_mov.resize(tot_steps);
+        // swivel angle
+        this->swivel_angle_mov.resize(tot_steps);
 
         vector<double> timesteps_mov_tot(tot_steps,0.0);
         int step = 0;
@@ -4010,6 +4014,8 @@ if(solved){
                 // shoulder
                 this->curr_scene->getHumanoid()->getShoulderPos(arm_code,this->shoulderPosition_mov.at(step),posture);
                 this->curr_scene->getHumanoid()->getShoulderOr(arm_code,this->shoulderOrientation_mov.at(step),posture);
+                // swivel angle
+                this->swivel_angle_mov.at(step) = this->curr_scene->getHumanoid()->getSwivelAngle(arm_code,posture);
                 // velocities
                 VectorXd vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
                 vector<double> velocities; velocities.resize(vel_row.size());
@@ -4039,6 +4045,7 @@ if(solved){
 
                 step++;
             }// loop steps in the stage
+
             // add microsteps for controlling
 //            vector<vector<double>> h_micro_pos;
 //            vector<vector<double>> h_micro_or_q;
@@ -4070,6 +4077,11 @@ if(solved){
             this->des_handOrientation_q.push_back(this->handOrientation_q_mov.at(step-1));
 
         }// loop stages
+
+        // max and min swivel angles
+        this->swivel_angle_mov_max = *std::max_element(this->swivel_angle_mov.begin(),this->swivel_angle_mov.end());
+        this->swivel_angle_mov_min = *std::min_element(this->swivel_angle_mov.begin(),this->swivel_angle_mov.end());
+        this->swivel_angle_mov_average = std::accumulate(this->swivel_angle_mov.begin(),this->swivel_angle_mov.end(),0.0)/this->swivel_angle_mov.size();
 
         // accelerations
         this->getDerivative(this->handLinearVelocity_mov,timesteps_mov_tot,this->handLinearAcceleration_mov);
@@ -12599,6 +12611,7 @@ void MainWindow::on_pushButton_start_control_pressed()
     this->samples_w_vel=0;
     this->samples_e_vel=0;
     this->samples_s_vel=0;  
+    this->exec_command_ctrl=true;
     this->arm_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
     this->hand_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, this->N_filter_length);
     this->arm_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
@@ -12611,26 +12624,29 @@ void MainWindow::on_pushButton_start_control_pressed()
     this->Jacobian = MatrixXd::Zero(6,JOINTS_ARM);
     this->qnode.resetSimTime();
 
-    this->mov_type_ctrl = this->curr_mov->getType();
-    this->dHO_ctrl = this->tols.mov_specs.dHO;
-    if(this->mov_type_ctrl==0){
-        // pick
-        this->approach_ctrl = this->tols.mov_specs.pre_grasp_approach;
-        this->retreat_ctrl = this->tols.mov_specs.post_grasp_retreat;
-    }else if(this->mov_type_ctrl==2 || this->mov_type_ctrl==3 || this->mov_type_ctrl==4){
-        // place
-        this->approach_ctrl = this->tols.mov_specs.pre_place_approach;
-        this->retreat_ctrl = this->tols.mov_specs.post_place_retreat;
-    }
-
-    vector<objectPtr> objs; this->curr_scene->getObjects(objs);
-    string obj_tar_name = this->curr_mov->getObject()->getName();
-    for(size_t i=0;i<objs.size();++i)
+    if(this->ui.checkBox_use_plan_hand_pos->isChecked())
     {
-        if(obj_tar_name.compare(objs.at(i)->getName())==0)
+        this->mov_type_ctrl = this->curr_mov->getType();
+        this->dHO_ctrl = this->tols.mov_specs.dHO;
+        if(this->mov_type_ctrl==0){
+            // pick
+            this->approach_ctrl = this->tols.mov_specs.pre_grasp_approach;
+            this->retreat_ctrl = this->tols.mov_specs.post_grasp_retreat;
+        }else if(this->mov_type_ctrl==2 || this->mov_type_ctrl==3 || this->mov_type_ctrl==4){
+            // place
+            this->approach_ctrl = this->tols.mov_specs.pre_place_approach;
+            this->retreat_ctrl = this->tols.mov_specs.post_place_retreat;
+        }
+
+        vector<objectPtr> objs; this->curr_scene->getObjects(objs);
+        string obj_tar_name = this->curr_mov->getObject()->getName();
+        for(size_t i=0;i<objs.size();++i)
         {
-            this->i_tar_ctrl = i;
-            break;
+            if(obj_tar_name.compare(objs.at(i)->getName())==0)
+            {
+                this->i_tar_ctrl = i;
+                break;
+            }
         }
     }
 
@@ -12720,6 +12736,7 @@ void MainWindow::on_pushButton_stop_control_pressed()
     qnode.log(QNode::Info,string("Control Stopped"));
     qnode.log(QNode::Info,string("Simulation Stopped"));
 
+    this->exec_command_ctrl=false;
     pos_control = false;
     vel_control = false;
     this->qnode.stopSim();

@@ -17,12 +17,12 @@ Sing_damping=0.01
 
 # Obstacle avoidance parameters #
 Obsts_av=true
-Obsts_coeff=0.02
+Obsts_coeff=1
 
-Obsts_damping=0.1
+Obsts_damping=0.01
 
-Obsts_noise=false
-Obsts_filter_noise=false
+Obsts_noise=true
+Obsts_filter_noise=true
 Obsts_f_cut_off=0.1
 
 Obsts_f_timestep=0.05
@@ -97,7 +97,9 @@ timestep_joint_pos=0.05
 Tar_noise=true
 Tar_filter_noise=true
 Tar_f_cut_off=0.1
+
 Tar_f_timestep=0.05
+
 # Maximum allowed velocity of the joints #
 vel_max=50.0
 

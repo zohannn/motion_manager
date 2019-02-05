@@ -3016,7 +3016,7 @@ p, li { white-space: pre-wrap; }
          <x>260</x>
          <y>30</y>
          <width>301</width>
-         <height>431</height>
+         <height>461</height>
         </rect>
        </property>
        <property name="title">
@@ -3386,18 +3386,57 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </widget>
-       <widget class="QPushButton" name="pushButton_time_map">
+       <widget class="QWidget" name="">
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>400</y>
-          <width>131</width>
-          <height>23</height>
+          <y>420</y>
+          <width>271</width>
+          <height>25</height>
          </rect>
         </property>
-        <property name="text">
-         <string>Time Mapping</string>
+        <layout class="QHBoxLayout" name="horizontalLayout_573">
+         <item>
+          <widget class="QLabel" name="label_swivel_tol">
+           <property name="text">
+            <string>Swivel angle tolerance [rad]</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_swivel_tol">
+           <property name="text">
+            <string>0.1</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>390</y>
+          <width>141</width>
+          <height>25</height>
+         </rect>
         </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_602">
+         <item>
+          <widget class="QLabel" name="label_g_th_replan">
+           <property name="text">
+            <string>g_th_replan</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_g_th_replan">
+           <property name="text">
+            <string>0.95</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
       <widget class="QCheckBox" name="checkBox_sing_av">
@@ -3500,6 +3539,22 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+      <widget class="QPushButton" name="pushButton_time_map">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>500</y>
+         <width>131</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Time Mapping</string>
+       </property>
+      </widget>
       <zorder>checkBox_hl_add</zorder>
       <zorder>checkBox_joints_limits_av</zorder>
       <zorder>checkBox_obsts_av</zorder>
@@ -3510,6 +3565,7 @@ p, li { white-space: pre-wrap; }
       <zorder>checkBox_sing_av</zorder>
       <zorder>groupBox_sing_av_params</zorder>
       <zorder>layoutWidget</zorder>
+      <zorder>pushButton_time_map</zorder>
      </widget>
      <widget class="QGroupBox" name="groupBox_noise_filter">
       <property name="geometry">
