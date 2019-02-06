@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1919,7 +1919,7 @@ p, li { white-space: pre-wrap; }
         <x>610</x>
         <y>200</y>
         <width>391</width>
-        <height>461</height>
+        <height>431</height>
        </rect>
       </property>
       <property name="title">
@@ -2342,19 +2342,6 @@ p, li { white-space: pre-wrap; }
         </layout>
        </widget>
       </widget>
-      <widget class="QCheckBox" name="checkBox_use_velocity_based_ctrl">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>430</y>
-         <width>291</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>use velocity-based control</string>
-       </property>
-      </widget>
      </widget>
      <widget class="QCheckBox" name="checkBox_right_hand_status">
       <property name="geometry">
@@ -2697,7 +2684,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QCheckBox" name="checkBox_hl_add">
        <property name="geometry">
         <rect>
-         <x>270</x>
+         <x>290</x>
          <y>600</y>
          <width>171</width>
          <height>21</height>
@@ -2838,7 +2825,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>10</x>
          <y>360</y>
-         <width>241</width>
+         <width>261</width>
          <height>211</height>
         </rect>
        </property>
@@ -2848,9 +2835,9 @@ p, li { white-space: pre-wrap; }
        <widget class="QWidget" name="layoutWidget_56">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>0</x>
           <y>30</y>
-          <width>171</width>
+          <width>111</width>
           <height>58</height>
          </rect>
         </property>
@@ -2860,7 +2847,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QLabel" name="label_obsts_coeff">
              <property name="text">
-              <string>Coefficient</string>
+              <string>Coeff.</string>
              </property>
             </widget>
            </item>
@@ -2983,6 +2970,54 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
+       <widget class="QWidget" name="layoutWidget_107">
+        <property name="geometry">
+         <rect>
+          <x>130</x>
+          <y>30</y>
+          <width>111</width>
+          <height>58</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_114">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_606">
+           <item>
+            <widget class="QLabel" name="label_obsts_coeff_torso">
+             <property name="text">
+              <string>Coeff.</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_obsts_coeff_torso">
+             <property name="text">
+              <string>0.2</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_607">
+           <item>
+            <widget class="QLabel" name="label_obsts_damping_torso">
+             <property name="text">
+              <string>Damping </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_obsts_damping_torso">
+             <property name="text">
+              <string>0.01</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
       </widget>
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
@@ -3013,7 +3048,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QGroupBox" name="groupBox_hl_add_params">
        <property name="geometry">
         <rect>
-         <x>260</x>
+         <x>280</x>
          <y>30</y>
          <width>301</width>
          <height>531</height>
@@ -3398,13 +3433,13 @@ p, li { white-space: pre-wrap; }
         <property name="title">
          <string>Replanning</string>
         </property>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>30</x>
            <y>30</y>
            <width>221</width>
-           <height>111</height>
+           <height>120</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_113">
@@ -3561,7 +3596,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>270</x>
+         <x>290</x>
          <y>620</y>
          <width>249</width>
          <height>25</height>
@@ -3590,7 +3625,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="geometry">
         <rect>
-         <x>260</x>
+         <x>280</x>
          <y>570</y>
          <width>131</width>
          <height>23</height>
@@ -3837,6 +3872,22 @@ p, li { white-space: pre-wrap; }
        </layout>
       </widget>
      </widget>
+     <widget class="QCheckBox" name="checkBox_use_velocity_based_ctrl">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>610</x>
+        <y>640</y>
+        <width>291</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>use velocity-based control</string>
+      </property>
+     </widget>
      <zorder>groupBox_right_hand_comp</zorder>
      <zorder>groupBox_control</zorder>
      <zorder>groupBox_ctrl_options</zorder>
@@ -3847,6 +3898,7 @@ p, li { white-space: pre-wrap; }
      <zorder>groupBox_noise_filter</zorder>
      <zorder>layoutWidget</zorder>
      <zorder>groupBox_tar_filter_noise</zorder>
+     <zorder>checkBox_use_velocity_based_ctrl</zorder>
     </widget>
     <widget class="QWidget" name="tab_results">
      <property name="enabled">
