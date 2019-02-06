@@ -35,23 +35,29 @@ Hl_add_p_pos_coeff_plan=15
 
 Hl_add_p_or_coeff_plan=50
 
-Hl_add_p_pos_coeff_app=6
+Hl_add_p_pos_coeff_app=12
 Hl_add_p_or_coeff_app=10
+
 Hl_add_p_pos_coeff_ret=10
 
 Hl_add_p_or_coeff_ret=10
+
 Hl_add_d_pos_coeff_plan=1
 
 Hl_add_d_or_coeff_plan=10
-Hl_add_d_pos_coeff_app=1
+
+Hl_add_d_pos_coeff_app=0.01
+
 Hl_add_d_or_coeff_app=1
 
 Hl_add_d_pos_coeff_ret=1
 
 Hl_add_d_or_coeff_ret=1
-Hl_add_g_th_pa=0.85
 
-Hl_add_g_th_rp=0.99
+Hl_add_g_th_pa=0.88
+
+Hl_add_g_th_rp=0.95
+
 Hl_fing_coeff=0.4
 
 # Control coefficients and error threshold #

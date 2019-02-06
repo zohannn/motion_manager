@@ -3026,7 +3026,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>11</x>
-          <y>360</y>
+          <y>350</y>
           <width>271</width>
           <height>25</height>
          </rect>
@@ -3052,7 +3052,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>330</y>
+          <y>320</y>
           <width>191</width>
           <height>27</height>
          </rect>
@@ -3247,7 +3247,7 @@ p, li { white-space: pre-wrap; }
           <x>10</x>
           <y>180</y>
           <width>281</width>
-          <height>141</height>
+          <height>131</height>
          </rect>
         </property>
         <property name="title">
@@ -3390,9 +3390,9 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>390</y>
+          <y>380</y>
           <width>281</width>
-          <height>131</height>
+          <height>151</height>
          </rect>
         </property>
         <property name="title">
@@ -3401,26 +3401,44 @@ p, li { white-space: pre-wrap; }
         <widget class="QWidget" name="">
          <property name="geometry">
           <rect>
-           <x>40</x>
+           <x>30</x>
            <y>30</y>
-           <width>191</width>
-           <height>89</height>
+           <width>221</width>
+           <height>111</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_113">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_602">
             <item>
-             <widget class="QLabel" name="label_g_th_replan">
+             <widget class="QLabel" name="label_g_th_max_replan">
               <property name="text">
-               <string>g_th_replan</string>
+               <string>g_th_max_replan</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_g_th_replan">
+             <widget class="QLineEdit" name="lineEdit_g_th_max_replan">
               <property name="text">
                <string>0.95</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_605">
+            <item>
+             <widget class="QLabel" name="label_g_th_min_replan">
+              <property name="text">
+               <string>g_th_min_replan</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_g_th_min_replan">
+              <property name="text">
+               <string>0.2</string>
               </property>
              </widget>
             </item>

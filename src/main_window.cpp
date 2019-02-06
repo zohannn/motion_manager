@@ -441,7 +441,7 @@ void MainWindow::execPosControl()
                      vv_ret << this->retreat_ctrl.at(0),this->retreat_ctrl.at(1),this->retreat_ctrl.at(2);
                      //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getXt(xt);
                      //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getYt(yt);
-                     this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getZt(zt);
+                     tar->getZt(zt);
                      if(this->ui.checkBox_tar_noise->isChecked()){
                          tar_pos(0) = tar_pos(0) - (obj_x_var/2) + obj_x_var*(rand() / double(RAND_MAX));
                          tar_pos(1) = tar_pos(1) - (obj_y_var/2) + obj_y_var*(rand() / double(RAND_MAX));
@@ -464,8 +464,8 @@ void MainWindow::execPosControl()
                  Vector3d zt_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(zt.data(), zt.size());
                  vector<double> tar_rpy_vec(tar_rpy.size()); VectorXd::Map(&tar_rpy_vec[0], tar_rpy.size()) = tar_rpy;
                  Matrix3d Rot_tar; this->Rot_matrix(Rot_tar,tar_rpy_vec); //Rot_tar.col(0) = xt_vec; Rot_tar.col(1) = yt_vec; Rot_tar.col(2) = zt_vec;
-                 tar_q = Rot_tar;
                  Vector3d vv_app_w = Rot_tar*vv_app; Vector3d vv_ret_w = Rot_tar*vv_ret;
+                 tar_q = Rot_tar;
 
                  hand_h_positions = this->handPosition_mov_stages.at(this->i_ctrl);
                  hand_h_orientations = this->handOrientation_mov_stages.at(this->i_ctrl);
@@ -478,14 +478,25 @@ void MainWindow::execPosControl()
                  period_T = std::accumulate(timesteps.begin(), timesteps.end(), 0.0);
                  n_steps = hand_h_positions.size();
 
-                 this->h_hand_pos_init = hand_h_positions.at(0); // initial human-like hand position
+                 // initial position of the human-like hand
+                 this->h_hand_pos_init.resize(3); Vector3d hand_pos_tmp;
+                 if(stage_descr.compare("plan")==0){
+                     vector<double> h_vec = hand_h_positions.at(0);
+                     hand_pos_tmp(0) = h_vec.at(0);
+                     hand_pos_tmp(1) = h_vec.at(1);
+                     hand_pos_tmp(2) = h_vec.at(2);
+                 }else if(stage_descr.compare("approach")==0){
+                    hand_pos_tmp = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                 }else if(stage_descr.compare("retreat")==0){
+                     hand_pos_tmp = tar_pos - this->dHO_ctrl*zt_vec;
+                 }
+                 this->h_hand_pos_init.at(0) = hand_pos_tmp(0);
+                 this->h_hand_pos_init.at(1) = hand_pos_tmp(1);
+                 this->h_hand_pos_init.at(2) = hand_pos_tmp(2);
+
+                 // initial orientation of the human-like hand
                  this->h_hand_or_init = hand_h_orientations.at(0); // initial human-like hand orientation (rpy)
                  this->h_hand_or_q_init = hand_h_orientations_q.at(0); // initial human-like hand orientation (quaternion)
-                 Quaterniond h_hand_or_q_init_vec;
-                 h_hand_or_q_init_vec.x() = this->h_hand_or_q_init.at(0);
-                 h_hand_or_q_init_vec.y() = this->h_hand_or_q_init.at(1);
-                 h_hand_or_q_init_vec.z() = this->h_hand_or_q_init.at(2);
-                 h_hand_or_q_init_vec.w() = this->h_hand_or_q_init.at(3);
                  Vector3d h_hand_or_q_e_init; h_hand_or_q_e_init << this->h_hand_or_q_init.at(0), this->h_hand_or_q_init.at(1), this->h_hand_or_q_init.at(2);
                  double h_hand_or_q_w_init = this->h_hand_or_q_init.at(3);
 
@@ -506,9 +517,14 @@ void MainWindow::execPosControl()
                  }else if(stage_descr.compare("retreat")==0){
                     hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_ret*vv_ret_w;
                  }
-                 this->h_hand_pos_end.resize(hand_pos_vec.size()); VectorXd::Map(&this->h_hand_pos_end[0], hand_pos_vec.size()) = hand_pos_vec;
+                 // position
+                 this->h_hand_pos_end.resize(3);
+                 this->h_hand_pos_end.at(0) = hand_pos_vec(0);
+                 this->h_hand_pos_end.at(1) = hand_pos_vec(1);
+                 this->h_hand_pos_end.at(2) = hand_pos_vec(2);
                  // orientation
-                 Quaterniond h_hand_or_q_end_vec(Rot_tar); this->h_hand_or_q_end.resize(4);
+                 Quaterniond h_hand_or_q_end_vec(Rot_tar);
+                 this->h_hand_or_q_end.resize(4);
                  this->h_hand_or_q_end.at(0) = h_hand_or_q_end_vec.x();
                  this->h_hand_or_q_end.at(1) = h_hand_or_q_end_vec.y();
                  this->h_hand_or_q_end.at(2) = h_hand_or_q_end_vec.z();
@@ -518,16 +534,18 @@ void MainWindow::execPosControl()
 
                  this->h_hand_lin_vel_init = hand_h_lin_velocities.at(0); // initial human-like hand linear velocities
                  this->h_hand_ang_vel_init = hand_h_ang_velocities.at(0); // initial human-like hand angular velocities
-                 Vector3d h_hand_ang_vel_init_vec; h_hand_ang_vel_init_vec << this->h_hand_ang_vel_init.at(0), this->h_hand_ang_vel_init.at(1), this->h_hand_ang_vel_init.at(2);
-                 this->h_hand_lin_vel_end = hand_h_lin_velocities.at(n_steps-1); // end human-like hand linear velocities
-                 this->h_hand_ang_vel_end = hand_h_ang_velocities.at(n_steps-1); // end human-like hand angular velocities
-                 Vector3d h_hand_ang_vel_end_vec; h_hand_ang_vel_end_vec << this->h_hand_ang_vel_end.at(0), this->h_hand_ang_vel_end.at(1), this->h_hand_ang_vel_end.at(2);
                  this->h_hand_lin_acc_init = hand_h_lin_accelerations.at(0); // initial human-like hand linear accelerations
                  this->h_hand_ang_acc_init = hand_h_ang_accelerations.at(0); // initial human-like hand angular accelerations
-                 Vector3d h_hand_ang_acc_init_vec; h_hand_ang_acc_init_vec << this->h_hand_ang_acc_init.at(0), this->h_hand_ang_acc_init.at(1), this->h_hand_ang_acc_init.at(2);
+
+                 this->h_hand_lin_vel_end = hand_h_lin_velocities.at(n_steps-1); // end human-like hand linear velocities
+                 this->h_hand_ang_vel_end = hand_h_ang_velocities.at(n_steps-1); // end human-like hand angular velocities
                  this->h_hand_lin_acc_end = hand_h_lin_accelerations.at(n_steps-1); // end human-like hand linear accelerations
                  this->h_hand_ang_acc_end = hand_h_ang_accelerations.at(n_steps-1); // end human-like hand angular accelerations
-                 Vector3d h_hand_ang_acc_end_vec; h_hand_ang_acc_end_vec << this->h_hand_ang_acc_end.at(0), this->h_hand_ang_acc_end.at(1), this->h_hand_ang_acc_end.at(2);
+
+                Vector3d h_hand_ang_vel_init_vec; h_hand_ang_vel_init_vec << this->h_hand_ang_vel_init.at(0), this->h_hand_ang_vel_init.at(1), this->h_hand_ang_vel_init.at(2);
+                Vector3d h_hand_ang_vel_end_vec; h_hand_ang_vel_end_vec << this->h_hand_ang_vel_end.at(0), this->h_hand_ang_vel_end.at(1), this->h_hand_ang_vel_end.at(2);
+                Vector3d h_hand_ang_acc_init_vec; h_hand_ang_acc_init_vec << this->h_hand_ang_acc_init.at(0), this->h_hand_ang_acc_init.at(1), this->h_hand_ang_acc_init.at(2);
+                Vector3d h_hand_ang_acc_end_vec; h_hand_ang_acc_end_vec << this->h_hand_ang_acc_end.at(0), this->h_hand_ang_acc_end.at(1), this->h_hand_ang_acc_end.at(2);
 
                  // initial angular velocity (quaternion)
                  h_hand_ang_vel_q_e_init = 0.5*(h_hand_or_q_w_init*I_3*h_hand_ang_vel_init_vec-h_hand_or_q_e_init.cross(h_hand_ang_vel_init_vec));
@@ -944,6 +962,7 @@ void MainWindow::execPosControl()
                 hand_pos_init_vec << this->h_hand_pos_init.at(0),this->h_hand_pos_init.at(1),this->h_hand_pos_init.at(2);
                 hand_or_q_e_init_vec << this->h_hand_or_q_init.at(0),this->h_hand_or_q_init.at(1),this->h_hand_or_q_init.at(2);
 
+
                 Vector3d error_f_pos = des_hand_pos - hand_pos_init_vec;
 
                 VectorXd error_f_orr(4);
@@ -1180,7 +1199,7 @@ void MainWindow::execPosControl()
                             g_map = 1 - exp((-dec_rate*curr_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
                             index = static_cast<int>(0.5+(n_steps-1)*g_map);
 
-//                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
+//                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping approach ------------------- # ";
 //                BOOST_LOG_SEV(lg, info) << "g_map = " << g_map;
 //                BOOST_LOG_SEV(lg, info) << "index = " << index;
 //                BOOST_LOG_SEV(lg, info) << "sim_time = " << this->qnode.getSimTime();
@@ -1208,6 +1227,14 @@ void MainWindow::execPosControl()
                             h_hand_vel(5) = (5/(4*period_T))*error_f_tot(5)*(1-pow(g_map,4));
                             h_hand_vel(6) = (5/(4*period_T))*error_f_tot(6)*(1-pow(g_map,4));
 
+//                            h_hand_vel(0) = this->h_hand_lin_vel_init.at(0)*(1-pow(g_map,4));
+//                            h_hand_vel(1) = this->h_hand_lin_vel_init.at(1)*(1-pow(g_map,4));
+//                            h_hand_vel(2) = this->h_hand_lin_vel_init.at(2)*(1-pow(g_map,4));
+//                            h_hand_vel(3) = h_hand_ang_vel_q_e_init(0)*(1-pow(g_map,4));
+//                            h_hand_vel(4) = h_hand_ang_vel_q_e_init(1)*(1-pow(g_map,4));
+//                            h_hand_vel(5) = h_hand_ang_vel_q_e_init(2)*(1-pow(g_map,4));
+//                            h_hand_vel(6) = h_hand_ang_vel_q_w_init*(1-pow(g_map,4));
+
                             // human-like desired hand acceleration
                             h_hand_acc(0) = -(5/pow(period_T,2))*error_f_tot(0)*pow(g_map,3);
                             h_hand_acc(1) = -(5/pow(period_T,2))*error_f_tot(1)*pow(g_map,3);
@@ -1216,6 +1243,14 @@ void MainWindow::execPosControl()
                             h_hand_acc(4) = -(5/pow(period_T,2))*error_f_tot(4)*pow(g_map,3);
                             h_hand_acc(5) = -(5/pow(period_T,2))*error_f_tot(5)*pow(g_map,3);
                             h_hand_acc(6) = -(5/pow(period_T,2))*error_f_tot(6)*pow(g_map,3);
+
+//                            h_hand_acc(0) = -this->h_hand_lin_acc_init.at(0)*pow(g_map,3);
+//                            h_hand_acc(1) = -this->h_hand_lin_acc_init.at(1)*pow(g_map,3);
+//                            h_hand_acc(2) = -this->h_hand_lin_acc_init.at(2)*pow(g_map,3);
+//                            h_hand_acc(3) = -h_hand_ang_acc_q_e_init(0)*pow(g_map,3);
+//                            h_hand_acc(4) = -h_hand_ang_acc_q_e_init(1)*pow(g_map,3);
+//                            h_hand_acc(5) = -h_hand_ang_acc_q_e_init(2)*pow(g_map,3);
+//                            h_hand_acc(6) = -h_hand_ang_acc_q_w_init*pow(g_map,3);
 
 //                    BOOST_LOG_SEV(lg, info) << "# ---------------- approach ------------------- # ";
 //                    BOOST_LOG_SEV(lg, info) << "h hand pos x = " << h_hand_pose(0);
@@ -1231,6 +1266,12 @@ void MainWindow::execPosControl()
 //                    BOOST_LOG_SEV(lg, info) << "h hand ang vel x = " << h_hand_vel(3);
 //                    BOOST_LOG_SEV(lg, info) << "h hand ang vel y = " << h_hand_vel(4);
 //                    BOOST_LOG_SEV(lg, info) << "h hand ang vel z = " << h_hand_vel(5);
+//                    BOOST_LOG_SEV(lg, info) << "h hand lin acc x = " << h_hand_acc(0);
+//                    BOOST_LOG_SEV(lg, info) << "h hand lin acc y = " << h_hand_acc(1);
+//                    BOOST_LOG_SEV(lg, info) << "h hand lin acc z = " << h_hand_acc(2);
+//                    BOOST_LOG_SEV(lg, info) << "h hand ang acc x = " << h_hand_acc(3);
+//                    BOOST_LOG_SEV(lg, info) << "h hand ang acc y = " << h_hand_acc(4);
+//                    BOOST_LOG_SEV(lg, info) << "h hand ang acc z = " << h_hand_acc(5);
 
                         }else if(stage_descr.compare("retreat")==0){
 
@@ -1266,6 +1307,14 @@ void MainWindow::execPosControl()
                             h_hand_vel(5) = (10/(3*period_T))*error_f_tot(5)*(2*pow(g_map,3)-pow(g_map,4));
                             h_hand_vel(6) = (10/(3*period_T))*error_f_tot(6)*(2*pow(g_map,3)-pow(g_map,4));
 
+//                            h_hand_vel(0) = this->h_hand_lin_vel_end.at(0)*(2*pow(g_map,3)-pow(g_map,4));
+//                            h_hand_vel(1) = this->h_hand_lin_vel_end.at(1)*(2*pow(g_map,3)-pow(g_map,4));
+//                            h_hand_vel(2) = this->h_hand_lin_vel_end.at(2)*(2*pow(g_map,3)-pow(g_map,4));
+//                            h_hand_vel(3) = h_hand_ang_vel_q_e_end(0)*(2*pow(g_map,3)-pow(g_map,4));
+//                            h_hand_vel(4) = h_hand_ang_vel_q_e_end(1)*(2*pow(g_map,3)-pow(g_map,4));
+//                            h_hand_vel(5) = h_hand_ang_vel_q_e_end(2)*(2*pow(g_map,3)-pow(g_map,4));
+//                            h_hand_vel(6) = h_hand_ang_vel_q_w_end*(2*pow(g_map,3)-pow(g_map,4));
+
                             // human-like desired hand acceleration
                             h_hand_acc(0) = (20/(3*pow(period_T,2)))*error_f_tot(0)*(3*pow(g_map,2)-2*pow(g_map,3));
                             h_hand_acc(1) = (20/(3*pow(period_T,2)))*error_f_tot(1)*(3*pow(g_map,2)-2*pow(g_map,3));
@@ -1274,6 +1323,14 @@ void MainWindow::execPosControl()
                             h_hand_acc(4) = (20/(3*pow(period_T,2)))*error_f_tot(4)*(3*pow(g_map,2)-2*pow(g_map,3));
                             h_hand_acc(5) = (20/(3*pow(period_T,2)))*error_f_tot(5)*(3*pow(g_map,2)-2*pow(g_map,3));
                             h_hand_acc(6) = (20/(3*pow(period_T,2)))*error_f_tot(6)*(3*pow(g_map,2)-2*pow(g_map,3));
+
+//                            h_hand_acc(0) = this->h_hand_lin_acc_end.at(0)*(3*pow(g_map,2)-2*pow(g_map,3));
+//                            h_hand_acc(1) = this->h_hand_lin_acc_end.at(1)*(3*pow(g_map,2)-2*pow(g_map,3));
+//                            h_hand_acc(2) = this->h_hand_lin_acc_end.at(2)*(3*pow(g_map,2)-2*pow(g_map,3));
+//                            h_hand_acc(3) = h_hand_ang_acc_q_e_end(0)*(3*pow(g_map,2)-2*pow(g_map,3));
+//                            h_hand_acc(4) = h_hand_ang_acc_q_e_end(1)*(3*pow(g_map,2)-2*pow(g_map,3));
+//                            h_hand_acc(5) = h_hand_ang_acc_q_e_end(2)*(3*pow(g_map,2)-2*pow(g_map,3));
+//                            h_hand_acc(6) = h_hand_ang_acc_q_w_end*(3*pow(g_map,2)-2*pow(g_map,3));
 
         //                    BOOST_LOG_SEV(lg, info) << "# ---------------- retreat ------------------- # ";
         //                    BOOST_LOG_SEV(lg, info) << "h hand pos x = " << h_hand_pose(0);
@@ -1339,21 +1396,35 @@ void MainWindow::execPosControl()
                     h_hand_ref_acc(5) = des_alpha(2);
 
 
-    //                BOOST_LOG_SEV(lg, info) << "# ---------------- h_hand_ref_vel ------------------- # ";
-    //                BOOST_LOG_SEV(lg, info) << "h_hand_ref_lin_vel x = " << h_hand_ref_vel(0);
-    //                BOOST_LOG_SEV(lg, info) << "h_hand_ref_lin_vel y = " << h_hand_ref_vel(1);
-    //                BOOST_LOG_SEV(lg, info) << "h_hand_ref_lin_vel z = " << h_hand_ref_vel(2);
-    //                BOOST_LOG_SEV(lg, info) << "h_hand_ref_ang_vel x = " << h_hand_ref_vel(3);
-    //                BOOST_LOG_SEV(lg, info) << "h_hand_ref_ang_vel y = " << h_hand_ref_vel(4);
-    //                BOOST_LOG_SEV(lg, info) << "h_hand_ref_ang_vel z = " << h_hand_ref_vel(5);
+//                BOOST_LOG_SEV(lg, info) << "# ---------------- h_hand_ref_vel ------------------- # ";
+//                BOOST_LOG_SEV(lg, info) << "h_hand_ref_lin_vel x = " << h_hand_ref_vel(0);
+//                BOOST_LOG_SEV(lg, info) << "h_hand_ref_lin_vel y = " << h_hand_ref_vel(1);
+//                BOOST_LOG_SEV(lg, info) << "h_hand_ref_lin_vel z = " << h_hand_ref_vel(2);
+//                BOOST_LOG_SEV(lg, info) << "h_hand_ref_ang_vel x = " << h_hand_ref_vel(3);
+//                BOOST_LOG_SEV(lg, info) << "h_hand_ref_ang_vel y = " << h_hand_ref_vel(4);
+//                BOOST_LOG_SEV(lg, info) << "h_hand_ref_ang_vel z = " << h_hand_ref_vel(5);
 
-    //                BOOST_LOG_SEV(lg, info) << "# ---------------- error ------------------- # ";
-    //                BOOST_LOG_SEV(lg, info) << "error pos x = " << error_h_tot(0);
-    //                BOOST_LOG_SEV(lg, info) << "error pos y = " << error_h_tot(1);
-    //                BOOST_LOG_SEV(lg, info) << "error pos z = " << error_h_tot(2);
-    //                BOOST_LOG_SEV(lg, info) << "error or qx = " << error_h_tot(3);
-    //                BOOST_LOG_SEV(lg, info) << "error or qy = " << error_h_tot(4);
-    //                BOOST_LOG_SEV(lg, info) << "error or qz = " << error_h_tot(5);
+//                BOOST_LOG_SEV(lg, info) << "# ---------------- h_hand_ref_acc ------------------- # ";
+//                BOOST_LOG_SEV(lg, info) << "h_hand_ref_lin_acc x = " << h_hand_ref_acc(0);
+//                BOOST_LOG_SEV(lg, info) << "h_hand_ref_lin_acc y = " << h_hand_ref_acc(1);
+//                BOOST_LOG_SEV(lg, info) << "h_hand_ref_lin_acc z = " << h_hand_ref_acc(2);
+//                BOOST_LOG_SEV(lg, info) << "h_hand_ref_ang_acc x = " << h_hand_ref_acc(3);
+//                BOOST_LOG_SEV(lg, info) << "h_hand_ref_ang_acc y = " << h_hand_ref_acc(4);
+//                BOOST_LOG_SEV(lg, info) << "h_hand_ref_ang_acc z = " << h_hand_ref_acc(5);
+
+//                BOOST_LOG_SEV(lg, info) << "# ---------------- errors ------------------- # ";
+//                BOOST_LOG_SEV(lg, info) << "error pos x = " << error_h_tot(0);
+//                BOOST_LOG_SEV(lg, info) << "error pos y = " << error_h_tot(1);
+//                BOOST_LOG_SEV(lg, info) << "error pos z = " << error_h_tot(2);
+//                BOOST_LOG_SEV(lg, info) << "error or qx = " << error_h_tot(3);
+//                BOOST_LOG_SEV(lg, info) << "error or qy = " << error_h_tot(4);
+//                BOOST_LOG_SEV(lg, info) << "error or qz = " << error_h_tot(5);
+//                BOOST_LOG_SEV(lg, info) << "error vel x = " << der_error_h_tot(0);
+//                BOOST_LOG_SEV(lg, info) << "error vel y = " << der_error_h_tot(1);
+//                BOOST_LOG_SEV(lg, info) << "error vel z = " << der_error_h_tot(2);
+//                BOOST_LOG_SEV(lg, info) << "error ang vel x = " << der_error_h_tot(3);
+//                BOOST_LOG_SEV(lg, info) << "error ang vel y = " << der_error_h_tot(4);
+//                BOOST_LOG_SEV(lg, info) << "error ang vel z = " << der_error_h_tot(5);
 
 
                     VectorXd h_posture = jointsPosition.row(index); // current human-like posture
@@ -1527,19 +1598,17 @@ void MainWindow::execPosControl()
                     }
                 }
 
-                // ------------------- RE-PLANNING STRATEGY ---------------------------------------- //
-                // swivel angle
-//                double curr_swivel_angle = this->curr_scene->getHumanoid()->getSwivelAngle(1,r_arm_posture);
+//                // ------------------- RE-PLANNING STRATEGY ---------------------------------------- //
                 double tar_pos_th = this->ui.lineEdit_tar_pos_th->text().toDouble();
                 double tar_or_th = this->ui.lineEdit_tar_or_th->text().toDouble();
-                double g_map_th_replan = this->ui.lineEdit_g_th_replan->text().toDouble();
+                double g_map_th_max_replan = this->ui.lineEdit_g_th_max_replan->text().toDouble();
+                double g_map_th_min_replan = this->ui.lineEdit_g_th_min_replan->text().toDouble();
                 bool b_tar_pos = (this->tar_position-tar_pos).norm()>tar_pos_th;
                 Vector3d tar_q_e(tar_q.x(),tar_q.y(),tar_q.z()); double tar_q_w = tar_q.w();
                 Vector3d tar_q_e_p(this->tar_quaternion.x(),this->tar_quaternion.y(),this->tar_quaternion.z()); double tar_q_w_p = this->tar_quaternion.w();
                 Vector3d diff_tar_q = tar_q_w_p*tar_q_e - tar_q_w*tar_q_e_p - tar_q_e.cross(tar_q_e_p);
                 bool b_tar_or = diff_tar_q.norm()>tar_or_th;
-                if((stage_descr.compare("plan")==0) && (g_map>0.1 && g_map<g_map_th_replan)
-                        && (b_tar_pos||b_tar_or))
+                if((stage_descr.compare("plan")==0) && (g_map>g_map_th_min_replan && g_map<g_map_th_max_replan) && (b_tar_pos||b_tar_or))
                 {
                     // stop the movement
                     this->exec_command_ctrl = false;
@@ -1547,6 +1616,7 @@ void MainWindow::execPosControl()
                     this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities_0,r_hand_posture_mes,r_hand_velocities_0);
 
                     // solve the new problem
+                    this->qnode.log(QNode::Info,string("Re-planning ..."));
                     objectPtr obj_man = this->curr_scene->getObject(this->i_tar_ctrl);
                     bool prec = this->ui.radioButton_prec->isChecked();
                     this->prob_ctrl.reset(new Problem(0,new Movement(mov_type,1,obj_man,prec),new Scenario(*(this->curr_scene.get()))));
@@ -1554,19 +1624,24 @@ void MainWindow::execPosControl()
                     try{
                         results_ptr = this->prob_ctrl->solve(this->tols_ctrl);
                         if(results_ptr!=nullptr && results_ptr->status==0){
+                            this->qnode.log(QNode::Info,string("Re-planning succeed! Using the new planned trajectory"));
                             // the planning succeed: update the results
                             this->updatePlanningResults(this->prob_ctrl,results_ptr);
+                            // clear
+                            this->clear_control_variables();
+                        }else{
+                            this->qnode.log(QNode::Info,string("Re-planning failed! Using the previous trajectory"));
                         }
-                    }catch( ... ){}
-                    // clear
-                    this->clear_control_variables();
+                    }catch( ... ){
+                        this->qnode.log(QNode::Info,string("Re-planning raised an exception! Using the previous trajectory"));
+                    }
                     // update the target info
                     this->tar_position = tar_pos;
                     this->tar_quaternion = tar_q;
                 }else{
                     this->exec_command_ctrl = true;
                 }
-
+//              // ----------------------------------------------------------- //
                 // position Koeff
                 Vector3d error_abs_pos; Vector3d error_abs_or;
                 error_abs_pos << abs(error_pos(0)),abs(error_pos(1)),abs(error_pos(2));
@@ -1702,6 +1777,7 @@ void MainWindow::execPosControl()
                         condition = (g_map >= g_map_th_rp);
                     }
                     if(condition){
+                        //this->qnode.log(QNode::Info,string("Simulation Time: ")+boost::lexical_cast<std::string>(this->qnode.getSimTime()));
                         this->t_past=curr_time;
                         if(stages==3 && this->i_ctrl<2){
                             if(!hl_en){
@@ -12912,6 +12988,10 @@ void MainWindow::on_pushButton_errors_ctrl_clicked()
 
 void MainWindow::on_pushButton_start_control_pressed()
 {
+    // plan the original movement
+    this->on_pushButton_plan_pressed();
+    this->on_pushButton_plan_clicked();
+
     qnode.log(QNode::Info,string("Simulation Started"));
     qnode.log(QNode::Info,string("Control Started"));
 //    BOOST_LOG_SEV(lg, info) << "# ---------------- Control started ------------------- # ";
@@ -13042,11 +13122,6 @@ void MainWindow::on_pushButton_stop_control_pressed()
     qnode.log(QNode::Info,string("Control Stopped"));
     qnode.log(QNode::Info,string("Simulation Stopped"));
 
-    this->exec_command_ctrl=false;
-    pos_control = false;
-    vel_control = false;
-    this->qnode.stopSim();
-
 }
 
 void MainWindow::on_pushButton_stop_control_clicked()
@@ -13058,9 +13133,10 @@ void MainWindow::on_pushButton_stop_control_clicked()
     this->curr_scene->getHumanoid()->getLeftHomePosture(l_p);
     this->curr_scene->getHumanoid()->setRightHomePosture(r_p);
     this->curr_scene->getHumanoid()->setLeftHomePosture(l_p);
-
-
-
+    this->exec_command_ctrl=false;
+    pos_control = false;
+    vel_control = false;
+    this->qnode.stopSim();
     this->qnode.resetSimTime();
 }
 
@@ -13199,6 +13275,11 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         stream << "Tar_f_timestep=" << this->ui.lineEdit_tar_timestep->text().toStdString().c_str() << endl;
         stream << "# Maximum allowed velocity of the joints #" << endl;
         stream << "vel_max=" << this->ui.lineEdit_vel_max->text().toStdString().c_str() << endl;
+        stream << "# Replanning #" << endl;
+        stream << "Tar_pos_th=" << this->ui.lineEdit_tar_pos_th->text().toStdString().c_str() << endl;
+        stream << "Tar_or_th=" << this->ui.lineEdit_tar_or_th->text().toStdString().c_str() << endl;
+        stream << "g_map_th_max=" << this->ui.lineEdit_g_th_max_replan->text().toStdString().c_str() << endl;
+        stream << "g_map_th_min=" << this->ui.lineEdit_g_th_min_replan->text().toStdString().c_str() << endl;
         f.close();
     }
 }
@@ -13417,6 +13498,14 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     this->ui.lineEdit_tar_f_cutoff->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Tar_f_timestep"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_tar_timestep->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Tar_pos_th"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_tar_pos_th->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Tar_or_th"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_tar_or_th->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("g_map_th_max"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_g_th_max_replan->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("g_map_th_min"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_g_th_min_replan->setText(fields.at(1));
                 }
             }
         }// while
