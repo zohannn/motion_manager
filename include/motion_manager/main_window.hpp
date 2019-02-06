@@ -190,6 +190,18 @@ public:
          */
         double getNoiseRobustDerivate(int N, double h, std::deque<double> &buff);
 
+        /**
+         * @brief updatePlanningResults
+         * @param prob
+         * @param results
+         */
+        void updatePlanningResults(problemPtr prob, HUMotion::planning_result_ptr results);
+
+        /**
+         * @brief clear_control_variables
+         */
+        void clear_control_variables();
+
 
 
 public Q_SLOTS:
@@ -1403,6 +1415,8 @@ private:
         std::vector<double> approach_ctrl; /**< approach vector during control */
         std::vector<double> retreat_ctrl; /**< retreat vector during control */
         size_t i_tar_ctrl; /**< index of the object being manipulated */
+        Vector3d tar_position; /**< target position */
+        Quaterniond tar_quaternion; /**< rarget orientation */
         bool exec_command_ctrl; /**< true to execute the command control, false otherwise */
         VectorXd hand_j_acc; /**< time derivative Jacobian dependant part of the hand accelearion */
         vector<double> h_hand_pos_end; /**< end hand position during control */

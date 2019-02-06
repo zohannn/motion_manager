@@ -419,22 +419,22 @@ void MainWindow::execPosControl()
             VectorXd jointsPosition_hand(JOINTS_HAND); vector<double> jointsPosition_hand_vec(JOINTS_HAND);
             VectorXd jointsPosition_hand_max(JOINTS_HAND); VectorXd jointsPosition_hand_min(JOINTS_HAND);
 
-
+            Vector3d tar_pos; Vector3d tar_rpy; Quaterniond tar_q;
             if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
                  stages = this->des_handPosition.size();
                  stage_descr = this->h_results->trajectory_descriptions.at(this->i_ctrl);
                  mov_type = this->curr_mov->getType();
-                 Vector3d tar_pos; Vector3d tar_rpy;
                  //vector<double> xt; vector<double> yt;
                  vector<double> zt;
                  double dist_app = 0.0; Vector3d vv_app; double dist_ret = 0.0; Vector3d vv_ret;
                  if(mov_type==0 || mov_type==2 || mov_type==3 || mov_type==4){
-                     tar_pos(0) = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getPos().Xpos;
-                     tar_pos(1) = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getPos().Ypos;
-                     tar_pos(2) = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getPos().Zpos;
-                     tar_rpy(0) = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getOr().roll;
-                     tar_rpy(1) = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getOr().pitch;
-                     tar_rpy(2) = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getOr().yaw;
+                     targetPtr tar = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight();
+                     tar_pos(0) = tar->getPos().Xpos;
+                     tar_pos(1) = tar->getPos().Ypos;
+                     tar_pos(2) = tar->getPos().Zpos;
+                     tar_rpy(0) = tar->getOr().roll;
+                     tar_rpy(1) = tar->getOr().pitch;
+                     tar_rpy(2) = tar->getOr().yaw;
                      dist_app = this->approach_ctrl.at(3);
                      vv_app << this->approach_ctrl.at(0),this->approach_ctrl.at(1),this->approach_ctrl.at(2);
                      dist_ret = this->retreat_ctrl.at(3);
@@ -464,6 +464,7 @@ void MainWindow::execPosControl()
                  Vector3d zt_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(zt.data(), zt.size());
                  vector<double> tar_rpy_vec(tar_rpy.size()); VectorXd::Map(&tar_rpy_vec[0], tar_rpy.size()) = tar_rpy;
                  Matrix3d Rot_tar; this->Rot_matrix(Rot_tar,tar_rpy_vec); //Rot_tar.col(0) = xt_vec; Rot_tar.col(1) = yt_vec; Rot_tar.col(2) = zt_vec;
+                 tar_q = Rot_tar;
                  Vector3d vv_app_w = Rot_tar*vv_app; Vector3d vv_ret_w = Rot_tar*vv_ret;
 
                  hand_h_positions = this->handPosition_mov_stages.at(this->i_ctrl);
@@ -1528,37 +1529,40 @@ void MainWindow::execPosControl()
 
                 // ------------------- RE-PLANNING STRATEGY ---------------------------------------- //
                 // swivel angle
-                double curr_swivel_angle = this->curr_scene->getHumanoid()->getSwivelAngle(1,r_arm_posture);
-                double swivel_tol = this->ui.lineEdit_swivel_tol->text().toDouble();
+//                double curr_swivel_angle = this->curr_scene->getHumanoid()->getSwivelAngle(1,r_arm_posture);
+                double tar_pos_th = this->ui.lineEdit_tar_pos_th->text().toDouble();
+                double tar_or_th = this->ui.lineEdit_tar_or_th->text().toDouble();
                 double g_map_th_replan = this->ui.lineEdit_g_th_replan->text().toDouble();
-                if(g_map<g_map_th_replan && (curr_swivel_angle<(this->swivel_angle_mov_min-swivel_tol)  || curr_swivel_angle>(this->swivel_angle_mov_max+swivel_tol)))
+                bool b_tar_pos = (this->tar_position-tar_pos).norm()>tar_pos_th;
+                Vector3d tar_q_e(tar_q.x(),tar_q.y(),tar_q.z()); double tar_q_w = tar_q.w();
+                Vector3d tar_q_e_p(this->tar_quaternion.x(),this->tar_quaternion.y(),this->tar_quaternion.z()); double tar_q_w_p = this->tar_quaternion.w();
+                Vector3d diff_tar_q = tar_q_w_p*tar_q_e - tar_q_w*tar_q_e_p - tar_q_e.cross(tar_q_e_p);
+                bool b_tar_or = diff_tar_q.norm()>tar_or_th;
+                if((stage_descr.compare("plan")==0) && (g_map>0.1 && g_map<g_map_th_replan)
+                        && (b_tar_pos||b_tar_or))
                 {
                     // stop the movement
                     this->exec_command_ctrl = false;
                     vector<double> r_arm_velocities_0(JOINTS_ARM,0.0);vector<double> r_hand_velocities_0(JOINTS_HAND,0.0);
                     this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities_0,r_hand_posture_mes,r_hand_velocities_0);
+
                     // solve the new problem
                     objectPtr obj_man = this->curr_scene->getObject(this->i_tar_ctrl);
                     bool prec = this->ui.radioButton_prec->isChecked();
                     this->prob_ctrl.reset(new Problem(0,new Movement(mov_type,1,obj_man,prec),new Scenario(*(this->curr_scene.get()))));
-                    if(stage_descr.compare("approach")==0){
-                        this->tols_ctrl.mov_specs.approach = false;
-                    }else if(stage_descr.compare("retreat")==0){
-                        this->tols_ctrl.mov_specs.approach = false;
-                        this->tols_ctrl.mov_specs.retreat = false;
-                    }
                     HUMotion::planning_result_ptr results_ptr;
                     try{
                         results_ptr = this->prob_ctrl->solve(this->tols_ctrl);
+                        if(results_ptr!=nullptr && results_ptr->status==0){
+                            // the planning succeed: update the results
+                            this->updatePlanningResults(this->prob_ctrl,results_ptr);
+                        }
                     }catch( ... ){}
-                    if(results_ptr==nullptr || results_ptr->status!=0){
-                        // the planning failed
-                        this->exec_command_ctrl = true;
-                    }else{
-                        // the planning succeed: update the results
-                        // TO DO
-
-                    }
+                    // clear
+                    this->clear_control_variables();
+                    // update the target info
+                    this->tar_position = tar_pos;
+                    this->tar_quaternion = tar_q;
                 }else{
                     this->exec_command_ctrl = true;
                 }
@@ -11955,6 +11959,355 @@ double MainWindow::getNoiseRobustDerivate(int N, double h, std::deque<double>& b
     }
 }
 
+void MainWindow::updatePlanningResults(problemPtr prob, HUMotion::planning_result_ptr results)
+{
+    this->curr_mov = prob->getMovement();
+    this->timesteps_mov.clear();
+    this->jointsPosition_mov.clear(); this->jointsPosition_mov = results->trajectory_stages;
+    this->jointsVelocity_mov.clear(); this->jointsVelocity_mov = results->velocity_stages;
+    this->jointsAcceleration_mov.clear(); this->jointsAcceleration_mov = results->acceleration_stages;
+    this->traj_descr_mov.clear(); this->traj_descr_mov = results->trajectory_descriptions;
+    this->final_warm_start_res_mov = results->final_warm_start_res;
+    this->bounce_warm_start_res_mov = results->bounce_warm_start_res;
+    std::vector<double> timesteps_stage_aux;
+    for(size_t i=0; i<results->trajectory_stages.size();++i){
+        timesteps_stage_aux.clear();
+        double t_stage = results->time_steps.at(i);
+        MatrixXd traj_stage = results->trajectory_stages.at(i);
+        for(int j=0;j<traj_stage.rows();++j){
+            if(j==traj_stage.rows()-1){
+                timesteps_stage_aux.push_back(0.0);
+            }else{
+                timesteps_stage_aux.push_back(t_stage);
+            }
+        }
+        this->timesteps_mov.push_back(timesteps_stage_aux);
+    }
+    this->moveit_mov=false;
+
+    // make a copy of the human-like parameters for controlling
+    this->tols_ctrl = this->tols;
+    this->tols_ctrl.mov_specs.warm_start = true;
+    this->tols_ctrl.mov_specs.final_warm_start_params = this->final_warm_start_res_mov;
+    this->tols_ctrl.mov_specs.bounce_warm_start_params = this->bounce_warm_start_res_mov;
+
+    // time taken to solve the problem
+    this->prob_time_mov = prob->getTime();
+    ui.label_solving_time->setText(QString::number(this->prob_time_mov));
+    ui.label_solv_time_dual_value->setText(QString::number(this->prob_time_mov));
+
+    uint tot_steps=0;
+    QStringList h_headers; bool h_head=false; QStringList v_headers;
+    double mov_duration = 0.0;
+    vector<double> time; QVector<double> tot_timesteps;
+    std::vector<std::vector<QString>> mov_steps;
+    for(size_t k=0; k< this->jointsPosition_mov.size();++k){
+        MatrixXd jointPosition_stage = this->jointsPosition_mov.at(k);
+        MatrixXd jointVelocity_stage = this->jointsVelocity_mov.at(k);
+        MatrixXd jointAcceleration_stage = this->jointsAcceleration_mov.at(k);
+        std::vector<double> timestep_stage = this->timesteps_mov.at(k);
+        std::vector<QString> stage_step;
+        double time_init;
+        if(time.empty()){
+            time_init=0.0;
+        }else{
+            time_init=time.at(time.size()-1);
+        }
+        vector<double> time_stage(timestep_stage.size());
+        time_stage.at(0) = time_init;
+        double stage_duration = 0.0;
+        for(int i = 0; i< jointPosition_stage.rows(); ++i){
+            tot_steps++;
+            tot_timesteps.push_back(timestep_stage.at(i));
+            if(i>0){
+                stage_duration += timestep_stage.at(i);
+                time_stage.at(i) = time_stage.at(i-1) + timestep_stage.at(i-1);
+            }
+            stage_step.clear();
+            v_headers.push_back(QString("Step ")+QString::number(i));
+            for (int j=0; j<jointPosition_stage.cols();++j){
+                stage_step.push_back(
+                        QString::number(jointPosition_stage(i,j)*180/M_PI,'g',3)+"|"+
+                        QString::number(jointVelocity_stage(i,j)*180/M_PI,'g',3)+"|"+
+                        QString::number(jointAcceleration_stage(i,j)*180/M_PI,'g',3));
+                if(!h_head){h_headers.push_back(QString("Joint ")+QString::number(j+1));}
+            } // columns
+            h_head = true;
+            mov_steps.push_back(stage_step);
+        }// rows
+        mov_duration += stage_duration;
+        time.reserve(time_stage.size());
+        std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time));
+    }// movements
+    this->qtime_mov = QVector<double>::fromStdVector(time);
+
+    // show the results
+    ui.tableWidget_sol_mov->setColumnCount(h_headers.size());
+    ui.tableWidget_sol_mov->setHorizontalHeaderLabels(h_headers);
+    ui.tableWidget_sol_mov->setRowCount(v_headers.size());
+    ui.tableWidget_sol_mov->setVerticalHeaderLabels(v_headers);
+    for(int i =0; i < v_headers.size(); ++i){
+        std::vector<QString> row = mov_steps.at(i);
+        for(int j=0; j < h_headers.size(); ++j){
+           QString item = row.at(j);
+           ui.tableWidget_sol_mov->setItem(i,j,new QTableWidgetItem(item));
+        }
+    }
+    ui.label_totalTime_value_mov->setText(QString::number(mov_duration).toStdString().c_str());
+    ui.tabWidget_sol->setEnabled(true);
+    if(this->moveit_mov){
+        ui.pushButton_execMov_moveit->setEnabled(true);
+    }else{
+        ui.pushButton_execMov_moveit->setEnabled(false);
+    }
+
+    this->tols_stop_mov.clear();
+    double tol_stop = ui.lineEdit_tol_stop_mov->text().toDouble();
+    for (size_t k=0; k< this->jointsPosition_mov.size();++k){
+        this->tols_stop_mov.push_back(tol_stop);
+    }
+
+    // compute the hand values, positions and accelerations
+    //hand
+    this->jointsPosition_mov_ctrl.resize(this->jointsPosition_mov.size());
+    this->des_handPosition.clear(); this->des_handOrientation.clear(); this->des_handOrientation_q.clear();
+    this->handPosition_mov.resize(tot_steps); this->handPosition_mov_stages.resize(this->jointsPosition_mov.size());
+    this->handOrientation_mov.resize(tot_steps); this->handOrientation_q_mov.resize(tot_steps);
+    this->handOrientation_mov_stages.resize(this->jointsPosition_mov.size());
+    this->handOrientation_q_mov_stages.resize(this->jointsPosition_mov.size());
+    this->wristPosition_mov.resize(tot_steps); this->wristOrientation_mov.resize(tot_steps);
+    this->elbowPosition_mov.resize(tot_steps); this->elbowOrientation_mov.resize(tot_steps);
+    this->shoulderPosition_mov.resize(tot_steps); this->shoulderOrientation_mov.resize(tot_steps);
+    this->handVelocityNorm_mov.resize(tot_steps);
+    this->handLinearVelocity_mov.resize(tot_steps); this->handLinearVelocity_mov_stages.resize(this->jointsPosition_mov.size());
+    this->handAngularVelocity_mov.resize(tot_steps); this->handAngularVelocity_mov_stages.resize(this->jointsPosition_mov.size());
+    this->handLinearAcceleration_mov_stages.resize(this->jointsPosition_mov.size());
+    this->handAngularAcceleration_mov_stages.resize(this->jointsPosition_mov.size());
+    // wrist
+    this->wristVelocityNorm_mov.resize(tot_steps);
+    this->wristLinearVelocity_mov.resize(tot_steps); this->wristAngularVelocity_mov.resize(tot_steps);
+    // elbow
+    this->elbowVelocityNorm_mov.resize(tot_steps);
+    this->elbowLinearVelocity_mov.resize(tot_steps); this->elbowAngularVelocity_mov.resize(tot_steps);
+    //shoulder
+    this->shoulderVelocityNorm_mov.resize(tot_steps);
+    this->shoulderLinearVelocity_mov.resize(tot_steps); this->shoulderAngularVelocity_mov.resize(tot_steps);
+    // swivel angle
+    this->swivel_angle_mov.resize(tot_steps);
+
+    vector<double> timesteps_mov_tot(tot_steps,0.0);
+    int step = 0;
+    int arm_code = prob->getMovement()->getArm();
+    // bounce posture data
+    vector<double> bounce_posture = this->h_results->bounce_warm_start_res.x;
+    vector<double> bounce_arm_posture(bounce_posture.begin(),bounce_posture.begin()+JOINTS_ARM);
+    this->curr_scene->getHumanoid()->getHandPos(arm_code,this->bounce_handPosition,bounce_arm_posture);
+    this->curr_scene->getHumanoid()->getHandOr(arm_code,this->bounce_handOrientation,bounce_arm_posture);
+    this->curr_scene->getHumanoid()->getHandOr_q(arm_code,this->bounce_handOrientation_q,bounce_arm_posture);
+
+    for (size_t k=0; k< this->jointsPosition_mov.size();++k){
+        MatrixXd pos_stage = this->jointsPosition_mov.at(k);
+        MatrixXd vel_stage = this->jointsVelocity_mov.at(k);
+        MatrixXd acc_stage = this->jointsAcceleration_mov.at(k);
+        vector<double> timesteps_mov_stage = this->timesteps_mov.at(k);
+        //this->curr_scene->getHumanoid()->getHandAcceleration(arm_code,pos_stage,vel_stage,acc_stage,this->timesteps_mov.at(k),this->handLinearAcceleration_mov_stages.at(k),this->handAngularAcceleration_mov_stages.at(k));
+        vector<vector<double>> h_pos(pos_stage.rows());
+        vector<vector<double>> h_or(pos_stage.rows());
+        vector<vector<double>> h_or_q(pos_stage.rows());
+        vector<vector<double>> h_lin_vel(pos_stage.rows());
+        vector<vector<double>> h_ang_vel(pos_stage.rows());
+        for(int i=0;i<pos_stage.rows();++i){
+            timesteps_mov_tot.at(step) = timesteps_mov_stage.at(i);
+            // position
+            VectorXd pos_row = pos_stage.block<1,JOINTS_ARM>(i,0);
+            vector<double> posture; posture.resize(pos_row.size());
+            VectorXd::Map(&posture[0], pos_row.size()) = pos_row;
+            // hand
+            this->curr_scene->getHumanoid()->getHandPos(arm_code,this->handPosition_mov.at(step),posture);
+            this->curr_scene->getHumanoid()->getHandPos(arm_code,h_pos.at(i),posture);
+            this->curr_scene->getHumanoid()->getHandOr(arm_code,this->handOrientation_mov.at(step),posture);
+            this->curr_scene->getHumanoid()->getHandOr(arm_code,h_or.at(i),posture);
+            this->curr_scene->getHumanoid()->getHandOr_q(arm_code,h_or_q.at(i),posture);
+            this->curr_scene->getHumanoid()->getHandOr_q(arm_code,this->handOrientation_q_mov.at(step),posture);
+            // wrist
+            this->curr_scene->getHumanoid()->getWristPos(arm_code,this->wristPosition_mov.at(step),posture);
+            this->curr_scene->getHumanoid()->getWristOr(arm_code,this->wristOrientation_mov.at(step),posture);
+            // elbow
+            this->curr_scene->getHumanoid()->getElbowPos(arm_code,this->elbowPosition_mov.at(step),posture);
+            this->curr_scene->getHumanoid()->getElbowOr(arm_code,this->elbowOrientation_mov.at(step),posture);
+            // shoulder
+            this->curr_scene->getHumanoid()->getShoulderPos(arm_code,this->shoulderPosition_mov.at(step),posture);
+            this->curr_scene->getHumanoid()->getShoulderOr(arm_code,this->shoulderOrientation_mov.at(step),posture);
+            // swivel angle
+            this->swivel_angle_mov.at(step) = this->curr_scene->getHumanoid()->getSwivelAngle(arm_code,posture);
+            // velocities
+            VectorXd vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
+            vector<double> velocities; velocities.resize(vel_row.size());
+            VectorXd::Map(&velocities[0], vel_row.size()) = vel_row;
+            // hand velocity
+            this->handVelocityNorm_mov.at(step) = this->curr_scene->getHumanoid()->getHandVelNorm(arm_code,posture,velocities);
+            vector<double> hand_vel; this->curr_scene->getHumanoid()->getHandVel(arm_code,hand_vel,posture,velocities);
+            this->handLinearVelocity_mov.at(step) = {hand_vel.at(0),hand_vel.at(1),hand_vel.at(2)};
+            this->handAngularVelocity_mov.at(step) = {hand_vel.at(3),hand_vel.at(4),hand_vel.at(5)};
+            h_lin_vel.at(i) = {hand_vel.at(0),hand_vel.at(1),hand_vel.at(2)};
+            h_ang_vel.at(i) = {hand_vel.at(3),hand_vel.at(4),hand_vel.at(5)};
+            // wrist velocity
+            this->wristVelocityNorm_mov.at(step) = this->curr_scene->getHumanoid()->getWristVelNorm(arm_code,posture,velocities);
+            vector<double> wrist_vel; this->curr_scene->getHumanoid()->getWristVel(arm_code,wrist_vel,posture,velocities);
+            this->wristLinearVelocity_mov.at(step) = {wrist_vel.at(0),wrist_vel.at(1),wrist_vel.at(2)};
+            this->wristAngularVelocity_mov.at(step) = {wrist_vel.at(3),wrist_vel.at(4),wrist_vel.at(5)};
+            // elbow velocity
+            this->elbowVelocityNorm_mov.at(step) = this->curr_scene->getHumanoid()->getElbowVelNorm(arm_code,posture,velocities);
+            vector<double> elbow_vel; this->curr_scene->getHumanoid()->getElbowVel(arm_code,elbow_vel,posture,velocities);
+            this->elbowLinearVelocity_mov.at(step) = {elbow_vel.at(0),elbow_vel.at(1),elbow_vel.at(2)};
+            this->elbowAngularVelocity_mov.at(step) = {elbow_vel.at(3),elbow_vel.at(4),elbow_vel.at(5)};
+            // shoulder velocity
+            this->shoulderVelocityNorm_mov.at(step) = this->curr_scene->getHumanoid()->getShoulderVelNorm(arm_code,posture,velocities);
+            vector<double> shoulder_vel; this->curr_scene->getHumanoid()->getShoulderVel(arm_code,shoulder_vel,posture,velocities);
+            this->shoulderLinearVelocity_mov.at(step) = {shoulder_vel.at(0),shoulder_vel.at(1),shoulder_vel.at(2)};
+            this->shoulderAngularVelocity_mov.at(step) = {shoulder_vel.at(3),shoulder_vel.at(4),shoulder_vel.at(5)};
+
+            step++;
+        }// loop steps in the stage
+
+        this->jointsPosition_mov_ctrl.at(k) = pos_stage;
+        this->handPosition_mov_stages.at(k) = h_pos;
+        this->handOrientation_mov_stages.at(k) = h_or;
+        this->handOrientation_q_mov_stages.at(k) = h_or_q;
+        this->handLinearVelocity_mov_stages.at(k) = h_lin_vel;
+        this->handAngularVelocity_mov_stages.at(k) = h_ang_vel;
+        this->getDerivative(this->handLinearVelocity_mov_stages.at(k),this->timesteps_mov.at(k),this->handLinearAcceleration_mov_stages.at(k));
+        this->getDerivative(this->handAngularVelocity_mov_stages.at(k),this->timesteps_mov.at(k),this->handAngularAcceleration_mov_stages.at(k));
+        this->des_handPosition.push_back(this->handPosition_mov.at(step-1));
+        this->des_handOrientation.push_back(this->handOrientation_mov.at(step-1));
+        this->des_handOrientation_q.push_back(this->handOrientation_q_mov.at(step-1));
+
+    }// loop stages
+
+    // max and min swivel angles
+    this->swivel_angle_mov_max = *std::max_element(this->swivel_angle_mov.begin(),this->swivel_angle_mov.end());
+    this->swivel_angle_mov_min = *std::min_element(this->swivel_angle_mov.begin(),this->swivel_angle_mov.end());
+    this->swivel_angle_mov_average = std::accumulate(this->swivel_angle_mov.begin(),this->swivel_angle_mov.end(),0.0)/this->swivel_angle_mov.size();
+
+    // accelerations
+    this->getDerivative(this->handLinearVelocity_mov,timesteps_mov_tot,this->handLinearAcceleration_mov);
+    this->getDerivative(this->handAngularVelocity_mov,timesteps_mov_tot,this->handAngularAcceleration_mov);
+    this->getDerivative(this->wristLinearVelocity_mov,timesteps_mov_tot,this->wristLinearAcceleration_mov);
+    this->getDerivative(this->wristAngularVelocity_mov,timesteps_mov_tot,this->wristAngularAcceleration_mov);
+    this->getDerivative(this->elbowLinearVelocity_mov,timesteps_mov_tot,this->elbowLinearAcceleration_mov);
+    this->getDerivative(this->elbowAngularVelocity_mov,timesteps_mov_tot,this->elbowAngularAcceleration_mov);
+    this->getDerivative(this->shoulderLinearVelocity_mov,timesteps_mov_tot,this->shoulderLinearAcceleration_mov);
+    this->getDerivative(this->shoulderAngularVelocity_mov,timesteps_mov_tot,this->shoulderAngularAcceleration_mov);
+
+    // -- normlized jerk cost of the hand -- //
+    QVector<double> handPosition_mov_x; QVector<double> handPosition_mov_y; QVector<double> handPosition_mov_z;
+    QVector<double> der_1_handPosition_mov_x; QVector<double> der_1_handPosition_mov_y; QVector<double> der_1_handPosition_mov_z;
+    QVector<double> der_2_handPosition_mov_x; QVector<double> der_2_handPosition_mov_y; QVector<double> der_2_handPosition_mov_z;
+    QVector<double> der_3_handPosition_mov_x; QVector<double> der_3_handPosition_mov_y; QVector<double> der_3_handPosition_mov_z;
+
+    for(size_t i=0; i<this->handPosition_mov.size();++i){
+        vector<double> position_i = this->handPosition_mov.at(i);
+        handPosition_mov_x.push_back(position_i.at(0));
+        handPosition_mov_y.push_back(position_i.at(1));
+        handPosition_mov_z.push_back(position_i.at(2));
+    }
+
+    // derivatives
+    this->getDerivative(handPosition_mov_x,tot_timesteps,der_1_handPosition_mov_x);
+    this->getDerivative(der_1_handPosition_mov_x,tot_timesteps,der_2_handPosition_mov_x);
+    this->getDerivative(der_2_handPosition_mov_x,tot_timesteps,der_3_handPosition_mov_x);
+    this->getDerivative(handPosition_mov_y,tot_timesteps,der_1_handPosition_mov_y);
+    this->getDerivative(der_1_handPosition_mov_y,tot_timesteps,der_2_handPosition_mov_y);
+    this->getDerivative(der_2_handPosition_mov_y,tot_timesteps,der_3_handPosition_mov_y);
+    this->getDerivative(handPosition_mov_z,tot_timesteps,der_1_handPosition_mov_z);
+    this->getDerivative(der_1_handPosition_mov_z,tot_timesteps,der_2_handPosition_mov_z);
+    this->getDerivative(der_2_handPosition_mov_z,tot_timesteps,der_3_handPosition_mov_z);
+
+    QVector<double> jerk_hand;
+    for(size_t i=0;i<handPosition_mov_x.size();++i){
+        jerk_hand.push_back(sqrt(pow(der_3_handPosition_mov_x.at(i),2)+pow(der_3_handPosition_mov_y.at(i),2)+pow(der_3_handPosition_mov_z.at(i),2)));
+    }
+    double duration = this->qtime_mov.at(this->qtime_mov.size()-1);
+    double length = sqrt(pow((handPosition_mov_x.at(handPosition_mov_x.size()-1)-handPosition_mov_x.at(0)),2)+
+                         pow((handPosition_mov_y.at(handPosition_mov_y.size()-1)-handPosition_mov_y.at(0)),2)+
+                         pow((handPosition_mov_z.at(handPosition_mov_z.size()-1)-handPosition_mov_z.at(0)),2));
+    double total_cost_jerk_hand=0.0;
+    for(size_t i=0;i<tot_timesteps.size();++i){
+        total_cost_jerk_hand += pow(jerk_hand.at(i),2)*tot_timesteps.at(i);
+    }
+    total_cost_jerk_hand = sqrt(0.5*total_cost_jerk_hand*(pow(duration,5)/pow(length,2)));
+    ui.label_cost_hand_value->setText(QString::number(total_cost_jerk_hand));
+    this->njs_mov = total_cost_jerk_hand;
+
+    // -- compute the number of movement units -- //
+    this->nmu_mov = this->getNumberMovementUnits(this->handVelocityNorm_mov,this->qtime_mov);
+    ui.label_nmu->setText(QString::number(this->nmu_mov));
+
+}
+
+void MainWindow::clear_control_variables()
+{
+    this->handPosition_ctrl.clear();
+    this->handLinearVelocity_ctrl.clear();
+    this->handAngularVelocity_ctrl.clear();
+    this->handLinearAcceleration_ctrl.clear();
+    this->handAngularAcceleration_ctrl.clear();
+    this->wristPosition_ctrl.clear();
+    this->wristOrientation_ctrl.clear();
+    this->wristLinearVelocity_ctrl.clear();
+    this->wristAngularVelocity_ctrl.clear();
+    this->wristLinearAcceleration_ctrl.clear();
+    this->wristAngularAcceleration_ctrl.clear();
+    this->elbowPosition_ctrl.clear();
+    this->elbowOrientation_ctrl.clear();
+    this->elbowLinearVelocity_ctrl.clear();
+    this->elbowAngularVelocity_ctrl.clear();
+    this->elbowLinearAcceleration_ctrl.clear();
+    this->elbowAngularAcceleration_ctrl.clear();
+    this->shoulderPosition_ctrl.clear();
+    this->shoulderOrientation_ctrl.clear();
+    this->shoulderLinearVelocity_ctrl.clear();
+    this->shoulderAngularVelocity_ctrl.clear();
+    this->shoulderLinearAcceleration_ctrl.clear();
+    this->shoulderAngularAcceleration_ctrl.clear();
+    this->handVelocityNorm_ctrl.clear();
+    this->handAccelerationNorm_ctrl.clear();
+    this->jointsPosition_ctrl.resize(0,0);
+    this->jointsVelocity_ctrl.resize(0,0);
+    this->jointsAcceleration_ctrl.resize(0,0);
+    this->sim_time.clear();
+    this->error_pos_tot_norm.clear();
+    this->error_or_tot_norm.clear();
+    this->error_pos_or_tot_norm.clear();
+    this->error_lin_vel_tot_norm.clear();
+    this->error_ang_vel_tot_norm.clear();
+    this->error_vel_tot_norm.clear();
+    this->error_lin_acc_tot_norm.clear();
+    this->error_ang_acc_tot_norm.clear();
+    this->error_acc_tot_norm.clear();
+    this->i_ctrl=0;
+    this->t_past=0.0;
+    this->t_j_past=0.0;
+    this->t_der_past=0.0;
+    this->samples_pos=0;
+    this->samples_vel=0;
+    this->samples_h_vel=0;
+    this->samples_w_vel=0;
+    this->samples_e_vel=0;
+    this->samples_s_vel=0;
+    this->exec_command_ctrl=true;
+    this->arm_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
+    this->hand_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, this->N_filter_length);
+    this->arm_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
+    this->hand_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, this->N_filter_length);
+    this->r_hand_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
+    this->r_wrist_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
+    this->r_elbow_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
+    this->r_shoulder_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
+    this->hand_j_acc = VectorXd::Zero(6);
+    this->Jacobian = MatrixXd::Zero(6,JOINTS_ARM);
+}
+
 
 void MainWindow::count_occurrence(std::unordered_map<int,int>& m, std::vector<int>& v){
     m.clear();
@@ -12563,65 +12916,8 @@ void MainWindow::on_pushButton_start_control_pressed()
     qnode.log(QNode::Info,string("Control Started"));
 //    BOOST_LOG_SEV(lg, info) << "# ---------------- Control started ------------------- # ";
 
-    this->handPosition_ctrl.clear();
-    this->handLinearVelocity_ctrl.clear();
-    this->handAngularVelocity_ctrl.clear();
-    this->handLinearAcceleration_ctrl.clear();
-    this->handAngularAcceleration_ctrl.clear();
-    this->wristPosition_ctrl.clear();
-    this->wristOrientation_ctrl.clear();
-    this->wristLinearVelocity_ctrl.clear();
-    this->wristAngularVelocity_ctrl.clear();
-    this->wristLinearAcceleration_ctrl.clear();
-    this->wristAngularAcceleration_ctrl.clear();
-    this->elbowPosition_ctrl.clear();
-    this->elbowOrientation_ctrl.clear();
-    this->elbowLinearVelocity_ctrl.clear();
-    this->elbowAngularVelocity_ctrl.clear();
-    this->elbowLinearAcceleration_ctrl.clear();
-    this->elbowAngularAcceleration_ctrl.clear();
-    this->shoulderPosition_ctrl.clear();
-    this->shoulderOrientation_ctrl.clear();
-    this->shoulderLinearVelocity_ctrl.clear();
-    this->shoulderAngularVelocity_ctrl.clear();
-    this->shoulderLinearAcceleration_ctrl.clear();
-    this->shoulderAngularAcceleration_ctrl.clear();
-    this->handVelocityNorm_ctrl.clear();
-    this->handAccelerationNorm_ctrl.clear();
-    this->jointsPosition_ctrl.resize(0,0);
-    this->jointsVelocity_ctrl.resize(0,0);
-    this->jointsAcceleration_ctrl.resize(0,0);
-    this->sim_time.clear();
-    this->error_pos_tot_norm.clear();
-    this->error_or_tot_norm.clear();
-    this->error_pos_or_tot_norm.clear();
-    this->error_lin_vel_tot_norm.clear();
-    this->error_ang_vel_tot_norm.clear();
-    this->error_vel_tot_norm.clear();
-    this->error_lin_acc_tot_norm.clear();
-    this->error_ang_acc_tot_norm.clear();
-    this->error_acc_tot_norm.clear();
-    this->i_ctrl=0;
-    this->t_past=0.0;
-    this->t_j_past=0.0;
-    this->t_der_past=0.0;
-    this->samples_pos=0;
-    this->samples_vel=0;
-    this->samples_h_vel=0;
-    this->samples_w_vel=0;
-    this->samples_e_vel=0;
-    this->samples_s_vel=0;  
-    this->exec_command_ctrl=true;
-    this->arm_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
-    this->hand_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, this->N_filter_length);
-    this->arm_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
-    this->hand_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, this->N_filter_length);
-    this->r_hand_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
-    this->r_wrist_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
-    this->r_elbow_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
-    this->r_shoulder_vel_buff = boost::make_shared<CircularBuffers<double>>(6, this->N_filter_length);
-    this->hand_j_acc = VectorXd::Zero(6);
-    this->Jacobian = MatrixXd::Zero(6,JOINTS_ARM);
+
+    this->clear_control_variables();
     this->qnode.resetSimTime();
 
     if(this->ui.checkBox_use_plan_hand_pos->isChecked())
@@ -12648,6 +12944,16 @@ void MainWindow::on_pushButton_start_control_pressed()
                 break;
             }
         }
+        Vector3d tar_pos;
+        targetPtr tar = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight();
+        tar_pos(0) = tar->getPos().Xpos;
+        tar_pos(1) = tar->getPos().Ypos;
+        tar_pos(2) = tar->getPos().Zpos;
+        Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
+        Quaterniond tar_q(Rot_tar);
+
+        this->tar_position= tar_pos;
+        this->tar_quaternion = tar_q;
     }
 
     this->lpf_tar_pos_x.reset(new LowPassFilter());

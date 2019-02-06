@@ -3016,7 +3016,7 @@ p, li { white-space: pre-wrap; }
          <x>260</x>
          <y>30</y>
          <width>301</width>
-         <height>461</height>
+         <height>531</height>
         </rect>
        </property>
        <property name="title">
@@ -3386,57 +3386,84 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </widget>
-       <widget class="QWidget" name="">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>420</y>
-          <width>271</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_573">
-         <item>
-          <widget class="QLabel" name="label_swivel_tol">
-           <property name="text">
-            <string>Swivel angle tolerance [rad]</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_swivel_tol">
-           <property name="text">
-            <string>0.1</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="">
+       <widget class="QGroupBox" name="groupBox_3">
         <property name="geometry">
          <rect>
           <x>10</x>
           <y>390</y>
-          <width>141</width>
-          <height>25</height>
+          <width>281</width>
+          <height>131</height>
          </rect>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_602">
-         <item>
-          <widget class="QLabel" name="label_g_th_replan">
-           <property name="text">
-            <string>g_th_replan</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_g_th_replan">
-           <property name="text">
-            <string>0.95</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <property name="title">
+         <string>Replanning</string>
+        </property>
+        <widget class="QWidget" name="">
+         <property name="geometry">
+          <rect>
+           <x>40</x>
+           <y>30</y>
+           <width>191</width>
+           <height>89</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_113">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_602">
+            <item>
+             <widget class="QLabel" name="label_g_th_replan">
+              <property name="text">
+               <string>g_th_replan</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_g_th_replan">
+              <property name="text">
+               <string>0.95</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_573">
+            <item>
+             <widget class="QLabel" name="label_tar_pos_th">
+              <property name="text">
+               <string>Target pos th [mm]</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_tar_pos_th">
+              <property name="text">
+               <string>200</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_603">
+            <item>
+             <widget class="QLabel" name="label_tar_or_th">
+              <property name="text">
+               <string>Target or q th </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_tar_or_th">
+              <property name="text">
+               <string>0.1</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </widget>
       <widget class="QCheckBox" name="checkBox_sing_av">
@@ -3546,7 +3573,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>260</x>
-         <y>500</y>
+         <y>570</y>
          <width>131</width>
          <height>23</height>
         </rect>
