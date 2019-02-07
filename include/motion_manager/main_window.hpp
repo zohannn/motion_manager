@@ -994,6 +994,8 @@ private:
         vector< MatrixXd > jacobian_mov; /**< trajectory of the jacobian of the movement */
         vector< MatrixXd > der_jacobian_mov; /**< trajectory of the derivative of the jacobian of the movement */
         vector< MatrixXd > jointsPosition_mov_ctrl; /**< trajectory of the joint position of the movement for controlling */
+        vector< MatrixXd > jointsVelocity_mov_ctrl; /**< trajectory of the joint velocity of the movement for controlling */
+        vector< MatrixXd > jointsAcceleration_mov_ctrl; /**< trajectory of the joint acceleration of the movement for controlling */
         vector< string > traj_descr_mov; /**< description of the trajectories */
         vector<HUMotion::warm_start_params> final_warm_start_res_mov; /**< warm start results of the target posture selections solved for the movement */
         HUMotion::warm_start_params bounce_warm_start_res_mov; /**< warm start results of the bounce posture selection solved for the movement */
@@ -1052,6 +1054,8 @@ private:
         vector<vector<double>> shoulderAngularAcceleration_mov;/**< shoulder angular acceleration during the movement */
         double njs_mov;/**< normalized jerk score of the movement */
         int nmu_mov;/**< number of the movement units */
+        double njs_mov_ctrl;/**< normalized jerk score of the movement during control */
+        int nmu_mov_ctrl;/**< number of the movement units during control */
 
         vector<vector<double>> handPosition_mov_left; /**< hand position during the movement. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_mov_left; /**< hand orientation (rpy) during the movement. */

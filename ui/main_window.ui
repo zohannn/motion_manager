@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1744,7 +1744,7 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>620</x>
         <y>10</y>
         <width>331</width>
         <height>161</height>
@@ -1916,7 +1916,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_des_right_hand_pos">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>620</x>
         <y>200</y>
         <width>391</width>
         <height>431</height>
@@ -2359,7 +2359,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="checkBox_use_vel_control">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>620</x>
         <y>170</y>
         <width>181</width>
         <height>21</height>
@@ -2665,7 +2665,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>591</width>
+        <width>601</width>
         <height>651</height>
        </rect>
       </property>
@@ -2684,7 +2684,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QCheckBox" name="checkBox_hl_add">
        <property name="geometry">
         <rect>
-         <x>290</x>
+         <x>300</x>
          <y>600</y>
          <width>171</width>
          <height>21</height>
@@ -2825,7 +2825,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>10</x>
          <y>360</y>
-         <width>261</width>
+         <width>271</width>
          <height>211</height>
         </rect>
        </property>
@@ -2973,9 +2973,9 @@ p, li { white-space: pre-wrap; }
        <widget class="QWidget" name="layoutWidget_107">
         <property name="geometry">
          <rect>
-          <x>130</x>
+          <x>120</x>
           <y>30</y>
-          <width>111</width>
+          <width>141</width>
           <height>58</height>
          </rect>
         </property>
@@ -2985,7 +2985,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QLabel" name="label_obsts_coeff_torso">
              <property name="text">
-              <string>Coeff.</string>
+              <string>Coeff. torso</string>
              </property>
             </widget>
            </item>
@@ -3003,7 +3003,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QLabel" name="label_obsts_damping_torso">
              <property name="text">
-              <string>Damping </string>
+              <string>Damping torso</string>
              </property>
             </widget>
            </item>
@@ -3048,7 +3048,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QGroupBox" name="groupBox_hl_add_params">
        <property name="geometry">
         <rect>
-         <x>280</x>
+         <x>290</x>
          <y>30</y>
          <width>301</width>
          <height>531</height>
@@ -3057,32 +3057,6 @@ p, li { white-space: pre-wrap; }
        <property name="title">
         <string>Human-likeness parameters</string>
        </property>
-       <widget class="QWidget" name="layoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>11</x>
-          <y>350</y>
-          <width>271</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_577">
-         <item>
-          <widget class="QLabel" name="label_fing_coeff">
-           <property name="text">
-            <string>Finger Control Coefficient</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="lineEdit_fing_coeff">
-           <property name="text">
-            <string>0.2</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
@@ -3518,6 +3492,54 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>350</y>
+          <width>271</width>
+          <height>27</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_612">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_577">
+           <item>
+            <widget class="QLabel" name="label_fing_p_coeff">
+             <property name="text">
+              <string>Finger Kp</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_fing_p_coeff">
+             <property name="text">
+              <string>0.2</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_611">
+           <item>
+            <widget class="QLabel" name="label_fing_d_coeff">
+             <property name="text">
+              <string>Finger Kd </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_fing_d_coeff">
+             <property name="text">
+              <string>0.2</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
       </widget>
       <widget class="QCheckBox" name="checkBox_sing_av">
        <property name="geometry">
@@ -3596,7 +3618,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>290</x>
+         <x>300</x>
          <y>620</y>
          <width>249</width>
          <height>25</height>
@@ -3625,7 +3647,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="geometry">
         <rect>
-         <x>280</x>
+         <x>290</x>
          <y>570</y>
          <width>131</width>
          <height>23</height>
@@ -3878,7 +3900,7 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>620</x>
         <y>640</y>
         <width>291</width>
         <height>21</height>
@@ -4004,7 +4026,7 @@ p, li { white-space: pre-wrap; }
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_5">
                <item>
-                <widget class="QLabel" name="label_cost_hand_3">
+                <widget class="QLabel" name="label_nmu_hand">
                  <property name="text">
                   <string>Number of movement units: </string>
                  </property>
@@ -13487,6 +13509,54 @@ p, li { white-space: pre-wrap; }
             <string>show joints</string>
            </property>
           </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>460</x>
+          <y>440</y>
+          <width>771</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_610">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_608">
+           <item>
+            <widget class="QLabel" name="label_cost_hand_ctrl">
+             <property name="text">
+              <string>Normalized jerk cost of the hand: </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_cost_hand_ctrl_value">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_609">
+           <item>
+            <widget class="QLabel" name="label_nmu_hand_ctrl">
+             <property name="text">
+              <string>Number of movement units: </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_nmu_hand_value_ctrl">
+             <property name="text">
+              <string/>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
