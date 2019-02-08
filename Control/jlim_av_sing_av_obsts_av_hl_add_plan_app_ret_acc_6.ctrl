@@ -64,7 +64,8 @@ Hl_add_g_th_pa=0.88
 Hl_add_g_th_rp=0.95
 
 Hl_fing_p_coeff=50
-Hl_fing_d_coeff=50
+
+Hl_fing_d_coeff=15
 # Control coefficients and error threshold #
 Pos_p_control_coeff=20
 
@@ -89,8 +90,8 @@ use_vel_based_control=false
 N_5=false
 N_7=false
 N_9=false
-N_11=false
-N_19=true
+N_11=true
+N_19=false
 N_25=false
 N_35=false
 N_45=false

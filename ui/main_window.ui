@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1770,7 +1770,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_x">
               <property name="text">
-               <string>x [mm/s]:</string>
+               <string>x [mm/s²]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1791,7 +1791,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_y">
               <property name="text">
-               <string>y [mm/s]:</string>
+               <string>y [mm/s²]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1812,7 +1812,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_z">
               <property name="text">
-               <string>z [mm/s]:</string>
+               <string>z [mm/s²]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1837,7 +1837,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_wx">
               <property name="text">
-               <string>wx [rad/s]:</string>
+               <string>ax [rad/s²]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1858,7 +1858,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_wy">
               <property name="text">
-               <string>wy [rad/s]:</string>
+               <string>ay [rad/s²]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -1879,7 +1879,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QCheckBox" name="checkBox_des_right_hand_vel_wz">
               <property name="text">
-               <string>wz [rad/s]:</string>
+               <string>az [rad/s²]:</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -2366,7 +2366,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>use velocity control</string>
+       <string>use acceleration control</string>
       </property>
      </widget>
      <widget class="QGroupBox" name="groupBox_right_hand_comp">
@@ -3492,7 +3492,7 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>11</x>
@@ -13512,7 +13512,7 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>460</x>
