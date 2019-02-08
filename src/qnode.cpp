@@ -269,7 +269,7 @@ bool  QNode::loadScenario(const std::string& path,int id)
             // Cylinder small  (obj_id = 0)
             subCylinderSmall= n.subscribe("/vrep/Cylinder_small_pose",1,&QNode::Cylinder_small_Callback,this);
             break;
-        case 15: // Controlling: pick a red column
+        case 15: case 16: // Controlling: pick a red column and Controlling: follow a moving red column
             pub_joints = n.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
             // Cylinder small  (obj_id = 0)
             subCylinderSmall= n.subscribe("/vrep/Cylinder_small_pose",1,&QNode::Cylinder_small_Callback,this);
@@ -6752,8 +6752,8 @@ bool QNode::getElements(scenarioPtr scene)
         }
         break;
 
-    case 16:
-        // // Controlling: pick a red column
+    case 16: case 17:
+        //  Controlling: pick a red column and Controlling: follow a moving red column
         // get the number of objects in the scenario
         add_client = n.serviceClient<vrep_common::simRosGetIntegerSignal>("/vrep/simRosGetIntegerSignal");
 

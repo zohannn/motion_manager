@@ -216,6 +216,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     this->t_der_past=0.0;
     this->t_past=0.0;
     this->qnode.resetSimTime();
+    this->samples_des_hand_pose=0;
+    this->samples_des_hand_vel=0;
     this->samples_pos=0;
     this->samples_vel=0;
     this->samples_h_vel=0;
@@ -223,6 +225,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     this->samples_e_vel=0;
     this->samples_s_vel=0;
     this->N_filter_length=5;
+    this->des_hand_pose_buff = boost::make_shared<CircularBuffers<double>>(7, this->N_filter_length);
+    this->des_hand_vel_buff = boost::make_shared<CircularBuffers<double>>(7, this->N_filter_length);
     this->arm_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
     this->hand_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, this->N_filter_length);
     this->arm_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
@@ -263,6 +267,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     scenarios.push_back(QString("Controlling: scenario with no obstacles for showing the effects of singularities"));
     scenarios.push_back(QString("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane"));
     scenarios.push_back(QString("Controlling: pick a red column"));
+    scenarios.push_back(QString("Controlling: follow a moving red column"));
 
 #endif
 
@@ -384,14 +389,17 @@ void MainWindow::execPosControl()
             // desired pose
             double des_hand_pos_x = 0.0; double des_hand_pos_y = 0.0; double des_hand_pos_z = 0.0;
             double des_hand_or_q_x = 0.0; double des_hand_or_q_y = 0.0; double des_hand_or_q_z = 0.0; double des_hand_or_q_w = 0.0;
+            VectorXd des_hand_pose(7); vector<double> des_hand_pose_vec(7,0.0);
 
             // desired velocity
             double des_hand_lin_vel_x = 0.0; double des_hand_lin_vel_y = 0.0; double des_hand_lin_vel_z = 0.0;
             double des_hand_ang_vel_q_x = 0.0; double des_hand_ang_vel_q_y = 0.0; double des_hand_ang_vel_q_z = 0.0; double des_hand_ang_vel_q_w = 0.0;
+            VectorXd des_hand_vel(7); vector<double> des_hand_vel_vec(7,0.0);
 
             // desired acceleration
             double des_hand_lin_acc_x = 0.0; double des_hand_lin_acc_y = 0.0; double des_hand_lin_acc_z = 0.0;
             double des_hand_ang_acc_q_x = 0.0; double des_hand_ang_acc_q_y = 0.0; double des_hand_ang_acc_q_z = 0.0; double des_hand_ang_acc_q_w = 0.0;
+            VectorXd des_hand_acc(7); vector<double> des_hand_acc_vec(7,0.0);
 
             // bounce pose
             double bounce_hand_pos_x = 0.0; double bounce_hand_pos_y = 0.0; double bounce_hand_pos_z = 0.0;
@@ -405,6 +413,8 @@ void MainWindow::execPosControl()
             double obj_pitch_var = 0.5; // rad
             double obj_yaw_var = 0.5; // rad
 
+            bool follow_tar = false;
+
 
             std::string stage_descr = "plan"; int stages = 1; int mov_type = 0;
 
@@ -415,7 +425,6 @@ void MainWindow::execPosControl()
             VectorXd jointsInitAcceleration_hand(JOINTS_HAND); vector<double> jointsInitAcceleration_hand_vec(JOINTS_HAND);
             VectorXd jointsFinalAcceleration_hand(JOINTS_HAND); vector<double> jointsFinalAcceleration_hand_vec(JOINTS_HAND);
             VectorXd jointsBouncePosition_hand(JOINTS_HAND); vector<double> jointsBouncePosition_hand_vec(JOINTS_HAND);
-            VectorXd jointsPosition_hand_max(JOINTS_HAND); VectorXd jointsPosition_hand_min(JOINTS_HAND);
             Matrix3d I_3 = Matrix3d::Identity();
             vector<vector<double>> hand_h_positions; int n_steps; double period_T;
             vector<vector<double>> hand_h_orientations; vector<vector<double>> hand_h_orientations_q;
@@ -427,6 +436,7 @@ void MainWindow::execPosControl()
 
             Vector3d tar_pos; Vector3d tar_rpy; Quaterniond tar_q;
             if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
+                 follow_tar = this->ui.checkBox_follow_target->isChecked();
                  stages = this->des_handPosition.size();
                  stage_descr = this->h_results->trajectory_descriptions.at(this->i_ctrl);
                  mov_type = this->curr_mov->getType();
@@ -519,7 +529,11 @@ void MainWindow::execPosControl()
                         hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;
                     }
                  }else if(stage_descr.compare("approach")==0){
-                    hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;
+                    if(follow_tar){
+                        hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                    }else{
+                       hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;
+                    }
                  }else if(stage_descr.compare("retreat")==0){
                     hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_ret*vv_ret_w;
                  }
@@ -713,7 +727,11 @@ void MainWindow::execPosControl()
                 hl_d_or_coeff_ret = this->ui.lineEdit_hl_d_or_coeff_ret->text().toDouble();
 
                 g_map_th_pa = this->ui.lineEdit_g_th_plan_app->text().toDouble();
-                g_map_th_rp = this->ui.lineEdit_g_th_ret_plan->text().toDouble();
+                if(follow_tar){
+                    g_map_th_rp = 2; // never go to retreat or to the subsequent movement
+                }else{
+                    g_map_th_rp = this->ui.lineEdit_g_th_ret_plan->text().toDouble();
+                }
                 fing_p_coeff = this->ui.lineEdit_fing_p_coeff->text().toDouble();
                 fing_d_coeff = this->ui.lineEdit_fing_d_coeff->text().toDouble();
                 phi = this->curr_task->getProblem(ui.listWidget_movs->currentRow())->getHUMPlanner()->getPHI();
@@ -736,29 +754,34 @@ void MainWindow::execPosControl()
             }
 
             // desired position
-            Vector3d des_hand_pos; Vector3d des_hand_or_q_e;
+            Vector3d des_hand_pos; VectorXd des_hand_or_q(4); Vector3d des_hand_or_q_e;
             des_hand_pos << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z;
             des_hand_or_q_e << des_hand_or_q_x,des_hand_or_q_y,des_hand_or_q_z;
+            des_hand_or_q << des_hand_or_q_x,des_hand_or_q_y,des_hand_or_q_z,des_hand_or_q_w;
+            des_hand_pose << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z,des_hand_or_q_x,des_hand_or_q_y,des_hand_or_q_z,des_hand_or_q_w;
+            VectorXd::Map(&des_hand_pose_vec[0], des_hand_pose.size()) = des_hand_pose;
 
-            // desired velocity
-            Vector3d des_hand_lin_vel; Vector3d des_hand_ang_vel_q_e;
-            des_hand_lin_vel << des_hand_lin_vel_x,des_hand_lin_vel_y,des_hand_lin_vel_z;
-            des_hand_ang_vel_q_e << des_hand_ang_vel_q_x,des_hand_ang_vel_q_y,des_hand_ang_vel_q_z;
+//            // desired velocity
+//            Vector3d des_hand_lin_vel; VectorXd des_hand_ang_vel_q(4); Vector3d des_hand_ang_vel_q_e;
+//            des_hand_lin_vel << des_hand_lin_vel_x,des_hand_lin_vel_y,des_hand_lin_vel_z;
+//            des_hand_ang_vel_q_e << des_hand_ang_vel_q_x,des_hand_ang_vel_q_y,des_hand_ang_vel_q_z;
+//            des_hand_ang_vel_q << des_hand_ang_vel_q_x,des_hand_ang_vel_q_y,des_hand_ang_vel_q_z,des_hand_ang_vel_q_w;
 
-            // desired acceleration
-            Vector3d des_hand_lin_acc; Vector3d des_hand_ang_acc_q_e;
-            des_hand_lin_acc << des_hand_lin_acc_x,des_hand_lin_acc_y,des_hand_lin_acc_z;
-            des_hand_ang_acc_q_e << des_hand_ang_acc_q_x,des_hand_ang_acc_q_y,des_hand_ang_acc_q_z;
+//            // desired acceleration
+//            Vector3d des_hand_lin_acc; VectorXd des_hand_ang_acc_q(4); Vector3d des_hand_ang_acc_q_e;
+//            des_hand_lin_acc << des_hand_lin_acc_x,des_hand_lin_acc_y,des_hand_lin_acc_z;
+//            des_hand_ang_acc_q_e << des_hand_ang_acc_q_x,des_hand_ang_acc_q_y,des_hand_ang_acc_q_z;
+//            des_hand_ang_acc_q << des_hand_ang_acc_q_x,des_hand_ang_acc_q_y,des_hand_ang_acc_q_z,des_hand_ang_acc_q_w;
 
-            // desired reference acceleration
-            VectorXd des_hand_acc(6);
-            des_hand_acc(0) = des_hand_lin_acc_x;
-            des_hand_acc(1) = des_hand_lin_acc_y;
-            des_hand_acc(2) = des_hand_lin_acc_z;
-            Vector3d des_hand_alpha = 2*des_hand_or_q_e.cross(des_hand_ang_acc_q_e) + 2*des_hand_or_q_w*des_hand_ang_acc_q_e - 2*des_hand_ang_acc_q_w*des_hand_or_q_e;
-            des_hand_acc(3) = des_hand_alpha(0);
-            des_hand_acc(4) = des_hand_alpha(1);
-            des_hand_acc(5) = des_hand_alpha(2);
+//            // desired reference acceleration
+//            VectorXd des_hand_acc(6);
+//            des_hand_acc(0) = des_hand_lin_acc_x;
+//            des_hand_acc(1) = des_hand_lin_acc_y;
+//            des_hand_acc(2) = des_hand_lin_acc_z;
+//            Vector3d des_hand_alpha = 2*des_hand_or_q_e.cross(des_hand_ang_acc_q_e) + 2*des_hand_or_q_w*des_hand_ang_acc_q_e - 2*des_hand_ang_acc_q_w*des_hand_or_q_e;
+//            des_hand_acc(3) = des_hand_alpha(0);
+//            des_hand_acc(4) = des_hand_alpha(1);
+//            des_hand_acc(5) = des_hand_alpha(2);
 
             double error_pos_th = this->ui.lineEdit_err_p_pos->text().toDouble();
             double error_or_th = this->ui.lineEdit_err_p_or->text().toDouble();
@@ -832,13 +855,33 @@ void MainWindow::execPosControl()
                 vector<double> r_shoulder_lin_pos(r_shoulder_pos.begin(), r_shoulder_pos.begin()+3);
                 vector<double> r_shoulder_ang_pos(r_shoulder_pos.begin()+3, r_shoulder_pos.begin()+6);
 
+                // get desired hand velocity
+                this->des_hand_pose_buff->push(des_hand_pose_vec);
+                if(this->samples_des_hand_pose==this->N_filter_length-1 && this->des_hand_pose_buff->full()){
+                    for(size_t i=0; i< des_hand_pose_vec.size();++i)
+                    {
+                        des_hand_vel_vec.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->des_hand_pose_buff->at(i));
+                    }
+                }else{this->samples_des_hand_pose++;}
+                des_hand_vel = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(des_hand_vel_vec.data(), des_hand_vel_vec.size());
+
+                // get desired hand acceleration
+                this->des_hand_vel_buff->push(des_hand_vel_vec);
+                if(this->samples_des_hand_vel==this->N_filter_length-1 && this->des_hand_vel_buff->full()){
+                    for(size_t i=0; i< des_hand_vel_vec.size();++i)
+                    {
+                        des_hand_acc_vec.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->des_hand_vel_buff->at(i));
+                    }
+                }else{this->samples_des_hand_vel++;}
+                des_hand_acc = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(des_hand_acc_vec.data(), des_hand_acc_vec.size());
+
 
 //                vector<double> r_arm_velocities_mes;
 //                vector<double> r_hand_velocities_mes(JOINTS_HAND,0.0);
-                if(this->ui.checkBox_use_velocity_based_ctrl->isChecked())
-                {
-                    this->curr_scene->getHumanoid()->getRightArmVelocities(r_arm_velocities_read);
-                    this->curr_scene->getHumanoid()->getRightHandVelocities(r_hand_velocities_read);
+//                if(this->ui.checkBox_use_velocity_based_ctrl->isChecked())
+//                {
+//                    this->curr_scene->getHumanoid()->getRightArmVelocities(r_arm_velocities_read);
+//                    this->curr_scene->getHumanoid()->getRightHandVelocities(r_hand_velocities_read);
 //                // filter noise from arm velocities
 //                r_arm_velocities.at(0) = this->lpf_r_arm_vel_1->update(r_arm_velocities_mes.at(0));
 //                r_arm_velocities.at(1) = this->lpf_r_arm_vel_2->update(r_arm_velocities_mes.at(1));
@@ -847,22 +890,22 @@ void MainWindow::execPosControl()
 //                r_arm_velocities.at(4) = this->lpf_r_arm_vel_5->update(r_arm_velocities_mes.at(4));
 //                r_arm_velocities.at(5) = this->lpf_r_arm_vel_6->update(r_arm_velocities_mes.at(5));
 //                r_arm_velocities.at(6) = this->lpf_r_arm_vel_7->update(r_arm_velocities_mes.at(6));
-                }else{
-                    // get the joint velocities
-                    this->arm_pos_buff->push(r_arm_posture);
-                    this->hand_pos_buff->push(r_hand_posture);
-                    if(this->samples_pos==this->N_filter_length-1 && this->arm_pos_buff->full() && this->hand_pos_buff->full()){
-                        for(size_t i=0; i< r_arm_posture.size();++i)
-                        {
-                            r_arm_velocities_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_pos_buff->at(i));
-                        }
-                        for(size_t i=0; i< r_hand_velocities_read.size();++i)
-                        {
-                            r_hand_velocities_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_pos_buff->at(i));
-                        }
-                    }else{this->samples_pos++;}
+//                }else{
+                // get the joint velocities
+                this->arm_pos_buff->push(r_arm_posture);
+                this->hand_pos_buff->push(r_hand_posture);
+                if(this->samples_pos==this->N_filter_length-1 && this->arm_pos_buff->full() && this->hand_pos_buff->full()){
+                    for(size_t i=0; i< r_arm_posture.size();++i)
+                    {
+                        r_arm_velocities_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_pos_buff->at(i));
+                    }
+                    for(size_t i=0; i< r_hand_velocities_read.size();++i)
+                    {
+                        r_hand_velocities_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_pos_buff->at(i));
+                    }
+                }else{this->samples_pos++;}
 
-                }
+//                }
 //                VectorXd r_arm_velocities_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_arm_velocities.data(), r_arm_velocities.size());
 
                 vector<double> r_hand_vel; vector<double> r_wrist_vel; vector<double> r_elbow_vel; vector<double> r_shoulder_vel;
@@ -966,11 +1009,11 @@ void MainWindow::execPosControl()
                 Vector3d error_pos = des_hand_pos - r_hand_pos_vec;
                 Vector3d error_or = r_hand_q_w*des_hand_or_q_e - des_hand_or_q_w*r_hand_or_q_e - des_hand_or_q_e.cross(r_hand_or_q_e);
                 VectorXd error_tot(6); error_tot << error_pos(0),error_pos(1),error_pos(2), error_or(0),error_or(1),error_or(2);
-                // error in velocity
-                Vector3d error_lin_vel = des_hand_lin_vel - r_hand_lin_vel_vec;
-                Vector3d error_ang_vel = r_hand_ang_vel_q_w*des_hand_or_q_e + r_hand_q_w*des_hand_ang_vel_q_e - des_hand_ang_vel_q_w*r_hand_or_q_e - des_hand_or_q_w*r_hand_ang_vel_q_e
-                                        - des_hand_ang_vel_q_e.cross(r_hand_or_q_e) - des_hand_or_q_e.cross(r_hand_ang_vel_q_e);
-                VectorXd der_error_tot(6); der_error_tot << error_lin_vel(0),error_lin_vel(1),error_lin_vel(2),error_ang_vel(0),error_ang_vel(1),error_ang_vel(2);
+//                // error in velocity
+//                Vector3d error_lin_vel = des_hand_lin_vel - r_hand_lin_vel_vec;
+//                Vector3d error_ang_vel = r_hand_ang_vel_q_w*des_hand_or_q_e + r_hand_q_w*des_hand_ang_vel_q_e - des_hand_ang_vel_q_w*r_hand_or_q_e - des_hand_or_q_w*r_hand_ang_vel_q_e
+//                                        - des_hand_ang_vel_q_e.cross(r_hand_or_q_e) - des_hand_or_q_e.cross(r_hand_ang_vel_q_e);
+//                VectorXd der_error_tot(6); der_error_tot << error_lin_vel(0),error_lin_vel(1),error_lin_vel(2),error_ang_vel(0),error_ang_vel(1),error_ang_vel(2);
 
 
                 double curr_time = this->qnode.getSimTime() - this->t_past - this->t_der_past;
@@ -1798,42 +1841,48 @@ void MainWindow::execPosControl()
                 error_abs_or << abs(error_or(0)),abs(error_or(1)),abs(error_or(2));
                 double e_n_pos = error_pos.norm(); double e_n_or = error_or.norm();
                 MatrixXd Koeff_p = MatrixXd::Identity(6,6);
-                if((this->ui.checkBox_des_right_hand_pos_x->isChecked()) && (error_abs_pos(0) > error_pos_th)){
+                //if((this->ui.checkBox_des_right_hand_pos_x->isChecked()) && (error_abs_pos(0) > error_pos_th)){
+                if((this->ui.checkBox_des_right_hand_pos_x->isChecked())){
                     if(hl_en){
                         Koeff_p(0,0) = hl_p_pos_coeff;
                     }else{
                         Koeff_p(0,0) = coeff_p_pos;
                     }
                 }else{ Koeff_p(0,0) = 0.0;}
-                if((this->ui.checkBox_des_right_hand_pos_y->isChecked()) && (error_abs_pos(1) > error_pos_th)){
+                //if((this->ui.checkBox_des_right_hand_pos_y->isChecked()) && (error_abs_pos(1) > error_pos_th)){
+                if((this->ui.checkBox_des_right_hand_pos_y->isChecked())){
                     if(hl_en){
                         Koeff_p(1,1) = hl_p_pos_coeff;
                     }else{
                         Koeff_p(1,1) = coeff_p_pos;
                     }
                 }else{ Koeff_p(1,1) = 0.0;}
-                if((this->ui.checkBox_des_right_hand_pos_z->isChecked()) && (error_abs_pos(2) > error_pos_th)){
+                //if((this->ui.checkBox_des_right_hand_pos_z->isChecked()) && (error_abs_pos(2) > error_pos_th)){
+                if((this->ui.checkBox_des_right_hand_pos_z->isChecked())){
                     if(hl_en){
                         Koeff_p(2,2) = hl_p_pos_coeff;
                     }else{
                         Koeff_p(2,2) = coeff_p_pos;
                     }
                 }else{ Koeff_p(2,2) = 0.0;}
-                if((this->ui.checkBox_des_right_hand_q_x->isChecked()) && (error_abs_or(0) > error_or_th)){
+                //if((this->ui.checkBox_des_right_hand_q_x->isChecked()) && (error_abs_or(0) > error_or_th)){
+                if((this->ui.checkBox_des_right_hand_q_x->isChecked())){
                     if(hl_en){
                         Koeff_p(3,3) = hl_p_or_coeff;
                     }else{
                         Koeff_p(3,3) = coeff_p_or;
                     }
                 }else{ Koeff_p(3,3) = 0.0;}
-                if((this->ui.checkBox_des_right_hand_q_y->isChecked()) && (error_abs_or(1) > error_or_th)){
+                //if((this->ui.checkBox_des_right_hand_q_y->isChecked()) && (error_abs_or(1) > error_or_th)){
+                if((this->ui.checkBox_des_right_hand_q_y->isChecked())){
                     if(hl_en){
                         Koeff_p(4,4) = hl_p_or_coeff;
                     }else{
                         Koeff_p(4,4) = coeff_p_or;
                     }
                 }else{ Koeff_p(4,4) = 0.0;}
-                if((this->ui.checkBox_des_right_hand_q_z->isChecked()) && (error_abs_or(2) > error_or_th)){
+                //if((this->ui.checkBox_des_right_hand_q_z->isChecked()) && (error_abs_or(2) > error_or_th)){
+                if((this->ui.checkBox_des_right_hand_q_z->isChecked())){
                     if(hl_en){
                         Koeff_p(5,5) = hl_p_or_coeff;
                     }else{
@@ -1841,47 +1890,53 @@ void MainWindow::execPosControl()
                     }
                 }else{ Koeff_p(5,5) = 0.0;}
 
-                Vector3d error_abs_lin_vel; Vector3d error_abs_ang_vel;
-                error_abs_lin_vel << abs(error_lin_vel(0)),abs(error_lin_vel(1)),abs(error_lin_vel(2));
-                error_abs_ang_vel << abs(error_ang_vel(0)),abs(error_ang_vel(1)),abs(error_ang_vel(2));
+//                Vector3d error_abs_lin_vel; Vector3d error_abs_ang_vel;
+//                error_abs_lin_vel << abs(error_lin_vel(0)),abs(error_lin_vel(1)),abs(error_lin_vel(2));
+//                error_abs_ang_vel << abs(error_ang_vel(0)),abs(error_ang_vel(1)),abs(error_ang_vel(2));
                 //double e_n_lin_vel = error_lin_vel.norm(); double e_n_ang_vel = error_ang_vel.norm();
                 MatrixXd Koeff_d = MatrixXd::Identity(6,6);
-                if((this->ui.checkBox_des_right_hand_pos_x->isChecked()) && (error_abs_lin_vel(0) > error_lin_vel_th)){
+//                if((this->ui.checkBox_des_right_hand_pos_x->isChecked()) && (error_abs_lin_vel(0) > error_lin_vel_th)){
+                if((this->ui.checkBox_des_right_hand_pos_x->isChecked())){
                     if(hl_en){
                         Koeff_d(0,0) = hl_d_pos_coeff;
                     }else{
                         Koeff_d(0,0) = coeff_d_pos;
                     }
                 }else{ Koeff_d(0,0) = 0.0;}
-                if((this->ui.checkBox_des_right_hand_pos_y->isChecked()) && (error_abs_lin_vel(1) > error_lin_vel_th)){
+//                if((this->ui.checkBox_des_right_hand_pos_y->isChecked()) && (error_abs_lin_vel(1) > error_lin_vel_th)){
+                if((this->ui.checkBox_des_right_hand_pos_y->isChecked())){
                     if(hl_en){
                         Koeff_d(1,1) = hl_d_pos_coeff;
                     }else{
                         Koeff_d(1,1) = coeff_d_pos;
                     }
                 }else{ Koeff_d(1,1) = 0.0;}
-                if((this->ui.checkBox_des_right_hand_pos_z->isChecked()) && (error_abs_lin_vel(2) > error_lin_vel_th)){
+//                if((this->ui.checkBox_des_right_hand_pos_z->isChecked()) && (error_abs_lin_vel(2) > error_lin_vel_th)){
+                if((this->ui.checkBox_des_right_hand_pos_z->isChecked())){
                     if(hl_en){
                         Koeff_d(2,2) = hl_d_pos_coeff;
                     }else{
                         Koeff_d(2,2) = coeff_d_pos;
                     }
                 }else{ Koeff_d(2,2) = 0.0;}
-                if((this->ui.checkBox_des_right_hand_q_x->isChecked()) && (error_abs_ang_vel(0) > error_ang_vel_th)){
+//                if((this->ui.checkBox_des_right_hand_q_x->isChecked()) && (error_abs_ang_vel(0) > error_ang_vel_th)){
+                if((this->ui.checkBox_des_right_hand_q_x->isChecked())){
                     if(hl_en){
                         Koeff_d(3,3) = hl_d_or_coeff;
                     }else{
                         Koeff_d(3,3) = coeff_d_or;
                     }
                 }else{ Koeff_d(3,3) = 0.0;}
-                if((this->ui.checkBox_des_right_hand_q_y->isChecked()) && (error_abs_ang_vel(1) > error_ang_vel_th)){
+//                if((this->ui.checkBox_des_right_hand_q_y->isChecked()) && (error_abs_ang_vel(1) > error_ang_vel_th)){
+                if((this->ui.checkBox_des_right_hand_q_y->isChecked())){
                     if(hl_en){
                         Koeff_d(4,4) = hl_d_or_coeff;
                     }else{
                         Koeff_d(4,4) = coeff_d_or;
                     }
                 }else{ Koeff_d(4,4) = 0.0;}
-                if((this->ui.checkBox_des_right_hand_q_z->isChecked()) && (error_abs_ang_vel(2) > error_ang_vel_th)){
+//                if((this->ui.checkBox_des_right_hand_q_z->isChecked()) && (error_abs_ang_vel(2) > error_ang_vel_th)){
+                if((this->ui.checkBox_des_right_hand_q_z->isChecked())){
                     if(hl_en){
                         Koeff_d(5,5) = hl_d_or_coeff;
                     }else{
@@ -1924,6 +1979,11 @@ void MainWindow::execPosControl()
                     if(stages==3 && hl_en && stage_descr.compare("plan")==0)
                     {
                         condition = (g_map >= g_map_th_pa);
+                    }else if((stage_descr.compare("approach")==0) && follow_tar && (des_hand_vel.norm()<=5.0)){
+                        // the target was being followed and it has stopped
+                        follow_tar = false; this->ui.checkBox_follow_target->setChecked(false); // the target has stopped
+                        this->qnode.openBarrettHand_to_pos(1,jointsInitPosition_hand_vec); // open the hand to the initial position of the approach stage
+                        this->t_past=curr_time; // reset the normalized time, but do not go to the next stage (the approach has to be performed)
                     }else if(stages==3 && hl_en && stage_descr.compare("approach")==0){
                         condition = (g_map >= g_map_th_rp);
                     }
@@ -1939,7 +1999,7 @@ void MainWindow::execPosControl()
                                     this->qnode.closeBarrettHand_to_pos(1,jointsFinalPosition_hand_vec);
                                 }
                             }
-                            this->i_ctrl++;
+                            this->i_ctrl++; // go to the next stage
                         }else if(stages==2 && this->i_ctrl<1){
                             // TO DO
                             this->i_ctrl++;
@@ -2877,6 +2937,8 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              string path_vrep_controlling_obsts_av_ellipse = PATH_SCENARIOS+string("/vrep/Controlling_obsts_av_ellipse.ttt");
              // Controlling: pick a red column
              string path_vrep_controlling_pick = PATH_SCENARIOS+string("/vrep/Controlling_pick_ToyVehicle_aros.ttt");
+             // Controlling: follow a moving red column
+             string path_vrep_controlling_follow = PATH_SCENARIOS+string("/vrep/Controlling_pick_ToyVehicle_aros_moving_column.ttt");
 
              switch(i){
              case 0: // Assembly scenario
@@ -3275,6 +3337,32 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                  }
 #endif
                  break;
+
+             case 15: // Controlling: follow a moving red column
+#if HAND==0
+
+#elif HAND==1
+                this->scenario_id = 16;
+                 if (qnode.loadScenario(path_vrep_controlling_follow,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Controlling: follow a moving red column HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Controlling: follow a moving red column");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
+                     //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
+                 }else{
+                     qnode.log(QNode::Error,std::string("Controlling: follow a moving red column HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+#endif
+                 break;
+
              }
 
          }
@@ -12886,6 +12974,8 @@ void MainWindow::clear_control_variables()
     this->t_past=0.0;
     this->t_j_past=0.0;
     this->t_der_past=0.0;
+    this->samples_des_hand_pose=0;
+    this->samples_des_hand_vel=0;
     this->samples_pos=0;
     this->samples_vel=0;
     this->samples_h_vel=0;
@@ -12893,6 +12983,8 @@ void MainWindow::clear_control_variables()
     this->samples_e_vel=0;
     this->samples_s_vel=0;
     this->exec_command_ctrl=true;
+    this->des_hand_pose_buff = boost::make_shared<CircularBuffers<double>>(7, this->N_filter_length);
+    this->des_hand_vel_buff = boost::make_shared<CircularBuffers<double>>(7, this->N_filter_length);
     this->arm_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
     this->hand_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_HAND, this->N_filter_length);
     this->arm_vel_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
@@ -13848,6 +13940,7 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         if (this->ui.checkBox_tar_filter_noise->isChecked()){ stream << "Tar_filter_noise=true"<< endl;}else{stream << "Tar_filter_noise=false"<< endl;}
         stream << "Tar_f_cut_off=" << this->ui.lineEdit_tar_f_cutoff->text().toStdString().c_str() << endl;
         stream << "Tar_f_timestep=" << this->ui.lineEdit_tar_timestep->text().toStdString().c_str() << endl;
+        if (this->ui.checkBox_follow_target->isChecked()){ stream << "follow_target=true"<< endl;}else{stream << "follow_target=false"<< endl;}
         stream << "# Maximum allowed velocity of the joints #" << endl;
         stream << "vel_max=" << this->ui.lineEdit_vel_max->text().toStdString().c_str() << endl;
         stream << "# Replanning #" << endl;
@@ -14079,6 +14172,12 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     this->ui.lineEdit_tar_f_cutoff->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Tar_f_timestep"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_tar_timestep->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("follow_target"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.checkBox_follow_target->setChecked(true);
+                    }else{
+                        this->ui.checkBox_follow_target->setChecked(false);
+                    }
                 }else if(QString::compare(fields.at(0),QString("Tar_pos_th"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_tar_pos_th->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Tar_or_th"),Qt::CaseInsensitive)==0){

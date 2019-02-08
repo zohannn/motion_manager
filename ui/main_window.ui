@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -3673,9 +3673,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>1020</x>
-        <y>450</y>
+        <y>460</y>
         <width>261</width>
-        <height>141</height>
+        <height>131</height>
        </rect>
       </property>
       <property name="title">
@@ -3687,7 +3687,7 @@ p, li { white-space: pre-wrap; }
          <x>10</x>
          <y>30</y>
          <width>243</width>
-         <height>102</height>
+         <height>91</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_601">
@@ -3910,6 +3910,19 @@ p, li { white-space: pre-wrap; }
        <string>use velocity-based control</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="checkBox_follow_target">
+      <property name="geometry">
+       <rect>
+        <x>1020</x>
+        <y>430</y>
+        <width>241</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Follow the moving target</string>
+      </property>
+     </widget>
      <zorder>groupBox_right_hand_comp</zorder>
      <zorder>groupBox_control</zorder>
      <zorder>groupBox_ctrl_options</zorder>
@@ -3921,6 +3934,7 @@ p, li { white-space: pre-wrap; }
      <zorder>layoutWidget</zorder>
      <zorder>groupBox_tar_filter_noise</zorder>
      <zorder>checkBox_use_velocity_based_ctrl</zorder>
+     <zorder>checkBox_follow_target</zorder>
     </widget>
     <widget class="QWidget" name="tab_results">
      <property name="enabled">
