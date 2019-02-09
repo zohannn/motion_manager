@@ -211,6 +211,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     ui.groupBox_sing_av_params->setEnabled(false);
     ui.groupBox_obsts_av_params->setEnabled(false);
     ui.groupBox_hl_add_params->setEnabled(false);
+    ui.checkBox_joints_velocity_ctrl->setEnabled(true);
     this->i_ctrl=0;
     this->t_j_past=0.0;
     this->t_der_past=0.0;
@@ -749,8 +750,13 @@ void MainWindow::execPosControl()
                 vector<double> bounce_posture = this->h_results->bounce_warm_start_res.x;
                 vector<double> bounce_hand_posture(bounce_posture.begin()+JOINTS_ARM,bounce_posture.end());
                 jointsBouncePosition_hand_vec = bounce_hand_posture;
-                jointsBouncePosition_hand << 0.0,jointsBouncePosition_hand_vec.at(0),
+                if(jointsBouncePosition_hand_vec.empty()){
+                    jointsBouncePosition_hand << 0.0,jointsInitPosition_hand_vec.at(0),
+                                             jointsInitPosition_hand_vec.at(0),jointsInitPosition_hand_vec.at(1);
+                }else{
+                    jointsBouncePosition_hand << 0.0,jointsBouncePosition_hand_vec.at(0),
                                              jointsBouncePosition_hand_vec.at(0),jointsBouncePosition_hand_vec.at(1);
+                }
             }
 
             // desired position
@@ -795,7 +801,7 @@ void MainWindow::execPosControl()
 
 
             // ---------------- start the simulation --------------------------- //
-            if(!this->qnode.isSimulationRunning())
+            if(!this->qnode.isSimulationRunning() || this->qnode.isSimulationPaused())
             {
                 // enable set joints subscriber
                 this->qnode.enableSetJoints();
@@ -920,62 +926,59 @@ void MainWindow::execPosControl()
                 vector<double> r_shoulder_lin_vel(r_shoulder_vel.begin(), r_shoulder_vel.begin()+3);
                 vector<double> r_shoulder_ang_vel(r_shoulder_vel.begin()+3, r_shoulder_vel.begin()+6);
 
-                if(!this->ui.checkBox_use_velocity_based_ctrl->isChecked())
-                {
-                    // get the joint accelerations
-                    this->arm_vel_buff->push(r_arm_velocities_read);
-                    this->hand_vel_buff->push(r_hand_velocities_read);
-                    if(this->samples_vel==this->N_filter_length-1 && this->arm_vel_buff->full() && this->hand_vel_buff->full()){
-                        for(size_t i=0; i< r_arm_velocities_read.size();++i)
-                        {
-                            r_arm_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_vel_buff->at(i));
-                        }
-                        for(size_t i=0; i< r_hand_velocities_read.size();++i)
-                        {
-                            r_hand_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_vel_buff->at(i));
-                        }
-                    }else{this->samples_vel++;}
-
-
-                    // get the hand acceleration
-                    this->r_hand_vel_buff->push(r_hand_vel);
-                    if(this->samples_h_vel==this->N_filter_length-1 && this->r_hand_vel_buff->full()){
-                        for(size_t i=0; i< r_hand_vel.size();++i)
-                        {
-                            r_hand_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_hand_vel_buff->at(i));
-                        }
-                    }else{this->samples_h_vel++;}
-
-
-                    // get the wrist acceleration
-                    this->r_wrist_vel_buff->push(r_wrist_vel);
-                    if(this->samples_w_vel==this->N_filter_length-1 && this->r_wrist_vel_buff->full()){
-                        for(size_t i=0; i< r_wrist_vel.size();++i)
-                        {
-                            r_wrist_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_wrist_vel_buff->at(i));
-                        }
-                    }else{this->samples_w_vel++;}
-
-                    // get the elbow acceleration
-                    this->r_elbow_vel_buff->push(r_elbow_vel);
-                    if(this->samples_e_vel==this->N_filter_length-1 && this->r_elbow_vel_buff->full()){
-                        for(size_t i=0; i< r_elbow_vel.size();++i)
-                        {
-                            r_elbow_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_elbow_vel_buff->at(i));
-                        }
-                    }else{this->samples_e_vel++;}
-
-                    // get the shoulder acceleration
-                    this->r_shoulder_vel_buff->push(r_shoulder_vel);
-                    if(this->samples_s_vel==this->N_filter_length-1 && this->r_shoulder_vel_buff->full()){
-                        for(size_t i=0; i< r_shoulder_vel.size();++i)
-                        {
-                            r_shoulder_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_shoulder_vel_buff->at(i));
-                        }
-                    }else{
-                        this->samples_s_vel++;
-                        this->t_der_past = this->qnode.getSimTime();
+                // get the joint accelerations
+                this->arm_vel_buff->push(r_arm_velocities_read);
+                this->hand_vel_buff->push(r_hand_velocities_read);
+                if(this->samples_vel==this->N_filter_length-1 && this->arm_vel_buff->full() && this->hand_vel_buff->full()){
+                    for(size_t i=0; i< r_arm_velocities_read.size();++i)
+                    {
+                        r_arm_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_vel_buff->at(i));
                     }
+                    for(size_t i=0; i< r_hand_velocities_read.size();++i)
+                    {
+                        r_hand_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_vel_buff->at(i));
+                    }
+                }else{this->samples_vel++;}
+
+
+                // get the hand acceleration
+                this->r_hand_vel_buff->push(r_hand_vel);
+                if(this->samples_h_vel==this->N_filter_length-1 && this->r_hand_vel_buff->full()){
+                    for(size_t i=0; i< r_hand_vel.size();++i)
+                    {
+                        r_hand_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_hand_vel_buff->at(i));
+                    }
+                }else{this->samples_h_vel++;}
+
+
+                // get the wrist acceleration
+                this->r_wrist_vel_buff->push(r_wrist_vel);
+                if(this->samples_w_vel==this->N_filter_length-1 && this->r_wrist_vel_buff->full()){
+                    for(size_t i=0; i< r_wrist_vel.size();++i)
+                    {
+                        r_wrist_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_wrist_vel_buff->at(i));
+                    }
+                }else{this->samples_w_vel++;}
+
+                // get the elbow acceleration
+                this->r_elbow_vel_buff->push(r_elbow_vel);
+                if(this->samples_e_vel==this->N_filter_length-1 && this->r_elbow_vel_buff->full()){
+                    for(size_t i=0; i< r_elbow_vel.size();++i)
+                    {
+                        r_elbow_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_elbow_vel_buff->at(i));
+                    }
+                }else{this->samples_e_vel++;}
+
+                // get the shoulder acceleration
+                this->r_shoulder_vel_buff->push(r_shoulder_vel);
+                if(this->samples_s_vel==this->N_filter_length-1 && this->r_shoulder_vel_buff->full()){
+                    for(size_t i=0; i< r_shoulder_vel.size();++i)
+                    {
+                        r_shoulder_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_shoulder_vel_buff->at(i));
+                    }
+                }else{
+                    this->samples_s_vel++;
+                    this->t_der_past = this->qnode.getSimTime();
                 }
                 VectorXd r_arm_accelerations_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_arm_accelerations_read.data(), r_arm_accelerations_read.size());
                 VectorXd r_hand_acc_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_hand_acc_read.data(), r_hand_acc_read.size());
@@ -2022,8 +2025,9 @@ void MainWindow::execPosControl()
 //                }
 
                 // execute the control
+                bool joints_arm_vel_ctrl = this->ui.checkBox_joints_velocity_ctrl->isChecked();
                 if(this->exec_command_ctrl){
-                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities);
+                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities,joints_arm_vel_ctrl);
                 }
 
                 // ------------- Recording ------------------------------- //
@@ -2603,7 +2607,8 @@ void MainWindow::execVelControl()
                                                                                  jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
 
                 // execute the control
-                this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities);
+                bool joints_arm_vel_ctrl = this->ui.checkBox_joints_velocity_ctrl->isChecked();
+                this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities,joints_arm_vel_ctrl);
 
                 // ------------- Recording ------------------------------- //
 
@@ -13924,7 +13929,7 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         stream << "Or_d_control_coeff=" << this->ui.lineEdit_coeff_d_or->text().toStdString().c_str() << endl;
         stream << "Or_d_error_th=" << this->ui.lineEdit_err_d_or->text().toStdString().c_str() << endl;
         stream << "t_f_trap=" << this->ui.lineEdit_t_f_trap->text().toStdString().c_str() << endl;
-        if (this->ui.checkBox_use_velocity_based_ctrl->isChecked()){ stream << "use_vel_based_control=true"<< endl;}else{stream << "use_vel_based_control=false"<< endl;}
+        if (this->ui.checkBox_joints_velocity_ctrl->isChecked()){ stream << "joints_vel_control=true"<< endl;}else{stream << "joints_vel_control=false"<< endl;}
         stream << "# Noise filtering #" << endl;
         if (this->ui.radioButton_N_5->isChecked()){stream << "N_5=true"<< endl;}else{stream << "N_5=false"<< endl;}
         if (this->ui.radioButton_N_7->isChecked()){stream << "N_7=true"<< endl;}else{stream << "N_7=false"<< endl;}
@@ -14150,11 +14155,11 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     this->ui.lineEdit_cutoff_freq_joint_pos->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("timestep_joint_pos"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_timestep_joint_pos->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("use_vel_based_control"),Qt::CaseInsensitive)==0){
+                }else if(QString::compare(fields.at(0),QString("joints_vel_control"),Qt::CaseInsensitive)==0){
                     if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
-                        this->ui.checkBox_use_velocity_based_ctrl->setChecked(true);
+                        this->ui.checkBox_joints_velocity_ctrl->setChecked(true);
                     }else{
-                        this->ui.checkBox_use_velocity_based_ctrl->setChecked(false);
+                        this->ui.checkBox_joints_velocity_ctrl->setChecked(false);
                     }
                 }else if(QString::compare(fields.at(0),QString("Tar_noise"),Qt::CaseInsensitive)==0){
                     if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){

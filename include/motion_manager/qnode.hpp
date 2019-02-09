@@ -174,9 +174,10 @@ public:
          * @param r_arm_velocities
          * @param r_hand_posture
          * @param r_hand_velocities
+         * @param joints_arm_vel_ctrl
          * @return
          */
-        bool execKinControl(int arm, vector<double> &r_arm_posture, vector<double>& r_arm_velocities, vector<double> &r_hand_posture, vector<double> &r_hand_velocities);
+        bool execKinControl(int arm, vector<double> &r_arm_posture, vector<double>& r_arm_velocities, vector<double> &r_hand_posture, vector<double> &r_hand_velocities, bool joints_arm_vel_ctrl);
 
         /**
          * @brief execKinControlAcc
@@ -211,10 +212,21 @@ public:
         void stopSim();
 
         /**
+         * @brief This method pauses the simulation in V-REP
+         */
+        void pauseSim();
+
+        /**
          * @brief getSimTime
          * @return
          */
         double getSimTime();
+
+        /**
+         * @brief getSimTimePaused
+         * @return
+         */
+        double getSimTimePaused();
 
         /**
          * @brief getSimTimeStep
@@ -233,6 +245,12 @@ public:
          * @return
          */
         bool isSimulationRunning();
+
+        /**
+         * @brief isSimulationPaused
+         * @return
+         */
+        bool isSimulationPaused();
 
 
         void enableSetJoints();
@@ -411,7 +429,9 @@ private:
 #endif()
         QStringListModel logging_model; /**< list of loggings */
         bool simulationRunning; /**< true if the simulation in V-REP is running */
+        bool simulationPaused; /**< true if the simulation is paused*/
         double simulationTime;/**< current time of the simulation */
+        double simulationTimePaused;/**< time of the simulation when it has paused*/
         double simulationTimeStep;/**< current time step of the simulation */
         string nodeName; /**< name of the ROS node */
         double TotalTime; /**< total time of the movements */

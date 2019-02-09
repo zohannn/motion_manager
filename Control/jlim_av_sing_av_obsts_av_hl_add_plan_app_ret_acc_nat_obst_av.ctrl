@@ -16,7 +16,7 @@ Sing_coeff=0.01
 Sing_damping=0.01
 
 # Obstacle avoidance parameters #
-Obsts_av=true
+Obsts_av=false
 Obsts_coeff=4
 
 Obsts_damping=1
@@ -86,7 +86,7 @@ Or_d_error_th=0.01
 
 t_f_trap=10
 
-joints_vel_control=true
+joints_vel_control=false
 # Noise filtering #
 N_5=false
 N_7=false

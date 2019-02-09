@@ -239,6 +239,8 @@ bool  QNode::loadScenario(const std::string& path,int id)
             // Bottle Juice (obj_id = 2)
             subBottleJuice = n.subscribe("/vrep/BottleJuice_pose",1,&QNode::BottleJuiceCallback,this);
 
+            pub_joints = n.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
+
             break;
 
         case 9: // Learning Tasks: reaching with one obstacle
@@ -408,9 +410,7 @@ bool QNode::getElements(scenarioPtr scene)
 
 
     // start the simulation
-    add_client = n.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
-    vrep_common::simRosStartSimulation srvc;
-    add_client.call(srvc);
+    this->startSim();
     sleep(1);
 
     int n_objs; // total number of objects in the scenario
@@ -8043,9 +8043,7 @@ bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>&
     }
 
     // start the simulation
-    add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
-    vrep_common::simRosStartSimulation srvstart;
-    add_client.call(srvstart);
+    this->startSim();
     ros::spinOnce(); // first handle ROS messages
 
 
@@ -8599,9 +8597,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 } // for loop stages
 
 // pause the simulation
-add_client = node.serviceClient<vrep_common::simRosPauseSimulation>("/vrep/simRosPauseSimulation");
-vrep_common::simRosPauseSimulation srvpause;
-add_client.call(srvpause);
+this->pauseSim();
 
 // handle ROS messages:
 ros::spinOnce();
@@ -10100,7 +10096,7 @@ bool QNode::execKinControl(int arm, vector<double> &r_posture, vector<double> &r
     }
 }
 
-bool QNode::execKinControl(int arm, vector<double> &r_arm_posture, vector<double> &r_arm_velocities, vector<double> &r_hand_posture, vector<double> &r_hand_velocities)
+bool QNode::execKinControl(int arm, vector<double> &r_arm_posture, vector<double> &r_arm_velocities, vector<double> &r_hand_posture, vector<double> &r_hand_velocities,bool joints_arm_vel_ctrl)
 {
 
     std::vector<int> handles;
@@ -10128,14 +10124,22 @@ bool QNode::execKinControl(int arm, vector<double> &r_arm_posture, vector<double
         ros::spinOnce();
 
         vrep_common::JointSetStateData data;
-        int exec_arm_mode = 2; // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+        int exec_arm_mode; // 0 to set the position, 1 to set the target position, 2 to set the target velocity
+        if(joints_arm_vel_ctrl){
+            exec_arm_mode=2;
+        }else{
+            exec_arm_mode=0;
+        }
         int exec_hand_mode = 1; // 0 to set the position, 1 to set the target position, 2 to set the target velocity
         double exec_value;
 
         for (size_t i = 0; i < r_arm_velocities.size(); ++i)
         {
-            //exec_value = r_arm_posture.at(i) +  0.5 * r_arm_accelerations.at(i))* pow(simulationTimeStep,2); // pos
-            exec_value =  r_arm_velocities.at(i); // vel
+            if(joints_arm_vel_ctrl){
+                exec_value =  r_arm_velocities.at(i); // vel
+            }else{
+               exec_value = r_arm_posture.at(i) +  r_arm_velocities.at(i)*simulationTimeStep; // pos
+            }
 
             if(arm!=0){
                 // single-arm
@@ -10263,7 +10267,11 @@ void QNode::startSim()
     add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
     vrep_common::simRosStartSimulation srvstart;
     add_client.call(srvstart);
-    this->simulationRunning=true;
+    if (srvstart.response.result == 1){
+        this->simulationRunning=true;
+        this->simulationPaused=false;
+    }else{throw string("Communication error");}
+
 }
 
 void QNode::stopSim()
@@ -10275,13 +10283,36 @@ void QNode::stopSim()
     add_client = node.serviceClient<vrep_common::simRosStopSimulation>("/vrep/simRosStopSimulation");
     vrep_common::simRosStopSimulation srvstop;
     add_client.call(srvstop);
-    this->simulationTime=0.0;
-    this->simulationRunning=false;
+    if (srvstop.response.result == 1){
+        this->simulationTime=0.0;
+        this->simulationRunning=false;
+        this->simulationPaused=false;
+    }else{throw string("Communication error");}
+}
+
+void QNode::pauseSim()
+{
+    ros::NodeHandle node;
+
+    // pause the simulation
+    add_client = node.serviceClient<vrep_common::simRosPauseSimulation>("/vrep/simRosPauseSimulation");
+    vrep_common::simRosPauseSimulation srvpause;
+    add_client.call(srvpause);
+    if (srvpause.response.result == 1){
+        this->simulationPaused=true;
+        this->simulationRunning=true;
+        this->simulationTimePaused = this->simulationTime;
+    }else{throw string("Communication error");}
 }
 
 double QNode::getSimTime()
 {
     return this->simulationTime;
+}
+
+double QNode::getSimTimePaused()
+{
+    return this->simulationTimePaused;
 }
 
 double QNode::getSimTimeStep()
@@ -10297,6 +10328,11 @@ string QNode::getNodeName()
 bool QNode::isSimulationRunning()
 {
     return this->simulationRunning;
+}
+
+bool QNode::isSimulationPaused()
+{
+    return this->simulationPaused;
 }
 
 void QNode::enableSetJoints()
