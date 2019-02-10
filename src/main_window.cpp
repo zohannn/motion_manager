@@ -393,13 +393,13 @@ void MainWindow::execPosControl()
             VectorXd des_hand_pose(7); vector<double> des_hand_pose_vec(7,0.0);
 
             // desired velocity
-            double des_hand_lin_vel_x = 0.0; double des_hand_lin_vel_y = 0.0; double des_hand_lin_vel_z = 0.0;
-            double des_hand_ang_vel_q_x = 0.0; double des_hand_ang_vel_q_y = 0.0; double des_hand_ang_vel_q_z = 0.0; double des_hand_ang_vel_q_w = 0.0;
+//            double des_hand_lin_vel_x = 0.0; double des_hand_lin_vel_y = 0.0; double des_hand_lin_vel_z = 0.0;
+//            double des_hand_ang_vel_q_x = 0.0; double des_hand_ang_vel_q_y = 0.0; double des_hand_ang_vel_q_z = 0.0; double des_hand_ang_vel_q_w = 0.0;
             VectorXd des_hand_vel(7); vector<double> des_hand_vel_vec(7,0.0);
 
             // desired acceleration
-            double des_hand_lin_acc_x = 0.0; double des_hand_lin_acc_y = 0.0; double des_hand_lin_acc_z = 0.0;
-            double des_hand_ang_acc_q_x = 0.0; double des_hand_ang_acc_q_y = 0.0; double des_hand_ang_acc_q_z = 0.0; double des_hand_ang_acc_q_w = 0.0;
+//            double des_hand_lin_acc_x = 0.0; double des_hand_lin_acc_y = 0.0; double des_hand_lin_acc_z = 0.0;
+//            double des_hand_ang_acc_q_x = 0.0; double des_hand_ang_acc_q_y = 0.0; double des_hand_ang_acc_q_z = 0.0; double des_hand_ang_acc_q_w = 0.0;
             VectorXd des_hand_acc(7); vector<double> des_hand_acc_vec(7,0.0);
 
             // bounce pose
@@ -791,8 +791,8 @@ void MainWindow::execPosControl()
 
             double error_pos_th = this->ui.lineEdit_err_p_pos->text().toDouble();
             double error_or_th = this->ui.lineEdit_err_p_or->text().toDouble();
-            double error_lin_vel_th = this->ui.lineEdit_err_d_pos->text().toDouble();
-            double error_ang_vel_th = this->ui.lineEdit_err_d_or->text().toDouble();
+//            double error_lin_vel_th = this->ui.lineEdit_err_d_pos->text().toDouble();
+//            double error_ang_vel_th = this->ui.lineEdit_err_d_or->text().toDouble();
 
             double coeff_p_pos = this->ui.lineEdit_coeff_p_pos->text().toDouble();
             double coeff_p_or = this->ui.lineEdit_coeff_p_or->text().toDouble();
@@ -800,15 +800,6 @@ void MainWindow::execPosControl()
             double coeff_d_or = this->ui.lineEdit_coeff_d_or->text().toDouble();
 
 
-            // ---------------- start the simulation --------------------------- //
-            if(!this->qnode.isSimulationRunning() || this->qnode.isSimulationPaused())
-            {
-                // enable set joints subscriber
-                this->qnode.enableSetJoints();
-
-                // start the simulation
-                this->qnode.startSim();
-            }
             ros::spinOnce(); // handle ROS messages
             double time_step = this->qnode.getSimTimeStep(); // sec
 
@@ -13728,6 +13719,15 @@ void MainWindow::on_pushButton_start_control_pressed()
 
 void MainWindow::on_pushButton_start_control_clicked()
 {
+    // ---------------- start the simulation --------------------------- //
+    if(!this->qnode.isSimulationRunning() || this->qnode.isSimulationPaused())
+    {
+        // enable set joints subscriber
+        this->qnode.enableSetJoints();
+
+        // start the simulation
+        this->qnode.startSim();
+    }
     if(this->ui.checkBox_use_vel_control->isChecked())
     {
         pos_control = false;
@@ -13761,51 +13761,53 @@ void MainWindow::on_pushButton_stop_control_clicked()
     this->qnode.resetSimTime();
     if(this->ui.checkBox_use_plan_hand_pos->isChecked())
     {
-        double timestep = this->qnode.getSimTimeStep();
-        QVector<double> tot_timesteps(this->handLinearAcceleration_ctrl.size(),timestep);
+        if (this->handLinearAcceleration_ctrl.size()>1){
+            double timestep = this->qnode.getSimTimeStep();
+            QVector<double> tot_timesteps(this->handLinearAcceleration_ctrl.size(),timestep);
 
 
-        // -- normlized jerk cost of the hand -- //
-        QVector<double> handPosition_mov_x; QVector<double> handPosition_mov_y; QVector<double> handPosition_mov_z;
-        QVector<double> handAcceleration_mov_x; QVector<double> handAcceleration_mov_y; QVector<double> handAcceleration_mov_z;
-        QVector<double> handJerk_mov_x; QVector<double> handJerk_mov_y; QVector<double> handJerk_mov_z;
+            // -- normlized jerk cost of the hand -- //
+            QVector<double> handPosition_mov_x; QVector<double> handPosition_mov_y; QVector<double> handPosition_mov_z;
+            QVector<double> handAcceleration_mov_x; QVector<double> handAcceleration_mov_y; QVector<double> handAcceleration_mov_z;
+            QVector<double> handJerk_mov_x; QVector<double> handJerk_mov_y; QVector<double> handJerk_mov_z;
 
-        for(size_t i=0; i<this->handLinearAcceleration_ctrl.size();++i){
-            vector<double> pos_i = this->handPosition_ctrl.at(i);
-            handPosition_mov_x.push_back(pos_i.at(0));
-            handPosition_mov_y.push_back(pos_i.at(1));
-            handPosition_mov_z.push_back(pos_i.at(2));
-            vector<double> acc_i = this->handLinearAcceleration_ctrl.at(i);
-            handAcceleration_mov_x.push_back(acc_i.at(0));
-            handAcceleration_mov_y.push_back(acc_i.at(1));
-            handAcceleration_mov_z.push_back(acc_i.at(2));
+            for(size_t i=0; i<this->handLinearAcceleration_ctrl.size();++i){
+                vector<double> pos_i = this->handPosition_ctrl.at(i);
+                handPosition_mov_x.push_back(pos_i.at(0));
+                handPosition_mov_y.push_back(pos_i.at(1));
+                handPosition_mov_z.push_back(pos_i.at(2));
+                vector<double> acc_i = this->handLinearAcceleration_ctrl.at(i);
+                handAcceleration_mov_x.push_back(acc_i.at(0));
+                handAcceleration_mov_y.push_back(acc_i.at(1));
+                handAcceleration_mov_z.push_back(acc_i.at(2));
+            }
+
+            // derivatives
+            this->getDerivative(handAcceleration_mov_x,tot_timesteps,handJerk_mov_x);
+            this->getDerivative(handAcceleration_mov_y,tot_timesteps,handJerk_mov_y);
+            this->getDerivative(handAcceleration_mov_z,tot_timesteps,handJerk_mov_z);
+
+            QVector<double> jerk_hand;
+            for(size_t i=0;i<handAcceleration_mov_x.size();++i){
+                jerk_hand.push_back(sqrt(pow(handJerk_mov_x.at(i),2)+pow(handJerk_mov_y.at(i),2)+pow(handJerk_mov_z.at(i),2)));
+            }
+            double duration = this->sim_time.at(this->sim_time.size()-1);
+            double length = sqrt(pow((handPosition_mov_x.at(handPosition_mov_x.size()-1)-handPosition_mov_x.at(0)),2)+
+                                 pow((handPosition_mov_y.at(handPosition_mov_y.size()-1)-handPosition_mov_y.at(0)),2)+
+                                 pow((handPosition_mov_z.at(handPosition_mov_z.size()-1)-handPosition_mov_z.at(0)),2));
+            double total_cost_jerk_hand=0.0;
+            for(size_t i=0;i<tot_timesteps.size();++i){
+                total_cost_jerk_hand += pow(jerk_hand.at(i),2)*tot_timesteps.at(i);
+            }
+            total_cost_jerk_hand = sqrt(0.5*total_cost_jerk_hand*(pow(duration,5)/pow(length,2)));
+            this->ui.label_cost_hand_ctrl_value->setText(QString::number(total_cost_jerk_hand));
+            this->njs_mov_ctrl = total_cost_jerk_hand;
+
+            // -- compute the number of movement units -- //
+            QVector<double> sim_time_q = QVector<double>::fromStdVector(this->sim_time);
+            this->nmu_mov_ctrl = this->getNumberMovementUnits(this->handVelocityNorm_ctrl,sim_time_q);
+            this->ui.label_nmu_hand_value_ctrl->setText(QString::number(this->nmu_mov_ctrl));
         }
-
-        // derivatives
-        this->getDerivative(handAcceleration_mov_x,tot_timesteps,handJerk_mov_x);
-        this->getDerivative(handAcceleration_mov_y,tot_timesteps,handJerk_mov_y);
-        this->getDerivative(handAcceleration_mov_z,tot_timesteps,handJerk_mov_z);
-
-        QVector<double> jerk_hand;
-        for(size_t i=0;i<handAcceleration_mov_x.size();++i){
-            jerk_hand.push_back(sqrt(pow(handJerk_mov_x.at(i),2)+pow(handJerk_mov_y.at(i),2)+pow(handJerk_mov_z.at(i),2)));
-        }
-        double duration = this->sim_time.at(this->sim_time.size()-1);
-        double length = sqrt(pow((handPosition_mov_x.at(handPosition_mov_x.size()-1)-handPosition_mov_x.at(0)),2)+
-                             pow((handPosition_mov_y.at(handPosition_mov_y.size()-1)-handPosition_mov_y.at(0)),2)+
-                             pow((handPosition_mov_z.at(handPosition_mov_z.size()-1)-handPosition_mov_z.at(0)),2));
-        double total_cost_jerk_hand=0.0;
-        for(size_t i=0;i<tot_timesteps.size();++i){
-            total_cost_jerk_hand += pow(jerk_hand.at(i),2)*tot_timesteps.at(i);
-        }
-        total_cost_jerk_hand = sqrt(0.5*total_cost_jerk_hand*(pow(duration,5)/pow(length,2)));
-        this->ui.label_cost_hand_ctrl_value->setText(QString::number(total_cost_jerk_hand));
-        this->njs_mov_ctrl = total_cost_jerk_hand;
-
-        // -- compute the number of movement units -- //
-        QVector<double> sim_time_q = QVector<double>::fromStdVector(this->sim_time);
-        this->nmu_mov_ctrl = this->getNumberMovementUnits(this->handVelocityNorm_ctrl,sim_time_q);
-        this->ui.label_nmu_hand_value_ctrl->setText(QString::number(this->nmu_mov_ctrl));
     }
 }
 

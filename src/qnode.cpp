@@ -8661,9 +8661,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
 
 
     // start the simulation
-    add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
-    vrep_common::simRosStartSimulation srvstart;
-    add_client.call(srvstart);
+    this->startSim();
     ros::spinOnce(); // first handle ROS messages
 
     int hh=0; // it counts problems that do not belong to the task
@@ -9237,9 +9235,7 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
       log(QNode::Info,string("Task completed"));
 
       // pause the simulation
-      add_client = node.serviceClient<vrep_common::simRosPauseSimulation>("/vrep/simRosPauseSimulation");
-      vrep_common::simRosPauseSimulation srvpause;
-      add_client.call(srvpause);
+      this->pauseSim();
 
       // handle ROS messages:
       ros::spinOnce();
@@ -9247,10 +9243,6 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
       TotalTime=simulationTime;
 
       return true;
-
-
-
-
 }
 
 bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double>>>& timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task, taskPtr task, scenarioPtr scene)
@@ -9308,9 +9300,7 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
     std::vector<double> ttsteps_prev_retreat;
 
     // start the simulation
-    add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
-    vrep_common::simRosStartSimulation srvstart;
-    add_client.call(srvstart);
+    this->startSim();
     ros::spinOnce(); // first handle ROS messages
 
     int hh=0; // it counts problems that do not belong to the task
@@ -10016,9 +10006,7 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
   log(QNode::Info,string("Task completed"));
 
   // pause the simulation
-  add_client = node.serviceClient<vrep_common::simRosPauseSimulation>("/vrep/simRosPauseSimulation");
-  vrep_common::simRosPauseSimulation srvpause;
-  add_client.call(srvpause);
+  this->pauseSim();
 
   // handle ROS messages:
   ros::spinOnce();
