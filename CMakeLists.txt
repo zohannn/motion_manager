@@ -122,7 +122,7 @@ set (OPEN_CLOSE_HAND 0)
 ## Execution of the trajectory
 # VEL=0. Execution with position
 # VEL=1. Execution with velocity
-set (VEL 0)
+# set (VEL 0)
 
 set(MAIN_PATH ${PROJECT_SOURCE_DIR}) ## Path of the main directory
 set(PATH_SCENARIOS /home/$ENV{USER}/scenarios) ## Path of the scenarios

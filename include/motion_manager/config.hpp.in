@@ -8,7 +8,7 @@
 #define OPEN_CLOSE_HAND @OPEN_CLOSE_HAND@
 
 // Execution of the trajectory
-#define VEL @VEL@
+//#define VEL @VEL@
 
 
 // MOVEIT

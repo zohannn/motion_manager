@@ -7939,7 +7939,8 @@ void QNode::leftHandVelCallback(const geometry_msgs::TwistStamped& data)
     this->curr_scene->getHumanoid()->setHandVelMes(2,hand_vel_mes);
 }
 
-bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>& vel_mov, std::vector<std::vector<double>> timesteps, std::vector<double> tols_stop, std::vector<string>& traj_descr,movementPtr mov, scenarioPtr scene)
+bool QNode::execMovement(std::vector<MatrixXd>& traj_mov, std::vector<MatrixXd>& vel_mov, std::vector<std::vector<double>> timesteps,
+                         std::vector<double> tols_stop, std::vector<string>& traj_descr,movementPtr mov, scenarioPtr scene, bool vel_mode)
 {
 
     this->curr_scene = scene;
@@ -8397,13 +8398,15 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
                         }
 
                         int exec_mode; double exec_value;
-#if VEL==0
-                        // position
-                        exec_mode = 0; exec_value = yxt;
-#elif VEL==1
-                        //velocity
-                        exec_mode = 2; exec_value = yx;
-#endif
+
+                        if(vel_mode){
+                            //velocity
+                            exec_mode = 2; exec_value = yx;
+                        }else{
+                            // position
+                            exec_mode = 0; exec_value = yxt;
+                        }
+
                         if(arm_code!=0){
                             // single-arm
                             //ARoS
@@ -8609,7 +8612,8 @@ return true;
 
 }
 
-bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double>>>& timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task,taskPtr task, scenarioPtr scene)
+bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double>>>& timesteps_task,
+                     vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task,taskPtr task, scenarioPtr scene,bool vel_mode)
 {
     bool hand_closed; closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
     ros::NodeHandle node;
@@ -9021,13 +9025,15 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
                                         }
                                     }
                                     int exec_mode; double exec_value;
-#if VEL==0
-                        // position
-                        exec_mode = 0; exec_value = yxt;
-#elif VEL==1
-                        //velocity
-                        exec_mode = 2; exec_value = yx;
-#endif
+
+                        if(vel_mode){
+                            //velocity
+                            exec_mode = 2; exec_value = yx;
+                        }else{
+                            // position
+                            exec_mode = 0; exec_value = yxt;
+                        }
+
                         if(arm_code!=0){
                             // single-arm
                             //ARoS
@@ -9242,7 +9248,8 @@ bool QNode::execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd
       return true;
 }
 
-bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double>>>& timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task, taskPtr task, scenarioPtr scene)
+bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double>>>& timesteps_task,
+                              vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task, taskPtr task, scenarioPtr scene, bool vel_mode)
 {
     bool hand_closed; closed.at(0)=false; closed.at(1)=false; closed.at(2)=false;
     ros::NodeHandle node;
@@ -9793,13 +9800,15 @@ bool QNode::execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector
                                         }
                                     }
                                     int exec_mode; double exec_value;
-#if VEL==0
-                        // position
-                        exec_mode = 0; exec_value = yxt;
-#elif VEL==1
-                        //velocity
-                        exec_mode = 2; exec_value = yx;
-#endif
+
+                        if(vel_mode){
+                            //velocity
+                            exec_mode = 2; exec_value = yx;
+                        }else{
+                            // position
+                            exec_mode = 0; exec_value = yxt;
+                        }
+
                         if(arm_code!=0){
                             // single-arm
                             //ARoS

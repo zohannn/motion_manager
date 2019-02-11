@@ -128,9 +128,10 @@ public:
          * @param traj_descr
          * @param mov
          * @param scene
+         * @param vel_mode
          * @return
          */
-        bool execMovement(vector<MatrixXd>& traj_mov, vector<MatrixXd>& vel_mov, std::vector<std::vector<double> > timesteps, vector<double> tols_stop, std::vector<string>& traj_descr, movementPtr mov, scenarioPtr scene);
+        bool execMovement(vector<MatrixXd>& traj_mov, vector<MatrixXd>& vel_mov, std::vector<std::vector<double> > timesteps, vector<double> tols_stop, std::vector<string>& traj_descr, movementPtr mov, scenarioPtr scene, bool vel_mode);
 
         /**
          * @brief execTask
@@ -141,9 +142,10 @@ public:
          * @param traj_descr_task
          * @param task
          * @param scene
+         * @param vel_mode
          * @return
          */
-        bool execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double> > > &timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task,taskPtr task, scenarioPtr scene);
+        bool execTask(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double> > > &timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task,taskPtr task, scenarioPtr scene, bool vel_mode);
 
         /**
          * @brief execTask_complete
@@ -154,9 +156,10 @@ public:
          * @param traj_descr_task
          * @param task
          * @param scene
+         * @param vel_mode
          * @return
          */
-        bool execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double> > > &timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task, taskPtr task, scenarioPtr scene);
+        bool execTask_complete(vector<vector<MatrixXd>>& traj_task, vector<vector<MatrixXd>>& vel_task, vector<vector<vector<double> > > &timesteps_task, vector<vector<double>>& tols_stop_task, vector<vector<string>>& traj_descr_task, taskPtr task, scenarioPtr scene, bool vel_mode);
 
         /**
          * @brief execKinControl
