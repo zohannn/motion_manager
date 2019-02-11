@@ -444,8 +444,39 @@ void MainWindow::execPosControl()
                  //vector<double> xt; vector<double> yt;
                  vector<double> zt;
                  double dist_app = 0.0; Vector3d vv_app; double dist_ret = 0.0; Vector3d vv_ret;
-                 if(mov_type==0 || mov_type==2 || mov_type==3 || mov_type==4){
+                 if(mov_type==0){ // pick
                      targetPtr tar = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight();
+                     tar_pos(0) = tar->getPos().Xpos;
+                     tar_pos(1) = tar->getPos().Ypos;
+                     tar_pos(2) = tar->getPos().Zpos;
+                     tar_rpy(0) = tar->getOr().roll;
+                     tar_rpy(1) = tar->getOr().pitch;
+                     tar_rpy(2) = tar->getOr().yaw;
+                     dist_app = this->approach_ctrl.at(3);
+                     vv_app << this->approach_ctrl.at(0),this->approach_ctrl.at(1),this->approach_ctrl.at(2);
+                     dist_ret = this->retreat_ctrl.at(3);
+                     vv_ret << this->retreat_ctrl.at(0),this->retreat_ctrl.at(1),this->retreat_ctrl.at(2);
+                     //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getXt(xt);
+                     //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getYt(yt);
+                     tar->getZt(zt);
+                     if(this->ui.checkBox_tar_noise->isChecked()){
+                         tar_pos(0) = tar_pos(0) - (obj_x_var/2) + obj_x_var*(rand() / double(RAND_MAX));
+                         tar_pos(1) = tar_pos(1) - (obj_y_var/2) + obj_y_var*(rand() / double(RAND_MAX));
+                         tar_pos(2) = tar_pos(2) - (obj_z_var/2) + obj_z_var*(rand() / double(RAND_MAX));
+                         tar_rpy(0) = tar_rpy(0) - (obj_roll_var/2) + obj_roll_var*(rand() / double(RAND_MAX));
+                         tar_rpy(1) = tar_rpy(1) - (obj_pitch_var/2) + obj_pitch_var*(rand() / double(RAND_MAX));
+                         tar_rpy(2) = tar_rpy(2) - (obj_yaw_var/2) + obj_yaw_var*(rand() / double(RAND_MAX));
+                         if(this->ui.checkBox_tar_filter_noise->isChecked()){
+                             tar_pos(0) = this->lpf_tar_pos_x->update(tar_pos(0));
+                             tar_pos(1) = this->lpf_tar_pos_y->update(tar_pos(1));
+                             tar_pos(2) = this->lpf_tar_pos_z->update(tar_pos(2));
+                             tar_rpy(0) = DEGTORAD*this->lpf_tar_or_roll->update(RADTODEG*tar_rpy(0));
+                             tar_rpy(1) = DEGTORAD*this->lpf_tar_or_pitch->update(RADTODEG*tar_rpy(1));
+                             tar_rpy(2) = DEGTORAD*this->lpf_tar_or_yaw->update(RADTODEG*tar_rpy(2));
+                         }
+                     }
+                 }else if(mov_type==2 || mov_type==3 || mov_type==4){ // place
+                     posePtr tar = this->curr_scene->getPose(this->i_tar_ctrl);
                      tar_pos(0) = tar->getPos().Xpos;
                      tar_pos(1) = tar->getPos().Ypos;
                      tar_pos(2) = tar->getPos().Zpos;
@@ -505,7 +536,7 @@ void MainWindow::execPosControl()
                  }else if(stage_descr.compare("approach")==0){
                     hand_pos_tmp = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
                  }else if(stage_descr.compare("retreat")==0){
-                     hand_pos_tmp = tar_pos - this->dHO_ctrl*zt_vec;
+                    hand_pos_tmp = tar_pos - this->dHO_ctrl*zt_vec;
                  }
                  this->h_hand_pos_init.at(0) = hand_pos_tmp(0);
                  this->h_hand_pos_init.at(1) = hand_pos_tmp(1);
@@ -750,9 +781,8 @@ void MainWindow::execPosControl()
                 vector<double> bounce_posture = this->h_results->bounce_warm_start_res.x;
                 vector<double> bounce_hand_posture(bounce_posture.begin()+JOINTS_ARM,bounce_posture.end());
                 jointsBouncePosition_hand_vec = bounce_hand_posture;
-                if(jointsBouncePosition_hand_vec.empty()){
-                    jointsBouncePosition_hand << 0.0,jointsInitPosition_hand_vec.at(0),
-                                             jointsInitPosition_hand_vec.at(0),jointsInitPosition_hand_vec.at(1);
+                if(mov_type==2 || mov_type==3 ||mov_type==4){ // place
+                    jointsBouncePosition_hand = jointsInitPosition_hand;
                 }else{
                     jointsBouncePosition_hand << 0.0,jointsBouncePosition_hand_vec.at(0),
                                              jointsBouncePosition_hand_vec.at(0),jointsBouncePosition_hand_vec.at(1);
@@ -799,7 +829,15 @@ void MainWindow::execPosControl()
             double coeff_d_pos = this->ui.lineEdit_coeff_d_pos->text().toDouble();
             double coeff_d_or = this->ui.lineEdit_coeff_d_or->text().toDouble();
 
+            // ---------------- start the simulation --------------------------- //
+            if(!this->qnode.isSimulationRunning() || this->qnode.isSimulationPaused())
+            {
+                // enable set joints subscriber
+                this->qnode.enableSetJoints();
 
+                // start the simulation
+                this->qnode.startSim();
+            }
             ros::spinOnce(); // handle ROS messages
             double time_step = this->qnode.getSimTimeStep(); // sec
 
@@ -13626,26 +13664,48 @@ void MainWindow::on_pushButton_start_control_pressed()
             this->retreat_ctrl = this->tols.mov_specs.post_place_retreat;
         }
 
-        vector<objectPtr> objs; this->curr_scene->getObjects(objs);
-        string obj_tar_name = this->curr_mov->getObject()->getName();
-        for(size_t i=0;i<objs.size();++i)
-        {
-            if(obj_tar_name.compare(objs.at(i)->getName())==0)
+        int mov_type = this->curr_mov->getType();
+        if(mov_type==0){ // pick
+            vector<objectPtr> objs; this->curr_scene->getObjects(objs);
+            string obj_tar_name = this->curr_mov->getObject()->getName();
+            for(size_t i=0;i<objs.size();++i)
             {
-                this->i_tar_ctrl = i;
-                break;
+                if(obj_tar_name.compare(objs.at(i)->getName())==0)
+                {
+                    this->i_tar_ctrl = i;
+                    break;
+                }
             }
+            Vector3d tar_pos;
+            targetPtr tar = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight();
+            tar_pos(0) = tar->getPos().Xpos;
+            tar_pos(1) = tar->getPos().Ypos;
+            tar_pos(2) = tar->getPos().Zpos;
+            Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
+            Quaterniond tar_q(Rot_tar);
+            this->tar_position= tar_pos;
+            this->tar_quaternion = tar_q;
+        }else if(mov_type==2 || mov_type==3 || mov_type==4){ // place
+            vector<posePtr> poses; this->curr_scene->getPoses(poses);
+            string tar_name = this->curr_mov->getPose()->getName();
+            for(size_t i=0;i<poses.size();++i)
+            {
+                if(tar_name.compare(poses.at(i)->getName())==0)
+                {
+                    this->i_tar_ctrl = i;
+                    break;
+                }
+            }
+            Vector3d tar_pos;
+            posePtr tar = this->curr_scene->getPose(this->i_tar_ctrl);
+            tar_pos(0) = tar->getPos().Xpos;
+            tar_pos(1) = tar->getPos().Ypos;
+            tar_pos(2) = tar->getPos().Zpos;
+            Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
+            Quaterniond tar_q(Rot_tar);
+            this->tar_position= tar_pos;
+            this->tar_quaternion = tar_q;
         }
-        Vector3d tar_pos;
-        targetPtr tar = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight();
-        tar_pos(0) = tar->getPos().Xpos;
-        tar_pos(1) = tar->getPos().Ypos;
-        tar_pos(2) = tar->getPos().Zpos;
-        Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
-        Quaterniond tar_q(Rot_tar);
-
-        this->tar_position= tar_pos;
-        this->tar_quaternion = tar_q;
     }
 
     this->lpf_tar_pos_x.reset(new LowPassFilter());
@@ -13719,15 +13779,7 @@ void MainWindow::on_pushButton_start_control_pressed()
 
 void MainWindow::on_pushButton_start_control_clicked()
 {
-    // ---------------- start the simulation --------------------------- //
-    if(!this->qnode.isSimulationRunning() || this->qnode.isSimulationPaused())
-    {
-        // enable set joints subscriber
-        this->qnode.enableSetJoints();
 
-        // start the simulation
-        this->qnode.startSim();
-    }
     if(this->ui.checkBox_use_vel_control->isChecked())
     {
         pos_control = false;

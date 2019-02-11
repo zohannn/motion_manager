@@ -7198,10 +7198,7 @@ bool QNode::getElements(scenarioPtr scene)
     this->curr_scene = scene;
 
     // stop the simulation
-    add_client = n.serviceClient<vrep_common::simRosStopSimulation>("/vrep/simRosStopSimulation");
-    vrep_common::simRosStopSimulation srvcc;
-    add_client.call(srvcc);
-
+    this->stopSim();
     got_scene = true;
 
     return succ;
@@ -10255,10 +10252,8 @@ void QNode::startSim()
     add_client = node.serviceClient<vrep_common::simRosStartSimulation>("/vrep/simRosStartSimulation");
     vrep_common::simRosStartSimulation srvstart;
     add_client.call(srvstart);
-    if (srvstart.response.result == 1){
-        this->simulationRunning=true;
-        this->simulationPaused=false;
-    }else{throw string("Communication error");}
+    this->simulationRunning=true;
+    this->simulationPaused=false;
 
 }
 
@@ -10271,11 +10266,9 @@ void QNode::stopSim()
     add_client = node.serviceClient<vrep_common::simRosStopSimulation>("/vrep/simRosStopSimulation");
     vrep_common::simRosStopSimulation srvstop;
     add_client.call(srvstop);
-    if (srvstop.response.result == 1){
-        this->simulationTime=0.0;
-        this->simulationRunning=false;
-        this->simulationPaused=false;
-    }else{throw string("Communication error");}
+    this->simulationTime=0.0;
+    this->simulationRunning=false;
+    this->simulationPaused=false;
 }
 
 void QNode::pauseSim()
@@ -10286,11 +10279,9 @@ void QNode::pauseSim()
     add_client = node.serviceClient<vrep_common::simRosPauseSimulation>("/vrep/simRosPauseSimulation");
     vrep_common::simRosPauseSimulation srvpause;
     add_client.call(srvpause);
-    if (srvpause.response.result == 1){
-        this->simulationPaused=true;
-        this->simulationRunning=true;
-        this->simulationTimePaused = this->simulationTime;
-    }else{throw string("Communication error");}
+    this->simulationPaused=true;
+    this->simulationRunning=true;
+    this->simulationTimePaused = this->simulationTime;
 }
 
 double QNode::getSimTime()

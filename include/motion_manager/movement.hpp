@@ -289,15 +289,13 @@ public:
     objectPtr getObjectLeft();
 
     /**
-     * @brief This method gets the object that is being manipulated
-     * during the movement (right)
+     * @brief This method gets the pose during the movement (right)
      * @return
      */
     posePtr getPose();
 
     /**
-     * @brief This method gets the object that is being manipulated
-     * during the movement (left)
+     * @brief This method gets the pose during the movement (left)
      * @return
      */
     posePtr getPoseLeft();

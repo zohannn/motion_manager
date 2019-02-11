@@ -35,37 +35,34 @@ use_plan_hand_pos=true
 use_vel_control=false
 # Human-likeness addition parameters #
 Hl_add=true
-Hl_add_p_pos_coeff_plan=15
+Hl_add_p_pos_coeff_plan=40
+Hl_add_p_or_coeff_plan=100
 
-Hl_add_p_or_coeff_plan=50
+Hl_add_p_pos_coeff_app=25
 
-Hl_add_p_pos_coeff_app=10
-
-Hl_add_p_or_coeff_app=10
+Hl_add_p_or_coeff_app=50
 
 Hl_add_p_pos_coeff_ret=10
 
 Hl_add_p_or_coeff_ret=10
 
-Hl_add_d_pos_coeff_plan=1
+Hl_add_d_pos_coeff_plan=10
+Hl_add_d_or_coeff_plan=20
 
-Hl_add_d_or_coeff_plan=10
+Hl_add_d_pos_coeff_app=5
 
-Hl_add_d_pos_coeff_app=1
-
-Hl_add_d_or_coeff_app=1
+Hl_add_d_or_coeff_app=10
 
 Hl_add_d_pos_coeff_ret=1
 
 Hl_add_d_or_coeff_ret=1
 
-Hl_add_g_th_pa=0.88
-
+Hl_add_g_th_pa=0.8
 Hl_add_g_th_rp=0.95
 
-Hl_fing_p_coeff=50
+Hl_fing_p_coeff=5
 
-Hl_fing_d_coeff=15
+Hl_fing_d_coeff=5
 
 # Control coefficients and error threshold #
 Pos_p_control_coeff=20
