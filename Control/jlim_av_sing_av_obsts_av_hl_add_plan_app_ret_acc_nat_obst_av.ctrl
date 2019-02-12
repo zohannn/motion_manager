@@ -16,11 +16,9 @@ Sing_coeff=0.01
 Sing_damping=0.01
 
 # Obstacle avoidance parameters #
-Obsts_av=false
-Obsts_coeff=4
-
-Obsts_damping=1
-
+Obsts_av=true
+Obsts_coeff=0.05
+Obsts_damping=0.1
 Obsts_coeff_torso=0.2
 
 Obsts_damping_torso=0.01
@@ -36,6 +34,7 @@ use_vel_control=false
 # Human-likeness addition parameters #
 Hl_add=true
 Hl_add_p_pos_coeff_plan=40
+
 Hl_add_p_or_coeff_plan=100
 
 Hl_add_p_pos_coeff_app=25
@@ -47,6 +46,7 @@ Hl_add_p_pos_coeff_ret=10
 Hl_add_p_or_coeff_ret=10
 
 Hl_add_d_pos_coeff_plan=10
+
 Hl_add_d_or_coeff_plan=20
 
 Hl_add_d_pos_coeff_app=5
@@ -58,6 +58,7 @@ Hl_add_d_pos_coeff_ret=1
 Hl_add_d_or_coeff_ret=1
 
 Hl_add_g_th_pa=0.8
+
 Hl_add_g_th_rp=0.95
 
 Hl_fing_p_coeff=5
