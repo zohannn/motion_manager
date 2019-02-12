@@ -63,6 +63,10 @@ QNode::QNode(int argc, char** argv ) :
     left_2hand_force.assign(3,0.0f);
     got_scene = false;
     obj_in_hand = false;
+    this->simulationTimePaused=0.0;
+    this->simulationTime=0.0;
+    this->simulationRunning=false;
+    this->simulationPaused=false;
 
 #if HAND ==1
     firstPartLocked.assign(3,false);
@@ -8274,7 +8278,7 @@ if ( client_enableSubscriber.call(srv_enableSubscriber)&&(srv_enableSubscriber.r
 
         ros::spinOnce(); // handle ROS messages
         pre_time = simulationTime - timeTot; // update the total time of the movement
-        BOOST_LOG_SEV(lg, info) << "timeTot = " << timeTot ;
+        //BOOST_LOG_SEV(lg, info) << "timeTot = " << timeTot ;
         //BOOST_LOG_SEV(lg, info) << "pre_time = " << pre_time ;
 
         tb = pre_time;
@@ -10068,14 +10072,14 @@ bool QNode::execKinControl(int arm, vector<double> &r_posture, vector<double> &r
         ros::spinOnce();
 
         vrep_common::JointSetStateData data;
-        int exec_mode = 0;
-        //int exec_mode = 2;
+        //int exec_mode = 0;
+        int exec_mode = 2;
         double exec_value;
         //double time_step = simulationTime - timetot;
         for (int i = 0; i < r_velocities.size(); ++i)
         {
-            exec_value = r_posture.at(i) + (r_velocities.at(i)) * simulationTimeStep;
-            //exec_value = r_velocities.at(i);
+            //exec_value = r_posture.at(i) + (r_velocities.at(i)) * simulationTimeStep;
+            exec_value = r_velocities.at(i);
 
             if(arm!=0){
                 // single-arm
@@ -10090,7 +10094,7 @@ bool QNode::execKinControl(int arm, vector<double> &r_posture, vector<double> &r
     }
 }
 
-bool QNode::execKinControl(int arm, vector<double> &r_arm_posture, vector<double> &r_arm_velocities, vector<double> &r_hand_posture, vector<double> &r_hand_velocities,bool joints_arm_vel_ctrl)
+bool QNode::execKinControl(int arm, vector<double> &r_arm_posture, vector<double> &r_arm_velocities, vector<double> &r_hand_posture, vector<double> &r_hand_velocities,bool joints_arm_vel_ctrl, bool hand_ctrl)
 {
 
     std::vector<int> handles;
@@ -10145,19 +10149,21 @@ bool QNode::execKinControl(int arm, vector<double> &r_arm_posture, vector<double
             }
         }// for loop arm joints
 
-        for (size_t i = 0; i < r_hand_velocities.size(); ++i)
-        {
-            exec_value = r_hand_posture.at(i) + (r_hand_velocities.at(i)) * simulationTimeStep;
+        if(hand_ctrl){
+            for (size_t i = 0; i < r_hand_velocities.size(); ++i)
+            {
+                exec_value = r_hand_posture.at(i) + (r_hand_velocities.at(i)) * simulationTimeStep;
 
-            if(arm!=0){
-                // single-arm
-                data.setModes.data.push_back(exec_hand_mode);
-                data.handles.data.push_back(handles.at(i+r_arm_velocities.size()));
-                data.values.data.push_back(exec_value);
-            }else{
-                // dual-arm (TO DO)
-            }
-        }// for loop hand joints
+                if(arm!=0){
+                    // single-arm
+                    data.setModes.data.push_back(exec_hand_mode);
+                    data.handles.data.push_back(handles.at(i+r_arm_velocities.size()));
+                    data.values.data.push_back(exec_value);
+                }else{
+                    // dual-arm (TO DO)
+                }
+            }// for loop hand joints
+        }
         pub_joints.publish(data);
     }
 }
@@ -10263,6 +10269,7 @@ void QNode::startSim()
     add_client.call(srvstart);
     this->simulationRunning=true;
     this->simulationPaused=false;
+    this->simulationTimePaused=0.0;
 
 }
 
@@ -10276,6 +10283,7 @@ void QNode::stopSim()
     vrep_common::simRosStopSimulation srvstop;
     add_client.call(srvstop);
     this->simulationTime=0.0;
+    this->simulationTimePaused=0.0;
     this->simulationRunning=false;
     this->simulationPaused=false;
 }

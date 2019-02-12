@@ -393,13 +393,9 @@ void MainWindow::execPosControl()
             VectorXd des_hand_pose(7); vector<double> des_hand_pose_vec(7,0.0);
 
             // desired velocity
-//            double des_hand_lin_vel_x = 0.0; double des_hand_lin_vel_y = 0.0; double des_hand_lin_vel_z = 0.0;
-//            double des_hand_ang_vel_q_x = 0.0; double des_hand_ang_vel_q_y = 0.0; double des_hand_ang_vel_q_z = 0.0; double des_hand_ang_vel_q_w = 0.0;
             VectorXd des_hand_vel(7); vector<double> des_hand_vel_vec(7,0.0);
 
             // desired acceleration
-//            double des_hand_lin_acc_x = 0.0; double des_hand_lin_acc_y = 0.0; double des_hand_lin_acc_z = 0.0;
-//            double des_hand_ang_acc_q_x = 0.0; double des_hand_ang_acc_q_y = 0.0; double des_hand_ang_acc_q_z = 0.0; double des_hand_ang_acc_q_w = 0.0;
             VectorXd des_hand_acc(7); vector<double> des_hand_acc_vec(7,0.0);
 
             // bounce pose
@@ -797,28 +793,6 @@ void MainWindow::execPosControl()
             des_hand_pose << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z,des_hand_or_q_x,des_hand_or_q_y,des_hand_or_q_z,des_hand_or_q_w;
             VectorXd::Map(&des_hand_pose_vec[0], des_hand_pose.size()) = des_hand_pose;
 
-//            // desired velocity
-//            Vector3d des_hand_lin_vel; VectorXd des_hand_ang_vel_q(4); Vector3d des_hand_ang_vel_q_e;
-//            des_hand_lin_vel << des_hand_lin_vel_x,des_hand_lin_vel_y,des_hand_lin_vel_z;
-//            des_hand_ang_vel_q_e << des_hand_ang_vel_q_x,des_hand_ang_vel_q_y,des_hand_ang_vel_q_z;
-//            des_hand_ang_vel_q << des_hand_ang_vel_q_x,des_hand_ang_vel_q_y,des_hand_ang_vel_q_z,des_hand_ang_vel_q_w;
-
-//            // desired acceleration
-//            Vector3d des_hand_lin_acc; VectorXd des_hand_ang_acc_q(4); Vector3d des_hand_ang_acc_q_e;
-//            des_hand_lin_acc << des_hand_lin_acc_x,des_hand_lin_acc_y,des_hand_lin_acc_z;
-//            des_hand_ang_acc_q_e << des_hand_ang_acc_q_x,des_hand_ang_acc_q_y,des_hand_ang_acc_q_z;
-//            des_hand_ang_acc_q << des_hand_ang_acc_q_x,des_hand_ang_acc_q_y,des_hand_ang_acc_q_z,des_hand_ang_acc_q_w;
-
-//            // desired reference acceleration
-//            VectorXd des_hand_acc(6);
-//            des_hand_acc(0) = des_hand_lin_acc_x;
-//            des_hand_acc(1) = des_hand_lin_acc_y;
-//            des_hand_acc(2) = des_hand_lin_acc_z;
-//            Vector3d des_hand_alpha = 2*des_hand_or_q_e.cross(des_hand_ang_acc_q_e) + 2*des_hand_or_q_w*des_hand_ang_acc_q_e - 2*des_hand_ang_acc_q_w*des_hand_or_q_e;
-//            des_hand_acc(3) = des_hand_alpha(0);
-//            des_hand_acc(4) = des_hand_alpha(1);
-//            des_hand_acc(5) = des_hand_alpha(2);
-
             double error_pos_th = this->ui.lineEdit_err_p_pos->text().toDouble();
             double error_or_th = this->ui.lineEdit_err_p_or->text().toDouble();
 //            double error_lin_vel_th = this->ui.lineEdit_err_d_pos->text().toDouble();
@@ -832,6 +806,7 @@ void MainWindow::execPosControl()
             // ---------------- start the simulation --------------------------- //
             if(!this->qnode.isSimulationRunning() || this->qnode.isSimulationPaused())
             {
+
                 // enable set joints subscriber
                 this->qnode.enableSetJoints();
 
@@ -849,6 +824,7 @@ void MainWindow::execPosControl()
                 vector<double> r_arm_posture_mes(JOINTS_ARM,0.0); vector<double> r_hand_posture_mes(JOINTS_HAND,0.0);
                 vector<double> r_arm_posture(JOINTS_ARM,0.0); vector<double> r_hand_posture(JOINTS_HAND,0.0);
                 // velocities
+                VectorXd r_arm_null_velocities = VectorXd::Zero(JOINTS_ARM);
                 vector<double> r_arm_velocities(JOINTS_ARM,0.0); vector<double> r_hand_velocities(JOINTS_HAND,0.0);
                 vector<double> r_arm_velocities_read(JOINTS_ARM,0.0); vector<double> r_hand_velocities_read(JOINTS_HAND,0.0);
                 // accelerations
@@ -1049,6 +1025,10 @@ void MainWindow::execPosControl()
 
 
                 double curr_time = this->qnode.getSimTime() - this->t_past - this->t_der_past;
+//                BOOST_LOG_SEV(lg, info) << "curr_time = " << curr_time;
+//                BOOST_LOG_SEV(lg, info) << "t_past = " << this->t_past;
+//                BOOST_LOG_SEV(lg, info) << "t_der_past = " << this->t_der_past;
+//                BOOST_LOG_SEV(lg, info) << "sim_time = " << this->qnode.getSimTime();
 
                 VectorXd trap_hand_pose(JOINTS_ARM); // trapezoidal desired hand pose
                 VectorXd trap_hand_vel(JOINTS_ARM);  // trapezoidal desired hand velocity
@@ -1980,22 +1960,11 @@ void MainWindow::execPosControl()
                 // closed-loop control
                 //VectorXd hand_vel_xd_vec(6);
                 VectorXd hand_acc_xd_vec(6);
-//                if(this->ui.checkBox_use_velocity_based_ctrl->isChecked())
-//                {
-//                    if(hl_en){
-//                        hand_vel_xd_vec = h_hand_ref_vel +  Koeff_p*error_h_tot;
-//                    }else{
-//                        hand_vel_xd_vec = trap_hand_ref_vel + Koeff_p*error_trap_tot;
-//                    }
-//                }else{
                 if(hl_en){
                     hand_acc_xd_vec = h_hand_ref_acc + Koeff_d*der_error_h_tot + Koeff_p*error_h_tot - this->hand_j_acc;
                 }else{
                     hand_acc_xd_vec = trap_hand_ref_acc + Koeff_d*der_error_trap_tot + Koeff_p*error_trap_tot - this->hand_j_acc;
                 }
-//                }
-//                vector<double> hand_vel_vec; hand_vel_vec.resize(hand_vel_xd_vec.size());
-//                VectorXd::Map(&hand_vel_vec[0], hand_vel_xd_vec.size()) = hand_vel_xd_vec;
                 vector<double> hand_acc_vec; hand_acc_vec.resize(hand_acc_xd_vec.size());
                 VectorXd::Map(&hand_acc_vec[0], hand_acc_xd_vec.size()) = hand_acc_xd_vec;
 
@@ -2039,24 +2008,17 @@ void MainWindow::execPosControl()
                     }
                 }
 
-//                if(this->ui.checkBox_use_velocity_based_ctrl->isChecked())
-//                {
-//                    // inverse algorithm
-//                    this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_arm_posture_mes,hand_vel_vec,r_arm_velocities,jlim_en,sing_en,obsts_en,
-//                                                                                    vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
 
-//                }else{
+                // inverse algorithm
+                this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,r_arm_velocities,r_arm_null_velocities,time_step,jlim_en,sing_en,obsts_en,
+                                                                                vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,obst_coeff_torso,obst_damping_torso,
+                                                                                 jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts_n);
 
-                    // inverse algorithm
-                    this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,r_arm_velocities,time_step,jlim_en,sing_en,obsts_en,
-                                                                                    vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,obst_coeff_torso,obst_damping_torso,
-                                                                                     jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts_n);
-//                }
 
                 // execute the control
                 bool joints_arm_vel_ctrl = this->ui.checkBox_joints_velocity_ctrl->isChecked();
                 if(this->exec_command_ctrl){
-                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities,joints_arm_vel_ctrl);
+                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities,joints_arm_vel_ctrl,true);
                 }
 
                 // ------------- Recording ------------------------------- //
@@ -2074,6 +2036,10 @@ void MainWindow::execPosControl()
                     this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,jj) = r_arm_velocities_read.at(jj);
                 for(size_t jj=0; jj < r_hand_velocities_read.size(); ++jj)
                     this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,r_arm_velocities_read.size()+jj) = r_hand_velocities_read.at(jj);
+
+                this->jointsVelocity_null_ctrl.conservativeResize(this->jointsVelocity_null_ctrl.rows()+1,JOINTS_ARM);
+                for(size_t jj=0; jj < r_arm_null_velocities.size(); ++jj)
+                    this->jointsVelocity_null_ctrl(this->jointsVelocity_null_ctrl.rows()-1,jj) = r_arm_null_velocities(jj);
 
 
                 // record the acceleration of the joints
@@ -2142,11 +2108,390 @@ void MainWindow::execPosControl()
 
                 // time
                 this->t_j_past = this->qnode.getSimTime();
-                this->sim_time.push_back(this->qnode.getSimTime());
+                this->sim_time.push_back(this->qnode.getSimTime()-this->t_der_past);
 
             } // check simulation timestep
         } // if pos control
     } // while execcntrol
+}
+
+void MainWindow::execVelControl()
+{
+    while(exec_control)
+    {
+
+        if(vel_control)
+        {
+            boost::unique_lock<boost::mutex> lck(hh_control_mtx);
+
+            double obsts_x_var = 100; // mm
+            double obsts_y_var = 100; // mm
+            double obsts_z_var = 100; // mm
+            double obsts_roll_var = 0.5; // rad
+            double obsts_pitch_var = 0.5; // rad
+            double obsts_yaw_var = 0.5; // rad
+
+            double des_hand_vel_x,des_hand_vel_y,des_hand_vel_z,des_hand_vel_wx,des_hand_vel_wy,des_hand_vel_wz;
+            if (this->ui.checkBox_draw_ellipse->isChecked()){
+                des_hand_vel_x = 40*cos(0.2*this->qnode.getSimTime()-M_PI/2);
+                des_hand_vel_y = -60*sin(0.2*this->qnode.getSimTime()-M_PI/2);
+                des_hand_vel_z = 0.0;
+                des_hand_vel_wx = 0.0;
+                des_hand_vel_wy = 0.0;
+                des_hand_vel_wz = 0.0;
+            }else{
+                des_hand_vel_x = this->ui.lineEdit_des_right_hand_vel_x->text().toDouble();
+                des_hand_vel_y = this->ui.lineEdit_des_right_hand_vel_y->text().toDouble();
+                des_hand_vel_z = this->ui.lineEdit_des_right_hand_vel_z->text().toDouble();
+                des_hand_vel_wx = this->ui.lineEdit_des_right_hand_vel_wx->text().toDouble();
+                des_hand_vel_wy = this->ui.lineEdit_des_right_hand_vel_wy->text().toDouble();
+                des_hand_vel_wz = this->ui.lineEdit_des_right_hand_vel_wz->text().toDouble();
+            }
+
+            if(!this->ui.checkBox_des_right_hand_vel_x->isChecked()){
+                des_hand_vel_x = 0.0;
+            }
+            if(!this->ui.checkBox_des_right_hand_vel_y->isChecked()){
+                des_hand_vel_y = 0.0;
+            }
+            if(!this->ui.checkBox_des_right_hand_vel_z->isChecked()){
+                des_hand_vel_z = 0.0;
+            }
+            if(!this->ui.checkBox_des_right_hand_vel_wx->isChecked()){
+                des_hand_vel_wx = 0.0;
+            }
+            if(!this->ui.checkBox_des_right_hand_vel_wy->isChecked()){
+                des_hand_vel_wy = 0.0;
+            }
+            if(!this->ui.checkBox_des_right_hand_vel_wz->isChecked()){
+                des_hand_vel_wz = 0.0;
+            }
+            vector<double> hand_vel_vec = {des_hand_vel_x,des_hand_vel_y,des_hand_vel_z, des_hand_vel_wx,des_hand_vel_wy,des_hand_vel_wz};
+            VectorXd hand_vel = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(hand_vel_vec.data(), hand_vel_vec.size());
+
+            double vel_max = this->ui.lineEdit_vel_max->text().toDouble()*M_PI/180;
+
+            bool jlim_en = this->ui.checkBox_joints_limits_av->isChecked();
+            double jlim_th = 0; double jlim_rate = 1;
+            double jlim_coeff = 1; double jlim_damping = 0.001;
+            if(jlim_en){
+                jlim_th = this->ui.lineEdit_jlim_th->text().toDouble();
+                jlim_rate = this->ui.lineEdit_jlim_rate->text().toDouble();
+                jlim_coeff = this->ui.lineEdit_jlim_coeff->text().toDouble();
+                jlim_damping = this->ui.lineEdit_jlim_damping->text().toDouble();
+            }
+            bool sing_en = this->ui.checkBox_sing_av->isChecked();
+            double sing_coeff = 1; double sing_damping = 0.001;
+            if(sing_en){
+                sing_damping = this->ui.lineEdit_sing_damping->text().toDouble();
+                sing_coeff = this->ui.lineEdit_sing_coeff->text().toDouble();
+            }
+
+            double obst_coeff = 1; double obst_damping = 0.001;
+            double obst_coeff_torso = 1; double obst_damping_torso = 0.001;
+            bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
+            vector<objectPtr> obsts_n; // obstacles in the scenario
+            if(obsts_en){
+                this->curr_scene->getObjects(obsts_n);
+                obst_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
+                obst_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
+                obst_coeff_torso = this->ui.lineEdit_obsts_coeff_torso->text().toDouble();
+                obst_damping_torso = this->ui.lineEdit_obsts_damping_torso->text().toDouble();
+                if(this->ui.checkBox_obsts_noise->isChecked()){
+                    vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
+                    obsts_n.resize(obsts.size());
+                    objectPtr obs_new;
+                    for(size_t i=0; i<obsts.size(); ++i){
+                        objectPtr obs = obsts.at(i);
+                        string obs_name = obs->getName();
+                        obs_new.reset(new Object(obs_name));
+                        motion_manager::pos obs_pos;
+                        motion_manager::orient obs_or;
+                        obs_pos.Xpos = obs->getPos().Xpos - (obsts_x_var/2) + obsts_x_var*(rand() / double(RAND_MAX));
+                        obs_pos.Ypos = obs->getPos().Ypos - (obsts_y_var/2) + obsts_y_var*(rand() / double(RAND_MAX));
+                        obs_pos.Zpos = obs->getPos().Zpos - (obsts_z_var/2) + obsts_z_var*(rand() / double(RAND_MAX));
+                        obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
+                        obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
+                        obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
+                        if(this->ui.checkBox_obsts_filter_noise->isChecked()){
+                            obs_pos.Xpos = this->lpf_obsts_pos_x->update(obs_pos.Xpos);
+                            obs_pos.Ypos = this->lpf_obsts_pos_y->update(obs_pos.Ypos);
+                            obs_pos.Zpos = this->lpf_obsts_pos_z->update(obs_pos.Zpos);
+                            obs_or.roll = DEGTORAD*this->lpf_obsts_or_roll->update(RADTODEG*obs_or.roll);
+                            obs_or.pitch = DEGTORAD*this->lpf_obsts_or_pitch->update(RADTODEG*obs_or.pitch);
+                            obs_or.yaw = DEGTORAD*this->lpf_obsts_or_yaw->update(RADTODEG*obs_or.yaw);
+                        }
+                        obs_new->setPos(obs_pos,false);
+                        obs_new->setOr(obs_or,false);
+                        obs_new->setSize(obs->getSize());
+                        obsts_n.at(i) = obs_new;
+                    }// for loop obstacles
+                }// noise on obstacles
+            }//obstacle avoidance enable
+
+
+            // ---------------- start the simulation --------------------------- //
+            if(!this->qnode.isSimulationRunning() || this->qnode.isSimulationPaused())
+            {
+                // enable set joints subscriber
+                this->qnode.enableSetJoints();
+
+                // start the simulation
+                this->qnode.startSim();
+            }
+            ros::spinOnce(); // handle ROS messages
+            double time_step = this->qnode.getSimTimeStep(); // sec
+
+            if(this->qnode.isSimulationRunning() && ((this->qnode.getSimTime()-this->t_j_past)>time_step))
+            {
+                // posture
+                vector<double> r_arm_posture_mes(JOINTS_ARM,0.0); vector<double> r_hand_posture_mes(JOINTS_HAND,0.0);
+                vector<double> r_arm_posture(JOINTS_ARM,0.0); vector<double> r_hand_posture(JOINTS_HAND,0.0);
+                // velocities
+                VectorXd r_arm_null_velocities = VectorXd::Zero(JOINTS_ARM);
+                vector<double> r_arm_velocities(JOINTS_ARM,0.0); vector<double> r_hand_velocities(JOINTS_HAND,0.0);
+                vector<double> r_arm_velocities_read(JOINTS_ARM,0.0); vector<double> r_hand_velocities_read(JOINTS_HAND,0.0);
+                // accelerations
+                vector<double> r_arm_accelerations(JOINTS_ARM,0.0); vector<double> r_hand_accelerations(JOINTS_HAND,0.0);
+
+                this->curr_scene->getHumanoid()->getRightArmPosture(r_arm_posture_mes);
+                this->curr_scene->getHumanoid()->getRightHandPosture(r_hand_posture_mes);
+
+                // filtering the joint positions
+                r_arm_posture.at(0) = this->lpf_joint_pos_1->update(r_arm_posture_mes.at(0));
+                r_arm_posture.at(1) = this->lpf_joint_pos_2->update(r_arm_posture_mes.at(1));
+                r_arm_posture.at(2) = this->lpf_joint_pos_3->update(r_arm_posture_mes.at(2));
+                r_arm_posture.at(3) = this->lpf_joint_pos_4->update(r_arm_posture_mes.at(3));
+                r_arm_posture.at(4) = this->lpf_joint_pos_5->update(r_arm_posture_mes.at(4));
+                r_arm_posture.at(5) = this->lpf_joint_pos_6->update(r_arm_posture_mes.at(5));
+                r_arm_posture.at(6) = this->lpf_joint_pos_7->update(r_arm_posture_mes.at(6));
+                r_hand_posture.at(0) = this->lpf_joint_pos_8->update(r_arm_posture_mes.at(0));
+                r_hand_posture.at(1) = this->lpf_joint_pos_9->update(r_hand_posture_mes.at(1));
+                r_hand_posture.at(2) = this->lpf_joint_pos_10->update(r_hand_posture_mes.at(2));
+                r_hand_posture.at(3) = this->lpf_joint_pos_11->update(r_hand_posture_mes.at(3));
+
+                // get the joint velocities
+                this->arm_pos_buff->push(r_arm_posture);
+                this->hand_pos_buff->push(r_hand_posture);
+                if(this->samples_pos==this->N_filter_length-1 && this->arm_pos_buff->full() && this->hand_pos_buff->full()){
+                    for(size_t i=0; i< r_arm_posture.size();++i)
+                    {
+                        r_arm_velocities_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_pos_buff->at(i));
+                    }
+                    for(size_t i=0; i< r_hand_velocities_read.size();++i)
+                    {
+                        r_hand_velocities_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_pos_buff->at(i));
+                    }
+                }else{this->samples_pos++;}
+
+                // get the joint accelerations
+                this->arm_vel_buff->push(r_arm_velocities_read);
+                this->hand_vel_buff->push(r_hand_velocities_read);
+                if(this->samples_vel==this->N_filter_length-1 && this->arm_vel_buff->full() && this->hand_vel_buff->full()){
+                    for(size_t i=0; i< r_arm_velocities_read.size();++i)
+                    {
+                        r_arm_accelerations.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_vel_buff->at(i));
+                    }
+                    for(size_t i=0; i< r_hand_velocities_read.size();++i)
+                    {
+                        r_hand_accelerations.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_vel_buff->at(i));
+                    }
+                }else{this->samples_vel++;}
+
+                vector<double> r_hand_pos; vector<double> r_wrist_pos; vector<double> r_elbow_pos; vector<double> r_shoulder_pos;
+                this->curr_scene->getHumanoid()->getAllPos(1,r_hand_pos,r_wrist_pos,r_elbow_pos,r_shoulder_pos,r_arm_posture);
+                VectorXd r_hand_pos_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_hand_pos.data(), r_hand_pos.size());
+
+                vector<double> r_hand_lin_pos(r_hand_pos.begin(), r_hand_pos.begin()+3);
+                vector<double> r_hand_ang_pos(r_hand_pos.begin()+3, r_hand_pos.begin()+6);
+                vector<double> r_wrist_lin_pos(r_wrist_pos.begin(), r_wrist_pos.begin()+3);
+                vector<double> r_wrist_ang_pos(r_wrist_pos.begin()+3, r_wrist_pos.begin()+6);
+                vector<double> r_elbow_lin_pos(r_elbow_pos.begin(), r_elbow_pos.begin()+3);
+                vector<double> r_elbow_ang_pos(r_elbow_pos.begin()+3, r_elbow_pos.begin()+6);
+                vector<double> r_shoulder_lin_pos(r_shoulder_pos.begin(), r_shoulder_pos.begin()+3);
+                vector<double> r_shoulder_ang_pos(r_shoulder_pos.begin()+3, r_shoulder_pos.begin()+6);
+
+                vector<double> r_hand_vel; vector<double> r_wrist_vel; vector<double> r_elbow_vel; vector<double> r_shoulder_vel;
+                this->curr_scene->getHumanoid()->getAllVel(1,r_hand_vel,r_wrist_vel,r_elbow_vel,r_shoulder_vel,r_arm_posture,r_arm_velocities_read);
+                VectorXd r_hand_vel_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_hand_vel.data(), r_hand_vel.size());
+
+                vector<double> r_hand_lin_vel(r_hand_vel.begin(), r_hand_vel.begin()+3);
+                vector<double> r_hand_ang_vel(r_hand_vel.begin()+3, r_hand_vel.begin()+6);
+                vector<double> r_wrist_lin_vel(r_wrist_vel.begin(), r_wrist_vel.begin()+3);
+                vector<double> r_wrist_ang_vel(r_wrist_vel.begin()+3, r_wrist_vel.begin()+6);
+                vector<double> r_elbow_lin_vel(r_elbow_vel.begin(), r_elbow_vel.begin()+3);
+                vector<double> r_elbow_ang_vel(r_elbow_vel.begin()+3, r_elbow_vel.begin()+6);
+                vector<double> r_shoulder_lin_vel(r_shoulder_vel.begin(), r_shoulder_vel.begin()+3);
+                vector<double> r_shoulder_ang_vel(r_shoulder_vel.begin()+3, r_shoulder_vel.begin()+6);
+
+                // get the wrist acceleration
+                vector<double> r_wrist_acc(6,0.0);
+                this->r_wrist_vel_buff->push(r_wrist_vel);
+                if(this->samples_w_vel==this->N_filter_length-1 && this->r_wrist_vel_buff->full()){
+                    for(size_t i=0; i< r_wrist_vel.size();++i)
+                    {
+                        r_wrist_acc.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_wrist_vel_buff->at(i));
+                    }
+                }else{this->samples_w_vel++;}
+
+                // get the elbow acceleration
+                vector<double> r_elbow_acc(6,0.0);
+                this->r_elbow_vel_buff->push(r_elbow_vel);
+                if(this->samples_e_vel==this->N_filter_length-1 && this->r_elbow_vel_buff->full()){
+                    for(size_t i=0; i< r_elbow_vel.size();++i)
+                    {
+                        r_elbow_acc.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_elbow_vel_buff->at(i));
+                    }
+                }else{this->samples_e_vel++;}
+
+                // get the shoulder acceleration
+                vector<double> r_shoulder_acc(6,0.0);
+                this->r_shoulder_vel_buff->push(r_shoulder_vel);
+                if(this->samples_s_vel==this->N_filter_length-1 && this->r_shoulder_vel_buff->full()){
+                    for(size_t i=0; i< r_shoulder_vel.size();++i)
+                    {
+                        r_shoulder_acc.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_shoulder_vel_buff->at(i));
+                    }
+                }else{this->samples_s_vel++;}
+
+                // get the hand acceleration
+                vector<double> r_hand_acc(6,0.0);
+                this->r_hand_vel_buff->push(r_hand_vel);
+                if(this->samples_h_vel==this->N_filter_length-1 && this->r_hand_vel_buff->full()){
+                    for(size_t i=0; i< r_hand_vel.size();++i)
+                    {
+                        r_hand_acc.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_hand_vel_buff->at(i));
+                    }
+                }else{
+                    this->samples_h_vel++;
+                    this->t_der_past = this->qnode.getSimTime();
+                }
+                VectorXd r_hand_acc_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_hand_acc.data(), r_hand_acc.size());
+
+                vector<double> r_hand_lin_acc(r_hand_acc.begin(), r_hand_acc.begin()+3);
+                vector<double> r_hand_ang_acc(r_hand_acc.begin()+3, r_hand_acc.begin()+6);
+                vector<double> r_wrist_lin_acc(r_wrist_acc.begin(), r_wrist_acc.begin()+3);
+                vector<double> r_wrist_ang_acc(r_wrist_acc.begin()+3, r_wrist_acc.begin()+6);
+                vector<double> r_elbow_lin_acc(r_elbow_acc.begin(), r_elbow_acc.begin()+3);
+                vector<double> r_elbow_ang_acc(r_elbow_acc.begin()+3, r_elbow_acc.begin()+6);
+                vector<double> r_shoulder_lin_acc(r_shoulder_acc.begin(), r_shoulder_acc.begin()+3);
+                vector<double> r_shoulder_ang_acc(r_shoulder_acc.begin()+3, r_shoulder_acc.begin()+6);
+
+                if(this->r_hand_init_pos.empty()){this->r_hand_init_pos=r_hand_pos;}
+                VectorXd r_hand_init_pos_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(this->r_hand_init_pos.data(), this->r_hand_init_pos.size());
+                VectorXd hand_pos(6); VectorXd hand_acc(6);
+                if (this->ui.checkBox_draw_ellipse->isChecked()){
+                    // desired position
+                    hand_pos(0) = r_hand_init_pos_vec(0)/0.2 + (40/0.2)*sin(0.2*this->qnode.getSimTime() - M_PI/2);
+                    hand_pos(1) = r_hand_init_pos_vec(1)/0.2 + (60/0.2)*cos(0.2*this->qnode.getSimTime() - M_PI/2);
+                    hand_pos(2) = r_hand_init_pos_vec(2);
+                    hand_pos(3) = r_hand_init_pos_vec(3);
+                    hand_pos(4) = r_hand_init_pos_vec(4);
+                    hand_pos(5) = r_hand_init_pos_vec(5);
+                    //desired acceleration
+                    hand_acc(0) = -40*0.2*sin(0.2*this->qnode.getSimTime() - M_PI/2);
+                    hand_acc(1) = -60*0.2*cos(0.2*this->qnode.getSimTime() - M_PI/2);
+                    hand_acc(2) = 0.0;
+                    hand_acc(3) = 0.0;
+                    hand_acc(4) = 0.0;
+                    hand_acc(5) = 0.0;
+                }else{
+                    // desired position
+                    hand_pos = r_hand_init_pos_vec + hand_vel*this->qnode.getSimTime();
+                    // desired acceleration
+                    hand_acc = hand_vel/this->qnode.getSimTime();
+                }
+
+                // inverse differential kinematics
+                this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_arm_posture,hand_vel_vec,r_arm_velocities,r_arm_null_velocities,jlim_en,sing_en,obsts_en,
+                                                                                vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,obst_coeff_torso,obst_damping_torso,
+                                                                                jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts_n);
+
+
+                // execute the control
+                bool joints_arm_vel_ctrl = this->ui.checkBox_joints_velocity_ctrl->isChecked();
+                this->qnode.execKinControl(1,r_arm_posture,r_arm_velocities,r_hand_posture,r_hand_velocities,joints_arm_vel_ctrl,false);
+
+                // -------------- Recording ---------------------------- //
+
+                // record the positions of the joints
+                this->jointsPosition_ctrl.conservativeResize(this->jointsPosition_ctrl.rows()+1,11);
+                for(size_t jj=0; jj < r_arm_posture.size(); ++jj)
+                    this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,jj) = r_arm_posture.at(jj);
+                for(size_t jj=0; jj < r_hand_posture.size(); ++jj)
+                    this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,r_arm_posture.size()+jj) = r_hand_posture.at(jj);
+
+                // record the velocities of the joints
+                this->jointsVelocity_ctrl.conservativeResize(this->jointsVelocity_ctrl.rows()+1,11);
+                for(size_t jj=0; jj < r_arm_velocities_read.size(); ++jj)
+                    this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,jj) = r_arm_velocities_read.at(jj);
+                for(size_t jj=0; jj < r_hand_velocities_read.size(); ++jj)
+                    this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,r_arm_velocities_read.size()+jj) = r_hand_velocities_read.at(jj);
+
+                this->jointsVelocity_null_ctrl.conservativeResize(this->jointsVelocity_null_ctrl.rows()+1,JOINTS_ARM);
+                for(size_t jj=0; jj < r_arm_null_velocities.size(); ++jj)
+                    this->jointsVelocity_null_ctrl(this->jointsVelocity_null_ctrl.rows()-1,jj) = r_arm_null_velocities(jj);
+
+                // record the acceleration of the joints
+                this->jointsAcceleration_ctrl.conservativeResize(this->jointsAcceleration_ctrl.rows()+1,JOINTS_ARM+JOINTS_HAND);
+                for(size_t jj=0; jj < r_arm_accelerations.size(); ++jj)
+                    this->jointsAcceleration_ctrl(this->jointsAcceleration_ctrl.rows()-1,jj) = r_arm_accelerations.at(jj);
+                for(size_t jj=0; jj < r_hand_accelerations.size(); ++jj)
+                    this->jointsAcceleration_ctrl(this->jointsAcceleration_ctrl.rows()-1,r_arm_accelerations.size()+jj) = r_hand_accelerations.at(jj);
+
+
+                // operational space positions
+                this->handPosition_ctrl.push_back(r_hand_lin_pos);
+                this->handOrientation_ctrl.push_back(r_hand_ang_pos);
+                this->wristPosition_ctrl.push_back(r_wrist_lin_pos);
+                this->wristOrientation_ctrl.push_back(r_wrist_ang_pos);
+                this->elbowPosition_ctrl.push_back(r_elbow_lin_pos);
+                this->elbowOrientation_ctrl.push_back(r_elbow_ang_pos);
+                this->shoulderPosition_ctrl.push_back(r_shoulder_lin_pos);
+                this->shoulderOrientation_ctrl.push_back(r_shoulder_ang_pos);
+
+                // operational space velocities
+                this->handLinearVelocity_ctrl.push_back(r_hand_lin_vel);
+                this->handAngularVelocity_ctrl.push_back(r_hand_ang_vel);
+                this->wristLinearVelocity_ctrl.push_back(r_wrist_lin_vel);
+                this->wristAngularVelocity_ctrl.push_back(r_wrist_ang_vel);
+                this->elbowLinearVelocity_ctrl.push_back(r_elbow_lin_vel);
+                this->elbowAngularVelocity_ctrl.push_back(r_elbow_ang_vel);
+                this->shoulderLinearVelocity_ctrl.push_back(r_shoulder_lin_vel);
+                this->shoulderAngularVelocity_ctrl.push_back(r_shoulder_ang_vel);
+                this->handVelocityNorm_ctrl.push_back(this->curr_scene->getHumanoid()->getHandVelNorm(1,r_arm_posture,r_arm_velocities_read));
+
+                // operational space accelerations
+                this->handLinearAcceleration_ctrl.push_back(r_hand_lin_acc);
+                this->handAngularAcceleration_ctrl.push_back(r_hand_ang_acc);
+                this->wristLinearAcceleration_ctrl.push_back(r_wrist_lin_acc);
+                this->wristAngularAcceleration_ctrl.push_back(r_wrist_ang_acc);
+                this->elbowLinearAcceleration_ctrl.push_back(r_elbow_lin_acc);
+                this->elbowAngularAcceleration_ctrl.push_back(r_elbow_ang_acc);
+                this->shoulderLinearAcceleration_ctrl.push_back(r_shoulder_lin_acc);
+                this->shoulderAngularAcceleration_ctrl.push_back(r_shoulder_ang_acc);
+                this->handAccelerationNorm_ctrl.push_back(sqrt(pow(r_hand_lin_acc.at(0),2)+pow(r_hand_lin_acc.at(1),2)+pow(r_hand_lin_acc.at(2),2)));
+
+                //errors
+                VectorXd error_pos_tot = hand_pos - r_hand_pos_vec;
+                this->error_pos_tot_norm.push_back(error_pos_tot.block<3,1>(0,0).norm());
+                this->error_or_tot_norm.push_back(error_pos_tot.block<3,1>(3,0).norm());
+                this->error_pos_or_tot_norm.push_back(error_pos_tot.norm());
+                VectorXd error_vel_tot = hand_vel - r_hand_vel_vec;
+                this->error_lin_vel_tot_norm.push_back(error_vel_tot.block<3,1>(0,0).norm());
+                this->error_ang_vel_tot_norm.push_back(error_vel_tot.block<3,1>(3,0).norm());
+                this->error_vel_tot_norm.push_back(error_vel_tot.norm());
+                VectorXd error_acc_tot = hand_acc - r_hand_acc_vec;
+                this->error_lin_acc_tot_norm.push_back(error_acc_tot.block<3,1>(0,0).norm());
+                this->error_ang_acc_tot_norm.push_back(error_acc_tot.block<3,1>(3,0).norm());
+                this->error_acc_tot_norm.push_back(error_acc_tot.norm());
+
+                // time
+                this->t_j_past = this->qnode.getSimTime();
+                this->sim_time.push_back(this->qnode.getSimTime()-this->t_der_past);
+            } // check simulation step
+        } // if vel control
+    }// while execcontrol
 }
 
 //void MainWindow::execVelControl()
@@ -2158,22 +2503,30 @@ void MainWindow::execPosControl()
 //        {
 //            boost::unique_lock<boost::mutex> lck(hh_control_mtx);
 
-//            double des_hand_vel_x,des_hand_vel_y,des_hand_vel_z,des_hand_vel_wx,des_hand_vel_wy,des_hand_vel_wz;
+//            double des_hand_acc_x,des_hand_acc_y,des_hand_acc_z,des_hand_acc_wx,des_hand_acc_wy,des_hand_acc_wz;
 //            if (this->ui.checkBox_draw_ellipse->isChecked()){
-//                des_hand_vel_x = 40*cos(0.2*this->qnode.getSimTime()-M_PI/2);
-//                des_hand_vel_y = -60*sin(0.2*this->qnode.getSimTime()-M_PI/2);
-//                des_hand_vel_z = 0.0;
-//                des_hand_vel_wx = 0.0;
-//                des_hand_vel_wy = 0.0;
-//                des_hand_vel_wz = 0.0;
+//                des_hand_acc_x = 400*cos(0.2*this->qnode.getSimTime()-M_PI/2);
+//                des_hand_acc_y = -600*sin(0.2*this->qnode.getSimTime()-M_PI/2);
+//                des_hand_acc_z = 0.0;
+//                des_hand_acc_wx = 0.0;
+//                des_hand_acc_wy = 0.0;
+//                des_hand_acc_wz = 0.0;
 //            }else{
-//                des_hand_vel_x = this->ui.lineEdit_des_right_hand_vel_x->text().toDouble();
-//                des_hand_vel_y = this->ui.lineEdit_des_right_hand_vel_y->text().toDouble();
-//                des_hand_vel_z = this->ui.lineEdit_des_right_hand_vel_z->text().toDouble();
-//                des_hand_vel_wx = this->ui.lineEdit_des_right_hand_vel_wx->text().toDouble();
-//                des_hand_vel_wy = this->ui.lineEdit_des_right_hand_vel_wy->text().toDouble();
-//                des_hand_vel_wz = this->ui.lineEdit_des_right_hand_vel_wz->text().toDouble();
+//                des_hand_acc_x = this->ui.lineEdit_des_right_hand_vel_x->text().toDouble();
+//                des_hand_acc_y = this->ui.lineEdit_des_right_hand_vel_y->text().toDouble();
+//                des_hand_acc_z = this->ui.lineEdit_des_right_hand_vel_z->text().toDouble();
+//                des_hand_acc_wx = this->ui.lineEdit_des_right_hand_vel_wx->text().toDouble();
+//                des_hand_acc_wy = this->ui.lineEdit_des_right_hand_vel_wy->text().toDouble();
+//                des_hand_acc_wz = this->ui.lineEdit_des_right_hand_vel_wz->text().toDouble();
 //            }
+//            // desired acceleration
+//            VectorXd h_hand_ref_acc(6);
+//            h_hand_ref_acc(0) = des_hand_acc_x;
+//            h_hand_ref_acc(1) = des_hand_acc_y;
+//            h_hand_ref_acc(2) = des_hand_acc_z;
+//            h_hand_ref_acc(3) = des_hand_acc_wx;
+//            h_hand_ref_acc(4) = des_hand_acc_wy;
+//            h_hand_ref_acc(5) = des_hand_acc_wz;
 
 //            double vel_max = this->ui.lineEdit_vel_max->text().toDouble()*M_PI/180;
 
@@ -2194,12 +2547,15 @@ void MainWindow::execPosControl()
 //            }
 
 //            double obst_coeff = 1; double obst_damping = 0.001;
+//            double obst_coeff_torso = 1; double obst_damping_torso = 0.001;
 //            bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
+//            vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
 //            if(obsts_en){
 //                obst_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
 //                obst_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
+//                obst_coeff_torso = this->ui.lineEdit_obsts_coeff_torso->text().toDouble();
+//                obst_damping_torso = this->ui.lineEdit_obsts_damping_torso->text().toDouble();
 //                if(this->ui.checkBox_obsts_noise->isChecked()){
-//                    vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
 //                    objectPtr obs_new;
 //                    double obsts_x_var = 100; // mm
 //                    double obsts_y_var = 100; // mm
@@ -2236,472 +2592,313 @@ void MainWindow::execPosControl()
 //                }// noise on obstacles
 //            }//obstacle avoidance enable
 
-//            VectorXd hand_vel(6);
-//            hand_vel << des_hand_vel_x,des_hand_vel_y,des_hand_vel_z,
-//                        des_hand_vel_wx,des_hand_vel_wy,des_hand_vel_wz;
+//            VectorXd hand_acc(6);
+//            hand_acc << des_hand_acc_x,des_hand_acc_y,des_hand_acc_z,
+//                        des_hand_acc_wx,des_hand_acc_wy,des_hand_acc_wz;
 
 //            if(!this->ui.checkBox_des_right_hand_vel_x->isChecked()){
-//                hand_vel(0) = 0.0;
+//                hand_acc(0) = 0.0;
 //            }
 //            if(!this->ui.checkBox_des_right_hand_vel_y->isChecked()){
-//                hand_vel(1) = 0.0;
+//                hand_acc(1) = 0.0;
 //            }
 //            if(!this->ui.checkBox_des_right_hand_vel_z->isChecked()){
-//                hand_vel(2) = 0.0;
+//                hand_acc(2) = 0.0;
 //            }
 //            if(!this->ui.checkBox_des_right_hand_vel_wx->isChecked()){
-//                hand_vel(3) = 0.0;
+//                hand_acc(3) = 0.0;
 //            }
 //            if(!this->ui.checkBox_des_right_hand_vel_wy->isChecked()){
-//                hand_vel(4) = 0.0;
+//                hand_acc(4) = 0.0;
 //            }
 //            if(!this->ui.checkBox_des_right_hand_vel_wz->isChecked()){
-//                hand_vel(5) = 0.0;
+//                hand_acc(5) = 0.0;
 //            }
-//            vector<double> r_posture; vector<double> r_hand_posture;
-//            this->curr_scene->getHumanoid()->getRightArmPosture(r_posture);
-//            this->curr_scene->getHumanoid()->getRightHandPosture(r_hand_posture);
 
-//            vector<double> r_hand_pos; vector<double> r_wrist_pos; vector<double> r_elbow_pos; vector<double> r_shoulder_pos;
-//            this->curr_scene->getHumanoid()->getAllPos(1,r_hand_pos,r_wrist_pos,r_elbow_pos,r_shoulder_pos,r_posture);
+//            // ---------------- start the simulation --------------------------- //
+//            if(!this->qnode.isSimulationRunning() || this->qnode.isSimulationPaused())
+//            {
+//                // enable set joints subscriber
+//                this->qnode.enableSetJoints();
 
-//            vector<double> r_hand_lin_pos(r_hand_pos.begin(), r_hand_pos.begin()+3);
-//            vector<double> r_hand_ang_pos(r_hand_pos.begin()+3, r_hand_pos.begin()+6);
-//            vector<double> r_wrist_lin_pos(r_wrist_pos.begin(), r_wrist_pos.begin()+3);
-//            vector<double> r_wrist_ang_pos(r_wrist_pos.begin()+3, r_wrist_pos.begin()+6);
-//            vector<double> r_elbow_lin_pos(r_elbow_pos.begin(), r_elbow_pos.begin()+3);
-//            vector<double> r_elbow_ang_pos(r_elbow_pos.begin()+3, r_elbow_pos.begin()+6);
-//            vector<double> r_shoulder_lin_pos(r_shoulder_pos.begin(), r_shoulder_pos.begin()+3);
-//            vector<double> r_shoulder_ang_pos(r_shoulder_pos.begin()+3, r_shoulder_pos.begin()+6);
+//                // start the simulation
+//                this->qnode.startSim();
+//            }
+//            ros::spinOnce(); // handle ROS messages
+//            double time_step = this->qnode.getSimTimeStep(); // sec
 
-//            this->handPosition_ctrl.push_back(r_hand_lin_pos);
-//            this->handOrientation_ctrl.push_back(r_hand_ang_pos);
-//            this->wristPosition_ctrl.push_back(r_wrist_lin_pos);
-//            this->wristOrientation_ctrl.push_back(r_wrist_ang_pos);
-//            this->elbowPosition_ctrl.push_back(r_elbow_lin_pos);
-//            this->elbowOrientation_ctrl.push_back(r_elbow_ang_pos);
-//            this->shoulderPosition_ctrl.push_back(r_shoulder_lin_pos);
-//            this->shoulderOrientation_ctrl.push_back(r_shoulder_ang_pos);
+//            if(this->qnode.isSimulationRunning() && ((this->qnode.getSimTime()-this->t_j_past)>time_step))
+//            {
 
-//            vector<double> hand_vel_vec; hand_vel_vec.resize(hand_vel.size());
-//            VectorXd::Map(&hand_vel_vec[0], hand_vel.size()) = hand_vel;
+//                // posture
+//                vector<double> r_arm_posture_mes(JOINTS_ARM,0.0); vector<double> r_hand_posture_mes(JOINTS_HAND,0.0);
+//                vector<double> r_arm_posture(JOINTS_ARM,0.0); vector<double> r_hand_posture(JOINTS_HAND,0.0);
+//                // velocities
+//                VectorXd r_arm_null_velocities = VectorXd::Zero(JOINTS_ARM);
+//                vector<double> r_arm_velocities(JOINTS_ARM,0.0); vector<double> r_hand_velocities(JOINTS_HAND,0.0);
+//                vector<double> r_arm_velocities_read(JOINTS_ARM,0.0); vector<double> r_hand_velocities_read(JOINTS_HAND,0.0);
+//                // accelerations
+//                //vector<double> r_arm_accelerations(JOINTS_ARM,0.0);
+//                vector<double> r_arm_accelerations_read(JOINTS_ARM,0.0); vector<double> r_hand_accelerations_read(JOINTS_HAND,0.0);
+//                vector<double> r_hand_acc_read(6,0.0);
+//                vector<double> r_wrist_acc_read(6,0.0);
+//                vector<double> r_elbow_acc_read(6,0.0);
+//                vector<double> r_shoulder_acc_read(6,0.0);
 
-//            vector<double> r_velocities;
-//            vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
-//            //this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities);
-//            this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm(1,r_posture,hand_vel_vec,r_velocities,jlim_en,sing_en,obsts_en,
-//                                                                            vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
-//            vector<double> r_velocities_mes; vector<double> r_hand_velocities_mes;
-//            this->curr_scene->getHumanoid()->getRightArmVelocities(r_velocities_mes);
-//            this->curr_scene->getHumanoid()->getRightHandVelocities(r_hand_velocities_mes);
 
-//            // record the positions of the joints
-//            this->jointsPosition_ctrl.conservativeResize(this->jointsPosition_ctrl.rows()+1,11);
-//            for(size_t jj=0; jj < r_posture.size(); ++jj)
-//                this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,jj) = r_posture.at(jj);
-//            for(size_t jj=0; jj < r_hand_posture.size(); ++jj)
-//                this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,r_posture.size()+jj) = r_hand_posture.at(jj);
+//                this->curr_scene->getHumanoid()->getRightArmPosture(r_arm_posture_mes);
+//                this->curr_scene->getHumanoid()->getRightHandPosture(r_hand_posture_mes);
+//                // filtering the joint positions
+//                r_arm_posture.at(0) = this->lpf_joint_pos_1->update(r_arm_posture_mes.at(0));
+//                r_arm_posture.at(1) = this->lpf_joint_pos_2->update(r_arm_posture_mes.at(1));
+//                r_arm_posture.at(2) = this->lpf_joint_pos_3->update(r_arm_posture_mes.at(2));
+//                r_arm_posture.at(3) = this->lpf_joint_pos_4->update(r_arm_posture_mes.at(3));
+//                r_arm_posture.at(4) = this->lpf_joint_pos_5->update(r_arm_posture_mes.at(4));
+//                r_arm_posture.at(5) = this->lpf_joint_pos_6->update(r_arm_posture_mes.at(5));
+//                r_arm_posture.at(6) = this->lpf_joint_pos_7->update(r_arm_posture_mes.at(6));
+//                r_hand_posture.at(0) = this->lpf_joint_pos_8->update(r_hand_posture_mes.at(0));
+//                r_hand_posture.at(1) = this->lpf_joint_pos_9->update(r_hand_posture_mes.at(1));
+//                r_hand_posture.at(2) = this->lpf_joint_pos_10->update(r_hand_posture_mes.at(2));
+//                r_hand_posture.at(3) = this->lpf_joint_pos_11->update(r_hand_posture_mes.at(3));
 
-//            // record the velocities of the joints
-//            this->jointsVelocity_ctrl.conservativeResize(this->jointsVelocity_ctrl.rows()+1,11);
-//            for(size_t jj=0; jj < r_velocities_mes.size(); ++jj)
-//                this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,jj) = r_velocities_mes.at(jj);
-//            for(size_t jj=0; jj < r_hand_velocities_mes.size(); ++jj)
-//                this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,r_velocities_mes.size()+jj) = r_hand_velocities_mes.at(jj);
+//                vector<double> r_hand_pos; vector<double> r_wrist_pos; vector<double> r_elbow_pos; vector<double> r_shoulder_pos;
+//                this->curr_scene->getHumanoid()->getAllPos(1,r_hand_pos,r_wrist_pos,r_elbow_pos,r_shoulder_pos,r_arm_posture);
+//                vector<double> r_hand_pos_q; vector<double> r_wrist_pos_q; vector<double> r_elbow_pos_q; vector<double> r_shoulder_pos_q;
+//                this->curr_scene->getHumanoid()->getAllPos_q(1,r_hand_pos_q,r_wrist_pos_q,r_elbow_pos_q,r_shoulder_pos_q,r_arm_posture);
 
-//            vector<double> r_hand_vel; vector<double> r_wrist_vel; vector<double> r_elbow_vel; vector<double> r_shoulder_vel;
-//            this->curr_scene->getHumanoid()->getAllVel(1,r_hand_vel,r_wrist_vel,r_elbow_vel,r_shoulder_vel,r_posture,r_velocities);
+//                if(this->r_hand_init_pos.empty()){this->r_hand_init_pos=r_hand_pos;}
+//                VectorXd r_hand_init_pos_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(this->r_hand_init_pos.data(), this->r_hand_init_pos.size());
+//                // desired position
+//                VectorXd h_hand_ref_pos = r_hand_init_pos_vec + 0.5*h_hand_ref_acc*pow(this->qnode.getSimTime(),2);
+//                // desired velocity
+//                VectorXd h_hand_ref_vel = h_hand_ref_acc*this->qnode.getSimTime();
 
-//            vector<double> r_hand_lin_vel(r_hand_vel.begin(), r_hand_vel.begin()+3);
-//            vector<double> r_hand_ang_vel(r_hand_vel.begin()+3, r_hand_vel.begin()+6);
-//            vector<double> r_wrist_lin_vel(r_wrist_vel.begin(), r_wrist_vel.begin()+3);
-//            vector<double> r_wrist_ang_vel(r_wrist_vel.begin()+3, r_wrist_vel.begin()+6);
-//            vector<double> r_elbow_lin_vel(r_elbow_vel.begin(), r_elbow_vel.begin()+3);
-//            vector<double> r_elbow_ang_vel(r_elbow_vel.begin()+3, r_elbow_vel.begin()+6);
-//            vector<double> r_shoulder_lin_vel(r_shoulder_vel.begin(), r_shoulder_vel.begin()+3);
-//            vector<double> r_shoulder_ang_vel(r_shoulder_vel.begin()+3, r_shoulder_vel.begin()+6);
 
-//            this->handLinearVelocity_ctrl.push_back(r_hand_lin_vel);
-//            this->handAngularVelocity_ctrl.push_back(r_hand_ang_vel);
-//            this->wristLinearVelocity_ctrl.push_back(r_wrist_lin_vel);
-//            this->wristAngularVelocity_ctrl.push_back(r_wrist_ang_vel);
-//            this->elbowLinearVelocity_ctrl.push_back(r_elbow_lin_vel);
-//            this->elbowAngularVelocity_ctrl.push_back(r_elbow_ang_vel);
-//            this->shoulderLinearVelocity_ctrl.push_back(r_shoulder_lin_vel);
-//            this->shoulderAngularVelocity_ctrl.push_back(r_shoulder_ang_vel);
+//                vector<double> r_hand_lin_pos(r_hand_pos.begin(), r_hand_pos.begin()+3);
+//                vector<double> r_hand_ang_pos(r_hand_pos.begin()+3, r_hand_pos.begin()+6);
+//                vector<double> r_hand_q(r_hand_pos_q.begin()+3, r_hand_pos_q.begin()+7);
+//                vector<double> r_wrist_lin_pos(r_wrist_pos.begin(), r_wrist_pos.begin()+3);
+//                vector<double> r_wrist_ang_pos(r_wrist_pos.begin()+3, r_wrist_pos.begin()+6);
+//                vector<double> r_elbow_lin_pos(r_elbow_pos.begin(), r_elbow_pos.begin()+3);
+//                vector<double> r_elbow_ang_pos(r_elbow_pos.begin()+3, r_elbow_pos.begin()+6);
+//                vector<double> r_shoulder_lin_pos(r_shoulder_pos.begin(), r_shoulder_pos.begin()+3);
+//                vector<double> r_shoulder_ang_pos(r_shoulder_pos.begin()+3, r_shoulder_pos.begin()+6);
 
-//            this->qnode.execKinControl(1,r_posture,r_velocities);
+//                // get the joint velocities
+//                this->arm_pos_buff->push(r_arm_posture);
+//                this->hand_pos_buff->push(r_hand_posture);
+//                if(this->samples_pos==this->N_filter_length-1 && this->arm_pos_buff->full() && this->hand_pos_buff->full()){
+//                    for(size_t i=0; i< r_arm_posture.size();++i)
+//                    {
+//                        r_arm_velocities_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_pos_buff->at(i));
+//                    }
+//                    for(size_t i=0; i< r_hand_velocities_read.size();++i)
+//                    {
+//                        r_hand_velocities_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_pos_buff->at(i));
+//                    }
+//                }else{this->samples_pos++;}
 
-//            this->handVelocityNorm_ctrl.push_back(this->curr_scene->getHumanoid()->getHandVelNorm(1,r_posture,r_velocities));
-//            this->sim_time.push_back(this->qnode.getSimTime());
-//        }
-//    }
+//                vector<double> r_hand_vel; vector<double> r_wrist_vel; vector<double> r_elbow_vel; vector<double> r_shoulder_vel;
+//                this->curr_scene->getHumanoid()->getAllVel(1,r_hand_vel,r_wrist_vel,r_elbow_vel,r_shoulder_vel,r_arm_posture,r_arm_velocities_read);
+
+//                vector<double> r_hand_lin_vel(r_hand_vel.begin(), r_hand_vel.begin()+3);
+//                vector<double> r_hand_ang_vel(r_hand_vel.begin()+3, r_hand_vel.begin()+6);
+//                vector<double> r_wrist_lin_vel(r_wrist_vel.begin(), r_wrist_vel.begin()+3);
+//                vector<double> r_wrist_ang_vel(r_wrist_vel.begin()+3, r_wrist_vel.begin()+6);
+//                vector<double> r_elbow_lin_vel(r_elbow_vel.begin(), r_elbow_vel.begin()+3);
+//                vector<double> r_elbow_ang_vel(r_elbow_vel.begin()+3, r_elbow_vel.begin()+6);
+//                vector<double> r_shoulder_lin_vel(r_shoulder_vel.begin(), r_shoulder_vel.begin()+3);
+//                vector<double> r_shoulder_ang_vel(r_shoulder_vel.begin()+3, r_shoulder_vel.begin()+6);
+
+//                // get the joint accelerations
+//                this->arm_vel_buff->push(r_arm_velocities_read);
+//                this->hand_vel_buff->push(r_hand_velocities_read);
+//                if(this->samples_vel==this->N_filter_length-1 && this->arm_vel_buff->full() && this->hand_vel_buff->full()){
+//                    for(size_t i=0; i< r_arm_velocities_read.size();++i)
+//                    {
+//                        r_arm_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_vel_buff->at(i));
+//                    }
+//                    for(size_t i=0; i< r_hand_velocities_read.size();++i)
+//                    {
+//                        r_hand_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_vel_buff->at(i));
+//                    }
+//                }else{this->samples_vel++;}
+
+//                // get the joint accelerations
+//                this->arm_vel_buff->push(r_arm_velocities_read);
+//                this->hand_vel_buff->push(r_hand_velocities_read);
+//                if(this->samples_vel==this->N_filter_length-1 && this->arm_vel_buff->full() && this->hand_vel_buff->full()){
+//                    for(size_t i=0; i< r_arm_velocities_read.size();++i)
+//                    {
+//                        r_arm_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_vel_buff->at(i));
+//                    }
+//                    for(size_t i=0; i< r_hand_velocities_read.size();++i)
+//                    {
+//                        r_hand_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_vel_buff->at(i));
+//                    }
+//                }else{this->samples_vel++;}
+
+
+//                // get the hand acceleration
+//                this->r_hand_vel_buff->push(r_hand_vel);
+//                if(this->samples_h_vel==this->N_filter_length-1 && this->r_hand_vel_buff->full()){
+//                    for(size_t i=0; i< r_hand_vel.size();++i)
+//                    {
+//                        r_hand_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_hand_vel_buff->at(i));
+//                    }
+//                }else{this->samples_h_vel++;}
+
+
+//                // get the wrist acceleration
+//                this->r_wrist_vel_buff->push(r_wrist_vel);
+//                if(this->samples_w_vel==this->N_filter_length-1 && this->r_wrist_vel_buff->full()){
+//                    for(size_t i=0; i< r_wrist_vel.size();++i)
+//                    {
+//                        r_wrist_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_wrist_vel_buff->at(i));
+//                    }
+//                }else{this->samples_w_vel++;}
+
+//                // get the elbow acceleration
+//                this->r_elbow_vel_buff->push(r_elbow_vel);
+//                if(this->samples_e_vel==this->N_filter_length-1 && this->r_elbow_vel_buff->full()){
+//                    for(size_t i=0; i< r_elbow_vel.size();++i)
+//                    {
+//                        r_elbow_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_elbow_vel_buff->at(i));
+//                    }
+//                }else{this->samples_e_vel++;}
+
+//                // get the shoulder acceleration
+//                this->r_shoulder_vel_buff->push(r_shoulder_vel);
+//                if(this->samples_s_vel==this->N_filter_length-1 && this->r_shoulder_vel_buff->full()){
+//                    for(size_t i=0; i< r_shoulder_vel.size();++i)
+//                    {
+//                        r_shoulder_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_shoulder_vel_buff->at(i));
+//                    }
+//                }else{
+//                    this->samples_s_vel++;
+//                    this->t_der_past = this->qnode.getSimTime();
+//                }
+
+//                VectorXd r_arm_accelerations_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_arm_accelerations_read.data(), r_arm_accelerations_read.size());
+//                VectorXd r_hand_pos_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_hand_pos.data(), r_hand_pos.size());
+//                VectorXd r_hand_vel_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_hand_vel.data(), r_hand_vel.size());
+//                VectorXd r_hand_acc_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_hand_acc_read.data(), r_hand_acc_read.size());
+//                // Jacobian
+//                this->curr_scene->getHumanoid()->getJacobian(1,r_arm_posture,this->Jacobian);
+//                this->hand_j_acc = r_hand_acc_read_vec - this->Jacobian*r_arm_accelerations_read_vec;
+
+//                vector<double> r_hand_lin_acc(r_hand_acc_read.begin(), r_hand_acc_read.begin()+3);
+//                vector<double> r_hand_ang_acc(r_hand_acc_read.begin()+3, r_hand_acc_read.begin()+6);
+//                vector<double> r_wrist_lin_acc(r_wrist_acc_read.begin(), r_wrist_acc_read.begin()+3);
+//                vector<double> r_wrist_ang_acc(r_wrist_acc_read.begin()+3, r_wrist_acc_read.begin()+6);
+//                vector<double> r_elbow_lin_acc(r_elbow_acc_read.begin(), r_elbow_acc_read.begin()+3);
+//                vector<double> r_elbow_ang_acc(r_elbow_acc_read.begin()+3, r_elbow_acc_read.begin()+6);
+//                vector<double> r_shoulder_lin_acc(r_shoulder_acc_read.begin(), r_shoulder_acc_read.begin()+3);
+//                vector<double> r_shoulder_ang_acc(r_shoulder_acc_read.begin()+3, r_shoulder_acc_read.begin()+6);
+
+//                VectorXd hand_acc_xd_vec = h_hand_ref_acc - this->hand_j_acc;
+//                vector<double> hand_acc_vec; hand_acc_vec.resize(hand_acc_xd_vec.size());
+//                VectorXd::Map(&hand_acc_vec[0], hand_acc_xd_vec.size()) = hand_acc_xd_vec;
+
+//                this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,r_arm_velocities_read,hand_acc_vec,r_arm_velocities,r_arm_null_velocities,time_step,jlim_en,sing_en,obsts_en,
+//                                                                                vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,obst_coeff_torso,obst_damping_torso,
+//                                                                                 jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
+
+//                // execute the control
+//                bool joints_arm_vel_ctrl = this->ui.checkBox_joints_velocity_ctrl->isChecked();
+//                this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities,joints_arm_vel_ctrl);
+
+////                BOOST_LOG_SEV(lg, info) << "hand_acc_xd_vec x = " << hand_acc_xd_vec(0);
+////                BOOST_LOG_SEV(lg, info) << "hand_acc_xd_vec y = " << hand_acc_xd_vec(1);
+////                BOOST_LOG_SEV(lg, info) << "hand_acc_xd_vec z = " << hand_acc_xd_vec(2);
+////                BOOST_LOG_SEV(lg, info) << "hand_acc_xd_vec wx = " << hand_acc_xd_vec(3);
+////                BOOST_LOG_SEV(lg, info) << "hand_acc_xd_vec wy = " << hand_acc_xd_vec(4);
+////                BOOST_LOG_SEV(lg, info) << "hand_acc_xd_vec wz = " << hand_acc_xd_vec(5);
+
+////                BOOST_LOG_SEV(lg, info) << "r_arm_velocities 0 = " << r_arm_velocities.at(0);
+////                BOOST_LOG_SEV(lg, info) << "r_arm_velocities 1 = " << r_arm_velocities.at(1);
+////                BOOST_LOG_SEV(lg, info) << "r_arm_velocities 2 = " << r_arm_velocities.at(2);
+
+//                // ------------- Recording ------------------------------- //
+
+//                // record the positions of the joints
+//                this->jointsPosition_ctrl.conservativeResize(this->jointsPosition_ctrl.rows()+1,JOINTS_ARM+JOINTS_HAND);
+//                for(size_t jj=0; jj < r_arm_posture_mes.size(); ++jj)
+//                    this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,jj) = r_arm_posture_mes.at(jj);
+//                for(size_t jj=0; jj < r_hand_posture_mes.size(); ++jj)
+//                    this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,r_arm_posture_mes.size()+jj) = r_hand_posture_mes.at(jj);
+
+//                // record the velocities of the joints
+//                this->jointsVelocity_ctrl.conservativeResize(this->jointsVelocity_ctrl.rows()+1,JOINTS_ARM+JOINTS_HAND);
+//                for(size_t jj=0; jj < r_arm_velocities_read.size(); ++jj)
+//                    this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,jj) = r_arm_velocities_read.at(jj);
+//                for(size_t jj=0; jj < r_hand_velocities_read.size(); ++jj)
+//                    this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,r_arm_velocities_read.size()+jj) = r_hand_velocities_read.at(jj);
+
+//                this->jointsVelocity_null_ctrl.conservativeResize(this->jointsVelocity_null_ctrl.rows()+1,JOINTS_ARM);
+//                for(size_t jj=0; jj < r_arm_null_velocities.size(); ++jj)
+//                    this->jointsVelocity_null_ctrl(this->jointsVelocity_null_ctrl.rows()-1,jj) = r_arm_null_velocities(jj);
+
+
+//                // record the acceleration of the joints
+//                this->jointsAcceleration_ctrl.conservativeResize(this->jointsAcceleration_ctrl.rows()+1,JOINTS_ARM+JOINTS_HAND);
+//                for(size_t jj=0; jj < r_arm_accelerations_read.size(); ++jj)
+//                    this->jointsAcceleration_ctrl(this->jointsAcceleration_ctrl.rows()-1,jj) = r_arm_accelerations_read.at(jj);
+//                for(size_t jj=0; jj < r_hand_accelerations_read.size(); ++jj)
+//                    this->jointsAcceleration_ctrl(this->jointsAcceleration_ctrl.rows()-1,r_arm_accelerations_read.size()+jj) = r_hand_accelerations_read.at(jj);
+
+//                // operational space positions
+//                this->handPosition_ctrl.push_back(r_hand_lin_pos);
+//                this->handOrientation_ctrl.push_back(r_hand_ang_pos);
+//                this->wristPosition_ctrl.push_back(r_wrist_lin_pos);
+//                this->wristOrientation_ctrl.push_back(r_wrist_ang_pos);
+//                this->elbowPosition_ctrl.push_back(r_elbow_lin_pos);
+//                this->elbowOrientation_ctrl.push_back(r_elbow_ang_pos);
+//                this->shoulderPosition_ctrl.push_back(r_shoulder_lin_pos);
+//                this->shoulderOrientation_ctrl.push_back(r_shoulder_ang_pos);
+
+//                // operational space velocities
+//                this->handLinearVelocity_ctrl.push_back(r_hand_lin_vel);
+//                this->handAngularVelocity_ctrl.push_back(r_hand_ang_vel);
+//                this->wristLinearVelocity_ctrl.push_back(r_wrist_lin_vel);
+//                this->wristAngularVelocity_ctrl.push_back(r_wrist_ang_vel);
+//                this->elbowLinearVelocity_ctrl.push_back(r_elbow_lin_vel);
+//                this->elbowAngularVelocity_ctrl.push_back(r_elbow_ang_vel);
+//                this->shoulderLinearVelocity_ctrl.push_back(r_shoulder_lin_vel);
+//                this->shoulderAngularVelocity_ctrl.push_back(r_shoulder_ang_vel);
+//                this->handVelocityNorm_ctrl.push_back(sqrt(pow(r_hand_lin_vel.at(0),2)+pow(r_hand_lin_vel.at(1),2)+pow(r_hand_lin_vel.at(2),2)));
+
+//                // operational space accelerations
+//                this->handLinearAcceleration_ctrl.push_back(r_hand_lin_acc);
+//                this->handAngularAcceleration_ctrl.push_back(r_hand_ang_acc);
+//                this->wristLinearAcceleration_ctrl.push_back(r_wrist_lin_acc);
+//                this->wristAngularAcceleration_ctrl.push_back(r_wrist_ang_acc);
+//                this->elbowLinearAcceleration_ctrl.push_back(r_elbow_lin_acc);
+//                this->elbowAngularAcceleration_ctrl.push_back(r_elbow_ang_acc);
+//                this->shoulderLinearAcceleration_ctrl.push_back(r_shoulder_lin_acc);
+//                this->shoulderAngularAcceleration_ctrl.push_back(r_shoulder_ang_acc);
+//                this->handAccelerationNorm_ctrl.push_back(sqrt(pow(r_hand_lin_acc.at(0),2)+pow(r_hand_lin_acc.at(1),2)+pow(r_hand_lin_acc.at(2),2)));
+
+//                VectorXd error_pos_tot = h_hand_ref_pos - r_hand_pos_read_vec;
+//                this->error_pos_tot_norm.push_back(error_pos_tot.block<3,1>(0,0).norm());
+//                this->error_or_tot_norm.push_back(error_pos_tot.block<3,1>(3,0).norm());
+//                this->error_pos_or_tot_norm.push_back(error_pos_tot.norm());
+//                VectorXd error_vel_tot = h_hand_ref_vel - r_hand_vel_read_vec;
+//                this->error_lin_vel_tot_norm.push_back(error_vel_tot.block<3,1>(0,0).norm());
+//                this->error_ang_vel_tot_norm.push_back(error_vel_tot.block<3,1>(3,0).norm());
+//                this->error_vel_tot_norm.push_back(error_vel_tot.norm());
+//                VectorXd error_acc_tot = h_hand_ref_acc - r_hand_acc_read_vec;
+//                this->error_lin_acc_tot_norm.push_back(error_acc_tot.block<3,1>(0,0).norm());
+//                this->error_ang_acc_tot_norm.push_back(error_acc_tot.block<3,1>(3,0).norm());
+//                this->error_acc_tot_norm.push_back(error_acc_tot.norm());
+
+//                // time
+//                this->t_j_past = this->qnode.getSimTime();
+//                this->sim_time.push_back(this->qnode.getSimTime()-this->t_der_past);
+//            } // check simulation step
+//        } // if vel control
+//    }// while execcontrol
 //}
-
-void MainWindow::execVelControl()
-{
-    while(exec_control)
-    {
-
-        if(vel_control)
-        {
-            boost::unique_lock<boost::mutex> lck(hh_control_mtx);
-
-            double des_hand_acc_x,des_hand_acc_y,des_hand_acc_z,des_hand_acc_wx,des_hand_acc_wy,des_hand_acc_wz;
-            if (this->ui.checkBox_draw_ellipse->isChecked()){
-                des_hand_acc_x = 400*cos(0.2*this->qnode.getSimTime()-M_PI/2);
-                des_hand_acc_y = -600*sin(0.2*this->qnode.getSimTime()-M_PI/2);
-                des_hand_acc_z = 0.0;
-                des_hand_acc_wx = 0.0;
-                des_hand_acc_wy = 0.0;
-                des_hand_acc_wz = 0.0;
-            }else{
-                des_hand_acc_x = this->ui.lineEdit_des_right_hand_vel_x->text().toDouble();
-                des_hand_acc_y = this->ui.lineEdit_des_right_hand_vel_y->text().toDouble();
-                des_hand_acc_z = this->ui.lineEdit_des_right_hand_vel_z->text().toDouble();
-                des_hand_acc_wx = this->ui.lineEdit_des_right_hand_vel_wx->text().toDouble();
-                des_hand_acc_wy = this->ui.lineEdit_des_right_hand_vel_wy->text().toDouble();
-                des_hand_acc_wz = this->ui.lineEdit_des_right_hand_vel_wz->text().toDouble();
-            }
-            VectorXd h_hand_ref_acc(6);
-            h_hand_ref_acc(0) = des_hand_acc_x;
-            h_hand_ref_acc(1) = des_hand_acc_y;
-            h_hand_ref_acc(2) = des_hand_acc_z;
-            h_hand_ref_acc(3) = des_hand_acc_wx;
-            h_hand_ref_acc(4) = des_hand_acc_wy;
-            h_hand_ref_acc(5) = des_hand_acc_wz;
-
-            double vel_max = this->ui.lineEdit_vel_max->text().toDouble()*M_PI/180;
-
-            bool jlim_en = this->ui.checkBox_joints_limits_av->isChecked();
-            double jlim_th = 0; double jlim_rate = 1;
-            double jlim_coeff = 1; double jlim_damping = 0.001;
-            if(jlim_en){
-                jlim_th = this->ui.lineEdit_jlim_th->text().toDouble();
-                jlim_rate = this->ui.lineEdit_jlim_rate->text().toDouble();
-                jlim_coeff = this->ui.lineEdit_jlim_coeff->text().toDouble();
-                jlim_damping = this->ui.lineEdit_jlim_damping->text().toDouble();
-            }
-            bool sing_en = this->ui.checkBox_sing_av->isChecked();
-            double sing_coeff = 1; double sing_damping = 0.001;
-            if(sing_en){
-                sing_damping = this->ui.lineEdit_sing_damping->text().toDouble();
-                sing_coeff = this->ui.lineEdit_sing_coeff->text().toDouble();
-            }
-
-            double obst_coeff = 1; double obst_damping = 0.001;
-            double obst_coeff_torso = 1; double obst_damping_torso = 0.001;
-            bool obsts_en = this->ui.checkBox_obsts_av->isChecked();
-            vector<objectPtr> obsts; this->curr_scene->getObjects(obsts);
-            if(obsts_en){
-                obst_coeff = this->ui.lineEdit_obsts_coeff->text().toDouble();
-                obst_damping = this->ui.lineEdit_obsts_damping->text().toDouble();
-                obst_coeff_torso = this->ui.lineEdit_obsts_coeff_torso->text().toDouble();
-                obst_damping_torso = this->ui.lineEdit_obsts_damping_torso->text().toDouble();
-                if(this->ui.checkBox_obsts_noise->isChecked()){
-                    objectPtr obs_new;
-                    double obsts_x_var = 100; // mm
-                    double obsts_y_var = 100; // mm
-                    double obsts_z_var = 100; // mm
-                    double obsts_roll_var = 0.5; // rad
-                    double obsts_pitch_var = 0.5; // rad
-                    double obsts_yaw_var = 0.5; // rad
-                    for(size_t i=0; i<obsts.size(); ++i){
-                        std::srand(std::time(NULL));
-                        objectPtr obs = obsts.at(i);
-                        string obs_name = obs->getName();
-                        obs_new.reset(new Object(obs_name));
-                        motion_manager::pos obs_pos;
-                        motion_manager::orient obs_or;
-                        obs_pos.Xpos = obs->getPos().Xpos - (obsts_x_var/2) + obsts_x_var*(rand() / double(RAND_MAX));
-                        obs_pos.Ypos = obs->getPos().Ypos - (obsts_y_var/2) + obsts_y_var*(rand() / double(RAND_MAX));
-                        obs_pos.Zpos = obs->getPos().Zpos - (obsts_z_var/2) + obsts_z_var*(rand() / double(RAND_MAX));
-                        obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
-                        obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
-                        obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
-                        if(this->ui.checkBox_obsts_noise->isChecked()){
-                            obs_pos.Xpos = this->lpf_obsts_pos_x->update(obs_pos.Xpos);
-                            obs_pos.Ypos = this->lpf_obsts_pos_y->update(obs_pos.Ypos);
-                            obs_pos.Zpos = this->lpf_obsts_pos_z->update(obs_pos.Zpos);
-                            obs_or.roll = DEGTORAD*this->lpf_obsts_or_roll->update(RADTODEG*obs_or.roll);
-                            obs_or.pitch = DEGTORAD*this->lpf_obsts_or_pitch->update(RADTODEG*obs_or.pitch);
-                            obs_or.yaw = DEGTORAD*this->lpf_obsts_or_yaw->update(RADTODEG*obs_or.yaw);
-                        }
-                        obs_new->setPos(obs_pos,false);
-                        obs_new->setOr(obs_or,false);
-                        obs_new->setSize(obs->getSize());
-                        this->curr_scene->setObject(i,obs_new);
-                    }// for loop obstacles
-                }// noise on obstacles
-            }//obstacle avoidance enable
-
-            VectorXd hand_acc(6);
-            hand_acc << des_hand_acc_x,des_hand_acc_y,des_hand_acc_z,
-                        des_hand_acc_wx,des_hand_acc_wy,des_hand_acc_wz;
-
-            if(!this->ui.checkBox_des_right_hand_vel_x->isChecked()){
-                hand_acc(0) = 0.0;
-            }
-            if(!this->ui.checkBox_des_right_hand_vel_y->isChecked()){
-                hand_acc(1) = 0.0;
-            }
-            if(!this->ui.checkBox_des_right_hand_vel_z->isChecked()){
-                hand_acc(2) = 0.0;
-            }
-            if(!this->ui.checkBox_des_right_hand_vel_wx->isChecked()){
-                hand_acc(3) = 0.0;
-            }
-            if(!this->ui.checkBox_des_right_hand_vel_wy->isChecked()){
-                hand_acc(4) = 0.0;
-            }
-            if(!this->ui.checkBox_des_right_hand_vel_wz->isChecked()){
-                hand_acc(5) = 0.0;
-            }
-
-            // ---------------- start the simulation --------------------------- //
-            if(!this->qnode.isSimulationRunning())
-            {
-                // enable set joints subscriber
-                this->qnode.enableSetJoints();
-
-                // start the simulation
-                this->qnode.startSim();
-            }
-            ros::spinOnce(); // handle ROS messages
-            double time_step = this->qnode.getSimTimeStep(); // sec
-
-            if(this->qnode.isSimulationRunning() && ((this->qnode.getSimTime()-this->t_j_past)>time_step))
-            {
-                // posture
-                vector<double> r_arm_posture_mes(JOINTS_ARM,0.0); vector<double> r_hand_posture_mes(JOINTS_HAND,0.0);
-                vector<double> r_arm_posture(JOINTS_ARM,0.0); vector<double> r_hand_posture(JOINTS_HAND,0.0);
-                // velocities
-                vector<double> r_arm_velocities(JOINTS_ARM,0.0); vector<double> r_hand_velocities(JOINTS_HAND,0.0);
-                vector<double> r_arm_velocities_read(JOINTS_ARM,0.0); vector<double> r_hand_velocities_read(JOINTS_HAND,0.0);
-                // accelerations
-                //vector<double> r_arm_accelerations(JOINTS_ARM,0.0);
-                vector<double> r_arm_accelerations_read(JOINTS_ARM,0.0); vector<double> r_hand_accelerations_read(JOINTS_HAND,0.0);
-                vector<double> r_hand_acc_read(6,0.0);
-                vector<double> r_wrist_acc_read(6,0.0);
-                vector<double> r_elbow_acc_read(6,0.0);
-                vector<double> r_shoulder_acc_read(6,0.0);
-
-
-                this->curr_scene->getHumanoid()->getRightArmPosture(r_arm_posture_mes);
-                this->curr_scene->getHumanoid()->getRightHandPosture(r_hand_posture_mes);
-                // filtering the joint positions
-                r_arm_posture.at(0) = this->lpf_joint_pos_1->update(r_arm_posture_mes.at(0));
-                r_arm_posture.at(1) = this->lpf_joint_pos_2->update(r_arm_posture_mes.at(1));
-                r_arm_posture.at(2) = this->lpf_joint_pos_3->update(r_arm_posture_mes.at(2));
-                r_arm_posture.at(3) = this->lpf_joint_pos_4->update(r_arm_posture_mes.at(3));
-                r_arm_posture.at(4) = this->lpf_joint_pos_5->update(r_arm_posture_mes.at(4));
-                r_arm_posture.at(5) = this->lpf_joint_pos_6->update(r_arm_posture_mes.at(5));
-                r_arm_posture.at(6) = this->lpf_joint_pos_7->update(r_arm_posture_mes.at(6));
-                r_hand_posture.at(0) = this->lpf_joint_pos_8->update(r_hand_posture_mes.at(0));
-                r_hand_posture.at(1) = this->lpf_joint_pos_9->update(r_hand_posture_mes.at(1));
-                r_hand_posture.at(2) = this->lpf_joint_pos_10->update(r_hand_posture_mes.at(2));
-                r_hand_posture.at(3) = this->lpf_joint_pos_11->update(r_hand_posture_mes.at(3));
-
-                vector<double> r_hand_pos; vector<double> r_wrist_pos; vector<double> r_elbow_pos; vector<double> r_shoulder_pos;
-                this->curr_scene->getHumanoid()->getAllPos(1,r_hand_pos,r_wrist_pos,r_elbow_pos,r_shoulder_pos,r_arm_posture);
-                vector<double> r_hand_pos_q; vector<double> r_wrist_pos_q; vector<double> r_elbow_pos_q; vector<double> r_shoulder_pos_q;
-                this->curr_scene->getHumanoid()->getAllPos_q(1,r_hand_pos_q,r_wrist_pos_q,r_elbow_pos_q,r_shoulder_pos_q,r_arm_posture);
-
-                vector<double> r_hand_lin_pos(r_hand_pos.begin(), r_hand_pos.begin()+3);
-                vector<double> r_hand_ang_pos(r_hand_pos.begin()+3, r_hand_pos.begin()+6);
-                vector<double> r_hand_q(r_hand_pos_q.begin()+3, r_hand_pos_q.begin()+7);
-                vector<double> r_wrist_lin_pos(r_wrist_pos.begin(), r_wrist_pos.begin()+3);
-                vector<double> r_wrist_ang_pos(r_wrist_pos.begin()+3, r_wrist_pos.begin()+6);
-                vector<double> r_elbow_lin_pos(r_elbow_pos.begin(), r_elbow_pos.begin()+3);
-                vector<double> r_elbow_ang_pos(r_elbow_pos.begin()+3, r_elbow_pos.begin()+6);
-                vector<double> r_shoulder_lin_pos(r_shoulder_pos.begin(), r_shoulder_pos.begin()+3);
-                vector<double> r_shoulder_ang_pos(r_shoulder_pos.begin()+3, r_shoulder_pos.begin()+6);
-
-                // get the joint velocities
-                this->arm_pos_buff->push(r_arm_posture);
-                this->hand_pos_buff->push(r_hand_posture);
-                if(this->samples_pos==this->N_filter_length-1 && this->arm_pos_buff->full() && this->hand_pos_buff->full()){
-                    for(size_t i=0; i< r_arm_posture.size();++i)
-                    {
-                        r_arm_velocities_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_pos_buff->at(i));
-                    }
-                    for(size_t i=0; i< r_hand_velocities_read.size();++i)
-                    {
-                        r_hand_velocities_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_pos_buff->at(i));
-                    }
-                }else{this->samples_pos++;}
-
-                vector<double> r_hand_vel; vector<double> r_wrist_vel; vector<double> r_elbow_vel; vector<double> r_shoulder_vel;
-                this->curr_scene->getHumanoid()->getAllVel(1,r_hand_vel,r_wrist_vel,r_elbow_vel,r_shoulder_vel,r_arm_posture,r_arm_velocities_read);
-
-                vector<double> r_hand_lin_vel(r_hand_vel.begin(), r_hand_vel.begin()+3);
-                vector<double> r_hand_ang_vel(r_hand_vel.begin()+3, r_hand_vel.begin()+6);
-                vector<double> r_wrist_lin_vel(r_wrist_vel.begin(), r_wrist_vel.begin()+3);
-                vector<double> r_wrist_ang_vel(r_wrist_vel.begin()+3, r_wrist_vel.begin()+6);
-                vector<double> r_elbow_lin_vel(r_elbow_vel.begin(), r_elbow_vel.begin()+3);
-                vector<double> r_elbow_ang_vel(r_elbow_vel.begin()+3, r_elbow_vel.begin()+6);
-                vector<double> r_shoulder_lin_vel(r_shoulder_vel.begin(), r_shoulder_vel.begin()+3);
-                vector<double> r_shoulder_ang_vel(r_shoulder_vel.begin()+3, r_shoulder_vel.begin()+6);
-
-                // get the joint accelerations
-                this->arm_vel_buff->push(r_arm_velocities_read);
-                this->hand_vel_buff->push(r_hand_velocities_read);
-                if(this->samples_vel==this->N_filter_length-1 && this->arm_vel_buff->full() && this->hand_vel_buff->full()){
-                    for(size_t i=0; i< r_arm_velocities_read.size();++i)
-                    {
-                        r_arm_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_vel_buff->at(i));
-                    }
-                    for(size_t i=0; i< r_hand_velocities_read.size();++i)
-                    {
-                        r_hand_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_vel_buff->at(i));
-                    }
-                }else{this->samples_vel++;}
-
-                // get the joint accelerations
-                this->arm_vel_buff->push(r_arm_velocities_read);
-                this->hand_vel_buff->push(r_hand_velocities_read);
-                if(this->samples_vel==this->N_filter_length-1 && this->arm_vel_buff->full() && this->hand_vel_buff->full()){
-                    for(size_t i=0; i< r_arm_velocities_read.size();++i)
-                    {
-                        r_arm_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->arm_vel_buff->at(i));
-                    }
-                    for(size_t i=0; i< r_hand_velocities_read.size();++i)
-                    {
-                        r_hand_accelerations_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->hand_vel_buff->at(i));
-                    }
-                }else{this->samples_vel++;}
-
-
-                // get the hand acceleration
-                this->r_hand_vel_buff->push(r_hand_vel);
-                if(this->samples_h_vel==this->N_filter_length-1 && this->r_hand_vel_buff->full()){
-                    for(size_t i=0; i< r_hand_vel.size();++i)
-                    {
-                        r_hand_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_hand_vel_buff->at(i));
-                    }
-                }else{this->samples_h_vel++;}
-
-
-                // get the wrist acceleration
-                this->r_wrist_vel_buff->push(r_wrist_vel);
-                if(this->samples_w_vel==this->N_filter_length-1 && this->r_wrist_vel_buff->full()){
-                    for(size_t i=0; i< r_wrist_vel.size();++i)
-                    {
-                        r_wrist_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_wrist_vel_buff->at(i));
-                    }
-                }else{this->samples_w_vel++;}
-
-                // get the elbow acceleration
-                this->r_elbow_vel_buff->push(r_elbow_vel);
-                if(this->samples_e_vel==this->N_filter_length-1 && this->r_elbow_vel_buff->full()){
-                    for(size_t i=0; i< r_elbow_vel.size();++i)
-                    {
-                        r_elbow_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_elbow_vel_buff->at(i));
-                    }
-                }else{this->samples_e_vel++;}
-
-                // get the shoulder acceleration
-                this->r_shoulder_vel_buff->push(r_shoulder_vel);
-                if(this->samples_s_vel==this->N_filter_length-1 && this->r_shoulder_vel_buff->full()){
-                    for(size_t i=0; i< r_shoulder_vel.size();++i)
-                    {
-                        r_shoulder_acc_read.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->r_shoulder_vel_buff->at(i));
-                    }
-                }else{
-                    this->samples_s_vel++;
-                    //this->t_der_past = this->qnode.getSimTime();
-                }
-
-                VectorXd r_arm_accelerations_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_arm_accelerations_read.data(), r_arm_accelerations_read.size());
-                VectorXd r_hand_acc_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_hand_acc_read.data(), r_hand_acc_read.size());
-                // Jacobian
-                this->curr_scene->getHumanoid()->getJacobian(1,r_arm_posture,this->Jacobian);
-                this->hand_j_acc = r_hand_acc_read_vec - this->Jacobian*r_arm_accelerations_read_vec;
-
-                vector<double> r_hand_lin_acc(r_hand_acc_read.begin(), r_hand_acc_read.begin()+3);
-                vector<double> r_hand_ang_acc(r_hand_acc_read.begin()+3, r_hand_acc_read.begin()+6);
-                vector<double> r_wrist_lin_acc(r_wrist_acc_read.begin(), r_wrist_acc_read.begin()+3);
-                vector<double> r_wrist_ang_acc(r_wrist_acc_read.begin()+3, r_wrist_acc_read.begin()+6);
-                vector<double> r_elbow_lin_acc(r_elbow_acc_read.begin(), r_elbow_acc_read.begin()+3);
-                vector<double> r_elbow_ang_acc(r_elbow_acc_read.begin()+3, r_elbow_acc_read.begin()+6);
-                vector<double> r_shoulder_lin_acc(r_shoulder_acc_read.begin(), r_shoulder_acc_read.begin()+3);
-                vector<double> r_shoulder_ang_acc(r_shoulder_acc_read.begin()+3, r_shoulder_acc_read.begin()+6);
-
-                VectorXd hand_acc_xd_vec = h_hand_ref_acc - this->hand_j_acc;
-                vector<double> hand_acc_vec; hand_acc_vec.resize(hand_acc_xd_vec.size());
-                VectorXd::Map(&hand_acc_vec[0], hand_acc_xd_vec.size()) = hand_acc_xd_vec;
-
-                this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,r_arm_velocities,time_step,jlim_en,sing_en,obsts_en,
-                                                                                vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,obst_coeff_torso,obst_damping_torso,
-                                                                                 jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts);
-
-                // execute the control
-                bool joints_arm_vel_ctrl = this->ui.checkBox_joints_velocity_ctrl->isChecked();
-                this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities,joints_arm_vel_ctrl);
-
-                // ------------- Recording ------------------------------- //
-
-                // record the positions of the joints
-                this->jointsPosition_ctrl.conservativeResize(this->jointsPosition_ctrl.rows()+1,JOINTS_ARM+JOINTS_HAND);
-                for(size_t jj=0; jj < r_arm_posture_mes.size(); ++jj)
-                    this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,jj) = r_arm_posture_mes.at(jj);
-                for(size_t jj=0; jj < r_hand_posture_mes.size(); ++jj)
-                    this->jointsPosition_ctrl(this->jointsPosition_ctrl.rows()-1,r_arm_posture_mes.size()+jj) = r_hand_posture_mes.at(jj);
-
-                // record the velocities of the joints
-                this->jointsVelocity_ctrl.conservativeResize(this->jointsVelocity_ctrl.rows()+1,JOINTS_ARM+JOINTS_HAND);
-                for(size_t jj=0; jj < r_arm_velocities_read.size(); ++jj)
-                    this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,jj) = r_arm_velocities_read.at(jj);
-                for(size_t jj=0; jj < r_hand_velocities_read.size(); ++jj)
-                    this->jointsVelocity_ctrl(this->jointsVelocity_ctrl.rows()-1,r_arm_velocities_read.size()+jj) = r_hand_velocities_read.at(jj);
-
-
-                // record the acceleration of the joints
-                this->jointsAcceleration_ctrl.conservativeResize(this->jointsAcceleration_ctrl.rows()+1,JOINTS_ARM+JOINTS_HAND);
-                for(size_t jj=0; jj < r_arm_accelerations_read.size(); ++jj)
-                    this->jointsAcceleration_ctrl(this->jointsAcceleration_ctrl.rows()-1,jj) = r_arm_accelerations_read.at(jj);
-                for(size_t jj=0; jj < r_hand_accelerations_read.size(); ++jj)
-                    this->jointsAcceleration_ctrl(this->jointsAcceleration_ctrl.rows()-1,r_arm_accelerations_read.size()+jj) = r_hand_accelerations_read.at(jj);
-
-                // operational space positions
-                this->handPosition_ctrl.push_back(r_hand_lin_pos);
-                this->handOrientation_ctrl.push_back(r_hand_ang_pos);
-                this->wristPosition_ctrl.push_back(r_wrist_lin_pos);
-                this->wristOrientation_ctrl.push_back(r_wrist_ang_pos);
-                this->elbowPosition_ctrl.push_back(r_elbow_lin_pos);
-                this->elbowOrientation_ctrl.push_back(r_elbow_ang_pos);
-                this->shoulderPosition_ctrl.push_back(r_shoulder_lin_pos);
-                this->shoulderOrientation_ctrl.push_back(r_shoulder_ang_pos);
-
-                // operational space velocities
-                this->handLinearVelocity_ctrl.push_back(r_hand_lin_vel);
-                this->handAngularVelocity_ctrl.push_back(r_hand_ang_vel);
-                this->wristLinearVelocity_ctrl.push_back(r_wrist_lin_vel);
-                this->wristAngularVelocity_ctrl.push_back(r_wrist_ang_vel);
-                this->elbowLinearVelocity_ctrl.push_back(r_elbow_lin_vel);
-                this->elbowAngularVelocity_ctrl.push_back(r_elbow_ang_vel);
-                this->shoulderLinearVelocity_ctrl.push_back(r_shoulder_lin_vel);
-                this->shoulderAngularVelocity_ctrl.push_back(r_shoulder_ang_vel);
-                this->handVelocityNorm_ctrl.push_back(sqrt(pow(r_hand_lin_vel.at(0),2)+pow(r_hand_lin_vel.at(1),2)+pow(r_hand_lin_vel.at(2),2)));
-
-                // operational space accelerations
-                this->handLinearAcceleration_ctrl.push_back(r_hand_lin_acc);
-                this->handAngularAcceleration_ctrl.push_back(r_hand_ang_acc);
-                this->wristLinearAcceleration_ctrl.push_back(r_wrist_lin_acc);
-                this->wristAngularAcceleration_ctrl.push_back(r_wrist_ang_acc);
-                this->elbowLinearAcceleration_ctrl.push_back(r_elbow_lin_acc);
-                this->elbowAngularAcceleration_ctrl.push_back(r_elbow_ang_acc);
-                this->shoulderLinearAcceleration_ctrl.push_back(r_shoulder_lin_acc);
-                this->shoulderAngularAcceleration_ctrl.push_back(r_shoulder_ang_acc);
-                this->handAccelerationNorm_ctrl.push_back(sqrt(pow(r_hand_lin_acc.at(0),2)+pow(r_hand_lin_acc.at(1),2)+pow(r_hand_lin_acc.at(2),2)));
-
-                // time
-                this->t_j_past = this->qnode.getSimTime();
-                this->sim_time.push_back(this->qnode.getSimTime());
-            } // chekc simulation step
-        } // if vel control
-    }// while execcontrol
-}
 
 
 /*****************************************************************************
@@ -12995,7 +13192,9 @@ void MainWindow::clear_control_variables()
     this->handAccelerationNorm_ctrl.clear();
     this->jointsPosition_ctrl.resize(0,0);
     this->jointsVelocity_ctrl.resize(0,0);
+    this->jointsVelocity_null_ctrl.resize(0,0);
     this->jointsAcceleration_ctrl.resize(0,0);
+    this->r_hand_init_pos.clear();
     this->sim_time.clear();
     this->error_pos_tot_norm.clear();
     this->error_or_tot_norm.clear();
@@ -13589,7 +13788,7 @@ void MainWindow::on_pushButton_control_plot_joints_clicked()
         vector<double> min_limits;
         this->curr_scene->getHumanoid()->getRightMaxLimits(max_limits);
         this->curr_scene->getHumanoid()->getRightMinLimits(min_limits);
-        this->mResultsCtrlJointsdlg->setupPlots(this->jointsPosition_ctrl,this->jointsVelocity_ctrl,this->jointsAcceleration_ctrl,max_limits,min_limits,this->sim_time);
+        this->mResultsCtrlJointsdlg->setupPlots(this->jointsPosition_ctrl,this->jointsVelocity_ctrl,this->jointsAcceleration_ctrl,this->jointsVelocity_null_ctrl,max_limits,min_limits,this->sim_time);
     }
     this->mResultsCtrlJointsdlg->show();
 }

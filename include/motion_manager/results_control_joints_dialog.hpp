@@ -13,6 +13,7 @@
 #include <eigen3/Eigen/Dense>
 #include <LowPassFilter.hpp>
 #include "config.hpp"
+#include "results_control_null_joints_dialog.hpp"
 
 namespace motion_manager{
 
@@ -52,11 +53,12 @@ public:
      * @param positions
      * @param velocities
      * @param accelerations
+     * @param null_velocities
      * @param max_limits
      * @param min_limits
      * @param time
      */
-    void setupPlots(MatrixXd &positions, MatrixXd &velocities, MatrixXd &accelerations, vector<double> &max_limits, vector<double> &min_limits, vector<double> &time);
+    void setupPlots(MatrixXd &positions, MatrixXd &velocities, MatrixXd &accelerations, MatrixXd &null_velocities, vector<double> &max_limits, vector<double> &min_limits, vector<double> &time);
 
 
 public Q_SLOTS:
@@ -67,11 +69,18 @@ public Q_SLOTS:
      */
     void check_jlim(int state);
 
+    /**
+     * @brief on_pushButton_null_space_vel_clicked
+     */
+    void on_pushButton_null_space_vel_clicked();
+
 private:
     Ui::ResultsCtrlJointsDialog *ui; /**< handle of the user interface */
+    ResultsCtrlNullJointsDialog *mResultsNullJointsdlg; /**< handle of the dialog to show the null space components of the joints velocities */
 
     MatrixXd positions; /**< positions of the joints */
     MatrixXd velocities; /**< velocities of the joints */
+    MatrixXd null_space_velocities; /**< null space velocities of the joints */
     MatrixXd accelerations; /**< accelerations of the joints */
     vector<double> max_pos_limits; /**< maximum limits of the joints */
     vector<double> min_pos_limits; /**< minimum limits of the joints */

@@ -9,6 +9,10 @@ ResultsCtrlJointsDialog::ResultsCtrlJointsDialog(QWidget *parent) :
     ui->setupUi(this);
     QObject::connect(this->ui->checkBox_jlim, SIGNAL(stateChanged(int)), this, SLOT(check_jlim(int)));
 
+    // create a Results null space velocities dialog
+    mResultsNullJointsdlg = new ResultsCtrlNullJointsDialog(this);
+    mResultsNullJointsdlg->setModal(false);
+
 }
 
 ResultsCtrlJointsDialog::~ResultsCtrlJointsDialog()
@@ -17,11 +21,12 @@ ResultsCtrlJointsDialog::~ResultsCtrlJointsDialog()
 }
 
 
-void ResultsCtrlJointsDialog::setupPlots(MatrixXd &positions, MatrixXd &velocities, MatrixXd &accelerations, vector<double> &max_limits, vector<double> &min_limits, vector<double> &time)
+void ResultsCtrlJointsDialog::setupPlots(MatrixXd &positions, MatrixXd &velocities, MatrixXd &accelerations, MatrixXd &null_velocities, vector<double> &max_limits, vector<double> &min_limits, vector<double> &time)
 {
     this->positions = positions.replicate(1,1);
     this->velocities = velocities.replicate(1,1);
     this->accelerations = accelerations.replicate(1,1);
+    this->null_space_velocities = null_velocities.replicate(1,1);
     this->max_pos_limits = max_limits;
     this->min_pos_limits = min_limits;
     this->time = time;
@@ -366,6 +371,12 @@ void ResultsCtrlJointsDialog::on_pushButton_save_joints_plots_clicked()
 void ResultsCtrlJointsDialog::check_jlim(int state)
 {
 
+}
+
+void ResultsCtrlJointsDialog::on_pushButton_null_space_vel_clicked()
+{
+    this->mResultsNullJointsdlg->setupPlots(this->null_space_velocities,this->time);
+    this->mResultsNullJointsdlg->show();
 }
 
 

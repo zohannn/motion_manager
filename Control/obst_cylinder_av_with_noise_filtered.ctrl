@@ -17,20 +17,68 @@ Sing_damping=0.01
 
 # Obstacle avoidance parameters #
 Obsts_av=true
-Obsts_coeff=4
+Obsts_coeff=2
 Obsts_damping=1
+
+Obsts_coeff_torso=0.2
+Obsts_damping_torso=0.01
 Obsts_noise=true
 Obsts_filter_noise=true
-Obsts_f_cut_off=1
-
+Obsts_f_cut_off=0.1
 Obsts_f_timestep=0.05
 
+use_plan_hand_pos=false
+use_vel_control=true
 # Human-likeness addition parameters #
 Hl_add=false
-Hl_add_coeff=0.2
-
-Hl_add_damping=0.01
-
+Hl_add_p_pos_coeff_plan=0.001
+Hl_add_p_or_coeff_plan=15
+Hl_add_p_pos_coeff_app=0.001
+Hl_add_p_or_coeff_app=15
+Hl_add_p_pos_coeff_ret=0.001
+Hl_add_p_or_coeff_ret=15
+Hl_add_d_pos_coeff_plan=0.001
+Hl_add_d_or_coeff_plan=15
+Hl_add_d_pos_coeff_app=0.001
+Hl_add_d_or_coeff_app=15
+Hl_add_d_pos_coeff_ret=0.001
+Hl_add_d_or_coeff_ret=15
+Hl_add_g_th_pa=0.95
+Hl_add_g_th_rp=0.95
+Hl_fing_p_coeff=0.2
+Hl_fing_d_coeff=0.2
+# Control coefficients and error threshold #
+Pos_p_control_coeff=0.05
+Pos_p_error_th=5.0
+Or_p_control_coeff=1
+Or_p_error_th=0.01
+Pos_d_control_coeff=0.05
+Pos_d_error_th=5.0
+Or_d_control_coeff=1
+Or_d_error_th=0.01
+t_f_trap=10.0
+joints_vel_control=false
+# Noise filtering #
+N_5=false
+N_7=false
+N_9=false
+N_11=true
+N_19=false
+N_25=false
+N_35=false
+N_45=false
+freq_cutoff_joint_pos=1000
+timestep_joint_pos=0.05
+Tar_noise=false
+Tar_filter_noise=false
+Tar_f_cut_off=0.1
+Tar_f_timestep=0.05
+follow_target=false
 # Maximum allowed velocity of the joints #
 vel_max=50.0
 
+# Replanning #
+Tar_pos_th=200
+Tar_or_th=0.1
+g_map_th_max=0.95
+g_map_th_min=0.2

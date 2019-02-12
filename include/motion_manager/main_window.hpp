@@ -1377,6 +1377,7 @@ private:
         void execPosControl();
         boost::thread execVelControl_thrd;
         void execVelControl();
+        vector<double> r_hand_init_pos; /**< initial position of the right hand during velocity control */
         // derivation parameters
         int samples_des_hand_pose; /**< counter to count 5 points for derivation of desired hand position */
         int samples_des_hand_vel; /**< counter to count 5 points for derivation of desired hand velocity */
@@ -1404,6 +1405,7 @@ private:
         MatrixXd jointsPosition_ctrl; /**< trajectory of the joint position during control */
         MatrixXd jointsVelocity_ctrl; /**< trajectory of the joint velocity during control */
         MatrixXd jointsAcceleration_ctrl; /**< trajectory of the joint acceleration during control */
+        MatrixXd jointsVelocity_null_ctrl; /**< trajectory of the null space joint velocity during control */
         boost::shared_ptr<HandPosPlot> handPosPlot_ctrl_ptr; /**< pointer to the hand position plot during control */
         // hand
         vector<vector<double>> des_handPosition; /**< vector of desired hand positions during control*/

@@ -4655,8 +4655,8 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
 
 }
 
-void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double> &velocities, bool jlim_en, bool sing_en, bool obsts_en,
-                                              double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping,
+void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, vector<double> hand_vel, vector<double> &velocities, VectorXd& null_velocities, bool jlim_en, bool sing_en, bool obsts_en,
+                                              double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping,double obst_coeff_torso, double obst_damping_torso,
                                               double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts)
 {
     Matrix4d T;
@@ -4825,6 +4825,7 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         double fd = jlim_coeff * (1 - exp(-jlim_damping*(J_jlim.norm())));
 
         joint_velocities +=  k_jlim*fd*J_jlim;
+        null_velocities += k_jlim*fd*J_jlim;
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------JOINTS LIMITS---------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_jlim = " << k_jlim;
@@ -4925,6 +4926,7 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         double fd = sing_coeff * (1 - exp(-sing_damping*(J_sing.norm())));
 
         joint_velocities +=  (k_sing*fd*J_sing);
+        null_velocities += (k_sing*fd*J_sing);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------SINGULARITIES AVOIDANCE-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_sing = " << k_sing;
@@ -5081,14 +5083,14 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
             obst_or.at(1) = obst->getOr().pitch;
             obst_or.at(2) = obst->getOr().yaw;
 
-            BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLE-------------- # ";
-            BOOST_LOG_SEV(lg, info) << "name = " << obst->getName();
-            BOOST_LOG_SEV(lg, info) << "obst pos x = " << obst_pos.at(0);
-            BOOST_LOG_SEV(lg, info) << "obst pos y = " << obst_pos.at(1);
-            BOOST_LOG_SEV(lg, info) << "obst pos z = " << obst_pos.at(2);
-            BOOST_LOG_SEV(lg, info) << "obst or roll = " << obst_or.at(0);
-            BOOST_LOG_SEV(lg, info) << "obst or pitch = " << obst_or.at(1);
-            BOOST_LOG_SEV(lg, info) << "obst or yaw = " << obst_or.at(2);
+//            BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLE-------------- # ";
+//            BOOST_LOG_SEV(lg, info) << "name = " << obst->getName();
+//            BOOST_LOG_SEV(lg, info) << "obst pos x = " << obst_pos.at(0);
+//            BOOST_LOG_SEV(lg, info) << "obst pos y = " << obst_pos.at(1);
+//            BOOST_LOG_SEV(lg, info) << "obst pos z = " << obst_pos.at(2);
+//            BOOST_LOG_SEV(lg, info) << "obst or roll = " << obst_or.at(0);
+//            BOOST_LOG_SEV(lg, info) << "obst or pitch = " << obst_or.at(1);
+//            BOOST_LOG_SEV(lg, info) << "obst or yaw = " << obst_or.at(2);
 
             Matrix3d Rot_obst; this->Rot_matrix(Rot_obst,obst_or);
             Matrix3d Rot_obst_t = Rot_obst.transpose();
@@ -5123,17 +5125,17 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
                 e_dist_arm_torso_delta.at(i) = 1/(dist_arm_torso_delta.at(i)+k_off);
             }
 
-            BOOST_LOG_SEV(lg, info) << "# --------------DISTANCES-------------- # ";
-            BOOST_LOG_SEV(lg, info) << "dist_arm 0 = " << dist_arm.at(0);
-            BOOST_LOG_SEV(lg, info) << "dist_arm 1 = " << dist_arm.at(1);
-            BOOST_LOG_SEV(lg, info) << "dist_arm 2 = " << dist_arm.at(2);
-            BOOST_LOG_SEV(lg, info) << "dist_arm 3 = " << dist_arm.at(3);
-            BOOST_LOG_SEV(lg, info) << "dist_arm 4 = " << dist_arm.at(4);
-            BOOST_LOG_SEV(lg, info) << "dist_arm_delta 0 = " << dist_arm_delta.at(0);
-            BOOST_LOG_SEV(lg, info) << "dist_arm_delta 1 = " << dist_arm_delta.at(1);
-            BOOST_LOG_SEV(lg, info) << "dist_arm_delta 2 = " << dist_arm_delta.at(2);
-            BOOST_LOG_SEV(lg, info) << "dist_arm_delta 3 = " << dist_arm_delta.at(3);
-            BOOST_LOG_SEV(lg, info) << "dist_arm_delta 4 = " << dist_arm_delta.at(4);
+//            BOOST_LOG_SEV(lg, info) << "# --------------DISTANCES-------------- # ";
+//            BOOST_LOG_SEV(lg, info) << "dist_arm 0 = " << dist_arm.at(0);
+//            BOOST_LOG_SEV(lg, info) << "dist_arm 1 = " << dist_arm.at(1);
+//            BOOST_LOG_SEV(lg, info) << "dist_arm 2 = " << dist_arm.at(2);
+//            BOOST_LOG_SEV(lg, info) << "dist_arm 3 = " << dist_arm.at(3);
+//            BOOST_LOG_SEV(lg, info) << "dist_arm 4 = " << dist_arm.at(4);
+//            BOOST_LOG_SEV(lg, info) << "dist_arm_delta 0 = " << dist_arm_delta.at(0);
+//            BOOST_LOG_SEV(lg, info) << "dist_arm_delta 1 = " << dist_arm_delta.at(1);
+//            BOOST_LOG_SEV(lg, info) << "dist_arm_delta 2 = " << dist_arm_delta.at(2);
+//            BOOST_LOG_SEV(lg, info) << "dist_arm_delta 3 = " << dist_arm_delta.at(3);
+//            BOOST_LOG_SEV(lg, info) << "dist_arm_delta 4 = " << dist_arm_delta.at(4);
 
             for(size_t i=0;i<e_arm.size();++i){
                 e_arm.at(i) += e_dist_arm.at(i);
@@ -5143,17 +5145,17 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
             }
         } //for loop obstacles
 
-        BOOST_LOG_SEV(lg, info) << "# --------------E FUNCTIONS-------------- # ";
-        BOOST_LOG_SEV(lg, info) << "e_arm 0 = " << e_arm.at(0);
-        BOOST_LOG_SEV(lg, info) << "e_arm 1 = " << e_arm.at(1);
-        BOOST_LOG_SEV(lg, info) << "e_arm 2 = " << e_arm.at(2);
-        BOOST_LOG_SEV(lg, info) << "e_arm 3 = " << e_arm.at(3);
-        BOOST_LOG_SEV(lg, info) << "e_arm 4 = " << e_arm.at(4);
-        BOOST_LOG_SEV(lg, info) << "e_arm_delta 0 = " << e_arm_delta.at(0);
-        BOOST_LOG_SEV(lg, info) << "e_arm_delta 1 = " << e_arm_delta.at(1);
-        BOOST_LOG_SEV(lg, info) << "e_arm_delta 2 = " << e_arm_delta.at(2);
-        BOOST_LOG_SEV(lg, info) << "e_arm_delta 3 = " << e_arm_delta.at(3);
-        BOOST_LOG_SEV(lg, info) << "e_arm_delta 4 = " << e_arm_delta.at(4);
+//        BOOST_LOG_SEV(lg, info) << "# --------------E FUNCTIONS-------------- # ";
+//        BOOST_LOG_SEV(lg, info) << "e_arm 0 = " << e_arm.at(0);
+//        BOOST_LOG_SEV(lg, info) << "e_arm 1 = " << e_arm.at(1);
+//        BOOST_LOG_SEV(lg, info) << "e_arm 2 = " << e_arm.at(2);
+//        BOOST_LOG_SEV(lg, info) << "e_arm 3 = " << e_arm.at(3);
+//        BOOST_LOG_SEV(lg, info) << "e_arm 4 = " << e_arm.at(4);
+//        BOOST_LOG_SEV(lg, info) << "e_arm_delta 0 = " << e_arm_delta.at(0);
+//        BOOST_LOG_SEV(lg, info) << "e_arm_delta 1 = " << e_arm_delta.at(1);
+//        BOOST_LOG_SEV(lg, info) << "e_arm_delta 2 = " << e_arm_delta.at(2);
+//        BOOST_LOG_SEV(lg, info) << "e_arm_delta 3 = " << e_arm_delta.at(3);
+//        BOOST_LOG_SEV(lg, info) << "e_arm_delta 4 = " << e_arm_delta.at(4);
 
         MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
         MatrixXd Jpp = J_plus*JacobianArm;
@@ -5171,8 +5173,9 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         if(J_torso_SE.norm() > null_th){
             k_torso_SE = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_SE.norm())));
         }
-        double fd_torso_SE = obst_coeff * (1 - exp(-obst_damping*(J_torso_SE.norm())));
+        double fd_torso_SE = obst_coeff_torso * (1 - exp(-obst_damping_torso*(J_torso_SE.norm())));
         joint_velocities +=  (k_torso_SE*fd_torso_SE*J_torso_SE);
+        null_velocities += (k_torso_SE*fd_torso_SE*J_torso_SE);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------TORSO AVOIDANCE SE-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_torso_SE = " << k_torso_SE;
@@ -5195,8 +5198,9 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         if(J_torso_E.norm() > null_th){
             k_torso_E = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_E.norm())));
         }
-        double fd_torso_E = obst_coeff * (1 - exp(-obst_damping*(J_torso_E.norm())));
+        double fd_torso_E = obst_coeff_torso * (1 - exp(-obst_damping_torso*(J_torso_E.norm())));
         joint_velocities +=  (k_torso_E*fd_torso_E*J_torso_E);
+        null_velocities += (k_torso_E*fd_torso_E*J_torso_E);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------TORSO AVOIDANCE E-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_torso_E = " << k_torso_E;
@@ -5219,8 +5223,9 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         if(J_torso_EW.norm() > null_th){
             k_torso_EW = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_EW.norm())));
         }
-        double fd_torso_EW = obst_coeff * (1 - exp(-obst_damping*(J_torso_EW.norm())));
+        double fd_torso_EW = obst_coeff_torso * (1 - exp(-obst_damping_torso*(J_torso_EW.norm())));
         joint_velocities +=  (k_torso_EW*fd_torso_EW*J_torso_EW);
+        null_velocities += (k_torso_EW*fd_torso_EW*J_torso_EW);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------TORSO AVOIDANCE EW-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_torso_EW = " << k_torso_EW;
@@ -5243,8 +5248,9 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         if(J_torso_W.norm() > null_th){
             k_torso_W = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_W.norm())));
         }
-        double fd_torso_W = obst_coeff * (1 - exp(-obst_damping*(J_torso_W.norm())));
+        double fd_torso_W = obst_coeff_torso * (1 - exp(-obst_damping_torso*(J_torso_W.norm())));
         joint_velocities +=  (k_torso_W*fd_torso_W*J_torso_W);
+        null_velocities += (k_torso_W*fd_torso_W*J_torso_W);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------TORSO AVOIDANCE W-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_torso_W = " << k_torso_W;
@@ -5267,8 +5273,9 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         if(J_torso_WH.norm() > null_th){
             k_torso_WH = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_torso_WH.norm())));
         }
-        double fd_torso_WH = obst_coeff * (1 - exp(-obst_damping*(J_torso_WH.norm())));
+        double fd_torso_WH = obst_coeff_torso * (1 - exp(-obst_damping_torso*(J_torso_WH.norm())));
         joint_velocities +=  (k_torso_WH*fd_torso_WH*J_torso_WH);
+        null_velocities += (k_torso_WH*fd_torso_WH*J_torso_WH);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------TORSO AVOIDANCE WH-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_torso_WH = " << k_torso_WH;
@@ -5295,24 +5302,25 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         }
         double fd_SE = obst_coeff * (1 - exp(-obst_damping*(J_obst_SE.norm())));
         joint_velocities +=  (k_obst_SE*fd_SE*J_obst_SE);
+        null_velocities += (k_obst_SE*fd_SE*J_obst_SE);
 
-        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE SE-------------- # ";
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 1 = " << delta_H_obst_SE(0);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 2 = " << delta_H_obst_SE(1);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 3 = " << delta_H_obst_SE(2);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 4 = " << delta_H_obst_SE(3);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 5 = " << delta_H_obst_SE(4);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 6 = " << delta_H_obst_SE(5);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 7 = " << delta_H_obst_SE(6);
-        BOOST_LOG_SEV(lg, info) << "k_obst_SE = " << k_obst_SE;
-        BOOST_LOG_SEV(lg, info) << "fd_SE = " << fd_SE;
-        BOOST_LOG_SEV(lg, info) << "joint 1 = " << J_obst_SE(0);
-        BOOST_LOG_SEV(lg, info) << "joint 2 = " << J_obst_SE(1);
-        BOOST_LOG_SEV(lg, info) << "joint 3 = " << J_obst_SE(2);
-        BOOST_LOG_SEV(lg, info) << "joint 4 = " << J_obst_SE(3);
-        BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_obst_SE(4);
-        BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_obst_SE(5);
-        BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_obst_SE(6);
+//        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE SE-------------- # ";
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 1 = " << delta_H_obst_SE(0);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 2 = " << delta_H_obst_SE(1);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 3 = " << delta_H_obst_SE(2);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 4 = " << delta_H_obst_SE(3);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 5 = " << delta_H_obst_SE(4);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 6 = " << delta_H_obst_SE(5);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 7 = " << delta_H_obst_SE(6);
+//        BOOST_LOG_SEV(lg, info) << "k_obst_SE = " << k_obst_SE;
+//        BOOST_LOG_SEV(lg, info) << "fd_SE = " << fd_SE;
+//        BOOST_LOG_SEV(lg, info) << "joint 1 = " << J_obst_SE(0);
+//        BOOST_LOG_SEV(lg, info) << "joint 2 = " << J_obst_SE(1);
+//        BOOST_LOG_SEV(lg, info) << "joint 3 = " << J_obst_SE(2);
+//        BOOST_LOG_SEV(lg, info) << "joint 4 = " << J_obst_SE(3);
+//        BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_obst_SE(4);
+//        BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_obst_SE(5);
+//        BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_obst_SE(6);
 
         // elbow
         VectorXd delta_H_obst_E(posture.size());
@@ -5327,24 +5335,25 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         }
         double fd_E = obst_coeff * (1 - exp(-obst_damping*(J_obst_E.norm())));
         joint_velocities +=  (k_obst_E*fd_E*J_obst_E);
+        null_velocities += (k_obst_E*fd_E*J_obst_E);
 
-        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE E-------------- # ";
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 1 = " << delta_H_obst_E(0);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 2 = " << delta_H_obst_E(1);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 3 = " << delta_H_obst_E(2);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 4 = " << delta_H_obst_E(3);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 5 = " << delta_H_obst_E(4);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 6 = " << delta_H_obst_E(5);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 7 = " << delta_H_obst_E(6);
-        BOOST_LOG_SEV(lg, info) << "k_obst_E = " << k_obst_E;
-        BOOST_LOG_SEV(lg, info) << "fd_E = " << fd_E;
-        BOOST_LOG_SEV(lg, info) << "joint 1 = " << J_obst_E(0);
-        BOOST_LOG_SEV(lg, info) << "joint 2 = " << J_obst_E(1);
-        BOOST_LOG_SEV(lg, info) << "joint 3 = " << J_obst_E(2);
-        BOOST_LOG_SEV(lg, info) << "joint 4 = " << J_obst_E(3);
-        BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_obst_E(4);
-        BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_obst_E(5);
-        BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_obst_E(6);
+//        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE E-------------- # ";
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 1 = " << delta_H_obst_E(0);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 2 = " << delta_H_obst_E(1);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 3 = " << delta_H_obst_E(2);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 4 = " << delta_H_obst_E(3);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 5 = " << delta_H_obst_E(4);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 6 = " << delta_H_obst_E(5);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 7 = " << delta_H_obst_E(6);
+//        BOOST_LOG_SEV(lg, info) << "k_obst_E = " << k_obst_E;
+//        BOOST_LOG_SEV(lg, info) << "fd_E = " << fd_E;
+//        BOOST_LOG_SEV(lg, info) << "joint 1 = " << J_obst_E(0);
+//        BOOST_LOG_SEV(lg, info) << "joint 2 = " << J_obst_E(1);
+//        BOOST_LOG_SEV(lg, info) << "joint 3 = " << J_obst_E(2);
+//        BOOST_LOG_SEV(lg, info) << "joint 4 = " << J_obst_E(3);
+//        BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_obst_E(4);
+//        BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_obst_E(5);
+//        BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_obst_E(6);
 
         // elbow - wrist
         VectorXd delta_H_obst_EW(posture.size());
@@ -5358,24 +5367,25 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         }
         double fd_EW = obst_coeff * (1 - exp(-obst_damping*(J_obst_EW.norm())));
         joint_velocities +=  (k_obst_EW*fd_EW*J_obst_EW);
+        null_velocities += (k_obst_EW*fd_EW*J_obst_EW);
 
-        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE EW-------------- # ";
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 1 = " << delta_H_obst_EW(0);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 2 = " << delta_H_obst_EW(1);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 3 = " << delta_H_obst_EW(2);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 4 = " << delta_H_obst_EW(3);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 5 = " << delta_H_obst_EW(4);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 6 = " << delta_H_obst_EW(5);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 7 = " << delta_H_obst_EW(6);
-        BOOST_LOG_SEV(lg, info) << "k_obst_EW = " << k_obst_EW;
-        BOOST_LOG_SEV(lg, info) << "fd_EW = " << fd_EW;
-        BOOST_LOG_SEV(lg, info) << "joint 1 = " << J_obst_EW(0);
-        BOOST_LOG_SEV(lg, info) << "joint 2 = " << J_obst_EW(1);
-        BOOST_LOG_SEV(lg, info) << "joint 3 = " << J_obst_EW(2);
-        BOOST_LOG_SEV(lg, info) << "joint 4 = " << J_obst_EW(3);
-        BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_obst_EW(4);
-        BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_obst_EW(5);
-        BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_obst_EW(6);
+//        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE EW-------------- # ";
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 1 = " << delta_H_obst_EW(0);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 2 = " << delta_H_obst_EW(1);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 3 = " << delta_H_obst_EW(2);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 4 = " << delta_H_obst_EW(3);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 5 = " << delta_H_obst_EW(4);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 6 = " << delta_H_obst_EW(5);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 7 = " << delta_H_obst_EW(6);
+//        BOOST_LOG_SEV(lg, info) << "k_obst_EW = " << k_obst_EW;
+//        BOOST_LOG_SEV(lg, info) << "fd_EW = " << fd_EW;
+//        BOOST_LOG_SEV(lg, info) << "joint 1 = " << J_obst_EW(0);
+//        BOOST_LOG_SEV(lg, info) << "joint 2 = " << J_obst_EW(1);
+//        BOOST_LOG_SEV(lg, info) << "joint 3 = " << J_obst_EW(2);
+//        BOOST_LOG_SEV(lg, info) << "joint 4 = " << J_obst_EW(3);
+//        BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_obst_EW(4);
+//        BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_obst_EW(5);
+//        BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_obst_EW(6);
 
         // wrist
         VectorXd delta_H_obst_W(posture.size());
@@ -5389,24 +5399,25 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         }
         double fd_W = obst_coeff * (1 - exp(-obst_damping*(J_obst_W.norm())));
         joint_velocities +=  (k_obst_W*fd_W*J_obst_W);
+        null_velocities += (k_obst_W*fd_W*J_obst_W);
 
-        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE W-------------- # ";
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 1 = " << delta_H_obst_W(0);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 2 = " << delta_H_obst_W(1);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 3 = " << delta_H_obst_W(2);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 4 = " << delta_H_obst_W(3);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 5 = " << delta_H_obst_W(4);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 6 = " << delta_H_obst_W(5);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 7 = " << delta_H_obst_W(6);
-        BOOST_LOG_SEV(lg, info) << "k_obst_W = " << k_obst_W;
-        BOOST_LOG_SEV(lg, info) << "fd_W = " << fd_W;
-        BOOST_LOG_SEV(lg, info) << "joint 1 = " << J_obst_W(0);
-        BOOST_LOG_SEV(lg, info) << "joint 2 = " << J_obst_W(1);
-        BOOST_LOG_SEV(lg, info) << "joint 3 = " << J_obst_W(2);
-        BOOST_LOG_SEV(lg, info) << "joint 4 = " << J_obst_W(3);
-        BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_obst_W(4);
-        BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_obst_W(5);
-        BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_obst_W(6);
+//        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE W-------------- # ";
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 1 = " << delta_H_obst_W(0);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 2 = " << delta_H_obst_W(1);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 3 = " << delta_H_obst_W(2);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 4 = " << delta_H_obst_W(3);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 5 = " << delta_H_obst_W(4);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 6 = " << delta_H_obst_W(5);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 7 = " << delta_H_obst_W(6);
+//        BOOST_LOG_SEV(lg, info) << "k_obst_W = " << k_obst_W;
+//        BOOST_LOG_SEV(lg, info) << "fd_W = " << fd_W;
+//        BOOST_LOG_SEV(lg, info) << "joint 1 = " << J_obst_W(0);
+//        BOOST_LOG_SEV(lg, info) << "joint 2 = " << J_obst_W(1);
+//        BOOST_LOG_SEV(lg, info) << "joint 3 = " << J_obst_W(2);
+//        BOOST_LOG_SEV(lg, info) << "joint 4 = " << J_obst_W(3);
+//        BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_obst_W(4);
+//        BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_obst_W(5);
+//        BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_obst_W(6);
 
         // wrist - hand
         VectorXd delta_H_obst_WH(posture.size());
@@ -5420,24 +5431,25 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
         }
         double fd_WH = obst_coeff * (1 - exp(-obst_damping*(J_obst_WH.norm())));
         joint_velocities +=  (k_obst_WH*fd_WH*J_obst_WH);
+        null_velocities += (k_obst_WH*fd_WH*J_obst_WH);
 
-        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE WH-------------- # ";
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 1 = " << delta_H_obst_WH(0);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 2 = " << delta_H_obst_WH(1);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 3 = " << delta_H_obst_WH(2);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 4 = " << delta_H_obst_WH(3);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 5 = " << delta_H_obst_WH(4);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 6 = " << delta_H_obst_WH(5);
-        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 7 = " << delta_H_obst_WH(6);
-        BOOST_LOG_SEV(lg, info) << "k_obst_WH = " << k_obst_WH;
-        BOOST_LOG_SEV(lg, info) << "fd_WH = " << fd_WH;
-        BOOST_LOG_SEV(lg, info) << "joint 1 = " << J_obst_WH(0);
-        BOOST_LOG_SEV(lg, info) << "joint 2 = " << J_obst_WH(1);
-        BOOST_LOG_SEV(lg, info) << "joint 3 = " << J_obst_WH(2);
-        BOOST_LOG_SEV(lg, info) << "joint 4 = " << J_obst_WH(3);
-        BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_obst_WH(4);
-        BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_obst_WH(5);
-        BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_obst_WH(6);
+//        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE WH-------------- # ";
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 1 = " << delta_H_obst_WH(0);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 2 = " << delta_H_obst_WH(1);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 3 = " << delta_H_obst_WH(2);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 4 = " << delta_H_obst_WH(3);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 5 = " << delta_H_obst_WH(4);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 6 = " << delta_H_obst_WH(5);
+//        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 7 = " << delta_H_obst_WH(6);
+//        BOOST_LOG_SEV(lg, info) << "k_obst_WH = " << k_obst_WH;
+//        BOOST_LOG_SEV(lg, info) << "fd_WH = " << fd_WH;
+//        BOOST_LOG_SEV(lg, info) << "joint 1 = " << J_obst_WH(0);
+//        BOOST_LOG_SEV(lg, info) << "joint 2 = " << J_obst_WH(1);
+//        BOOST_LOG_SEV(lg, info) << "joint 3 = " << J_obst_WH(2);
+//        BOOST_LOG_SEV(lg, info) << "joint 4 = " << J_obst_WH(3);
+//        BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_obst_WH(4);
+//        BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_obst_WH(5);
+//        BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_obst_WH(6);
 
     }
 
@@ -5449,7 +5461,7 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
 }
 
 
-void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, vector<double> hand_acc, vector<double> &velocities, double timestep,bool jlim_en, bool sing_en, bool obsts_en,
+void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,vector<double> hand_acc, vector<double> &velocities, VectorXd& null_velocities,double timestep,bool jlim_en, bool sing_en, bool obsts_en,
                                               double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping,double obst_coeff_torso, double obst_damping_torso,
                                               double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts)
 {
@@ -5619,7 +5631,8 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, 
         }
         double fd_jlim = jlim_coeff * (1 - exp(-jlim_damping*(J_jlim.norm())));
 
-        joint_velocities +=  (k_jlim*fd_jlim*J_jlim);
+        joint_velocities +=  (k_jlim*fd_jlim*J_jlim);        
+        null_velocities += (k_jlim*fd_jlim*J_jlim);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------JOINTS LIMITS---------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_jlim = " << k_jlim;
@@ -5720,6 +5733,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, 
         double fd_sing = sing_coeff * (1 - exp(-sing_damping*(J_sing.norm())));
 
         joint_velocities +=  (k_sing*fd_sing*J_sing);
+        null_velocities += (k_sing*fd_sing*J_sing);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------SINGULARITIES AVOIDANCE-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_sing = " << k_sing;
@@ -5968,6 +5982,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, 
         }
         double fd_torso_SE = obst_coeff_torso * (1 - exp(-obst_damping_torso*(J_torso_SE.norm())));
         joint_velocities +=  (k_torso_SE*fd_torso_SE*J_torso_SE);
+        null_velocities += (k_torso_SE*fd_torso_SE*J_torso_SE);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------TORSO AVOIDANCE SE-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_torso_SE = " << k_torso_SE;
@@ -5992,6 +6007,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, 
         }
         double fd_torso_E = obst_coeff_torso * (1 - exp(-obst_damping_torso*(J_torso_E.norm())));
         joint_velocities +=  (k_torso_E*fd_torso_E*J_torso_E);
+        null_velocities += (k_torso_E*fd_torso_E*J_torso_E);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------TORSO AVOIDANCE E-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_torso_E = " << k_torso_E;
@@ -6016,6 +6032,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, 
         }
         double fd_torso_EW = obst_coeff_torso * (1 - exp(-obst_damping_torso*(J_torso_EW.norm())));
         joint_velocities +=  (k_torso_EW*fd_torso_EW*J_torso_EW);
+        null_velocities += (k_torso_EW*fd_torso_EW*J_torso_EW);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------TORSO AVOIDANCE EW-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_torso_EW = " << k_torso_EW;
@@ -6040,6 +6057,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, 
         }
         double fd_torso_W = obst_coeff_torso * (1 - exp(-obst_damping_torso*(J_torso_W.norm())));
         joint_velocities +=  (k_torso_W*fd_torso_W*J_torso_W);
+        null_velocities += (k_torso_W*fd_torso_W*J_torso_W);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------TORSO AVOIDANCE W-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_torso_W = " << k_torso_W;
@@ -6064,6 +6082,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, 
         }
         double fd_torso_WH = obst_coeff_torso * (1 - exp(-obst_damping_torso*(J_torso_WH.norm())));
         joint_velocities +=  (k_torso_WH*fd_torso_WH*J_torso_WH);
+        null_velocities += (k_torso_WH*fd_torso_WH*J_torso_WH);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------TORSO AVOIDANCE WH-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "k_torso_WH = " << k_torso_WH;
@@ -6090,6 +6109,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, 
         }
         double fd_SE = obst_coeff * (1 - exp(-obst_damping*(J_obst_SE.norm())));
         joint_velocities +=  (k_obst_SE*fd_SE*J_obst_SE);
+        null_velocities += (k_obst_SE*fd_SE*J_obst_SE);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE SE-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "delta_H_obst_SE 1 = " << delta_H_obst_SE(0);
@@ -6121,6 +6141,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, 
         }
         double fd_E = obst_coeff * (1 - exp(-obst_damping*(J_obst_E.norm())));
         joint_velocities +=  (k_obst_E*fd_E*J_obst_E);
+        null_velocities += (k_obst_E*fd_E*J_obst_E);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE E-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "delta_H_obst_E 1 = " << delta_H_obst_E(0);
@@ -6152,6 +6173,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, 
         }
         double fd_EW = obst_coeff * (1 - exp(-obst_damping*(J_obst_EW.norm())));
         joint_velocities +=  (k_obst_EW*fd_EW*J_obst_EW);
+        null_velocities += (k_obst_EW*fd_EW*J_obst_EW);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE EW-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "delta_H_obst_EW 1 = " << delta_H_obst_EW(0);
@@ -6183,6 +6205,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, 
         }
         double fd_W = obst_coeff * (1 - exp(-obst_damping*(J_obst_W.norm())));
         joint_velocities +=  (k_obst_W*fd_W*J_obst_W);
+        null_velocities += (k_obst_W*fd_W*J_obst_W);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE W-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "delta_H_obst_W 1 = " << delta_H_obst_W(0);
@@ -6214,6 +6237,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, 
         }
         double fd_WH = obst_coeff * (1 - exp(-obst_damping*(J_obst_WH.norm())));
         joint_velocities +=  (k_obst_WH*fd_WH*J_obst_WH);
+        null_velocities += (k_obst_WH*fd_WH*J_obst_WH);
 
 //        BOOST_LOG_SEV(lg, info) << "# --------------OBSTACLES AVOIDANCE WH-------------- # ";
 //        BOOST_LOG_SEV(lg, info) << "delta_H_obst_WH 1 = " << delta_H_obst_WH(0);

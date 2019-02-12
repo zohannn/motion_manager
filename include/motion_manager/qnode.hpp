@@ -178,9 +178,10 @@ public:
          * @param r_hand_posture
          * @param r_hand_velocities
          * @param joints_arm_vel_ctrl
+         * @param hand_ctrl
          * @return
          */
-        bool execKinControl(int arm, vector<double> &r_arm_posture, vector<double>& r_arm_velocities, vector<double> &r_hand_posture, vector<double> &r_hand_velocities, bool joints_arm_vel_ctrl);
+        bool execKinControl(int arm, vector<double> &r_arm_posture, vector<double>& r_arm_velocities, vector<double> &r_hand_posture, vector<double> &r_hand_velocities, bool joints_arm_vel_ctrl, bool hand_ctrl);
 
         /**
          * @brief execKinControlAcc

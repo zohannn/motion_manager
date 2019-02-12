@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ResultsCtrlJointsDialog</class>
- <widget class="QDialog" name="ResultsCtrlJointsDialog">
+ <class>ResultsCtrlNullJointsDialog</class>
+ <widget class="QDialog" name="ResultsCtrlNullJointsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1550</width>
-    <height>800</height>
+    <width>1169</width>
+    <height>773</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Results of the joints</string>
+   <string>Null space joints velocities</string>
   </property>
   <widget class="QCustomPlot" name="plot_joint_4" native="true">
    <property name="geometry">
@@ -53,16 +53,6 @@
     </rect>
    </property>
   </widget>
-  <widget class="QCustomPlot" name="plot_joint_10" native="true">
-   <property name="geometry">
-    <rect>
-     <x>1157</x>
-     <y>31</y>
-     <width>373</width>
-     <height>236</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QCustomPlot" name="plot_joint_2" native="true">
    <property name="geometry">
     <rect>
@@ -83,26 +73,6 @@
     </rect>
    </property>
   </widget>
-  <widget class="QCustomPlot" name="plot_joint_11" native="true">
-   <property name="geometry">
-    <rect>
-     <x>1157</x>
-     <y>273</y>
-     <width>373</width>
-     <height>235</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QCustomPlot" name="plot_joint_8" native="true">
-   <property name="geometry">
-    <rect>
-     <x>779</x>
-     <y>273</y>
-     <width>372</width>
-     <height>235</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QCustomPlot" name="plot_joint_6" native="true">
    <property name="geometry">
     <rect>
@@ -113,21 +83,11 @@
     </rect>
    </property>
   </widget>
-  <widget class="QCustomPlot" name="plot_joint_9" native="true">
-   <property name="geometry">
-    <rect>
-     <x>779</x>
-     <y>514</y>
-     <width>372</width>
-     <height>236</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>1370</x>
-     <y>710</y>
+     <x>990</x>
+     <y>730</y>
      <width>168</width>
      <height>25</height>
     </rect>
@@ -152,9 +112,9 @@
   <widget class="QGroupBox" name="groupBox_low_pass_vel">
    <property name="geometry">
     <rect>
-     <x>1160</x>
-     <y>540</y>
-     <width>191</width>
+     <x>790</x>
+     <y>650</y>
+     <width>181</width>
      <height>101</height>
     </rect>
    </property>
@@ -209,93 +169,6 @@
      </item>
     </layout>
    </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_low_pass_vel_2">
-   <property name="geometry">
-    <rect>
-     <x>1160</x>
-     <y>660</y>
-     <width>191</width>
-     <height>101</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Accelerations Low Pass Filter </string>
-   </property>
-   <widget class="QWidget" name="layoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>161</width>
-      <height>58</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
-       <item>
-        <widget class="QLabel" name="label_f_cutoff_acc">
-         <property name="text">
-          <string>CutOff Freq. [Hz]:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEdit_f_cutoff_acc">
-         <property name="text">
-          <string>1000</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
-       <item>
-        <widget class="QLabel" name="label_time_step_acc">
-         <property name="text">
-          <string> Time step [s] :</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEdit_time_step_acc">
-         <property name="text">
-          <string>0.05</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QCheckBox" name="checkBox_jlim">
-   <property name="geometry">
-    <rect>
-     <x>1380</x>
-     <y>670</y>
-     <width>153</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>show the joints limits</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton_null_space_vel">
-   <property name="geometry">
-    <rect>
-     <x>1360</x>
-     <y>760</y>
-     <width>181</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>show null space velocities</string>
-   </property>
   </widget>
  </widget>
  <customwidgets>
