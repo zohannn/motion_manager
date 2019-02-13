@@ -193,10 +193,9 @@ public:
         /**
          * @brief getPredictedSwivelAngle
          * @param hand_pos
-         * @param hand_or_q
          * @return
          */
-        double getPredictedSwivelAngle(Vector3d hand_pos,Quaterniond hand_or_q);
+        double getPredictedSwivelAngle(VectorXd hand_pos);
 
         /**
          * @brief getDerivativePredictedSwivelAngle
@@ -1040,6 +1039,7 @@ private:
         vector<vector<double>> elbowOrientation_mov; /**< elbow orientation (rpy) during the movement. */
         vector<vector<double>> shoulderPosition_mov; /**< shoulder position during the movement. 0=x,1=y,2=z */
         vector<double> swivel_angle_mov; /**< swivel angle of the trajectory of the movement */
+        vector<vector<double>> swivel_angle_mov_stages; /**< swivel angle of the trajectory of the movement divided in stages */
         double swivel_angle_mov_max; /**< max swivel angle of the trajectory of the movement */
         double swivel_angle_mov_min; /**< min swivel angle of the trajectory of the movement */
         double swivel_angle_mov_average; /**< average swivel angle of the trajectory of the movement */

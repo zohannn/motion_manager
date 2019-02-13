@@ -391,12 +391,14 @@ void MainWindow::execPosControl()
             double des_hand_pos_x = 0.0; double des_hand_pos_y = 0.0; double des_hand_pos_z = 0.0;
             double des_hand_or_q_x = 0.0; double des_hand_or_q_y = 0.0; double des_hand_or_q_z = 0.0; double des_hand_or_q_w = 0.0;
             VectorXd des_hand_pose(7); vector<double> des_hand_pose_vec(7,0.0);
+            VectorXd hand_pos_vec_x = VectorXd::Zero(7); vector<double> hand_pos_vec_xd(7,0.0);
 
             // desired velocity
-            VectorXd des_hand_vel(7); vector<double> des_hand_vel_vec(7,0.0);
+            VectorXd hand_vel_vec_x = VectorXd::Zero(7);
+//            VectorXd des_hand_vel(7); vector<double> des_hand_vel_vec(7,0.0);
 
             // desired acceleration
-            VectorXd des_hand_acc(7); vector<double> des_hand_acc_vec(7,0.0);
+//            VectorXd des_hand_acc(7); vector<double> des_hand_acc_vec(7,0.0);
 
             // bounce pose
             double bounce_hand_pos_x = 0.0; double bounce_hand_pos_y = 0.0; double bounce_hand_pos_z = 0.0;
@@ -579,9 +581,13 @@ void MainWindow::execPosControl()
                  this->h_hand_or_q_end.at(3) = h_hand_or_q_end_vec.w();
                  Vector3d h_hand_or_q_e_end; h_hand_or_q_e_end << this->h_hand_or_q_end.at(0), this->h_hand_or_q_end.at(1), this->h_hand_or_q_end.at(2);
                  double h_hand_or_q_w_end = this->h_hand_or_q_end.at(3);
-                 // predicted swivel angle
-                 double alpha_predicted = this->getPredictedSwivelAngle(hand_pos_vec,h_hand_or_q_end_vec);
-                 BOOST_LOG_SEV(lg, info) << "alpha_predicted = " << alpha_predicted;
+                 hand_pos_vec_x(0) = this->h_hand_pos_end.at(0);
+                 hand_pos_vec_x(1) = this->h_hand_pos_end.at(1);
+                 hand_pos_vec_x(2) = this->h_hand_pos_end.at(2);
+                 hand_pos_vec_x(3) = this->h_hand_or_q_end.at(0);
+                 hand_pos_vec_x(4) = this->h_hand_or_q_end.at(1);
+                 hand_pos_vec_x(5) = this->h_hand_or_q_end.at(2);
+                 hand_pos_vec_x(6) = this->h_hand_or_q_end.at(3);
 
                  this->h_hand_lin_vel_init = hand_h_lin_velocities.at(0); // initial human-like hand linear velocities
                  this->h_hand_ang_vel_init = hand_h_ang_velocities.at(0); // initial human-like hand angular velocities
@@ -870,24 +876,33 @@ void MainWindow::execPosControl()
                 vector<double> r_shoulder_ang_pos(r_shoulder_pos.begin()+3, r_shoulder_pos.begin()+6);
 
                 // get desired hand velocity
-                this->des_hand_pose_buff->push(des_hand_pose_vec);
+                VectorXd::Map(&hand_pos_vec_xd[0], hand_pos_vec_x.size()) = hand_pos_vec_x;
+                this->des_hand_pose_buff->push(hand_pos_vec_xd);
                 if(this->samples_des_hand_pose==this->N_filter_length-1 && this->des_hand_pose_buff->full()){
-                    for(size_t i=0; i< des_hand_pose_vec.size();++i)
+                    for(size_t i=0; i< hand_pos_vec_xd.size();++i)
                     {
-                        des_hand_vel_vec.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->des_hand_pose_buff->at(i));
+                        hand_vel_vec_x(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->des_hand_pose_buff->at(i));
                     }
                 }else{this->samples_des_hand_pose++;}
-                des_hand_vel = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(des_hand_vel_vec.data(), des_hand_vel_vec.size());
 
-                // get desired hand acceleration
-                this->des_hand_vel_buff->push(des_hand_vel_vec);
-                if(this->samples_des_hand_vel==this->N_filter_length-1 && this->des_hand_vel_buff->full()){
-                    for(size_t i=0; i< des_hand_vel_vec.size();++i)
-                    {
-                        des_hand_acc_vec.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->des_hand_vel_buff->at(i));
-                    }
-                }else{this->samples_des_hand_vel++;}
-                des_hand_acc = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(des_hand_acc_vec.data(), des_hand_acc_vec.size());
+                // predicted swivel angle
+                double alpha_predicted = this->getPredictedSwivelAngle(hand_pos_vec_x);
+                BOOST_LOG_SEV(lg, info) << "alpha_predicted = " << alpha_predicted;
+
+                // derivative of the predicted swivel angle
+                double der_alpha_predicted = this->getDerivativePredictedSwivelAngle(hand_pos_vec_x,hand_vel_vec_x);
+                BOOST_LOG_SEV(lg, info) << "der_alpha_predicted = " << der_alpha_predicted;
+
+
+//                // get desired hand acceleration
+//                this->des_hand_vel_buff->push(des_hand_vel_vec);
+//                if(this->samples_des_hand_vel==this->N_filter_length-1 && this->des_hand_vel_buff->full()){
+//                    for(size_t i=0; i< des_hand_vel_vec.size();++i)
+//                    {
+//                        des_hand_acc_vec.at(i) = this->getNoiseRobustDerivate(this->N_filter_length,time_step,this->des_hand_vel_buff->at(i));
+//                    }
+//                }else{this->samples_des_hand_vel++;}
+//                des_hand_acc = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(des_hand_acc_vec.data(), des_hand_acc_vec.size());
 
 
 //                vector<double> r_arm_velocities_mes;
@@ -1983,7 +1998,7 @@ void MainWindow::execPosControl()
                     if(stages==3 && hl_en && stage_descr.compare("plan")==0)
                     {
                         condition = (g_map >= g_map_th_pa);
-                    }else if((stage_descr.compare("approach")==0) && follow_tar && (des_hand_vel.norm()<=5.0)){
+                    }else if((stage_descr.compare("approach")==0) && follow_tar && (hand_vel_vec_x.norm()<=5.0)){
                         // the target was being followed and it has stopped
                         follow_tar = false; this->ui.checkBox_follow_target->setChecked(false); // the target has stopped
                         this->qnode.openBarrettHand_to_pos(1,jointsInitPosition_hand_vec); // open the hand to the initial position of the approach stage
@@ -4891,6 +4906,7 @@ if(solved){
         this->shoulderLinearVelocity_mov.resize(tot_steps); this->shoulderAngularVelocity_mov.resize(tot_steps);
         // swivel angle
         this->swivel_angle_mov.resize(tot_steps);
+        this->swivel_angle_mov_stages.resize(this->jointsPosition_mov.size());
 
         vector<double> timesteps_mov_tot(tot_steps,0.0);
         int step = 0;
@@ -4913,6 +4929,7 @@ if(solved){
             vector<vector<double>> h_or_q(pos_stage.rows());
             vector<vector<double>> h_lin_vel(pos_stage.rows());
             vector<vector<double>> h_ang_vel(pos_stage.rows());
+            vector<double> swivel_angles_stage(pos_stage.rows());
             for(int i=0;i<pos_stage.rows();++i){
                 timesteps_mov_tot.at(step) = timesteps_mov_stage.at(i);
                 // position
@@ -4937,6 +4954,7 @@ if(solved){
                 this->curr_scene->getHumanoid()->getShoulderOr(arm_code,this->shoulderOrientation_mov.at(step),posture);
                 // swivel angle
                 this->swivel_angle_mov.at(step) = this->curr_scene->getHumanoid()->getSwivelAngle(arm_code,posture);
+                swivel_angles_stage = this->curr_scene->getHumanoid()->getSwivelAngle(arm_code,posture);
                 // velocities
                 VectorXd vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
                 vector<double> velocities; velocities.resize(vel_row.size());
@@ -4998,6 +5016,7 @@ if(solved){
             this->des_handPosition.push_back(this->handPosition_mov.at(step-1));
             this->des_handOrientation.push_back(this->handOrientation_mov.at(step-1));
             this->des_handOrientation_q.push_back(this->handOrientation_q_mov.at(step-1));
+            this->swivel_angle_mov_stages.at(k) = swivel_angles_stage;
 
         }// loop stages
 
@@ -12880,40 +12899,27 @@ double MainWindow::getNoiseRobustDerivate(int N, double h, std::deque<double>& b
     }
 }
 
-double MainWindow::getPredictedSwivelAngle(Vector3d hand_pos, Quaterniond hand_or_q)
+double MainWindow::getPredictedSwivelAngle(VectorXd hand_pos)
 {
-//    double err_tol = -0.2; // rad, error between our planner and the method to compute the swivel angle
-//    // https://ieeexplore.ieee.org/document/5979654
-//    //position of the wrist
-//    vector<double> hand_pos_vec; this->curr_scene->getHumanoid()->getRightHandPos(hand_pos_vec);
-//    VectorXd curr_hand_pos = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(hand_pos_vec.data(), hand_pos_vec.size());
-//    vector<double> wrist_pos_vec; this->curr_scene->getHumanoid()->getRightWristPos(wrist_pos_vec);
-//    VectorXd curr_wrist_pos = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(wrist_pos_vec.data(), wrist_pos_vec.size());
-//    VectorXd diff_hand_wrist = curr_hand_pos - curr_wrist_pos;
-//    VectorXd wrist_pos = hand_pos - diff_hand_wrist;
-//    double wrist_x = -wrist_pos(0); double wrist_y = wrist_pos(1); double wrist_z = wrist_pos(2);
-    double hand_x = -hand_pos(0); double hand_y = hand_pos(1); double hand_z = hand_pos(2);
-    // orientation of the hand
-    Vector3d rpy = hand_or_q.toRotationMatrix().eulerAngles(2, 1, 2); // ZYZ euler angles
-    //Vector3d rpy = hand_or_q.toRotationMatrix().eulerAngles(2, 1, 0); // ZYX euler angles
-    //Vector3d rpy = hand_or_q.toRotationMatrix().eulerAngles(0, 1, 2); // XYZ euler angles
+    // position
+    double hand_x = hand_pos(0); double hand_y = hand_pos(1); double hand_z = hand_pos(2);
+    Quaterniond hand_or_q;
+    hand_or_q.x() = hand_pos(3);
+    hand_or_q.y() = hand_pos(4);
+    hand_or_q.z() = hand_pos(5);
+    hand_or_q.w() = hand_pos(6);
+    Vector3d rpy = hand_or_q.toRotationMatrix().eulerAngles(2,1,2); // ZYZ angles
     double hand_roll = rpy(0); double hand_pitch = rpy(1); double hand_yaw = rpy(2);
 
-//    double alpha = 0.88*cos(hand_pitch+2.30)+0.49*cos(hand_pitch+hand_yaw+2.98)
-//                    -0.21*atan2(wrist_z,wrist_y)-0.64*sin(hand_roll)-1.39
-//                    -0.5*atan2(wrist_y,wrist_x)-0.22*cos(hand_roll+hand_pitch+hand_yaw)
-//                    +0.47*cos(hand_yaw+0.6)-0.15*atan2(wrist_z,wrist_x)
-//                    +0.34*cos(hand_roll+hand_yaw+1.07)-0.4*cos(hand_roll+hand_pitch);
 
-    double alpha_2 = 0.88*cos(hand_pitch+2.30)+0.49*cos(hand_pitch+hand_yaw+2.98)
+    double alpha = 0.88*cos(hand_pitch+2.30)+0.49*cos(hand_pitch+hand_yaw+2.98)
                     -0.21*atan2(hand_z,hand_y)-0.64*sin(hand_roll)-1.39
                     -0.5*atan2(hand_y,hand_x)-0.22*cos(hand_roll+hand_pitch+hand_yaw)
                     +0.47*cos(hand_yaw+0.6)-0.15*atan2(hand_z,hand_x)
                     +0.34*cos(hand_roll+hand_yaw+1.07)-0.4*cos(hand_roll+hand_pitch);
 
-//    double alpha_r = (2*M_PI+alpha)-M_PI/2;
-//    double alpha_2_r = (2*M_PI+alpha_2)-M_PI/2;
-    return alpha_2;
+    double alpha_r = (2*M_PI+alpha)-M_PI/2;
+    return alpha_r;
 }
 
 
@@ -12921,21 +12927,44 @@ double MainWindow::getDerivativePredictedSwivelAngle(VectorXd hand_pos, VectorXd
 {
     // position
     Vector3d hand_p = hand_pos.block<3,1>(0,0);
+    double hand_x = hand_p(0); double hand_y = hand_p(1); double hand_z = hand_p(2);
     Vector3d hand_or_q_e = hand_pos.block<3,1>(3,0); double hand_or_q_w = hand_pos(6);
     Quaterniond hand_or_q;
     hand_or_q.x() = hand_pos(3);
     hand_or_q.y() = hand_pos(4);
     hand_or_q.z() = hand_pos(5);
     hand_or_q.w() = hand_pos(6);
-    Vector3d rpy = hand_or_q.toRotationMatrix().eulerAngles(2,1,2); // ZYZ
+    Vector3d rpy = hand_or_q.toRotationMatrix().eulerAngles(2,1,2); // ZYZ angles
     double hand_roll = rpy(0); double hand_pitch = rpy(1); double hand_yaw = rpy(2);
+    Matrix3d T;
+    T(0,0)=0; T(0,1)=-sin(hand_roll); T(0,2)=cos(hand_roll)*sin(hand_pitch);
+    T(1,0)=0; T(1,1)=cos(hand_roll); T(1,2)=sin(hand_roll)*sin(hand_pitch);
+    T(2,0)=1; T(2,1)=0; T(2,2)=cos(hand_pitch);
     // velocity
     Vector3d hand_lin_vel = hand_vel.block<3,1>(0,0);
+    double hand_vel_x = hand_lin_vel(0); double hand_vel_y = hand_lin_vel(1); double hand_vel_z = hand_lin_vel(2);
     Vector3d hand_ang_vel_q_e = hand_vel.block<3,1>(3,0); double hand_ang_vel_q_w = hand_vel(6);
     Vector3d omega = 2*hand_or_q_e.cross(hand_ang_vel_q_e)+2*hand_or_q_w*hand_ang_vel_q_e-2*hand_ang_vel_q_w*hand_or_q_e;
+    Vector3d rpy_vel; // ZYZ velocities
+    if(abs(sin(hand_pitch))<0.0001){
+        // singularity
+        rpy_vel(0) = omega(2);
+        rpy_vel(1) = sqrt(pow(omega(0),2)+pow(omega(1),2));
+        rpy_vel(2) = 0;
+    }else{
+        rpy_vel = T.inverse()*omega;
+    }
+    double hand_vel_roll = rpy_vel(0); double hand_vel_pitch = rpy_vel(1); double hand_vel_yaw = rpy_vel(2);
 
+    double datan2_zy = (hand_vel_z*hand_y-hand_vel_y*hand_z)/(pow(hand_y,2)+pow(hand_z,2));
+    double datan2_yx = (hand_vel_y*hand_x-hand_vel_x*hand_y)/(pow(hand_x,2)+pow(hand_y,2));
+    double datan2_zx = (hand_vel_z*hand_x-hand_vel_x*hand_z)/(pow(hand_x,2)+pow(hand_z,2));
 
-    double der_alpha = 0.0;
+    double der_alpha = -0.88*hand_vel_pitch*sin(hand_pitch+2.3)-0.49*(hand_vel_pitch+hand_vel_yaw)*sin(hand_pitch+hand_yaw+2.98)
+                        -0.21*datan2_zy-0.64*hand_vel_roll*cos(hand_roll)
+                        -0.5*datan2_yx+0.22*(hand_vel_roll+hand_vel_pitch+hand_vel_yaw)*sin(hand_roll+hand_pitch+hand_yaw)
+                        -0.47*hand_vel_pitch*sin(hand_pitch+0.6)-0.15*datan2_zx
+                        -0.34*(hand_vel_roll+hand_vel_yaw)*sin(hand_roll+hand_yaw+1.07)+0.4*(hand_vel_roll+hand_vel_pitch)*sin(hand_roll+hand_pitch);
     return der_alpha;
 }
 
