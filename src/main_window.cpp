@@ -559,7 +559,7 @@ void MainWindow::execPosControl()
                  }else if(stage_descr.compare("approach")==0){
                     if(follow_tar){
                         hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
-                    }else{
+                    }else{                        
                        hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;
                     }
                  }else if(stage_descr.compare("retreat")==0){
@@ -579,6 +579,9 @@ void MainWindow::execPosControl()
                  this->h_hand_or_q_end.at(3) = h_hand_or_q_end_vec.w();
                  Vector3d h_hand_or_q_e_end; h_hand_or_q_e_end << this->h_hand_or_q_end.at(0), this->h_hand_or_q_end.at(1), this->h_hand_or_q_end.at(2);
                  double h_hand_or_q_w_end = this->h_hand_or_q_end.at(3);
+                 // predicted swivel angle
+                 double alpha_predicted = this->getPredictedSwivelAngle(hand_pos_vec,h_hand_or_q_end_vec);
+                 BOOST_LOG_SEV(lg, info) << "alpha_predicted = " << alpha_predicted;
 
                  this->h_hand_lin_vel_init = hand_h_lin_velocities.at(0); // initial human-like hand linear velocities
                  this->h_hand_ang_vel_init = hand_h_ang_velocities.at(0); // initial human-like hand angular velocities
@@ -12875,6 +12878,65 @@ double MainWindow::getNoiseRobustDerivate(int N, double h, std::deque<double>& b
     }else{
         throw ex_length;
     }
+}
+
+double MainWindow::getPredictedSwivelAngle(Vector3d hand_pos, Quaterniond hand_or_q)
+{
+//    double err_tol = -0.2; // rad, error between our planner and the method to compute the swivel angle
+//    // https://ieeexplore.ieee.org/document/5979654
+//    //position of the wrist
+//    vector<double> hand_pos_vec; this->curr_scene->getHumanoid()->getRightHandPos(hand_pos_vec);
+//    VectorXd curr_hand_pos = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(hand_pos_vec.data(), hand_pos_vec.size());
+//    vector<double> wrist_pos_vec; this->curr_scene->getHumanoid()->getRightWristPos(wrist_pos_vec);
+//    VectorXd curr_wrist_pos = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(wrist_pos_vec.data(), wrist_pos_vec.size());
+//    VectorXd diff_hand_wrist = curr_hand_pos - curr_wrist_pos;
+//    VectorXd wrist_pos = hand_pos - diff_hand_wrist;
+//    double wrist_x = -wrist_pos(0); double wrist_y = wrist_pos(1); double wrist_z = wrist_pos(2);
+    double hand_x = -hand_pos(0); double hand_y = hand_pos(1); double hand_z = hand_pos(2);
+    // orientation of the hand
+    Vector3d rpy = hand_or_q.toRotationMatrix().eulerAngles(2, 1, 2); // ZYZ euler angles
+    //Vector3d rpy = hand_or_q.toRotationMatrix().eulerAngles(2, 1, 0); // ZYX euler angles
+    //Vector3d rpy = hand_or_q.toRotationMatrix().eulerAngles(0, 1, 2); // XYZ euler angles
+    double hand_roll = rpy(0); double hand_pitch = rpy(1); double hand_yaw = rpy(2);
+
+//    double alpha = 0.88*cos(hand_pitch+2.30)+0.49*cos(hand_pitch+hand_yaw+2.98)
+//                    -0.21*atan2(wrist_z,wrist_y)-0.64*sin(hand_roll)-1.39
+//                    -0.5*atan2(wrist_y,wrist_x)-0.22*cos(hand_roll+hand_pitch+hand_yaw)
+//                    +0.47*cos(hand_yaw+0.6)-0.15*atan2(wrist_z,wrist_x)
+//                    +0.34*cos(hand_roll+hand_yaw+1.07)-0.4*cos(hand_roll+hand_pitch);
+
+    double alpha_2 = 0.88*cos(hand_pitch+2.30)+0.49*cos(hand_pitch+hand_yaw+2.98)
+                    -0.21*atan2(hand_z,hand_y)-0.64*sin(hand_roll)-1.39
+                    -0.5*atan2(hand_y,hand_x)-0.22*cos(hand_roll+hand_pitch+hand_yaw)
+                    +0.47*cos(hand_yaw+0.6)-0.15*atan2(hand_z,hand_x)
+                    +0.34*cos(hand_roll+hand_yaw+1.07)-0.4*cos(hand_roll+hand_pitch);
+
+//    double alpha_r = (2*M_PI+alpha)-M_PI/2;
+//    double alpha_2_r = (2*M_PI+alpha_2)-M_PI/2;
+    return alpha_2;
+}
+
+
+double MainWindow::getDerivativePredictedSwivelAngle(VectorXd hand_pos, VectorXd hand_vel)
+{
+    // position
+    Vector3d hand_p = hand_pos.block<3,1>(0,0);
+    Vector3d hand_or_q_e = hand_pos.block<3,1>(3,0); double hand_or_q_w = hand_pos(6);
+    Quaterniond hand_or_q;
+    hand_or_q.x() = hand_pos(3);
+    hand_or_q.y() = hand_pos(4);
+    hand_or_q.z() = hand_pos(5);
+    hand_or_q.w() = hand_pos(6);
+    Vector3d rpy = hand_or_q.toRotationMatrix().eulerAngles(2,1,2); // ZYZ
+    double hand_roll = rpy(0); double hand_pitch = rpy(1); double hand_yaw = rpy(2);
+    // velocity
+    Vector3d hand_lin_vel = hand_vel.block<3,1>(0,0);
+    Vector3d hand_ang_vel_q_e = hand_vel.block<3,1>(3,0); double hand_ang_vel_q_w = hand_vel(6);
+    Vector3d omega = 2*hand_or_q_e.cross(hand_ang_vel_q_e)+2*hand_or_q_w*hand_ang_vel_q_e-2*hand_ang_vel_q_w*hand_or_q_e;
+
+
+    double der_alpha = 0.0;
+    return der_alpha;
 }
 
 void MainWindow::updatePlanningResults(problemPtr prob, HUMotion::planning_result_ptr results)

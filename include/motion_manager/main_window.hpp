@@ -191,6 +191,22 @@ public:
         double getNoiseRobustDerivate(int N, double h, std::deque<double> &buff);
 
         /**
+         * @brief getPredictedSwivelAngle
+         * @param hand_pos
+         * @param hand_or_q
+         * @return
+         */
+        double getPredictedSwivelAngle(Vector3d hand_pos,Quaterniond hand_or_q);
+
+        /**
+         * @brief getDerivativePredictedSwivelAngle
+         * @param hand_pos
+         * @param hand_vel
+         * @return
+         */
+        double getDerivativePredictedSwivelAngle(VectorXd hand_pos, VectorXd hand_vel);
+
+        /**
          * @brief updatePlanningResults
          * @param prob
          * @param results
