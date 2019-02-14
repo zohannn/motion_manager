@@ -9,6 +9,7 @@ Object::Object()
     this->m_name = "";
     this->m_pos.Xpos=0;this->m_pos.Ypos=0;this->m_pos.Zpos=0;
     this->m_or.pitch = 0; this->m_or.roll = 0; this->m_or.yaw = 0;
+    this->m_q = AngleAxisd(this->m_or.roll,Vector3d::UnitZ())*AngleAxisd(this->m_or.pitch,Vector3d::UnitY())*AngleAxisd(this->m_or.yaw,Vector3d::UnitX());
     this->m_size.Xsize = 0; this->m_size.Ysize = 0; this->m_size.Zsize = 0;
     this->handle = -1;
     this->handle_body = -1;
@@ -88,6 +89,7 @@ Object::Object(string name)
     this->m_name = name;
     this->m_pos.Xpos=0;this->m_pos.Ypos=0;this->m_pos.Zpos=0;
     this->m_or.pitch = 0; this->m_or.roll = 0; this->m_or.yaw = 0;
+    this->m_q = AngleAxisd(this->m_or.roll,Vector3d::UnitZ())*AngleAxisd(this->m_or.pitch,Vector3d::UnitY())*AngleAxisd(this->m_or.yaw,Vector3d::UnitX());
     this->m_size.Xsize = 0; this->m_size.Ysize = 0; this->m_size.Zsize = 0;
     this->handle = -1;
     this->handle_body = -1;
@@ -164,6 +166,7 @@ Object::Object(string name, pos ppos, orient oor, dim ssize,
     this->m_name = name;
     this->m_pos = ppos;
     this->m_or = oor;
+    this->m_q = AngleAxisd(this->m_or.roll,Vector3d::UnitZ())*AngleAxisd(this->m_or.pitch,Vector3d::UnitY())*AngleAxisd(this->m_or.yaw,Vector3d::UnitX());
     this->m_size = ssize;
     this->handle = -1;
     this->handle_body = -1;
@@ -240,6 +243,7 @@ Object::Object(const Object &obj)
     this->m_name = obj.m_name;
     this->m_pos = obj.m_pos;
     this->m_or = obj.m_or;
+    this->m_q = obj.m_q;
     this->m_size = obj.m_size;
 
     this->p_targetRight = targetPtr(new Target(*obj.p_targetRight.get()));
@@ -381,34 +385,86 @@ void Object::setOr(orient& oor, bool update_features)
 
         // update the new orientation of the object and update the features
         this->m_or = oor;
+        this->m_q = AngleAxisd(oor.roll,Vector3d::UnitZ())*AngleAxisd(oor.pitch,Vector3d::UnitY())*AngleAxisd(oor.yaw,Vector3d::UnitX());
         this->Trans_matrix(trans_obj);
 
         trans_tar_right = trans_obj * trans_obj_tar_right; // updated matrix of target right
-        std::vector<double> rpy_tar_right;
-        this->getRPY(trans_tar_right,rpy_tar_right);
+//        std::vector<double> rpy_tar_right; this->getRPY(trans_tar_right,rpy_tar_right);
+        Matrix3d Rot_tar_right = trans_tar_right.block<3,3>(0,0);
+        Vector3d rpy_tar_right = Rot_tar_right.eulerAngles(2,1,0);
         orient new_tar_right_or;
-        new_tar_right_or.roll = rpy_tar_right.at(0); new_tar_right_or.pitch = rpy_tar_right.at(1); new_tar_right_or.yaw = rpy_tar_right.at(2);
+        new_tar_right_or.roll = rpy_tar_right(0); new_tar_right_or.pitch = rpy_tar_right(1); new_tar_right_or.yaw = rpy_tar_right(2);
         this->p_targetRight->setOr(new_tar_right_or);
 
         trans_tar_left = trans_obj * trans_obj_tar_left; // updated matrix of target left
-        std::vector<double> rpy_tar_left;
-        this->getRPY(trans_tar_left,rpy_tar_left);
+//        std::vector<double> rpy_tar_left; this->getRPY(trans_tar_left,rpy_tar_left);
+        Matrix3d Rot_tar_left = trans_tar_left.block<3,3>(0,0);
+        Vector3d rpy_tar_left = Rot_tar_left.eulerAngles(2,1,0);
         orient new_tar_left_or;
-        new_tar_left_or.roll = rpy_tar_left.at(0); new_tar_left_or.pitch = rpy_tar_left.at(1); new_tar_left_or.yaw = rpy_tar_left.at(2);
+        new_tar_left_or.roll = rpy_tar_left(0); new_tar_left_or.pitch = rpy_tar_left(1); new_tar_left_or.yaw = rpy_tar_left(2);
         this->p_targetLeft->setOr(new_tar_left_or);
 
         trans_engage = trans_obj * trans_obj_engage; // updated matrix of engage point
-        std::vector<double> rpy_engage;
-        this->getRPY(trans_engage,rpy_engage);
+//        std::vector<double> rpy_engage; this->getRPY(trans_engage,rpy_engage);
+        Matrix3d Rot_engage = trans_engage.block<3,3>(0,0);
+        Vector3d rpy_engage = Rot_engage.eulerAngles(2,1,0);
         orient new_engage_or;
-        new_engage_or.roll = rpy_engage.at(0); new_engage_or.pitch = rpy_engage.at(1); new_engage_or.yaw = rpy_engage.at(2);
+        new_engage_or.roll = rpy_engage(0); new_engage_or.pitch = rpy_engage(1); new_engage_or.yaw = rpy_engage(2);
         this->p_engage->setOr(new_engage_or);
-
-
-
     }else{
         this->m_or = oor;
+        this->m_q = AngleAxisd(oor.roll,Vector3d::UnitZ())*AngleAxisd(oor.pitch,Vector3d::UnitY())*AngleAxisd(oor.yaw,Vector3d::UnitX());
+    }
 
+}
+
+void Object::setOr(Quaterniond& oor_q, bool update_features)
+{
+    if (update_features){
+
+        Matrix4d trans_tar_right;
+        Matrix4d trans_tar_left;
+        Matrix4d trans_engage;
+
+        Matrix4d trans_obj;
+        Matrix4d inv_trans_obj;
+
+        Matrix4d trans_obj_tar_right;
+        Matrix4d trans_obj_tar_left;
+        Matrix4d trans_obj_engage;
+
+        this->Trans_matrix(trans_obj);
+        this->getTar_right_matrix(trans_tar_right);
+        this->getTar_left_matrix(trans_tar_left);
+        this->getEngage_matrix(trans_engage);
+
+
+        inv_trans_obj = trans_obj.inverse();
+        trans_obj_tar_right=inv_trans_obj * trans_tar_right; // transformation matrix object - target right
+        trans_obj_tar_left=inv_trans_obj * trans_tar_left; // transformation matrix object - target left
+        trans_obj_engage=inv_trans_obj * trans_engage; // transformation matrix object - engage
+
+        // update the new orientation of the object and update the features
+        this->m_q = oor_q;
+        Vector3d rpy = oor_q.toRotationMatrix().eulerAngles(2,1,0); // ZYX angles
+        this->m_or.roll = rpy(0); this->m_or.pitch = rpy(1); this->m_or.yaw = rpy(2);
+        this->Trans_matrix(trans_obj);
+
+        trans_tar_right = trans_obj * trans_obj_tar_right; // updated matrix of target right
+        Matrix3d Rot_tar_right = trans_tar_right.block<3,3>(0,0); Quaterniond q_tar_right(Rot_tar_right);
+        this->p_targetRight->setQuaternion(q_tar_right);
+
+        trans_tar_left = trans_obj * trans_obj_tar_left; // updated matrix of target left
+        Matrix3d Rot_tar_left = trans_tar_left.block<3,3>(0,0); Quaterniond q_tar_left(Rot_tar_left);
+        this->p_targetLeft->setQuaternion(q_tar_left);
+
+        trans_engage = trans_obj * trans_obj_engage; // updated matrix of engage point
+        Matrix3d Rot_engage = trans_engage.block<3,3>(0,0);Quaterniond q_eng(Rot_engage);
+        this->p_engage->setQuaternion(q_eng);
+    }else{
+        this->m_q = oor_q;
+        Vector3d rpy = oor_q.toRotationMatrix().eulerAngles(2,1,0); // ZYX angles
+        this->m_or.roll = rpy(0); this->m_or.pitch = rpy(1); this->m_or.yaw = rpy(2);
     }
 }
 

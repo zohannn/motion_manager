@@ -63,6 +63,12 @@ public:
     void setOr(orient& oor);
 
     /**
+     * @brief setQuaternion
+     * @param or_q
+     */
+    void setQuaternion(Quaterniond& or_q);
+
+    /**
      * @brief This method gets the name of the point.
      * @return
      */
@@ -79,6 +85,12 @@ public:
      * @return
      */
     orient getOr() const;
+
+    /**
+     * @brief getQuaternion
+     * @return
+     */
+    Quaterniond getQuaternion() const;
 
     /**
      * @brief This method gets the x axis of the orientation frame.
@@ -121,6 +133,7 @@ protected:
     string m_name; /**< name of the point */
     pos m_pos; /**< position of the point */
     orient m_or; /**< orientation of the point */
+    Quaterniond m_q; /**< quaternion of the point */
 
     /**
      * @brief Get the axis of the orientation matrix from the orientation in Roll-Pitch-Yaw.

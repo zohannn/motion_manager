@@ -53,8 +53,7 @@ void ResultsCtrlNullJointsDialog::plotJoint(QCustomPlot *plot, QString title, QV
     plot->graph(0)->setData(time, vel);
     plot->graph(0)->valueAxis()->setRange(*std::min_element(vel.begin(), vel.end()),*std::max_element(vel.begin(), vel.end()));
     plot->graph(0)->rescaleAxes();
-
-
+    plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
     plot->replot();
 }
 

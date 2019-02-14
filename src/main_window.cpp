@@ -116,6 +116,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mTimeMapdlg = new TimeMapDialog(this);
     mTimeMapdlg->setModal(false);
 
+    //create the Results Control Predicted Swivel Angle dialog
+    mResultsCtrlPredSwivelAngledlg = new ResultsCtrlPredSwivelAngleDialog(this);
+    mResultsCtrlPredSwivelAngledlg->setModal(false);
+
     // check boxes
     QObject::connect(this->ui.checkBox_tar_x_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_tar_x_pos_var(int)));
     QObject::connect(this->ui.checkBox_tar_y_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_tar_y_pos_var(int)));
@@ -280,17 +284,19 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     this->lpf_tar_pos_x.reset(new LowPassFilter());
     this->lpf_tar_pos_y.reset(new LowPassFilter());
     this->lpf_tar_pos_z.reset(new LowPassFilter());
-    this->lpf_tar_or_roll.reset(new LowPassFilter());
-    this->lpf_tar_or_pitch.reset(new LowPassFilter());
-    this->lpf_tar_or_yaw.reset(new LowPassFilter());
+    this->lpf_tar_or_q_x.reset(new LowPassFilter());
+    this->lpf_tar_or_q_y.reset(new LowPassFilter());
+    this->lpf_tar_or_q_z.reset(new LowPassFilter());
+    this->lpf_tar_or_q_w.reset(new LowPassFilter());
 
     // controlling: low pass filter of obstacles' information
     this->lpf_obsts_pos_x.reset(new LowPassFilter());
     this->lpf_obsts_pos_y.reset(new LowPassFilter());
     this->lpf_obsts_pos_z.reset(new LowPassFilter());
-    this->lpf_obsts_or_roll.reset(new LowPassFilter());
-    this->lpf_obsts_or_pitch.reset(new LowPassFilter());
-    this->lpf_obsts_or_yaw.reset(new LowPassFilter());
+    this->lpf_obsts_or_q_x.reset(new LowPassFilter());
+    this->lpf_obsts_or_q_y.reset(new LowPassFilter());
+    this->lpf_obsts_or_q_z.reset(new LowPassFilter());
+    this->lpf_obsts_or_q_w.reset(new LowPassFilter());
 
     // controlling: low pass filter of the position of the joints
     this->lpf_joint_pos_1.reset(new LowPassFilter());
@@ -408,9 +414,10 @@ void MainWindow::execPosControl()
             double obj_x_var = 100; // mm
             double obj_y_var = 100; // mm
             double obj_z_var = 100; // mm
-            double obj_roll_var = 0.5; // rad
-            double obj_pitch_var = 0.5; // rad
-            double obj_yaw_var = 0.5; // rad
+            double obj_q_x_var = 0.1;
+            double obj_q_y_var = 0.1;
+            double obj_q_z_var = 0.1;
+            double obj_q_w_var = 0.1;
 
             bool follow_tar = false;
 
@@ -433,7 +440,7 @@ void MainWindow::execPosControl()
             Vector3d h_hand_ang_acc_q_e_init; double h_hand_ang_acc_q_w_init; Vector3d h_hand_ang_acc_q_e_end; double h_hand_ang_acc_q_w_end;
 
 
-            Vector3d tar_pos; Vector3d tar_rpy; Quaterniond tar_q;
+            Vector3d tar_pos; Quaterniond tar_q;
             if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
                  follow_tar = this->ui.checkBox_follow_target->isChecked();
                  stages = this->des_handPosition.size();
@@ -447,9 +454,7 @@ void MainWindow::execPosControl()
                      tar_pos(0) = tar->getPos().Xpos;
                      tar_pos(1) = tar->getPos().Ypos;
                      tar_pos(2) = tar->getPos().Zpos;
-                     tar_rpy(0) = tar->getOr().roll;
-                     tar_rpy(1) = tar->getOr().pitch;
-                     tar_rpy(2) = tar->getOr().yaw;
+                     tar_q = tar->getQuaternion();
                      dist_app = this->approach_ctrl.at(3);
                      vv_app << this->approach_ctrl.at(0),this->approach_ctrl.at(1),this->approach_ctrl.at(2);
                      dist_ret = this->retreat_ctrl.at(3);
@@ -461,16 +466,18 @@ void MainWindow::execPosControl()
                          tar_pos(0) = tar_pos(0) - (obj_x_var/2) + obj_x_var*(rand() / double(RAND_MAX));
                          tar_pos(1) = tar_pos(1) - (obj_y_var/2) + obj_y_var*(rand() / double(RAND_MAX));
                          tar_pos(2) = tar_pos(2) - (obj_z_var/2) + obj_z_var*(rand() / double(RAND_MAX));
-                         tar_rpy(0) = tar_rpy(0) - (obj_roll_var/2) + obj_roll_var*(rand() / double(RAND_MAX));
-                         tar_rpy(1) = tar_rpy(1) - (obj_pitch_var/2) + obj_pitch_var*(rand() / double(RAND_MAX));
-                         tar_rpy(2) = tar_rpy(2) - (obj_yaw_var/2) + obj_yaw_var*(rand() / double(RAND_MAX));
+                         tar_q.x() = tar_q.x() - (obj_q_x_var/2) + obj_q_x_var*(rand() / double(RAND_MAX));
+                         tar_q.y() = tar_q.y() - (obj_q_y_var/2) + obj_q_y_var*(rand() / double(RAND_MAX));
+                         tar_q.z() = tar_q.z() - (obj_q_z_var/2) + obj_q_z_var*(rand() / double(RAND_MAX));
+                         tar_q.w() = tar_q.w() - (obj_q_w_var/2) + obj_q_w_var*(rand() / double(RAND_MAX));
                          if(this->ui.checkBox_tar_filter_noise->isChecked()){
                              tar_pos(0) = this->lpf_tar_pos_x->update(tar_pos(0));
                              tar_pos(1) = this->lpf_tar_pos_y->update(tar_pos(1));
                              tar_pos(2) = this->lpf_tar_pos_z->update(tar_pos(2));
-                             tar_rpy(0) = DEGTORAD*this->lpf_tar_or_roll->update(RADTODEG*tar_rpy(0));
-                             tar_rpy(1) = DEGTORAD*this->lpf_tar_or_pitch->update(RADTODEG*tar_rpy(1));
-                             tar_rpy(2) = DEGTORAD*this->lpf_tar_or_yaw->update(RADTODEG*tar_rpy(2));
+                             tar_q.x() = this->lpf_tar_or_q_x->update(tar_q.x());
+                             tar_q.y() = this->lpf_tar_or_q_y->update(tar_q.y());
+                             tar_q.z() = this->lpf_tar_or_q_z->update(tar_q.z());
+                             tar_q.w() = this->lpf_tar_or_q_w->update(tar_q.w());
                          }
                      }
                  }else if(mov_type==2 || mov_type==3 || mov_type==4){ // place
@@ -478,9 +485,7 @@ void MainWindow::execPosControl()
                      tar_pos(0) = tar->getPos().Xpos;
                      tar_pos(1) = tar->getPos().Ypos;
                      tar_pos(2) = tar->getPos().Zpos;
-                     tar_rpy(0) = tar->getOr().roll;
-                     tar_rpy(1) = tar->getOr().pitch;
-                     tar_rpy(2) = tar->getOr().yaw;
+                     tar_q = tar->getQuaternion();
                      dist_app = this->approach_ctrl.at(3);
                      vv_app << this->approach_ctrl.at(0),this->approach_ctrl.at(1),this->approach_ctrl.at(2);
                      dist_ret = this->retreat_ctrl.at(3);
@@ -492,26 +497,26 @@ void MainWindow::execPosControl()
                          tar_pos(0) = tar_pos(0) - (obj_x_var/2) + obj_x_var*(rand() / double(RAND_MAX));
                          tar_pos(1) = tar_pos(1) - (obj_y_var/2) + obj_y_var*(rand() / double(RAND_MAX));
                          tar_pos(2) = tar_pos(2) - (obj_z_var/2) + obj_z_var*(rand() / double(RAND_MAX));
-                         tar_rpy(0) = tar_rpy(0) - (obj_roll_var/2) + obj_roll_var*(rand() / double(RAND_MAX));
-                         tar_rpy(1) = tar_rpy(1) - (obj_pitch_var/2) + obj_pitch_var*(rand() / double(RAND_MAX));
-                         tar_rpy(2) = tar_rpy(2) - (obj_yaw_var/2) + obj_yaw_var*(rand() / double(RAND_MAX));
+                         tar_q.x() = tar_q.x() - (obj_q_x_var/2) + obj_q_x_var*(rand() / double(RAND_MAX));
+                         tar_q.y() = tar_q.y() - (obj_q_y_var/2) + obj_q_y_var*(rand() / double(RAND_MAX));
+                         tar_q.z() = tar_q.z() - (obj_q_z_var/2) + obj_q_z_var*(rand() / double(RAND_MAX));
+                         tar_q.w() = tar_q.w() - (obj_q_w_var/2) + obj_q_w_var*(rand() / double(RAND_MAX));
                          if(this->ui.checkBox_tar_filter_noise->isChecked()){
                              tar_pos(0) = this->lpf_tar_pos_x->update(tar_pos(0));
                              tar_pos(1) = this->lpf_tar_pos_y->update(tar_pos(1));
                              tar_pos(2) = this->lpf_tar_pos_z->update(tar_pos(2));
-                             tar_rpy(0) = DEGTORAD*this->lpf_tar_or_roll->update(RADTODEG*tar_rpy(0));
-                             tar_rpy(1) = DEGTORAD*this->lpf_tar_or_pitch->update(RADTODEG*tar_rpy(1));
-                             tar_rpy(2) = DEGTORAD*this->lpf_tar_or_yaw->update(RADTODEG*tar_rpy(2));
+                             tar_q.x() = this->lpf_tar_or_q_x->update(tar_q.x());
+                             tar_q.y() = this->lpf_tar_or_q_y->update(tar_q.y());
+                             tar_q.z() = this->lpf_tar_or_q_z->update(tar_q.z());
+                             tar_q.w() = this->lpf_tar_or_q_w->update(tar_q.w());
                          }
                      }
                  }
                  //Vector3d xt_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(xt.data(), xt.size());
                  //Vector3d yt_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(yt.data(), yt.size());
                  Vector3d zt_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(zt.data(), zt.size());
-                 vector<double> tar_rpy_vec(tar_rpy.size()); VectorXd::Map(&tar_rpy_vec[0], tar_rpy.size()) = tar_rpy;
-                 Matrix3d Rot_tar; this->Rot_matrix(Rot_tar,tar_rpy_vec); //Rot_tar.col(0) = xt_vec; Rot_tar.col(1) = yt_vec; Rot_tar.col(2) = zt_vec;
+                 Matrix3d Rot_tar = tar_q.toRotationMatrix();
                  Vector3d vv_app_w = Rot_tar*vv_app; Vector3d vv_ret_w = Rot_tar*vv_ret;
-                 tar_q = Rot_tar;
 
                  hand_h_positions = this->handPosition_mov_stages.at(this->i_ctrl);
                  hand_h_orientations = this->handOrientation_mov_stages.at(this->i_ctrl);
@@ -663,6 +668,10 @@ void MainWindow::execPosControl()
 
 
             double vel_max = this->ui.lineEdit_vel_max->text().toDouble()*M_PI/180;
+            bool joints_arm_vel_ctrl = this->ui.checkBox_joints_velocity_ctrl->isChecked();
+            double swivel_angle_th = this->ui.lineEdit_swivel_angle_th->text().toDouble();
+            double g_map_th_max_replan = this->ui.lineEdit_g_th_max_replan->text().toDouble();
+            double g_map_th_min_replan = this->ui.lineEdit_g_th_min_replan->text().toDouble();
             double t_f_trap = this->ui.lineEdit_t_f_trap->text().toDouble();
 
             bool jlim_en = this->ui.checkBox_joints_limits_av->isChecked();
@@ -712,24 +721,25 @@ void MainWindow::execPosControl()
                         objectPtr obs = obsts.at(i);
                         string obs_name = obs->getName();
                         obs_new.reset(new Object(obs_name));
-                        motion_manager::pos obs_pos;
-                        motion_manager::orient obs_or;
+                        motion_manager::pos obs_pos; Quaterniond obs_or_q;
                         obs_pos.Xpos = obs->getPos().Xpos - (obj_x_var/2) + obj_x_var*(rand() / double(RAND_MAX));
                         obs_pos.Ypos = obs->getPos().Ypos - (obj_y_var/2) + obj_y_var*(rand() / double(RAND_MAX));
                         obs_pos.Zpos = obs->getPos().Zpos - (obj_z_var/2) + obj_z_var*(rand() / double(RAND_MAX));
-                        obs_or.roll = obs->getOr().roll - (obj_roll_var/2) + obj_roll_var*(rand() / double(RAND_MAX));
-                        obs_or.pitch = obs->getOr().pitch - (obj_pitch_var/2) + obj_pitch_var*(rand() / double(RAND_MAX));
-                        obs_or.yaw = obs->getOr().yaw - (obj_yaw_var/2) + obj_yaw_var*(rand() / double(RAND_MAX));
+                        obs_or_q.x() = obs->getQuaternion().x() - (obj_q_x_var/2) + obj_q_x_var*(rand() / double(RAND_MAX));
+                        obs_or_q.y() = obs->getQuaternion().y() - (obj_q_y_var/2) + obj_q_y_var*(rand() / double(RAND_MAX));
+                        obs_or_q.z() = obs->getQuaternion().z() - (obj_q_z_var/2) + obj_q_z_var*(rand() / double(RAND_MAX));
+                        obs_or_q.w() = obs->getQuaternion().w() - (obj_q_w_var/2) + obj_q_w_var*(rand() / double(RAND_MAX));
                         if(this->ui.checkBox_obsts_filter_noise->isChecked()){
                             obs_pos.Xpos = this->lpf_obsts_pos_x->update(obs_pos.Xpos);
                             obs_pos.Ypos = this->lpf_obsts_pos_y->update(obs_pos.Ypos);
                             obs_pos.Zpos = this->lpf_obsts_pos_z->update(obs_pos.Zpos);
-                            obs_or.roll = DEGTORAD*this->lpf_obsts_or_roll->update(RADTODEG*obs_or.roll);
-                            obs_or.pitch = DEGTORAD*this->lpf_obsts_or_pitch->update(RADTODEG*obs_or.pitch);
-                            obs_or.yaw = DEGTORAD*this->lpf_obsts_or_yaw->update(RADTODEG*obs_or.yaw);
+                            obs_or_q.x() = this->lpf_obsts_or_q_x->update(obs_or_q.x());
+                            obs_or_q.y() = this->lpf_obsts_or_q_y->update(obs_or_q.y());
+                            obs_or_q.z() = this->lpf_obsts_or_q_z->update(obs_or_q.z());
+                            obs_or_q.w() = this->lpf_obsts_or_q_w->update(obs_or_q.w());
                         }
                         obs_new->setPos(obs_pos,false);
-                        obs_new->setOr(obs_or,false);
+                        obs_new->setOr(obs_or_q,false);
                         obs_new->setSize(obs->getSize());
                         obsts_n.at(i) = obs_new;
                     } // for loop obstacles
@@ -886,12 +896,14 @@ void MainWindow::execPosControl()
                 }else{this->samples_des_hand_pose++;}
 
                 // predicted swivel angle
-                double alpha_predicted = this->getPredictedSwivelAngle(hand_pos_vec_x);
-                BOOST_LOG_SEV(lg, info) << "alpha_predicted = " << alpha_predicted;
+                double alpha_predicted = RADTODEG*this->getPredictedSwivelAngle(hand_pos_vec_x);
+                //BOOST_LOG_SEV(lg, info) << "alpha_predicted = " << alpha_predicted;
 
                 // derivative of the predicted swivel angle
-                double der_alpha_predicted = this->getDerivativePredictedSwivelAngle(hand_pos_vec_x,hand_vel_vec_x);
-                BOOST_LOG_SEV(lg, info) << "der_alpha_predicted = " << der_alpha_predicted;
+                double der_alpha_predicted = RADTODEG*this->getDerivativePredictedSwivelAngle(hand_pos_vec_x,hand_vel_vec_x);
+                //BOOST_LOG_SEV(lg, info) << "der_alpha_predicted = " << der_alpha_predicted;
+
+//                double curr_alpha = this->curr_scene->getHumanoid()->getSwivelAngle(1,r_arm_posture);
 
 
 //                // get desired hand acceleration
@@ -1820,49 +1832,38 @@ void MainWindow::execPosControl()
                     }
                 }
 
-                // ------------------- RE-PLANNING STRATEGY -----------TO DO ----------------------------- //
-//                double tar_pos_th = this->ui.lineEdit_tar_pos_th->text().toDouble();
-//                double tar_or_th = this->ui.lineEdit_tar_or_th->text().toDouble();
-//                double g_map_th_max_replan = this->ui.lineEdit_g_th_max_replan->text().toDouble();
-//                double g_map_th_min_replan = this->ui.lineEdit_g_th_min_replan->text().toDouble();
-//                bool b_tar_pos = (this->tar_position-tar_pos).norm()>tar_pos_th;
-//                Vector3d tar_q_e(tar_q.x(),tar_q.y(),tar_q.z()); double tar_q_w = tar_q.w();
-//                Vector3d tar_q_e_p(this->tar_quaternion.x(),this->tar_quaternion.y(),this->tar_quaternion.z()); double tar_q_w_p = this->tar_quaternion.w();
-//                Vector3d diff_tar_q = tar_q_w_p*tar_q_e - tar_q_w*tar_q_e_p - tar_q_e.cross(tar_q_e_p);
-//                bool b_tar_or = diff_tar_q.norm()>tar_or_th;
-//                if((stage_descr.compare("plan")==0) && (g_map>g_map_th_min_replan && g_map<g_map_th_max_replan) && (b_tar_pos||b_tar_or))
-//                {
-//                    // stop the movement
-//                    this->exec_command_ctrl = false;
-//                    vector<double> r_arm_velocities_0(JOINTS_ARM,0.0);vector<double> r_hand_velocities_0(JOINTS_HAND,0.0);
-//                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities_0,r_hand_posture_mes,r_hand_velocities_0);
+                // ------------------- RE-PLANNING STRATEGY ---------------------------------------- //
+                if((stage_descr.compare("plan")==0) && (g_map>g_map_th_min_replan && g_map<g_map_th_max_replan)
+                        && (abs(der_alpha_predicted)>=swivel_angle_th))
+                {
+                    // stop the movement
+                    this->exec_command_ctrl = false; this->replanning_succeed = false;
+                    vector<double> r_arm_velocities_0(JOINTS_ARM,0.0);vector<double> r_hand_velocities_0(JOINTS_HAND,0.0);
+                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities_0,r_hand_posture_mes,r_hand_velocities_0,joints_arm_vel_ctrl,true);
 
-//                    // solve the new problem
-//                    this->qnode.log(QNode::Info,string("Re-planning ..."));
-//                    objectPtr obj_man = this->curr_scene->getObject(this->i_tar_ctrl);
-//                    bool prec = this->ui.radioButton_prec->isChecked();
-//                    this->prob_ctrl.reset(new Problem(0,new Movement(mov_type,1,obj_man,prec),new Scenario(*(this->curr_scene.get()))));
-//                    HUMotion::planning_result_ptr results_ptr;
-//                    try{
-//                        results_ptr = this->prob_ctrl->solve(this->tols_ctrl);
-//                        if(results_ptr!=nullptr && results_ptr->status==0){
-//                            this->qnode.log(QNode::Info,string("Re-planning succeed! Using the new planned trajectory"));
-//                            // the planning succeed: update the results
-//                            this->updatePlanningResults(this->prob_ctrl,results_ptr);
-//                            // clear
-//                            this->clear_control_variables();
-//                        }else{
-//                            this->qnode.log(QNode::Info,string("Re-planning failed! Using the previous trajectory"));
-//                        }
-//                    }catch( ... ){
-//                        this->qnode.log(QNode::Info,string("Re-planning raised an exception! Using the previous trajectory"));
-//                    }
-//                    // update the target info
-//                    this->tar_position = tar_pos;
-//                    this->tar_quaternion = tar_q;
-//                }else{
-//                    this->exec_command_ctrl = true;
-//                }
+                    // solve the new problem
+                    this->qnode.log(QNode::Info,string("Re-planning ..."));
+                    objectPtr obj_man = this->curr_scene->getObject(this->i_tar_ctrl);
+                    bool prec = this->ui.radioButton_prec->isChecked();
+                    this->prob_ctrl.reset(new Problem(0,new Movement(mov_type,1,obj_man,prec),new Scenario(*(this->curr_scene.get()))));
+                    HUMotion::planning_result_ptr results_ptr;
+                    try{
+                        results_ptr = this->prob_ctrl->solve(this->tols_ctrl);
+                        if(results_ptr!=nullptr && results_ptr->status==0){
+                            this->qnode.log(QNode::Info,string("Re-planning succeed! Using the new planned trajectory"));
+                            // the planning succeed: update the results
+                            this->updatePlanningResults(this->prob_ctrl,results_ptr);
+                            // clear
+                            this->clear_control_variables();
+                        }else{
+                            this->qnode.log(QNode::Info,string("Re-planning failed! The motion stops!"));
+                        }
+                    }catch( ... ){
+                        this->qnode.log(QNode::Info,string("Re-planning raised an exception! The motion stops!"));
+                    }
+                }else if(this->replanning_succeed){
+                    this->exec_command_ctrl = true;
+                }
                 // ----------------------------------------------------------- //
 
                 // position Koeff
@@ -2033,8 +2034,7 @@ void MainWindow::execPosControl()
                                                                                  jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts_n);
 
 
-                // execute the control
-                bool joints_arm_vel_ctrl = this->ui.checkBox_joints_velocity_ctrl->isChecked();
+                // execute the control                
                 if(this->exec_command_ctrl){
                     this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities,joints_arm_vel_ctrl,true);
                 }
@@ -2124,6 +2124,10 @@ void MainWindow::execPosControl()
                     this->error_acc_tot_norm.push_back(error_acc_tot.norm());
                 }
 
+                // predicted swivel angle
+                this->pred_swivel_angle_ctrl.push_back(alpha_predicted);
+                this->pred_der_swivel_angle_ctrl.push_back(der_alpha_predicted);
+
                 // time
                 this->t_j_past = this->qnode.getSimTime();
                 this->sim_time.push_back(this->qnode.getSimTime()-this->t_der_past);
@@ -2145,9 +2149,10 @@ void MainWindow::execVelControl()
             double obsts_x_var = 100; // mm
             double obsts_y_var = 100; // mm
             double obsts_z_var = 100; // mm
-            double obsts_roll_var = 0.5; // rad
-            double obsts_pitch_var = 0.5; // rad
-            double obsts_yaw_var = 0.5; // rad
+            double obsts_q_x_var = 0.1;
+            double obsts_q_y_var = 0.1;
+            double obsts_q_z_var = 0.1;
+            double obsts_q_w_var = 0.1;
 
             double des_hand_vel_x,des_hand_vel_y,des_hand_vel_z,des_hand_vel_wx,des_hand_vel_wy,des_hand_vel_wz;
             if (this->ui.checkBox_draw_ellipse->isChecked()){
@@ -2224,23 +2229,25 @@ void MainWindow::execVelControl()
                         string obs_name = obs->getName();
                         obs_new.reset(new Object(obs_name));
                         motion_manager::pos obs_pos;
-                        motion_manager::orient obs_or;
+                        Quaterniond obs_or_q;
                         obs_pos.Xpos = obs->getPos().Xpos - (obsts_x_var/2) + obsts_x_var*(rand() / double(RAND_MAX));
                         obs_pos.Ypos = obs->getPos().Ypos - (obsts_y_var/2) + obsts_y_var*(rand() / double(RAND_MAX));
                         obs_pos.Zpos = obs->getPos().Zpos - (obsts_z_var/2) + obsts_z_var*(rand() / double(RAND_MAX));
-                        obs_or.roll = obs->getOr().roll - (obsts_roll_var/2) + obsts_roll_var*(rand() / double(RAND_MAX));
-                        obs_or.pitch = obs->getOr().pitch - (obsts_pitch_var/2) + obsts_pitch_var*(rand() / double(RAND_MAX));
-                        obs_or.yaw = obs->getOr().yaw - (obsts_yaw_var/2) + obsts_yaw_var*(rand() / double(RAND_MAX));
+                        obs_or_q.x() = obs->getQuaternion().x() - (obsts_q_x_var/2) + obsts_q_x_var*(rand() / double(RAND_MAX));
+                        obs_or_q.y() = obs->getQuaternion().y() - (obsts_q_y_var/2) + obsts_q_y_var*(rand() / double(RAND_MAX));
+                        obs_or_q.z() = obs->getQuaternion().z() - (obsts_q_z_var/2) + obsts_q_z_var*(rand() / double(RAND_MAX));
+                        obs_or_q.w() = obs->getQuaternion().w() - (obsts_q_w_var/2) + obsts_q_w_var*(rand() / double(RAND_MAX));
                         if(this->ui.checkBox_obsts_filter_noise->isChecked()){
                             obs_pos.Xpos = this->lpf_obsts_pos_x->update(obs_pos.Xpos);
                             obs_pos.Ypos = this->lpf_obsts_pos_y->update(obs_pos.Ypos);
                             obs_pos.Zpos = this->lpf_obsts_pos_z->update(obs_pos.Zpos);
-                            obs_or.roll = DEGTORAD*this->lpf_obsts_or_roll->update(RADTODEG*obs_or.roll);
-                            obs_or.pitch = DEGTORAD*this->lpf_obsts_or_pitch->update(RADTODEG*obs_or.pitch);
-                            obs_or.yaw = DEGTORAD*this->lpf_obsts_or_yaw->update(RADTODEG*obs_or.yaw);
+                            obs_or_q.x() = this->lpf_obsts_or_q_x->update(obs_or_q.x());
+                            obs_or_q.y() = this->lpf_obsts_or_q_y->update(obs_or_q.y());
+                            obs_or_q.z() = this->lpf_obsts_or_q_z->update(obs_or_q.z());
+                            obs_or_q.w() = this->lpf_obsts_or_q_w->update(obs_or_q.w());
                         }
                         obs_new->setPos(obs_pos,false);
-                        obs_new->setOr(obs_or,false);
+                        obs_new->setOr(obs_or_q,false);
                         obs_new->setSize(obs->getSize());
                         obsts_n.at(i) = obs_new;
                     }// for loop obstacles
@@ -4086,8 +4093,10 @@ void MainWindow::on_pushButton_plan_clicked()
                     HUMotion::warm_start_params final_plan;
                     final_plan.valid = true;
                     final_plan.description = "plan";
-                    mTolHumpdlg->getPlanData(final_plan.x,final_plan.zL,final_plan.zU,final_plan.dual_vars);
+                    int warm_steps;
+                    mTolHumpdlg->getPlanData(final_plan.x,final_plan.zL,final_plan.zU,final_plan.dual_vars,warm_steps);
                     tols.mov_specs.final_warm_start_params.push_back(final_plan);
+                    tols.mov_specs.warm_n_steps = warm_steps;
                 }
                 // approach
                 if(mTolHumpdlg->getWarmStartApproachOption()){
@@ -4136,6 +4145,10 @@ void MainWindow::on_pushButton_plan_clicked()
                         timesteps_stage_aux.clear();
                         double t_stage = h_results->time_steps.at(i);
                         MatrixXd traj_stage = h_results->trajectory_stages.at(i);
+                        if(i==0){
+                            // plan stage
+                            this->warm_n_steps_mov = traj_stage.rows()-1;
+                        }
                         for(int j=0;j<traj_stage.rows();++j){
                             if(j==traj_stage.rows()-1){
                                 timesteps_stage_aux.push_back(0.0);
@@ -4159,6 +4172,7 @@ void MainWindow::on_pushButton_plan_clicked()
             // make a copy of the human-like parameters for controlling
             this->tols_ctrl = this->tols;
             this->tols_ctrl.mov_specs.warm_start = true;
+            this->tols_ctrl.mov_specs.warm_n_steps = this->warm_n_steps_mov;
             this->tols_ctrl.mov_specs.final_warm_start_params = this->final_warm_start_res_mov;
             this->tols_ctrl.mov_specs.bounce_warm_start_params = this->bounce_warm_start_res_mov;
 
@@ -4907,6 +4921,10 @@ if(solved){
         // swivel angle
         this->swivel_angle_mov.resize(tot_steps);
         this->swivel_angle_mov_stages.resize(this->jointsPosition_mov.size());
+        this->der_swivel_angle_mov_stages.resize(this->jointsPosition_mov.size());
+        this->der_swivel_angle_mov_max_stages.resize(this->jointsPosition_mov.size());
+        this->der_swivel_angle_mov_min_stages.resize(this->jointsPosition_mov.size());
+        this->der_swivel_angle_mov_average_stages.resize(this->jointsPosition_mov.size());
 
         vector<double> timesteps_mov_tot(tot_steps,0.0);
         int step = 0;
@@ -4954,7 +4972,7 @@ if(solved){
                 this->curr_scene->getHumanoid()->getShoulderOr(arm_code,this->shoulderOrientation_mov.at(step),posture);
                 // swivel angle
                 this->swivel_angle_mov.at(step) = this->curr_scene->getHumanoid()->getSwivelAngle(arm_code,posture);
-                swivel_angles_stage = this->curr_scene->getHumanoid()->getSwivelAngle(arm_code,posture);
+                swivel_angles_stage.at(i) = this->curr_scene->getHumanoid()->getSwivelAngle(arm_code,posture);
                 // velocities
                 VectorXd vel_row = vel_stage.block<1,JOINTS_ARM>(i,0);
                 vector<double> velocities; velocities.resize(vel_row.size());
@@ -5017,6 +5035,10 @@ if(solved){
             this->des_handOrientation.push_back(this->handOrientation_mov.at(step-1));
             this->des_handOrientation_q.push_back(this->handOrientation_q_mov.at(step-1));
             this->swivel_angle_mov_stages.at(k) = swivel_angles_stage;
+            this->getDerivative(this->swivel_angle_mov_stages.at(k),this->timesteps_mov.at(k),this->der_swivel_angle_mov_stages.at(k));
+            this->der_swivel_angle_mov_max_stages.at(k) = *std::max_element(this->der_swivel_angle_mov_stages.at(k).begin(),this->der_swivel_angle_mov_stages.at(k).end());
+            this->der_swivel_angle_mov_min_stages.at(k) = *std::min_element(this->der_swivel_angle_mov_stages.at(k).begin(),this->der_swivel_angle_mov_stages.at(k).end());
+            this->der_swivel_angle_mov_average_stages.at(k) = std::accumulate(this->der_swivel_angle_mov_stages.at(k).begin(),this->der_swivel_angle_mov_stages.at(k).end(),0.0)/this->der_swivel_angle_mov_stages.at(k).size();
 
         }// loop stages
 
@@ -7641,7 +7663,7 @@ void MainWindow::on_pushButton_warm_start_res_clicked()
         {
             this->mWarmdlg->enablePlanData(true);
             HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(1);
-            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars);
+            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_steps_mov);
 
             this->mWarmdlg->enableApproachData(true);
             HUMotion::warm_start_params approach_tar = this->final_warm_start_res_mov.at(0);
@@ -7661,13 +7683,13 @@ void MainWindow::on_pushButton_warm_start_res_clicked()
 
                 this->mWarmdlg->enablePlanData(true);
                 HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(1);
-                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars);
+                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_steps_mov);
 
             }else{
 
                 this->mWarmdlg->enablePlanData(true);
                 HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(0);
-                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars);
+                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_steps_mov);
 
                 this->mWarmdlg->enableRetreatData(true);
                 HUMotion::warm_start_params retreat_tar = this->final_warm_start_res_mov.at(1);
@@ -7677,7 +7699,7 @@ void MainWindow::on_pushButton_warm_start_res_clicked()
         }else{
             this->mWarmdlg->enablePlanData(true);
             HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(0);
-            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars);
+            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_steps_mov);
         }
     }
 
@@ -12903,6 +12925,7 @@ double MainWindow::getPredictedSwivelAngle(VectorXd hand_pos)
 {
     // position
     double hand_x = hand_pos(0); double hand_y = hand_pos(1); double hand_z = hand_pos(2);
+//    double hand_x = -hand_pos(0); double hand_y = hand_pos(1); double hand_z = hand_pos(2);
     Quaterniond hand_or_q;
     hand_or_q.x() = hand_pos(3);
     hand_or_q.y() = hand_pos(4);
@@ -12918,8 +12941,8 @@ double MainWindow::getPredictedSwivelAngle(VectorXd hand_pos)
                     +0.47*cos(hand_yaw+0.6)-0.15*atan2(hand_z,hand_x)
                     +0.34*cos(hand_roll+hand_yaw+1.07)-0.4*cos(hand_roll+hand_pitch);
 
-    double alpha_r = (2*M_PI+alpha)-M_PI/2;
-    return alpha_r;
+//    double alpha_r = (2*M_PI+alpha)-M_PI/2;
+    return alpha;
 }
 
 
@@ -12983,6 +13006,10 @@ void MainWindow::updatePlanningResults(problemPtr prob, HUMotion::planning_resul
         timesteps_stage_aux.clear();
         double t_stage = results->time_steps.at(i);
         MatrixXd traj_stage = results->trajectory_stages.at(i);
+        if(i==0){
+            // plan stage
+            this->warm_n_steps_mov = traj_stage.rows()-1;
+        }
         for(int j=0;j<traj_stage.rows();++j){
             if(j==traj_stage.rows()-1){
                 timesteps_stage_aux.push_back(0.0);
@@ -12997,6 +13024,7 @@ void MainWindow::updatePlanningResults(problemPtr prob, HUMotion::planning_resul
     // make a copy of the human-like parameters for controlling
     this->tols_ctrl = this->tols;
     this->tols_ctrl.mov_specs.warm_start = true;
+    this->tols_ctrl.mov_specs.warm_n_steps = this->warm_n_steps_mov;
     this->tols_ctrl.mov_specs.final_warm_start_params = this->final_warm_start_res_mov;
     this->tols_ctrl.mov_specs.bounce_warm_start_params = this->bounce_warm_start_res_mov;
 
@@ -13296,6 +13324,8 @@ void MainWindow::clear_control_variables()
     this->error_lin_acc_tot_norm.clear();
     this->error_ang_acc_tot_norm.clear();
     this->error_acc_tot_norm.clear();
+    this->pred_swivel_angle_ctrl.clear();
+    this->pred_der_swivel_angle_ctrl.clear();
     this->i_ctrl=0;
     this->t_past=0.0;
     this->t_j_past=0.0;
@@ -13309,6 +13339,7 @@ void MainWindow::clear_control_variables()
     this->samples_e_vel=0;
     this->samples_s_vel=0;
     this->exec_command_ctrl=true;
+    this->replanning_succeed=true;
     this->des_hand_pose_buff = boost::make_shared<CircularBuffers<double>>(7, this->N_filter_length);
     this->des_hand_vel_buff = boost::make_shared<CircularBuffers<double>>(7, this->N_filter_length);
     this->arm_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
@@ -13884,6 +13915,15 @@ void MainWindow::on_pushButton_control_plot_joints_clicked()
     this->mResultsCtrlJointsdlg->show();
 }
 
+void MainWindow::on_pushButton_pred_swivel_angle_clicked()
+{
+    if(!this->pred_swivel_angle_ctrl.empty())
+    {
+        this->mResultsCtrlPredSwivelAngledlg->setupPlots(this->pred_swivel_angle_ctrl,this->pred_der_swivel_angle_ctrl,this->sim_time);
+    }
+    this->mResultsCtrlPredSwivelAngledlg->show();
+}
+
 void MainWindow::on_pushButton_control_plot_pos_vel_comps_clicked()
 {
     if(!this->shoulderLinearVelocity_ctrl.empty())
@@ -13975,8 +14015,8 @@ void MainWindow::on_pushButton_start_control_pressed()
             tar_pos(2) = tar->getPos().Zpos;
             Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
             Quaterniond tar_q(Rot_tar);
-            this->tar_position= tar_pos;
-            this->tar_quaternion = tar_q;
+//            this->tar_position= tar_pos;
+//            this->tar_quaternion = tar_q;
         }else if(mov_type==2 || mov_type==3 || mov_type==4){ // place
             vector<posePtr> poses; this->curr_scene->getPoses(poses);
             string tar_name = this->curr_mov->getPose()->getName();
@@ -13995,24 +14035,26 @@ void MainWindow::on_pushButton_start_control_pressed()
             tar_pos(2) = tar->getPos().Zpos;
             Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
             Quaterniond tar_q(Rot_tar);
-            this->tar_position= tar_pos;
-            this->tar_quaternion = tar_q;
+//            this->tar_position= tar_pos;
+//            this->tar_quaternion = tar_q;
         }
     }
 
     this->lpf_tar_pos_x.reset(new LowPassFilter());
     this->lpf_tar_pos_y.reset(new LowPassFilter());
     this->lpf_tar_pos_z.reset(new LowPassFilter());
-    this->lpf_tar_or_roll.reset(new LowPassFilter());
-    this->lpf_tar_or_pitch.reset(new LowPassFilter());
-    this->lpf_tar_or_yaw.reset(new LowPassFilter());
+    this->lpf_tar_or_q_x.reset(new LowPassFilter());
+    this->lpf_tar_or_q_y.reset(new LowPassFilter());
+    this->lpf_tar_or_q_z.reset(new LowPassFilter());
+    this->lpf_tar_or_q_w.reset(new LowPassFilter());
 
     this->lpf_obsts_pos_x.reset(new LowPassFilter());
     this->lpf_obsts_pos_y.reset(new LowPassFilter());
     this->lpf_obsts_pos_z.reset(new LowPassFilter());
-    this->lpf_obsts_or_roll.reset(new LowPassFilter());
-    this->lpf_obsts_or_pitch.reset(new LowPassFilter());
-    this->lpf_obsts_or_yaw.reset(new LowPassFilter());
+    this->lpf_obsts_or_q_x.reset(new LowPassFilter());
+    this->lpf_obsts_or_q_y.reset(new LowPassFilter());
+    this->lpf_obsts_or_q_z.reset(new LowPassFilter());
+    this->lpf_obsts_or_q_w.reset(new LowPassFilter());
 
     this->lpf_joint_pos_1.reset(new LowPassFilter());
     this->lpf_joint_pos_2.reset(new LowPassFilter());
@@ -14043,16 +14085,18 @@ void MainWindow::on_pushButton_start_control_pressed()
     this->lpf_tar_pos_x->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_pos_x->setDeltaTime(filter_tar_timestep);
     this->lpf_tar_pos_y->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_pos_y->setDeltaTime(filter_tar_timestep);
     this->lpf_tar_pos_z->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_pos_z->setDeltaTime(filter_tar_timestep);
-    this->lpf_tar_or_roll->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_roll->setDeltaTime(filter_tar_timestep);
-    this->lpf_tar_or_pitch->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_pitch->setDeltaTime(filter_tar_timestep);
-    this->lpf_tar_or_yaw->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_yaw->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_or_q_x->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_q_x->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_or_q_y->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_q_y->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_or_q_z->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_q_z->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_or_q_w->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_q_w->setDeltaTime(filter_tar_timestep);
 
     this->lpf_obsts_pos_x->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_obsts_timestep);
     this->lpf_obsts_pos_y->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_obsts_timestep);
     this->lpf_obsts_pos_z->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_obsts_timestep);
-    this->lpf_obsts_or_roll->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_roll->setDeltaTime(filter_obsts_timestep);
-    this->lpf_obsts_or_pitch->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_pitch->setDeltaTime(filter_obsts_timestep);
-    this->lpf_obsts_or_yaw->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_yaw->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_or_q_x->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_q_x->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_or_q_y->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_q_y->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_or_q_z->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_q_z->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_or_q_w->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_q_w->setDeltaTime(filter_obsts_timestep);
 
     double filter_cut_off_freq_j_pos = this->ui.lineEdit_cutoff_freq_joint_pos->text().toDouble();
     double filter_time_step_j_pos = this->ui.lineEdit_timestep_joint_pos->text().toDouble();
@@ -14099,6 +14143,7 @@ void MainWindow::on_pushButton_stop_control_clicked()
     this->curr_scene->getHumanoid()->setRightPosture(r_p);
     this->curr_scene->getHumanoid()->setLeftPosture(l_p);
     this->exec_command_ctrl=false;
+    this->replanning_succeed=false;
     pos_control = false;
     vel_control = false;
     this->qnode.stopSim();
@@ -14295,8 +14340,7 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         stream << "# Maximum allowed velocity of the joints #" << endl;
         stream << "vel_max=" << this->ui.lineEdit_vel_max->text().toStdString().c_str() << endl;
         stream << "# Replanning #" << endl;
-        stream << "Tar_pos_th=" << this->ui.lineEdit_tar_pos_th->text().toStdString().c_str() << endl;
-        stream << "Tar_or_th=" << this->ui.lineEdit_tar_or_th->text().toStdString().c_str() << endl;
+        stream << "Swivel_angle_th=" << this->ui.lineEdit_swivel_angle_th->text().toStdString().c_str() << endl;
         stream << "g_map_th_max=" << this->ui.lineEdit_g_th_max_replan->text().toStdString().c_str() << endl;
         stream << "g_map_th_min=" << this->ui.lineEdit_g_th_min_replan->text().toStdString().c_str() << endl;
         f.close();
@@ -14529,10 +14573,8 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     }else{
                         this->ui.checkBox_follow_target->setChecked(false);
                     }
-                }else if(QString::compare(fields.at(0),QString("Tar_pos_th"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_tar_pos_th->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Tar_or_th"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_tar_or_th->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Swivel_angle_th"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_swivel_angle_th->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("g_map_th_max"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_g_th_max_replan->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("g_map_th_min"),Qt::CaseInsensitive)==0){

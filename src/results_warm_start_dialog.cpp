@@ -18,7 +18,7 @@ WarmStartResultsDialog::~WarmStartResultsDialog()
 
 
 
-void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars)
+void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps)
 {
 
     this->iterations_plan = iter;
@@ -28,6 +28,8 @@ void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, 
     this->zL_plan = zL;
     this->zU_plan = zU;
     this->dual_plan = dual_vars;
+    this->n_steps = warm_n_steps;
+    this->ui->label_warm_n_steps_value->setText(QString::number(warm_n_steps));
 
     this->ui->label_iter_count_plan_value->setText(QString::number(iter));
     this->ui->label_cpu_time_plan_value->setText(QString::number(cpu_time));
@@ -286,6 +288,7 @@ void WarmStartResultsDialog::on_pushButton_save_warm_start_res_clicked()
             stream << "Iterations_plan=" << QString::number(this->iterations_plan).toStdString().c_str() << endl;
             stream << "Cpu_time_plan=" << QString::number(this->cpu_time_plan).toStdString().c_str() << endl;
             stream << "Obj_plan=" << QString::number(this->obj_plan).toStdString().c_str() << endl;
+            stream << "Warm_n_steps=" << QString::number(this->n_steps).toStdString().c_str() << endl;
 
             stream << "X_plan=";
             for(size_t i=0; i<this->x_plan.size();++i)

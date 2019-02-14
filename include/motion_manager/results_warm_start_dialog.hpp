@@ -53,8 +53,9 @@ public:
      * @param zL
      * @param zU
      * @param dual_vars
+     * @param warm_n_steps
      */
-    void setPlanData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars);
+    void setPlanData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps);
 
     /**
      * @brief setApproachData
@@ -129,6 +130,7 @@ private:
     vector<double> zL_plan; /**< lower bounds multipliers of the plan data */
     vector<double> zU_plan; /**< upper bounds multipliers of the plan data */
     vector<double> dual_plan; /**< constraints multipliers of the plan data */
+    int n_steps; /**< steps in the plan stage */
 
     // approach data
     bool en_approach; /**< true if the approach tab is enabled, false otherwise */

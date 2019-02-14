@@ -107,7 +107,7 @@ typedef struct{
     double Zpos; /**< position along the z axis in [mm] */
 } pos;
 
-/** this struct defines the orientation in Roll-Pitch-Yaw */
+/** this struct defines the orientation in Roll-Pitch-Yaw (ZYX) */
 typedef struct{
     double roll; /**< rotarion around the z axis in [rad] */
     double pitch; /**< rotarion around the y axis in [rad] */

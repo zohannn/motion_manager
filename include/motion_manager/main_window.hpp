@@ -30,6 +30,7 @@
 #include "prmstardialog.hpp"
 #include "results_plan_joints_dialog.hpp"
 #include "results_control_joints_dialog.hpp"
+#include "results_control_pred_swivel_angle_dialog.hpp"
 #include "results_warm_start_dialog.hpp"
 #include "power_law_dialog.hpp"
 #include "powerlaw3ddialog.hpp"
@@ -899,6 +900,11 @@ public Q_SLOTS:
         void on_pushButton_control_plot_joints_clicked();
 
         /**
+         * @brief on_pushButton_pred_swivel_angle_clicked
+         */
+        void on_pushButton_pred_swivel_angle_clicked();
+
+        /**
          * @brief on_pushButton_control_plot_pos_vel_comps_clicked
          */
         void on_pushButton_control_plot_pos_vel_comps_clicked();
@@ -995,6 +1001,7 @@ private:
         NatCollAvDialog *mNatCollAvdlg; /**< handle of the natural collision avoidance dlg */
         WarmStartResultsDialog *mWarmdlg; /**< handle of the warm start results dialog */
         ResultsCtrlJointsDialog *mResultsCtrlJointsdlg;/**< handle of the results joints dlg during control*/
+        ResultsCtrlPredSwivelAngleDialog *mResultsCtrlPredSwivelAngledlg;/**< handle of the results of the predicted swivel angle dlg during control*/
         CompControlDialog *mCompCtrldlg; /** < handle of the components dlg during control */
         ErrorsControlDialog *mErrCtrldlg; /** < handle of the errors dlg during control */
         int scenario_id; /**< id of the current scenario */
@@ -1014,6 +1021,7 @@ private:
         vector< string > traj_descr_mov; /**< description of the trajectories */
         vector<HUMotion::warm_start_params> final_warm_start_res_mov; /**< warm start results of the target posture selections solved for the movement */
         HUMotion::warm_start_params bounce_warm_start_res_mov; /**< warm start results of the bounce posture selection solved for the movement */
+        int warm_n_steps_mov; /**< number of steps in the plan stage of the planned movement */
         vector<double> jointsEndPosition_mov; /**< end joint position of the movement */
         vector<double> jointsEndVelocity_mov; /**< end joint velocity of the movement */
         vector<double> jointsEndAcceleration_mov; /**< end joint acceleration of the movement */
@@ -1040,9 +1048,13 @@ private:
         vector<vector<double>> shoulderPosition_mov; /**< shoulder position during the movement. 0=x,1=y,2=z */
         vector<double> swivel_angle_mov; /**< swivel angle of the trajectory of the movement */
         vector<vector<double>> swivel_angle_mov_stages; /**< swivel angle of the trajectory of the movement divided in stages */
+        vector<vector<double>> der_swivel_angle_mov_stages; /**< derivative of the swivel angle of the trajectory of the movement divided in stages */
         double swivel_angle_mov_max; /**< max swivel angle of the trajectory of the movement */
         double swivel_angle_mov_min; /**< min swivel angle of the trajectory of the movement */
         double swivel_angle_mov_average; /**< average swivel angle of the trajectory of the movement */
+        vector<double> der_swivel_angle_mov_max_stages; /**< max derivative swivel angle of the trajectory of the movement for each stage */
+        vector<double> der_swivel_angle_mov_min_stages; /**< min derivative swivel angle of the trajectory of the movement for each stage */
+        vector<double> der_swivel_angle_mov_average_stages; /**< average derivative swivel angle of the trajectory of the movement for each stage */
         vector<vector<double>> shoulderOrientation_mov; /**< shoulder orientation (rpy) during the movement. */
         vector<vector<double>> handLinearVelocity_mov; /**< hand linear velocity during the movement */
         vector<vector<double>> handAngularVelocity_mov;/**< hand angular velocity during the movement */
@@ -1441,9 +1453,10 @@ private:
         std::vector<double> approach_ctrl; /**< approach vector during control */
         std::vector<double> retreat_ctrl; /**< retreat vector during control */
         size_t i_tar_ctrl; /**< index of the object being manipulated */
-        Vector3d tar_position; /**< target position */
-        Quaterniond tar_quaternion; /**< rarget orientation */
+//        Vector3d tar_position; /**< target position */
+//        Quaterniond tar_quaternion; /**< target orientation */
         bool exec_command_ctrl; /**< true to execute the command control, false otherwise */
+        bool replanning_succeed; /**< true if replanning succeed, false otherwise*/
         VectorXd hand_j_acc; /**< time derivative Jacobian dependant part of the hand accelearion */
         vector<double> h_hand_pos_end; /**< end hand position during control */
         vector<double> h_hand_or_q_end; /**< end hand orientation (quaternion) during control */
@@ -1499,23 +1512,28 @@ private:
         vector<double> error_ang_acc_tot_norm; /**< norm of the total error in angular acceleration */
         vector<double> error_acc_tot_norm; /**< norm of the total error in acceleration */
 
+        vector<double> pred_swivel_angle_ctrl; /**< predicted swivel angle during control */
+        vector<double> pred_der_swivel_angle_ctrl; /**< predicted time derivative of the swivel angle during control */
+
         vector<double> sim_time; /**< simulation time [s]*/
 
         // low pass filter for the target object data
         boost::shared_ptr<LowPassFilter> lpf_tar_pos_x;
         boost::shared_ptr<LowPassFilter> lpf_tar_pos_y;
         boost::shared_ptr<LowPassFilter> lpf_tar_pos_z;
-        boost::shared_ptr<LowPassFilter> lpf_tar_or_roll;
-        boost::shared_ptr<LowPassFilter> lpf_tar_or_pitch;
-        boost::shared_ptr<LowPassFilter> lpf_tar_or_yaw;
+        boost::shared_ptr<LowPassFilter> lpf_tar_or_q_x;
+        boost::shared_ptr<LowPassFilter> lpf_tar_or_q_y;
+        boost::shared_ptr<LowPassFilter> lpf_tar_or_q_z;
+        boost::shared_ptr<LowPassFilter> lpf_tar_or_q_w;
 
         // low pass filter for obstacles data
         boost::shared_ptr<LowPassFilter> lpf_obsts_pos_x;
         boost::shared_ptr<LowPassFilter> lpf_obsts_pos_y;
         boost::shared_ptr<LowPassFilter> lpf_obsts_pos_z;
-        boost::shared_ptr<LowPassFilter> lpf_obsts_or_roll;
-        boost::shared_ptr<LowPassFilter> lpf_obsts_or_pitch;
-        boost::shared_ptr<LowPassFilter> lpf_obsts_or_yaw;
+        boost::shared_ptr<LowPassFilter> lpf_obsts_or_q_x;
+        boost::shared_ptr<LowPassFilter> lpf_obsts_or_q_y;
+        boost::shared_ptr<LowPassFilter> lpf_obsts_or_q_z;
+        boost::shared_ptr<LowPassFilter> lpf_obsts_or_q_w;
 
         // low pass filter for the position of the joints
         boost::shared_ptr<LowPassFilter> lpf_joint_pos_1;

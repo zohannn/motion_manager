@@ -17,6 +17,7 @@ Point::Point(string name, pos ppos, orient oor)
     this->m_or.pitch = oor.pitch;
     this->m_or.roll = oor.roll;
     this->m_or.yaw = oor.yaw;
+    this->m_q = AngleAxisd(oor.roll,Vector3d::UnitZ())*AngleAxisd(oor.pitch,Vector3d::UnitY())*AngleAxisd(oor.yaw,Vector3d::UnitX());
 }
 
 Point::Point(const Point &pt)
@@ -28,6 +29,7 @@ Point::Point(const Point &pt)
     this->m_or.pitch = pt.m_or.pitch;
     this->m_or.roll = pt.m_or.roll;
     this->m_or.yaw = pt.m_or.yaw;
+    this->m_q = pt.m_q;
 }
 
 Point::~Point(){
@@ -52,6 +54,14 @@ void Point::setOr(orient &oor)
 {
 
     this->m_or = oor;
+    this->m_q = AngleAxisd(oor.roll, Vector3d::UnitZ())*AngleAxisd(oor.pitch,Vector3d::UnitY())*AngleAxisd(oor.yaw,Vector3d::UnitX());
+}
+
+void Point::setQuaternion(Quaterniond &or_q)
+{
+    this->m_q = or_q;
+    Vector3d rpy = or_q.toRotationMatrix().eulerAngles(2, 1, 0); // ZYX
+    this->m_or.roll = rpy(0); this->m_or.pitch = rpy(1); this->m_or.yaw = rpy(2);
 }
 
 
@@ -71,6 +81,11 @@ orient Point::getOr() const
 {
 
    return this->m_or;
+}
+
+Quaterniond Point::getQuaternion() const
+{
+    return this->m_q;
 }
 
 

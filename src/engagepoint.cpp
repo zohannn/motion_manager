@@ -17,6 +17,7 @@ EngagePoint::EngagePoint(string name, pos ppos, orient oor)
     this->m_or.pitch = oor.pitch;
     this->m_or.roll = oor.roll;
     this->m_or.yaw = oor.yaw;
+    this->m_q = AngleAxisd(oor.roll,Vector3d::UnitZ())*AngleAxisd(oor.pitch,Vector3d::UnitY())*AngleAxisd(oor.yaw,Vector3d::UnitX());
 }
 
 EngagePoint::EngagePoint(const EngagePoint &eng)
@@ -28,6 +29,7 @@ EngagePoint::EngagePoint(const EngagePoint &eng)
     this->m_or.pitch = eng.m_or.pitch;
     this->m_or.roll = eng.m_or.roll;
     this->m_or.yaw = eng.m_or.yaw;
+    this->m_q = eng.m_q;
 }
 
 EngagePoint::~EngagePoint()

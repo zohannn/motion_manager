@@ -7563,7 +7563,7 @@ void QNode::updateObjectInfo(int obj_id, string name, const geometry_msgs::PoseS
 {
 
 
-    std::vector<double> rpy;
+//    std::vector<double> rpy;
     objectPtr obj = this->curr_scene->getObject(name);
 
     // position
@@ -7575,33 +7575,42 @@ void QNode::updateObjectInfo(int obj_id, string name, const geometry_msgs::PoseS
     obj->setPos(poss,true);
 
     // orientation
-    orient orr;
+    Quaterniond orr_q;
     // get the quaternion
     double epx = data.pose.orientation.x;
     double epy = data.pose.orientation.y;
     double epz = data.pose.orientation.z;
     double w = data.pose.orientation.w;
+    orr_q.x() = epx; orr_q.y() = epy; orr_q.z() = epz; orr_q.w() = w;
 
-    Matrix3d Rot;
-    Rot(0,0) = 2*(pow(w,2)+pow(epx,2))-1; Rot(0,1) = 2*(epx*epy-w*epz);         Rot(0,2) = 2*(epx*epz+w*epy);
-    Rot(1,0) = 2*(epx*epy+w*epz);         Rot(1,1) = 2*(pow(w,2)+pow(epy,2))-1; Rot(1,2) = 2*(epy*epz-w*epx);
-    Rot(2,0) = 2*(epx*epz-w*epy);         Rot(2,1) = 2*(epy*epz+w*epx);         Rot(2,2) = 2*(pow(w,2)+pow(epz,2))-1;
+//    Matrix3d Rot;
+//    Rot(0,0) = 2*(pow(w,2)+pow(epx,2))-1; Rot(0,1) = 2*(epx*epy-w*epz);         Rot(0,2) = 2*(epx*epz+w*epy);
+//    Rot(1,0) = 2*(epx*epy+w*epz);         Rot(1,1) = 2*(pow(w,2)+pow(epy,2))-1; Rot(1,2) = 2*(epy*epz-w*epx);
+//    Rot(2,0) = 2*(epx*epz-w*epy);         Rot(2,1) = 2*(epy*epz+w*epx);         Rot(2,2) = 2*(pow(w,2)+pow(epz,2))-1;
 
-    Matrix4d trans_obj;
-    trans_obj(0,0) = Rot(0,0); trans_obj(0,1) = Rot(0,1); trans_obj(0,2) = Rot(0,2); trans_obj(0,3) = poss.Xpos;
-    trans_obj(1,0) = Rot(1,0); trans_obj(1,1) = Rot(1,1); trans_obj(1,2) = Rot(1,2); trans_obj(1,3) = poss.Ypos;
-    trans_obj(2,0) = Rot(2,0); trans_obj(2,1) = Rot(2,1); trans_obj(2,2) = Rot(2,2); trans_obj(2,3) = poss.Zpos;
-    trans_obj(3,0) = 0;        trans_obj(3,1) = 0;        trans_obj(3,2) = 0;        trans_obj(3,3) = 1;
+//    Matrix4d trans_obj;
+//    trans_obj(0,0) = Rot(0,0); trans_obj(0,1) = Rot(0,1); trans_obj(0,2) = Rot(0,2); trans_obj(0,3) = poss.Xpos;
+//    trans_obj(1,0) = Rot(1,0); trans_obj(1,1) = Rot(1,1); trans_obj(1,2) = Rot(1,2); trans_obj(1,3) = poss.Ypos;
+//    trans_obj(2,0) = Rot(2,0); trans_obj(2,1) = Rot(2,1); trans_obj(2,2) = Rot(2,2); trans_obj(2,3) = poss.Zpos;
+//    trans_obj(3,0) = 0;        trans_obj(3,1) = 0;        trans_obj(3,2) = 0;        trans_obj(3,3) = 1;
 
-    if (this->getRPY(trans_obj,rpy)){
-        orr.roll  = rpy.at(0);
-        orr.pitch = rpy.at(1);
-        orr.yaw = rpy.at(2);
-        obj->setOr(orr,true);
-    }else{
-        // TO DO
-        // singularity: leave the previous orientation
-    }
+//    Vector3d rpy = orr_q.toRotationMatrix().eulerAngles(2,1,0); // ZYX euler angles
+//    orient orr;
+//    orr.roll  = rpy(0);
+//    orr.pitch = rpy(1);
+//    orr.yaw = rpy(2);
+//    obj->setOr(orr,true);
+    obj->setOr(orr_q,true);
+
+//    if (this->getRPY(trans_obj,rpy)){
+//        orr.roll  = rpy.at(0);
+//        orr.pitch = rpy.at(1);
+//        orr.yaw = rpy.at(2);
+//        obj->setOr(orr,true);
+//    }else{
+//        // TO DO
+//        // singularity: leave the previous orientation
+//    }
 
 
     /*

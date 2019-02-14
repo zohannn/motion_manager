@@ -408,8 +408,9 @@ public:
      * @param zL
      * @param zU
      * @param dual
+     * @param steps
      */
-    void getPlanData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual);
+    void getPlanData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual, int& steps);
 
     /**
      * @brief getApproachData
@@ -449,6 +450,7 @@ private:
     bool warm_start;/**< warm start option */
     // plan
     bool warm_start_plan; /**< true if there are plan target warm start parameters */
+    int warm_n_steps; /**< steps of the plan stage when warming start */
     vector<double> x_plan; /**< initial guess of the plan target posture selection problem */
     vector<double> zL_plan; /**< lower bounds multipliers of the plan target posture selection problem */
     vector<double> zU_plan; /**< upper bounds multipliers of the plan target posture selection problem */

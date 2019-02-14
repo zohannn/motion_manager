@@ -71,6 +71,13 @@ public:
     void setOr(orient& oor, bool update_features);
 
     /**
+     * @brief setOr
+     * @param oor_q
+     * @param update_features
+     */
+    void setOr(Quaterniond& oor_q, bool update_features);
+
+    /**
      * @brief This method sets the size of the object.
      * @param ssize
      */

@@ -745,6 +745,9 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
                     QStringList data = fields.at(1).split("|");
                     for (size_t i=0; i<data.size();++i)
                         x_plan.push_back(data.at(i).toDouble());
+                }else if (QString::compare(fields.at(0),QString("Warm_n_steps"),Qt::CaseInsensitive)==0){
+                    QString data = fields.at(1);
+                    this->warm_n_steps = data.toDouble();
                 }else if (QString::compare(fields.at(0),QString("ZL_plan"),Qt::CaseInsensitive)==0){
                     QStringList data = fields.at(1).split("|");
                     for (size_t i=0; i<data.size();++i)
@@ -824,6 +827,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
     QStringList v_dual_headers;
 
     // ----------- display the plan data ----------------------- //
+    this->ui->label_warm_n_steps_value->setText(QString::number(this->warm_n_steps));
     this->ui->tableWidget_init_guess_plan->clear();
     this->ui->tableWidget_dual_vars_plan->clear();
 
@@ -831,7 +835,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
     v_headers.clear();
     this->ui->tableWidget_init_guess_plan->setColumnCount(h_headers.size());
     this->ui->tableWidget_init_guess_plan->setRowCount(x_plan.size());
-    for(int i =0; i < x_plan.size(); ++i){
+    for(size_t i =0; i < x_plan.size(); ++i){
         double x_value = x_plan.at(i);
         double zL_value = zL_plan.at(i);
         double zU_value = zU_plan.at(i);
@@ -849,7 +853,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
     v_dual_headers.clear();
     this->ui->tableWidget_dual_vars_plan->setColumnCount(h_dual_headers.size());
     this->ui->tableWidget_dual_vars_plan->setRowCount(dual_plan.size());
-    for(int i =0; i < dual_plan.size(); ++i){
+    for(size_t i =0; i < dual_plan.size(); ++i){
         double d_value = dual_plan.at(i);
         v_dual_headers.push_back(QString("Constraint ")+QString::number(i));
         std::vector<QString> row = {QString::number(d_value)};
@@ -870,7 +874,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
     v_headers.clear();
     this->ui->tableWidget_init_guess_approach->setColumnCount(h_headers.size());
     this->ui->tableWidget_init_guess_approach->setRowCount(x_approach.size());
-    for(int i =0; i < x_approach.size(); ++i){
+    for(size_t i =0; i < x_approach.size(); ++i){
         double x_value = x_approach.at(i);
         double zL_value = zL_approach.at(i);
         double zU_value = zU_approach.at(i);
@@ -888,7 +892,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
     v_dual_headers.clear();
     this->ui->tableWidget_dual_vars_approach->setColumnCount(h_dual_headers.size());
     this->ui->tableWidget_dual_vars_approach->setRowCount(dual_approach.size());
-    for(int i =0; i < dual_approach.size(); ++i){
+    for(size_t i =0; i < dual_approach.size(); ++i){
         double d_value = dual_approach.at(i);
         v_dual_headers.push_back(QString("Constraint ")+QString::number(i));
         std::vector<QString> row = {QString::number(d_value)};
@@ -908,7 +912,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
     v_headers.clear();
     this->ui->tableWidget_init_guess_retreat->setColumnCount(h_headers.size());
     this->ui->tableWidget_init_guess_retreat->setRowCount(x_retreat.size());
-    for(int i =0; i < x_retreat.size(); ++i){
+    for(size_t i =0; i < x_retreat.size(); ++i){
         double x_value = x_retreat.at(i);
         double zL_value = zL_retreat.at(i);
         double zU_value = zU_retreat.at(i);
@@ -926,7 +930,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
     v_dual_headers.clear();
     this->ui->tableWidget_dual_vars_retreat->setColumnCount(h_dual_headers.size());
     this->ui->tableWidget_dual_vars_retreat->setRowCount(dual_retreat.size());
-    for(int i =0; i < dual_retreat.size(); ++i){
+    for(size_t i =0; i < dual_retreat.size(); ++i){
         double d_value = dual_retreat.at(i);
         v_dual_headers.push_back(QString("Constraint ")+QString::number(i));
         std::vector<QString> row = {QString::number(d_value)};
@@ -947,7 +951,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
     v_headers.clear();
     this->ui->tableWidget_init_guess_bounce->setColumnCount(h_headers.size());
     this->ui->tableWidget_init_guess_bounce->setRowCount(x_bounce.size());
-    for(int i =0; i < x_bounce.size(); ++i){
+    for(size_t i =0; i < x_bounce.size(); ++i){
         double x_value = x_bounce.at(i);
         double zL_value = zL_bounce.at(i);
         double zU_value = zU_bounce.at(i);
@@ -965,7 +969,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
     v_dual_headers.clear();
     this->ui->tableWidget_dual_vars_bounce->setColumnCount(h_dual_headers.size());
     this->ui->tableWidget_dual_vars_bounce->setRowCount(dual_bounce.size());
-    for(int i =0; i < dual_bounce.size(); ++i){
+    for(size_t i =0; i < dual_bounce.size(); ++i){
         double d_value = dual_bounce.at(i);
         v_dual_headers.push_back(QString("Constraint ")+QString::number(i));
         std::vector<QString> row = {QString::number(d_value)};
@@ -1645,12 +1649,13 @@ bool TolDialogHUMP::getWarmStartBounceOption()
 }
 
 
-void TolDialogHUMP::getPlanData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual)
+void TolDialogHUMP::getPlanData(vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual, int &steps)
 {
     x = this->x_plan;
     zL = this->zL_plan;
     zU = this->zU_plan;
     dual = this->dual_plan;
+    steps = this->warm_n_steps;
 }
 
 void TolDialogHUMP::getApproachData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual)

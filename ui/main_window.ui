@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -2697,9 +2697,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QCheckBox" name="checkBox_hl_add">
        <property name="geometry">
         <rect>
-         <x>300</x>
-         <y>600</y>
-         <width>171</width>
+         <x>290</x>
+         <y>570</y>
+         <width>161</width>
          <height>21</height>
         </rect>
        </property>
@@ -3425,8 +3425,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>30</x>
            <y>30</y>
-           <width>221</width>
-           <height>120</height>
+           <width>211</width>
+           <height>111</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_113">
@@ -3469,34 +3469,16 @@ p, li { white-space: pre-wrap; }
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_573">
             <item>
-             <widget class="QLabel" name="label_tar_pos_th">
+             <widget class="QLabel" name="label_swivel_angle_th">
               <property name="text">
-               <string>Target pos th [mm]</string>
+               <string>Swivel angle th [deg/s]</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="lineEdit_tar_pos_th">
+             <widget class="QLineEdit" name="lineEdit_swivel_angle_th">
               <property name="text">
-               <string>200</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_603">
-            <item>
-             <widget class="QLabel" name="label_tar_or_th">
-              <property name="text">
-               <string>Target or q th </string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="lineEdit_tar_or_th">
-              <property name="text">
-               <string>0.1</string>
+               <string>600</string>
               </property>
              </widget>
             </item>
@@ -3660,8 +3642,8 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="geometry">
         <rect>
-         <x>290</x>
-         <y>570</y>
+         <x>460</x>
+         <y>590</y>
          <width>131</width>
          <height>23</height>
         </rect>
@@ -3961,12 +3943,12 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>-4</x>
         <y>-1</y>
-        <width>1251</width>
+        <width>1281</width>
         <height>551</height>
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_results_plan">
        <attribute name="title">
@@ -13493,7 +13475,7 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>11</x>
           <y>10</y>
-          <width>1221</width>
+          <width>1251</width>
           <height>381</height>
          </rect>
         </property>
@@ -13509,40 +13491,7 @@ p, li { white-space: pre-wrap; }
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
-          <x>720</x>
-          <y>485</y>
-          <width>511</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_298">
-         <item>
-          <widget class="QPushButton" name="pushButton_errors_ctrl">
-           <property name="text">
-            <string>show errors</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_control_plot_pos_vel_comps">
-           <property name="text">
-            <string>show operational space components</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_control_plot_joints">
-           <property name="text">
-            <string>show joints</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="layoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>460</x>
+          <x>490</x>
           <y>440</y>
           <width>771</width>
           <height>31</height>
@@ -13584,6 +13533,46 @@ p, li { white-space: pre-wrap; }
             </widget>
            </item>
           </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>590</x>
+          <y>486</y>
+          <width>671</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_298">
+         <item>
+          <widget class="QPushButton" name="pushButton_pred_swivel_angle">
+           <property name="text">
+            <string>show predicted swivel angle</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_errors_ctrl">
+           <property name="text">
+            <string>show errors</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_control_plot_pos_vel_comps">
+           <property name="text">
+            <string>show operational space components</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_control_plot_joints">
+           <property name="text">
+            <string>show joints</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

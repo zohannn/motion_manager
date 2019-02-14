@@ -55,8 +55,6 @@ public:
     void setupPlots(MatrixXd &velocities, vector<double> &time);
 
 
-public Q_SLOTS:
-
 
 
 private:
