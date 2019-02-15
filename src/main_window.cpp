@@ -328,10 +328,12 @@ MainWindow::~MainWindow()
         display_r_hand_status_thrd.join();
 
     exec_control = false;
-    if (execPosControl_thrd.joinable())
+    if(execPosControl_thrd.joinable())
         execPosControl_thrd.join();
-    if (execVelControl_thrd.joinable())
+    if(execVelControl_thrd.joinable())
         execVelControl_thrd.join();
+    if(execReplanning_thrd.joinable())
+        execReplanning_thrd.join();
 
 }
 
@@ -380,6 +382,38 @@ void MainWindow::display_r_hand_status()
                 this->ui.label_comp_right_hand_vel_wz_value->setText(QString::number(r_hand_vel_comp.at(5)));
             }
         }
+    }
+}
+
+void MainWindow::execReplanning()
+{
+    boost::unique_lock<boost::mutex> lck(hh_control_mtx);
+
+    // solve the new problem
+    this->qnode.log(QNode::Info,string("Re-planning ..."));
+    objectPtr obj_man = this->curr_scene->getObject(this->i_tar_ctrl);
+    bool prec = this->ui.radioButton_prec->isChecked();
+    int mov_type = this->curr_mov->getType();
+    this->prob_ctrl.reset(new Problem(0,new Movement(mov_type,1,obj_man,prec),new Scenario(*(this->curr_scene.get()))));
+    HUMotion::planning_result_ptr results_ptr;
+    try{
+        results_ptr = this->prob_ctrl->solve(this->tols_ctrl);
+        if(results_ptr!=nullptr && results_ptr->status==0){
+            string solv_time = boost::str(boost::format("%1%") % (this->prob_ctrl->getTime()));
+            this->qnode.log(QNode::Info,string("Re-planning succeed! Problem solved in ")+solv_time+string(" ms. Using the new planned trajectory . . ."));
+            // the planning succeed: update the results
+            this->updatePlanningResults(this->prob_ctrl,results_ptr);
+            this->exec_command_ctrl=true;
+            this->replanning_succeed=true;
+            this->t_past=this->curr_time; // reset time
+            this->i_ctrl=0; // plan stage
+        }else{
+            this->replanning_succeed=false;
+            this->qnode.log(QNode::Info,string("Re-planning failed!"));
+        }
+    }catch( ... ){
+        this->replanning_succeed=false;
+        this->qnode.log(QNode::Info,string("Re-planning raised an exception!"));
     }
 }
 
@@ -1054,7 +1088,7 @@ void MainWindow::execPosControl()
 //                VectorXd der_error_tot(6); der_error_tot << error_lin_vel(0),error_lin_vel(1),error_lin_vel(2),error_ang_vel(0),error_ang_vel(1),error_ang_vel(2);
 
 
-                double curr_time = this->qnode.getSimTime() - this->t_past - this->t_der_past;
+                this->curr_time = this->qnode.getSimTime() - this->t_past - this->t_der_past;
 //                BOOST_LOG_SEV(lg, info) << "curr_time = " << curr_time;
 //                BOOST_LOG_SEV(lg, info) << "t_past = " << this->t_past;
 //                BOOST_LOG_SEV(lg, info) << "t_der_past = " << this->t_der_past;
@@ -1108,7 +1142,7 @@ void MainWindow::execPosControl()
                         if(stage_descr.compare("plan")==0)
                         {
                             this->mTimeMapdlg->getPlanTimeMapping(tau,dec_rate,diff_w);
-                            g_map = 1 - exp((-dec_rate*curr_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
+                            g_map = 1 - exp((-dec_rate*this->curr_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
                             index = static_cast<int>(0.5+(n_steps-1)*g_map);
 
                             //                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
@@ -1409,7 +1443,7 @@ void MainWindow::execPosControl()
                         }else if(stage_descr.compare("approach")==0){
 
                             this->mTimeMapdlg->getApproachTimeMapping(tau,dec_rate,diff_w);
-                            g_map = 1 - exp((-dec_rate*curr_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
+                            g_map = 1 - exp((-dec_rate*this->curr_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
                             index = static_cast<int>(0.5+(n_steps-1)*g_map);
 
                             //                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping approach ------------------- # ";
@@ -1493,7 +1527,7 @@ void MainWindow::execPosControl()
                         }else if(stage_descr.compare("retreat")==0){
 
                             this->mTimeMapdlg->getRetreatTimeMapping(tau,dec_rate,diff_w);
-                            g_map = 1 - exp((-dec_rate*curr_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
+                            g_map = 1 - exp((-dec_rate*this->curr_time)/(tau*(1+diff_w*error_tot.squaredNorm()))); // normalized mapped time
                             index = static_cast<int>(0.5+(n_steps-1)*g_map);
 
             //                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
@@ -1696,25 +1730,25 @@ void MainWindow::execPosControl()
                         acc_trap(6) = pow(vel_trap(6),2)/(hand_or_q_w_init_vec-des_hand_or_q_w+vel_trap(6)*t_f_trap);
 
                         double t_c_trap = t_f_trap/2;
-                        if(curr_time<=t_c_trap)
+                        if(this->curr_time<=t_c_trap)
                         {
                             // hand pose
-                            trap_hand_pose(0) = hand_pos_init_vec(0) + 0.5*acc_trap(0)*pow(curr_time,2);
-                            trap_hand_pose(1) = hand_pos_init_vec(1) + 0.5*acc_trap(1)*pow(curr_time,2);
-                            trap_hand_pose(2) = hand_pos_init_vec(2) + 0.5*acc_trap(2)*pow(curr_time,2);
-                            trap_hand_pose(3) = hand_or_q_e_init_vec(0) + 0.5*acc_trap(3)*pow(curr_time,2);
-                            trap_hand_pose(4) = hand_or_q_e_init_vec(1) + 0.5*acc_trap(4)*pow(curr_time,2);
-                            trap_hand_pose(5) = hand_or_q_e_init_vec(2) + 0.5*acc_trap(5)*pow(curr_time,2);
-                            trap_hand_pose(6) = hand_or_q_w_init_vec + 0.5*acc_trap(6)*pow(curr_time,2);
+                            trap_hand_pose(0) = hand_pos_init_vec(0) + 0.5*acc_trap(0)*pow(this->curr_time,2);
+                            trap_hand_pose(1) = hand_pos_init_vec(1) + 0.5*acc_trap(1)*pow(this->curr_time,2);
+                            trap_hand_pose(2) = hand_pos_init_vec(2) + 0.5*acc_trap(2)*pow(this->curr_time,2);
+                            trap_hand_pose(3) = hand_or_q_e_init_vec(0) + 0.5*acc_trap(3)*pow(this->curr_time,2);
+                            trap_hand_pose(4) = hand_or_q_e_init_vec(1) + 0.5*acc_trap(4)*pow(this->curr_time,2);
+                            trap_hand_pose(5) = hand_or_q_e_init_vec(2) + 0.5*acc_trap(5)*pow(this->curr_time,2);
+                            trap_hand_pose(6) = hand_or_q_w_init_vec + 0.5*acc_trap(6)*pow(this->curr_time,2);
 
                             // hand velocity
-                            trap_hand_vel(0) = acc_trap(0)*curr_time;
-                            trap_hand_vel(1) = acc_trap(1)*curr_time;
-                            trap_hand_vel(2) = acc_trap(2)*curr_time;
-                            trap_hand_vel(3) = acc_trap(3)*curr_time;
-                            trap_hand_vel(4) = acc_trap(4)*curr_time;
-                            trap_hand_vel(5) = acc_trap(5)*curr_time;
-                            trap_hand_vel(6) = acc_trap(6)*curr_time;
+                            trap_hand_vel(0) = acc_trap(0)*this->curr_time;
+                            trap_hand_vel(1) = acc_trap(1)*this->curr_time;
+                            trap_hand_vel(2) = acc_trap(2)*this->curr_time;
+                            trap_hand_vel(3) = acc_trap(3)*this->curr_time;
+                            trap_hand_vel(4) = acc_trap(4)*this->curr_time;
+                            trap_hand_vel(5) = acc_trap(5)*this->curr_time;
+                            trap_hand_vel(6) = acc_trap(6)*this->curr_time;
 
                             // hand acceleration
                             trap_hand_acc(0) = acc_trap(0);
@@ -1725,25 +1759,25 @@ void MainWindow::execPosControl()
                             trap_hand_acc(5) = acc_trap(5);
                             trap_hand_acc(6) = acc_trap(6);
 
-                        }else if((curr_time > t_c_trap) && (curr_time <= t_f_trap)){
+                        }else if((this->curr_time > t_c_trap) && (this->curr_time <= t_f_trap)){
 
                             //hand pose
-                            trap_hand_pose(0) = des_hand_pos(0) - 0.5*acc_trap(0)*pow((t_f_trap-curr_time),2);
-                            trap_hand_pose(1) = des_hand_pos(1) - 0.5*acc_trap(1)*pow((t_f_trap-curr_time),2);
-                            trap_hand_pose(2) = des_hand_pos(2) - 0.5*acc_trap(2)*pow((t_f_trap-curr_time),2);
-                            trap_hand_pose(3) = des_hand_or_q_e(0) - 0.5*acc_trap(3)*pow((t_f_trap-curr_time),2);
-                            trap_hand_pose(4) = des_hand_or_q_e(1) - 0.5*acc_trap(4)*pow((t_f_trap-curr_time),2);
-                            trap_hand_pose(5) = des_hand_or_q_e(2) - 0.5*acc_trap(5)*pow((t_f_trap-curr_time),2);
-                            trap_hand_pose(6) = des_hand_or_q_w - 0.5*acc_trap(6)*pow((t_f_trap-curr_time),2);
+                            trap_hand_pose(0) = des_hand_pos(0) - 0.5*acc_trap(0)*pow((t_f_trap-this->curr_time),2);
+                            trap_hand_pose(1) = des_hand_pos(1) - 0.5*acc_trap(1)*pow((t_f_trap-this->curr_time),2);
+                            trap_hand_pose(2) = des_hand_pos(2) - 0.5*acc_trap(2)*pow((t_f_trap-this->curr_time),2);
+                            trap_hand_pose(3) = des_hand_or_q_e(0) - 0.5*acc_trap(3)*pow((t_f_trap-this->curr_time),2);
+                            trap_hand_pose(4) = des_hand_or_q_e(1) - 0.5*acc_trap(4)*pow((t_f_trap-this->curr_time),2);
+                            trap_hand_pose(5) = des_hand_or_q_e(2) - 0.5*acc_trap(5)*pow((t_f_trap-this->curr_time),2);
+                            trap_hand_pose(6) = des_hand_or_q_w - 0.5*acc_trap(6)*pow((t_f_trap-this->curr_time),2);
 
                             // hand velocity
-                            trap_hand_vel(0) = -acc_trap(0)*(t_f_trap-curr_time);
-                            trap_hand_vel(1) = -acc_trap(1)*(t_f_trap-curr_time);
-                            trap_hand_vel(2) = -acc_trap(2)*(t_f_trap-curr_time);
-                            trap_hand_vel(3) = -acc_trap(3)*(t_f_trap-curr_time);
-                            trap_hand_vel(4) = -acc_trap(4)*(t_f_trap-curr_time);
-                            trap_hand_vel(5) = -acc_trap(5)*(t_f_trap-curr_time);
-                            trap_hand_vel(6) = -acc_trap(6)*(t_f_trap-curr_time);
+                            trap_hand_vel(0) = -acc_trap(0)*(t_f_trap-this->curr_time);
+                            trap_hand_vel(1) = -acc_trap(1)*(t_f_trap-this->curr_time);
+                            trap_hand_vel(2) = -acc_trap(2)*(t_f_trap-this->curr_time);
+                            trap_hand_vel(3) = -acc_trap(3)*(t_f_trap-this->curr_time);
+                            trap_hand_vel(4) = -acc_trap(4)*(t_f_trap-this->curr_time);
+                            trap_hand_vel(5) = -acc_trap(5)*(t_f_trap-this->curr_time);
+                            trap_hand_vel(6) = -acc_trap(6)*(t_f_trap-this->curr_time);
 
                             // hand acceleration
                             trap_hand_acc(0) = -acc_trap(0);
@@ -1754,7 +1788,7 @@ void MainWindow::execPosControl()
                             trap_hand_acc(5) = -acc_trap(5);
                             trap_hand_acc(6) = -acc_trap(6);
 
-                        }else if(curr_time > t_f_trap){
+                        }else if(this->curr_time > t_f_trap){
                             //hand pose
                             trap_hand_pose(0) = des_hand_pos(0);
                             trap_hand_pose(1) = des_hand_pos(1);
@@ -1834,35 +1868,14 @@ void MainWindow::execPosControl()
 
                 // ------------------- RE-PLANNING STRATEGY ---------------------------------------- //
                 if((stage_descr.compare("plan")==0) && (g_map>g_map_th_min_replan && g_map<g_map_th_max_replan)
-                        && (abs(der_alpha_predicted)>=swivel_angle_th))
+                        && (abs(der_alpha_predicted)>=swivel_angle_th) && !this->replanning_done)
                 {
-                    // stop the movement
-                    this->exec_command_ctrl = false; this->replanning_succeed = false;
-                    vector<double> r_arm_velocities_0(JOINTS_ARM,0.0);vector<double> r_hand_velocities_0(JOINTS_HAND,0.0);
-                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities_0,r_hand_posture_mes,r_hand_velocities_0,joints_arm_vel_ctrl,true);
-
-                    // solve the new problem
-                    this->qnode.log(QNode::Info,string("Re-planning ..."));
-                    objectPtr obj_man = this->curr_scene->getObject(this->i_tar_ctrl);
-                    bool prec = this->ui.radioButton_prec->isChecked();
-                    this->prob_ctrl.reset(new Problem(0,new Movement(mov_type,1,obj_man,prec),new Scenario(*(this->curr_scene.get()))));
-                    HUMotion::planning_result_ptr results_ptr;
-                    try{
-                        results_ptr = this->prob_ctrl->solve(this->tols_ctrl);
-                        if(results_ptr!=nullptr && results_ptr->status==0){
-                            this->qnode.log(QNode::Info,string("Re-planning succeed! Using the new planned trajectory"));
-                            // the planning succeed: update the results
-                            this->updatePlanningResults(this->prob_ctrl,results_ptr);
-                            // clear
-                            this->clear_control_variables();
-                        }else{
-                            this->qnode.log(QNode::Info,string("Re-planning failed! The motion stops!"));
-                        }
-                    }catch( ... ){
-                        this->qnode.log(QNode::Info,string("Re-planning raised an exception! The motion stops!"));
-                    }
-                }else if(this->replanning_succeed){
-                    this->exec_command_ctrl = true;
+                    this->exec_command_ctrl = false; // stop the motion
+                    this->replanning_done = true;
+                    execReplanning_thrd = boost::thread(boost::bind(&MainWindow::execReplanning, this));
+                }else{
+//                    this->exec_command_ctrl = true;
+//                    this->replanning_done = false;
                 }
                 // ----------------------------------------------------------- //
 
@@ -2003,13 +2016,13 @@ void MainWindow::execPosControl()
                         // the target was being followed and it has stopped
                         follow_tar = false; this->ui.checkBox_follow_target->setChecked(false); // the target has stopped
                         this->qnode.openBarrettHand_to_pos(1,jointsInitPosition_hand_vec); // open the hand to the initial position of the approach stage
-                        this->t_past=curr_time; // reset the normalized time, but do not go to the next stage (the approach has to be performed)
+                        this->t_past=this->curr_time; // reset the normalized time, but do not go to the next stage (the approach has to be performed)
                     }else if(stages==3 && hl_en && stage_descr.compare("approach")==0){
                         condition = (g_map >= g_map_th_rp);
                     }
                     if(condition){
                         //this->qnode.log(QNode::Info,string("Simulation Time: ")+boost::lexical_cast<std::string>(this->qnode.getSimTime()));
-                        this->t_past=curr_time;
+                        this->t_past=this->curr_time;
                         if(stages==3 && this->i_ctrl<2){
                             if(!hl_en){
                                 if(stage_descr.compare("plan")==0){
@@ -2037,6 +2050,10 @@ void MainWindow::execPosControl()
                 // execute the control                
                 if(this->exec_command_ctrl){
                     this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities,joints_arm_vel_ctrl,true);
+                }else{
+                    // stop the motion
+                    vector<double> r_arm_velocities_0(JOINTS_ARM,0.0);vector<double> r_hand_velocities_0(JOINTS_HAND,0.0);
+                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities_0,r_hand_posture_mes,r_hand_velocities_0,joints_arm_vel_ctrl,true);
                 }
 
                 // ------------- Recording ------------------------------- //
@@ -13339,7 +13356,8 @@ void MainWindow::clear_control_variables()
     this->samples_e_vel=0;
     this->samples_s_vel=0;
     this->exec_command_ctrl=true;
-    this->replanning_succeed=true;
+    this->replanning_succeed=false;
+    this->replanning_done=false;
     this->des_hand_pose_buff = boost::make_shared<CircularBuffers<double>>(7, this->N_filter_length);
     this->des_hand_vel_buff = boost::make_shared<CircularBuffers<double>>(7, this->N_filter_length);
     this->arm_pos_buff = boost::make_shared<CircularBuffers<double>>(JOINTS_ARM, this->N_filter_length);
@@ -14144,6 +14162,7 @@ void MainWindow::on_pushButton_stop_control_clicked()
     this->curr_scene->getHumanoid()->setLeftPosture(l_p);
     this->exec_command_ctrl=false;
     this->replanning_succeed=false;
+    this->replanning_done=false;
     pos_control = false;
     vel_control = false;
     this->qnode.stopSim();

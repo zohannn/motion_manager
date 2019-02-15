@@ -1405,6 +1405,8 @@ private:
         void execPosControl();
         boost::thread execVelControl_thrd;
         void execVelControl();
+        boost::thread execReplanning_thrd;
+        void execReplanning();
         vector<double> r_hand_init_pos; /**< initial position of the right hand during velocity control */
         // derivation parameters
         int samples_des_hand_pose; /**< counter to count 5 points for derivation of desired hand position */
@@ -1442,8 +1444,9 @@ private:
         vector<double> bounce_handPosition; /**< bounce hand positions during control*/
         vector<double> bounce_handOrientation; /**< bounce hand orientation (rpy) during control*/
         vector<double> bounce_handOrientation_q; /**< bounce hand orientation (quaternion) during control*/
-        int i_ctrl; /**< index of the desired hand pose*/
-        double t_past; /**< time past in previous stages during control */
+        boost::atomic<int> i_ctrl; /**< index of the desired hand pose*/
+        double curr_time; /**< current elapsed time */
+        boost::atomic<double> t_past; /**< time past in previous stages during control */
         double t_j_past; /**< time past in previous timestep during control */
         double t_der_past; /**< time past in previous calculus of the derivatives during control */
         int mov_type_ctrl; /**<  movement type during control */
@@ -1453,10 +1456,9 @@ private:
         std::vector<double> approach_ctrl; /**< approach vector during control */
         std::vector<double> retreat_ctrl; /**< retreat vector during control */
         size_t i_tar_ctrl; /**< index of the object being manipulated */
-//        Vector3d tar_position; /**< target position */
-//        Quaterniond tar_quaternion; /**< target orientation */
-        bool exec_command_ctrl; /**< true to execute the command control, false otherwise */
-        bool replanning_succeed; /**< true if replanning succeed, false otherwise*/
+        boost::atomic<bool> exec_command_ctrl; /**< true to execute the command control, false otherwise */
+        boost::atomic<bool> replanning_succeed; /**< true if replanning succeed, false otherwise*/
+        boost::atomic<bool> replanning_done; /**< true if the replanning has been called, false otherwise */
         VectorXd hand_j_acc; /**< time derivative Jacobian dependant part of the hand accelearion */
         vector<double> h_hand_pos_end; /**< end hand position during control */
         vector<double> h_hand_or_q_end; /**< end hand orientation (quaternion) during control */
