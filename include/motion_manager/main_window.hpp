@@ -54,6 +54,10 @@ using namespace p1d;
 namespace motion_manager {
 
 typedef boost::shared_ptr< CircularBuffers<double> > bufferPtr;
+typedef boost::chrono::high_resolution_clock Clock;
+//typedef boost::chrono::duration<double,boost::ratio<1>> dsec;
+typedef boost::chrono::seconds sec;
+typedef boost::chrono::milliseconds msec;
 
 
 //! The MainWindow class
@@ -1445,10 +1449,15 @@ private:
         vector<double> bounce_handOrientation; /**< bounce hand orientation (rpy) during control*/
         vector<double> bounce_handOrientation_q; /**< bounce hand orientation (quaternion) during control*/
         boost::atomic<int> i_ctrl; /**< index of the desired hand pose*/
+        Clock::time_point start_time_point;
         double curr_time; /**< current elapsed time */
+        Clock::time_point curr_time_ctrl; /**< current time during control */
         boost::atomic<double> t_past; /**< time past in previous stages during control */
+        msec t_past_ctrl; /**< time past in previous stages during control */
         double t_j_past; /**< time past in previous timestep during control */
+        Clock::time_point t_j_past_ctrl; /**< time past in previous timestep during control */
         double t_der_past; /**< time past in previous calculus of the derivatives during control */
+        msec t_der_past_ctrl; /**< time past in previous calculus of the derivatives during control */
         int mov_type_ctrl; /**<  movement type during control */
         int dHO_ctrl; /**< distance between the hand and the object being manipulated during control*/
         HUMotion::hump_params tols_ctrl; /**< human-like parameters for single-arm planning during control */

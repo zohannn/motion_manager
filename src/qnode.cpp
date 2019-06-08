@@ -67,6 +67,7 @@ QNode::QNode(int argc, char** argv ) :
     this->simulationTime=0.0;
     this->simulationRunning=false;
     this->simulationPaused=false;
+    this->sim_robot = true;
 
 #if HAND ==1
     firstPartLocked.assign(3,false);
@@ -140,7 +141,9 @@ bool  QNode::loadScenario(const std::string& path,int id)
 
         subInfo = n.subscribe("/vrep/info",1, &QNode::infoCallback,this);
 
-        subJoints_state = n.subscribe("/vrep/joints_state",1, &QNode::JointsCallback, this);
+        subJoints_state = n.subscribe("/vrep/joints_state",1, &QNode::JointsCallback, this); // vrep joints state
+        subJoints_state_real = n.subscribe("/ARoS/joints_state",1, &QNode::JointsRealCallback, this); // ARoS real joints state
+
         subRightProxSensor = n.subscribe("/vrep/right_prox_sensor",1,&QNode::rightProxCallback,this);
         subLeftProxSensor = n.subscribe("/vrep/left_prox_sensor",1,&QNode::leftProxCallback,this);
         subRightHandPos = n.subscribe("/vrep/right_hand_pose",1,&QNode::rightHandPosCallback,this);
@@ -10538,7 +10541,7 @@ BOOST_LOG_SEV(lg, info) << "right forces: "
 
                         */
 
-if (this->curr_scene){
+if (this->curr_scene && this->sim_robot){
 
     this->curr_scene->getHumanoid()->setRightPosture(right_posture);
     this->curr_scene->getHumanoid()->setLeftPosture(left_posture);
@@ -10549,6 +10552,63 @@ if (this->curr_scene){
 
 }
 
+
+
+}
+
+void QNode::JointsRealCallback(const sensor_msgs::JointState& state)
+{
+    std::vector<std::string> joints_names = state.name;
+    std::vector<double> joints_pos(state.position.begin(),state.position.end());
+    std::vector<double> joints_vel(state.velocity.begin(),state.velocity.end());
+    std::vector<double> joints_force(state.effort.begin(),state.effort.end());
+
+    std::vector<double> right_posture;
+    std::vector<double> right_vel;
+    std::vector<double> right_forces;
+
+#if HAND == 0
+
+#elif HAND == 1
+const char *r_names[] = {"joint 0", "joint 1", "joint 2", "joint 3","joint 4", "joint 5", "joint 6","joint 7","joint 8","joint 9","joint 10"};
+const char *r_2hand[]={"BarrettHand_jointC_0","BarrettHand_jointC_2","BarrettHand_jointC_1"};
+#endif
+
+for (int i = 0; i < JOINTS_ARM+JOINTS_HAND; ++i){
+
+    size_t r_index = std::find(joints_names.begin(), joints_names.end(), r_names[i]) - joints_names.begin();
+    if (r_index >= joints_names.size()){
+        std::cout << "element not found in state.name\n";
+    }else{
+        right_posture.push_back(joints_pos.at(r_index));
+        right_vel.push_back(joints_vel.at(r_index));
+        right_forces.push_back(joints_force.at(r_index));
+    }
+}
+
+for(int i = 0; i < HAND_FINGERS; ++i){
+
+    //size_t r_index = std::find(joints_names.begin(), joints_names.end(), r_2hand[i]) - joints_names.begin();
+    //if (r_index >= joints_names.size()){
+    //    std::cout << "element not found in state.name\n";
+    //}else{
+
+        right_2hand_pos.at(i)=0.0;
+        right_2hand_vel.at(i)=0.0;
+        right_2hand_force.at(i)=0.0;
+    //}
+}
+
+if (this->curr_scene && !this->sim_robot){
+
+    this->curr_scene->getHumanoid()->setRightPosture(right_posture);
+    //this->curr_scene->getHumanoid()->setLeftPosture(left_posture);
+    this->curr_scene->getHumanoid()->setRightVelocities(right_vel);
+    //this->curr_scene->getHumanoid()->setLeftVelocities(left_vel);
+    this->curr_scene->getHumanoid()->setRightForces(right_forces);
+    //this->curr_scene->getHumanoid()->setLeftForces(left_forces);
+
+}
 
 
 }
@@ -11200,6 +11260,16 @@ case 1: // Jarde
 
 
     return succ;
+}
+
+bool QNode::getSimRobot()
+{
+    return this->sim_robot;
+}
+
+void QNode::setSimRobot(bool sr)
+{
+    this->sim_robot = sr;
 }
 
 #if HAND == 1

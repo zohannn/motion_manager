@@ -326,6 +326,18 @@ public:
          */
         bool closeBarrettHand_to_pos(int hand, std::vector<double>& hand_posture);
 
+        /**
+         * @brief getSimRobot
+         * @return
+         */
+        bool getSimRobot();
+
+        /**
+         * @brief setSimRobot
+         * @param sr
+         */
+        void setSimRobot(bool sr);
+
 
 
 Q_SIGNALS:
@@ -378,7 +390,8 @@ private:
         char** init_argv; /**< initial argv */
         ros::ServiceClient add_client;/**<  ROS client */
         ros::Subscriber subInfo; /**< ROS subscriber for information about the simulation */
-        ros::Subscriber subJoints_state; /**< ROS subscriber to the topic /vrep/joint_state */
+        ros::Subscriber subJoints_state; /**< ROS subscriber to the topic /vrep/joints_state */
+        ros::Subscriber subJoints_state_real; /**< ROS subscriber to the topic /ARoS/joints_state */
         ros::Subscriber subRightProxSensor;/**< ROS subscriber to the topic /vrep/right_prox_sensor */
         ros::Subscriber subLeftProxSensor; /**< ROS subscriber to the topic /vrep/left_prox_sensor */
         ros::Subscriber subRightHandPos; /**< ROS subscriber to the topic /vrep/right_hand_pose */
@@ -463,6 +476,7 @@ private:
         std::vector<double> left_2hand_pos; /**< position of the left hand 2 phalanx */
         std::vector<double> left_2hand_vel; /**< velocity of the left hand 2 phalanx */
         std::vector<double> left_2hand_force; /**< forces of the left hand 2 phalanx */
+        bool sim_robot; /**< true if the robot is simulated, false if the robot is real */
 
 #if HAND ==1
         std::vector<bool> firstPartLocked;
@@ -486,10 +500,16 @@ private:
         void infoCallback(const vrep_common::VrepInfoConstPtr& info);
 
         /**
-         * @brief This is the callback to retrieve the state of the joints
+         * @brief This is the callback to retrieve the state of the joints from vrep
          * @param state
          */
         void JointsCallback(const sensor_msgs::JointState& state);
+
+        /**
+         * @brief This is the callback to retrieve the state of the joints from the real robot ARoS
+         * @param state
+         */
+        void JointsRealCallback(const sensor_msgs::JointState& state);
 
         /**
          * @brief This is the callback to retrieve the state of the proximity sensor on the right end-effector

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1310</width>
-    <height>937</height>
+    <width>1316</width>
+    <height>993</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,11 +30,11 @@
       <x>9</x>
       <y>9</y>
       <width>1291</width>
-      <height>701</height>
+      <height>761</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -2637,10 +2637,10 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_control">
       <property name="geometry">
        <rect>
-        <x>1090</x>
+        <x>1020</x>
         <y>600</y>
-        <width>191</width>
-        <height>61</height>
+        <width>261</width>
+        <height>121</height>
        </rect>
       </property>
       <property name="title">
@@ -2649,8 +2649,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="pushButton_stop_control">
        <property name="geometry">
         <rect>
-         <x>110</x>
-         <y>30</y>
+         <x>10</x>
+         <y>80</y>
          <width>71</width>
          <height>21</height>
         </rect>
@@ -2663,7 +2663,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>30</y>
+         <y>50</y>
          <width>71</width>
          <height>21</height>
         </rect>
@@ -2672,6 +2672,48 @@ p, li { white-space: pre-wrap; }
         <string>Start</string>
        </property>
       </widget>
+      <widget class="QGroupBox" name="groupBox_sim_real">
+       <property name="geometry">
+        <rect>
+         <x>120</x>
+         <y>20</y>
+         <width>121</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string/>
+       </property>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>12</x>
+          <y>32</y>
+          <width>95</width>
+          <height>50</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_115">
+         <item>
+          <widget class="QRadioButton" name="radioButton_sim">
+           <property name="text">
+            <string>Simulator</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radioButton_robot">
+           <property name="text">
+            <string>robot ARoS</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_ctrl_options">
       <property name="geometry">
@@ -2679,7 +2721,7 @@ p, li { white-space: pre-wrap; }
         <x>10</x>
         <y>10</y>
         <width>601</width>
-        <height>651</height>
+        <height>711</height>
        </rect>
       </property>
       <property name="font">
@@ -3613,8 +3655,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>300</x>
-         <y>620</y>
+         <x>290</x>
+         <y>600</y>
          <width>249</width>
          <height>25</height>
         </rect>
@@ -3643,7 +3685,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>460</x>
-         <y>590</y>
+         <y>680</y>
          <width>131</width>
          <height>23</height>
         </rect>
@@ -3896,7 +3938,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>620</x>
-        <y>640</y>
+        <y>670</y>
         <width>291</width>
         <height>21</height>
        </rect>
@@ -3948,7 +3990,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_results_plan">
        <attribute name="title">
@@ -13584,7 +13626,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>710</y>
+      <y>770</y>
       <width>1291</width>
       <height>121</height>
      </rect>
@@ -13602,7 +13644,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>820</y>
+      <y>880</y>
       <width>601</width>
       <height>61</height>
      </rect>
@@ -13838,7 +13880,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1310</width>
+     <width>1316</width>
      <height>20</height>
     </rect>
    </property>
