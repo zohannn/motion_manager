@@ -440,6 +440,7 @@ private:
         // -----------------------------------------------------------------------------------------------------------------------------------
         // Controlling: scenario without objects -------------------------------------------------------------------------------------
         ros::Publisher pub_joints; /**< ROS publisher to the topic /motion_manager/set_joints */
+        ros::Publisher pub_real_joints; /**< ROS publisher to the topic /motion_manager/set_real_joints */
 
 #if MOVEIT==1
         boost::shared_ptr<moveit::planning_interface::PlanningSceneInterface> planning_scene_interface_ptr;/**< scene interface */

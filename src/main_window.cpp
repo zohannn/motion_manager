@@ -878,7 +878,7 @@ void MainWindow::execPosControl()
                 time_step = this->qnode.getSimTimeStep(); // sec
                 condition = this->qnode.isSimulationRunning() && ((this->qnode.getSimTime()-this->t_j_past)>time_step);
             }else{
-                time_step = 0.05; // time step of receiving the state of the joints from ARoS [sec]
+                time_step = 0.005; // time step of receiving the state of the joints from ARoS [sec]
                 condition = (Clock::now() - this->t_j_past_ctrl) > boost::chrono::duration<double,boost::ratio<1>>(time_step);
 
             }
@@ -1175,8 +1175,8 @@ void MainWindow::execPosControl()
                             if(sim_robot){
                                 g_map = 1 - exp((-dec_rate*this->curr_time)/(tau*(1+diff_w*error_tot.squaredNorm())));
                             }else{
-                                double d_curr_time = (boost::chrono::duration_cast<msec>(this->curr_time_ctrl-this->start_time_point)).count()/1000;
-                                g_map = 1 - exp((-dec_rate*d_curr_time)/(tau*(1+diff_w*error_tot.squaredNorm())));
+                                double d_curr_time = (boost::chrono::duration_cast<msec>(this->curr_time_ctrl-this->start_time_point)).count();
+                                g_map = 1 - exp((-dec_rate*(d_curr_time/1000))/(tau*(1+diff_w*error_tot.squaredNorm())));
                             }
                             index = static_cast<int>(0.5+(n_steps-1)*g_map);
 
@@ -1482,8 +1482,8 @@ void MainWindow::execPosControl()
                             if(sim_robot){
                                 g_map = 1 - exp((-dec_rate*this->curr_time)/(tau*(1+diff_w*error_tot.squaredNorm())));
                             }else{
-                                double d_curr_time = (boost::chrono::duration_cast<msec>(this->curr_time_ctrl-this->start_time_point)).count()/1000;
-                                g_map = 1 - exp((-dec_rate*d_curr_time)/(tau*(1+diff_w*error_tot.squaredNorm())));
+                                double d_curr_time = (boost::chrono::duration_cast<msec>(this->curr_time_ctrl-this->start_time_point)).count();
+                                g_map = 1 - exp((-dec_rate*(d_curr_time/1000))/(tau*(1+diff_w*error_tot.squaredNorm())));
                             }
                             index = static_cast<int>(0.5+(n_steps-1)*g_map);
 
@@ -1572,8 +1572,8 @@ void MainWindow::execPosControl()
                             if(sim_robot){
                                 g_map = 1 - exp((-dec_rate*this->curr_time)/(tau*(1+diff_w*error_tot.squaredNorm())));
                             }else{
-                                double d_curr_time = (boost::chrono::duration_cast<msec>(this->curr_time_ctrl-this->start_time_point)).count()/1000;
-                                g_map = 1 - exp((-dec_rate*d_curr_time)/(tau*(1+diff_w*error_tot.squaredNorm())));
+                                double d_curr_time = (boost::chrono::duration_cast<msec>(this->curr_time_ctrl-this->start_time_point)).count();
+                                g_map = 1 - exp((-dec_rate*(d_curr_time/1000))/(tau*(1+diff_w*error_tot.squaredNorm())));
                             }
                             index = static_cast<int>(0.5+(n_steps-1)*g_map);
 
@@ -1781,7 +1781,8 @@ void MainWindow::execPosControl()
                         if(sim_robot){
                             curr_t = this->curr_time;
                         }else{
-                            curr_t = (boost::chrono::duration_cast<msec>(this->curr_time_ctrl-this->start_time_point)).count()/1000;
+                            double d_curr_t = (boost::chrono::duration_cast<msec>(this->curr_time_ctrl-this->start_time_point)).count();
+                            curr_t = d_curr_t/1000;
                         }
                         if(curr_t <= t_c_trap)
                         {
@@ -2215,8 +2216,9 @@ void MainWindow::execPosControl()
                 }else{
                     this->t_j_past_ctrl = Clock::now();
                     Clock::time_point sim_tp = this->t_j_past_ctrl - this->t_der_past_ctrl;
-                    double d_sim_time = (boost::chrono::duration_cast<msec>(sim_tp-this->start_time_point)).count()/1000;
-                    this->sim_time.push_back(d_sim_time);
+                    double d_sim_time = (boost::chrono::duration_cast<msec>(sim_tp-this->start_time_point)).count();
+                    //BOOST_LOG_SEV(lg, info) << "d_sim_time = " << d_sim_time/1000;
+                    this->sim_time.push_back(d_sim_time/1000);
                 }
 
             } // check timestep
@@ -14314,9 +14316,17 @@ void MainWindow::on_pushButton_control_plot_clicked()
     this->handPosPlot_ctrl_ptr->show();
 
     // plot the hand velocity norm
+    double f_th = this->ui.lineEdit_f_cutoff->text().toDouble();
+    double timestep = this->ui.lineEdit_time_step->text().toDouble();
+    LowPassFilter lpf_hand_vel(f_th, timestep);
+
     if(!this->handVelocityNorm_ctrl.empty()){
 
-        QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_ctrl);
+        //QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_ctrl);
+        QVector<double> qhand_vel;
+        for(int k=0;k<this->handVelocityNorm_ctrl.size();++k){
+            qhand_vel.push_back(lpf_hand_vel.update(this->handVelocityNorm_ctrl.at(k)));
+        }
         QVector<double> qtime = QVector<double>::fromStdVector(this->sim_time);
         ui.plot_control_hand_vel->plotLayout()->clear();
         ui.plot_control_hand_vel->clearGraphs();

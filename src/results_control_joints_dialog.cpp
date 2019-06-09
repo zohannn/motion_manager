@@ -146,6 +146,8 @@ void ResultsCtrlJointsDialog::on_pushButton_plot_clicked()
 {
     const double radtodeg = 180.0/static_cast<double>(M_PI);
 
+    double f_th_pos = this->ui->lineEdit_f_cutoff_pos->text().toDouble();
+    double timestep_pos = this->ui->lineEdit_time_step_pos->text().toDouble();
     double f_th_vel = this->ui->lineEdit_f_cutoff_vel->text().toDouble();
     double timestep_vel = this->ui->lineEdit_time_step_vel->text().toDouble();
     double f_th_acc = this->ui->lineEdit_f_cutoff_acc->text().toDouble();
@@ -162,6 +164,18 @@ void ResultsCtrlJointsDialog::on_pushButton_plot_clicked()
     QVector<double> pos_joint9, vel_joint9,acc_joint9,max_limits_joint9,min_limits_joint9;
     QVector<double> pos_joint10, vel_joint10,acc_joint10,max_limits_joint10,min_limits_joint10;
     QVector<double> pos_joint11, vel_joint11,acc_joint11,max_limits_joint11,min_limits_joint11;
+
+    LowPassFilter lpf_pos_1(f_th_pos, timestep_pos);
+    LowPassFilter lpf_pos_2(f_th_pos, timestep_pos);
+    LowPassFilter lpf_pos_3(f_th_pos, timestep_pos);
+    LowPassFilter lpf_pos_4(f_th_pos, timestep_pos);
+    LowPassFilter lpf_pos_5(f_th_pos, timestep_pos);
+    LowPassFilter lpf_pos_6(f_th_pos, timestep_pos);
+    LowPassFilter lpf_pos_7(f_th_pos, timestep_pos);
+    LowPassFilter lpf_pos_8(f_th_pos, timestep_pos);
+    LowPassFilter lpf_pos_9(f_th_pos, timestep_pos);
+    LowPassFilter lpf_pos_10(f_th_pos, timestep_pos);
+    LowPassFilter lpf_pos_11(f_th_pos, timestep_pos);
 
     LowPassFilter lpf_vel_1(f_th_vel, timestep_vel);
     LowPassFilter lpf_vel_2(f_th_vel, timestep_vel);
@@ -191,67 +205,67 @@ void ResultsCtrlJointsDialog::on_pushButton_plot_clicked()
     for(int k=0;k<positions.rows();++k){
         for(int j=0;j < positions.cols();++j){
             if(j==0){// joint 1
-                pos_joint1.push_back(radtodeg*positions(k,j));
+                pos_joint1.push_back(lpf_pos_1.update(radtodeg*positions(k,j)));
                 vel_joint1.push_back(lpf_vel_1.update(radtodeg*velocities(k,j)));
                 acc_joint1.push_back(lpf_acc_1.update(radtodeg*accelerations(k,j)));
                 max_limits_joint1.push_back(radtodeg*max_pos_limits.at(j));
                 min_limits_joint1.push_back(radtodeg*min_pos_limits.at(j));
             }else if(j==1){//joint 2
-                pos_joint2.push_back(radtodeg*positions(k,j));
+                pos_joint2.push_back(lpf_pos_2.update(radtodeg*positions(k,j)));
                 vel_joint2.push_back(lpf_vel_2.update(radtodeg*velocities(k,j)));
                 acc_joint2.push_back(lpf_acc_2.update(radtodeg*accelerations(k,j)));
                 max_limits_joint2.push_back(radtodeg*max_pos_limits.at(j));
                 min_limits_joint2.push_back(radtodeg*min_pos_limits.at(j));
             }else if(j==2){//joint 3
-                pos_joint3.push_back(radtodeg*positions(k,j));
+                pos_joint3.push_back(lpf_pos_3.update(radtodeg*positions(k,j)));
                 vel_joint3.push_back(lpf_vel_3.update(radtodeg*velocities(k,j)));
                 acc_joint3.push_back(lpf_acc_3.update(radtodeg*accelerations(k,j)));
                 max_limits_joint3.push_back(radtodeg*max_pos_limits.at(j));
                 min_limits_joint3.push_back(radtodeg*min_pos_limits.at(j));
             }else if(j==3){//joint 4
-                pos_joint4.push_back(radtodeg*positions(k,j));
+                pos_joint4.push_back(lpf_pos_4.update(radtodeg*positions(k,j)));
                 vel_joint4.push_back(lpf_vel_4.update(radtodeg*velocities(k,j)));
                 acc_joint4.push_back(lpf_acc_4.update(radtodeg*accelerations(k,j)));
                 max_limits_joint4.push_back(radtodeg*max_pos_limits.at(j));
                 min_limits_joint4.push_back(radtodeg*min_pos_limits.at(j));
             }else if(j==4){//joint 5
-                pos_joint5.push_back(radtodeg*positions(k,j));
+                pos_joint5.push_back(lpf_pos_5.update(radtodeg*positions(k,j)));
                 vel_joint5.push_back(lpf_vel_5.update(radtodeg*velocities(k,j)));
                 acc_joint5.push_back(lpf_acc_5.update(radtodeg*accelerations(k,j)));
                 max_limits_joint5.push_back(radtodeg*max_pos_limits.at(j));
                 min_limits_joint5.push_back(radtodeg*min_pos_limits.at(j));
             }else if(j==5){//joint 6
-                pos_joint6.push_back(radtodeg*positions(k,j));
+                pos_joint6.push_back(lpf_pos_6.update(radtodeg*positions(k,j)));
                 vel_joint6.push_back(lpf_vel_6.update(radtodeg*velocities(k,j)));
                 acc_joint6.push_back(lpf_acc_6.update(radtodeg*accelerations(k,j)));
                 max_limits_joint6.push_back(radtodeg*max_pos_limits.at(j));
                 min_limits_joint6.push_back(radtodeg*min_pos_limits.at(j));
             }else if(j==6){//joint 7
-                pos_joint7.push_back(radtodeg*positions(k,j));
+                pos_joint7.push_back(lpf_pos_7.update(radtodeg*positions(k,j)));
                 vel_joint7.push_back(lpf_vel_7.update(radtodeg*velocities(k,j)));
                 acc_joint7.push_back(lpf_acc_7.update(radtodeg*accelerations(k,j)));
                 max_limits_joint7.push_back(radtodeg*max_pos_limits.at(j));
                 min_limits_joint7.push_back(radtodeg*min_pos_limits.at(j));
             }else if(j==7){//joint 8
-                pos_joint8.push_back(radtodeg*positions(k,j));
+                pos_joint8.push_back(lpf_pos_8.update(radtodeg*positions(k,j)));
                 vel_joint8.push_back(lpf_vel_8.update(radtodeg*velocities(k,j)));
                 acc_joint8.push_back(lpf_acc_8.update(radtodeg*accelerations(k,j)));
                 max_limits_joint8.push_back(radtodeg*max_pos_limits.at(j));
                 min_limits_joint8.push_back(radtodeg*min_pos_limits.at(j));
             }else if(j==8){//joint 9
-                pos_joint9.push_back(radtodeg*positions(k,j));
+                pos_joint9.push_back(lpf_pos_9.update(radtodeg*positions(k,j)));
                 vel_joint9.push_back(lpf_vel_9.update(radtodeg*velocities(k,j)));
                 acc_joint9.push_back(lpf_acc_9.update(radtodeg*accelerations(k,j)));
                 max_limits_joint9.push_back(radtodeg*max_pos_limits.at(j));
                 min_limits_joint9.push_back(radtodeg*min_pos_limits.at(j));
             }else if(j==9){//joint 10
-                pos_joint10.push_back(radtodeg*positions(k,j));
+                pos_joint10.push_back(lpf_pos_10.update(radtodeg*positions(k,j)));
                 vel_joint10.push_back(lpf_vel_10.update(radtodeg*velocities(k,j)));
                 acc_joint10.push_back(lpf_acc_10.update(radtodeg*accelerations(k,j)));
                 max_limits_joint10.push_back(radtodeg*max_pos_limits.at(j));
                 min_limits_joint10.push_back(radtodeg*min_pos_limits.at(j));
             }else if(j==10){//joint 11
-                pos_joint11.push_back(radtodeg*positions(k,j));
+                pos_joint11.push_back(lpf_pos_11.update(radtodeg*positions(k,j)));
                 vel_joint11.push_back(lpf_vel_11.update(radtodeg*velocities(k,j)));
                 acc_joint11.push_back(lpf_acc_11.update(radtodeg*accelerations(k,j)));
                 max_limits_joint11.push_back(radtodeg*max_pos_limits.at(j));

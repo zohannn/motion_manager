@@ -3986,7 +3986,7 @@ p, li { white-space: pre-wrap; }
         <x>-4</x>
         <y>-1</y>
         <width>1281</width>
-        <height>551</height>
+        <height>621</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -13461,7 +13461,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>480</y>
+          <y>554</y>
           <width>168</width>
           <height>25</height>
          </rect>
@@ -13534,7 +13534,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>490</x>
-          <y>440</y>
+          <y>510</y>
           <width>771</width>
           <height>31</height>
          </rect>
@@ -13582,7 +13582,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>590</x>
-          <y>486</y>
+          <y>560</y>
           <width>671</width>
           <height>25</height>
          </rect>
@@ -13617,6 +13617,67 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
         </layout>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_low_pass_filter">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>440</y>
+          <width>191</width>
+          <height>101</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Low Pass Filter </string>
+        </property>
+        <widget class="QWidget" name="layoutWidget_108">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>161</width>
+           <height>58</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_116">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_603">
+            <item>
+             <widget class="QLabel" name="label_f_cutoff">
+              <property name="text">
+               <string>CutOff Freq. [Hz]:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_f_cutoff">
+              <property name="text">
+               <string>1000</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_613">
+            <item>
+             <widget class="QLabel" name="label_time_step">
+              <property name="text">
+               <string> Time step [s] :</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_time_step">
+              <property name="text">
+               <string>0.05</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </widget>
      </widget>

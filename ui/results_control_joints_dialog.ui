@@ -152,7 +152,7 @@
   <widget class="QGroupBox" name="groupBox_low_pass_vel">
    <property name="geometry">
     <rect>
-     <x>1160</x>
+     <x>1350</x>
      <y>540</y>
      <width>191</width>
      <height>101</height>
@@ -296,6 +296,67 @@
    <property name="text">
     <string>show null space velocities</string>
    </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_low_pass_pos">
+   <property name="geometry">
+    <rect>
+     <x>1150</x>
+     <y>540</y>
+     <width>191</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Positions Low Pass Filter </string>
+   </property>
+   <widget class="QWidget" name="layoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>161</width>
+      <height>58</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <widget class="QLabel" name="label_f_cutoff_pos">
+         <property name="text">
+          <string>CutOff Freq. [Hz]:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_f_cutoff_pos">
+         <property name="text">
+          <string>1000</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_8">
+       <item>
+        <widget class="QLabel" name="label_time_step_pos">
+         <property name="text">
+          <string> Time step [s] :</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_time_step_pos">
+         <property name="text">
+          <string>0.05</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
   </widget>
  </widget>
  <customwidgets>
