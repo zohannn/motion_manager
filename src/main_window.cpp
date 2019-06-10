@@ -2078,6 +2078,9 @@ void MainWindow::execPosControl()
                         }
                     }else if(stages==3 && hl_en && stage_descr.compare("approach")==0){
                         condition = (g_map >= g_map_th_rp);
+                        if(condition && hl_en && !sim_robot){
+                            // close the Barrett Hand of ARoS
+                        }
                     }
                     if(condition){
                         //this->qnode.log(QNode::Info,string("Simulation Time: ")+boost::lexical_cast<std::string>(this->qnode.getSimTime()));
@@ -2113,11 +2116,19 @@ void MainWindow::execPosControl()
 
                 // execute the control                
                 if(this->exec_command_ctrl){
-                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities,joints_arm_vel_ctrl,true);
+                    if(sim_robot){
+                        this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities,joints_arm_vel_ctrl,true);
+                    }else{
+                        this->qnode.execKinRealControl(1,r_arm_velocities,r_hand_velocities,true);
+                    }
                 }else{
                     // stop the motion
                     vector<double> r_arm_velocities_0(JOINTS_ARM,0.0);vector<double> r_hand_velocities_0(JOINTS_HAND,0.0);
-                    this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities_0,r_hand_posture_mes,r_hand_velocities_0,joints_arm_vel_ctrl,true);
+                    if(sim_robot){
+                        this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities_0,r_hand_posture_mes,r_hand_velocities_0,joints_arm_vel_ctrl,true);
+                    }else{
+                        this->qnode.execKinRealControl(1,r_arm_velocities_0,r_hand_velocities_0,true);
+                    }
                 }
 
                 // ------------- Recording ------------------------------- //
@@ -14224,9 +14235,13 @@ void MainWindow::on_pushButton_start_control_clicked()
 void MainWindow::on_pushButton_stop_control_pressed()
 {
     this->ui.groupBox_sim_real->setEnabled(true);
-    qnode.log(QNode::Info,string("Control Stopped"));
+    this->qnode.log(QNode::Info,string("Control Stopped"));
+    // stop the motion
     if(this->ui.radioButton_sim->isChecked()){
-        qnode.log(QNode::Info,string("Simulation Stopped"));
+        this->qnode.log(QNode::Info,string("Simulation Stopped"));
+    }else{
+        this->exec_command_ctrl=false;
+        sleep(1);
     }
 }
 

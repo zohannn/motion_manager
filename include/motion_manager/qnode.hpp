@@ -15,6 +15,11 @@
 #include <sensor_msgs/JointState.h>
 #include <string>
 #include <std_msgs/String.h>
+
+#include <std_msgs/MultiArrayLayout.h>
+#include <std_msgs/MultiArrayDimension.h>
+#include <std_msgs/Float32MultiArray.h>
+
 #include <QThread>
 #include <QStringListModel>
 #include <vrep_common/VrepInfo.h>
@@ -182,6 +187,17 @@ public:
          * @return
          */
         bool execKinControl(int arm, vector<double> &r_arm_posture, vector<double>& r_arm_velocities, vector<double> &r_hand_posture, vector<double> &r_hand_velocities, bool joints_arm_vel_ctrl, bool hand_ctrl);
+
+
+        /**
+         * @brief execKinRealControl
+         * @param arm
+         * @param r_arm_velocities
+         * @param r_hand_velocities
+         * @param hand_ctrl
+         * @return
+         */
+        bool execKinRealControl(int arm, vector<double> &r_arm_velocities, vector<double> &r_hand_velocities, bool hand_ctrl);
 
         /**
          * @brief execKinControlAcc
@@ -435,10 +451,10 @@ private:
         ros::Subscriber subCylinderSmall; /**< ROS sunscriber to the topic /vrep/Cylinder_small  */
         ros::Subscriber subCylinderTall; /**< ROS sunscriber to the topic /vrep/Cylinder_tall  */
         // -----------------------------------------------------------------------------------------------------------------------------------
-        // Learning tasks: reaching with one obstacle scenario -------------------------------------------------------------------------------------
+        // Learning tasks: reaching with one obstacle scenario -------------------------------------------------------------------------------
         ros::Subscriber subObstacle;
         // -----------------------------------------------------------------------------------------------------------------------------------
-        // Controlling: scenario without objects -------------------------------------------------------------------------------------
+        // Controlling: scenario without objects ---------------------------------------------------------------------------------------------
         ros::Publisher pub_joints; /**< ROS publisher to the topic /motion_manager/set_joints */
         ros::Publisher pub_real_joints; /**< ROS publisher to the topic /motion_manager/set_real_joints */
 
