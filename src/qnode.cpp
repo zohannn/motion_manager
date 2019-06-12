@@ -271,17 +271,22 @@ bool  QNode::loadScenario(const std::string& path,int id)
         case 12: case 13: // Controlling scenarios without objects
             pub_joints = n.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
             pub_real_joints =  n.advertise<std_msgs::Float32MultiArray>("/"+nodeName+"/set_real_joints",1);
+            clientOpenCloseBH = n.serviceClient<open_close_BH::OpenClose_BH>("/ARoS/open_close_BH_srv");
             break;
 
         case 14: // Controlling: scenario with one obstacle and draw an allipse on the XY plane
             pub_joints = n.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
             pub_real_joints =  n.advertise<std_msgs::Float32MultiArray>("/"+nodeName+"/set_real_joints",1);
+            clientOpenCloseBH = n.serviceClient<open_close_BH::OpenClose_BH>("/ARoS/open_close_BH_srv");
+            subTargetPose= n.subscribe("/ARoS/target_pose",1,&QNode::Target_pose_Callback,this);
             // Cylinder small  (obj_id = 0)
             subCylinderSmall= n.subscribe("/vrep/Cylinder_small_pose",1,&QNode::Cylinder_small_Callback,this);
             break;
         case 15: case 16: // Controlling: pick a red column and Controlling: follow a moving red column
             pub_joints = n.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
             pub_real_joints =  n.advertise<std_msgs::Float32MultiArray>("/"+nodeName+"/set_real_joints",1);
+            clientOpenCloseBH = n.serviceClient<open_close_BH::OpenClose_BH>("/ARoS/open_close_BH_srv");
+            subTargetPose= n.subscribe("/ARoS/target_pose",1,&QNode::Target_pose_Callback,this);
             // Cylinder small  (obj_id = 0)
             subCylinderSmall= n.subscribe("/vrep/Cylinder_small_pose",1,&QNode::Cylinder_small_Callback,this);
             // Cylinder tall  (obj_id = 1)
@@ -7665,6 +7670,30 @@ void QNode::updateObjectInfo(int obj_id, string name, const geometry_msgs::PoseS
 
 }
 
+void QNode::Target_pose_Callback(const geometry_msgs::PoseStamped& data)
+{
+    targetPtr h_tar = this->curr_scene->getHandTarget();
+
+    // position
+    pos poss;
+    poss.Xpos = data.pose.position.x; //[mm]
+    poss.Ypos = data.pose.position.y; //[mm]
+    poss.Zpos = data.pose.position.z; //[mm]
+
+    // orientation
+    Quaterniond orr_q;
+    // get the quaternion
+    double epx = data.pose.orientation.x;
+    double epy = data.pose.orientation.y;
+    double epz = data.pose.orientation.z;
+    double w = data.pose.orientation.w;
+    orr_q.x() = epx; orr_q.y() = epy; orr_q.z() = epz; orr_q.w() = w;
+
+    h_tar->setPos(poss);
+    h_tar->setQuaternion(orr_q);
+    this->curr_scene->setHandTarget(h_tar);
+}
+
 bool QNode::getRPY(Matrix4d Trans, std::vector<double> &rpy)
 {
 
@@ -10193,8 +10222,8 @@ bool QNode::execKinRealControl(int arm, vector<double> &r_arm_velocities, vector
             arr_vel.data.push_back(r_arm_velocities.at(i));
         }
         if(hand_ctrl){
-            for(size_t i=0; i<r_hand_velocities.size();++i){
-                arr_vel.data.push_back(r_hand_velocities.at(i));
+            for(size_t j=0; j<r_hand_velocities.size();++j){
+                arr_vel.data.push_back(r_hand_velocities.at(j));
             }
         }
     }else{
@@ -11298,6 +11327,18 @@ bool QNode::getSimRobot()
 void QNode::setSimRobot(bool sr)
 {
     this->sim_robot = sr;
+}
+
+bool QNode::open_close_BH(bool close)
+{
+    open_close_BH::OpenClose_BH srv;
+    srv.request.close = close;
+    if(this->clientOpenCloseBH.call(srv))
+    {
+        return srv.response.success;
+    }else{
+        return false;
+    }
 }
 
 #if HAND == 1

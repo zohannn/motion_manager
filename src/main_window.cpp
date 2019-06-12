@@ -429,6 +429,8 @@ void MainWindow::execPosControl()
         {
             boost::unique_lock<boost::mutex> lck(hh_control_mtx);
 
+            bool sim_robot = this->ui.radioButton_sim->isChecked(); // true to control the simulator, false to control the real robot
+
             // desired pose
             double des_hand_pos_x = 0.0; double des_hand_pos_y = 0.0; double des_hand_pos_z = 0.0;
             double des_hand_or_q_x = 0.0; double des_hand_or_q_y = 0.0; double des_hand_or_q_z = 0.0; double des_hand_or_q_w = 0.0;
@@ -486,7 +488,12 @@ void MainWindow::execPosControl()
                  vector<double> zt;
                  double dist_app = 0.0; Vector3d vv_app; double dist_ret = 0.0; Vector3d vv_ret;
                  if(mov_type==0){ // pick
-                     targetPtr tar = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight();
+                     targetPtr tar;
+                     if(sim_robot){
+                        tar = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight();
+                     }else{
+                        tar = this->curr_scene->getHandTarget();
+                     }
                      tar_pos(0) = tar->getPos().Xpos;
                      tar_pos(1) = tar->getPos().Ypos;
                      tar_pos(2) = tar->getPos().Zpos;
@@ -498,7 +505,7 @@ void MainWindow::execPosControl()
                      //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getXt(xt);
                      //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getYt(yt);
                      tar->getZt(zt);
-                     if(this->ui.checkBox_tar_noise->isChecked()){
+                     if(this->ui.checkBox_tar_noise->isChecked() && sim_robot){
                          tar_pos(0) = tar_pos(0) - (obj_x_var/2) + obj_x_var*(rand() / double(RAND_MAX));
                          tar_pos(1) = tar_pos(1) - (obj_y_var/2) + obj_y_var*(rand() / double(RAND_MAX));
                          tar_pos(2) = tar_pos(2) - (obj_z_var/2) + obj_z_var*(rand() / double(RAND_MAX));
@@ -506,18 +513,23 @@ void MainWindow::execPosControl()
                          tar_q.y() = tar_q.y() - (obj_q_y_var/2) + obj_q_y_var*(rand() / double(RAND_MAX));
                          tar_q.z() = tar_q.z() - (obj_q_z_var/2) + obj_q_z_var*(rand() / double(RAND_MAX));
                          tar_q.w() = tar_q.w() - (obj_q_w_var/2) + obj_q_w_var*(rand() / double(RAND_MAX));
-                         if(this->ui.checkBox_tar_filter_noise->isChecked()){
-                             tar_pos(0) = this->lpf_tar_pos_x->update(tar_pos(0));
-                             tar_pos(1) = this->lpf_tar_pos_y->update(tar_pos(1));
-                             tar_pos(2) = this->lpf_tar_pos_z->update(tar_pos(2));
-                             tar_q.x() = this->lpf_tar_or_q_x->update(tar_q.x());
-                             tar_q.y() = this->lpf_tar_or_q_y->update(tar_q.y());
-                             tar_q.z() = this->lpf_tar_or_q_z->update(tar_q.z());
-                             tar_q.w() = this->lpf_tar_or_q_w->update(tar_q.w());
-                         }
+                     }
+                     if(this->ui.checkBox_tar_filter_noise->isChecked()){
+                         tar_pos(0) = this->lpf_tar_pos_x->update(tar_pos(0));
+                         tar_pos(1) = this->lpf_tar_pos_y->update(tar_pos(1));
+                         tar_pos(2) = this->lpf_tar_pos_z->update(tar_pos(2));
+                         tar_q.x() = this->lpf_tar_or_q_x->update(tar_q.x());
+                         tar_q.y() = this->lpf_tar_or_q_y->update(tar_q.y());
+                         tar_q.z() = this->lpf_tar_or_q_z->update(tar_q.z());
+                         tar_q.w() = this->lpf_tar_or_q_w->update(tar_q.w());
                      }
                  }else if(mov_type==2 || mov_type==3 || mov_type==4){ // place
-                     posePtr tar = this->curr_scene->getPose(this->i_tar_ctrl);
+                     posePtr tar;
+                     if(sim_robot){
+                         tar = this->curr_scene->getPose(this->i_tar_ctrl);
+                     }else{
+                         tar = this->curr_scene->getHandPose();
+                     }
                      tar_pos(0) = tar->getPos().Xpos;
                      tar_pos(1) = tar->getPos().Ypos;
                      tar_pos(2) = tar->getPos().Zpos;
@@ -529,7 +541,7 @@ void MainWindow::execPosControl()
                      //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getXt(xt);
                      //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getYt(yt);
                      tar->getZt(zt);
-                     if(this->ui.checkBox_tar_noise->isChecked()){
+                     if(this->ui.checkBox_tar_noise->isChecked() && sim_robot){
                          tar_pos(0) = tar_pos(0) - (obj_x_var/2) + obj_x_var*(rand() / double(RAND_MAX));
                          tar_pos(1) = tar_pos(1) - (obj_y_var/2) + obj_y_var*(rand() / double(RAND_MAX));
                          tar_pos(2) = tar_pos(2) - (obj_z_var/2) + obj_z_var*(rand() / double(RAND_MAX));
@@ -537,15 +549,15 @@ void MainWindow::execPosControl()
                          tar_q.y() = tar_q.y() - (obj_q_y_var/2) + obj_q_y_var*(rand() / double(RAND_MAX));
                          tar_q.z() = tar_q.z() - (obj_q_z_var/2) + obj_q_z_var*(rand() / double(RAND_MAX));
                          tar_q.w() = tar_q.w() - (obj_q_w_var/2) + obj_q_w_var*(rand() / double(RAND_MAX));
-                         if(this->ui.checkBox_tar_filter_noise->isChecked()){
-                             tar_pos(0) = this->lpf_tar_pos_x->update(tar_pos(0));
-                             tar_pos(1) = this->lpf_tar_pos_y->update(tar_pos(1));
-                             tar_pos(2) = this->lpf_tar_pos_z->update(tar_pos(2));
-                             tar_q.x() = this->lpf_tar_or_q_x->update(tar_q.x());
-                             tar_q.y() = this->lpf_tar_or_q_y->update(tar_q.y());
-                             tar_q.z() = this->lpf_tar_or_q_z->update(tar_q.z());
-                             tar_q.w() = this->lpf_tar_or_q_w->update(tar_q.w());
-                         }
+                     }
+                     if(this->ui.checkBox_tar_filter_noise->isChecked()){
+                         tar_pos(0) = this->lpf_tar_pos_x->update(tar_pos(0));
+                         tar_pos(1) = this->lpf_tar_pos_y->update(tar_pos(1));
+                         tar_pos(2) = this->lpf_tar_pos_z->update(tar_pos(2));
+                         tar_q.x() = this->lpf_tar_or_q_x->update(tar_q.x());
+                         tar_q.y() = this->lpf_tar_or_q_y->update(tar_q.y());
+                         tar_q.z() = this->lpf_tar_or_q_z->update(tar_q.z());
+                         tar_q.w() = this->lpf_tar_or_q_w->update(tar_q.w());
                      }
                  }
                  //Vector3d xt_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(xt.data(), xt.size());
@@ -859,7 +871,6 @@ void MainWindow::execPosControl()
             double coeff_d_or = this->ui.lineEdit_coeff_d_or->text().toDouble();
 
             // -------------- simulation or real robot --------------------------------- //
-            bool sim_robot = this->ui.radioButton_sim->isChecked(); // true to control the simulator, false to control the real robot
             this->qnode.setSimRobot(sim_robot);
             double time_step; // time step of the controlling
             bool condition; // condition to process the control
@@ -891,7 +902,7 @@ void MainWindow::execPosControl()
 
                 // posture
                 vector<double> r_arm_posture_mes(JOINTS_ARM,0.0); vector<double> r_hand_posture_mes(JOINTS_HAND,0.0);
-                vector<double> r_arm_posture(JOINTS_ARM,0.0); vector<double> r_hand_posture(JOINTS_HAND,0.0);
+                vector<double> r_arm_posture(JOINTS_ARM,0.0); vector<double> r_hand_posture(JOINTS_HAND,0.0); //vector<double> r_hand_posture_ctrl(JOINTS_HAND,0.0);
                 // velocities
                 VectorXd r_arm_null_velocities = VectorXd::Zero(JOINTS_ARM);
                 vector<double> r_arm_velocities(JOINTS_ARM,0.0); vector<double> r_hand_velocities(JOINTS_HAND,0.0);
@@ -1685,10 +1696,11 @@ void MainWindow::execPosControl()
                     der_error_h_tot << error_h_lin_vel(0),error_h_lin_vel(1),error_h_lin_vel(2),error_h_der_or(0),error_h_der_or(1),error_h_der_or(2);
 
                     // fingers
-                    der_error_h_fing_tot(0) = h_fing_vel(0) - r_hand_velocities.at(0);
-                    der_error_h_fing_tot(1) = h_fing_vel(1) - r_hand_velocities.at(1);
-                    der_error_h_fing_tot(2) = h_fing_vel(2) - r_hand_velocities.at(2);
-                    der_error_h_fing_tot(3) = h_fing_vel(3) - r_hand_velocities.at(3);
+                    der_error_h_fing_tot(0) = h_fing_vel(0) - r_hand_velocities_read.at(0);
+                    der_error_h_fing_tot(1) = h_fing_vel(1) - r_hand_velocities_read.at(1);
+                    der_error_h_fing_tot(2) = h_fing_vel(2) - r_hand_velocities_read.at(2);
+                    der_error_h_fing_tot(3) = h_fing_vel(3) - r_hand_velocities_read.at(3);
+
 
 //                    // human-like reference velocity
 //                    h_hand_ref_vel(0) = h_hand_vel(0);
@@ -1755,6 +1767,10 @@ void MainWindow::execPosControl()
                     Kd_fing(0,0) = fing_d_coeff; Kd_fing(1,1) = fing_d_coeff; Kd_fing(2,2) = fing_d_coeff; Kd_fing(3,3) = fing_d_coeff;
                     VectorXd r_hand_acceleration_vec = h_fing_ref_acc + Kd_fing*der_error_h_fing_tot + Kp_fing*error_h_fing_tot;
                     VectorXd r_hand_velocities_vec = r_hand_acceleration_vec * time_step;
+                    if(mov_type==0 && stage_descr.compare("retreat")==0){
+                        // retreat stage of a pick movement
+                        r_hand_velocities_vec = VectorXd::Zero(JOINTS_HAND);
+                    }
                     VectorXd::Map(&r_hand_velocities[0], r_hand_velocities_vec.size()) = r_hand_velocities_vec;
 
                     }else{
@@ -2069,9 +2085,9 @@ void MainWindow::execPosControl()
                     }else if((stage_descr.compare("approach")==0) && follow_tar && (hand_vel_vec_x.norm()<=5.0)){
                         // the target was being followed and it has stopped
                         follow_tar = false; this->ui.checkBox_follow_target->setChecked(false); // the target has stopped
-                        this->qnode.openBarrettHand_to_pos(1,jointsInitPosition_hand_vec); // open the hand to the initial position of the approach stage
                         // reset the normalized time, but do not go to the next stage (the approach has to be performed)
                         if(sim_robot){
+                            this->qnode.openBarrettHand_to_pos(1,jointsInitPosition_hand_vec); // open the hand to the initial position of the approach stage
                             this->t_past=this->curr_time;
                         }else{
                             this->t_past_ctrl = boost::chrono::duration_cast<msec>(this->curr_time_ctrl - this->start_time_point);
@@ -2080,6 +2096,7 @@ void MainWindow::execPosControl()
                         condition = (g_map >= g_map_th_rp);
                         if(condition && hl_en && !sim_robot){
                             // close the Barrett Hand of ARoS
+                            this->qnode.open_close_BH(true);
                         }
                     }
                     if(condition){
@@ -2104,7 +2121,7 @@ void MainWindow::execPosControl()
                             // TO DO
                             this->i_ctrl++;
                         }
-                    }
+                    } // if condition
                 }
 
 
@@ -2119,7 +2136,7 @@ void MainWindow::execPosControl()
                     if(sim_robot){
                         this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities,r_hand_posture_mes,r_hand_velocities,joints_arm_vel_ctrl,true);
                     }else{
-                        this->qnode.execKinRealControl(1,r_arm_velocities,r_hand_velocities,true);
+                       this->qnode.execKinRealControl(1,r_arm_velocities,r_hand_velocities,true);
                     }
                 }else{
                     // stop the motion
@@ -2127,7 +2144,7 @@ void MainWindow::execPosControl()
                     if(sim_robot){
                         this->qnode.execKinControl(1,r_arm_posture_mes,r_arm_velocities_0,r_hand_posture_mes,r_hand_velocities_0,joints_arm_vel_ctrl,true);
                     }else{
-                        this->qnode.execKinRealControl(1,r_arm_velocities_0,r_hand_velocities_0,true);
+                       this->qnode.execKinRealControl(1,r_arm_velocities_0,r_hand_velocities_0,true);
                     }
                 }
 
@@ -14115,6 +14132,7 @@ void MainWindow::on_pushButton_start_control_pressed()
             }
             Vector3d tar_pos;
             targetPtr tar = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight();
+            this->curr_scene->setHandTarget(tar);
             tar_pos(0) = tar->getPos().Xpos;
             tar_pos(1) = tar->getPos().Ypos;
             tar_pos(2) = tar->getPos().Zpos;
@@ -14135,6 +14153,7 @@ void MainWindow::on_pushButton_start_control_pressed()
             }
             Vector3d tar_pos;
             posePtr tar = this->curr_scene->getPose(this->i_tar_ctrl);
+            this->curr_scene->setHandPose(tar);
             tar_pos(0) = tar->getPos().Xpos;
             tar_pos(1) = tar->getPos().Ypos;
             tar_pos(2) = tar->getPos().Zpos;

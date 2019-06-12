@@ -6,6 +6,8 @@ Scenario::Scenario(string name, int id)
 {
     this->m_name = name;
     this->m_scenarioID = id;
+    this->hand_target = targetPtr(new Target());
+    this->hand_pose = posePtr(new Pose());
 }
 
 
@@ -31,6 +33,9 @@ Scenario::Scenario(const Scenario &scene)
     }
 
     this->hPtr=humanoidPtr(new Humanoid(*scene.hPtr.get()));
+
+    this->hand_target = targetPtr(new Target(*scene.hand_target.get()));
+    this->hand_pose = posePtr(new Pose(*scene.hand_pose.get()));
 }
 
 
@@ -65,6 +70,19 @@ void Scenario::setPose(int pos, posePtr pt)
     this->poses_list.at(pos) = posePtr(new Pose(*pt.get()));
 
 }
+
+void Scenario::setHandTarget(targetPtr h_tar)
+{
+
+    this->hand_target = targetPtr(new Target(*h_tar.get()));
+}
+
+void Scenario::setHandPose(posePtr h_pose)
+{
+
+    this->hand_pose = posePtr(new Pose(*h_pose.get()));
+}
+
 
 string Scenario::getName()
 {
@@ -109,6 +127,19 @@ bool Scenario::getPoses(vector<posePtr> &pts)
     }
 
 }
+
+targetPtr Scenario::getHandTarget()
+{
+
+    return this->hand_target;
+}
+
+posePtr Scenario::getHandPose()
+{
+
+    return this->hand_pose;
+}
+
 
 
 void Scenario::addObject(objectPtr obj_ptr)

@@ -67,6 +67,18 @@ public:
     void setPose(int pos, posePtr pt);
 
     /**
+     * @brief setHandTarget
+     * @param h_tar
+     */
+    void setHandTarget(targetPtr h_tar);
+
+    /**
+     * @brief setHandPose
+     * @param h_pose
+     */
+    void setHandPose(posePtr h_pose);
+
+    /**
      * @brief This method gets the name of the scenario
      * @return
      */
@@ -144,6 +156,18 @@ public:
      */
     void addHumanoid(humanoidPtr hh_ptr);
 
+    /**
+     * @brief getHandTarget
+     * @return
+     */
+    targetPtr getHandTarget();
+
+    /**
+     * @brief getHandPose
+     * @return
+     */
+    posePtr getHandPose();
+
 
 private:
 
@@ -151,6 +175,8 @@ private:
     int m_scenarioID; /**< the ID of the scenario*/
     vector<objectPtr> objs_list; /**< the objects in the scenario */
     vector<posePtr> poses_list; /**< the poses in the scenario */
+    targetPtr hand_target; /**< hand target pose of the real robot ARoS */
+    posePtr hand_pose; /**< hand pose of the real robot ARoS */
     humanoidPtr hPtr; /**< the humanoid robot in the scenario */
 
 

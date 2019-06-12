@@ -20,6 +20,8 @@
 #include <std_msgs/MultiArrayDimension.h>
 #include <std_msgs/Float32MultiArray.h>
 
+#include <open_close_BH/OpenClose_BH.h>
+
 #include <QThread>
 #include <QStringListModel>
 #include <vrep_common/VrepInfo.h>
@@ -354,6 +356,13 @@ public:
          */
         void setSimRobot(bool sr);
 
+        /**
+         * @brief open_close_BH
+         * @param close
+         * @return
+         */
+        bool open_close_BH(bool close);
+
 
 
 Q_SIGNALS:
@@ -397,6 +406,7 @@ Q_SIGNALS:
          * @param value
          */
         void newJoint(string value);
+
 
 
 private:
@@ -457,6 +467,8 @@ private:
         // Controlling: scenario without objects ---------------------------------------------------------------------------------------------
         ros::Publisher pub_joints; /**< ROS publisher to the topic /motion_manager/set_joints */
         ros::Publisher pub_real_joints; /**< ROS publisher to the topic /motion_manager/set_real_joints */
+        ros::ServiceClient clientOpenCloseBH; /**< ROS service client to open/close the Barrett Hand*/
+        ros::Subscriber subTargetPose; /**< ROS subscriber to the topic /ARos/target_pose */
 
 #if MOVEIT==1
         boost::shared_ptr<moveit::planning_interface::PlanningSceneInterface> planning_scene_interface_ptr;/**< scene interface */
@@ -765,6 +777,11 @@ private:
          * @brief This method initializate the logging
          */
         void init();
+
+        // Controlling --------------------------------------
+
+        void Target_pose_Callback(const geometry_msgs::PoseStamped& data);
+
 
 #if HAND == 1
 
