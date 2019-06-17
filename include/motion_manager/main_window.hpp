@@ -1559,6 +1559,9 @@ private:
         boost::shared_ptr<LowPassFilter> lpf_joint_pos_10;
         boost::shared_ptr<LowPassFilter> lpf_joint_pos_11;
 
+        // target recored during the plan stage
+        targetPtr tar_rec;
+
 
 
 
