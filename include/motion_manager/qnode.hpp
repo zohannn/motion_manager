@@ -363,6 +363,11 @@ public:
          */
         bool open_close_BH(bool close);
 
+        /**
+         * @brief reset_open_close_BH
+         */
+        void reset_open_close_BH();
+
 
 
 Q_SIGNALS:
@@ -511,6 +516,7 @@ private:
         std::vector<bool> firstPartLocked;
         std::vector<int> needFullOpening;
         std::vector<bool> closed;
+        bool hand_closed; /**< true if the hand of the robot ARoS is closed, false otherwise*/
 #endif
 
 

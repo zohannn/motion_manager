@@ -485,7 +485,7 @@ void MainWindow::execPosControl()
                  stage_descr = this->h_results->trajectory_descriptions.at(this->i_ctrl);
                  mov_type = this->curr_mov->getType();
                  //vector<double> xt; vector<double> yt;
-                 vector<double> zt;
+                 //vector<double> zt;
                  double dist_app = 0.0; Vector3d vv_app; double dist_ret = 0.0; Vector3d vv_ret;
                  if(mov_type==0){ // pick
                      targetPtr tar;
@@ -500,12 +500,9 @@ void MainWindow::execPosControl()
                         tar_pos(0) = tar->getPos().Xpos;
                         tar_pos(1) = tar->getPos().Ypos;
                         tar_pos(2) = tar->getPos().Zpos;
-                        //tar_q = tar->getQuaternion();
-                        tar_q = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getQuaternion();
-                        if(stage_descr.compare("plan")==0){
-                            this->tar_rec = tar;
-                            this->tar_rec->setQuaternion(tar_q);
-                        } // record the latest target of the plan stage
+                        tar_q = tar->getQuaternion();
+                        //tar_q = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getQuaternion(); tar->setQuaternion(tar_q);
+                        if(stage_descr.compare("plan")==0){this->tar_rec = tar;} // record the latest target of the plan stage
                      }
                      /*
                      BOOST_LOG_SEV(lg, info) << "target position x = " << tar_pos(0);
@@ -522,7 +519,7 @@ void MainWindow::execPosControl()
                      vv_ret << this->retreat_ctrl.at(0),this->retreat_ctrl.at(1),this->retreat_ctrl.at(2);
                      //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getXt(xt);
                      //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getYt(yt);
-                     tar->getZt(zt);
+                     //tar->getZt(zt);
                      if(this->ui.checkBox_tar_noise->isChecked() && sim_robot){
                          tar_pos(0) = tar_pos(0) - (obj_x_var/2) + obj_x_var*(rand() / double(RAND_MAX));
                          tar_pos(1) = tar_pos(1) - (obj_y_var/2) + obj_y_var*(rand() / double(RAND_MAX));
@@ -543,6 +540,12 @@ void MainWindow::execPosControl()
                      }
                  }else if(mov_type==2 || mov_type==3 || mov_type==4){ // place
                      posePtr tar;
+                     tar = this->curr_scene->getPose(this->i_tar_ctrl);
+                     tar_pos(0) = tar->getPos().Xpos;
+                     tar_pos(1) = tar->getPos().Ypos;
+                     tar_pos(2) = tar->getPos().Zpos;
+                     tar_q = tar->getQuaternion();
+                     /*
                      if(sim_robot){
                          tar = this->curr_scene->getPose(this->i_tar_ctrl);
                          tar_pos(0) = tar->getPos().Xpos;
@@ -554,12 +557,14 @@ void MainWindow::execPosControl()
                          tar_pos(0) = tar->getPos().Xpos;
                          tar_pos(1) = tar->getPos().Ypos;
                          tar_pos(2) = tar->getPos().Zpos;
-                         tar_q = this->curr_scene->getPose(this->i_tar_ctrl)->getQuaternion();
+                         tar_q = tar->getQuaternion();
+                         //tar_q = this->curr_scene->getPose(this->i_tar_ctrl)->getQuaternion();
                          //if(stage_descr.compare("plan")==0){
                          //    this->tar_rec = tar;
                          //    this->tar_rec->setQuaternion(tar_q);
                          //} // record the latest target of the plan stage
                      }
+                     */
 
                      /*
                      BOOST_LOG_SEV(lg, info) << "target position x = " << tar_pos(0);
@@ -576,7 +581,7 @@ void MainWindow::execPosControl()
                      vv_ret << this->retreat_ctrl.at(0),this->retreat_ctrl.at(1),this->retreat_ctrl.at(2);
                      //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getXt(xt);
                      //this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getYt(yt);
-                     tar->getZt(zt);
+                     //tar->getZt(zt);
                      if(this->ui.checkBox_tar_noise->isChecked() && sim_robot){
                          tar_pos(0) = tar_pos(0) - (obj_x_var/2) + obj_x_var*(rand() / double(RAND_MAX));
                          tar_pos(1) = tar_pos(1) - (obj_y_var/2) + obj_y_var*(rand() / double(RAND_MAX));
@@ -598,8 +603,9 @@ void MainWindow::execPosControl()
                  }
                  //Vector3d xt_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(xt.data(), xt.size());
                  //Vector3d yt_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(yt.data(), yt.size());
-                 Vector3d zt_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(zt.data(), zt.size());
+                 //Vector3d zt_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(zt.data(), zt.size());
                  Matrix3d Rot_tar = tar_q.toRotationMatrix();
+                 Vector3d zt_vec = Rot_tar.col(2);
                  Vector3d vv_app_w = Rot_tar*vv_app; Vector3d vv_ret_w = Rot_tar*vv_ret;
 
                  hand_h_positions = this->handPosition_mov_stages.at(this->i_ctrl);
@@ -621,9 +627,29 @@ void MainWindow::execPosControl()
                      hand_pos_tmp(1) = h_vec.at(1);
                      hand_pos_tmp(2) = h_vec.at(2);
                  }else if(stage_descr.compare("approach")==0){
-                    hand_pos_tmp = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                    if(sim_robot){
+                        hand_pos_tmp = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                    }else{
+                        Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
+                        zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
+                        Vector3d tar_rec_pos;
+                        tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
+                        tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
+                        tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
+                        hand_pos_tmp = tar_rec_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                    }
                  }else if(stage_descr.compare("retreat")==0){
-                    hand_pos_tmp = tar_pos - this->dHO_ctrl*zt_vec;
+                    if(sim_robot){
+                        hand_pos_tmp = tar_pos - this->dHO_ctrl*zt_vec;
+                    }else{
+                        Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
+                        zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
+                        Vector3d tar_rec_pos;
+                        tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
+                        tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
+                        tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
+                        hand_pos_tmp = tar_rec_pos - this->dHO_ctrl*zt_vec;
+                    }
                  }
                  this->h_hand_pos_init.at(0) = hand_pos_tmp(0);
                  this->h_hand_pos_init.at(1) = hand_pos_tmp(1);
@@ -642,7 +668,17 @@ void MainWindow::execPosControl()
                     if(stages>1){
                         string stage_succ = this->h_results->trajectory_descriptions.at(this->i_ctrl+1);
                         if(stage_succ.compare("approach")==0){
-                            hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                            if(sim_robot){
+                                hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                            }else{
+                                Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
+                                zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
+                                Vector3d tar_rec_pos;
+                                tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
+                                tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
+                                tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
+                                hand_pos_vec = tar_rec_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                            }
                         }else{hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;}
                     }else{
                         hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;
@@ -651,9 +687,11 @@ void MainWindow::execPosControl()
                     if(follow_tar){
                         hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
                     }else{
-                       if(sim_robot){
+                        if(sim_robot){
                             hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;
                        }else{
+                           Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
+                           zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
                            Vector3d tar_rec_pos;
                            tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
                            tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
@@ -665,6 +703,8 @@ void MainWindow::execPosControl()
                      if(sim_robot){
                         hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_ret*vv_ret_w;
                      }else{
+                         Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
+                         zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
                          Vector3d tar_rec_pos;
                          tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
                          tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
@@ -2146,7 +2186,8 @@ void MainWindow::execPosControl()
                         }
                     }else if(stages==3 && hl_en && stage_descr.compare("approach")==0){
                         condition = (g_map >= g_map_th_rp);
-                        if(condition && hl_en && !sim_robot){
+                    }else if(stages==3 && hl_en && stage_descr.compare("retreat")==0){
+                        if(mov_type==0 && !sim_robot){//pick
                             // close the Barrett Hand of ARoS
                             this->qnode.open_close_BH(true);
                         }
@@ -2166,7 +2207,7 @@ void MainWindow::execPosControl()
                                 }
                                 if(stage_descr.compare("approach")==0){
                                     this->qnode.closeBarrettHand_to_pos(1,jointsFinalPosition_hand_vec);
-                                }
+                                }                          
                             }
                             this->i_ctrl++; // go to the next stage
                         }else if(stages==2 && this->i_ctrl<1){
@@ -14139,6 +14180,7 @@ void MainWindow::on_pushButton_errors_ctrl_clicked()
 
 void MainWindow::on_pushButton_start_control_pressed()
 {
+    this->qnode.reset_open_close_BH();
     this->ui.groupBox_sim_real->setEnabled(false);
     if(this->ui.checkBox_use_plan_hand_pos->isChecked())
     {
@@ -14304,7 +14346,7 @@ void MainWindow::on_pushButton_start_control_clicked()
 }
 
 void MainWindow::on_pushButton_stop_control_pressed()
-{
+{    
     this->ui.groupBox_sim_real->setEnabled(true);
     this->qnode.log(QNode::Info,string("Control Stopped"));
     // stop the motion
@@ -14314,6 +14356,7 @@ void MainWindow::on_pushButton_stop_control_pressed()
         this->exec_command_ctrl=false;
         sleep(1);
     }
+    this->qnode.reset_open_close_BH();
 }
 
 void MainWindow::on_pushButton_stop_control_clicked()

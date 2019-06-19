@@ -149,8 +149,9 @@ void Point::Trans_matrix(Matrix4d& Trans)
 
 void Point::getRotAxis(vector<double>& xt, int id){
 
-    Matrix3d Rot;
-    this->RPY_matrix(Rot);
+    //Matrix3d Rot;
+    //this->RPY_matrix(Rot);
+    Matrix3d Rot = this->m_q.toRotationMatrix();
     Vector3d v = Rot.col(id);
 
     // get the components of the axis

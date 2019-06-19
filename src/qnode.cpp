@@ -68,6 +68,7 @@ QNode::QNode(int argc, char** argv ) :
     this->simulationRunning=false;
     this->simulationPaused=false;
     this->sim_robot = true;
+    this->hand_closed = false;
 
 #if HAND ==1
     firstPartLocked.assign(3,false);
@@ -11329,16 +11330,22 @@ void QNode::setSimRobot(bool sr)
     this->sim_robot = sr;
 }
 
+void QNode::reset_open_close_BH()
+{
+    this->hand_closed = false;
+}
+
 bool QNode::open_close_BH(bool close)
 {
-    open_close_BH::OpenClose_BH srv;
-    srv.request.close = close;
-    if(this->clientOpenCloseBH.call(srv))
-    {
-        return srv.response.success;
-    }else{
-        return false;
-    }
+    if(!this->hand_closed){
+        open_close_BH::OpenClose_BH srv;
+        srv.request.close = close;
+        if(this->clientOpenCloseBH.call(srv))
+        {
+            this->hand_closed = srv.response.success;
+            return srv.response.success;
+        }else{return false;}
+    }else{return false;}
 }
 
 #if HAND == 1
