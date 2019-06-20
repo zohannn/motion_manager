@@ -502,7 +502,27 @@ void MainWindow::execPosControl()
                         tar_pos(2) = tar->getPos().Zpos;
                         tar_q = tar->getQuaternion();
                         //tar_q = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight()->getQuaternion(); tar->setQuaternion(tar_q);
-                        if(stage_descr.compare("plan")==0){this->tar_rec = tar;} // record the latest target of the plan stage
+                        if(stage_descr.compare("plan")==0){this->tar_rec = targetPtr(new Target(*tar.get()));} // record the latest target of the plan stage
+
+                        /*
+                        BOOST_LOG_SEV(lg, info) << "stage = " << stage_descr;
+                        BOOST_LOG_SEV(lg, info) << "Target  X pos = " << tar->getPos().Xpos;
+                        BOOST_LOG_SEV(lg, info) << "Target  Y pos = " << tar->getPos().Ypos;
+                        BOOST_LOG_SEV(lg, info) << "Target  Z pos = " << tar->getPos().Zpos;
+                        BOOST_LOG_SEV(lg, info) << "Target  Q X = " << tar->getQuaternion().x();
+                        BOOST_LOG_SEV(lg, info) << "Target  Q Y = " << tar->getQuaternion().y();
+                        BOOST_LOG_SEV(lg, info) << "Target  Q Z = " << tar->getQuaternion().z();
+                        BOOST_LOG_SEV(lg, info) << "Target  Q W = " << tar->getQuaternion().w();
+
+                        BOOST_LOG_SEV(lg, info) << "Target Recorded X pos = " << this->tar_rec->getPos().Xpos;
+                        BOOST_LOG_SEV(lg, info) << "Target Recorded Y pos = " << this->tar_rec->getPos().Ypos;
+                        BOOST_LOG_SEV(lg, info) << "Target Recorded Z pos = " << this->tar_rec->getPos().Zpos;
+                        BOOST_LOG_SEV(lg, info) << "Target Recorded Q X = " << this->tar_rec->getQuaternion().x();
+                        BOOST_LOG_SEV(lg, info) << "Target Recorded Q Y = " << this->tar_rec->getQuaternion().y();
+                        BOOST_LOG_SEV(lg, info) << "Target Recorded Q Z = " << this->tar_rec->getQuaternion().z();
+                        BOOST_LOG_SEV(lg, info) << "Target Recorded Q W = " << this->tar_rec->getQuaternion().w();
+                        */
+
                      }
                      /*
                      BOOST_LOG_SEV(lg, info) << "target position x = " << tar_pos(0);
@@ -619,16 +639,21 @@ void MainWindow::execPosControl()
                  period_T = std::accumulate(timesteps.begin(), timesteps.end(), 0.0);
                  n_steps = hand_h_positions.size();
 
-                 // initial position of the human-like hand
+                 // initial pose of the human-like hand
                  this->h_hand_pos_init.resize(3); Vector3d hand_pos_tmp;
                  if(stage_descr.compare("plan")==0){
                      vector<double> h_vec = hand_h_positions.at(0);
                      hand_pos_tmp(0) = h_vec.at(0);
                      hand_pos_tmp(1) = h_vec.at(1);
                      hand_pos_tmp(2) = h_vec.at(2);
+                     this->h_hand_or_q_init = hand_h_orientations_q.at(0); // initial human-like hand orientation (quaternion)
                  }else if(stage_descr.compare("approach")==0){
                     if(sim_robot){
                         hand_pos_tmp = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                        this->h_hand_or_q_init.at(0) = tar_q.x();
+                        this->h_hand_or_q_init.at(1) = tar_q.y();
+                        this->h_hand_or_q_init.at(2) = tar_q.z();
+                        this->h_hand_or_q_init.at(3) = tar_q.w();
                     }else{
                         Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
                         zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
@@ -637,10 +662,20 @@ void MainWindow::execPosControl()
                         tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
                         tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
                         hand_pos_tmp = tar_rec_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+
+                        this->h_hand_or_q_init.at(0) = this->tar_rec->getQuaternion().x();
+                        this->h_hand_or_q_init.at(1) = this->tar_rec->getQuaternion().y();
+                        this->h_hand_or_q_init.at(2) = this->tar_rec->getQuaternion().z();
+                        this->h_hand_or_q_init.at(3) = this->tar_rec->getQuaternion().w();
+
                     }
                  }else if(stage_descr.compare("retreat")==0){
                     if(sim_robot){
                         hand_pos_tmp = tar_pos - this->dHO_ctrl*zt_vec;
+                        this->h_hand_or_q_init.at(0) = tar_q.x();
+                        this->h_hand_or_q_init.at(1) = tar_q.y();
+                        this->h_hand_or_q_init.at(2) = tar_q.z();
+                        this->h_hand_or_q_init.at(3) = tar_q.w();
                     }else{
                         Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
                         zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
@@ -649,6 +684,12 @@ void MainWindow::execPosControl()
                         tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
                         tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
                         hand_pos_tmp = tar_rec_pos - this->dHO_ctrl*zt_vec;
+
+                        this->h_hand_or_q_init.at(0) = this->tar_rec->getQuaternion().x();
+                        this->h_hand_or_q_init.at(1) = this->tar_rec->getQuaternion().y();
+                        this->h_hand_or_q_init.at(2) = this->tar_rec->getQuaternion().z();
+                        this->h_hand_or_q_init.at(3) = this->tar_rec->getQuaternion().w();
+
                     }
                  }
                  this->h_hand_pos_init.at(0) = hand_pos_tmp(0);
@@ -656,8 +697,6 @@ void MainWindow::execPosControl()
                  this->h_hand_pos_init.at(2) = hand_pos_tmp(2);
 
                  // initial orientation of the human-like hand
-                 this->h_hand_or_init = hand_h_orientations.at(0); // initial human-like hand orientation (rpy)
-                 this->h_hand_or_q_init = hand_h_orientations_q.at(0); // initial human-like hand orientation (quaternion)
                  Vector3d h_hand_or_q_e_init; h_hand_or_q_e_init << this->h_hand_or_q_init.at(0), this->h_hand_or_q_init.at(1), this->h_hand_or_q_init.at(2);
                  double h_hand_or_q_w_init = this->h_hand_or_q_init.at(3);
 
@@ -671,8 +710,8 @@ void MainWindow::execPosControl()
                             if(sim_robot){
                                 hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
                             }else{
-                                Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
-                                zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
+                                //Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
+                                //zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
                                 Vector3d tar_rec_pos;
                                 tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
                                 tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
