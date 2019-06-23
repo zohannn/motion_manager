@@ -6,11 +6,15 @@
 #include <QFile>
 #include <QTextStream>
 #include <cstring>
+#include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <ui_results_control_null_joints_dialog.h>
 #include <eigen3/Eigen/Dense>
+#include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include <LowPassFilter.hpp>
 #include "config.hpp"
 
@@ -62,6 +66,15 @@ private:
 
     MatrixXd velocities; /**< velocities of the joints */
     vector<double> time; /**< elapsed time */
+
+    QVector<double> qtime;
+    QVector<double> vel_joint1;
+    QVector<double> vel_joint2;
+    QVector<double> vel_joint3;
+    QVector<double> vel_joint4;
+    QVector<double> vel_joint5;
+    QVector<double> vel_joint6;
+    QVector<double> vel_joint7;
 
     /**
      * @brief plotJoint

@@ -14488,12 +14488,10 @@ void MainWindow::on_pushButton_control_plot_clicked()
     double timestep = this->ui.lineEdit_time_step->text().toDouble();
     LowPassFilter lpf_hand_vel(f_th, timestep);
 
+    this->handVelocityNorm_ctrl_plot.clear();
     if(!this->handVelocityNorm_ctrl.empty()){
-
-        //QVector<double> qhand_vel = QVector<double>::fromStdVector(this->handVelocityNorm_ctrl);
-        QVector<double> qhand_vel;
         for(int k=0;k<this->handVelocityNorm_ctrl.size();++k){
-            qhand_vel.push_back(lpf_hand_vel.update(this->handVelocityNorm_ctrl.at(k)));
+            this->handVelocityNorm_ctrl_plot.push_back(lpf_hand_vel.update(this->handVelocityNorm_ctrl.at(k)));
         }
         QVector<double> qtime = QVector<double>::fromStdVector(this->sim_time);
         ui.plot_control_hand_vel->plotLayout()->clear();
@@ -14521,9 +14519,9 @@ void MainWindow::on_pushButton_control_plot_clicked()
         ui.plot_control_hand_vel->graph(0)->setName(title);
         ui.plot_control_hand_vel->graph(0)->valueAxis()->setLabel("hand velocity [mm/s]");
         ui.plot_control_hand_vel->graph(0)->keyAxis()->setLabel("time [s]");
-        ui.plot_control_hand_vel->graph(0)->setData(qtime, qhand_vel);
-        ui.plot_control_hand_vel->graph(0)->valueAxis()->setRange(*std::min_element(qhand_vel.begin(), qhand_vel.end()),
-                                                          *std::max_element(qhand_vel.begin(), qhand_vel.end()));
+        ui.plot_control_hand_vel->graph(0)->setData(qtime, this->handVelocityNorm_ctrl_plot);
+        ui.plot_control_hand_vel->graph(0)->valueAxis()->setRange(*std::min_element(this->handVelocityNorm_ctrl_plot.begin(), this->handVelocityNorm_ctrl_plot.end()),
+                                                          *std::max_element(this->handVelocityNorm_ctrl_plot.begin(), this->handVelocityNorm_ctrl_plot.end()));
         ui.plot_control_hand_vel->graph(0)->rescaleAxes();
         ui.plot_control_hand_vel->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
         ui.plot_control_hand_vel->replot();
@@ -14919,8 +14917,9 @@ void MainWindow::on_pushButton_control_save_clicked()
         }
         hand_pos.close();
     }
+
     // hand velocity
-    if(!this->handVelocityNorm_ctrl.empty()){
+    if(!this->handVelocityNorm_ctrl_plot.empty()){
         string filename_hand_vel("hand_vel.txt");
         ofstream hand_vel;
         hand_vel.open(path.toStdString()+filename_hand_vel);
@@ -14928,8 +14927,8 @@ void MainWindow::on_pushButton_control_save_clicked()
         hand_vel << string("# HAND VELOCITY NORM \n");
         hand_vel << string("# velocity [mm/s], time [s] \n");
 
-        for(size_t i=0;i<this->handVelocityNorm_ctrl.size();++i){
-            double vel = this->handVelocityNorm_ctrl.at(i);
+        for(size_t i=0;i<this->handVelocityNorm_ctrl_plot.size();++i){
+            double vel = this->handVelocityNorm_ctrl_plot.at(i);
             double time = this->sim_time.at(i);
             string vel_str =  boost::str(boost::format("%.2f") % (vel));
             boost::replace_all(vel_str,",",".");

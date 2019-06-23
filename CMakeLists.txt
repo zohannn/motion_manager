@@ -41,7 +41,7 @@ include_directories(${catkin_INCLUDE_DIRS})
 catkin_package()
 
 set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost REQUIRED COMPONENTS log_setup log thread filesystem)
+find_package(Boost REQUIRED COMPONENTS log_setup log thread filesystem chrono)
 include_directories( ${Boost_INCLUDE_DIRS})
 link_directories( ${Boost_LIBRARY_DIRS} )
 

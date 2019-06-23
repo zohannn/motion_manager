@@ -6,11 +6,16 @@
 #include <QFile>
 #include <QTextStream>
 #include <cstring>
+#include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <ui_errors_controldialog.h>
 #include <eigen3/Eigen/Dense>
+#include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/replace.hpp>
+#include <LowPassFilter.hpp>
 #include "config.hpp"
 
 namespace motion_manager {
@@ -24,6 +29,11 @@ class ErrorsControlDialog : public QDialog
 
 public Q_SLOTS:
 
+
+    /**
+     * @brief on_pushButton_plot_clicked
+     */
+    void on_pushButton_plot_clicked();
 
     /**
      * @brief on_pushButton_save_clicked
@@ -61,6 +71,26 @@ public:
 
 private:
     Ui::ErrorsControlDialog *ui; /**< handle of the user interface */
+    QVector<double> qtime; /**< time */
+    QVector<double> qerrors_pos; /**< error in position */
+    QVector<double> qerrors_pos_plot; /**< error in position plot*/
+    QVector<double> qerrors_or; /**< error in orientation */
+    QVector<double> qerrors_or_plot; /**< error in orientation plot */
+    QVector<double> qerrors_pos_or_tot; /**< error in position and orientation */
+    QVector<double> qerrors_pos_or_tot_plot; /**< error in position and orientation plot*/
+    QVector<double> qerrors_lin_vel; /**< error in linear velocity */
+    QVector<double> qerrors_lin_vel_plot; /**< error in linear velocity plot*/
+    QVector<double> qerrors_ang_vel; /**< error in angular velocity */
+    QVector<double> qerrors_ang_vel_plot; /**< error in angular velocity plot */
+    QVector<double> qerrors_vel_tot; /**< error in velocity */
+    QVector<double> qerrors_vel_tot_plot; /**< error in velocity plot*/
+    QVector<double> qerrors_lin_acc; /**< error in linear acceleration */
+    QVector<double> qerrors_lin_acc_plot; /**< error in linear acceleration plot*/
+    QVector<double> qerrors_ang_acc; /**< error in angular acceleration */
+    QVector<double> qerrors_ang_acc_plot; /**< error in angular acceleration plot*/
+    QVector<double> qerrors_acc_tot; /**< error in acceleration */
+    QVector<double> qerrors_acc_tot_plot; /**< error in acceleration plot*/
+
 
     /**
      * @brief plotError

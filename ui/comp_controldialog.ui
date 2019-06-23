@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1131</width>
-    <height>688</height>
+    <height>769</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>10</x>
      <y>10</y>
      <width>1111</width>
-     <height>671</height>
+     <height>751</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -58,7 +58,11 @@
          <widget class="QCustomPlot" name="plot_hand_wx" native="true"/>
         </item>
         <item>
-         <widget class="QCustomPlot" name="plot_hand_wy" native="true"/>
+         <widget class="QCustomPlot" name="plot_hand_wy" native="true">
+          <zorder>groupBox_low_pass_vel</zorder>
+          <zorder>groupBox_low_pass_vel_2</zorder>
+          <zorder>groupBox_low_pass_pos</zorder>
+         </widget>
         </item>
         <item>
          <widget class="QCustomPlot" name="plot_hand_wz" native="true"/>
@@ -70,8 +74,8 @@
     <widget class="QPushButton" name="pushButton_save_hand">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>610</y>
+       <x>1020</x>
+       <y>690</y>
        <width>80</width>
        <height>23</height>
       </rect>
@@ -79,6 +83,202 @@
      <property name="text">
       <string>Save</string>
      </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_plot_hand">
+     <property name="geometry">
+      <rect>
+       <x>930</x>
+       <y>690</y>
+       <width>80</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Plot</string>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_low_pass_acc_hand">
+     <property name="geometry">
+      <rect>
+       <x>430</x>
+       <y>610</y>
+       <width>191</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Accelerations Low Pass Filter </string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_13">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>58</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_14">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_27">
+         <item>
+          <widget class="QLabel" name="label_f_cutoff_acc_hand">
+           <property name="text">
+            <string>CutOff Freq. [Hz]:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_f_cutoff_acc_hand">
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_28">
+         <item>
+          <widget class="QLabel" name="label_time_step_acc_hand">
+           <property name="text">
+            <string> Time step [s] :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_time_step_acc_hand">
+           <property name="text">
+            <string>0.05</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_low_pass_pos_hand">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>610</y>
+       <width>191</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Positions Low Pass Filter </string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_14">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>58</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_15">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_29">
+         <item>
+          <widget class="QLabel" name="label_f_cutoff_pos_hand">
+           <property name="text">
+            <string>CutOff Freq. [Hz]:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_f_cutoff_pos_hand">
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_30">
+         <item>
+          <widget class="QLabel" name="label_time_step_pos_hand">
+           <property name="text">
+            <string> Time step [s] :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_time_step_pos_hand">
+           <property name="text">
+            <string>0.05</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_low_pass_vel_hand">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>610</y>
+       <width>191</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Velocities Low Pass Filter </string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_15">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>58</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_16">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_31">
+         <item>
+          <widget class="QLabel" name="label_f_cutoff_vel_hand">
+           <property name="text">
+            <string>CutOff Freq. [Hz]:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_f_cutoff_vel_hand">
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_32">
+         <item>
+          <widget class="QLabel" name="label_time_step_vel_hand">
+           <property name="text">
+            <string> Time step [s] :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_time_step_vel_hand">
+           <property name="text">
+            <string>0.05</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_wrist">
@@ -126,8 +326,8 @@
     <widget class="QPushButton" name="pushButton_save_wrist">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>610</y>
+       <x>1020</x>
+       <y>690</y>
        <width>80</width>
        <height>23</height>
       </rect>
@@ -135,6 +335,202 @@
      <property name="text">
       <string>Save</string>
      </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_plot_wrist">
+     <property name="geometry">
+      <rect>
+       <x>930</x>
+       <y>690</y>
+       <width>80</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Plot</string>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_low_pass_acc_wrist">
+     <property name="geometry">
+      <rect>
+       <x>430</x>
+       <y>610</y>
+       <width>191</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Accelerations Low Pass Filter </string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_16">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>58</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_17">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_33">
+         <item>
+          <widget class="QLabel" name="label_f_cutoff_acc_wrist">
+           <property name="text">
+            <string>CutOff Freq. [Hz]:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_f_cutoff_acc_wrist">
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_34">
+         <item>
+          <widget class="QLabel" name="label_time_step_acc_wrist">
+           <property name="text">
+            <string> Time step [s] :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_time_step_acc_wrist">
+           <property name="text">
+            <string>0.05</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_low_pass_vel_wrist">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>610</y>
+       <width>191</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Velocities Low Pass Filter </string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_17">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>58</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_18">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_35">
+         <item>
+          <widget class="QLabel" name="label_f_cutoff_vel_wrist">
+           <property name="text">
+            <string>CutOff Freq. [Hz]:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_f_cutoff_vel_wrist">
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_36">
+         <item>
+          <widget class="QLabel" name="label_time_step_vel_wrist">
+           <property name="text">
+            <string> Time step [s] :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_time_step_vel_wrist">
+           <property name="text">
+            <string>0.05</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_low_pass_pos_wrist">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>610</y>
+       <width>191</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Positions Low Pass Filter </string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_18">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>58</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_19">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_37">
+         <item>
+          <widget class="QLabel" name="label_f_cutoff_pos_wrist">
+           <property name="text">
+            <string>CutOff Freq. [Hz]:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_f_cutoff_pos_wrist">
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_38">
+         <item>
+          <widget class="QLabel" name="label_time_step_pos_wrist">
+           <property name="text">
+            <string> Time step [s] :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_time_step_pos_wrist">
+           <property name="text">
+            <string>0.05</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_elbow">
@@ -182,8 +578,8 @@
     <widget class="QPushButton" name="pushButton_save_elbow">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>610</y>
+       <x>1020</x>
+       <y>690</y>
        <width>80</width>
        <height>23</height>
       </rect>
@@ -191,6 +587,202 @@
      <property name="text">
       <string>Save</string>
      </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_plot_elbow">
+     <property name="geometry">
+      <rect>
+       <x>930</x>
+       <y>690</y>
+       <width>80</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Plot</string>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_low_pass_vel_elbow">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>610</y>
+       <width>191</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Velocities Low Pass Filter </string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_19">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>58</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_20">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_39">
+         <item>
+          <widget class="QLabel" name="label_f_cutoff_vel_elbow">
+           <property name="text">
+            <string>CutOff Freq. [Hz]:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_f_cutoff_vel_elbow">
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_40">
+         <item>
+          <widget class="QLabel" name="label_time_step_vel_elbow">
+           <property name="text">
+            <string> Time step [s] :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_time_step_vel_elbow">
+           <property name="text">
+            <string>0.05</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_low_pass_pos_elbow">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>610</y>
+       <width>191</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Positions Low Pass Filter </string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_20">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>58</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_21">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_41">
+         <item>
+          <widget class="QLabel" name="label_f_cutoff_pos_elbow">
+           <property name="text">
+            <string>CutOff Freq. [Hz]:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_f_cutoff_pos_elbow">
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_42">
+         <item>
+          <widget class="QLabel" name="label_time_step_pos_elbow">
+           <property name="text">
+            <string> Time step [s] :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_time_step_pos_elbow">
+           <property name="text">
+            <string>0.05</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_low_pass_acc_elbow">
+     <property name="geometry">
+      <rect>
+       <x>430</x>
+       <y>610</y>
+       <width>191</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Accelerations Low Pass Filter </string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_21">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>58</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_22">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_43">
+         <item>
+          <widget class="QLabel" name="label_f_cutoff_acc_elbow">
+           <property name="text">
+            <string>CutOff Freq. [Hz]:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_f_cutoff_acc_elbow">
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_44">
+         <item>
+          <widget class="QLabel" name="label_time_step_acc_elbow">
+           <property name="text">
+            <string> Time step [s] :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_time_step_acc_elbow">
+           <property name="text">
+            <string>0.05</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_shoulder">
@@ -238,8 +830,8 @@
     <widget class="QPushButton" name="pushButton_save_shoulder">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>610</y>
+       <x>1020</x>
+       <y>690</y>
        <width>80</width>
        <height>23</height>
       </rect>
@@ -247,6 +839,202 @@
      <property name="text">
       <string>Save</string>
      </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_plot_shoulder">
+     <property name="geometry">
+      <rect>
+       <x>930</x>
+       <y>690</y>
+       <width>80</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Plot</string>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_low_pass_pos_shoulder">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>610</y>
+       <width>191</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Positions Low Pass Filter </string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_10">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>58</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_11">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_21">
+         <item>
+          <widget class="QLabel" name="label_f_cutoff_pos_shoulder">
+           <property name="text">
+            <string>CutOff Freq. [Hz]:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_f_cutoff_pos_shoulder">
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_22">
+         <item>
+          <widget class="QLabel" name="label_time_step_pos_shoulder">
+           <property name="text">
+            <string> Time step [s] :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_time_step_pos_shoulder">
+           <property name="text">
+            <string>0.05</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_low_pass_acc_shoulder">
+     <property name="geometry">
+      <rect>
+       <x>430</x>
+       <y>610</y>
+       <width>191</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Accelerations Low Pass Filter </string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_11">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>58</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_12">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_23">
+         <item>
+          <widget class="QLabel" name="label_f_cutoff_acc_shoulder">
+           <property name="text">
+            <string>CutOff Freq. [Hz]:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_f_cutoff_acc_shoulder">
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_24">
+         <item>
+          <widget class="QLabel" name="label_time_step_acc_shoulder">
+           <property name="text">
+            <string> Time step [s] :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_time_step_acc_shoulder">
+           <property name="text">
+            <string>0.05</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBox_low_pass_vel_shoulder">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>610</y>
+       <width>191</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Velocities Low Pass Filter </string>
+     </property>
+     <widget class="QWidget" name="layoutWidget_12">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>58</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_13">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_25">
+         <item>
+          <widget class="QLabel" name="label_f_cutoff_vel_shoulder">
+           <property name="text">
+            <string>CutOff Freq. [Hz]:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_f_cutoff_vel_shoulder">
+           <property name="text">
+            <string>1000</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_26">
+         <item>
+          <widget class="QLabel" name="label_time_step_vel_shoulder">
+           <property name="text">
+            <string> Time step [s] :</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_time_step_vel_shoulder">
+           <property name="text">
+            <string>0.05</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </widget>
   </widget>

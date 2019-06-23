@@ -123,6 +123,44 @@ void ResultsCtrlPredSwivelAngleDialog::on_pushButton_save_clicked()
     cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
     system(cmdLine.c_str());
 
+    // swivel angle position
+    if(!this->swivel_angle_pos.empty()){
+        string filename("swivel_angle_pos.txt");
+        ofstream swivel_stream;
+        swivel_stream.open(path.toStdString()+filename);
+
+        swivel_stream << string("# SWIVEL ANGLE POSITION \n");
+        swivel_stream << string("# swivel angle [deg], time [s] \n");
+
+        for(size_t i=0;i<this->swivel_angle_pos.size();++i){
+            double sw = this->swivel_angle_pos.at(i);
+            double time = this->time.at(i);
+            string sw_str =  boost::str(boost::format("%.2f") % (sw)); boost::replace_all(sw_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            swivel_stream << sw_str+string(", ")+t_str+string("\n");
+        }
+        swivel_stream.close();
+    }
+
+    // swivel angle velocity
+    if(!this->swivel_angle_vel.empty()){
+        string filename("swivel_angle_vel.txt");
+        ofstream swivel_stream;
+        swivel_stream.open(path.toStdString()+filename);
+
+        swivel_stream << string("# SWIVEL ANGLE VELOCITY \n");
+        swivel_stream << string("# swivel angle [deg/s], time [s] \n");
+
+        for(size_t i=0;i<this->swivel_angle_vel.size();++i){
+            double sw = this->swivel_angle_vel.at(i);
+            double time = this->time.at(i);
+            string sw_str =  boost::str(boost::format("%.2f") % (sw)); boost::replace_all(sw_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            swivel_stream << sw_str+string(", ")+t_str+string("\n");
+        }
+        swivel_stream.close();
+    }
+
 }
 
 

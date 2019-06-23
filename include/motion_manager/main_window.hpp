@@ -1488,6 +1488,7 @@ private:
         vector<vector<double>> handLinearVelocity_ctrl; /**< hand linear velocity during control */
         vector<vector<double>> handAngularVelocity_ctrl;/**< hand angular velocity during control */
         vector<double> handVelocityNorm_ctrl; /**< hand linear velocity norm during control */
+        QVector<double> handVelocityNorm_ctrl_plot; /**< hand linear velocity norm during control to plot */
         vector<vector<double>> handLinearAcceleration_ctrl; /**< hand linear acceleration during control */
         vector<vector<double>> handAngularAcceleration_ctrl;/**< hand angular acceleration during control */
         vector<double> handAccelerationNorm_ctrl; /**< hand linear acceleration norm during control */

@@ -86,6 +86,21 @@ private:
     vector<double> min_pos_limits; /**< minimum limits of the joints */
     vector<double> time; /**< elapsed time */
 
+    QVector<double> pos_joint1, vel_joint1,acc_joint1,max_limits_joint1,min_limits_joint1;
+    QVector<double> pos_joint2, vel_joint2,acc_joint2,max_limits_joint2,min_limits_joint2;
+    QVector<double> pos_joint3, vel_joint3,acc_joint3,max_limits_joint3,min_limits_joint3;
+    QVector<double> pos_joint4, vel_joint4,acc_joint4,max_limits_joint4,min_limits_joint4;
+    QVector<double> pos_joint5, vel_joint5,acc_joint5,max_limits_joint5,min_limits_joint5;
+    QVector<double> pos_joint6, vel_joint6,acc_joint6,max_limits_joint6,min_limits_joint6;
+    QVector<double> pos_joint7, vel_joint7,acc_joint7,max_limits_joint7,min_limits_joint7;
+    QVector<double> pos_joint8, vel_joint8,acc_joint8,max_limits_joint8,min_limits_joint8;
+    QVector<double> pos_joint9, vel_joint9,acc_joint9,max_limits_joint9,min_limits_joint9;
+    QVector<double> pos_joint10, vel_joint10,acc_joint10,max_limits_joint10,min_limits_joint10;
+    QVector<double> pos_joint11, vel_joint11,acc_joint11,max_limits_joint11,min_limits_joint11;
+
+    QVector<double> qtime;
+
+
     /**
      * @brief plotJoint
      * @param plot

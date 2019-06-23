@@ -67,14 +67,6 @@ void ResultsCtrlNullJointsDialog::on_pushButton_plot_clicked()
     double f_th_vel = this->ui->lineEdit_f_cutoff_vel->text().toDouble();
     double timestep_vel = this->ui->lineEdit_time_step_vel->text().toDouble();
 
-    QVector<double> vel_joint1;
-    QVector<double> vel_joint2;
-    QVector<double> vel_joint3;
-    QVector<double> vel_joint4;
-    QVector<double> vel_joint5;
-    QVector<double> vel_joint6;
-    QVector<double> vel_joint7;
-
     LowPassFilter lpf_vel_1(f_th_vel, timestep_vel);
     LowPassFilter lpf_vel_2(f_th_vel, timestep_vel);
     LowPassFilter lpf_vel_3(f_th_vel, timestep_vel);
@@ -82,6 +74,14 @@ void ResultsCtrlNullJointsDialog::on_pushButton_plot_clicked()
     LowPassFilter lpf_vel_5(f_th_vel, timestep_vel);
     LowPassFilter lpf_vel_6(f_th_vel, timestep_vel);
     LowPassFilter lpf_vel_7(f_th_vel, timestep_vel);
+
+    this->vel_joint1.clear();
+    this->vel_joint2.clear();
+    this->vel_joint3.clear();
+    this->vel_joint4.clear();
+    this->vel_joint5.clear();
+    this->vel_joint6.clear();
+    this->vel_joint7.clear();
 
     for(int k=0;k<velocities.rows();++k){
         for(int j=0;j < velocities.cols();++j){
@@ -104,8 +104,7 @@ void ResultsCtrlNullJointsDialog::on_pushButton_plot_clicked()
     }
 
 
-    QVector<double> qtime = QVector<double>::fromStdVector(time);
-
+    this->qtime = QVector<double>::fromStdVector(time);
 
     plotJoint(ui->plot_joint_1,QString("Joint 1"),qtime,vel_joint1); // plot joint 1
     plotJoint(ui->plot_joint_2,QString("Joint 2"),qtime,vel_joint2); // plot joint 2
@@ -183,6 +182,154 @@ void ResultsCtrlNullJointsDialog::on_pushButton_save_joints_plots_clicked()
     svg_qstr = path+QString("joint7.svg"); svg_str = svg_qstr.toStdString();
     cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
     system(cmdLine.c_str());
+
+    // null velocity joint 1
+    if(!this->vel_joint1.empty()){
+        string filename("null_vel_joint1.txt");
+        ofstream vel_stream;
+        vel_stream.open(path.toStdString()+filename);
+
+        vel_stream << string("# NULL SPACE VELOCITY JOINT 1 \n");
+        vel_stream << string("# velocity [deg/s], time [s] \n");
+
+        for(size_t i=0;i<this->vel_joint1.size();++i){
+            double vel = this->vel_joint1.at(i);
+            double time = this->qtime.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            vel_stream << vel_str+string(", ")+t_str+string("\n");
+        }
+        vel_stream.close();
+    }
+
+    // null velocity joint 2
+    if(!this->vel_joint2.empty()){
+        string filename("null_vel_joint2.txt");
+        ofstream vel_stream;
+        vel_stream.open(path.toStdString()+filename);
+
+        vel_stream << string("# NULL SPACE VELOCITY JOINT 2 \n");
+        vel_stream << string("# velocity [deg/s], time [s] \n");
+
+        for(size_t i=0;i<this->vel_joint2.size();++i){
+            double vel = this->vel_joint2.at(i);
+            double time = this->qtime.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            vel_stream << vel_str+string(", ")+t_str+string("\n");
+        }
+        vel_stream.close();
+    }
+
+    // null velocity joint 3
+    if(!this->vel_joint3.empty()){
+        string filename("null_vel_joint3.txt");
+        ofstream vel_stream;
+        vel_stream.open(path.toStdString()+filename);
+
+        vel_stream << string("# NULL SPACE VELOCITY JOINT 3 \n");
+        vel_stream << string("# velocity [deg/s], time [s] \n");
+
+        for(size_t i=0;i<this->vel_joint3.size();++i){
+            double vel = this->vel_joint3.at(i);
+            double time = this->qtime.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            vel_stream << vel_str+string(", ")+t_str+string("\n");
+        }
+        vel_stream.close();
+    }
+
+    // null velocity joint 4
+    if(!this->vel_joint4.empty()){
+        string filename("null_vel_joint4.txt");
+        ofstream vel_stream;
+        vel_stream.open(path.toStdString()+filename);
+
+        vel_stream << string("# NULL SPACE VELOCITY JOINT 4 \n");
+        vel_stream << string("# velocity [deg/s], time [s] \n");
+
+        for(size_t i=0;i<this->vel_joint4.size();++i){
+            double vel = this->vel_joint4.at(i);
+            double time = this->qtime.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            vel_stream << vel_str+string(", ")+t_str+string("\n");
+        }
+        vel_stream.close();
+    }
+
+    // null velocity joint 5
+    if(!this->vel_joint5.empty()){
+        string filename("null_vel_joint5.txt");
+        ofstream vel_stream;
+        vel_stream.open(path.toStdString()+filename);
+
+        vel_stream << string("# NULL SPACE VELOCITY JOINT 5 \n");
+        vel_stream << string("# velocity [deg/s], time [s] \n");
+
+        for(size_t i=0;i<this->vel_joint5.size();++i){
+            double vel = this->vel_joint5.at(i);
+            double time = this->qtime.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            vel_stream << vel_str+string(", ")+t_str+string("\n");
+        }
+        vel_stream.close();
+    }
+
+    // null velocity joint 6
+    if(!this->vel_joint6.empty()){
+        string filename("null_vel_joint6.txt");
+        ofstream vel_stream;
+        vel_stream.open(path.toStdString()+filename);
+
+        vel_stream << string("# NULL SPACE VELOCITY JOINT 6 \n");
+        vel_stream << string("# velocity [deg/s], time [s] \n");
+
+        for(size_t i=0;i<this->vel_joint6.size();++i){
+            double vel = this->vel_joint6.at(i);
+            double time = this->qtime.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            vel_stream << vel_str+string(", ")+t_str+string("\n");
+        }
+        vel_stream.close();
+    }
+
+    // null velocity joint 7
+    if(!this->vel_joint7.empty()){
+        string filename("null_vel_joint7.txt");
+        ofstream vel_stream;
+        vel_stream.open(path.toStdString()+filename);
+
+        vel_stream << string("# NULL SPACE VELOCITY JOINT 7 \n");
+        vel_stream << string("# velocity [deg/s], time [s] \n");
+
+        for(size_t i=0;i<this->vel_joint7.size();++i){
+            double vel = this->vel_joint7.at(i);
+            double time = this->qtime.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            vel_stream << vel_str+string(", ")+t_str+string("\n");
+        }
+        vel_stream.close();
+    }
+
 
 }
 

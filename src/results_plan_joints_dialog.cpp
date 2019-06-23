@@ -30,17 +30,17 @@ void ResultsJointsDialog::setupPlots(vector<MatrixXd> &pos, vector<MatrixXd> &ve
     const double radtodeg = 180.0/static_cast<double>(M_PI);
 
     vector<double> time;
-    QVector<double> pos_joint1, vel_joint1, acc_joint1;
-    QVector<double> pos_joint2, vel_joint2, acc_joint2;
-    QVector<double> pos_joint3, vel_joint3, acc_joint3;
-    QVector<double> pos_joint4, vel_joint4, acc_joint4;
-    QVector<double> pos_joint5, vel_joint5, acc_joint5;
-    QVector<double> pos_joint6, vel_joint6, acc_joint6;
-    QVector<double> pos_joint7, vel_joint7, acc_joint7;
-    QVector<double> pos_joint8, vel_joint8, acc_joint8;
-    QVector<double> pos_joint9, vel_joint9, acc_joint9;
-    QVector<double> pos_joint10, vel_joint10, acc_joint10;
-    QVector<double> pos_joint11, vel_joint11, acc_joint11;
+    pos_joint1.clear(); vel_joint1.clear(); acc_joint1.clear();
+    pos_joint2.clear(); vel_joint2.clear(); acc_joint2.clear();
+    pos_joint3.clear(); vel_joint3.clear(); acc_joint3.clear();
+    pos_joint4.clear(); vel_joint4.clear(); acc_joint4.clear();
+    pos_joint5.clear(); vel_joint5.clear(); acc_joint5.clear();
+    pos_joint6.clear(); vel_joint6.clear(); acc_joint6.clear();
+    pos_joint7.clear(); vel_joint7.clear(); acc_joint7.clear();
+    pos_joint8.clear(); vel_joint8.clear(); acc_joint8.clear();
+    pos_joint9.clear(); vel_joint9.clear(); acc_joint9.clear();
+    pos_joint10.clear(); vel_joint10.clear(); acc_joint10.clear();
+    pos_joint11.clear(); vel_joint11.clear(); acc_joint11.clear();
 
     for(size_t i=0; i<pos.size();++i){
         MatrixXd pos_stage = pos.at(i);
@@ -123,7 +123,7 @@ void ResultsJointsDialog::setupPlots(vector<MatrixXd> &pos, vector<MatrixXd> &ve
         time.reserve(time_stage.size());
         std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time));
     }
-    QVector<double> qtime = QVector<double>::fromStdVector(time);
+    qtime = QVector<double>::fromStdVector(time);
 
     if (dual)
     {
@@ -176,17 +176,17 @@ void ResultsJointsDialog::setupPlots(vector<vector<MatrixXd> > &pos, vector<vect
     const double radtodeg = 180.0/static_cast<double>(M_PI);
 
     vector<double> time;
-    QVector<double> pos_joint1, vel_joint1, acc_joint1;
-    QVector<double> pos_joint2, vel_joint2, acc_joint2;
-    QVector<double> pos_joint3, vel_joint3, acc_joint3;
-    QVector<double> pos_joint4, vel_joint4, acc_joint4;
-    QVector<double> pos_joint5, vel_joint5, acc_joint5;
-    QVector<double> pos_joint6, vel_joint6, acc_joint6;
-    QVector<double> pos_joint7, vel_joint7, acc_joint7;
-    QVector<double> pos_joint8, vel_joint8, acc_joint8;
-    QVector<double> pos_joint9, vel_joint9, acc_joint9;
-    QVector<double> pos_joint10, vel_joint10, acc_joint10;
-    QVector<double> pos_joint11, vel_joint11, acc_joint11;
+    pos_joint1.clear(); vel_joint1.clear(); acc_joint1.clear();
+    pos_joint2.clear(); vel_joint2.clear(); acc_joint2.clear();
+    pos_joint3.clear(); vel_joint3.clear(); acc_joint3.clear();
+    pos_joint4.clear(); vel_joint4.clear(); acc_joint4.clear();
+    pos_joint5.clear(); vel_joint5.clear(); acc_joint5.clear();
+    pos_joint6.clear(); vel_joint6.clear(); acc_joint6.clear();
+    pos_joint7.clear(); vel_joint7.clear(); acc_joint7.clear();
+    pos_joint8.clear(); vel_joint8.clear(); acc_joint8.clear();
+    pos_joint9.clear(); vel_joint9.clear(); acc_joint9.clear();
+    pos_joint10.clear(); vel_joint10.clear(); acc_joint10.clear();
+    pos_joint11.clear(); vel_joint11.clear(); acc_joint11.clear();
 
     for(size_t h=0; h<pos.size();++h){
         vector<MatrixXd> pos_mov = pos.at(h);
@@ -275,7 +275,7 @@ void ResultsJointsDialog::setupPlots(vector<vector<MatrixXd> > &pos, vector<vect
             std::copy (time_stage.begin(), time_stage.end(), std::back_inserter(time));
         }// mov
     }// task
-    QVector<double> qtime = QVector<double>::fromStdVector(time);
+    qtime = QVector<double>::fromStdVector(time);
 
     if (dual)
     {
@@ -524,6 +524,259 @@ void ResultsJointsDialog::on_pushButton_save_joints_plots_clicked()
     svg_qstr = path+QString("joint11.svg"); svg_str = svg_qstr.toStdString();
     cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
     system(cmdLine.c_str());
+
+    // joint 1
+    if(!this->pos_joint1.empty()){
+        string filename("joint1.txt");
+        ofstream joint_stream;
+        joint_stream.open(path.toStdString()+filename);
+
+        joint_stream << string("# JOINT 1 \n");
+        joint_stream << string("# position [deg], velocity [deg/s], acceleration [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->pos_joint1.size();++i){
+            double pos = this->pos_joint1.at(i);
+            double vel = this->vel_joint1.at(i);
+            double acc = this->acc_joint1.at(i);
+            double time = this->qtime.at(i);
+            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
+        }
+        joint_stream.close();
+    }
+
+    // joint 2
+    if(!this->pos_joint2.empty()){
+        string filename("joint2.txt");
+        ofstream joint_stream;
+        joint_stream.open(path.toStdString()+filename);
+
+        joint_stream << string("# JOINT 2 \n");
+        joint_stream << string("# position [deg], velocity [deg/s], acceleration [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->pos_joint2.size();++i){
+            double pos = this->pos_joint2.at(i);
+            double vel = this->vel_joint2.at(i);
+            double acc = this->acc_joint2.at(i);
+            double time = this->qtime.at(i);
+            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
+        }
+        joint_stream.close();
+    }
+
+    // joint 3
+    if(!this->pos_joint3.empty()){
+        string filename("joint3.txt");
+        ofstream joint_stream;
+        joint_stream.open(path.toStdString()+filename);
+
+        joint_stream << string("# JOINT 3 \n");
+        joint_stream << string("# position [deg], velocity [deg/s], acceleration [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->pos_joint3.size();++i){
+            double pos = this->pos_joint3.at(i);
+            double vel = this->vel_joint3.at(i);
+            double acc = this->acc_joint3.at(i);
+            double time = this->qtime.at(i);
+            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
+        }
+        joint_stream.close();
+    }
+
+    // joint 4
+    if(!this->pos_joint4.empty()){
+        string filename("joint4.txt");
+        ofstream joint_stream;
+        joint_stream.open(path.toStdString()+filename);
+
+        joint_stream << string("# JOINT 4 \n");
+        joint_stream << string("# position [deg], velocity [deg/s], acceleration [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->pos_joint4.size();++i){
+            double pos = this->pos_joint4.at(i);
+            double vel = this->vel_joint4.at(i);
+            double acc = this->acc_joint4.at(i);
+            double time = this->qtime.at(i);
+            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
+        }
+        joint_stream.close();
+    }
+
+    // joint 5
+    if(!this->pos_joint5.empty()){
+        string filename("joint5.txt");
+        ofstream joint_stream;
+        joint_stream.open(path.toStdString()+filename);
+
+        joint_stream << string("# JOINT 5 \n");
+        joint_stream << string("# position [deg], velocity [deg/s], acceleration [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->pos_joint5.size();++i){
+            double pos = this->pos_joint5.at(i);
+            double vel = this->vel_joint5.at(i);
+            double acc = this->acc_joint5.at(i);
+            double time = this->qtime.at(i);
+            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
+        }
+        joint_stream.close();
+    }
+
+    // joint 6
+    if(!this->pos_joint6.empty()){
+        string filename("joint6.txt");
+        ofstream joint_stream;
+        joint_stream.open(path.toStdString()+filename);
+
+        joint_stream << string("# JOINT 6 \n");
+        joint_stream << string("# position [deg], velocity [deg/s], acceleration [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->pos_joint6.size();++i){
+            double pos = this->pos_joint6.at(i);
+            double vel = this->vel_joint6.at(i);
+            double acc = this->acc_joint6.at(i);
+            double time = this->qtime.at(i);
+            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
+        }
+        joint_stream.close();
+    }
+
+    // joint 7
+    if(!this->pos_joint7.empty()){
+        string filename("joint7.txt");
+        ofstream joint_stream;
+        joint_stream.open(path.toStdString()+filename);
+
+        joint_stream << string("# JOINT 7 \n");
+        joint_stream << string("# position [deg], velocity [deg/s], acceleration [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->pos_joint7.size();++i){
+            double pos = this->pos_joint7.at(i);
+            double vel = this->vel_joint7.at(i);
+            double acc = this->acc_joint7.at(i);
+            double time = this->qtime.at(i);
+            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
+        }
+        joint_stream.close();
+    }
+
+    // joint 8
+    if(!this->pos_joint8.empty()){
+        string filename("joint8.txt");
+        ofstream joint_stream;
+        joint_stream.open(path.toStdString()+filename);
+
+        joint_stream << string("# JOINT 8 \n");
+        joint_stream << string("# position [deg], velocity [deg/s], acceleration [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->pos_joint8.size();++i){
+            double pos = this->pos_joint8.at(i);
+            double vel = this->vel_joint8.at(i);
+            double acc = this->acc_joint8.at(i);
+            double time = this->qtime.at(i);
+            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
+        }
+        joint_stream.close();
+    }
+
+    // joint 9
+    if(!this->pos_joint9.empty()){
+        string filename("joint9.txt");
+        ofstream joint_stream;
+        joint_stream.open(path.toStdString()+filename);
+
+        joint_stream << string("# JOINT 9 \n");
+        joint_stream << string("# position [deg], velocity [deg/s], acceleration [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->pos_joint9.size();++i){
+            double pos = this->pos_joint9.at(i);
+            double vel = this->vel_joint9.at(i);
+            double acc = this->acc_joint9.at(i);
+            double time = this->qtime.at(i);
+            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
+        }
+        joint_stream.close();
+    }
+
+    // joint 10
+    if(!this->pos_joint10.empty()){
+        string filename("joint10.txt");
+        ofstream joint_stream;
+        joint_stream.open(path.toStdString()+filename);
+
+        joint_stream << string("# JOINT 10 \n");
+        joint_stream << string("# position [deg], velocity [deg/s], acceleration [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->pos_joint10.size();++i){
+            double pos = this->pos_joint10.at(i);
+            double vel = this->vel_joint10.at(i);
+            double acc = this->acc_joint10.at(i);
+            double time = this->qtime.at(i);
+            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
+        }
+        joint_stream.close();
+    }
+
+    // joint 11
+    if(!this->pos_joint11.empty()){
+        string filename("joint11.txt");
+        ofstream joint_stream;
+        joint_stream.open(path.toStdString()+filename);
+
+        joint_stream << string("# JOINT 11 \n");
+        joint_stream << string("# position [deg], velocity [deg/s], acceleration [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->pos_joint11.size();++i){
+            double pos = this->pos_joint11.at(i);
+            double vel = this->vel_joint11.at(i);
+            double acc = this->acc_joint11.at(i);
+            double time = this->qtime.at(i);
+            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
+        }
+        joint_stream.close();
+    }
 
 }
 

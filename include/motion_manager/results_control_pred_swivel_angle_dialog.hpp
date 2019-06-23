@@ -6,11 +6,15 @@
 #include <QFile>
 #include <QTextStream>
 #include <cstring>
+#include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <ui_results_control_pred_swivel_angle_dialog.h>
 #include <eigen3/Eigen/Dense>
+#include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include <LowPassFilter.hpp>
 #include "config.hpp"
 

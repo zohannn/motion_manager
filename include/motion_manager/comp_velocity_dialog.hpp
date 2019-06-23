@@ -6,11 +6,15 @@
 #include <QFile>
 #include <QTextStream>
 #include <cstring>
+#include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <ui_comp_velocitydialog.h>
 #include <eigen3/Eigen/Dense>
+#include <boost/format.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include "config.hpp"
 
 namespace motion_manager {
@@ -84,6 +88,50 @@ public:
 
 private:
     Ui::CompVelocityDialog *ui; /**< handle of the user interface */
+
+    QVector<double> qtime;
+
+    // hand
+    QVector<double> linear_pos_x_hand, linear_pos_y_hand, linear_pos_z_hand;
+    QVector<double> angular_pos_x_hand, angular_pos_y_hand, angular_pos_z_hand;
+    QVector<double> linear_vel_x_hand, linear_vel_y_hand, linear_vel_z_hand;
+    QVector<double> angular_vel_x_hand, angular_vel_y_hand, angular_vel_z_hand;
+    QVector<double> linear_acc_x_hand, linear_acc_y_hand, linear_acc_z_hand;
+    QVector<double> angular_acc_x_hand, angular_acc_y_hand, angular_acc_z_hand;
+    QVector<double> linear_pos_norm_hand, angular_pos_norm_hand;
+    QVector<double> linear_vel_norm_hand,angular_vel_norm_hand;
+    QVector<double> linear_acc_norm_hand,angular_acc_norm_hand;
+    // wrist
+    QVector<double> linear_pos_x_wrist, linear_pos_y_wrist, linear_pos_z_wrist;
+    QVector<double> angular_pos_x_wrist, angular_pos_y_wrist, angular_pos_z_wrist;
+    QVector<double> linear_vel_x_wrist, linear_vel_y_wrist, linear_vel_z_wrist;
+    QVector<double> angular_vel_x_wrist, angular_vel_y_wrist, angular_vel_z_wrist;
+    QVector<double> linear_acc_x_wrist, linear_acc_y_wrist, linear_acc_z_wrist;
+    QVector<double> angular_acc_x_wrist, angular_acc_y_wrist, angular_acc_z_wrist;
+    QVector<double> linear_pos_norm_wrist, angular_pos_norm_wrist;
+    QVector<double> linear_vel_norm_wrist,angular_vel_norm_wrist;
+    QVector<double> linear_acc_norm_wrist,angular_acc_norm_wrist;
+    // elbow
+    QVector<double> linear_pos_x_elbow, linear_pos_y_elbow, linear_pos_z_elbow;
+    QVector<double> angular_pos_x_elbow, angular_pos_y_elbow, angular_pos_z_elbow;
+    QVector<double> linear_vel_x_elbow, linear_vel_y_elbow, linear_vel_z_elbow;
+    QVector<double> angular_vel_x_elbow, angular_vel_y_elbow, angular_vel_z_elbow;
+    QVector<double> linear_acc_x_elbow, linear_acc_y_elbow, linear_acc_z_elbow;
+    QVector<double> angular_acc_x_elbow, angular_acc_y_elbow, angular_acc_z_elbow;
+    QVector<double> linear_pos_norm_elbow, angular_pos_norm_elbow;
+    QVector<double> linear_vel_norm_elbow,angular_vel_norm_elbow;
+    QVector<double> linear_acc_norm_elbow,angular_acc_norm_elbow;
+    // shoulder
+    QVector<double> linear_pos_x_shoulder, linear_pos_y_shoulder, linear_pos_z_shoulder;
+    QVector<double> angular_pos_x_shoulder, angular_pos_y_shoulder, angular_pos_z_shoulder;
+    QVector<double> linear_vel_x_shoulder, linear_vel_y_shoulder, linear_vel_z_shoulder;
+    QVector<double> angular_vel_x_shoulder, angular_vel_y_shoulder, angular_vel_z_shoulder;
+    QVector<double> linear_acc_x_shoulder, linear_acc_y_shoulder, linear_acc_z_shoulder;
+    QVector<double> angular_acc_x_shoulder, angular_acc_y_shoulder, angular_acc_z_shoulder;
+    QVector<double> linear_pos_norm_shoulder, angular_pos_norm_shoulder;
+    QVector<double> linear_vel_norm_shoulder,angular_vel_norm_shoulder;
+    QVector<double> linear_acc_norm_shoulder,angular_acc_norm_shoulder;
+
 
     /**
      * @brief plotComp
