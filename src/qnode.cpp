@@ -248,6 +248,8 @@ bool  QNode::loadScenario(const std::string& path,int id)
             subBottleJuice = n.subscribe("/vrep/BottleJuice_pose",1,&QNode::BottleJuiceCallback,this);
 
             pub_joints = n.advertise<vrep_common::JointSetStateData>("/"+nodeName+"/set_joints",1);
+            pub_real_joints =  n.advertise<std_msgs::Float32MultiArray>("/"+nodeName+"/set_real_joints",1);
+            clientOpenCloseBH = n.serviceClient<open_close_BH::OpenClose_BH>("/ARoS/open_close_BH_srv");
 
             break;
 

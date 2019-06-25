@@ -58,11 +58,7 @@
          <widget class="QCustomPlot" name="plot_hand_wx" native="true"/>
         </item>
         <item>
-         <widget class="QCustomPlot" name="plot_hand_wy" native="true">
-          <zorder>groupBox_low_pass_vel</zorder>
-          <zorder>groupBox_low_pass_vel_2</zorder>
-          <zorder>groupBox_low_pass_pos</zorder>
-         </widget>
+         <widget class="QCustomPlot" name="plot_hand_wy" native="true"/>
         </item>
         <item>
          <widget class="QCustomPlot" name="plot_hand_wz" native="true"/>
@@ -102,7 +98,7 @@
       <rect>
        <x>430</x>
        <y>610</y>
-       <width>191</width>
+       <width>211</width>
        <height>101</height>
       </rect>
      </property>
@@ -354,7 +350,7 @@
       <rect>
        <x>430</x>
        <y>610</y>
-       <width>191</width>
+       <width>211</width>
        <height>101</height>
       </rect>
      </property>
@@ -728,7 +724,7 @@
       <rect>
        <x>430</x>
        <y>610</y>
-       <width>191</width>
+       <width>211</width>
        <height>101</height>
       </rect>
      </property>
@@ -919,7 +915,7 @@
       <rect>
        <x>430</x>
        <y>610</y>
-       <width>191</width>
+       <width>211</width>
        <height>101</height>
       </rect>
      </property>

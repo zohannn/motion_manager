@@ -568,7 +568,7 @@ void MainWindow::execPosControl()
                      tar_pos(0) = tar->getPos().Xpos;
                      tar_pos(1) = tar->getPos().Ypos;
                      tar_pos(2) = tar->getPos().Zpos;
-                     tar_q = tar->getQuaternion();   
+                     tar_q = tar->getQuaternion();
                      /*
                      BOOST_LOG_SEV(lg, info) << "target position x = " << tar_pos(0);
                      BOOST_LOG_SEV(lg, info) << "target position y = " << tar_pos(1);
@@ -639,18 +639,26 @@ void MainWindow::execPosControl()
                         this->h_hand_or_q_init.at(2) = tar_q.z();
                         this->h_hand_or_q_init.at(3) = tar_q.w();
                     }else{
-                        Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
-                        zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
-                        Vector3d tar_rec_pos;
-                        tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
-                        tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
-                        tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
-                        hand_pos_tmp = tar_rec_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                        if(mov_type==0){ // pick
+                            Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
+                            zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
+                            Vector3d tar_rec_pos;
+                            tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
+                            tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
+                            tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
+                            hand_pos_tmp = tar_rec_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
 
-                        this->h_hand_or_q_init.at(0) = this->tar_rec->getQuaternion().x();
-                        this->h_hand_or_q_init.at(1) = this->tar_rec->getQuaternion().y();
-                        this->h_hand_or_q_init.at(2) = this->tar_rec->getQuaternion().z();
-                        this->h_hand_or_q_init.at(3) = this->tar_rec->getQuaternion().w();
+                            this->h_hand_or_q_init.at(0) = this->tar_rec->getQuaternion().x();
+                            this->h_hand_or_q_init.at(1) = this->tar_rec->getQuaternion().y();
+                            this->h_hand_or_q_init.at(2) = this->tar_rec->getQuaternion().z();
+                            this->h_hand_or_q_init.at(3) = this->tar_rec->getQuaternion().w();
+                        }else{
+                            hand_pos_tmp = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                            this->h_hand_or_q_init.at(0) = tar_q.x();
+                            this->h_hand_or_q_init.at(1) = tar_q.y();
+                            this->h_hand_or_q_init.at(2) = tar_q.z();
+                            this->h_hand_or_q_init.at(3) = tar_q.w();
+                        }
 
                     }
                  }else if(stage_descr.compare("retreat")==0){
@@ -661,19 +669,26 @@ void MainWindow::execPosControl()
                         this->h_hand_or_q_init.at(2) = tar_q.z();
                         this->h_hand_or_q_init.at(3) = tar_q.w();
                     }else{
-                        Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
-                        zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
-                        Vector3d tar_rec_pos;
-                        tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
-                        tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
-                        tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
-                        hand_pos_tmp = tar_rec_pos - this->dHO_ctrl*zt_vec;
+                        if(mov_type==0){ // pick
+                            Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
+                            zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
+                            Vector3d tar_rec_pos;
+                            tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
+                            tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
+                            tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
+                            hand_pos_tmp = tar_rec_pos - this->dHO_ctrl*zt_vec;
 
-                        this->h_hand_or_q_init.at(0) = this->tar_rec->getQuaternion().x();
-                        this->h_hand_or_q_init.at(1) = this->tar_rec->getQuaternion().y();
-                        this->h_hand_or_q_init.at(2) = this->tar_rec->getQuaternion().z();
-                        this->h_hand_or_q_init.at(3) = this->tar_rec->getQuaternion().w();
-
+                            this->h_hand_or_q_init.at(0) = this->tar_rec->getQuaternion().x();
+                            this->h_hand_or_q_init.at(1) = this->tar_rec->getQuaternion().y();
+                            this->h_hand_or_q_init.at(2) = this->tar_rec->getQuaternion().z();
+                            this->h_hand_or_q_init.at(3) = this->tar_rec->getQuaternion().w();
+                        }else{
+                            hand_pos_tmp = tar_pos - this->dHO_ctrl*zt_vec;
+                            this->h_hand_or_q_init.at(0) = tar_q.x();
+                            this->h_hand_or_q_init.at(1) = tar_q.y();
+                            this->h_hand_or_q_init.at(2) = tar_q.z();
+                            this->h_hand_or_q_init.at(3) = tar_q.w();
+                        }
                     }
                  }
                  this->h_hand_pos_init.at(0) = hand_pos_tmp(0);
@@ -694,13 +709,15 @@ void MainWindow::execPosControl()
                             if(sim_robot){
                                 hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
                             }else{
-                                //Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
-                                //zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
-                                Vector3d tar_rec_pos;
-                                tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
-                                tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
-                                tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
-                                hand_pos_vec = tar_rec_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                                if(mov_type==0){//pick
+                                    Vector3d tar_rec_pos;
+                                    tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
+                                    tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
+                                    tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
+                                    hand_pos_vec = tar_rec_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                                }else{
+                                    hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_app*vv_app_w;
+                                }
                             }
                         }else{hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;}
                     }else{
@@ -713,26 +730,34 @@ void MainWindow::execPosControl()
                         if(sim_robot){
                             hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;
                        }else{
-                           Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
-                           zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
-                           Vector3d tar_rec_pos;
-                           tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
-                           tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
-                           tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
-                           hand_pos_vec = tar_rec_pos - this->dHO_ctrl*zt_vec;
+                           if(mov_type==0){//pick
+                               Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
+                               zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
+                               Vector3d tar_rec_pos;
+                               tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
+                               tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
+                               tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
+                               hand_pos_vec = tar_rec_pos - this->dHO_ctrl*zt_vec;
+                           }else{
+                              hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec;
+                           }
                        }
                     }
                  }else if(stage_descr.compare("retreat")==0){
                      if(sim_robot){
                         hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_ret*vv_ret_w;
                      }else{
-                         Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
-                         zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
-                         Vector3d tar_rec_pos;
-                         tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
-                         tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
-                         tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
-                         hand_pos_vec = tar_rec_pos - this->dHO_ctrl*zt_vec + dist_ret*vv_ret_w;
+                         if(mov_type==0){//pick
+                             Rot_tar = this->tar_rec->getQuaternion().toRotationMatrix();
+                             zt_vec = Rot_tar.col(2); vv_app_w = Rot_tar*vv_app; vv_ret_w = Rot_tar*vv_ret;
+                             Vector3d tar_rec_pos;
+                             tar_rec_pos(0) = this->tar_rec->getPos().Xpos;
+                             tar_rec_pos(1) = this->tar_rec->getPos().Ypos;
+                             tar_rec_pos(2) = this->tar_rec->getPos().Zpos;
+                             hand_pos_vec = tar_rec_pos - this->dHO_ctrl*zt_vec + dist_ret*vv_ret_w;
+                         }else{
+                            hand_pos_vec = tar_pos - this->dHO_ctrl*zt_vec + dist_ret*vv_ret_w;
+                         }
                      }
                  }
                  // position

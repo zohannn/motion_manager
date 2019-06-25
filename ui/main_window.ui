@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1931,7 +1931,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>620</x>
         <y>200</y>
-        <width>391</width>
+        <width>381</width>
         <height>431</height>
        </rect>
       </property>
@@ -2649,8 +2649,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="pushButton_stop_control">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>80</y>
+         <x>20</x>
+         <y>90</y>
          <width>71</width>
          <height>21</height>
         </rect>
@@ -2662,8 +2662,8 @@ p, li { white-space: pre-wrap; }
       <widget class="QPushButton" name="pushButton_start_control">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>50</y>
+         <x>20</x>
+         <y>60</y>
          <width>71</width>
          <height>21</height>
         </rect>
@@ -2677,7 +2677,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>120</x>
          <y>20</y>
-         <width>121</width>
+         <width>111</width>
          <height>91</height>
         </rect>
        </property>
@@ -2689,7 +2689,7 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>12</x>
           <y>32</y>
-          <width>95</width>
+          <width>91</width>
           <height>50</height>
          </rect>
         </property>
@@ -2707,7 +2707,7 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QRadioButton" name="radioButton_robot">
            <property name="text">
-            <string>robot ARoS</string>
+            <string>ARoS</string>
            </property>
           </widget>
          </item>
@@ -3990,7 +3990,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_results_plan">
        <attribute name="title">
@@ -13639,12 +13639,12 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
-          <x>580</x>
+          <x>393</x>
           <y>560</y>
-          <width>684</width>
+          <width>871</width>
           <height>25</height>
          </rect>
         </property>
