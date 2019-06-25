@@ -31,14 +31,24 @@ public Q_SLOTS:
 
 
     /**
-     * @brief on_pushButton_plot_clicked
+     * @brief on_pushButton_plot_hand_clicked
      */
-    void on_pushButton_plot_clicked();
+    void on_pushButton_plot_hand_clicked();
 
     /**
-     * @brief on_pushButton_save_clicked
+     * @brief on_pushButton_save_hand_clicked
      */
-    void on_pushButton_save_clicked();
+    void on_pushButton_save_hand_clicked();
+
+    /**
+     * @brief on_pushButton_plot_fing_clicked
+     */
+    void on_pushButton_plot_fing_clicked();
+
+    /**
+     * @brief on_pushButton_save_fing_clicked
+     */
+    void on_pushButton_save_fing_clicked();
 
 public:
 
@@ -54,7 +64,7 @@ public:
     ~ErrorsControlDialog();
 
     /**
-     * @brief setupPlots
+     * @brief setupHandPlots
      * @param errors_pos
      * @param errors_or
      * @param errors_pos_or_tot
@@ -66,12 +76,21 @@ public:
      * @param errors_acc_tot
      * @param time
      */
-    void setupPlots(vector<double> &errors_pos, vector<double> &errors_or, vector<double> &errors_pos_or_tot, vector<double> &errors_lin_vel, vector<double> &errors_ang_vel, vector<double> &errors_vel_tot, vector<double> &errors_lin_acc, vector<double> &errors_ang_acc, vector<double> &errors_acc_tot, vector<double> &time);
+    void setupHandPlots(vector<double> &errors_pos, vector<double> &errors_or, vector<double> &errors_pos_or_tot, vector<double> &errors_lin_vel, vector<double> &errors_ang_vel, vector<double> &errors_vel_tot, vector<double> &errors_lin_acc, vector<double> &errors_ang_acc, vector<double> &errors_acc_tot, vector<double> &time);
 
+    /**
+     * @brief setupFingersPlots
+     * @param errors_pos
+     * @param errors_vel
+     * @param errors_acc
+     * @param time
+     */
+    void setupFingersPlots(vector<vector<double>> &errors_pos,vector<vector<double>> &errors_vel,vector<vector<double>> &errors_acc, vector<double> &time);
 
 private:
     Ui::ErrorsControlDialog *ui; /**< handle of the user interface */
     QVector<double> qtime; /**< time */
+    // hand
     QVector<double> qerrors_pos; /**< error in position */
     QVector<double> qerrors_pos_plot; /**< error in position plot*/
     QVector<double> qerrors_or; /**< error in orientation */
@@ -91,6 +110,37 @@ private:
     QVector<double> qerrors_acc_tot; /**< error in acceleration */
     QVector<double> qerrors_acc_tot_plot; /**< error in acceleration plot*/
 
+    //finger 0
+    QVector<double> qerrors_fing_pos_0;
+    QVector<double> qerrors_fing_pos_0_plot;
+    QVector<double> qerrors_fing_vel_0;
+    QVector<double> qerrors_fing_vel_0_plot;
+    QVector<double> qerrors_fing_acc_0;
+    QVector<double> qerrors_fing_acc_0_plot;
+
+    //finger 1
+    QVector<double> qerrors_fing_pos_1;
+    QVector<double> qerrors_fing_pos_1_plot;
+    QVector<double> qerrors_fing_vel_1;
+    QVector<double> qerrors_fing_vel_1_plot;
+    QVector<double> qerrors_fing_acc_1;
+    QVector<double> qerrors_fing_acc_1_plot;
+
+    //finger 2
+    QVector<double> qerrors_fing_pos_2;
+    QVector<double> qerrors_fing_pos_2_plot;
+    QVector<double> qerrors_fing_vel_2;
+    QVector<double> qerrors_fing_vel_2_plot;
+    QVector<double> qerrors_fing_acc_2;
+    QVector<double> qerrors_fing_acc_2_plot;
+
+    //finger 3
+    QVector<double> qerrors_fing_pos_3;
+    QVector<double> qerrors_fing_pos_3_plot;
+    QVector<double> qerrors_fing_vel_3;
+    QVector<double> qerrors_fing_vel_3_plot;
+    QVector<double> qerrors_fing_acc_3;
+    QVector<double> qerrors_fing_acc_3_plot;
 
     /**
      * @brief plotError

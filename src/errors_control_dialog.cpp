@@ -14,7 +14,7 @@ ErrorsControlDialog::~ErrorsControlDialog()
     delete ui;
 }
 
-void ErrorsControlDialog::setupPlots(vector<double> &errors_pos, vector<double> &errors_or, vector<double> &errors_pos_or_tot,
+void ErrorsControlDialog::setupHandPlots(vector<double> &errors_pos, vector<double> &errors_or, vector<double> &errors_pos_or_tot,
                                      vector<double> &errors_lin_vel, vector<double> &errors_ang_vel, vector<double> &errors_vel_tot,
                                      vector<double> &errors_lin_acc, vector<double> &errors_ang_acc, vector<double> &errors_acc_tot,
                                      vector<double> &time)
@@ -33,6 +33,37 @@ void ErrorsControlDialog::setupPlots(vector<double> &errors_pos, vector<double> 
 
 
 
+}
+
+void ErrorsControlDialog::setupFingersPlots(vector<vector<double>> &errors_pos,vector<vector<double>> &errors_vel,vector<vector<double>> &errors_acc, vector<double> &time)
+{
+    this->qtime = QVector<double>::fromStdVector(time);
+    this->qerrors_fing_pos_0.clear(); this->qerrors_fing_vel_0.clear(); this->qerrors_fing_acc_0.clear();
+    this->qerrors_fing_pos_1.clear(); this->qerrors_fing_vel_1.clear(); this->qerrors_fing_acc_1.clear();
+    this->qerrors_fing_pos_2.clear(); this->qerrors_fing_vel_2.clear(); this->qerrors_fing_acc_2.clear();
+    this->qerrors_fing_pos_3.clear(); this->qerrors_fing_vel_3.clear(); this->qerrors_fing_acc_3.clear();
+
+    for(size_t i=0;i<errors_pos.size();++i){
+        vector<double> pos = errors_pos.at(i);
+        vector<double> vel = errors_vel.at(i);
+        vector<double> acc = errors_acc.at(i);
+        // finger 0
+        this->qerrors_fing_pos_0.push_back(pos.at(0));
+        this->qerrors_fing_vel_0.push_back(vel.at(0));
+        this->qerrors_fing_acc_0.push_back(acc.at(0));
+        // finger 1
+        this->qerrors_fing_pos_1.push_back(pos.at(1));
+        this->qerrors_fing_vel_1.push_back(vel.at(1));
+        this->qerrors_fing_acc_1.push_back(acc.at(1));
+        // finger 2
+        this->qerrors_fing_pos_2.push_back(pos.at(2));
+        this->qerrors_fing_vel_2.push_back(vel.at(2));
+        this->qerrors_fing_acc_2.push_back(acc.at(2));
+        // finger 3
+        this->qerrors_fing_pos_3.push_back(pos.at(3));
+        this->qerrors_fing_vel_3.push_back(vel.at(3));
+        this->qerrors_fing_acc_3.push_back(acc.at(3));
+    }
 }
 
 
@@ -95,7 +126,9 @@ void ErrorsControlDialog::plotError(QCustomPlot *plot, QString title, QVector<do
 
 // Q_SLOTS
 
-void ErrorsControlDialog::on_pushButton_plot_clicked()
+// hand
+
+void ErrorsControlDialog::on_pushButton_plot_hand_clicked()
 {
     double f_th_pos = this->ui->lineEdit_f_cutoff_pos->text().toDouble();
     double timestep_pos = this->ui->lineEdit_time_step_pos->text().toDouble();
@@ -135,18 +168,76 @@ void ErrorsControlDialog::on_pushButton_plot_clicked()
     }
 
 
-    plotError(ui->plot_error_pos,QString("Error in position"),qtime,qerrors_pos_plot,"[mm]",Qt::blue);
-    plotError(ui->plot_error_or,QString("Error in orientation"),qtime,qerrors_or_plot,"q error",Qt::blue);
-    plotError(ui->plot_error_pos_or_tot,QString("Error in position and in orientation"),qtime,qerrors_pos_or_tot_plot,"total error",Qt::blue);
-    plotError(ui->plot_error_lin_vel,QString("Error in linear velocity"),qtime,qerrors_lin_vel_plot,"[mm/s]",Qt::red);
-    plotError(ui->plot_error_ang_vel,QString("Error in angular velocity"),qtime,qerrors_ang_vel_plot,"q propag error",Qt::red);
-    plotError(ui->plot_error_vel_tot,QString("Error in velocity"),qtime,qerrors_vel_tot_plot,"total error",Qt::red);
-    plotError(ui->plot_error_lin_acc,QString("Error in linear acceleration"),qtime,qerrors_lin_acc_plot,"[mm/s^2]",Qt::darkGreen);
-    plotError(ui->plot_error_ang_acc,QString("Error in angular acceleration"),qtime,qerrors_ang_acc_plot,"q acc error",Qt::darkGreen);
-    plotError(ui->plot_error_acc_tot,QString("Error in acceleration"),qtime,qerrors_acc_tot_plot,"total error",Qt::darkGreen);
+    plotError(ui->plot_error_pos_hand,QString("Error in position"),qtime,qerrors_pos_plot,"[mm]",Qt::blue);
+    plotError(ui->plot_error_or_hand,QString("Error in orientation"),qtime,qerrors_or_plot,"q error",Qt::blue);
+    plotError(ui->plot_error_pos_or_tot_hand,QString("Error in position and in orientation"),qtime,qerrors_pos_or_tot_plot,"total error",Qt::blue);
+    plotError(ui->plot_error_lin_vel_hand,QString("Error in linear velocity"),qtime,qerrors_lin_vel_plot,"[mm/s]",Qt::red);
+    plotError(ui->plot_error_ang_vel_hand,QString("Error in angular velocity"),qtime,qerrors_ang_vel_plot,"q propag error",Qt::red);
+    plotError(ui->plot_error_vel_tot_hand,QString("Error in velocity"),qtime,qerrors_vel_tot_plot,"total error",Qt::red);
+    plotError(ui->plot_error_lin_acc_hand,QString("Error in linear acceleration"),qtime,qerrors_lin_acc_plot,"[mm/s^2]",Qt::darkGreen);
+    plotError(ui->plot_error_ang_acc_hand,QString("Error in angular acceleration"),qtime,qerrors_ang_acc_plot,"q acc error",Qt::darkGreen);
+    plotError(ui->plot_error_acc_tot_hand,QString("Error in acceleration"),qtime,qerrors_acc_tot_plot,"total error",Qt::darkGreen);
 }
 
-void ErrorsControlDialog::on_pushButton_save_clicked()
+void ErrorsControlDialog::on_pushButton_plot_fing_clicked()
+{
+    double f_th_pos = this->ui->lineEdit_f_cutoff_pos->text().toDouble();
+    double timestep_pos = this->ui->lineEdit_time_step_pos->text().toDouble();
+    double f_th_vel = this->ui->lineEdit_f_cutoff_vel->text().toDouble();
+    double timestep_vel = this->ui->lineEdit_time_step_vel->text().toDouble();
+    double f_th_acc = this->ui->lineEdit_f_cutoff_acc->text().toDouble();
+    double timestep_acc = this->ui->lineEdit_time_step_acc->text().toDouble();
+
+    LowPassFilter lpf_err_pos_fing_0(f_th_pos, timestep_pos); LowPassFilter lpf_err_vel_fing_0(f_th_vel, timestep_vel); LowPassFilter lpf_err_acc_fing_0(f_th_acc, timestep_acc);
+    LowPassFilter lpf_err_pos_fing_1(f_th_pos, timestep_pos); LowPassFilter lpf_err_vel_fing_1(f_th_vel, timestep_vel); LowPassFilter lpf_err_acc_fing_1(f_th_acc, timestep_acc);
+    LowPassFilter lpf_err_pos_fing_2(f_th_pos, timestep_pos); LowPassFilter lpf_err_vel_fing_2(f_th_vel, timestep_vel); LowPassFilter lpf_err_acc_fing_2(f_th_acc, timestep_acc);
+    LowPassFilter lpf_err_pos_fing_3(f_th_pos, timestep_pos); LowPassFilter lpf_err_vel_fing_3(f_th_vel, timestep_vel); LowPassFilter lpf_err_acc_fing_3(f_th_acc, timestep_acc);
+
+    qerrors_fing_pos_0_plot.clear(); qerrors_fing_vel_0_plot.clear(); qerrors_fing_acc_0_plot.clear();
+    qerrors_fing_pos_1_plot.clear(); qerrors_fing_vel_1_plot.clear(); qerrors_fing_acc_1_plot.clear();
+    qerrors_fing_pos_2_plot.clear(); qerrors_fing_vel_2_plot.clear(); qerrors_fing_acc_2_plot.clear();
+    qerrors_fing_pos_3_plot.clear(); qerrors_fing_vel_3_plot.clear(); qerrors_fing_acc_3_plot.clear();
+
+    for(int k=0;k<this->qerrors_fing_pos_0.size();++k){
+        // finger 0
+        this->qerrors_fing_pos_0_plot.push_back(lpf_err_pos_fing_0.update(this->qerrors_fing_pos_0.at(k)));
+        this->qerrors_fing_vel_0_plot.push_back(lpf_err_vel_fing_0.update(this->qerrors_fing_vel_0.at(k)));
+        this->qerrors_fing_acc_0_plot.push_back(lpf_err_acc_fing_0.update(this->qerrors_fing_acc_0.at(k)));
+        // finger 1
+        this->qerrors_fing_pos_1_plot.push_back(lpf_err_pos_fing_1.update(this->qerrors_fing_pos_1.at(k)));
+        this->qerrors_fing_vel_1_plot.push_back(lpf_err_vel_fing_1.update(this->qerrors_fing_vel_1.at(k)));
+        this->qerrors_fing_acc_1_plot.push_back(lpf_err_acc_fing_1.update(this->qerrors_fing_acc_1.at(k)));
+        // finger 2
+        this->qerrors_fing_pos_2_plot.push_back(lpf_err_pos_fing_2.update(this->qerrors_fing_pos_2.at(k)));
+        this->qerrors_fing_vel_2_plot.push_back(lpf_err_vel_fing_2.update(this->qerrors_fing_vel_2.at(k)));
+        this->qerrors_fing_acc_2_plot.push_back(lpf_err_acc_fing_2.update(this->qerrors_fing_acc_2.at(k)));
+        // finger 3
+        this->qerrors_fing_pos_3_plot.push_back(lpf_err_pos_fing_3.update(this->qerrors_fing_pos_3.at(k)));
+        this->qerrors_fing_vel_3_plot.push_back(lpf_err_vel_fing_3.update(this->qerrors_fing_vel_3.at(k)));
+        this->qerrors_fing_acc_3_plot.push_back(lpf_err_acc_fing_3.update(this->qerrors_fing_acc_3.at(k)));
+    }
+
+    // finger 0
+    plotError(ui->plot_error_pos_fing_0,QString("Error in position Finger 0"),qtime,qerrors_fing_pos_0_plot,"[deg]",Qt::blue);
+    plotError(ui->plot_error_vel_fing_0,QString("Error in velocity Finger 0"),qtime,qerrors_fing_vel_0_plot,"[deg/s]",Qt::red);
+    plotError(ui->plot_error_acc_fing_0,QString("Error in acceleration Finger 0"),qtime,qerrors_fing_acc_0_plot,"[deg/s^2]",Qt::darkGreen);
+    // finger 1
+    plotError(ui->plot_error_pos_fing_1,QString("Error in position Finger 1"),qtime,qerrors_fing_pos_1_plot,"[deg]",Qt::blue);
+    plotError(ui->plot_error_vel_fing_1,QString("Error in velocity Finger 1"),qtime,qerrors_fing_vel_1_plot,"[deg/s]",Qt::red);
+    plotError(ui->plot_error_acc_fing_1,QString("Error in acceleration Finger 1"),qtime,qerrors_fing_acc_1_plot,"[deg/s^2]",Qt::darkGreen);
+    // finger 2
+    plotError(ui->plot_error_pos_fing_2,QString("Error in position Finger 2"),qtime,qerrors_fing_pos_2_plot,"[deg]",Qt::blue);
+    plotError(ui->plot_error_vel_fing_2,QString("Error in velocity Finger 2"),qtime,qerrors_fing_vel_2_plot,"[deg/s]",Qt::red);
+    plotError(ui->plot_error_acc_fing_2,QString("Error in acceleration Finger 2"),qtime,qerrors_fing_acc_2_plot,"[deg/s^2]",Qt::darkGreen);
+    // finger 3
+    plotError(ui->plot_error_pos_fing_3,QString("Error in position Finger 3"),qtime,qerrors_fing_pos_3_plot,"[deg]",Qt::blue);
+    plotError(ui->plot_error_vel_fing_3,QString("Error in velocity Finger 3"),qtime,qerrors_fing_vel_3_plot,"[deg/s]",Qt::red);
+    plotError(ui->plot_error_acc_fing_3,QString("Error in acceleration Finger 3"),qtime,qerrors_fing_acc_3_plot,"[deg/s^2]",Qt::darkGreen);
+
+
+}
+
+void ErrorsControlDialog::on_pushButton_save_hand_clicked()
 {
 
     QString path;
@@ -161,23 +252,26 @@ void ErrorsControlDialog::on_pushButton_save_clicked()
     if (stat("results/controlling/errors", &st) == -1) {
         mkdir("results/controlling/errors", 0700);
     }
-    path = QString("results/controlling/errors/");
+    if (stat("results/controlling/errors/hand", &st) == -1) {
+        mkdir("results/controlling/errors/hand", 0700);
+    }
+    path = QString("results/controlling/errors/hand/");
 
-    ui->plot_error_pos->savePdf(path+QString("error_pos.pdf"),true,0,0,QString(),QString("Error in position [mm]"));
-    ui->plot_error_or->savePdf(path+QString("error_or.pdf"),true,0,0,QString(),QString("Error in orientation"));
-    ui->plot_error_pos_or_tot->savePdf(path+QString("error_pos_or.pdf"),true,0,0,QString(),QString("Error in position and in orientation"));
-    ui->plot_error_lin_vel->savePdf(path+QString("error_lin_vel.pdf"),true,0,0,QString(),QString("Error in linear velocity [mm/s]"));
-    ui->plot_error_ang_vel->savePdf(path+QString("error_ang_vel.pdf"),true,0,0,QString(),QString("Error in angular velocity"));
-    ui->plot_error_vel_tot->savePdf(path+QString("error_vel.pdf"),true,0,0,QString(),QString("Error in velocity"));
-    ui->plot_error_lin_acc->savePdf(path+QString("error_lin_acc.pdf"),true,0,0,QString(),QString("Error in linear acceleration [mm/s^2]"));
-    ui->plot_error_ang_acc->savePdf(path+QString("error_ang_acc.pdf"),true,0,0,QString(),QString("Error in angular acceleration"));
-    ui->plot_error_acc_tot->savePdf(path+QString("error_acc.pdf"),true,0,0,QString(),QString("Error in acceleration"));
+    ui->plot_error_pos_hand->savePdf(path+QString("error_pos_hand.pdf"),true,0,0,QString(),QString("Error in position [mm]"));
+    ui->plot_error_or_hand->savePdf(path+QString("error_or_hand.pdf"),true,0,0,QString(),QString("Error in orientation"));
+    ui->plot_error_pos_or_tot_hand->savePdf(path+QString("error_pos_or_hand.pdf"),true,0,0,QString(),QString("Error in position and in orientation"));
+    ui->plot_error_lin_vel_hand->savePdf(path+QString("error_lin_vel_hand.pdf"),true,0,0,QString(),QString("Error in linear velocity [mm/s]"));
+    ui->plot_error_ang_vel_hand->savePdf(path+QString("error_ang_vel_hand.pdf"),true,0,0,QString(),QString("Error in angular velocity"));
+    ui->plot_error_vel_tot_hand->savePdf(path+QString("error_vel_hand.pdf"),true,0,0,QString(),QString("Error in velocity"));
+    ui->plot_error_lin_acc_hand->savePdf(path+QString("error_lin_acc_hand.pdf"),true,0,0,QString(),QString("Error in linear acceleration [mm/s^2]"));
+    ui->plot_error_ang_acc_hand->savePdf(path+QString("error_ang_acc_hand.pdf"),true,0,0,QString(),QString("Error in angular acceleration"));
+    ui->plot_error_acc_tot_hand->savePdf(path+QString("error_acc_hand.pdf"),true,0,0,QString(),QString("Error in acceleration"));
 
     // save text data files
 
     // error in position
     if(!this->qerrors_pos_plot.empty()){
-        string filename("error_pos.txt");
+        string filename("error_pos_hand.txt");
         ofstream error;
         error.open(path.toStdString()+filename);
 
@@ -198,7 +292,7 @@ void ErrorsControlDialog::on_pushButton_save_clicked()
 
     // error in orientation
     if(!this->qerrors_or_plot.empty()){
-        string filename("error_or.txt");
+        string filename("error_or_hand.txt");
         ofstream error;
         error.open(path.toStdString()+filename);
 
@@ -219,7 +313,7 @@ void ErrorsControlDialog::on_pushButton_save_clicked()
 
     // error in position and orientation
     if(!this->qerrors_pos_or_tot_plot.empty()){
-        string filename("error_pos_or_tot.txt");
+        string filename("error_pos_or_tot_hand.txt");
         ofstream error;
         error.open(path.toStdString()+filename);
 
@@ -240,7 +334,7 @@ void ErrorsControlDialog::on_pushButton_save_clicked()
 
     // error in linear velocity
     if(!this->qerrors_lin_vel_plot.empty()){
-        string filename("error_lin_vel.txt");
+        string filename("error_lin_vel_hand.txt");
         ofstream error;
         error.open(path.toStdString()+filename);
 
@@ -261,7 +355,7 @@ void ErrorsControlDialog::on_pushButton_save_clicked()
 
     // error in angular velocity
     if(!this->qerrors_ang_vel_plot.empty()){
-        string filename("error_ang_vel.txt");
+        string filename("error_ang_vel_hand.txt");
         ofstream error;
         error.open(path.toStdString()+filename);
 
@@ -282,7 +376,7 @@ void ErrorsControlDialog::on_pushButton_save_clicked()
 
     // error in velocity
     if(!this->qerrors_vel_tot_plot.empty()){
-        string filename("error_vel_tot.txt");
+        string filename("error_vel_tot_hand.txt");
         ofstream error;
         error.open(path.toStdString()+filename);
 
@@ -303,7 +397,7 @@ void ErrorsControlDialog::on_pushButton_save_clicked()
 
     // error in linear acceleration
     if(!this->qerrors_lin_acc_plot.empty()){
-        string filename("error_lin_acc.txt");
+        string filename("error_lin_acc_hand.txt");
         ofstream error;
         error.open(path.toStdString()+filename);
 
@@ -324,7 +418,7 @@ void ErrorsControlDialog::on_pushButton_save_clicked()
 
     // error in angular acceleration
     if(!this->qerrors_ang_acc_plot.empty()){
-        string filename("error_ang_acc.txt");
+        string filename("error_ang_acc_hand.txt");
         ofstream error;
         error.open(path.toStdString()+filename);
 
@@ -345,7 +439,7 @@ void ErrorsControlDialog::on_pushButton_save_clicked()
 
     // error in total acceleration
     if(!this->qerrors_acc_tot_plot.empty()){
-        string filename("error_acc_tot.txt");
+        string filename("error_acc_tot_hand.txt");
         ofstream error;
         error.open(path.toStdString()+filename);
 
@@ -363,6 +457,139 @@ void ErrorsControlDialog::on_pushButton_save_clicked()
         }
         error.close();
     }
+
+}
+
+void ErrorsControlDialog::on_pushButton_save_fing_clicked()
+{
+    QString path;
+
+    struct stat st = {0};
+    if (stat("results", &st) == -1) {
+        mkdir("results", 0700);
+    }
+    if (stat("results/controlling", &st) == -1) {
+        mkdir("results/controlling", 0700);
+    }
+    if (stat("results/controlling/errors", &st) == -1) {
+        mkdir("results/controlling/errors", 0700);
+    }
+    if (stat("results/controlling/errors/fingers", &st) == -1) {
+        mkdir("results/controlling/errors/fingers", 0700);
+    }
+    path = QString("results/controlling/errors/fingers/");
+
+    // finger 0
+    ui->plot_error_pos_fing_0->savePdf(path+QString("error_pos_fing_0.pdf"),true,0,0,QString(),QString("Error in position Finger 0 [deg]"));
+    ui->plot_error_vel_fing_0->savePdf(path+QString("error_vel_fing_0.pdf"),true,0,0,QString(),QString("Error in velocity Finger 0 [deg/s]"));
+    ui->plot_error_acc_fing_0->savePdf(path+QString("error_acc_fing_0.pdf"),true,0,0,QString(),QString("Error in acceleration Finger 0 [deg/s^2]"));
+    // finger 1
+    ui->plot_error_pos_fing_1->savePdf(path+QString("error_pos_fing_1.pdf"),true,0,0,QString(),QString("Error in position Finger 1 [deg]"));
+    ui->plot_error_vel_fing_1->savePdf(path+QString("error_vel_fing_1.pdf"),true,0,0,QString(),QString("Error in velocity Finger 1 [deg/s]"));
+    ui->plot_error_acc_fing_1->savePdf(path+QString("error_acc_fing_1.pdf"),true,0,0,QString(),QString("Error in acceleration Finger 1 [deg/s^2]"));
+    // finger 2
+    ui->plot_error_pos_fing_2->savePdf(path+QString("error_pos_fing_2.pdf"),true,0,0,QString(),QString("Error in position Finger 2 [deg]"));
+    ui->plot_error_vel_fing_2->savePdf(path+QString("error_vel_fing_2.pdf"),true,0,0,QString(),QString("Error in velocity Finger 2 [deg/s]"));
+    ui->plot_error_acc_fing_2->savePdf(path+QString("error_acc_fing_2.pdf"),true,0,0,QString(),QString("Error in acceleration Finger 2 [deg/s^2]"));
+    // finger 3
+    ui->plot_error_pos_fing_3->savePdf(path+QString("error_pos_fing_3.pdf"),true,0,0,QString(),QString("Error in position Finger 3 [deg]"));
+    ui->plot_error_vel_fing_3->savePdf(path+QString("error_vel_fing_3.pdf"),true,0,0,QString(),QString("Error in velocity Finger 3 [deg/s]"));
+    ui->plot_error_acc_fing_3->savePdf(path+QString("error_acc_fing_3.pdf"),true,0,0,QString(),QString("Error in acceleration Finger 3 [deg/s^2]"));
+
+    // save text data files
+
+    // finger 0
+    if(!this->qerrors_fing_pos_0_plot.empty()){
+        string filename("error_fing_0.txt");
+        ofstream error;
+        error.open(path.toStdString()+filename);
+
+        error << string("# ERRORS IN FINGER 0 \n");
+        error << string("# error pos [deg], error vel [deg/s], error acc [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->qerrors_fing_pos_0_plot.size();++i){
+            double err_pos = this->qerrors_fing_pos_0_plot.at(i);
+            double err_vel = this->qerrors_fing_vel_0_plot.at(i);
+            double err_acc = this->qerrors_fing_acc_0_plot.at(i);
+            double time = this->qtime.at(i);
+            string err_pos_str =  boost::str(boost::format("%.2f") % (err_pos)); boost::replace_all(err_pos_str,",",".");
+            string err_vel_str =  boost::str(boost::format("%.2f") % (err_vel)); boost::replace_all(err_vel_str,",",".");
+            string err_acc_str =  boost::str(boost::format("%.2f") % (err_acc)); boost::replace_all(err_acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            error << err_pos_str+string(", ")+err_vel_str+string(", ")+err_acc_str+string(", ")+t_str+string("\n");
+        }
+        error.close();
+    }
+
+    // finger 1
+    if(!this->qerrors_fing_pos_1_plot.empty()){
+        string filename("error_fing_1.txt");
+        ofstream error;
+        error.open(path.toStdString()+filename);
+
+        error << string("# ERRORS IN FINGER 1 \n");
+        error << string("# error pos [deg], error vel [deg/s], error acc [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->qerrors_fing_pos_1_plot.size();++i){
+            double err_pos = this->qerrors_fing_pos_1_plot.at(i);
+            double err_vel = this->qerrors_fing_vel_1_plot.at(i);
+            double err_acc = this->qerrors_fing_acc_1_plot.at(i);
+            double time = this->qtime.at(i);
+            string err_pos_str =  boost::str(boost::format("%.2f") % (err_pos)); boost::replace_all(err_pos_str,",",".");
+            string err_vel_str =  boost::str(boost::format("%.2f") % (err_vel)); boost::replace_all(err_vel_str,",",".");
+            string err_acc_str =  boost::str(boost::format("%.2f") % (err_acc)); boost::replace_all(err_acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            error << err_pos_str+string(", ")+err_vel_str+string(", ")+err_acc_str+string(", ")+t_str+string("\n");
+        }
+        error.close();
+    }
+
+    // finger 2
+    if(!this->qerrors_fing_pos_2_plot.empty()){
+        string filename("error_fing_2.txt");
+        ofstream error;
+        error.open(path.toStdString()+filename);
+
+        error << string("# ERRORS IN FINGER 2 \n");
+        error << string("# error pos [deg], error vel [deg/s], error acc [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->qerrors_fing_pos_2_plot.size();++i){
+            double err_pos = this->qerrors_fing_pos_2_plot.at(i);
+            double err_vel = this->qerrors_fing_vel_2_plot.at(i);
+            double err_acc = this->qerrors_fing_acc_2_plot.at(i);
+            double time = this->qtime.at(i);
+            string err_pos_str =  boost::str(boost::format("%.2f") % (err_pos)); boost::replace_all(err_pos_str,",",".");
+            string err_vel_str =  boost::str(boost::format("%.2f") % (err_vel)); boost::replace_all(err_vel_str,",",".");
+            string err_acc_str =  boost::str(boost::format("%.2f") % (err_acc)); boost::replace_all(err_acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            error << err_pos_str+string(", ")+err_vel_str+string(", ")+err_acc_str+string(", ")+t_str+string("\n");
+        }
+        error.close();
+    }
+
+    // finger 3
+    if(!this->qerrors_fing_pos_3_plot.empty()){
+        string filename("error_fing_3.txt");
+        ofstream error;
+        error.open(path.toStdString()+filename);
+
+        error << string("# ERRORS IN FINGER 3 \n");
+        error << string("# error pos [deg], error vel [deg/s], error acc [deg/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->qerrors_fing_pos_3_plot.size();++i){
+            double err_pos = this->qerrors_fing_pos_3_plot.at(i);
+            double err_vel = this->qerrors_fing_vel_3_plot.at(i);
+            double err_acc = this->qerrors_fing_acc_3_plot.at(i);
+            double time = this->qtime.at(i);
+            string err_pos_str =  boost::str(boost::format("%.2f") % (err_pos)); boost::replace_all(err_pos_str,",",".");
+            string err_vel_str =  boost::str(boost::format("%.2f") % (err_vel)); boost::replace_all(err_vel_str,",",".");
+            string err_acc_str =  boost::str(boost::format("%.2f") % (err_acc)); boost::replace_all(err_acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            error << err_pos_str+string(", ")+err_vel_str+string(", ")+err_acc_str+string(", ")+t_str+string("\n");
+        }
+        error.close();
+    }
+
 
 }
 

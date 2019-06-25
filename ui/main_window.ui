@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -13578,46 +13578,6 @@ p, li { white-space: pre-wrap; }
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="layoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>590</x>
-          <y>560</y>
-          <width>671</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_298">
-         <item>
-          <widget class="QPushButton" name="pushButton_pred_swivel_angle">
-           <property name="text">
-            <string>show predicted swivel angle</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_errors_ctrl">
-           <property name="text">
-            <string>show errors</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_control_plot_pos_vel_comps">
-           <property name="text">
-            <string>show operational space components</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pushButton_control_plot_joints">
-           <property name="text">
-            <string>show joints</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
        <widget class="QGroupBox" name="groupBox_low_pass_filter">
         <property name="geometry">
          <rect>
@@ -13678,6 +13638,53 @@ p, li { white-space: pre-wrap; }
           </item>
          </layout>
         </widget>
+       </widget>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>580</x>
+          <y>560</y>
+          <width>684</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_298">
+         <item>
+          <widget class="QPushButton" name="pushButton_pred_swivel_angle">
+           <property name="text">
+            <string>show predicted swivel angle</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_tracking_ctrl">
+           <property name="text">
+            <string>show tracking</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_errors_ctrl">
+           <property name="text">
+            <string>show errors</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_control_plot_pos_vel_comps">
+           <property name="text">
+            <string>show operational space components</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_control_plot_joints">
+           <property name="text">
+            <string>show joints</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
      </widget>

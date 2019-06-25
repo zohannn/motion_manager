@@ -7,94 +7,17 @@
     <x>0</x>
     <y>0</y>
     <width>1286</width>
-    <height>859</height>
+    <height>1025</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Errors during control</string>
   </property>
-  <widget class="QPushButton" name="pushButton_save">
-   <property name="geometry">
-    <rect>
-     <x>1200</x>
-     <y>830</y>
-     <width>80</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Save</string>
-   </property>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>17</x>
-     <y>13</y>
-     <width>1261</width>
-     <height>691</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QCustomPlot" name="plot_error_pos" native="true"/>
-      </item>
-      <item>
-       <widget class="QCustomPlot" name="plot_error_or" native="true"/>
-      </item>
-      <item>
-       <widget class="QCustomPlot" name="plot_error_pos_or_tot" native="true"/>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QCustomPlot" name="plot_error_lin_vel" native="true"/>
-      </item>
-      <item>
-       <widget class="QCustomPlot" name="plot_error_ang_vel" native="true"/>
-      </item>
-      <item>
-       <widget class="QCustomPlot" name="plot_error_vel_tot" native="true"/>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
-       <widget class="QCustomPlot" name="plot_error_lin_acc" native="true"/>
-      </item>
-      <item>
-       <widget class="QCustomPlot" name="plot_error_ang_acc" native="true"/>
-      </item>
-      <item>
-       <widget class="QCustomPlot" name="plot_error_acc_tot" native="true"/>
-      </item>
-     </layout>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QPushButton" name="pushButton_plot">
-   <property name="geometry">
-    <rect>
-     <x>1110</x>
-     <y>830</y>
-     <width>80</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Plot</string>
-   </property>
-  </widget>
   <widget class="QGroupBox" name="groupBox_low_pass_pos">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>750</y>
+     <y>910</y>
      <width>191</width>
      <height>101</height>
     </rect>
@@ -155,7 +78,7 @@
    <property name="geometry">
     <rect>
      <x>440</x>
-     <y>750</y>
+     <y>910</y>
      <width>191</width>
      <height>101</height>
     </rect>
@@ -216,7 +139,7 @@
    <property name="geometry">
     <rect>
      <x>230</x>
-     <y>750</y>
+     <y>910</y>
      <width>191</width>
      <height>101</height>
     </rect>
@@ -271,6 +194,192 @@
       </layout>
      </item>
     </layout>
+   </widget>
+  </widget>
+  <widget class="QTabWidget" name="tabWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>0</y>
+     <width>1271</width>
+     <height>901</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="tab_hand">
+    <attribute name="title">
+     <string>Hand</string>
+    </attribute>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>1251</width>
+       <height>821</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QCustomPlot" name="plot_error_pos_hand" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_or_hand" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_pos_or_tot_hand" native="true"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QCustomPlot" name="plot_error_lin_vel_hand" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_ang_vel_hand" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_vel_tot_hand" native="true"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QCustomPlot" name="plot_error_lin_acc_hand" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_ang_acc_hand" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_acc_tot_hand" native="true"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>1090</x>
+       <y>840</y>
+       <width>168</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QPushButton" name="pushButton_plot_hand">
+        <property name="text">
+         <string>Plot</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_save_hand">
+        <property name="text">
+         <string>Save</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_fingers">
+    <attribute name="title">
+     <string>Fingers</string>
+    </attribute>
+    <widget class="QPushButton" name="pushButton_plot_fing">
+     <property name="geometry">
+      <rect>
+       <x>1094</x>
+       <y>840</y>
+       <width>80</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Plot</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_save_fing">
+     <property name="geometry">
+      <rect>
+       <x>1180</x>
+       <y>840</y>
+       <width>80</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Save</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>1251</width>
+       <height>821</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QCustomPlot" name="plot_error_pos_fing_0" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_pos_fing_1" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_pos_fing_2" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_pos_fing_3" native="true"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_8">
+        <item>
+         <widget class="QCustomPlot" name="plot_error_vel_fing_0" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_vel_fing_1" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_vel_fing_2" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_vel_fing_3" native="true"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_9">
+        <item>
+         <widget class="QCustomPlot" name="plot_error_acc_fing_0" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_acc_fing_1" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_acc_fing_2" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_error_acc_fing_3" native="true"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </widget>
   </widget>
  </widget>

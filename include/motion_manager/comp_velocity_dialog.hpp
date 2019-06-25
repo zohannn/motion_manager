@@ -1,5 +1,5 @@
 #ifndef COMP_VELOCITY_DIALOG_HPP
-#define COMP_VELOCITY_DIALOG
+#define COMP_VELOCITY_DIALOG_HPP
 
 #include <QDialog>
 #include <QFileDialog>
@@ -151,4 +151,4 @@ private:
 };
 
 } // namespace motion_manager
-#endif // COMP_VELOCITY_DIALOG
+#endif // COMP_VELOCITY_DIALOG_HPP

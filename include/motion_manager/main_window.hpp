@@ -36,6 +36,7 @@
 #include "powerlaw3ddialog.hpp"
 #include "comp_velocity_dialog.hpp"
 #include "comp_control_dialog.hpp"
+#include "comp_tracking_control_dialog.hpp"
 #include "nat_coll_av_dialog.hpp"
 #include "errors_control_dialog.hpp"
 #include "handposplot.hpp"
@@ -919,6 +920,11 @@ public Q_SLOTS:
         void on_pushButton_errors_ctrl_clicked();
 
         /**
+         * @brief on_pushButton_tracking_ctrl_clicked
+         */
+        void on_pushButton_tracking_ctrl_clicked();
+
+        /**
          * @brief on_pushButton_save_ctrl_params_clicked
          */
         void on_pushButton_save_ctrl_params_clicked();
@@ -1008,6 +1014,7 @@ private:
         ResultsCtrlPredSwivelAngleDialog *mResultsCtrlPredSwivelAngledlg;/**< handle of the results of the predicted swivel angle dlg during control*/
         CompControlDialog *mCompCtrldlg; /** < handle of the components dlg during control */
         ErrorsControlDialog *mErrCtrldlg; /** < handle of the errors dlg during control */
+        CompTrackingControlDialog *mCompTrackCtrldlg; /** < handle of the tracking dlg during control */
         int scenario_id; /**< id of the current scenario */
         QVector<QString> scenarios;  /**< list of scenarios */
 
@@ -1483,8 +1490,12 @@ private:
         vector<double> h_hand_lin_acc_init; /**< initial hand linear acceleration during control */
         vector<double> h_hand_ang_acc_init; /**< initial hand angular acceleration during control */
 
+        vector<vector<double>> fingPosition_ctrl; /**< fingers real positions during control */
+        vector<vector<double>> fingPosition_des_ctrl; /**< fingers desired positions */
         vector<vector<double>> handPosition_ctrl; /**< hand position during control. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_ctrl; /**< hand orientation during control. 0=roll,1=pitch,2=yaw */
+        vector<vector<double>> handOrientation_q_ctrl; /**< hand orientation desired during control. 0=qx,1=qy,2=qz,3=qw */
+        vector<vector<double>> handPosition_des_ctrl; /**< desired hand positions during control 0=x, 1=y, 2=z, 3=qx, 4=qy, 5=qz, 6=qw*/
         vector<vector<double>> handLinearVelocity_ctrl; /**< hand linear velocity during control */
         vector<vector<double>> handAngularVelocity_ctrl;/**< hand angular velocity during control */
         vector<double> handVelocityNorm_ctrl; /**< hand linear velocity norm during control */
@@ -1514,6 +1525,7 @@ private:
         vector<vector<double>> shoulderLinearAcceleration_ctrl; /**< shoulder linear acceleration during control */
         vector<vector<double>> shoulderAngularAcceleration_ctrl;/**< shoulder angular acceleration during control */
 
+        // hand errors
         vector<double> error_pos_tot_norm; /**< norm of the total error in position */
         vector<double> error_or_tot_norm; /**< norm of the total error in orientation */
         vector<double> error_pos_or_tot_norm; /**< norm of the total error in position + orientation */
@@ -1523,6 +1535,11 @@ private:
         vector<double> error_lin_acc_tot_norm; /**< norm of the total error in linear acceleration */
         vector<double> error_ang_acc_tot_norm; /**< norm of the total error in angular acceleration */
         vector<double> error_acc_tot_norm; /**< norm of the total error in acceleration */
+
+        // fingers errors
+        vector<vector<double>> error_fing_pos; /**< fingers error in position */
+        vector<vector<double>> error_fing_vel; /**< fingers error in velocity */
+        vector<vector<double>> error_fing_acc; /**< fingers error in acceleration */
 
         vector<double> pred_swivel_angle_ctrl; /**< predicted swivel angle during control */
         vector<double> pred_der_swivel_angle_ctrl; /**< predicted time derivative of the swivel angle during control */

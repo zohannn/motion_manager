@@ -112,6 +112,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mErrCtrldlg = new ErrorsControlDialog(this);
     mErrCtrldlg->setModal(false);
 
+    // create the tracking control dialog
+    mCompTrackCtrldlg = new CompTrackingControlDialog(this);
+    mCompTrackCtrldlg->setModal(false);
+
     // create the time mapping dialog
     mTimeMapdlg = new TimeMapDialog(this);
     mTimeMapdlg->setModal(false);
@@ -564,28 +568,7 @@ void MainWindow::execPosControl()
                      tar_pos(0) = tar->getPos().Xpos;
                      tar_pos(1) = tar->getPos().Ypos;
                      tar_pos(2) = tar->getPos().Zpos;
-                     tar_q = tar->getQuaternion();
-                     /*
-                     if(sim_robot){
-                         tar = this->curr_scene->getPose(this->i_tar_ctrl);
-                         tar_pos(0) = tar->getPos().Xpos;
-                         tar_pos(1) = tar->getPos().Ypos;
-                         tar_pos(2) = tar->getPos().Zpos;
-                         tar_q = tar->getQuaternion();
-                     }else{
-                         tar = this->curr_scene->getHandPose();
-                         tar_pos(0) = tar->getPos().Xpos;
-                         tar_pos(1) = tar->getPos().Ypos;
-                         tar_pos(2) = tar->getPos().Zpos;
-                         tar_q = tar->getQuaternion();
-                         //tar_q = this->curr_scene->getPose(this->i_tar_ctrl)->getQuaternion();
-                         //if(stage_descr.compare("plan")==0){
-                         //    this->tar_rec = tar;
-                         //    this->tar_rec->setQuaternion(tar_q);
-                         //} // record the latest target of the plan stage
-                     }
-                     */
-
+                     tar_q = tar->getQuaternion();   
                      /*
                      BOOST_LOG_SEV(lg, info) << "target position x = " << tar_pos(0);
                      BOOST_LOG_SEV(lg, info) << "target position y = " << tar_pos(1);
@@ -595,6 +578,7 @@ void MainWindow::execPosControl()
                      BOOST_LOG_SEV(lg, info) << "target quaternion z = " << tar_q.z();
                      BOOST_LOG_SEV(lg, info) << "target quaternion w = " << tar_q.w();
                      */
+
                      dist_app = this->approach_ctrl.at(3);
                      vv_app << this->approach_ctrl.at(0),this->approach_ctrl.at(1),this->approach_ctrl.at(2);
                      dist_ret = this->retreat_ctrl.at(3);
@@ -1213,6 +1197,7 @@ void MainWindow::execPosControl()
                 }
                 VectorXd r_arm_accelerations_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_arm_accelerations_read.data(), r_arm_accelerations_read.size());
                 VectorXd r_hand_acc_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_hand_acc_read.data(), r_hand_acc_read.size());
+                VectorXd r_hand_accelerations_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_hand_accelerations_read.data(), r_hand_accelerations_read.size());
                 // Jacobian
                 this->curr_scene->getHumanoid()->getJacobian(1,r_arm_posture,this->Jacobian);
                 this->hand_j_acc = r_hand_acc_read_vec - this->Jacobian*r_arm_accelerations_read_vec;
@@ -1896,8 +1881,8 @@ void MainWindow::execPosControl()
                     MatrixXd Kd_fing = MatrixXd::Identity(JOINTS_HAND,JOINTS_HAND);
                     Kp_fing(0,0) = fing_p_coeff; Kp_fing(1,1) = fing_p_coeff; Kp_fing(2,2) = fing_p_coeff; Kp_fing(3,3) = fing_p_coeff;
                     Kd_fing(0,0) = fing_d_coeff; Kd_fing(1,1) = fing_d_coeff; Kd_fing(2,2) = fing_d_coeff; Kd_fing(3,3) = fing_d_coeff;
-                    VectorXd r_hand_acceleration_vec = h_fing_ref_acc + Kd_fing*der_error_h_fing_tot + Kp_fing*error_h_fing_tot;
-                    VectorXd r_hand_velocities_vec = r_hand_acceleration_vec * time_step;
+                    VectorXd r_fing_acc_read_vec = h_fing_ref_acc + Kd_fing*der_error_h_fing_tot + Kp_fing*error_h_fing_tot;
+                    VectorXd r_hand_velocities_vec = r_fing_acc_read_vec * time_step;
                     if(mov_type==0 && stage_descr.compare("retreat")==0){
                         // retreat stage of a pick movement
                         r_hand_velocities_vec = VectorXd::Zero(JOINTS_HAND);
@@ -2308,9 +2293,23 @@ void MainWindow::execPosControl()
                 for(size_t jj=0; jj < r_hand_accelerations_read.size(); ++jj)
                     this->jointsAcceleration_ctrl(this->jointsAcceleration_ctrl.rows()-1,r_arm_accelerations_read.size()+jj) = r_hand_accelerations_read.at(jj);
 
+                // desired hand pose
+                vector<double> std_h_hand_des_pose;  std_h_hand_des_pose.resize(h_hand_pose.size());
+                VectorXd::Map(&std_h_hand_des_pose[0], h_hand_pose.size()) = h_hand_pose;
+                this->handPosition_des_ctrl.push_back(std_h_hand_des_pose);
+
+                // desired fingers positions
+                vector<double> std_h_fing_pos;  std_h_fing_pos.resize(h_fing_pos.size());
+                VectorXd::Map(&std_h_fing_pos[0], h_fing_pos.size()) = h_fing_pos;
+                this->fingPosition_des_ctrl.push_back(std_h_fing_pos);
+
+                // fingers positions
+                this->fingPosition_ctrl.push_back(r_hand_posture_mes);
+
                 // operational space positions
                 this->handPosition_ctrl.push_back(r_hand_lin_pos);
                 this->handOrientation_ctrl.push_back(r_hand_ang_pos);
+                this->handOrientation_q_ctrl.push_back(r_hand_q);
                 this->wristPosition_ctrl.push_back(r_wrist_lin_pos);
                 this->wristOrientation_ctrl.push_back(r_wrist_ang_pos);
                 this->elbowPosition_ctrl.push_back(r_elbow_lin_pos);
@@ -2342,6 +2341,7 @@ void MainWindow::execPosControl()
 
                 // errors
                 if(hl_en){
+                    // hand
                     this->error_pos_tot_norm.push_back(error_h_tot.block<3,1>(0,0).norm());
                     this->error_or_tot_norm.push_back(error_h_tot.block<3,1>(3,0).norm());
                     this->error_pos_or_tot_norm.push_back(error_h_tot.norm());
@@ -2352,6 +2352,17 @@ void MainWindow::execPosControl()
                     this->error_lin_acc_tot_norm.push_back(error_acc_tot.block<3,1>(0,0).norm());
                     this->error_ang_acc_tot_norm.push_back(error_acc_tot.block<3,1>(3,0).norm());
                     this->error_acc_tot_norm.push_back(error_acc_tot.norm());
+                    // fingers
+                    vector<double> error_h_fing_tot_vec;  error_h_fing_tot_vec.resize(error_h_fing_tot.size());
+                    VectorXd::Map(&error_h_fing_tot_vec[0], error_h_fing_tot.size()) = error_h_fing_tot;
+                    this->error_fing_pos.push_back(error_h_fing_tot_vec);
+                    vector<double> der_error_h_fing_tot_vec;  der_error_h_fing_tot_vec.resize(der_error_h_fing_tot.size());
+                    VectorXd::Map(&der_error_h_fing_tot_vec[0], der_error_h_fing_tot.size()) = der_error_h_fing_tot;
+                    this->error_fing_vel.push_back(der_error_h_fing_tot_vec);
+                    VectorXd error_fing_acc_tot = h_fing_ref_acc - r_hand_accelerations_read_vec;
+                    vector<double> error_fing_acc_tot_vec;  error_fing_acc_tot_vec.resize(error_fing_acc_tot.size());
+                    VectorXd::Map(&error_fing_acc_tot_vec[0], error_fing_acc_tot.size()) = error_fing_acc_tot;
+                    this->error_fing_acc.push_back(error_fing_acc_tot_vec);
                 }else{
                     this->error_pos_tot_norm.push_back(error_trap_tot.block<3,1>(0,0).norm());
                     this->error_or_tot_norm.push_back(error_trap_tot.block<3,1>(3,0).norm());
@@ -13534,6 +13545,11 @@ void MainWindow::updatePlanningResults(problemPtr prob, HUMotion::planning_resul
 void MainWindow::clear_control_variables()
 {
     this->handPosition_ctrl.clear();
+    this->handOrientation_ctrl.clear();
+    this->handOrientation_q_ctrl.clear();
+    this->handPosition_des_ctrl.clear();
+    this->fingPosition_ctrl.clear();
+    this->fingPosition_des_ctrl.clear();
     this->handLinearVelocity_ctrl.clear();
     this->handAngularVelocity_ctrl.clear();
     this->handLinearAcceleration_ctrl.clear();
@@ -13564,6 +13580,9 @@ void MainWindow::clear_control_variables()
     this->jointsAcceleration_ctrl.resize(0,0);
     this->r_hand_init_pos.clear();
     this->sim_time.clear();
+    this->error_fing_pos.clear();
+    this->error_fing_vel.clear();
+    this->error_fing_acc.clear();
     this->error_pos_tot_norm.clear();
     this->error_or_tot_norm.clear();
     this->error_pos_or_tot_norm.clear();
@@ -14206,11 +14225,28 @@ void MainWindow::on_pushButton_control_plot_pos_vel_comps_clicked()
 void MainWindow::on_pushButton_errors_ctrl_clicked()
 {
     if(!this->error_pos_tot_norm.empty())
-        this->mErrCtrldlg->setupPlots(this->error_pos_tot_norm,this->error_or_tot_norm,this->error_pos_or_tot_norm,
+        this->mErrCtrldlg->setupHandPlots(this->error_pos_tot_norm,this->error_or_tot_norm,this->error_pos_or_tot_norm,
                                       this->error_lin_vel_tot_norm,this->error_ang_vel_tot_norm,this->error_vel_tot_norm,
                                       this->error_lin_acc_tot_norm,this->error_ang_acc_tot_norm,this->error_acc_tot_norm,
                                       this->sim_time);
+
+    if(!this->error_fing_pos.empty())
+        this->mErrCtrldlg->setupFingersPlots(this->error_fing_pos,this->error_fing_vel,this->error_fing_acc,this->sim_time);
+
+
     this->mErrCtrldlg->show();
+}
+
+void MainWindow::on_pushButton_tracking_ctrl_clicked()
+{
+    if(!this->handPosition_ctrl.empty())
+    {
+        this->mCompTrackCtrldlg->setupPlots(this->handPosition_ctrl,this->handOrientation_q_ctrl,this->handPosition_des_ctrl,
+                                            this->fingPosition_ctrl,this->fingPosition_des_ctrl,
+                                            this->sim_time);
+    }
+
+    this->mCompTrackCtrldlg->show();
 }
 
 
