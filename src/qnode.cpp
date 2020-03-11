@@ -7443,7 +7443,7 @@ void QNode::Cup_shelfCallback(const geometry_msgs::PoseStamped& data)
 {
     //BOOST_LOG_SEV(lg, info) << "cup_shelf_callback"  ;
 
-    int obj_id = 3;
+    int obj_id = 0;
     string name = string("Cup");
 
     this->updateObjectInfo(obj_id,name,data);

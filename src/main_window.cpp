@@ -1253,6 +1253,7 @@ void MainWindow::execPosControl()
                 Vector3d error_pos = des_hand_pos - r_hand_pos_vec;
                 Vector3d error_or = r_hand_q_w*des_hand_or_q_e - des_hand_or_q_w*r_hand_or_q_e - des_hand_or_q_e.cross(r_hand_or_q_e);
                 VectorXd error_tot(6); error_tot << error_pos(0),error_pos(1),error_pos(2), error_or(0),error_or(1),error_or(2);
+                VectorXd error_tot_init(6);
 //                // error in velocity
 //                Vector3d error_lin_vel = des_hand_lin_vel - r_hand_lin_vel_vec;
 //                Vector3d error_ang_vel = r_hand_ang_vel_q_w*des_hand_or_q_e + r_hand_q_w*des_hand_ang_vel_q_e - des_hand_ang_vel_q_w*r_hand_or_q_e - des_hand_or_q_w*r_hand_ang_vel_q_e
@@ -1312,7 +1313,7 @@ void MainWindow::execPosControl()
                 VectorXd h_hand_ref_acc(6); // human-like reference acceleration
                 VectorXd h_fing_ref_acc(JOINTS_HAND); // human-like reference acceleration
 
-                double g_map = 0.0; int index = 0;// normalized mapped time
+                double g_map = 0.0; double g_map_fing = 0.0; int index = 0;// normalized mapped time
                 if(this->ui.checkBox_use_plan_hand_pos->isChecked())
                 {
 
@@ -1326,6 +1327,7 @@ void MainWindow::execPosControl()
                             // normalized mapped time
                             if(sim_robot){
                                 g_map = 1 - exp((-dec_rate*this->curr_time)/(tau*(1+diff_w*error_tot.squaredNorm())));
+                                //TO DO g_map_fing = 1 - (error_tot.squaredNorm()/error_tot_init.squaredNorm());
                             }else{
                                 double d_curr_time = (boost::chrono::duration_cast<msec>(this->curr_time_ctrl-this->start_time_point)).count();
                                 g_map = 1 - exp((-dec_rate*(d_curr_time/1000))/(tau*(1+diff_w*error_tot.squaredNorm())));
