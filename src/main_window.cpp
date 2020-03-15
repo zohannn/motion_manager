@@ -8867,6 +8867,27 @@ void MainWindow::on_pushButton_save_res_task_dual_clicked()
         hand_pos.close();
     }
 
+    // right hand velocity
+    if(!this->handVelocityNorm_task.empty()){
+        string filename_hand_vel("hand_vel_task_right.txt");
+        ofstream hand_vel;
+        hand_vel.open(path.toStdString()+filename_hand_vel);
+
+        hand_vel << string("# RIGHT HAND VELOCITY NORM \n");
+        hand_vel << string("# velocity [mm/s], time [s] \n");
+
+        for(size_t i=0;i<this->handVelocityNorm_task.size();++i){
+            double vel = this->handVelocityNorm_task.at(i);
+            double time = this->qtime_task.at(i);
+            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            boost::replace_all(vel_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            hand_vel << vel_str+string(", ")+t_str+string("\n");
+        }
+        hand_vel.close();
+    }
+
     // left hand velocity
     if(!this->handVelocityNorm_task_left.empty()){
         string filename_hand_vel("hand_vel_task_left.txt");
