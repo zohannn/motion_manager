@@ -14,6 +14,8 @@ Problem::Problem():
     this->leftFinalPosture_eng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
     this->rightFinalHand = std::vector<double>(JOINTS_HAND);
     this->leftFinalHand = std::vector<double>(JOINTS_HAND);
+    this->initPosture_right = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->initPosture_left = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
     //this->rightBouncePosture = std::vector<double>(JOINTS_ARM);
     //this->leftBouncePosture = std::vector<double>(JOINTS_ARM);
 
@@ -35,6 +37,8 @@ Problem::Problem(int planner_id,Movement* mov,Scenario* scene)
     this->leftFinalPosture_eng = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
     this->rightFinalHand = std::vector<double>(JOINTS_HAND);
     this->leftFinalHand = std::vector<double>(JOINTS_HAND);
+    this->initPosture_right = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+    this->initPosture_left = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
 
     this->targetAxis = 0;
     this->solved=false;
@@ -238,6 +242,8 @@ Problem::Problem(const Problem& s)
     this->leftFinalPosture_eng = s.leftFinalPosture_eng;
     this->leftFinalPosture_diseng = s.leftFinalPosture_diseng;
     this->leftFinalHand = s.leftFinalHand;
+    this->initPosture_right = s.initPosture_right;
+    this->initPosture_left = s.initPosture_left;
 
     this->dFF = s.dFF;
     this->dFH = s.dFH;
@@ -378,6 +384,16 @@ void Problem::setMoveSettings(std::vector<double> &tar_right, std::vector<double
     this->use_posture_right=use_posture_right;
     this->use_posture_left=use_posture_left;
 
+}
+
+void Problem::setInitialRightPosture(std::vector<double> &start_right_posture)
+{
+    this->initPosture_right = start_right_posture;
+}
+
+void Problem::setInitialLeftPosture(std::vector<double> &start_left_posture)
+{
+    this->initPosture_left = start_left_posture;
 }
 
 bool Problem::getObstacles(std::vector<objectPtr>& obs)
@@ -937,7 +953,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         break;
     case 1://right arm
         if(obj!=nullptr){obj->getEngTarRight(eng_to_tar);}
-        this->scene->getHumanoid()->getRightPosture(initPosture);
+        initPosture = this->initPosture_right;
         this->scene->getHumanoid()->getRightArmHomePosture(homePosture);
         if(mov_type==5){
           this->scene->getHumanoid()->getRightHandHomePosture(finalHand);
@@ -951,7 +967,7 @@ HUMotion::planning_result_ptr Problem::solve(HUMotion::hump_params &params)
         break;
     case 2:// left arm
         if(obj!=nullptr){obj->getEngTarLeft(eng_to_tar);}
-        this->scene->getHumanoid()->getLeftPosture(initPosture);
+         initPosture = this->initPosture_left;
         this->scene->getHumanoid()->getLeftArmHomePosture(homePosture);
         if(mov_type==5){
           this->scene->getHumanoid()->getLeftHandHomePosture(finalHand);
@@ -1111,7 +1127,6 @@ HUMotion::planning_dual_result_ptr Problem::solve(HUMotion::hump_dual_params &pa
     double dHO_right; double dHO_left;
     std::vector<double> finalHand_right; std::vector<double> finalHand_left;
     std::vector<double> homePosture_right; std::vector<double> homePosture_left;
-    std::vector<double> initPosture_right; std::vector<double> initPosture_left;
 
     targetPtr tar_right; targetPtr tar_left;
     objectPtr obj_right; engagePtr eng_right;
@@ -1145,8 +1160,8 @@ HUMotion::planning_dual_result_ptr Problem::solve(HUMotion::hump_dual_params &pa
     std::vector<double> eng_to_tar_right; std::vector<double> eng_to_tar_left;
     if(obj_right!=nullptr){obj_right->getEngTarRight(eng_to_tar_right);}
     if(obj_left!=nullptr){obj_left->getEngTarLeft(eng_to_tar_left);}
-    this->scene->getHumanoid()->getRightPosture(initPosture_right);
-    this->scene->getHumanoid()->getLeftPosture(initPosture_left);
+    //this->scene->getHumanoid()->getRightPosture(initPosture_right);
+    //this->scene->getHumanoid()->getLeftPosture(initPosture_left);
     this->scene->getHumanoid()->getRightArmHomePosture(homePosture_right);
     this->scene->getHumanoid()->getLeftArmHomePosture(homePosture_left);
     if(mov_type_right==5){

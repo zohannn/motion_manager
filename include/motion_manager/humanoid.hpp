@@ -640,6 +640,24 @@ public:
      */
     double getRightHandVelNorm();
 
+    /**
+     * @brief getRightThumbFingerPositions
+     * @param pos
+     */
+    void getRightThumbFingerPositions(vector<double>& pos);
+
+    /**
+     * @brief getRightIndexFingerPositions
+     * @param pos
+     */
+    void getRightIndexFingerPositions(vector<double>& pos);
+
+    /**
+     * @brief getRightMiddleFingerPositions
+     * @param pos
+     */
+    void getRightMiddleFingerPositions(vector<double>& pos);
+
 
     /**
      * @brief This method gets the position of the left shoulder
@@ -723,6 +741,24 @@ public:
      * @return
      */
     double getLeftHandVelNorm();
+
+    /**
+     * @brief getLeftThumbFingerPositions
+     * @param pos
+     */
+    void getLeftThumbFingerPositions(vector<double>& pos);
+
+    /**
+     * @brief getLeftIndexFingerPositions
+     * @param pos
+     */
+    void getLeftIndexFingerPositions(vector<double>& pos);
+
+    /**
+     * @brief getLeftMiddleFingerPositions
+     * @param pos
+     */
+    void getLeftMiddleFingerPositions(vector<double>& pos);
 
     /**
      * @brief getAllPos
@@ -1307,14 +1343,13 @@ private:
     void directKinematicsDualArm();
 
     /**
-     * @brief This method computes the direct kinematics of the fingers
+     * @brief directKinematicsFinger
      * @param p
      * @param T_ext
-     * @param T_H_0_pos
      * @param id_fing
      * @param Fingers
      */
-    void directKinematicsFinger(DHparams& p,Matrix4d& T_ext,Matrix4d& T_H_0_pos,int id_fing, MatrixXd& Fingers);
+    void directKinematicsFinger(DHparams& p, Matrix4d& T_ext, int id_fing, MatrixXd& Fingers);
 
     /**
      * @brief This method computes the transformation matrix from the D-H parameters

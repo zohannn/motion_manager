@@ -28,8 +28,8 @@ void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, 
     this->zL_plan = zL;
     this->zU_plan = zU;
     this->dual_plan = dual_vars;
-    this->n_steps = warm_n_steps;
-    this->ui->label_warm_n_steps_value->setText(QString::number(warm_n_steps));
+    this->n_plan_steps = warm_n_steps;
+    this->ui->label_warm_n_plan_steps_value->setText(QString::number(warm_n_steps));
 
     this->ui->label_iter_count_plan_value->setText(QString::number(iter));
     this->ui->label_cpu_time_plan_value->setText(QString::number(cpu_time));
@@ -76,7 +76,7 @@ void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, 
 
 }
 
-void WarmStartResultsDialog::setApproachData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars)
+void WarmStartResultsDialog::setApproachData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps)
 {
 
     this->iterations_approach = iter;
@@ -86,6 +86,8 @@ void WarmStartResultsDialog::setApproachData(int iter, double cpu_time, double o
     this->zL_approach = zL;
     this->zU_approach = zU;
     this->dual_approach = dual_vars;
+    this->n_app_steps = warm_n_steps;
+    this->ui->label_warm_n_app_steps_value->setText(QString::number(warm_n_steps));
 
     this->ui->label_iter_count_app_value->setText(QString::number(iter));
     this->ui->label_cpu_time_app_value->setText(QString::number(cpu_time));
@@ -132,7 +134,7 @@ void WarmStartResultsDialog::setApproachData(int iter, double cpu_time, double o
 
 }
 
-void WarmStartResultsDialog::setRetreatData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars)
+void WarmStartResultsDialog::setRetreatData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps)
 {
 
     this->iterations_retreat = iter;
@@ -142,6 +144,8 @@ void WarmStartResultsDialog::setRetreatData(int iter, double cpu_time, double ob
     this->zL_retreat = zL;
     this->zU_retreat = zU;
     this->dual_retreat = dual_vars;
+    this->n_ret_steps = warm_n_steps;
+    this->ui->label_warm_n_ret_steps_value->setText(QString::number(warm_n_steps));
 
     this->ui->label_iter_count_retreat_value->setText(QString::number(iter));
     this->ui->label_cpu_time_retreat_value->setText(QString::number(cpu_time));
@@ -288,7 +292,7 @@ void WarmStartResultsDialog::on_pushButton_save_warm_start_res_clicked()
             stream << "Iterations_plan=" << QString::number(this->iterations_plan).toStdString().c_str() << endl;
             stream << "Cpu_time_plan=" << QString::number(this->cpu_time_plan).toStdString().c_str() << endl;
             stream << "Obj_plan=" << QString::number(this->obj_plan).toStdString().c_str() << endl;
-            stream << "Warm_n_steps=" << QString::number(this->n_steps).toStdString().c_str() << endl;
+            stream << "Warm_n_plan_steps=" << QString::number(this->n_plan_steps).toStdString().c_str() << endl;
 
             stream << "X_plan=";
             for(size_t i=0; i<this->x_plan.size();++i)
@@ -341,6 +345,7 @@ void WarmStartResultsDialog::on_pushButton_save_warm_start_res_clicked()
             stream << "Iterations_approach=" << QString::number(this->iterations_approach).toStdString().c_str() << endl;
             stream << "Cpu_time_approach=" << QString::number(this->cpu_time_approach).toStdString().c_str() << endl;
             stream << "Obj_approach=" << QString::number(this->obj_approach).toStdString().c_str() << endl;
+            stream << "Warm_n_app_steps=" << QString::number(this->n_app_steps).toStdString().c_str() << endl;
 
             stream << "X_approach=";
             for(size_t i=0; i<this->x_approach.size();++i)
@@ -393,6 +398,7 @@ void WarmStartResultsDialog::on_pushButton_save_warm_start_res_clicked()
             stream << "Iterations_retreat=" << QString::number(this->iterations_retreat).toStdString().c_str() << endl;
             stream << "Cpu_time_retreat=" << QString::number(this->cpu_time_retreat).toStdString().c_str() << endl;
             stream << "Obj_retreat=" << QString::number(this->obj_retreat).toStdString().c_str() << endl;
+            stream << "Warm_n_ret_steps=" << QString::number(this->n_ret_steps).toStdString().c_str() << endl;
 
             stream << "X_retreat=";
             for(size_t i=0; i<this->x_retreat.size();++i)

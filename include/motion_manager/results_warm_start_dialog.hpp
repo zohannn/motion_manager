@@ -66,8 +66,9 @@ public:
      * @param zL
      * @param zU
      * @param dual_vars
+     * @param warm_n_steps
      */
-    void setApproachData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars);
+    void setApproachData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps);
 
     /**
      * @brief setRetreatData
@@ -78,8 +79,9 @@ public:
      * @param zL
      * @param zU
      * @param dual_vars
+     * @param warm_n_steps
      */
-    void setRetreatData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars);
+    void setRetreatData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps);
 
     /**
      * @brief setBounceData
@@ -130,7 +132,7 @@ private:
     vector<double> zL_plan; /**< lower bounds multipliers of the plan data */
     vector<double> zU_plan; /**< upper bounds multipliers of the plan data */
     vector<double> dual_plan; /**< constraints multipliers of the plan data */
-    int n_steps; /**< steps in the plan stage */
+    int n_plan_steps; /**< steps in the plan stage */
 
     // approach data
     bool en_approach; /**< true if the approach tab is enabled, false otherwise */
@@ -141,6 +143,7 @@ private:
     vector<double> zL_approach; /**< lower bounds multipliers of the approach data */
     vector<double> zU_approach; /**< upper bounds multipliers of the approach data */
     vector<double> dual_approach; /**< constraints multipliers of the approach data */
+    int n_app_steps; /**< steps in the approach stage */
 
     // retreat data
     bool en_retreat; /**< true if the retreat tab is enabled, false otherwise */
@@ -151,6 +154,7 @@ private:
     vector<double> zL_retreat; /**< lower bounds multipliers of the retreat data */
     vector<double> zU_retreat; /**< upper bounds multipliers of the retreat data */
     vector<double> dual_retreat; /**< constraints multipliers of the retreat data */
+    int n_ret_steps; /**< steps in the retreat stage */
 
     //bounce data
     bool en_bounce; /**< true if the bounce tab is enabled, false otherwise */

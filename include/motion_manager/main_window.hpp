@@ -1032,7 +1032,9 @@ private:
         vector< string > traj_descr_mov; /**< description of the trajectories */
         vector<HUMotion::warm_start_params> final_warm_start_res_mov; /**< warm start results of the target posture selections solved for the movement */
         HUMotion::warm_start_params bounce_warm_start_res_mov; /**< warm start results of the bounce posture selection solved for the movement */
-        int warm_n_steps_mov; /**< number of steps in the plan stage of the planned movement */
+        int warm_n_plan_steps_mov; /**< number of steps in the plan stage of the planned movement */
+        int warm_n_app_steps_mov; /**< number of steps in the approach stage of the planned movement */
+        int warm_n_ret_steps_mov; /**< number of steps in the ret stage of the planned movement */
         vector<double> jointsEndPosition_mov; /**< end joint position of the movement */
         vector<double> jointsEndVelocity_mov; /**< end joint velocity of the movement */
         vector<double> jointsEndAcceleration_mov; /**< end joint acceleration of the movement */

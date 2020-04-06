@@ -1192,6 +1192,57 @@ double Humanoid::getRightHandVelNorm()
     return sqrt(pow(hand_vel.at(0),2)+pow(hand_vel.at(1),2)+pow(hand_vel.at(2),2));
 }
 
+void Humanoid::getRightThumbFingerPositions(vector<double>& pos)
+{
+    // direct kinematics of the right arm
+    std::vector<double> posture;
+    this->getRightArmPosture(posture);
+    directKinematicsSingleArm(1,posture);
+
+#if HAND==0
+
+#elif HAND==1
+    VectorXd pos_vec= this->rightFingers.block<1,9>(2,3);
+#endif
+    pos.resize(pos_vec.size());
+    VectorXd::Map(&pos[0], pos_vec.size()) = pos_vec;
+
+}
+
+void Humanoid::getRightIndexFingerPositions(vector<double>& pos)
+{
+    // direct kinematics of the right arm
+    std::vector<double> posture;
+    this->getRightArmPosture(posture);
+    directKinematicsSingleArm(1,posture);
+
+#if HAND==0
+
+#elif HAND==1
+    VectorXd pos_vec= this->rightFingers.block<1,9>(1,3);
+#endif
+    pos.resize(pos_vec.size());
+    VectorXd::Map(&pos[0], pos_vec.size()) = pos_vec;
+
+}
+
+void Humanoid::getRightMiddleFingerPositions(vector<double>& pos)
+{
+    // direct kinematics of the right arm
+    std::vector<double> posture;
+    this->getRightArmPosture(posture);
+    directKinematicsSingleArm(1,posture);
+
+#if HAND==0
+
+#elif HAND==1
+    VectorXd pos_vec= this->rightFingers.block<1,9>(0,3);
+#endif
+    pos.resize(pos_vec.size());
+    VectorXd::Map(&pos[0], pos_vec.size()) = pos_vec;
+
+}
+
 void Humanoid::getLeftShoulderPos(vector<double> &pos)
 {
 
@@ -1345,6 +1396,57 @@ double Humanoid::getLeftHandVelNorm()
     this->getLeftHandVel(hand_vel);
 
     return sqrt(pow(hand_vel.at(0),2)+pow(hand_vel.at(1),2)+pow(hand_vel.at(2),2));
+}
+
+void Humanoid::getLeftThumbFingerPositions(vector<double>& pos)
+{
+    // direct kinematics of the left arm
+    std::vector<double> posture;
+    this->getLeftArmPosture(posture);
+    directKinematicsSingleArm(2,posture);
+
+#if HAND==0
+
+#elif HAND==1
+    VectorXd pos_vec= this->leftFingers.block<1,9>(2,3);
+#endif
+    pos.resize(pos_vec.size());
+    VectorXd::Map(&pos[0], pos_vec.size()) = pos_vec;
+
+}
+
+void Humanoid::getLeftIndexFingerPositions(vector<double>& pos)
+{
+    // direct kinematics of the left arm
+    std::vector<double> posture;
+    this->getLeftArmPosture(posture);
+    directKinematicsSingleArm(2,posture);
+
+#if HAND==0
+
+#elif HAND==1
+    VectorXd pos_vec= this->leftFingers.block<1,9>(1,3);
+#endif
+    pos.resize(pos_vec.size());
+    VectorXd::Map(&pos[0], pos_vec.size()) = pos_vec;
+
+}
+
+void Humanoid::getLeftMiddleFingerPositions(vector<double>& pos)
+{
+    // direct kinematics of the left arm
+    std::vector<double> posture;
+    this->getRightArmPosture(posture);
+    directKinematicsSingleArm(2,posture);
+
+#if HAND==0
+
+#elif HAND==1
+    VectorXd pos_vec= this->leftFingers.block<1,9>(0,3);
+#endif
+    pos.resize(pos_vec.size());
+    VectorXd::Map(&pos[0], pos_vec.size()) = pos_vec;
+
 }
 
 void Humanoid::getAllPos(int arm, vector<double> &hand_pos, vector<double> &wrist_pos, vector<double> &elbow_pos, vector<double> &shoulder_pos, vector<double> &posture)
@@ -3345,7 +3447,7 @@ void Humanoid::computeRightHandDHparams()
         this->getRightHandPosture(t);
 
         DHparams f;
-        vector<double> fing_pos;
+        //vector<double> fing_pos;
 
 
 #if HAND==0
@@ -3464,9 +3566,9 @@ void Humanoid::computeRightHandDHparams()
         f.theta = vector<double>(4);
 
         // finger positions [mm]
-        fing_pos.push_back(0);
-        fing_pos.push_back(0);
-        fing_pos.push_back(0);
+        //fing_pos.push_back(0);
+        //fing_pos.push_back(0);
+        //fing_pos.push_back(0);
 
         //a [mm]
         f.a.at(0) = (rk.at(i)*(m_barrett_hand_specs.Aw));
@@ -3495,7 +3597,7 @@ void Humanoid::computeRightHandDHparams()
 #endif
 
           m_DH_rightHand.push_back(f);
-          right_fing_pos.push_back(fing_pos);
+          //right_fing_pos.push_back(fing_pos);
 
     }
 
@@ -3512,7 +3614,7 @@ void Humanoid::computeLeftHandDHparams()
     for (int i = 0; i< HAND_FINGERS; ++i){
 
         DHparams f;
-        vector<double> fing_pos;
+        //vector<double> fing_pos;
 
         vector<double> t;
         this->getLeftHandPosture(t);
@@ -3633,9 +3735,9 @@ void Humanoid::computeLeftHandDHparams()
         f.theta = vector<double>(4);
 
         // finger positions [mm]
-        fing_pos.push_back(0);
-        fing_pos.push_back(0);
-        fing_pos.push_back(0);
+        //fing_pos.push_back(0);
+        //fing_pos.push_back(0);
+        //fing_pos.push_back(0);
 
         //a [mm]
         f.a.at(0) = (rk.at(i)*(m_barrett_hand_specs.Aw));
@@ -3663,7 +3765,7 @@ void Humanoid::computeLeftHandDHparams()
 #endif
 
         m_DH_leftHand.push_back(f);
-        left_fing_pos.push_back(fing_pos);
+        //left_fing_pos.push_back(fing_pos);
 
 
     }
@@ -4305,25 +4407,25 @@ void Humanoid::directKinematicsSingleArm(int arm, std::vector<double>& posture)
     this->rightFingers.resize(HAND_FINGERS,12);
     this->leftFingers.resize(HAND_FINGERS,12);
 
-    Matrix4d T_H_0_pos;
-    vector<double> fing_pos;
+    //Matrix4d T_H_0_pos = Matrix4d::Identity();;
+    //vector<double> fing_pos;
 
     for (int i=0; i< HAND_FINGERS; ++i){
         DHparams p = m_DH_hand.at(i);
         switch (arm) {
         case 1: // right arm
-            fing_pos=this->right_fing_pos.at(i);
-            T_H_0_pos(0,3)=fing_pos.at(0);
-            T_H_0_pos(1,3)=fing_pos.at(1);
-            T_H_0_pos(2,3)=fing_pos.at(2);
-            this->directKinematicsFinger(p,T,T_H_0_pos,i,rightFingers);
+            //fing_pos=this->right_fing_pos.at(i);
+            //T_H_0_pos(0,3)=fing_pos.at(0);
+            //T_H_0_pos(1,3)=fing_pos.at(1);
+            //T_H_0_pos(2,3)=fing_pos.at(2);
+            this->directKinematicsFinger(p,T,i,rightFingers);
             break;
         case 2: // left arm
-            fing_pos=this->left_fing_pos.at(i);
-            T_H_0_pos(0,3)=fing_pos.at(0);
-            T_H_0_pos(1,3)=fing_pos.at(1);
-            T_H_0_pos(2,3)=fing_pos.at(2);
-            this->directKinematicsFinger(p,T,T_H_0_pos,i,leftFingers);
+            //fing_pos=this->left_fing_pos.at(i);
+            //T_H_0_pos(0,3)=fing_pos.at(0);
+            //T_H_0_pos(1,3)=fing_pos.at(1);
+            //T_H_0_pos(2,3)=fing_pos.at(2);
+            this->directKinematicsFinger(p,T,i,leftFingers);
             break;
         }
     }
@@ -6531,7 +6633,7 @@ void Humanoid::Rot_matrix_q(Matrix3d &Rot,std::vector<double>& qq)
 }
 
 
-void Humanoid::directKinematicsFinger(DHparams& p, Matrix4d& T_ext, Matrix4d& T_H_0_pos, int id_fing, MatrixXd& Fingers)
+void Humanoid::directKinematicsFinger(DHparams& p, Matrix4d& T_ext, int id_fing, MatrixXd& Fingers)
 {
 
 
@@ -6540,14 +6642,15 @@ void Humanoid::directKinematicsFinger(DHparams& p, Matrix4d& T_ext, Matrix4d& T_
      vector<double> pos = vector<double>(3);
      Matrix4d T_aux;
 
-     for(int i =0; i<T_aux.rows();++i){
-         for(int j=0; j<T_aux.cols();++j){
-             T_aux(i,j)=T_ext(i,j);
-         }
-     }
+     //for(int i =0; i<T_aux.rows();++i){
+       //  for(int j=0; j<T_aux.cols();++j){
+         //    T_aux(i,j)=T_ext(i,j);
+         //}
+     //}
 
-     // translate to the begenning of each finger
-     T_aux = T_aux * T_H_0_pos;
+     // translate to the beginning of each finger
+     //T_aux = T_aux * T_H_0_pos;
+     T_aux = T_ext;// * T_H_0_pos;
 
 #if HAND == 0
      int cnt;

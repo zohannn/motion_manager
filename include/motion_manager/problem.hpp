@@ -152,6 +152,18 @@ public:
      */
     bool setObstacle(objectPtr obs, unsigned pos);
 
+    /**
+     * @brief setInitialRightPosture
+     * @param start_right_posture
+     */
+    void setInitialRightPosture(std::vector<double> &start_right_posture);
+
+    /**
+     * @brief setInitialLeftPosture
+     * @param start_left_posture
+     */
+    void setInitialLeftPosture(std::vector<double> &start_left_posture);
+
 
     /**
      * @brief This method solves the problem given the tolerances and the parameters of the planner HUMP
@@ -306,6 +318,10 @@ private:
     std::vector<double> move_target_left;/**< goal target pose of the left end-effector in move movements */
     bool use_posture_right;/**< true to use the move_final_arm, false to use move_target in move movements (right) */
     bool use_posture_left;/**< true to use the move_final_arm, false to use move_target in move movements (left) */
+
+    // initial configurations of the robot
+    std::vector<double> initPosture_right; /**< initial posture of the right arm+hand */
+    std::vector<double> initPosture_left; /**< initial posture of the left arm+hand */
 
 #if MOVEIT==1
     moveit_plannerPtr m_planner; /**< MoveIt! Libraries planner */

@@ -3501,7 +3501,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 
              }else{
 
-                 qnode.log(QNode::Error,std::string("Assembly scenario: the Toy vehicle with Jarde HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                 qnode.log(QNode::Error,std::string("Assembly scenario: the Toy vehicle with Jarde HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                  ui.groupBox_getElements->setEnabled(false);
                  ui.groupBox_homePosture->setEnabled(false);
                  ui.pushButton_loadScenario->setEnabled(true);
@@ -3526,7 +3526,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 #endif
 
                  }else{
-                     qnode.log(QNode::Error,std::string("Assembly scenario: the Toy vehicle with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Assembly scenario: the Toy vehicle with ARoS HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3554,7 +3554,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 #endif
 
                  }else{
-                     qnode.log(QNode::Error,std::string("Empty scenario: empty scenario with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Empty scenario: empty scenario with ARoS HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3580,7 +3580,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 #endif
 
                  }else{
-                     qnode.log(QNode::Error,std::string("Empty scenario: empty scenario with ARoS and NO collisions HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Empty scenario: empty scenario with ARoS and NO collisions HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3604,7 +3604,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 #endif
                  }else{
-                     qnode.log(QNode::Error,std::string("Human assistance scenario: Serving a drink with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Human assistance scenario: Serving a drink with ARoS HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3628,7 +3628,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 #endif
                  }else{
-                     qnode.log(QNode::Error,std::string("Challenging scenario: picking a cup from a shelf with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Challenging scenario: picking a cup from a shelf with ARoS HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3653,7 +3653,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 #endif
                  }else{
-                     qnode.log(QNode::Error,std::string("Assembly scenario: swap two columns of the toy vehicle HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Assembly scenario: swap two columns of the toy vehicle HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3678,7 +3678,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 #endif
                  }else{
-                     qnode.log(QNode::Error,std::string("Human assistance scenario: Moving a tray with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Human assistance scenario: Moving a tray with ARoS HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3703,7 +3703,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 #endif
                  }else{
-                     qnode.log(QNode::Error,std::string("Natural obstacle avoidance with ARoS HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Natural obstacle avoidance with ARoS HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3728,7 +3728,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 #endif
                  }else{
-                     qnode.log(QNode::Error,std::string("Learning tasks: reaching with one obstacle HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Learning tasks: reaching with one obstacle HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3752,7 +3752,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 #endif
                  }else{
-                     qnode.log(QNode::Error,std::string("Learning tasks: reaching with many obstacles HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Learning tasks: reaching with many obstacles HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3776,7 +3776,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 #endif
                  }else{
-                     qnode.log(QNode::Error,std::string("Learning tasks: picking the blue column HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Learning tasks: picking the blue column HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3800,7 +3800,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 #endif
                  }else{
-                     qnode.log(QNode::Error,std::string("Controlling: scenario without objects HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Controlling: scenario without objects HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3824,7 +3824,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 #endif
                  }else{
-                     qnode.log(QNode::Error,std::string("Controlling: scenario with no obstacles for showing the effects of singularities HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Controlling: scenario with no obstacles for showing the effects of singularities HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3848,7 +3848,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 #endif
                  }else{
-                     qnode.log(QNode::Error,std::string("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3873,7 +3873,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 #endif
                  }else{
-                     qnode.log(QNode::Error,std::string("Controlling: pick a red column HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Controlling: pick a red column HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -3898,7 +3898,7 @@ void MainWindow::on_pushButton_loadScenario_clicked()
                      //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
 #endif
                  }else{
-                     qnode.log(QNode::Error,std::string("Controlling: follow a moving red column HAS NOT BEEN LOADED. You probaly have to stop the simulation"));
+                     qnode.log(QNode::Error,std::string("Controlling: follow a moving red column HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -4289,6 +4289,9 @@ void MainWindow::on_pushButton_plan_clicked()
     problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
     int planner_id = prob->getPlannerID();
     int arm_sel = prob->getMovement()->getArm();
+    // start configuration of the robot
+    std::vector<double> r_posture; curr_scene->getHumanoid()->getRightPosture(r_posture); prob->setInitialRightPosture(r_posture);
+    std::vector<double> l_posture; curr_scene->getHumanoid()->getLeftPosture(l_posture); prob->setInitialLeftPosture(l_posture);
 
     std::vector<double> move_target;
     std::vector<double> move_final_hand;
@@ -4432,9 +4435,12 @@ void MainWindow::on_pushButton_plan_clicked()
                         timesteps_stage_aux.clear();
                         double t_stage = h_results->time_steps.at(i);
                         MatrixXd traj_stage = h_results->trajectory_stages.at(i);
-                        if(i==0){
-                            // plan stage
-                            this->warm_n_steps_mov = traj_stage.rows()-1;
+                        if(this->traj_descr_mov.at(i).compare("plan")==0){
+                            this->warm_n_plan_steps_mov = traj_stage.rows()-1;
+                        }else if(this->traj_descr_mov.at(i).compare("approach")==0){
+                            this->warm_n_app_steps_mov = traj_stage.rows()-1;
+                        }else if(this->traj_descr_mov.at(i).compare("retreat")==0){
+                            this->warm_n_ret_steps_mov = traj_stage.rows()-1;
                         }
                         for(int j=0;j<traj_stage.rows();++j){
                             if(j==traj_stage.rows()-1){
@@ -4459,7 +4465,7 @@ void MainWindow::on_pushButton_plan_clicked()
             // make a copy of the human-like parameters for controlling
             this->tols_ctrl = this->tols;
             this->tols_ctrl.mov_specs.warm_start = true;
-            this->tols_ctrl.mov_specs.warm_n_steps = this->warm_n_steps_mov;
+            this->tols_ctrl.mov_specs.warm_n_steps = this->warm_n_plan_steps_mov;
             this->tols_ctrl.mov_specs.final_warm_start_params = this->final_warm_start_res_mov;
             this->tols_ctrl.mov_specs.bounce_warm_start_params = this->bounce_warm_start_res_mov;
 
@@ -7950,15 +7956,15 @@ void MainWindow::on_pushButton_warm_start_res_clicked()
         {
             this->mWarmdlg->enablePlanData(true);
             HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(1);
-            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_steps_mov);
+            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
 
             this->mWarmdlg->enableApproachData(true);
             HUMotion::warm_start_params approach_tar = this->final_warm_start_res_mov.at(0);
-            this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars);
+            this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars,this->warm_n_app_steps_mov);
 
             this->mWarmdlg->enableRetreatData(true);
             HUMotion::warm_start_params retreat_tar = this->final_warm_start_res_mov.at(2);
-            this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars);
+            this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars,this->warm_n_ret_steps_mov);
 
         }else if(this->final_warm_start_res_mov.size()==2){
 
@@ -7966,27 +7972,27 @@ void MainWindow::on_pushButton_warm_start_res_clicked()
             {
                 this->mWarmdlg->enableApproachData(true);
                 HUMotion::warm_start_params approach_tar = this->final_warm_start_res_mov.at(0);
-                this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars);
+                this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars,this->warm_n_app_steps_mov);
 
                 this->mWarmdlg->enablePlanData(true);
                 HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(1);
-                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_steps_mov);
+                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
 
             }else{
 
                 this->mWarmdlg->enablePlanData(true);
                 HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(0);
-                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_steps_mov);
+                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
 
                 this->mWarmdlg->enableRetreatData(true);
                 HUMotion::warm_start_params retreat_tar = this->final_warm_start_res_mov.at(1);
-                this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars);
+                this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars,this->warm_n_ret_steps_mov);
 
             }
         }else{
             this->mWarmdlg->enablePlanData(true);
             HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(0);
-            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_steps_mov);
+            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
         }
     }
 
@@ -9074,6 +9080,9 @@ void MainWindow::on_pushButton_plan_collect_clicked()
 {
     problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
     int planner_id = prob->getPlannerID();
+    std::vector<double> start_r_posture; curr_scene->getHumanoid()->getRightPosture(start_r_posture);
+    std::vector<double> max_r_posture; curr_scene->getHumanoid()->getRightMaxLimits(max_r_posture);
+    std::vector<double> min_r_posture; curr_scene->getHumanoid()->getRightMinLimits(min_r_posture);
     int arm_sel = prob->getMovement()->getArm();
     int mov_type = prob->getMovement()->getType();
     string collect_dir = this->ui.lineEdit_collections->text().toStdString();
@@ -9169,6 +9178,9 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                 double obsts_pitch_var = ui.lineEdit_obsts_pitch_var->text().toDouble();
                 double obsts_yaw_var = ui.lineEdit_obsts_yaw_var->text().toDouble();
                 std::vector<objectPtr> obsts; prob->getObstacles(obsts);     // get the obstacles of the scenario
+                // Maximum variations of the robot configuration
+                double arm_pos_var = ui.lineEdit_arm_pos_var->text().toDouble()*DEGTORAD;
+                double hand_pos_var = ui.lineEdit_hand_pos_var->text().toDouble()*DEGTORAD;
 
                 bool solved = false;
                 // csv
@@ -9369,6 +9381,27 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                 prob->setObstacle(obs_new,j);
                             }// for loop obstacles
 
+                            // modify the start configuration
+                            std::vector<double> r_posture = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+                            double tmp;
+                            for(size_t p=0;p<start_r_posture.size();++p){
+                                if(p<JOINTS_ARM){
+                                    tmp = start_r_posture.at(p) - (arm_pos_var/2) + arm_pos_var*(rand() / double(RAND_MAX));
+                                }else{
+                                    tmp = start_r_posture.at(p) - (hand_pos_var/2) + hand_pos_var*(rand() / double(RAND_MAX));
+                                }
+                                // check joints limits
+                                if(tmp > max_r_posture.at(p)){
+                                    r_posture.at(p) = max_r_posture.at(p);
+                                }else if(tmp < min_r_posture.at(p)){
+                                    r_posture.at(p) = min_r_posture.at(p);
+                                }else{
+                                    r_posture.at(p) = tmp;
+                                }
+                            }
+                            prob->setInitialRightPosture(r_posture);
+                            curr_scene->getHumanoid()->setRightPosture(r_posture);
+
                             // plan the movement
                             h_results_tmp = prob->solve(tols);
                             if(h_results_tmp!=nullptr){
@@ -9379,6 +9412,29 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                     {
                                         qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
                                         solved=true;
+
+                                        // arm points
+                                        std::vector<double> r_e_pos; curr_scene->getHumanoid()->getRightElbowPos(r_e_pos);
+                                        std::vector<double> r_w_pos; curr_scene->getHumanoid()->getRightWristPos(r_w_pos);
+                                        std::vector<double> r_h_pos; curr_scene->getHumanoid()->getRightHandPos(r_h_pos);
+                                        // hand points
+                                        // thumb
+                                        std::vector<double> r_thumb_pos; curr_scene->getHumanoid()->getRightThumbFingerPositions(r_thumb_pos);
+                                        std::vector<double> r_thumb_pos_1(3); std::copy(r_thumb_pos.begin(), r_thumb_pos.begin()+3, r_thumb_pos_1.begin());
+                                        std::vector<double> r_thumb_pos_2(3); std::copy(r_thumb_pos.begin()+3, r_thumb_pos.begin()+6, r_thumb_pos_2.begin());
+                                        std::vector<double> r_thumb_pos_tip(3); std::copy(r_thumb_pos.begin()+6, r_thumb_pos.begin()+9, r_thumb_pos_tip.begin());
+                                        // index
+                                        std::vector<double> r_index_pos; curr_scene->getHumanoid()->getRightIndexFingerPositions(r_index_pos);
+                                        std::vector<double> r_index_pos_1(3); std::copy(r_index_pos.begin(), r_index_pos.begin()+3, r_index_pos_1.begin());
+                                        std::vector<double> r_index_pos_2(3); std::copy(r_index_pos.begin()+3, r_index_pos.begin()+6, r_index_pos_2.begin());
+                                        std::vector<double> r_index_pos_tip(3); std::copy(r_index_pos.begin()+6, r_index_pos.begin()+9, r_index_pos_tip.begin());
+                                        //middle
+                                        std::vector<double> r_middle_pos; curr_scene->getHumanoid()->getRightMiddleFingerPositions(r_middle_pos);
+                                        std::vector<double> r_middle_pos_1(3); std::copy(r_middle_pos.begin(), r_middle_pos.begin()+3, r_middle_pos_1.begin());
+                                        std::vector<double> r_middle_pos_2(3); std::copy(r_middle_pos.begin()+3, r_middle_pos.begin()+6, r_middle_pos_2.begin());
+                                        std::vector<double> r_middle_pos_tip(3); std::copy(r_middle_pos.begin()+6, r_middle_pos.begin()+9, r_middle_pos_tip.begin());
+
+
                                         // target
                                         if(mov_type==0){ // reach-to-grasp movement
                                             objectPtr obj_tar = prob->getMovement()->getObject();
@@ -9586,6 +9642,7 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                     data_csv.close();
                 }
                 ui.pushButton_plan_collect->setCheckable(true);
+                curr_scene->getHumanoid()->setRightPosture(start_r_posture);
                 qnode.log(QNode::Info,std::string("Planning and collecting ended"));
             }
             break;
@@ -13314,9 +13371,12 @@ void MainWindow::updatePlanningResults(problemPtr prob, HUMotion::planning_resul
         timesteps_stage_aux.clear();
         double t_stage = results->time_steps.at(i);
         MatrixXd traj_stage = results->trajectory_stages.at(i);
-        if(i==0){
-            // plan stage
-            this->warm_n_steps_mov = traj_stage.rows()-1;
+        if(this->traj_descr_mov.at(i).compare("plan")==0){
+            this->warm_n_plan_steps_mov = traj_stage.rows()-1;
+        }else if(this->traj_descr_mov.at(i).compare("approach")==0){
+            this->warm_n_app_steps_mov = traj_stage.rows()-1;
+        }else if(this->traj_descr_mov.at(i).compare("retreat")==0){
+            this->warm_n_ret_steps_mov = traj_stage.rows()-1;
         }
         for(int j=0;j<traj_stage.rows();++j){
             if(j==traj_stage.rows()-1){
@@ -13332,7 +13392,7 @@ void MainWindow::updatePlanningResults(problemPtr prob, HUMotion::planning_resul
     // make a copy of the human-like parameters for controlling
     this->tols_ctrl = this->tols;
     this->tols_ctrl.mov_specs.warm_start = true;
-    this->tols_ctrl.mov_specs.warm_n_steps = this->warm_n_steps_mov;
+    this->tols_ctrl.mov_specs.warm_n_steps = this->warm_n_plan_steps_mov;
     this->tols_ctrl.mov_specs.final_warm_start_params = this->final_warm_start_res_mov;
     this->tols_ctrl.mov_specs.bounce_warm_start_params = this->bounce_warm_start_res_mov;
 
