@@ -29,12 +29,58 @@
     <attribute name="title">
      <string>Plan target posture results</string>
     </attribute>
+    <widget class="QTableWidget" name="tableWidget_init_guess_plan">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>20</y>
+       <width>500</width>
+       <height>500</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="tableWidget_dual_vars_plan">
+     <property name="geometry">
+      <rect>
+       <x>700</x>
+       <y>20</y>
+       <width>400</width>
+       <height>520</height>
+      </rect>
+     </property>
+    </widget>
     <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>30</x>
+       <y>530</y>
+       <width>261</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_17">
+      <item>
+       <widget class="QLabel" name="label_warm_n_plan_steps">
+        <property name="text">
+         <string>Number of steps in the plan stage: </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_warm_n_plan_steps_value">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>11</x>
        <y>570</y>
-       <width>1051</width>
+       <width>1091</width>
        <height>19</height>
       </rect>
      </property>
@@ -93,19 +139,32 @@
         </item>
        </layout>
       </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_20">
+        <item>
+         <widget class="QLabel" name="label_error_plan">
+          <property name="text">
+           <string>Overall error value:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_error_plan_value">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
      </layout>
     </widget>
-    <widget class="QTableWidget" name="tableWidget_init_guess_plan">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>20</y>
-       <width>500</width>
-       <height>500</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="tableWidget_dual_vars_plan">
+   </widget>
+   <widget class="QWidget" name="tab_approach">
+    <attribute name="title">
+     <string>Approach target posture results</string>
+    </attribute>
+    <widget class="QTableWidget" name="tableWidget_dual_vars_app">
      <property name="geometry">
       <rect>
        <x>700</x>
@@ -115,25 +174,35 @@
       </rect>
      </property>
     </widget>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QTableWidget" name="tableWidget_init_guess_app">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>20</y>
+       <width>500</width>
+       <height>500</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QWidget" name="layoutWidget_4">
      <property name="geometry">
       <rect>
        <x>30</x>
        <y>530</y>
-       <width>391</width>
+       <width>281</width>
        <height>31</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_17">
+     <layout class="QHBoxLayout" name="horizontalLayout_18">
       <item>
-       <widget class="QLabel" name="label_warm_n_plan_steps">
+       <widget class="QLabel" name="label_warm_n_app_steps">
         <property name="text">
-         <string>Number of steps in the plan stage: </string>
+         <string>Number of steps in the approach stage: </string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_warm_n_plan_steps_value">
+       <widget class="QLabel" name="label_warm_n_app_steps_value">
         <property name="text">
          <string/>
         </property>
@@ -141,21 +210,16 @@
       </item>
      </layout>
     </widget>
-   </widget>
-   <widget class="QWidget" name="tab_approach">
-    <attribute name="title">
-     <string>Approach target posture results</string>
-    </attribute>
-    <widget class="QWidget" name="layoutWidget">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>11</x>
        <y>570</y>
-       <width>1051</width>
+       <width>1091</width>
        <height>19</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <layout class="QHBoxLayout" name="horizontalLayout_21">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
@@ -210,9 +274,32 @@
         </item>
        </layout>
       </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_error_app">
+          <property name="text">
+           <string>Overall error value:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_error_app_value">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
      </layout>
     </widget>
-    <widget class="QTableWidget" name="tableWidget_dual_vars_app">
+   </widget>
+   <widget class="QWidget" name="tab_retreat">
+    <attribute name="title">
+     <string>Retreat target posture results</string>
+    </attribute>
+    <widget class="QTableWidget" name="tableWidget_dual_vars_retreat">
      <property name="geometry">
       <rect>
        <x>700</x>
@@ -222,7 +309,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QTableWidget" name="tableWidget_init_guess_app">
+    <widget class="QTableWidget" name="tableWidget_init_guess_retreat">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -232,25 +319,25 @@
       </rect>
      </property>
     </widget>
-    <widget class="QWidget" name="layoutWidget_4">
+    <widget class="QWidget" name="layoutWidget_5">
      <property name="geometry">
       <rect>
        <x>30</x>
        <y>530</y>
-       <width>391</width>
+       <width>271</width>
        <height>31</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_18">
+     <layout class="QHBoxLayout" name="horizontalLayout_19">
       <item>
-       <widget class="QLabel" name="label_warm_n_app_steps">
+       <widget class="QLabel" name="label_warm_n_ret_steps">
         <property name="text">
-         <string>Number of steps in the approach stage: </string>
+         <string>Number of steps in the retreat stage: </string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_warm_n_app_steps_value">
+       <widget class="QLabel" name="label_warm_n_ret_steps_value">
         <property name="text">
          <string/>
         </property>
@@ -258,21 +345,16 @@
       </item>
      </layout>
     </widget>
-   </widget>
-   <widget class="QWidget" name="tab_retreat">
-    <attribute name="title">
-     <string>Retreat target posture results</string>
-    </attribute>
-    <widget class="QWidget" name="layoutWidget_2">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>11</x>
        <y>570</y>
-       <width>1051</width>
+       <width>1091</width>
        <height>19</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <layout class="QHBoxLayout" name="horizontalLayout_22">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>
@@ -327,9 +409,32 @@
         </item>
        </layout>
       </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QLabel" name="label_error_retreat">
+          <property name="text">
+           <string>Overall error value:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_error_retreat_value">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
      </layout>
     </widget>
-    <widget class="QTableWidget" name="tableWidget_dual_vars_retreat">
+   </widget>
+   <widget class="QWidget" name="tab_bounce">
+    <attribute name="title">
+     <string>Bounce posture results</string>
+    </attribute>
+    <widget class="QTableWidget" name="tableWidget_dual_vars_bounce">
      <property name="geometry">
       <rect>
        <x>700</x>
@@ -339,7 +444,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QTableWidget" name="tableWidget_init_guess_retreat">
+    <widget class="QTableWidget" name="tableWidget_init_guess_bounce">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -349,47 +454,16 @@
       </rect>
      </property>
     </widget>
-    <widget class="QWidget" name="layoutWidget_5">
+    <widget class="QWidget" name="">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>530</y>
-       <width>391</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_19">
-      <item>
-       <widget class="QLabel" name="label_warm_n_ret_steps">
-        <property name="text">
-         <string>Number of steps in the retreat stage: </string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_warm_n_ret_steps_value">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="tab_bounce">
-    <attribute name="title">
-     <string>Bounce posture results</string>
-    </attribute>
-    <widget class="QWidget" name="layoutWidget_3">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>570</y>
-       <width>1051</width>
+       <x>11</x>
+       <y>571</y>
+       <width>1091</width>
        <height>19</height>
       </rect>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_13">
+     <layout class="QHBoxLayout" name="horizontalLayout_23">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_14">
         <item>
@@ -444,27 +518,25 @@
         </item>
        </layout>
       </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <item>
+         <widget class="QLabel" name="label_error_bounce">
+          <property name="text">
+           <string>Overall error value:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_error_bounce_value">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
      </layout>
-    </widget>
-    <widget class="QTableWidget" name="tableWidget_dual_vars_bounce">
-     <property name="geometry">
-      <rect>
-       <x>700</x>
-       <y>20</y>
-       <width>400</width>
-       <height>520</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="tableWidget_init_guess_bounce">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>20</y>
-       <width>500</width>
-       <height>500</height>
-      </rect>
-     </property>
     </widget>
    </widget>
   </widget>

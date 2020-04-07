@@ -16,6 +16,10 @@ TolDialogHUMP::TolDialogHUMP(QWidget *parent) :
      QObject::connect(ui->checkBox_sel_final_posture, SIGNAL(stateChanged(int)), this, SLOT(checkFinalPosture(int)));
      QObject::connect(ui->checkBox_add_plane, SIGNAL(stateChanged(int)), this, SLOT(checkAddPlane(int)));
      QObject::connect(ui->checkBox_warm_start, SIGNAL(stateChanged(int)), this, SLOT(checkWarmStart(int)));
+     QObject::connect(ui->checkBox_max_iter_plan, SIGNAL(stateChanged(int)), this, SLOT(checkMaxIterPlan(int)));
+     QObject::connect(ui->checkBox_max_iter_app, SIGNAL(stateChanged(int)), this, SLOT(checkMaxIterApp(int)));
+     QObject::connect(ui->checkBox_max_iter_ret, SIGNAL(stateChanged(int)), this, SLOT(checkMaxIterRet(int)));
+     QObject::connect(ui->checkBox_max_iter_bounce, SIGNAL(stateChanged(int)), this, SLOT(checkMaxIterBounce(int)));
      //QObject::connect(ui->checkBox_hand_cond, SIGNAL(stateChanged(int)), this, SLOT(checkHandCond(int)));
      //QObject::connect(ui->checkBox_hand_cond_approach, SIGNAL(stateChanged(int)), this, SLOT(checkHandCondApproach(int)));
 
@@ -41,6 +45,38 @@ TolDialogHUMP::TolDialogHUMP(QWidget *parent) :
     this->warm_start_approach = false;
     this->warm_start_retreat = false;
     this->warm_start_bounce = false;
+
+    if(ui->checkBox_max_iter_plan->isChecked()){
+        this->set_max_iter_plan = true;
+        ui->lineEdit_max_iter_plan->setEnabled(true);
+    }else{
+        this->set_max_iter_plan = false;
+        ui->lineEdit_max_iter_plan->setEnabled(false);
+    }
+
+    if(ui->checkBox_max_iter_app->isChecked()){
+        this->set_max_iter_app = true;
+        ui->lineEdit_max_iter_app->setEnabled(true);
+    }else{
+        this->set_max_iter_app = false;
+        ui->lineEdit_max_iter_app->setEnabled(false);
+    }
+
+    if(ui->checkBox_max_iter_ret->isChecked()){
+        this->set_max_iter_ret = true;
+        ui->lineEdit_max_iter_ret->setEnabled(true);
+    }else{
+        this->set_max_iter_ret = false;
+        ui->lineEdit_max_iter_ret->setEnabled(false);
+    }
+
+    if(ui->checkBox_max_iter_bounce->isChecked()){
+        this->set_max_iter_bounce = true;
+        ui->lineEdit_max_iter_bounce->setEnabled(true);
+    }else{
+        this->set_max_iter_bounce = false;
+        ui->lineEdit_max_iter_bounce->setEnabled(false);
+    }
 }
 
 TolDialogHUMP::~TolDialogHUMP()
@@ -136,6 +172,12 @@ void TolDialogHUMP::setWMax(double w)
 {
 
     ui->lineEdit_w_max->setText(QString::number(w));
+}
+
+void TolDialogHUMP::setAlphaMax(double a)
+{
+
+    ui->lineEdit_alpha_max->setText(QString::number(a));
 }
 
 
@@ -701,6 +743,15 @@ void TolDialogHUMP::on_pushButton_save_clicked()
        if(ui->checkBox_coll_body->isChecked()){stream << "coll_body=false"<<endl;}else{stream << "coll_body=true"<<endl;}
        if(ui->checkBox_straight_line->isChecked()){stream << "straight_line=true"<<endl;}else{stream << "straight_line=false"<<endl;}
        if(ui->checkBox_warm_start->isChecked()){stream << "warm_start=true"<<endl;}else{stream << "warm_start=false"<<endl;}
+       if(ui->checkBox_max_iter_plan->isChecked()){stream << "set_max_iter_plan=true"<<endl;}else{stream << "set_max_iter_plan=false"<<endl;}
+       if(ui->checkBox_max_iter_app->isChecked()){stream << "set_max_iter_app=true"<<endl;}else{stream << "set_max_iter_app=false"<<endl;}
+       if(ui->checkBox_max_iter_ret->isChecked()){stream << "set_max_iter_ret=true"<<endl;}else{stream << "set_max_iter_ret=false"<<endl;}
+       if(ui->checkBox_max_iter_bounce->isChecked()){stream << "set_max_iter_bounce=true"<<endl;}else{stream << "set_max_iter_bounce=false"<<endl;}
+       stream << "max_iter_plan=" << ui->lineEdit_max_iter_plan->text().toStdString().c_str() << endl;
+       stream << "max_iter_app=" << ui->lineEdit_max_iter_app->text().toStdString().c_str() << endl;
+       stream << "max_iter_ret=" << ui->lineEdit_max_iter_ret->text().toStdString().c_str() << endl;
+       stream << "max_iter_bounce=" << ui->lineEdit_max_iter_bounce->text().toStdString().c_str() << endl;
+
        //stream << "# END" << endl;
 
 
@@ -745,9 +796,15 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
                     QStringList data = fields.at(1).split("|");
                     for (size_t i=0; i<data.size();++i)
                         x_plan.push_back(data.at(i).toDouble());
-                }else if (QString::compare(fields.at(0),QString("Warm_n_steps"),Qt::CaseInsensitive)==0){
+                }else if (QString::compare(fields.at(0),QString("Warm_n_plan_steps"),Qt::CaseInsensitive)==0){
                     QString data = fields.at(1);
-                    this->warm_n_steps = data.toDouble();
+                    this->warm_n_steps_plan = data.toDouble();
+                }else if (QString::compare(fields.at(0),QString("Warm_n_app_steps"),Qt::CaseInsensitive)==0){
+                    QString data = fields.at(1);
+                    this->warm_n_steps_approach = data.toDouble();
+                }else if (QString::compare(fields.at(0),QString("Warm_n_ret_steps"),Qt::CaseInsensitive)==0){
+                    QString data = fields.at(1);
+                    this->warm_n_steps_retreat = data.toDouble();
                 }else if (QString::compare(fields.at(0),QString("ZL_plan"),Qt::CaseInsensitive)==0){
                     QStringList data = fields.at(1).split("|");
                     for (size_t i=0; i<data.size();++i)
@@ -827,7 +884,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
     QStringList v_dual_headers;
 
     // ----------- display the plan data ----------------------- //
-    this->ui->label_warm_n_steps_value->setText(QString::number(this->warm_n_steps));
+    this->ui->label_warm_n_steps_plan_value->setText(QString::number(this->warm_n_steps_plan));
     this->ui->tableWidget_init_guess_plan->clear();
     this->ui->tableWidget_dual_vars_plan->clear();
 
@@ -867,6 +924,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
 
 
     // ----------- display the approach data ----------------------- //
+    this->ui->label_warm_n_steps_app_value->setText(QString::number(this->warm_n_steps_approach));
     this->ui->tableWidget_init_guess_approach->clear();
     this->ui->tableWidget_dual_vars_approach->clear();
 
@@ -905,6 +963,7 @@ void TolDialogHUMP::on_pushButton_load_warm_start_settings_clicked()
     this->ui->tableWidget_dual_vars_approach->setVerticalHeaderLabels(v_dual_headers);
 
     // ----------- display the retreat data ----------------------- //
+    this->ui->label_warm_n_steps_ret_value->setText(QString::number(this->warm_n_steps_retreat));
     this->ui->tableWidget_init_guess_retreat->clear();
     this->ui->tableWidget_dual_vars_retreat->clear();
 
@@ -1432,6 +1491,42 @@ void TolDialogHUMP::on_pushButton_load_clicked()
                         ui->checkBox_warm_start->setChecked(true);
                     }
 
+                }else if(QString::compare(fields.at(0),QString("set_max_iter_plan"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_max_iter_plan->setChecked(false);
+                    }else{
+                        ui->checkBox_max_iter_plan->setChecked(true);
+                    }
+                }else if(QString::compare(fields.at(0),QString("set_max_iter_app"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_max_iter_app->setChecked(false);
+                    }else{
+                        ui->checkBox_max_iter_app->setChecked(true);
+                    }
+                }else if(QString::compare(fields.at(0),QString("set_max_iter_ret"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_max_iter_ret->setChecked(false);
+                    }else{
+                        ui->checkBox_max_iter_ret->setChecked(true);
+                    }
+                }else if(QString::compare(fields.at(0),QString("set_max_iter_bounce"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_max_iter_bounce->setChecked(false);
+                    }else{
+                        ui->checkBox_max_iter_bounce->setChecked(true);
+                    }
+                }else if(QString::compare(fields.at(0),QString("max_iter_plan"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_max_iter_plan->setText(fields.at(1));
+                    this->max_iter_plan = ui->lineEdit_max_iter_plan->text().toDouble();
+                }else if(QString::compare(fields.at(0),QString("max_iter_app"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_max_iter_app->setText(fields.at(1));
+                    this->max_iter_app = ui->lineEdit_max_iter_app->text().toDouble();
+                }else if(QString::compare(fields.at(0),QString("max_iter_ret"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_max_iter_ret->setText(fields.at(1));
+                    this->max_iter_ret = ui->lineEdit_max_iter_ret->text().toDouble();
+                }else if(QString::compare(fields.at(0),QString("max_iter_bounce"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_max_iter_bounce->setText(fields.at(1));
+                    this->max_iter_bounce = ui->lineEdit_max_iter_bounce->text().toDouble();
                 }
 
             }
@@ -1510,6 +1605,58 @@ void TolDialogHUMP::checkWarmStart(int state)
         warm_start = true;
         ui->tab_hump_warm->setEnabled(true);
         //ui->tabWidget->setTabEnabled(4,true);
+    }
+}
+
+void TolDialogHUMP::checkMaxIterPlan(int state)
+{
+    if(state==0){
+        //unchecked
+        set_max_iter_plan = false;
+        ui->lineEdit_max_iter_plan->setEnabled(false);
+    }else{
+        //checked
+        set_max_iter_plan = true;
+        ui->lineEdit_max_iter_plan->setEnabled(true);
+    }
+}
+
+void TolDialogHUMP::checkMaxIterApp(int state)
+{
+    if(state==0){
+        //unchecked
+        set_max_iter_app = false;
+        ui->lineEdit_max_iter_app->setEnabled(false);
+    }else{
+        //checked
+        set_max_iter_app = true;
+        ui->lineEdit_max_iter_app->setEnabled(true);
+    }
+}
+
+void TolDialogHUMP::checkMaxIterRet(int state)
+{
+    if(state==0){
+        //unchecked
+        set_max_iter_ret = false;
+        ui->lineEdit_max_iter_ret->setEnabled(false);
+    }else{
+        //checked
+        set_max_iter_ret = true;
+        ui->lineEdit_max_iter_ret->setEnabled(true);
+    }
+}
+
+void TolDialogHUMP::checkMaxIterBounce(int state)
+{
+    if(state==0){
+        //unchecked
+        set_max_iter_bounce = false;
+        ui->lineEdit_max_iter_bounce->setEnabled(false);
+    }else{
+        //checked
+        set_max_iter_bounce = true;
+        ui->lineEdit_max_iter_bounce->setEnabled(true);
     }
 }
 
@@ -1655,23 +1802,25 @@ void TolDialogHUMP::getPlanData(vector<double> &x, vector<double> &zL, vector<do
     zL = this->zL_plan;
     zU = this->zU_plan;
     dual = this->dual_plan;
-    steps = this->warm_n_steps;
+    steps = this->warm_n_steps_plan;
 }
 
-void TolDialogHUMP::getApproachData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual)
+void TolDialogHUMP::getApproachData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual, int &steps)
 {
     x = this->x_approach;
     zL = this->zL_approach;
     zU = this->zU_approach;
     dual = this->dual_approach;
+    steps = this->warm_n_steps_approach;
 }
 
-void TolDialogHUMP::getRetreatData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual)
+void TolDialogHUMP::getRetreatData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual, int &steps)
 {
     x = this->x_retreat;
     zL = this->zL_retreat;
     zU = this->zU_retreat;
     dual = this->dual_retreat;
+    steps = this->warm_n_steps_retreat;
 }
 
 void TolDialogHUMP::getBounceData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual)
@@ -1680,6 +1829,46 @@ void TolDialogHUMP::getBounceData(vector<double> &x,vector<double> &zL,vector<do
     zL = this->zL_bounce;
     zU = this->zU_bounce;
     dual = this->dual_bounce;
+}
+
+bool TolDialogHUMP::getMaxIterPlanOption()
+{
+    return this->set_max_iter_plan;
+}
+
+bool TolDialogHUMP::getMaxIterAppOption()
+{
+    return this->set_max_iter_app;
+}
+
+bool TolDialogHUMP::getMaxIterRetOption()
+{
+    return this->set_max_iter_ret;
+}
+
+bool TolDialogHUMP::getMaxIterBounceOption()
+{
+    return this->set_max_iter_bounce;
+}
+
+int TolDialogHUMP::getMaxIterPlan()
+{
+    return this->max_iter_plan;
+}
+
+int TolDialogHUMP::getMaxIterApp()
+{
+    return this->max_iter_app;
+}
+
+int TolDialogHUMP::getMaxIterRet()
+{
+    return this->max_iter_ret;
+}
+
+int TolDialogHUMP::getMaxIterBounce()
+{
+    return this->max_iter_bounce;
 }
 
 

@@ -18,12 +18,13 @@ WarmStartResultsDialog::~WarmStartResultsDialog()
 
 
 
-void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps)
+void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps)
 {
 
     this->iterations_plan = iter;
     this->cpu_time_plan = cpu_time;
     this->obj_plan = obj;
+    this->error_plan = overall_error;
     this->x_plan = x;
     this->zL_plan = zL;
     this->zU_plan = zU;
@@ -34,6 +35,7 @@ void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, 
     this->ui->label_iter_count_plan_value->setText(QString::number(iter));
     this->ui->label_cpu_time_plan_value->setText(QString::number(cpu_time));
     this->ui->label_obj_func_plan_value->setText(QString::number(obj));
+    this->ui->label_error_plan_value->setText(QString::number(overall_error));
 
     this->ui->tableWidget_init_guess_plan->clear();
     this->ui->tableWidget_dual_vars_plan->clear();
@@ -76,12 +78,13 @@ void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, 
 
 }
 
-void WarmStartResultsDialog::setApproachData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps)
+void WarmStartResultsDialog::setApproachData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps)
 {
 
     this->iterations_approach = iter;
     this->cpu_time_approach = cpu_time;
     this->obj_approach = obj;
+    this->error_approach = overall_error;
     this->x_approach = x;
     this->zL_approach = zL;
     this->zU_approach = zU;
@@ -92,6 +95,7 @@ void WarmStartResultsDialog::setApproachData(int iter, double cpu_time, double o
     this->ui->label_iter_count_app_value->setText(QString::number(iter));
     this->ui->label_cpu_time_app_value->setText(QString::number(cpu_time));
     this->ui->label_obj_func_app_value->setText(QString::number(obj));
+    this->ui->label_error_app_value->setText(QString::number(overall_error));
 
     this->ui->tableWidget_init_guess_app->clear();
     this->ui->tableWidget_dual_vars_app->clear();
@@ -134,12 +138,13 @@ void WarmStartResultsDialog::setApproachData(int iter, double cpu_time, double o
 
 }
 
-void WarmStartResultsDialog::setRetreatData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps)
+void WarmStartResultsDialog::setRetreatData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps)
 {
 
     this->iterations_retreat = iter;
     this->cpu_time_retreat = cpu_time;
     this->obj_retreat = obj;
+    this->error_retreat = overall_error;
     this->x_retreat = x;
     this->zL_retreat = zL;
     this->zU_retreat = zU;
@@ -150,6 +155,7 @@ void WarmStartResultsDialog::setRetreatData(int iter, double cpu_time, double ob
     this->ui->label_iter_count_retreat_value->setText(QString::number(iter));
     this->ui->label_cpu_time_retreat_value->setText(QString::number(cpu_time));
     this->ui->label_obj_func_retreat_value->setText(QString::number(obj));
+    this->ui->label_error_retreat_value->setText(QString::number(overall_error));
 
     this->ui->tableWidget_init_guess_retreat->clear();
     this->ui->tableWidget_dual_vars_retreat->clear();
@@ -192,12 +198,13 @@ void WarmStartResultsDialog::setRetreatData(int iter, double cpu_time, double ob
 
 }
 
-void WarmStartResultsDialog::setBounceData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars)
+void WarmStartResultsDialog::setBounceData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars)
 {
 
     this->iterations_bounce = iter;
     this->cpu_time_bounce = cpu_time;
     this->obj_bounce = obj;
+    this->error_bounce = overall_error;
     this->x_bounce = x;
     this->zL_bounce = zL;
     this->zU_bounce = zU;
@@ -206,6 +213,7 @@ void WarmStartResultsDialog::setBounceData(int iter, double cpu_time, double obj
     this->ui->label_iter_count_bounce_value->setText(QString::number(iter));
     this->ui->label_cpu_time_bounce_value->setText(QString::number(cpu_time));
     this->ui->label_obj_func_bounce_value->setText(QString::number(obj));
+    this->ui->label_error_bounce_value->setText(QString::number(overall_error));
 
     this->ui->tableWidget_init_guess_bounce->clear();
     this->ui->tableWidget_dual_vars_bounce->clear();
@@ -292,6 +300,7 @@ void WarmStartResultsDialog::on_pushButton_save_warm_start_res_clicked()
             stream << "Iterations_plan=" << QString::number(this->iterations_plan).toStdString().c_str() << endl;
             stream << "Cpu_time_plan=" << QString::number(this->cpu_time_plan).toStdString().c_str() << endl;
             stream << "Obj_plan=" << QString::number(this->obj_plan).toStdString().c_str() << endl;
+            stream << "Error_plan=" << QString::number(this->error_plan).toStdString().c_str() << endl;
             stream << "Warm_n_plan_steps=" << QString::number(this->n_plan_steps).toStdString().c_str() << endl;
 
             stream << "X_plan=";
@@ -345,6 +354,7 @@ void WarmStartResultsDialog::on_pushButton_save_warm_start_res_clicked()
             stream << "Iterations_approach=" << QString::number(this->iterations_approach).toStdString().c_str() << endl;
             stream << "Cpu_time_approach=" << QString::number(this->cpu_time_approach).toStdString().c_str() << endl;
             stream << "Obj_approach=" << QString::number(this->obj_approach).toStdString().c_str() << endl;
+            stream << "Error_approach=" << QString::number(this->error_approach).toStdString().c_str() << endl;
             stream << "Warm_n_app_steps=" << QString::number(this->n_app_steps).toStdString().c_str() << endl;
 
             stream << "X_approach=";
@@ -398,6 +408,7 @@ void WarmStartResultsDialog::on_pushButton_save_warm_start_res_clicked()
             stream << "Iterations_retreat=" << QString::number(this->iterations_retreat).toStdString().c_str() << endl;
             stream << "Cpu_time_retreat=" << QString::number(this->cpu_time_retreat).toStdString().c_str() << endl;
             stream << "Obj_retreat=" << QString::number(this->obj_retreat).toStdString().c_str() << endl;
+            stream << "Error_retreat=" << QString::number(this->error_retreat).toStdString().c_str() << endl;
             stream << "Warm_n_ret_steps=" << QString::number(this->n_ret_steps).toStdString().c_str() << endl;
 
             stream << "X_retreat=";
@@ -451,6 +462,7 @@ void WarmStartResultsDialog::on_pushButton_save_warm_start_res_clicked()
             stream << "Iterations_bounce=" << QString::number(this->iterations_bounce).toStdString().c_str() << endl;
             stream << "Cpu_time_bounce=" << QString::number(this->cpu_time_bounce).toStdString().c_str() << endl;
             stream << "Obj_bounce=" << QString::number(this->obj_bounce).toStdString().c_str() << endl;
+            stream << "Error_bounce=" << QString::number(this->error_bounce).toStdString().c_str() << endl;
 
             stream << "X_bounce=";
             for(size_t i=0; i<this->x_bounce.size();++i)

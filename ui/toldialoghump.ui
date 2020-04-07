@@ -1123,6 +1123,54 @@
       </layout>
      </widget>
     </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>540</y>
+       <width>671</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_65">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_39">
+        <item>
+         <widget class="QCheckBox" name="checkBox_max_iter_plan">
+          <property name="text">
+           <string>Max iterations for the plan target selection</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_max_iter_plan">
+          <property name="text">
+           <string>500</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_40">
+        <item>
+         <widget class="QCheckBox" name="checkBox_max_iter_bounce">
+          <property name="text">
+           <string>Max iterations for the bounce selection</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_max_iter_bounce">
+          <property name="text">
+           <string>500</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_hump_bounds">
     <attribute name="title">
@@ -2445,7 +2493,7 @@
      <property name="geometry">
       <rect>
        <x>720</x>
-       <y>520</y>
+       <y>540</y>
        <width>231</width>
        <height>21</height>
       </rect>
@@ -2502,6 +2550,54 @@
       </item>
      </layout>
     </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>330</x>
+       <y>470</y>
+       <width>381</width>
+       <height>58</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_30">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_37">
+        <item>
+         <widget class="QCheckBox" name="checkBox_max_iter_app">
+          <property name="text">
+           <string>Max iterations for the approach target selection</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_max_iter_app">
+          <property name="text">
+           <string>500</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_38">
+        <item>
+         <widget class="QCheckBox" name="checkBox_max_iter_ret">
+          <property name="text">
+           <string>Max iterations for the retreat target selection</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_max_iter_ret">
+          <property name="text">
+           <string>500</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
     <zorder>layoutWidget</zorder>
     <zorder>groupBox_pre_grasp</zorder>
     <zorder>groupBox_post_grasp</zorder>
@@ -2510,6 +2606,10 @@
     <zorder>label_pick_3</zorder>
     <zorder>groupBox_post_place</zorder>
     <zorder>checkBox_straight_line</zorder>
+    <zorder>checkBox_max_iter_app</zorder>
+    <zorder>lineEdit_max_iter_app</zorder>
+    <zorder>checkBox_max_iter_ret</zorder>
+    <zorder>lineEdit_max_iter_ret</zorder>
    </widget>
    <widget class="QWidget" name="tab_hump_move">
     <attribute name="title">
@@ -3283,7 +3383,7 @@
          <x>20</x>
          <y>30</y>
          <width>381</width>
-         <height>321</height>
+         <height>371</height>
         </rect>
        </property>
       </widget>
@@ -3292,12 +3392,12 @@
         <rect>
          <x>550</x>
          <y>30</y>
-         <width>341</width>
+         <width>381</width>
          <height>441</height>
         </rect>
        </property>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>20</x>
@@ -3308,14 +3408,14 @@
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_24">
         <item>
-         <widget class="QLabel" name="label_warm_n_steps">
+         <widget class="QLabel" name="label_warm_n_steps_plan">
           <property name="text">
            <string>Number of steps in the plan stage</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_warm_n_steps_value">
+         <widget class="QLabel" name="label_warm_n_steps_plan_value">
           <property name="text">
            <string/>
           </property>
@@ -3333,7 +3433,7 @@
         <rect>
          <x>550</x>
          <y>30</y>
-         <width>341</width>
+         <width>381</width>
          <height>441</height>
         </rect>
        </property>
@@ -3344,9 +3444,35 @@
          <x>20</x>
          <y>30</y>
          <width>381</width>
-         <height>321</height>
+         <height>371</height>
         </rect>
        </property>
+      </widget>
+      <widget class="QWidget" name="layoutWidget_6">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>410</y>
+         <width>281</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_35">
+        <item>
+         <widget class="QLabel" name="label_warm_n_steps_app">
+          <property name="text">
+           <string>Number of steps in the approach stage</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_warm_n_steps_app_value">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
      <widget class="QWidget" name="tab_3">
@@ -3358,7 +3484,7 @@
         <rect>
          <x>550</x>
          <y>30</y>
-         <width>341</width>
+         <width>381</width>
          <height>441</height>
         </rect>
        </property>
@@ -3369,9 +3495,35 @@
          <x>20</x>
          <y>30</y>
          <width>381</width>
-         <height>321</height>
+         <height>371</height>
         </rect>
        </property>
+      </widget>
+      <widget class="QWidget" name="layoutWidget_7">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>410</y>
+         <width>281</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_36">
+        <item>
+         <widget class="QLabel" name="label_warm_n_steps_ret">
+          <property name="text">
+           <string>Number of steps in the retreat stage</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_warm_n_steps_ret_value">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
      <widget class="QWidget" name="tab_warm_start_bounce">
@@ -3383,7 +3535,7 @@
         <rect>
          <x>550</x>
          <y>30</y>
-         <width>341</width>
+         <width>381</width>
          <height>441</height>
         </rect>
        </property>

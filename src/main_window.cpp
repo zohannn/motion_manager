@@ -4393,7 +4393,8 @@ void MainWindow::on_pushButton_plan_clicked()
                     HUMotion::warm_start_params final_approach;
                     final_approach.valid = true;
                     final_approach.description = "approach";
-                    mTolHumpdlg->getApproachData(final_approach.x,final_approach.zL,final_approach.zU,final_approach.dual_vars);
+                    int warm_steps;
+                    mTolHumpdlg->getApproachData(final_approach.x,final_approach.zL,final_approach.zU,final_approach.dual_vars,warm_steps);
                     tols.mov_specs.final_warm_start_params.push_back(final_approach);
                 }
                 // retreat
@@ -4401,7 +4402,8 @@ void MainWindow::on_pushButton_plan_clicked()
                     HUMotion::warm_start_params final_retreat;
                     final_retreat.valid = true;
                     final_retreat.description = "retreat";
-                    mTolHumpdlg->getRetreatData(final_retreat.x,final_retreat.zL,final_retreat.zU,final_retreat.dual_vars);
+                    int warm_steps;
+                    mTolHumpdlg->getRetreatData(final_retreat.x,final_retreat.zL,final_retreat.zU,final_retreat.dual_vars,warm_steps);
                     tols.mov_specs.final_warm_start_params.push_back(final_retreat);
                 }
                 // bounce
@@ -4415,6 +4417,15 @@ void MainWindow::on_pushButton_plan_clicked()
             }else{
                 tols.mov_specs.warm_start = false;
             }
+            // maximum iterations option
+            tols.mov_specs.set_max_iter_plan = mTolHumpdlg->getMaxIterPlanOption();
+            tols.mov_specs.max_iter_plan = mTolHumpdlg->getMaxIterPlan();
+            tols.mov_specs.set_max_iter_app = mTolHumpdlg->getMaxIterAppOption();
+            tols.mov_specs.max_iter_app = mTolHumpdlg->getMaxIterApp();
+            tols.mov_specs.set_max_iter_ret = mTolHumpdlg->getMaxIterRetOption();
+            tols.mov_specs.max_iter_ret = mTolHumpdlg->getMaxIterRet();
+            tols.mov_specs.set_max_iter_bounce = mTolHumpdlg->getMaxIterBounceOption();
+            tols.mov_specs.max_iter_bounce = mTolHumpdlg->getMaxIterBounce();
 
             h_results = prob->solve(tols); // plan the movement
 
@@ -7956,15 +7967,15 @@ void MainWindow::on_pushButton_warm_start_res_clicked()
         {
             this->mWarmdlg->enablePlanData(true);
             HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(1);
-            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
+            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.error_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
 
             this->mWarmdlg->enableApproachData(true);
             HUMotion::warm_start_params approach_tar = this->final_warm_start_res_mov.at(0);
-            this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars,this->warm_n_app_steps_mov);
+            this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,approach_tar.error_value,approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars,this->warm_n_app_steps_mov);
 
             this->mWarmdlg->enableRetreatData(true);
             HUMotion::warm_start_params retreat_tar = this->final_warm_start_res_mov.at(2);
-            this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars,this->warm_n_ret_steps_mov);
+            this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.error_value,retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars,this->warm_n_ret_steps_mov);
 
         }else if(this->final_warm_start_res_mov.size()==2){
 
@@ -7972,27 +7983,27 @@ void MainWindow::on_pushButton_warm_start_res_clicked()
             {
                 this->mWarmdlg->enableApproachData(true);
                 HUMotion::warm_start_params approach_tar = this->final_warm_start_res_mov.at(0);
-                this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars,this->warm_n_app_steps_mov);
+                this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,approach_tar.error_value,approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars,this->warm_n_app_steps_mov);
 
                 this->mWarmdlg->enablePlanData(true);
                 HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(1);
-                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
+                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.error_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
 
             }else{
 
                 this->mWarmdlg->enablePlanData(true);
                 HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(0);
-                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
+                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.error_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
 
                 this->mWarmdlg->enableRetreatData(true);
                 HUMotion::warm_start_params retreat_tar = this->final_warm_start_res_mov.at(1);
-                this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars,this->warm_n_ret_steps_mov);
+                this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.error_value,retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars,this->warm_n_ret_steps_mov);
 
             }
         }else{
             this->mWarmdlg->enablePlanData(true);
             HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(0);
-            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
+            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.error_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
         }
     }
 
@@ -8000,7 +8011,7 @@ void MainWindow::on_pushButton_warm_start_res_clicked()
     if (this->bounce_warm_start_res_mov.valid)
     {
         this->mWarmdlg->enableBounceData(true);
-        this->mWarmdlg->setBounceData(this->bounce_warm_start_res_mov.iterations,this->bounce_warm_start_res_mov.cpu_time,this->bounce_warm_start_res_mov.obj_value,this->bounce_warm_start_res_mov.x,this->bounce_warm_start_res_mov.zL,this->bounce_warm_start_res_mov.zU,this->bounce_warm_start_res_mov.dual_vars);
+        this->mWarmdlg->setBounceData(this->bounce_warm_start_res_mov.iterations,this->bounce_warm_start_res_mov.cpu_time,this->bounce_warm_start_res_mov.obj_value,this->bounce_warm_start_res_mov.error_value,this->bounce_warm_start_res_mov.x,this->bounce_warm_start_res_mov.zL,this->bounce_warm_start_res_mov.zU,this->bounce_warm_start_res_mov.dual_vars);
     }else{
         this->mWarmdlg->enableBounceData(false);
     }
@@ -9078,7 +9089,7 @@ void MainWindow::on_pushButton_plan_collect_pressed()
 
 void MainWindow::on_pushButton_plan_collect_clicked()
 {
-    problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
+    problemPtr prob = problemPtr(new Problem(*curr_task->getProblem(ui.listWidget_movs->currentRow()).get()));
     int planner_id = prob->getPlannerID();
     std::vector<double> start_r_posture; curr_scene->getHumanoid()->getRightPosture(start_r_posture);
     std::vector<double> max_r_posture; curr_scene->getHumanoid()->getRightMaxLimits(max_r_posture);
@@ -9190,13 +9201,24 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                     ofstream data_csv;
                     data_csv.open(collect_dir+string("/")+filename_csv);
                     // headers
-                    data_csv << "target_x_mm,target_y_mm,target_z_mm,target_roll_rad,target_pitch_rad,target_yaw_rad";                    
+                    // robot configuration
+                    data_csv << "elbow_x_mm,elbow_y_mm,elbow_z_mm";
+                    data_csv << ",wrist_x_mm,wrist_y_mm,wrist_z_mm";
+                    data_csv << ",hand_x_mm,hand_y_mm,hand_z_mm";
+                    data_csv << ",thumb_1_x_mm,thumb_1_y_mm,thumb_1_z_mm,thumb_2_x_mm,thumb_2_y_mm,thumb_2_z_mm,thumb_tip_x_mm,thumb_tip_y_mm,thumb_tip_z_mm";
+                    data_csv << ",index_1_x_mm,index_1_y_mm,index_1_z_mm,index_2_x_mm,index_2_y_mm,index_2_z_mm,index_tip_x_mm,index_tip_y_mm,thumb_tip_z_mm";
+                    data_csv << ",middle_1_x_mm,middle_1_y_mm,middle_1_z_mm,middle_2_x_mm,middle_2_y_mm,middle_2_z_mm,middle_tip_x_mm,middle_tip_y_mm,middle_tip_z_mm";
+                    //target
+                    data_csv << ",target_x_mm,target_y_mm,target_z_mm,target_roll_rad,target_pitch_rad,target_yaw_rad";
+                    // obstacles
                     for(size_t j=0;j<obsts.size();++j){
                         data_csv << ",obstacle_"+to_string(j+1)+"_x_mm,obstacle_"+to_string(j+1)+"_y_mm,obstacle_"+to_string(j+1)+"_z_mm,obstacle_"+to_string(j+1)+"_roll_rad,obstacle_"+to_string(j+1)+"_pitch_rad,obstacle_"+to_string(j+1)+"_yaw_rad";
                     }
+                    // solution
                     if(mov_type==0){ // reach-to-grasp movement
 
                         // final plan posture selection
+                        data_csv << ",cpu_time_plan,iterations_plan,obj_plan,error_plan";
                         data_csv << ",xf_plan_1_rad,xf_plan_2_rad,xf_plan_3_rad,xf_plan_4_rad,xf_plan_5_rad,xf_plan_6_rad,xf_plan_7_rad";
                         data_csv << ",zf_L_plan_1,zf_L_plan_2,zf_L_plan_3,zf_L_plan_4,zf_L_plan_5,zf_L_plan_6,zf_L_plan_7";
                         data_csv << ",zf_U_plan_1,zf_U_plan_2,zf_U_plan_3,zf_U_plan_4,zf_U_plan_5,zf_U_plan_6,zf_U_plan_7";
@@ -9205,6 +9227,7 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                         }
 
                         // final approach posture selection
+                        data_csv << ",cpu_time_approach,iterations_approach,obj_approach,error_approach";
                         data_csv << ",xf_approach_1_rad,xf_approach_2_rad,xf_approach_3_rad,xf_approach_4_rad,xf_approach_5_rad,xf_approach_6_rad,xf_approach_7_rad";
                         data_csv << ",zf_L_approach_1,zf_L_approach_2,zf_L_approach_3,zf_L_approach_4,zf_L_approach_5,zf_L_approach_6,zf_L_approach_7";
                         data_csv << ",zf_U_approach_1,zf_U_approach_2,zf_U_approach_3,zf_U_approach_4,zf_U_approach_5,zf_U_approach_6,zf_U_approach_7";
@@ -9213,6 +9236,7 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                         }
 
                         // final retreat posture selection
+                        data_csv << ",cpu_time_retreat,iterations_retreat,obj_retreat,error_retreat";
                         data_csv << ",xf_retreat_1_rad,xf_retreat_2_rad,xf_retreat_3_rad,xf_retreat_4_rad,xf_retreat_5_rad,xf_retreat_6_rad,xf_retreat_7_rad";
                         data_csv << ",zf_L_retreat_1,zf_L_retreat_2,zf_L_retreat_3,zf_L_retreat_4,zf_L_retreat_5,zf_L_retreat_6,zf_L_retreat_7";
                         data_csv << ",zf_U_retreat_1,zf_U_retreat_2,zf_U_retreat_3,zf_U_retreat_4,zf_U_retreat_5,zf_U_retreat_6,zf_U_retreat_7";
@@ -9221,6 +9245,7 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                         }
 
                         // bounce posture selection
+                        data_csv << ",cpu_time_bounce,iterations_bounce,obj_bounce,error_bounce";
                         data_csv << ",x_bounce_1_rad,x_bounce_2_rad,x_bounce_3_rad,x_bounce_4_rad,x_bounce_5_rad,x_bounce_6_rad,x_bounce_7_rad,x_bounce_8_rad,x_bounce_9_rad";
                         data_csv << ",zb_L_1,zb_L_2,zb_L_3,zb_L_4,zb_L_5,zb_L_6,zb_L_7,zb_L_8,zb_L_9";
                         data_csv << ",zb_U_1,zb_U_2,zb_U_3,zb_U_4,zb_U_5,zb_U_6,zb_U_7,zb_U_8,zb_U_9";
@@ -9231,6 +9256,7 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                     }else if(mov_type==1 || mov_type==5){ // move movement
 
                         // final posture selection
+                        data_csv << ",cpu_time_plan,iterations_plan,obj_plan,error_plan";
                         data_csv << ",xf_plan_1_rad,xf_plan_2_rad,xf_plan_3_rad,xf_plan_4_rad,xf_plan_5_rad,xf_plan_6_rad,xf_plan_7_rad";
                         data_csv << ",zf_L_plan_1,zf_L_plan_2,zf_L_plan_3,zf_L_plan_4,zf_L_plan_5,zf_L_plan_6,zf_L_plan_7";
                         data_csv << ",zf_U_plan_1,zf_U_plan_2,zf_U_plan_3,zf_U_plan_4,zf_U_plan_5,zf_U_plan_6,zf_U_plan_7";
@@ -9239,6 +9265,7 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                         }
 
                         // bounce posture selection
+                        data_csv << ",cpu_time_bounce,iterations_bounce,obj_bounce,error_bounce";
                         data_csv << ",x_bounce_1_rad,x_bounce_2_rad,x_bounce_3_rad,x_bounce_4_rad,x_bounce_5_rad,x_bounce_6_rad,x_bounce_7_rad,x_bounce_8_rad,x_bounce_9_rad";
                         data_csv << ",zb_L_1,zb_L_2,zb_L_3,zb_L_4,zb_L_5,zb_L_6,zb_L_7,zb_L_8,zb_L_9";
                         data_csv << ",zb_U_1,zb_U_2,zb_U_3,zb_U_4,zb_U_5,zb_U_6,zb_U_7,zb_U_8,zb_U_9";
@@ -9413,27 +9440,76 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                         qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
                                         solved=true;
 
-                                        // arm points
+                                        // robot configuration
+                                        // elbow
                                         std::vector<double> r_e_pos; curr_scene->getHumanoid()->getRightElbowPos(r_e_pos);
+                                        string r_e_pos_x_str =  boost::str(boost::format("%.8f") % (r_e_pos.at(0))); boost::replace_all(r_e_pos_x_str,",",".");
+                                        string r_e_pos_y_str =  boost::str(boost::format("%.8f") % (r_e_pos.at(1))); boost::replace_all(r_e_pos_y_str,",",".");
+                                        string r_e_pos_z_str =  boost::str(boost::format("%.8f") % (r_e_pos.at(2))); boost::replace_all(r_e_pos_z_str,",",".");
+                                        data_csv << r_e_pos_x_str+","+r_e_pos_y_str+","+r_e_pos_z_str+",";
+                                        // wrist
                                         std::vector<double> r_w_pos; curr_scene->getHumanoid()->getRightWristPos(r_w_pos);
+                                        string r_w_pos_x_str =  boost::str(boost::format("%.8f") % (r_w_pos.at(0))); boost::replace_all(r_w_pos_x_str,",",".");
+                                        string r_w_pos_y_str =  boost::str(boost::format("%.8f") % (r_w_pos.at(1))); boost::replace_all(r_w_pos_y_str,",",".");
+                                        string r_w_pos_z_str =  boost::str(boost::format("%.8f") % (r_w_pos.at(2))); boost::replace_all(r_w_pos_z_str,",",".");
+                                        data_csv << r_w_pos_x_str+","+r_w_pos_y_str+","+r_w_pos_z_str+",";
+                                        // hand
                                         std::vector<double> r_h_pos; curr_scene->getHumanoid()->getRightHandPos(r_h_pos);
-                                        // hand points
+                                        string r_h_pos_x_str =  boost::str(boost::format("%.8f") % (r_h_pos.at(0))); boost::replace_all(r_h_pos_x_str,",",".");
+                                        string r_h_pos_y_str =  boost::str(boost::format("%.8f") % (r_h_pos.at(1))); boost::replace_all(r_h_pos_y_str,",",".");
+                                        string r_h_pos_z_str =  boost::str(boost::format("%.8f") % (r_h_pos.at(2))); boost::replace_all(r_h_pos_z_str,",",".");
+                                        data_csv << r_h_pos_x_str+","+r_h_pos_y_str+","+r_h_pos_z_str+",";
                                         // thumb
                                         std::vector<double> r_thumb_pos; curr_scene->getHumanoid()->getRightThumbFingerPositions(r_thumb_pos);
                                         std::vector<double> r_thumb_pos_1(3); std::copy(r_thumb_pos.begin(), r_thumb_pos.begin()+3, r_thumb_pos_1.begin());
                                         std::vector<double> r_thumb_pos_2(3); std::copy(r_thumb_pos.begin()+3, r_thumb_pos.begin()+6, r_thumb_pos_2.begin());
                                         std::vector<double> r_thumb_pos_tip(3); std::copy(r_thumb_pos.begin()+6, r_thumb_pos.begin()+9, r_thumb_pos_tip.begin());
+                                        string r_thumb_pos_1_x_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_1.at(0))); boost::replace_all(r_thumb_pos_1_x_str,",",".");
+                                        string r_thumb_pos_1_y_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_1.at(1))); boost::replace_all(r_thumb_pos_1_y_str,",",".");
+                                        string r_thumb_pos_1_z_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_1.at(2))); boost::replace_all(r_thumb_pos_1_z_str,",",".");
+                                        string r_thumb_pos_2_x_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_2.at(0))); boost::replace_all(r_thumb_pos_2_x_str,",",".");
+                                        string r_thumb_pos_2_y_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_2.at(1))); boost::replace_all(r_thumb_pos_2_y_str,",",".");
+                                        string r_thumb_pos_2_z_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_2.at(2))); boost::replace_all(r_thumb_pos_2_z_str,",",".");
+                                        string r_thumb_pos_tip_x_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_tip.at(0))); boost::replace_all(r_thumb_pos_tip_x_str,",",".");
+                                        string r_thumb_pos_tip_y_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_tip.at(1))); boost::replace_all(r_thumb_pos_tip_y_str,",",".");
+                                        string r_thumb_pos_tip_z_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_tip.at(2))); boost::replace_all(r_thumb_pos_tip_z_str,",",".");
+                                        data_csv << r_thumb_pos_1_x_str+","+r_thumb_pos_1_y_str+","+r_thumb_pos_1_z_str+","+
+                                                    r_thumb_pos_2_x_str+","+r_thumb_pos_2_y_str+","+r_thumb_pos_2_z_str+","+
+                                                    r_thumb_pos_tip_x_str+","+r_thumb_pos_tip_y_str+","+r_thumb_pos_tip_z_str+",";
                                         // index
                                         std::vector<double> r_index_pos; curr_scene->getHumanoid()->getRightIndexFingerPositions(r_index_pos);
                                         std::vector<double> r_index_pos_1(3); std::copy(r_index_pos.begin(), r_index_pos.begin()+3, r_index_pos_1.begin());
                                         std::vector<double> r_index_pos_2(3); std::copy(r_index_pos.begin()+3, r_index_pos.begin()+6, r_index_pos_2.begin());
                                         std::vector<double> r_index_pos_tip(3); std::copy(r_index_pos.begin()+6, r_index_pos.begin()+9, r_index_pos_tip.begin());
+                                        string r_index_pos_1_x_str =  boost::str(boost::format("%.8f") % (r_index_pos_1.at(0))); boost::replace_all(r_index_pos_1_x_str,",",".");
+                                        string r_index_pos_1_y_str =  boost::str(boost::format("%.8f") % (r_index_pos_1.at(1))); boost::replace_all(r_index_pos_1_y_str,",",".");
+                                        string r_index_pos_1_z_str =  boost::str(boost::format("%.8f") % (r_index_pos_1.at(2))); boost::replace_all(r_index_pos_1_z_str,",",".");
+                                        string r_index_pos_2_x_str =  boost::str(boost::format("%.8f") % (r_index_pos_2.at(0))); boost::replace_all(r_index_pos_2_x_str,",",".");
+                                        string r_index_pos_2_y_str =  boost::str(boost::format("%.8f") % (r_index_pos_2.at(1))); boost::replace_all(r_index_pos_2_y_str,",",".");
+                                        string r_index_pos_2_z_str =  boost::str(boost::format("%.8f") % (r_index_pos_2.at(2))); boost::replace_all(r_index_pos_2_z_str,",",".");
+                                        string r_index_pos_tip_x_str =  boost::str(boost::format("%.8f") % (r_index_pos_tip.at(0))); boost::replace_all(r_index_pos_tip_x_str,",",".");
+                                        string r_index_pos_tip_y_str =  boost::str(boost::format("%.8f") % (r_index_pos_tip.at(1))); boost::replace_all(r_index_pos_tip_y_str,",",".");
+                                        string r_index_pos_tip_z_str =  boost::str(boost::format("%.8f") % (r_index_pos_tip.at(2))); boost::replace_all(r_index_pos_tip_z_str,",",".");
+                                        data_csv << r_index_pos_1_x_str+","+r_index_pos_1_y_str+","+r_index_pos_1_z_str+","+
+                                                    r_index_pos_2_x_str+","+r_index_pos_2_y_str+","+r_index_pos_2_z_str+","+
+                                                    r_index_pos_tip_x_str+","+r_index_pos_tip_y_str+","+r_index_pos_tip_z_str+",";
                                         //middle
                                         std::vector<double> r_middle_pos; curr_scene->getHumanoid()->getRightMiddleFingerPositions(r_middle_pos);
                                         std::vector<double> r_middle_pos_1(3); std::copy(r_middle_pos.begin(), r_middle_pos.begin()+3, r_middle_pos_1.begin());
                                         std::vector<double> r_middle_pos_2(3); std::copy(r_middle_pos.begin()+3, r_middle_pos.begin()+6, r_middle_pos_2.begin());
                                         std::vector<double> r_middle_pos_tip(3); std::copy(r_middle_pos.begin()+6, r_middle_pos.begin()+9, r_middle_pos_tip.begin());
-
+                                        string r_middle_pos_1_x_str =  boost::str(boost::format("%.8f") % (r_middle_pos_1.at(0))); boost::replace_all(r_middle_pos_1_x_str,",",".");
+                                        string r_middle_pos_1_y_str =  boost::str(boost::format("%.8f") % (r_middle_pos_1.at(1))); boost::replace_all(r_middle_pos_1_y_str,",",".");
+                                        string r_middle_pos_1_z_str =  boost::str(boost::format("%.8f") % (r_middle_pos_1.at(2))); boost::replace_all(r_middle_pos_1_z_str,",",".");
+                                        string r_middle_pos_2_x_str =  boost::str(boost::format("%.8f") % (r_middle_pos_2.at(0))); boost::replace_all(r_middle_pos_2_x_str,",",".");
+                                        string r_middle_pos_2_y_str =  boost::str(boost::format("%.8f") % (r_middle_pos_2.at(1))); boost::replace_all(r_middle_pos_2_y_str,",",".");
+                                        string r_middle_pos_2_z_str =  boost::str(boost::format("%.8f") % (r_middle_pos_2.at(2))); boost::replace_all(r_middle_pos_2_z_str,",",".");
+                                        string r_middle_pos_tip_x_str =  boost::str(boost::format("%.8f") % (r_middle_pos_tip.at(0))); boost::replace_all(r_middle_pos_tip_x_str,",",".");
+                                        string r_middle_pos_tip_y_str =  boost::str(boost::format("%.8f") % (r_middle_pos_tip.at(1))); boost::replace_all(r_middle_pos_tip_y_str,",",".");
+                                        string r_middle_pos_tip_z_str =  boost::str(boost::format("%.8f") % (r_middle_pos_tip.at(2))); boost::replace_all(r_middle_pos_tip_z_str,",",".");
+                                        data_csv << r_middle_pos_1_x_str+","+r_middle_pos_1_y_str+","+r_middle_pos_1_z_str+","+
+                                                    r_middle_pos_2_x_str+","+r_middle_pos_2_y_str+","+r_middle_pos_2_z_str+","+
+                                                    r_middle_pos_tip_x_str+","+r_middle_pos_tip_y_str+","+r_middle_pos_tip_z_str+",";
 
                                         // target
                                         if(mov_type==0){ // reach-to-grasp movement
@@ -9469,7 +9545,12 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                         // final posture selections
                                         if(h_results_tmp->final_warm_start_res.size()==3){
                                             // plan
-                                            HUMotion::warm_start_params f_plan_res = h_results_tmp->final_warm_start_res.at(1);
+                                            HUMotion::warm_start_params f_plan_res = h_results_tmp->final_warm_start_res.at(1);                                            
+                                            string cpu_time_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
+                                            string iter_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
+                                            string obj_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
+                                            string error_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
+                                            data_csv << cpu_time_plan_str+","+iter_plan_str+","+obj_plan_str+","+error_plan_str+",";
                                             for(int h=0;h<f_plan_res.x.size();++h){
                                                 string x_str =  boost::str(boost::format("%.8f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                 data_csv << x_str+",";
@@ -9488,6 +9569,11 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                             }
                                             // approach
                                             HUMotion::warm_start_params f_app_res = h_results_tmp->final_warm_start_res.at(0);
+                                            string cpu_time_app_str =  boost::str(boost::format("%.8f") % (f_app_res.cpu_time)); boost::replace_all(cpu_time_app_str,",",".");
+                                            string iter_app_str =  boost::str(boost::format("%.8f") % (f_app_res.iterations)); boost::replace_all(iter_app_str,",",".");
+                                            string obj_app_str =  boost::str(boost::format("%.8f") % (f_app_res.obj_value)); boost::replace_all(obj_app_str,",",".");
+                                            string error_app_str =  boost::str(boost::format("%.8f") % (f_app_res.error_value)); boost::replace_all(error_app_str,",",".");
+                                            data_csv << cpu_time_app_str+","+iter_app_str+","+obj_app_str+","+error_app_str+",";
                                             for(int h=0;h<f_app_res.x.size();++h){
                                                 string x_str =  boost::str(boost::format("%.8f") % (f_app_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                 data_csv << x_str+",";
@@ -9506,6 +9592,11 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                             }
                                             //retreat
                                             HUMotion::warm_start_params f_ret_res = h_results_tmp->final_warm_start_res.at(2);
+                                            string cpu_time_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.cpu_time)); boost::replace_all(cpu_time_ret_str,",",".");
+                                            string iter_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.iterations)); boost::replace_all(iter_ret_str,",",".");
+                                            string obj_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.obj_value)); boost::replace_all(obj_ret_str,",",".");
+                                            string error_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.error_value)); boost::replace_all(error_ret_str,",",".");
+                                            data_csv << cpu_time_ret_str+","+iter_ret_str+","+obj_ret_str+","+error_ret_str+",";
                                             for(int h=0;h<f_ret_res.x.size();++h){
                                                 string x_str =  boost::str(boost::format("%.8f") % (f_ret_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                 data_csv << x_str+",";
@@ -9527,6 +9618,11 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                             {
                                                 // plan
                                                 HUMotion::warm_start_params f_plan_res = h_results_tmp->final_warm_start_res.at(1);
+                                                string cpu_time_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
+                                                string iter_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
+                                                string obj_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
+                                                string error_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
+                                                data_csv << cpu_time_plan_str+","+iter_plan_str+","+obj_plan_str+","+error_plan_str+",";
                                                 for(int h=0;h<f_plan_res.x.size();++h){
                                                     string x_str =  boost::str(boost::format("%.8f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                     data_csv << x_str+",";
@@ -9541,6 +9637,11 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                                 }
                                                 //approach
                                                 HUMotion::warm_start_params f_app_res = h_results_tmp->final_warm_start_res.at(0);
+                                                string cpu_time_app_str =  boost::str(boost::format("%.8f") % (f_app_res.cpu_time)); boost::replace_all(cpu_time_app_str,",",".");
+                                                string iter_app_str =  boost::str(boost::format("%.8f") % (f_app_res.iterations)); boost::replace_all(iter_app_str,",",".");
+                                                string obj_app_str =  boost::str(boost::format("%.8f") % (f_app_res.obj_value)); boost::replace_all(obj_app_str,",",".");
+                                                string error_app_str =  boost::str(boost::format("%.8f") % (f_app_res.error_value)); boost::replace_all(error_app_str,",",".");
+                                                data_csv << cpu_time_app_str+","+iter_app_str+","+obj_app_str+","+error_app_str+",";
                                                 for(int h=0;h<f_app_res.x.size();++h){
                                                     string x_str =  boost::str(boost::format("%.8f") % (f_app_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                     data_csv << x_str+",";
@@ -9560,6 +9661,11 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                             }else{
                                                 // plan
                                                 HUMotion::warm_start_params f_plan_res = h_results_tmp->final_warm_start_res.at(0);
+                                                string cpu_time_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
+                                                string iter_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
+                                                string obj_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
+                                                string error_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
+                                                data_csv << cpu_time_plan_str+","+iter_plan_str+","+obj_plan_str+","+error_plan_str+",";
                                                 for(int h=0;h<f_plan_res.x.size();++h){
                                                     string x_str =  boost::str(boost::format("%.8f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                     data_csv << x_str+",";
@@ -9574,6 +9680,11 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                                 }
                                                 // retreat
                                                 HUMotion::warm_start_params f_ret_res = h_results_tmp->final_warm_start_res.at(1);
+                                                string cpu_time_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.cpu_time)); boost::replace_all(cpu_time_ret_str,",",".");
+                                                string iter_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.iterations)); boost::replace_all(iter_ret_str,",",".");
+                                                string obj_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.obj_value)); boost::replace_all(obj_ret_str,",",".");
+                                                string error_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.error_value)); boost::replace_all(error_ret_str,",",".");
+                                                data_csv << cpu_time_ret_str+","+iter_ret_str+","+obj_ret_str+","+error_ret_str+",";
                                                 for(int h=0;h<f_ret_res.x.size();++h){
                                                     string x_str =  boost::str(boost::format("%.8f") % (f_ret_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                     data_csv << x_str+",";
@@ -9594,6 +9705,11 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                         }else if(h_results_tmp->final_warm_start_res.size()==1){
                                             // plan
                                             HUMotion::warm_start_params f_res = h_results_tmp->final_warm_start_res.at(0);
+                                            string cpu_time_plan_str =  boost::str(boost::format("%.8f") % (f_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
+                                            string iter_plan_str =  boost::str(boost::format("%.8f") % (f_res.iterations)); boost::replace_all(iter_plan_str,",",".");
+                                            string obj_plan_str =  boost::str(boost::format("%.8f") % (f_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
+                                            string error_plan_str =  boost::str(boost::format("%.8f") % (f_res.error_value)); boost::replace_all(error_plan_str,",",".");
+                                            data_csv << cpu_time_plan_str+","+iter_plan_str+","+obj_plan_str+","+error_plan_str+",";
                                             for(int h=0;h<f_res.x.size();++h){
                                                 string x_str =  boost::str(boost::format("%.8f") % (f_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                 data_csv << x_str+",";
@@ -9612,6 +9728,11 @@ void MainWindow::on_pushButton_plan_collect_clicked()
                                             }
                                         }
                                         // bounce posture selection
+                                        string cpu_time_b_str =  boost::str(boost::format("%.8f") % (b_res.cpu_time)); boost::replace_all(cpu_time_b_str,",",".");
+                                        string iter_b_str =  boost::str(boost::format("%.8f") % (b_res.iterations)); boost::replace_all(iter_b_str,",",".");
+                                        string obj_b_str =  boost::str(boost::format("%.8f") % (b_res.obj_value)); boost::replace_all(obj_b_str,",",".");
+                                        string error_b_str =  boost::str(boost::format("%.8f") % (b_res.error_value)); boost::replace_all(error_b_str,",",".");
+                                        data_csv << cpu_time_b_str+","+iter_b_str+","+obj_b_str+","+error_b_str+",";
                                         for(size_t h=0;h<b_res.x.size();++h){
                                             string x_str =  boost::str(boost::format("%.8f") % (b_res.x.at(h))); boost::replace_all(x_str,",",".");
                                             data_csv << x_str+",";

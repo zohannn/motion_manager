@@ -70,6 +70,30 @@ public Q_SLOTS:
     void checkWarmStart(int state);
 
     /**
+     * @brief checkMaxIterPlan
+     * @param state
+     */
+    void checkMaxIterPlan(int state);
+
+    /**
+     * @brief checkMaxIterApp
+     * @param state
+     */
+    void checkMaxIterApp(int state);
+
+    /**
+     * @brief checkMaxIterRet
+     * @param state
+     */
+    void checkMaxIterRet(int state);
+
+    /**
+     * @brief checkMaxIterBounce
+     * @param state
+     */
+    void checkMaxIterBounce(int state);
+
+    /**
      * @brief checkSetHandCond
      * @param state
      */
@@ -144,6 +168,12 @@ public:
      * @param w
      */
     void setWMax(double w);
+
+    /**
+     * @brief setAlphaMax
+     * @param a
+     */
+    void setAlphaMax(double a);
 
 
     /**
@@ -418,8 +448,9 @@ public:
      * @param zL
      * @param zU
      * @param dual
+     * @param steps
      */
-    void getApproachData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual);
+    void getApproachData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual,int &steps);
 
     /**
      * @brief getRetreatData
@@ -427,8 +458,9 @@ public:
      * @param zL
      * @param zU
      * @param dual
+     * @param steps
      */
-    void getRetreatData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual);
+    void getRetreatData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual,int &steps);
 
     /**
      * @brief getBounceData
@@ -439,6 +471,53 @@ public:
      */
     void getBounceData(vector<double> &x,vector<double> &zL,vector<double> &zU,vector<double> &dual);
 
+    /**
+     * @brief getMaxIterPlanOption
+     * @return
+     */
+    bool getMaxIterPlanOption();
+
+    /**
+     * @brief getMaxIterAppOption
+     * @return
+     */
+    bool getMaxIterAppOption();
+
+    /**
+     * @brief getMaxIterRetOption
+     * @return
+     */
+    bool getMaxIterRetOption();
+
+    /**
+     * @brief getMaxIterBounceOption
+     * @return
+     */
+    bool getMaxIterBounceOption();
+
+    /**
+     * @brief getMaxIterPlan
+     * @return
+     */
+    int getMaxIterPlan();
+
+    /**
+     * @brief getMaxIterApp
+     * @return
+     */
+    int getMaxIterApp();
+
+    /**
+     * @brief getMaxIterRet
+     * @return
+     */
+    int getMaxIterRet();
+
+    /**
+     * @brief getMaxIterBounce
+     * @return
+     */
+    int getMaxIterBounce();
 
 
 private:
@@ -446,23 +525,35 @@ private:
     string infoLine; /**< information about the tuning of the planner */
     bool rand_init;/**< random initialization */
 
+    // max iterations
+    bool set_max_iter_plan; /**< true if the max iterations for plan must be set */
+    bool set_max_iter_app; /**< true if the max iterations for approach must be set */
+    bool set_max_iter_ret; /**< true if the max iterations for retreat must be set */
+    bool set_max_iter_bounce; /**< true if the max iterations for bounce must be set */
+    int max_iter_plan;/**< max iterations for the plan target posture selection */
+    int max_iter_app;/**< max iterations for the approach target posture selection */
+    int max_iter_ret;/**< max iterations for the retreat target posture selection */
+    int max_iter_bounce;/**< max iterations for the bounce posture selection */
+
     // warm start settings
     bool warm_start;/**< warm start option */
     // plan
     bool warm_start_plan; /**< true if there are plan target warm start parameters */
-    int warm_n_steps; /**< steps of the plan stage when warming start */
+    int warm_n_steps_plan; /**< steps of the plan stage when warming start */
     vector<double> x_plan; /**< initial guess of the plan target posture selection problem */
     vector<double> zL_plan; /**< lower bounds multipliers of the plan target posture selection problem */
     vector<double> zU_plan; /**< upper bounds multipliers of the plan target posture selection problem */
     vector<double> dual_plan; /**< constraints multipliers of the plan target posture selection problem */
     // approach
     bool warm_start_approach; /**< true if there are approach target warm start parameters */
+    int warm_n_steps_approach; /**< steps of the approach stage when warming start */
     vector<double> x_approach; /**< initial guess of the approach target posture selection problem */
     vector<double> zL_approach; /**< lower bounds multipliers of the approach target posture selection problem */
     vector<double> zU_approach; /**< upper bounds multipliers of the approach target posture selection problem */
     vector<double> dual_approach; /**< constraints multipliers of the approach target posture selection problem */
     // retreat
     bool warm_start_retreat; /**< true if there are retreat target warm start parameters */
+    int warm_n_steps_retreat; /**< steps of the retreat stage when warming start */
     vector<double> x_retreat; /**< initial guess of the retreat target posture selection problem */
     vector<double> zL_retreat; /**< lower bounds multipliers of the retreat target posture selection problem */
     vector<double> zU_retreat; /**< upper bounds multipliers of the retreat target posture selection problem */

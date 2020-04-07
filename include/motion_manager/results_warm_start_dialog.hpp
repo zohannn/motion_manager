@@ -49,51 +49,55 @@ public:
      * @param iter
      * @param cpu_time
      * @param obj
+     * @param overall_error
      * @param x
      * @param zL
      * @param zU
      * @param dual_vars
      * @param warm_n_steps
      */
-    void setPlanData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps);
+    void setPlanData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps);
 
     /**
      * @brief setApproachData
      * @param iter
      * @param cpu_time
      * @param obj
+     * @param overall_error
      * @param x
      * @param zL
      * @param zU
      * @param dual_vars
      * @param warm_n_steps
      */
-    void setApproachData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps);
+    void setApproachData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps);
 
     /**
      * @brief setRetreatData
      * @param iter
      * @param cpu_time
      * @param obj
+     * @param overall_error
      * @param x
      * @param zL
      * @param zU
      * @param dual_vars
      * @param warm_n_steps
      */
-    void setRetreatData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps);
+    void setRetreatData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps);
 
     /**
      * @brief setBounceData
      * @param iter
      * @param cpu_time
      * @param obj
+     * @param overall_error
      * @param x
      * @param zL
      * @param zU
      * @param dual_vars
      */
-    void setBounceData(int iter, double cpu_time, double obj, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars);
+    void setBounceData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars);
 
     /**
      * @brief enablePlanData
@@ -128,6 +132,7 @@ private:
     int iterations_plan; /**< number of iterations of the plan data */
     double cpu_time_plan; /**< cpu time of the plan data */
     double obj_plan; /**< obj value of the plan data */
+    double error_plan; /**< overall error value of the plan data */
     vector<double> x_plan; /**< solution of the plan data */
     vector<double> zL_plan; /**< lower bounds multipliers of the plan data */
     vector<double> zU_plan; /**< upper bounds multipliers of the plan data */
@@ -139,6 +144,7 @@ private:
     int iterations_approach; /**< number of iterations of the approach data */
     double cpu_time_approach; /**< cpu time of the approach data */
     double obj_approach; /**< obj value of the approach data */
+    double error_approach; /**< overall error value of the approach data */
     vector<double> x_approach; /**< solution of the approach data */
     vector<double> zL_approach; /**< lower bounds multipliers of the approach data */
     vector<double> zU_approach; /**< upper bounds multipliers of the approach data */
@@ -150,6 +156,7 @@ private:
     int iterations_retreat; /**< number of iterations of the retreat data */
     double cpu_time_retreat; /**< cpu time of the retreat data */
     double obj_retreat; /**< obj value of the retreat data */
+    double error_retreat; /**< overall error value of the retreat data */
     vector<double> x_retreat; /**< solution of the retreat data */
     vector<double> zL_retreat; /**< lower bounds multipliers of the retreat data */
     vector<double> zU_retreat; /**< upper bounds multipliers of the retreat data */
@@ -161,6 +168,7 @@ private:
     int iterations_bounce; /**< number of iterations of the bounce data */
     double cpu_time_bounce; /**< cpu time of the bounce data */
     double obj_bounce; /**< obj value of the bounce data */
+    double error_bounce; /**< overall error value of the bounce data */
     vector<double> x_bounce; /**< solution of the bounce data */
     vector<double> zL_bounce; /**< lower bounds multipliers of the bounce data */
     vector<double> zU_bounce; /**< upper bounds multipliers of the bounce data */
