@@ -4418,14 +4418,14 @@ void MainWindow::on_pushButton_plan_clicked()
                 tols.mov_specs.warm_start = false;
             }
             // maximum iterations option
-            tols.mov_specs.set_max_iter_plan = mTolHumpdlg->getMaxIterPlanOption();
-            tols.mov_specs.max_iter_plan = mTolHumpdlg->getMaxIterPlan();
-            tols.mov_specs.set_max_iter_app = mTolHumpdlg->getMaxIterAppOption();
-            tols.mov_specs.max_iter_app = mTolHumpdlg->getMaxIterApp();
-            tols.mov_specs.set_max_iter_ret = mTolHumpdlg->getMaxIterRetOption();
-            tols.mov_specs.max_iter_ret = mTolHumpdlg->getMaxIterRet();
-            tols.mov_specs.set_max_iter_bounce = mTolHumpdlg->getMaxIterBounceOption();
-            tols.mov_specs.max_iter_bounce = mTolHumpdlg->getMaxIterBounce();
+            tols.set_max_iter_plan = mTolHumpdlg->getMaxIterPlanOption();
+            tols.max_iter_plan = mTolHumpdlg->getMaxIterPlan();
+            tols.set_max_iter_app = mTolHumpdlg->getMaxIterAppOption();
+            tols.max_iter_app = mTolHumpdlg->getMaxIterApp();
+            tols.set_max_iter_ret = mTolHumpdlg->getMaxIterRetOption();
+            tols.max_iter_ret = mTolHumpdlg->getMaxIterRet();
+            tols.set_max_iter_bounce = mTolHumpdlg->getMaxIterBounceOption();
+            tols.max_iter_bounce = mTolHumpdlg->getMaxIterBounce();
 
             h_results = prob->solve(tols); // plan the movement
 
@@ -4572,8 +4572,18 @@ void MainWindow::on_pushButton_plan_clicked()
                                   move_final_hand_right,move_final_hand_left,
                                   move_final_arm_right,move_final_arm_left,
                                   use_final_right,use_final_left);
+            // maximum iterations option
+            dual_tols.set_max_iter_plan = mTolHumpDualdlg->getMaxIterPlanOption();
+            dual_tols.max_iter_plan = mTolHumpDualdlg->getMaxIterPlan();
+            dual_tols.set_max_iter_app = mTolHumpDualdlg->getMaxIterAppOption();
+            dual_tols.max_iter_app = mTolHumpDualdlg->getMaxIterApp();
+            dual_tols.set_max_iter_ret = mTolHumpDualdlg->getMaxIterRetOption();
+            dual_tols.max_iter_ret = mTolHumpDualdlg->getMaxIterRet();
+            dual_tols.set_max_iter_bounce = mTolHumpDualdlg->getMaxIterBounceOption();
+            dual_tols.max_iter_bounce = mTolHumpDualdlg->getMaxIterBounce();
 
             h_dual_results = prob->solve(dual_tols); // plan the movement
+
             ui.pushButton_plan->setCheckable(false);
             if(h_dual_results!=nullptr){
                 if(h_dual_results->status==0){

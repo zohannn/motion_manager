@@ -65,6 +65,30 @@ public Q_SLOTS:
     void checkAddPlane(int state);
 
     /**
+     * @brief checkMaxIterPlan
+     * @param state
+     */
+    void checkMaxIterPlan(int state);
+
+    /**
+     * @brief checkMaxIterApp
+     * @param state
+     */
+    void checkMaxIterApp(int state);
+
+    /**
+     * @brief checkMaxIterRet
+     * @param state
+     */
+    void checkMaxIterRet(int state);
+
+    /**
+     * @brief checkMaxIterBounce
+     * @param state
+     */
+    void checkMaxIterBounce(int state);
+
+    /**
      * @brief checkSetHandCond
      * @param state
      */
@@ -553,6 +577,53 @@ public:
     void setPlaneParameters(std::vector<double> &point1,std::vector<double> &point2,std::vector<double> &point3);
 
 
+    /**
+     * @brief getMaxIterPlanOption
+     * @return
+     */
+    bool getMaxIterPlanOption();
+
+    /**
+     * @brief getMaxIterAppOption
+     * @return
+     */
+    bool getMaxIterAppOption();
+
+    /**
+     * @brief getMaxIterRetOption
+     * @return
+     */
+    bool getMaxIterRetOption();
+
+    /**
+     * @brief getMaxIterBounceOption
+     * @return
+     */
+    bool getMaxIterBounceOption();
+
+    /**
+     * @brief getMaxIterPlan
+     * @return
+     */
+    int getMaxIterPlan();
+
+    /**
+     * @brief getMaxIterApp
+     * @return
+     */
+    int getMaxIterApp();
+
+    /**
+     * @brief getMaxIterRet
+     * @return
+     */
+    int getMaxIterRet();
+
+    /**
+     * @brief getMaxIterBounce
+     * @return
+     */
+    int getMaxIterBounce();
 
 
 
@@ -560,6 +631,17 @@ private:
     Ui::TolDialogHUMPDual *ui; /**< handle of the user interface */
     string infoLine; /**< information about the tuning of the planner */
     bool rand_init;
+
+    // max iterations
+    bool set_max_iter_plan; /**< true if the max iterations for plan must be set */
+    bool set_max_iter_app; /**< true if the max iterations for approach must be set */
+    bool set_max_iter_ret; /**< true if the max iterations for retreat must be set */
+    bool set_max_iter_bounce; /**< true if the max iterations for bounce must be set */
+    int max_iter_plan;/**< max iterations for the plan target posture selection */
+    int max_iter_app;/**< max iterations for the approach target posture selection */
+    int max_iter_ret;/**< max iterations for the retreat target posture selection */
+    int max_iter_bounce;/**< max iterations for the bounce posture selection */
+
 };
 
 } // namespace motion_manager

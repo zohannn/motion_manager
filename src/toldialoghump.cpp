@@ -751,7 +751,6 @@ void TolDialogHUMP::on_pushButton_save_clicked()
        stream << "max_iter_app=" << ui->lineEdit_max_iter_app->text().toStdString().c_str() << endl;
        stream << "max_iter_ret=" << ui->lineEdit_max_iter_ret->text().toStdString().c_str() << endl;
        stream << "max_iter_bounce=" << ui->lineEdit_max_iter_bounce->text().toStdString().c_str() << endl;
-
        //stream << "# END" << endl;
 
 
@@ -1853,21 +1852,25 @@ bool TolDialogHUMP::getMaxIterBounceOption()
 
 int TolDialogHUMP::getMaxIterPlan()
 {
+    this->max_iter_plan = ui->lineEdit_max_iter_plan->text().toDouble();
     return this->max_iter_plan;
 }
 
 int TolDialogHUMP::getMaxIterApp()
 {
+    this->max_iter_app = ui->lineEdit_max_iter_app->text().toDouble();
     return this->max_iter_app;
 }
 
 int TolDialogHUMP::getMaxIterRet()
 {
+    this->max_iter_ret = ui->lineEdit_max_iter_ret->text().toDouble();
     return this->max_iter_ret;
 }
 
 int TolDialogHUMP::getMaxIterBounce()
 {
+    this->max_iter_bounce = ui->lineEdit_max_iter_bounce->text().toDouble();
     return this->max_iter_bounce;
 }
 

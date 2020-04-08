@@ -7,38 +7,12 @@
     <x>0</x>
     <y>0</y>
     <width>970</width>
-    <height>737</height>
+    <height>772</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Human-like Upper-limbs Motion Planner parameters</string>
   </property>
-  <widget class="QWidget" name="layoutWidget_max_vel">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>700</y>
-     <width>261</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_13">
-    <item>
-     <widget class="QLabel" name="label_41">
-      <property name="text">
-       <string>Max Velocity of the joints [deg/sec]</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="lineEdit_w_max">
-      <property name="text">
-       <string>20.0</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QGroupBox" name="groupBox_constraints">
    <property name="geometry">
     <rect>
@@ -1122,54 +1096,6 @@
        </item>
       </layout>
      </widget>
-    </widget>
-    <widget class="QWidget" name="">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>540</y>
-       <width>671</width>
-       <height>27</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_65">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_39">
-        <item>
-         <widget class="QCheckBox" name="checkBox_max_iter_plan">
-          <property name="text">
-           <string>Max iterations for the plan target selection</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_max_iter_plan">
-          <property name="text">
-           <string>500</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_40">
-        <item>
-         <widget class="QCheckBox" name="checkBox_max_iter_bounce">
-          <property name="text">
-           <string>Max iterations for the bounce selection</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_max_iter_bounce">
-          <property name="text">
-           <string>500</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
     </widget>
    </widget>
    <widget class="QWidget" name="tab_hump_bounds">
@@ -2550,7 +2476,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>330</x>
@@ -2599,6 +2525,7 @@
      </layout>
     </widget>
     <zorder>layoutWidget</zorder>
+    <zorder>layoutWidget</zorder>
     <zorder>groupBox_pre_grasp</zorder>
     <zorder>groupBox_post_grasp</zorder>
     <zorder>label_pick</zorder>
@@ -2606,10 +2533,6 @@
     <zorder>label_pick_3</zorder>
     <zorder>groupBox_post_place</zorder>
     <zorder>checkBox_straight_line</zorder>
-    <zorder>checkBox_max_iter_app</zorder>
-    <zorder>lineEdit_max_iter_app</zorder>
-    <zorder>checkBox_max_iter_ret</zorder>
-    <zorder>lineEdit_max_iter_ret</zorder>
    </widget>
    <widget class="QWidget" name="tab_hump_move">
     <attribute name="title">
@@ -3603,7 +3526,7 @@
    <property name="geometry">
     <rect>
      <x>620</x>
-     <y>700</y>
+     <y>740</y>
      <width>342</width>
      <height>27</height>
     </rect>
@@ -3639,37 +3562,11 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_max_vel_2">
-   <property name="geometry">
-    <rect>
-     <x>280</x>
-     <y>700</y>
-     <width>311</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_22">
-    <item>
-     <widget class="QLabel" name="label_42">
-      <property name="text">
-       <string>Max Acceleration of the joints [deg/sec²]</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLineEdit" name="lineEdit_alpha_max">
-      <property name="text">
-       <string>10.0</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>491</x>
-     <y>620</y>
+     <y>640</y>
      <width>469</width>
      <height>52</height>
     </rect>
@@ -3725,6 +3622,102 @@
     </item>
    </layout>
   </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>700</y>
+     <width>671</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_65">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_39">
+      <item>
+       <widget class="QCheckBox" name="checkBox_max_iter_plan">
+        <property name="text">
+         <string>Max iterations for the plan target selection</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_max_iter_plan">
+        <property name="text">
+         <string>500</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_40">
+      <item>
+       <widget class="QCheckBox" name="checkBox_max_iter_bounce">
+        <property name="text">
+         <string>Max iterations for the bounce selection</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_max_iter_bounce">
+        <property name="text">
+         <string>500</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>740</y>
+     <width>591</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_66">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_13">
+      <item>
+       <widget class="QLabel" name="label_41">
+        <property name="text">
+         <string>Max Velocity of the joints [deg/sec]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_w_max">
+        <property name="text">
+         <string>20.0</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_22">
+      <item>
+       <widget class="QLabel" name="label_42">
+        <property name="text">
+         <string>Max Acceleration of the joints [deg/sec²]</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_alpha_max">
+        <property name="text">
+         <string>10.0</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
   <zorder>layoutWidget</zorder>
   <zorder>layoutWidget</zorder>
   <zorder>layoutWidget_max_vel</zorder>
@@ -3732,6 +3725,7 @@
   <zorder>tabWidget</zorder>
   <zorder>groupBox_constraints_2</zorder>
   <zorder>layoutWidget_max_vel_2</zorder>
+  <zorder>layoutWidget</zorder>
  </widget>
  <resources/>
  <connections>

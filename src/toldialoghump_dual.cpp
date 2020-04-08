@@ -16,6 +16,10 @@ TolDialogHUMPDual::TolDialogHUMPDual(QWidget *parent) :
      QObject::connect(ui->checkBox_sel_final_posture_right, SIGNAL(stateChanged(int)), this, SLOT(checkFinalPostureRight(int)));
      QObject::connect(ui->checkBox_sel_final_posture_left, SIGNAL(stateChanged(int)), this, SLOT(checkFinalPostureLeft(int)));
      QObject::connect(ui->checkBox_add_plane, SIGNAL(stateChanged(int)), this, SLOT(checkAddPlane(int)));
+     QObject::connect(ui->checkBox_max_iter_plan, SIGNAL(stateChanged(int)), this, SLOT(checkMaxIterPlan(int)));
+     QObject::connect(ui->checkBox_max_iter_app, SIGNAL(stateChanged(int)), this, SLOT(checkMaxIterApp(int)));
+     QObject::connect(ui->checkBox_max_iter_ret, SIGNAL(stateChanged(int)), this, SLOT(checkMaxIterRet(int)));
+     QObject::connect(ui->checkBox_max_iter_bounce, SIGNAL(stateChanged(int)), this, SLOT(checkMaxIterBounce(int)));
      //QObject::connect(ui->checkBox_hand_cond, SIGNAL(stateChanged(int)), this, SLOT(checkHandCond(int)));
      //QObject::connect(ui->checkBox_hand_cond_approach, SIGNAL(stateChanged(int)), this, SLOT(checkHandCondApproach(int)));
 
@@ -35,6 +39,38 @@ TolDialogHUMPDual::TolDialogHUMPDual(QWidget *parent) :
 
         ui->groupBox_post_grasp_left->setEnabled(false);
         ui->groupBox_post_place_left->setEnabled(false);
+    }
+
+    if(ui->checkBox_max_iter_plan->isChecked()){
+        this->set_max_iter_plan = true;
+        ui->lineEdit_max_iter_plan->setEnabled(true);
+    }else{
+        this->set_max_iter_plan = false;
+        ui->lineEdit_max_iter_plan->setEnabled(false);
+    }
+
+    if(ui->checkBox_max_iter_app->isChecked()){
+        this->set_max_iter_app = true;
+        ui->lineEdit_max_iter_app->setEnabled(true);
+    }else{
+        this->set_max_iter_app = false;
+        ui->lineEdit_max_iter_app->setEnabled(false);
+    }
+
+    if(ui->checkBox_max_iter_ret->isChecked()){
+        this->set_max_iter_ret = true;
+        ui->lineEdit_max_iter_ret->setEnabled(true);
+    }else{
+        this->set_max_iter_ret = false;
+        ui->lineEdit_max_iter_ret->setEnabled(false);
+    }
+
+    if(ui->checkBox_max_iter_bounce->isChecked()){
+        this->set_max_iter_bounce = true;
+        ui->lineEdit_max_iter_bounce->setEnabled(true);
+    }else{
+        this->set_max_iter_bounce = false;
+        ui->lineEdit_max_iter_bounce->setEnabled(false);
     }
 }
 
@@ -1184,9 +1220,16 @@ void TolDialogHUMPDual::on_pushButton_save_clicked()
        if(ui->checkBox_coll->isChecked()){stream << "coll=false"<<endl;}else{stream << "coll=true"<<endl;}
        if(ui->checkBox_coll_body->isChecked()){stream << "coll_body=false"<<endl;}else{stream << "coll_body=true"<<endl;}
        if(ui->checkBox_coll_arms->isChecked()){stream << "coll_arms=false"<<endl;}else{stream << "coll_arms=true"<<endl;}
-
        if(ui->checkBox_straight_line_right->isChecked()){stream << "straight_line_right=true"<<endl;}else{stream << "straight_line_right=false"<<endl;}
        if(ui->checkBox_straight_line_left->isChecked()){stream << "straight_line_left=true"<<endl;}else{stream << "straight_line_left=false"<<endl;}
+       if(ui->checkBox_max_iter_plan->isChecked()){stream << "set_max_iter_plan=true"<<endl;}else{stream << "set_max_iter_plan=false"<<endl;}
+       if(ui->checkBox_max_iter_app->isChecked()){stream << "set_max_iter_app=true"<<endl;}else{stream << "set_max_iter_app=false"<<endl;}
+       if(ui->checkBox_max_iter_ret->isChecked()){stream << "set_max_iter_ret=true"<<endl;}else{stream << "set_max_iter_ret=false"<<endl;}
+       if(ui->checkBox_max_iter_bounce->isChecked()){stream << "set_max_iter_bounce=true"<<endl;}else{stream << "set_max_iter_bounce=false"<<endl;}
+       stream << "max_iter_plan=" << ui->lineEdit_max_iter_plan->text().toStdString().c_str() << endl;
+       stream << "max_iter_app=" << ui->lineEdit_max_iter_app->text().toStdString().c_str() << endl;
+       stream << "max_iter_ret=" << ui->lineEdit_max_iter_ret->text().toStdString().c_str() << endl;
+       stream << "max_iter_bounce=" << ui->lineEdit_max_iter_bounce->text().toStdString().c_str() << endl;
        //stream << "# END" << endl;
 
 
@@ -1935,6 +1978,42 @@ void TolDialogHUMPDual::on_pushButton_load_clicked()
                         ui->checkBox_straight_line_left->setChecked(true);
                     }
 
+                }else if(QString::compare(fields.at(0),QString("set_max_iter_plan"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_max_iter_plan->setChecked(false);
+                    }else{
+                        ui->checkBox_max_iter_plan->setChecked(true);
+                    }
+                }else if(QString::compare(fields.at(0),QString("set_max_iter_app"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_max_iter_app->setChecked(false);
+                    }else{
+                        ui->checkBox_max_iter_app->setChecked(true);
+                    }
+                }else if(QString::compare(fields.at(0),QString("set_max_iter_ret"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_max_iter_ret->setChecked(false);
+                    }else{
+                        ui->checkBox_max_iter_ret->setChecked(true);
+                    }
+                }else if(QString::compare(fields.at(0),QString("set_max_iter_bounce"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("false\n"),Qt::CaseInsensitive)==0){
+                        ui->checkBox_max_iter_bounce->setChecked(false);
+                    }else{
+                        ui->checkBox_max_iter_bounce->setChecked(true);
+                    }
+                }else if(QString::compare(fields.at(0),QString("max_iter_plan"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_max_iter_plan->setText(fields.at(1));
+                    this->max_iter_plan = ui->lineEdit_max_iter_plan->text().toDouble();
+                }else if(QString::compare(fields.at(0),QString("max_iter_app"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_max_iter_app->setText(fields.at(1));
+                    this->max_iter_app = ui->lineEdit_max_iter_app->text().toDouble();
+                }else if(QString::compare(fields.at(0),QString("max_iter_ret"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_max_iter_ret->setText(fields.at(1));
+                    this->max_iter_ret = ui->lineEdit_max_iter_ret->text().toDouble();
+                }else if(QString::compare(fields.at(0),QString("max_iter_bounce"),Qt::CaseInsensitive)==0){
+                    ui->lineEdit_max_iter_bounce->setText(fields.at(1));
+                    this->max_iter_bounce = ui->lineEdit_max_iter_bounce->text().toDouble();
                 }
 
             }
@@ -2025,6 +2104,58 @@ void TolDialogHUMPDual::checkAddPlane(int state)
     }else{
         //checked
         ui->groupBox_plane->setEnabled(true);
+    }
+}
+
+void TolDialogHUMPDual::checkMaxIterPlan(int state)
+{
+    if(state==0){
+        //unchecked
+        set_max_iter_plan = false;
+        ui->lineEdit_max_iter_plan->setEnabled(false);
+    }else{
+        //checked
+        set_max_iter_plan = true;
+        ui->lineEdit_max_iter_plan->setEnabled(true);
+    }
+}
+
+void TolDialogHUMPDual::checkMaxIterApp(int state)
+{
+    if(state==0){
+        //unchecked
+        set_max_iter_app = false;
+        ui->lineEdit_max_iter_app->setEnabled(false);
+    }else{
+        //checked
+        set_max_iter_app = true;
+        ui->lineEdit_max_iter_app->setEnabled(true);
+    }
+}
+
+void TolDialogHUMPDual::checkMaxIterRet(int state)
+{
+    if(state==0){
+        //unchecked
+        set_max_iter_ret = false;
+        ui->lineEdit_max_iter_ret->setEnabled(false);
+    }else{
+        //checked
+        set_max_iter_ret = true;
+        ui->lineEdit_max_iter_ret->setEnabled(true);
+    }
+}
+
+void TolDialogHUMPDual::checkMaxIterBounce(int state)
+{
+    if(state==0){
+        //unchecked
+        set_max_iter_bounce = false;
+        ui->lineEdit_max_iter_bounce->setEnabled(false);
+    }else{
+        //checked
+        set_max_iter_bounce = true;
+        ui->lineEdit_max_iter_bounce->setEnabled(true);
     }
 }
 
@@ -2155,6 +2286,50 @@ void TolDialogHUMPDual::setStraightLineLeft(bool straight)
 void TolDialogHUMPDual::set_add_plane(bool plane)
 {
     ui->checkBox_add_plane->setChecked(plane);
+}
+
+bool TolDialogHUMPDual::getMaxIterPlanOption()
+{
+    return this->set_max_iter_plan;
+}
+
+bool TolDialogHUMPDual::getMaxIterAppOption()
+{
+    return this->set_max_iter_app;
+}
+
+bool TolDialogHUMPDual::getMaxIterRetOption()
+{
+    return this->set_max_iter_ret;
+}
+
+bool TolDialogHUMPDual::getMaxIterBounceOption()
+{
+    return this->set_max_iter_bounce;
+}
+
+int TolDialogHUMPDual::getMaxIterPlan()
+{
+    this->max_iter_plan = ui->lineEdit_max_iter_plan->text().toDouble();
+    return this->max_iter_plan;
+}
+
+int TolDialogHUMPDual::getMaxIterApp()
+{
+    this->max_iter_app = ui->lineEdit_max_iter_app->text().toDouble();
+    return this->max_iter_app;
+}
+
+int TolDialogHUMPDual::getMaxIterRet()
+{
+    this->max_iter_ret = ui->lineEdit_max_iter_ret->text().toDouble();
+    return this->max_iter_ret;
+}
+
+int TolDialogHUMPDual::getMaxIterBounce()
+{
+    this->max_iter_bounce = ui->lineEdit_max_iter_bounce->text().toDouble();
+    return this->max_iter_bounce;
 }
 
 

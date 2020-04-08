@@ -6,6 +6,7 @@ Shoulder_radius=80.0
 Elbow_radius=70.0
 
 Wrist_radius=150
+
 Hand_radius=100
 
 Hand_1_1=25.0
@@ -34,6 +35,7 @@ Hand_tip_3=15
 
 # Joint Expanse factors
 lambda_1=1
+
 lambda_2=1.0
 
 lambda_3=1.0
@@ -190,9 +192,12 @@ obs_xx_2=10
 
 obs_xx_3=10
 
-obs_yy_1=0
-obs_yy_2=0
-obs_yy_3=0
+obs_yy_1=10
+
+obs_yy_2=10
+
+obs_yy_3=10
+
 obs_zz_1=150
 
 obs_zz_2=150
@@ -329,3 +334,11 @@ coll=true
 coll_body=true
 straight_line=false
 warm_start=false
+set_max_iter_plan=false
+set_max_iter_app=false
+set_max_iter_ret=false
+set_max_iter_bounce=false
+max_iter_plan=500
+max_iter_app=500
+max_iter_ret=500
+max_iter_bounce=500
