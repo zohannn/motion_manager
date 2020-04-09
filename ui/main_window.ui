@@ -1076,100 +1076,234 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_collection">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>20</x>
         <y>240</y>
-        <width>441</width>
-        <height>201</height>
+        <width>1201</width>
+        <height>271</height>
        </rect>
       </property>
       <property name="title">
        <string>Collecting data</string>
       </property>
+      <widget class="QGroupBox" name="groupBox_cold_data">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>391</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Cold started dataset</string>
+       </property>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>372</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_46">
+         <item>
+          <widget class="QLabel" name="label_trials_cold_data">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Number of successful cold started trials</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_trials_cold_data">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>5</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QPushButton" name="pushButton_plan_collect_cold_data">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>60</y>
+          <width>210</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Plan and collect cold started data</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_cold_data_2">
+       <property name="geometry">
+        <rect>
+         <x>450</x>
+         <y>60</y>
+         <width>701</width>
+         <height>151</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Warm started dataset</string>
+       </property>
+       <widget class="QWidget" name="layoutWidget_109">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>90</y>
+          <width>372</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_618">
+         <item>
+          <widget class="QLabel" name="label_trials_warm_data">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Number of successful warm started trials</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_trials_warm_data">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>5</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QPushButton" name="pushButton_plan_collect_warm_data">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>120</y>
+          <width>231</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Plan and collect warm started data</string>
+        </property>
+       </widget>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>60</y>
+          <width>661</width>
+          <height>25</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_614">
+         <item>
+          <widget class="QLabel" name="label_cold_data">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Path of cold started data</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_cold_data">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_cold_data">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Select</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QLabel" name="label_cold_data_note">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>631</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <italic>true</italic>
+         </font>
+        </property>
+        <property name="text">
+         <string>The limitations on the number of iterations are set by tuning the parameters of the planning problem.</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::AutoText</enum>
+        </property>
+       </widget>
+      </widget>
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>80</y>
-         <width>391</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_46">
-        <item>
-         <widget class="QLabel" name="label_trials">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Number of successful trials</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_trials">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>5</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_plan_collect">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Plan and collect</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="layoutWidget_53">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>40</y>
-         <width>391</width>
+         <y>30</y>
+         <width>811</width>
          <height>25</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_295">
         <item>
-         <widget class="QLineEdit" name="lineEdit_collections"/>
+         <widget class="QLabel" name="label_collections">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Directory of data collection</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_collections">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_collections">
-          <property name="text">
-           <string>Select directory of collection</string>
+          <property name="enabled">
+           <bool>false</bool>
           </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>160</y>
-         <width>291</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_47">
-        <item>
-         <widget class="QPushButton" name="pushButton_load_learn_prim_duals">
           <property name="text">
-           <string>Load primals/duals</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_loaded">
-          <property name="text">
-           <string>Unloaded</string>
+           <string>Select</string>
           </property>
          </widget>
         </item>
@@ -1179,8 +1313,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_training">
       <property name="geometry">
        <rect>
-        <x>30</x>
-        <y>450</y>
+        <x>20</x>
+        <y>520</y>
         <width>571</width>
         <height>201</height>
        </rect>
@@ -1272,7 +1406,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>630</x>
-        <y>490</y>
+        <y>560</y>
         <width>591</width>
         <height>161</height>
        </rect>
@@ -1831,6 +1965,47 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>190</y>
+        <width>492</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_47">
+       <item>
+        <widget class="QLabel" name="label_load_note">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="font">
+          <font>
+           <italic>false</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Load the solution of the original problem. Status: </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_loaded">
+         <property name="text">
+          <string>Unloaded</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_load_learn_prim_duals">
+         <property name="text">
+          <string>Load primals/duals</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_control">

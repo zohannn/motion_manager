@@ -67,6 +67,7 @@ using namespace Eigen;
 
 namespace motion_manager{
 
+
 namespace logging = boost::log;
 namespace src = boost::log::sources;
 namespace sinks = boost::log::sinks;
@@ -183,7 +184,64 @@ typedef struct{
 } humanoid_part;
 
 
+/**
+ * @brief readNextRow: read a row of a csv file
+ * @param str
+ * @param m_data
+ * @return
+ */
+static inline std::istream& readNextRow(std::istream& str,std::vector<std::string>& m_data)
+{
+    std::string         line;
+    std::getline(str, line);
+
+    std::stringstream   lineStream(line);
+    std::string         cell;
+
+    m_data.clear();
+    while(std::getline(lineStream, cell, ','))
+    {
+        m_data.push_back(cell);
+    }
+    // This checks for a trailing comma with no data after it.
+    if (!lineStream && cell.empty())
+    {
+        // If there was a trailing comma then add an empty element.
+        m_data.push_back("");
+    }
+    return str;
+}
+
+/**
+ * @brief readCSVColdData
+ * @param cold_data_path
+ * @param csv_cold_data
+ * @return
+ */
+static inline bool readCSVColdData(std::string& cold_data_path, std::vector<std::map<std::string,double>>& csv_cold_data)
+{
+    csv_cold_data.clear();
+    std::ifstream cold_data_file(cold_data_path);
+    if(cold_data_file.is_open()){
+        std::vector<std::string> headers;
+        readNextRow(cold_data_file,headers);
+        std::vector<std::string> line_str;
+        while(readNextRow(cold_data_file,line_str))
+        {
+            std::map<std::string,double> csv_line;
+            for (size_t i=0; i < line_str.size(); ++i)
+            {
+                csv_line[headers.at(i)] = ::atof(line_str.at(i).c_str());
+            }
+            csv_cold_data.push_back(csv_line);
+        }
+        return true;
+    }else{return false;}
+
+}
 
 }// namespace motion_manager
+
+
 
 #endif // COMMON_HPP

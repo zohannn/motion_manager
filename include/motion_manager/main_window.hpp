@@ -591,14 +591,24 @@ public Q_SLOTS:
         void on_pushButton_load_learn_prim_duals_clicked();
 
         /**
-         * @brief on_pushButton_plan_collect_clicked
+         * @brief on_pushButton_plan_collect_cold_data_clicked
          */
-        void on_pushButton_plan_collect_clicked();
+        void on_pushButton_plan_collect_cold_data_clicked();
 
         /**
-         * @brief on_pushButton_plan_collect_pressed
+         * @brief on_pushButton_plan_collect_cold_data_pressed
          */
-        void on_pushButton_plan_collect_pressed();
+        void on_pushButton_plan_collect_cold_data_pressed();
+
+        /**
+         * @brief on_pushButton_plan_collect_warm_data_clicked
+         */
+        void on_pushButton_plan_collect_warm_data_clicked();
+
+        /**
+         * @brief on_pushButton_plan_collect_warm_data_pressed
+         */
+        void on_pushButton_plan_collect_warm_data_pressed();
 
         /**
          * @brief on_pushButton_py_train_file_clicked
@@ -640,6 +650,11 @@ public Q_SLOTS:
          * @brief on_pushButton_collections_clicked
          */
         void on_pushButton_collections_clicked();
+
+        /**
+         * @brief on_pushButton_cold_data_clicked
+         */
+        void on_pushButton_cold_data_clicked();
 
         /**
          * @brief on_pushButton_pred_plan_pressed
@@ -1282,18 +1297,21 @@ private:
         vector<double> zL_plan; /**< lower bounds multipliers of the plan target posture selection problem */
         vector<double> zU_plan; /**< upper bounds multipliers of the plan target posture selection problem */
         vector<double> dual_plan; /**< constraints multipliers of the plan target posture selection problem */
+        int warm_n_plan_steps; /**< number of steps in the plan stage */
         // approach
         bool sol_approach; /**< true if there are approach target solution */
         vector<double> x_approach; /**< initial guess of the approach target posture selection problem */
         vector<double> zL_approach; /**< lower bounds multipliers of the approach target posture selection problem */
         vector<double> zU_approach; /**< upper bounds multipliers of the approach target posture selection problem */
         vector<double> dual_approach; /**< constraints multipliers of the approach target posture selection problem */
+        int warm_n_app_steps; /**< number of steps in the approach stage */
         // retreat
         bool sol_retreat; /**< true if there are retreat target solution */
         vector<double> x_retreat; /**< initial guess of the retreat target posture selection problem */
         vector<double> zL_retreat; /**< lower bounds multipliers of the retreat target posture selection problem */
         vector<double> zU_retreat; /**< upper bounds multipliers of the retreat target posture selection problem */
         vector<double> dual_retreat; /**< constraints multipliers of the retreat target posture selection problem */
+        int warm_n_ret_steps; /**< number of steps in the retreat stage */
         // bounce
         bool sol_bounce; /**< true if there are bounce solution */
         vector<double> x_bounce; /**< initial guess of the bounce target posture selection problem */
