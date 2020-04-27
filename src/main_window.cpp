@@ -7977,15 +7977,21 @@ void MainWindow::on_pushButton_warm_start_res_clicked()
         {
             this->mWarmdlg->enablePlanData(true);
             HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(1);
-            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.error_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
+            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.error_value,
+                                        plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov,
+                                        plan_tar.obj_values,plan_tar.dual_inf_values,plan_tar.constr_viol_values,plan_tar.error_values);
 
             this->mWarmdlg->enableApproachData(true);
             HUMotion::warm_start_params approach_tar = this->final_warm_start_res_mov.at(0);
-            this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,approach_tar.error_value,approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars,this->warm_n_app_steps_mov);
+            this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,approach_tar.error_value,
+                                            approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars,this->warm_n_app_steps_mov,
+                                            approach_tar.obj_values,approach_tar.dual_inf_values,approach_tar.constr_viol_values,approach_tar.error_values);
 
             this->mWarmdlg->enableRetreatData(true);
             HUMotion::warm_start_params retreat_tar = this->final_warm_start_res_mov.at(2);
-            this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.error_value,retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars,this->warm_n_ret_steps_mov);
+            this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.error_value,
+                                           retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars,this->warm_n_ret_steps_mov,
+                                           retreat_tar.obj_values,retreat_tar.dual_inf_values,retreat_tar.constr_viol_values,retreat_tar.error_values);
 
         }else if(this->final_warm_start_res_mov.size()==2){
 
@@ -7993,27 +7999,37 @@ void MainWindow::on_pushButton_warm_start_res_clicked()
             {
                 this->mWarmdlg->enableApproachData(true);
                 HUMotion::warm_start_params approach_tar = this->final_warm_start_res_mov.at(0);
-                this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,approach_tar.error_value,approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars,this->warm_n_app_steps_mov);
+                this->mWarmdlg->setApproachData(approach_tar.iterations,approach_tar.cpu_time,approach_tar.obj_value,
+                                                approach_tar.error_value,approach_tar.x,approach_tar.zL,approach_tar.zU,approach_tar.dual_vars,this->warm_n_app_steps_mov,
+                                                approach_tar.obj_values,approach_tar.dual_inf_values,approach_tar.constr_viol_values,approach_tar.error_values);
 
                 this->mWarmdlg->enablePlanData(true);
                 HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(1);
-                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.error_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
+                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.error_value,
+                                            plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov,
+                                            plan_tar.obj_values,plan_tar.dual_inf_values,plan_tar.constr_viol_values,plan_tar.error_values);
 
             }else{
 
                 this->mWarmdlg->enablePlanData(true);
                 HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(0);
-                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.error_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
+                this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.error_value,
+                                            plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov,
+                                            plan_tar.obj_values,plan_tar.dual_inf_values,plan_tar.constr_viol_values,plan_tar.error_values);
 
                 this->mWarmdlg->enableRetreatData(true);
                 HUMotion::warm_start_params retreat_tar = this->final_warm_start_res_mov.at(1);
-                this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.error_value,retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars,this->warm_n_ret_steps_mov);
+                this->mWarmdlg->setRetreatData(retreat_tar.iterations,retreat_tar.cpu_time,retreat_tar.obj_value,retreat_tar.error_value,
+                                               retreat_tar.x,retreat_tar.zL,retreat_tar.zU,retreat_tar.dual_vars,this->warm_n_ret_steps_mov,
+                                               retreat_tar.obj_values,retreat_tar.dual_inf_values,retreat_tar.constr_viol_values,retreat_tar.error_values);
 
             }
         }else{
             this->mWarmdlg->enablePlanData(true);
             HUMotion::warm_start_params plan_tar = this->final_warm_start_res_mov.at(0);
-            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,plan_tar.error_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov);
+            this->mWarmdlg->setPlanData(plan_tar.iterations,plan_tar.cpu_time,plan_tar.obj_value,
+                                        plan_tar.error_value,plan_tar.x,plan_tar.zL,plan_tar.zU,plan_tar.dual_vars,this->warm_n_plan_steps_mov,
+                                        plan_tar.obj_values,plan_tar.dual_inf_values,plan_tar.constr_viol_values,plan_tar.error_values);
         }
     }
 
@@ -8021,7 +8037,9 @@ void MainWindow::on_pushButton_warm_start_res_clicked()
     if (this->bounce_warm_start_res_mov.valid)
     {
         this->mWarmdlg->enableBounceData(true);
-        this->mWarmdlg->setBounceData(this->bounce_warm_start_res_mov.iterations,this->bounce_warm_start_res_mov.cpu_time,this->bounce_warm_start_res_mov.obj_value,this->bounce_warm_start_res_mov.error_value,this->bounce_warm_start_res_mov.x,this->bounce_warm_start_res_mov.zL,this->bounce_warm_start_res_mov.zU,this->bounce_warm_start_res_mov.dual_vars);
+        this->mWarmdlg->setBounceData(this->bounce_warm_start_res_mov.iterations,this->bounce_warm_start_res_mov.cpu_time,this->bounce_warm_start_res_mov.obj_value,this->bounce_warm_start_res_mov.error_value,
+                                      this->bounce_warm_start_res_mov.x,this->bounce_warm_start_res_mov.zL,this->bounce_warm_start_res_mov.zU,this->bounce_warm_start_res_mov.dual_vars,
+                                      this->bounce_warm_start_res_mov.obj_values,this->bounce_warm_start_res_mov.dual_inf_values,this->bounce_warm_start_res_mov.constr_viol_values,this->bounce_warm_start_res_mov.error_values);
     }else{
         this->mWarmdlg->enableBounceData(false);
     }
@@ -8503,9 +8521,9 @@ void MainWindow::on_pushButton_save_res_task_clicked()
     results_csv.open(path.toStdString()+filename_csv);
     results_csv << "TRAJ,NJS,NMU,PLANNING TIME [ms] \n";
     for(size_t i=0;i<this->njs_task.size();++i){
-        string njs_str =  boost::str(boost::format("%.8f") % (this->njs_task.at(i)));
-        string nmu_str =  boost::str(boost::format("%.8f") % (this->nmu_task.at(i)));
-        string prob_str =  boost::str(boost::format("%.8f") % (this->prob_time_task.at(i)));
+        string njs_str =  boost::str(boost::format("%.15f") % (this->njs_task.at(i)));
+        string nmu_str =  boost::str(boost::format("%.15f") % (this->nmu_task.at(i)));
+        string prob_str =  boost::str(boost::format("%.15f") % (this->prob_time_task.at(i)));
         boost::replace_all(njs_str,",","."); boost::replace_all(nmu_str,",","."); boost::replace_all(prob_str,",",".");
         results_csv << QString::number(i+1).toStdString()+","+njs_str+","+nmu_str+","+prob_str+" \n";
     }
@@ -8809,9 +8827,9 @@ void MainWindow::on_pushButton_save_res_task_dual_clicked()
     results_csv_right.open(path.toStdString()+filename_csv_right);
     results_csv_right << "TRAJ,NJS,NMU,PLANNING TIME [ms] \n";
     for(size_t i=0;i < this->njs_task.size();++i){
-        string njs_str =  boost::str(boost::format("%.8f") % (this->njs_task.at(i)));
-        string nmu_str =  boost::str(boost::format("%.8f") % (this->nmu_task.at(i)));
-        string prob_str =  boost::str(boost::format("%.8f") % (this->prob_time_task.at(i)));
+        string njs_str =  boost::str(boost::format("%.15f") % (this->njs_task.at(i)));
+        string nmu_str =  boost::str(boost::format("%.15f") % (this->nmu_task.at(i)));
+        string prob_str =  boost::str(boost::format("%.15f") % (this->prob_time_task.at(i)));
         boost::replace_all(njs_str,",","."); boost::replace_all(nmu_str,",","."); boost::replace_all(prob_str,",",".");
         results_csv_right << QString::number(i+1).toStdString()+","+njs_str+","+nmu_str+","+prob_str+" \n";
     }
@@ -8823,9 +8841,9 @@ void MainWindow::on_pushButton_save_res_task_dual_clicked()
     results_csv_left.open(path.toStdString()+filename_csv_left);
     results_csv_left << "TRAJ,NJS,NMU,PLANNING TIME [ms] \n";
     for(size_t i=0;i<this->njs_task_left.size();++i){
-        string njs_str =  boost::str(boost::format("%.8f") % (this->njs_task_left.at(i)));
-        string nmu_str =  boost::str(boost::format("%.8f") % (this->nmu_task_left.at(i)));
-        string prob_str =  boost::str(boost::format("%.8f") % (this->prob_time_task.at(i)));
+        string njs_str =  boost::str(boost::format("%.15f") % (this->njs_task_left.at(i)));
+        string nmu_str =  boost::str(boost::format("%.15f") % (this->nmu_task_left.at(i)));
+        string prob_str =  boost::str(boost::format("%.15f") % (this->prob_time_task.at(i)));
         boost::replace_all(njs_str,",","."); boost::replace_all(nmu_str,",","."); boost::replace_all(prob_str,",",".");
         results_csv_left << QString::number(i+1).toStdString()+","+njs_str+","+nmu_str+","+prob_str+" \n";
     }
@@ -9487,36 +9505,36 @@ void MainWindow::on_pushButton_plan_collect_cold_data_clicked()
                                         // robot configuration
                                         // elbow
                                         std::vector<double> r_e_pos; curr_scene->getHumanoid()->getRightElbowPos(r_e_pos);
-                                        string r_e_pos_x_str =  boost::str(boost::format("%.8f") % (r_e_pos.at(0))); boost::replace_all(r_e_pos_x_str,",",".");
-                                        string r_e_pos_y_str =  boost::str(boost::format("%.8f") % (r_e_pos.at(1))); boost::replace_all(r_e_pos_y_str,",",".");
-                                        string r_e_pos_z_str =  boost::str(boost::format("%.8f") % (r_e_pos.at(2))); boost::replace_all(r_e_pos_z_str,",",".");
+                                        string r_e_pos_x_str =  boost::str(boost::format("%.15f") % (r_e_pos.at(0))); boost::replace_all(r_e_pos_x_str,",",".");
+                                        string r_e_pos_y_str =  boost::str(boost::format("%.15f") % (r_e_pos.at(1))); boost::replace_all(r_e_pos_y_str,",",".");
+                                        string r_e_pos_z_str =  boost::str(boost::format("%.15f") % (r_e_pos.at(2))); boost::replace_all(r_e_pos_z_str,",",".");
                                         data_csv << r_e_pos_x_str+","+r_e_pos_y_str+","+r_e_pos_z_str+",";
                                         // wrist
                                         std::vector<double> r_w_pos; curr_scene->getHumanoid()->getRightWristPos(r_w_pos);
-                                        string r_w_pos_x_str =  boost::str(boost::format("%.8f") % (r_w_pos.at(0))); boost::replace_all(r_w_pos_x_str,",",".");
-                                        string r_w_pos_y_str =  boost::str(boost::format("%.8f") % (r_w_pos.at(1))); boost::replace_all(r_w_pos_y_str,",",".");
-                                        string r_w_pos_z_str =  boost::str(boost::format("%.8f") % (r_w_pos.at(2))); boost::replace_all(r_w_pos_z_str,",",".");
+                                        string r_w_pos_x_str =  boost::str(boost::format("%.15f") % (r_w_pos.at(0))); boost::replace_all(r_w_pos_x_str,",",".");
+                                        string r_w_pos_y_str =  boost::str(boost::format("%.15f") % (r_w_pos.at(1))); boost::replace_all(r_w_pos_y_str,",",".");
+                                        string r_w_pos_z_str =  boost::str(boost::format("%.15f") % (r_w_pos.at(2))); boost::replace_all(r_w_pos_z_str,",",".");
                                         data_csv << r_w_pos_x_str+","+r_w_pos_y_str+","+r_w_pos_z_str+",";
                                         // hand
                                         std::vector<double> r_h_pos; curr_scene->getHumanoid()->getRightHandPos(r_h_pos);
-                                        string r_h_pos_x_str =  boost::str(boost::format("%.8f") % (r_h_pos.at(0))); boost::replace_all(r_h_pos_x_str,",",".");
-                                        string r_h_pos_y_str =  boost::str(boost::format("%.8f") % (r_h_pos.at(1))); boost::replace_all(r_h_pos_y_str,",",".");
-                                        string r_h_pos_z_str =  boost::str(boost::format("%.8f") % (r_h_pos.at(2))); boost::replace_all(r_h_pos_z_str,",",".");
+                                        string r_h_pos_x_str =  boost::str(boost::format("%.15f") % (r_h_pos.at(0))); boost::replace_all(r_h_pos_x_str,",",".");
+                                        string r_h_pos_y_str =  boost::str(boost::format("%.15f") % (r_h_pos.at(1))); boost::replace_all(r_h_pos_y_str,",",".");
+                                        string r_h_pos_z_str =  boost::str(boost::format("%.15f") % (r_h_pos.at(2))); boost::replace_all(r_h_pos_z_str,",",".");
                                         data_csv << r_h_pos_x_str+","+r_h_pos_y_str+","+r_h_pos_z_str+",";
                                         // thumb
                                         std::vector<double> r_thumb_pos; curr_scene->getHumanoid()->getRightThumbFingerPositions(r_thumb_pos);
                                         std::vector<double> r_thumb_pos_1(3); std::copy(r_thumb_pos.begin(), r_thumb_pos.begin()+3, r_thumb_pos_1.begin());
                                         std::vector<double> r_thumb_pos_2(3); std::copy(r_thumb_pos.begin()+3, r_thumb_pos.begin()+6, r_thumb_pos_2.begin());
                                         std::vector<double> r_thumb_pos_tip(3); std::copy(r_thumb_pos.begin()+6, r_thumb_pos.begin()+9, r_thumb_pos_tip.begin());
-                                        string r_thumb_pos_1_x_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_1.at(0))); boost::replace_all(r_thumb_pos_1_x_str,",",".");
-                                        string r_thumb_pos_1_y_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_1.at(1))); boost::replace_all(r_thumb_pos_1_y_str,",",".");
-                                        string r_thumb_pos_1_z_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_1.at(2))); boost::replace_all(r_thumb_pos_1_z_str,",",".");
-                                        string r_thumb_pos_2_x_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_2.at(0))); boost::replace_all(r_thumb_pos_2_x_str,",",".");
-                                        string r_thumb_pos_2_y_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_2.at(1))); boost::replace_all(r_thumb_pos_2_y_str,",",".");
-                                        string r_thumb_pos_2_z_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_2.at(2))); boost::replace_all(r_thumb_pos_2_z_str,",",".");
-                                        string r_thumb_pos_tip_x_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_tip.at(0))); boost::replace_all(r_thumb_pos_tip_x_str,",",".");
-                                        string r_thumb_pos_tip_y_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_tip.at(1))); boost::replace_all(r_thumb_pos_tip_y_str,",",".");
-                                        string r_thumb_pos_tip_z_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_tip.at(2))); boost::replace_all(r_thumb_pos_tip_z_str,",",".");
+                                        string r_thumb_pos_1_x_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_1.at(0))); boost::replace_all(r_thumb_pos_1_x_str,",",".");
+                                        string r_thumb_pos_1_y_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_1.at(1))); boost::replace_all(r_thumb_pos_1_y_str,",",".");
+                                        string r_thumb_pos_1_z_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_1.at(2))); boost::replace_all(r_thumb_pos_1_z_str,",",".");
+                                        string r_thumb_pos_2_x_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_2.at(0))); boost::replace_all(r_thumb_pos_2_x_str,",",".");
+                                        string r_thumb_pos_2_y_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_2.at(1))); boost::replace_all(r_thumb_pos_2_y_str,",",".");
+                                        string r_thumb_pos_2_z_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_2.at(2))); boost::replace_all(r_thumb_pos_2_z_str,",",".");
+                                        string r_thumb_pos_tip_x_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_tip.at(0))); boost::replace_all(r_thumb_pos_tip_x_str,",",".");
+                                        string r_thumb_pos_tip_y_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_tip.at(1))); boost::replace_all(r_thumb_pos_tip_y_str,",",".");
+                                        string r_thumb_pos_tip_z_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_tip.at(2))); boost::replace_all(r_thumb_pos_tip_z_str,",",".");
                                         data_csv << r_thumb_pos_1_x_str+","+r_thumb_pos_1_y_str+","+r_thumb_pos_1_z_str+","+
                                                     r_thumb_pos_2_x_str+","+r_thumb_pos_2_y_str+","+r_thumb_pos_2_z_str+","+
                                                     r_thumb_pos_tip_x_str+","+r_thumb_pos_tip_y_str+","+r_thumb_pos_tip_z_str+",";
@@ -9525,15 +9543,15 @@ void MainWindow::on_pushButton_plan_collect_cold_data_clicked()
                                         std::vector<double> r_index_pos_1(3); std::copy(r_index_pos.begin(), r_index_pos.begin()+3, r_index_pos_1.begin());
                                         std::vector<double> r_index_pos_2(3); std::copy(r_index_pos.begin()+3, r_index_pos.begin()+6, r_index_pos_2.begin());
                                         std::vector<double> r_index_pos_tip(3); std::copy(r_index_pos.begin()+6, r_index_pos.begin()+9, r_index_pos_tip.begin());
-                                        string r_index_pos_1_x_str =  boost::str(boost::format("%.8f") % (r_index_pos_1.at(0))); boost::replace_all(r_index_pos_1_x_str,",",".");
-                                        string r_index_pos_1_y_str =  boost::str(boost::format("%.8f") % (r_index_pos_1.at(1))); boost::replace_all(r_index_pos_1_y_str,",",".");
-                                        string r_index_pos_1_z_str =  boost::str(boost::format("%.8f") % (r_index_pos_1.at(2))); boost::replace_all(r_index_pos_1_z_str,",",".");
-                                        string r_index_pos_2_x_str =  boost::str(boost::format("%.8f") % (r_index_pos_2.at(0))); boost::replace_all(r_index_pos_2_x_str,",",".");
-                                        string r_index_pos_2_y_str =  boost::str(boost::format("%.8f") % (r_index_pos_2.at(1))); boost::replace_all(r_index_pos_2_y_str,",",".");
-                                        string r_index_pos_2_z_str =  boost::str(boost::format("%.8f") % (r_index_pos_2.at(2))); boost::replace_all(r_index_pos_2_z_str,",",".");
-                                        string r_index_pos_tip_x_str =  boost::str(boost::format("%.8f") % (r_index_pos_tip.at(0))); boost::replace_all(r_index_pos_tip_x_str,",",".");
-                                        string r_index_pos_tip_y_str =  boost::str(boost::format("%.8f") % (r_index_pos_tip.at(1))); boost::replace_all(r_index_pos_tip_y_str,",",".");
-                                        string r_index_pos_tip_z_str =  boost::str(boost::format("%.8f") % (r_index_pos_tip.at(2))); boost::replace_all(r_index_pos_tip_z_str,",",".");
+                                        string r_index_pos_1_x_str =  boost::str(boost::format("%.15f") % (r_index_pos_1.at(0))); boost::replace_all(r_index_pos_1_x_str,",",".");
+                                        string r_index_pos_1_y_str =  boost::str(boost::format("%.15f") % (r_index_pos_1.at(1))); boost::replace_all(r_index_pos_1_y_str,",",".");
+                                        string r_index_pos_1_z_str =  boost::str(boost::format("%.15f") % (r_index_pos_1.at(2))); boost::replace_all(r_index_pos_1_z_str,",",".");
+                                        string r_index_pos_2_x_str =  boost::str(boost::format("%.15f") % (r_index_pos_2.at(0))); boost::replace_all(r_index_pos_2_x_str,",",".");
+                                        string r_index_pos_2_y_str =  boost::str(boost::format("%.15f") % (r_index_pos_2.at(1))); boost::replace_all(r_index_pos_2_y_str,",",".");
+                                        string r_index_pos_2_z_str =  boost::str(boost::format("%.15f") % (r_index_pos_2.at(2))); boost::replace_all(r_index_pos_2_z_str,",",".");
+                                        string r_index_pos_tip_x_str =  boost::str(boost::format("%.15f") % (r_index_pos_tip.at(0))); boost::replace_all(r_index_pos_tip_x_str,",",".");
+                                        string r_index_pos_tip_y_str =  boost::str(boost::format("%.15f") % (r_index_pos_tip.at(1))); boost::replace_all(r_index_pos_tip_y_str,",",".");
+                                        string r_index_pos_tip_z_str =  boost::str(boost::format("%.15f") % (r_index_pos_tip.at(2))); boost::replace_all(r_index_pos_tip_z_str,",",".");
                                         data_csv << r_index_pos_1_x_str+","+r_index_pos_1_y_str+","+r_index_pos_1_z_str+","+
                                                     r_index_pos_2_x_str+","+r_index_pos_2_y_str+","+r_index_pos_2_z_str+","+
                                                     r_index_pos_tip_x_str+","+r_index_pos_tip_y_str+","+r_index_pos_tip_z_str+",";
@@ -9542,15 +9560,15 @@ void MainWindow::on_pushButton_plan_collect_cold_data_clicked()
                                         std::vector<double> r_middle_pos_1(3); std::copy(r_middle_pos.begin(), r_middle_pos.begin()+3, r_middle_pos_1.begin());
                                         std::vector<double> r_middle_pos_2(3); std::copy(r_middle_pos.begin()+3, r_middle_pos.begin()+6, r_middle_pos_2.begin());
                                         std::vector<double> r_middle_pos_tip(3); std::copy(r_middle_pos.begin()+6, r_middle_pos.begin()+9, r_middle_pos_tip.begin());
-                                        string r_middle_pos_1_x_str =  boost::str(boost::format("%.8f") % (r_middle_pos_1.at(0))); boost::replace_all(r_middle_pos_1_x_str,",",".");
-                                        string r_middle_pos_1_y_str =  boost::str(boost::format("%.8f") % (r_middle_pos_1.at(1))); boost::replace_all(r_middle_pos_1_y_str,",",".");
-                                        string r_middle_pos_1_z_str =  boost::str(boost::format("%.8f") % (r_middle_pos_1.at(2))); boost::replace_all(r_middle_pos_1_z_str,",",".");
-                                        string r_middle_pos_2_x_str =  boost::str(boost::format("%.8f") % (r_middle_pos_2.at(0))); boost::replace_all(r_middle_pos_2_x_str,",",".");
-                                        string r_middle_pos_2_y_str =  boost::str(boost::format("%.8f") % (r_middle_pos_2.at(1))); boost::replace_all(r_middle_pos_2_y_str,",",".");
-                                        string r_middle_pos_2_z_str =  boost::str(boost::format("%.8f") % (r_middle_pos_2.at(2))); boost::replace_all(r_middle_pos_2_z_str,",",".");
-                                        string r_middle_pos_tip_x_str =  boost::str(boost::format("%.8f") % (r_middle_pos_tip.at(0))); boost::replace_all(r_middle_pos_tip_x_str,",",".");
-                                        string r_middle_pos_tip_y_str =  boost::str(boost::format("%.8f") % (r_middle_pos_tip.at(1))); boost::replace_all(r_middle_pos_tip_y_str,",",".");
-                                        string r_middle_pos_tip_z_str =  boost::str(boost::format("%.8f") % (r_middle_pos_tip.at(2))); boost::replace_all(r_middle_pos_tip_z_str,",",".");
+                                        string r_middle_pos_1_x_str =  boost::str(boost::format("%.15f") % (r_middle_pos_1.at(0))); boost::replace_all(r_middle_pos_1_x_str,",",".");
+                                        string r_middle_pos_1_y_str =  boost::str(boost::format("%.15f") % (r_middle_pos_1.at(1))); boost::replace_all(r_middle_pos_1_y_str,",",".");
+                                        string r_middle_pos_1_z_str =  boost::str(boost::format("%.15f") % (r_middle_pos_1.at(2))); boost::replace_all(r_middle_pos_1_z_str,",",".");
+                                        string r_middle_pos_2_x_str =  boost::str(boost::format("%.15f") % (r_middle_pos_2.at(0))); boost::replace_all(r_middle_pos_2_x_str,",",".");
+                                        string r_middle_pos_2_y_str =  boost::str(boost::format("%.15f") % (r_middle_pos_2.at(1))); boost::replace_all(r_middle_pos_2_y_str,",",".");
+                                        string r_middle_pos_2_z_str =  boost::str(boost::format("%.15f") % (r_middle_pos_2.at(2))); boost::replace_all(r_middle_pos_2_z_str,",",".");
+                                        string r_middle_pos_tip_x_str =  boost::str(boost::format("%.15f") % (r_middle_pos_tip.at(0))); boost::replace_all(r_middle_pos_tip_x_str,",",".");
+                                        string r_middle_pos_tip_y_str =  boost::str(boost::format("%.15f") % (r_middle_pos_tip.at(1))); boost::replace_all(r_middle_pos_tip_y_str,",",".");
+                                        string r_middle_pos_tip_z_str =  boost::str(boost::format("%.15f") % (r_middle_pos_tip.at(2))); boost::replace_all(r_middle_pos_tip_z_str,",",".");
                                         data_csv << r_middle_pos_1_x_str+","+r_middle_pos_1_y_str+","+r_middle_pos_1_z_str+","+
                                                     r_middle_pos_2_x_str+","+r_middle_pos_2_y_str+","+r_middle_pos_2_z_str+","+
                                                     r_middle_pos_tip_x_str+","+r_middle_pos_tip_y_str+","+r_middle_pos_tip_z_str+",";
@@ -9558,103 +9576,103 @@ void MainWindow::on_pushButton_plan_collect_cold_data_clicked()
                                         // target
                                         if(mov_type==0){ // reach-to-grasp movement
                                             objectPtr obj_tar = prob->getMovement()->getObject();
-                                            string tar_x_pos_str =  boost::str(boost::format("%.8f") % (obj_tar->getPos().Xpos)); boost::replace_all(tar_x_pos_str,",",".");
-                                            string tar_y_pos_str =  boost::str(boost::format("%.8f") % (obj_tar->getPos().Ypos)); boost::replace_all(tar_y_pos_str,",",".");
-                                            string tar_z_pos_str =  boost::str(boost::format("%.8f") % (obj_tar->getPos().Zpos)); boost::replace_all(tar_z_pos_str,",",".");
-                                            string tar_roll_str =  boost::str(boost::format("%.8f") % (obj_tar->getOr().roll)); boost::replace_all(tar_roll_str,",",".");
-                                            string tar_pitch_str =  boost::str(boost::format("%.8f") % (obj_tar->getOr().pitch)); boost::replace_all(tar_pitch_str,",",".");
-                                            string tar_yaw_str =  boost::str(boost::format("%.8f") % (obj_tar->getOr().yaw)); boost::replace_all(tar_yaw_str,",",".");
+                                            string tar_x_pos_str =  boost::str(boost::format("%.15f") % (obj_tar->getPos().Xpos)); boost::replace_all(tar_x_pos_str,",",".");
+                                            string tar_y_pos_str =  boost::str(boost::format("%.15f") % (obj_tar->getPos().Ypos)); boost::replace_all(tar_y_pos_str,",",".");
+                                            string tar_z_pos_str =  boost::str(boost::format("%.15f") % (obj_tar->getPos().Zpos)); boost::replace_all(tar_z_pos_str,",",".");
+                                            string tar_roll_str =  boost::str(boost::format("%.15f") % (obj_tar->getOr().roll)); boost::replace_all(tar_roll_str,",",".");
+                                            string tar_pitch_str =  boost::str(boost::format("%.15f") % (obj_tar->getOr().pitch)); boost::replace_all(tar_pitch_str,",",".");
+                                            string tar_yaw_str =  boost::str(boost::format("%.15f") % (obj_tar->getOr().yaw)); boost::replace_all(tar_yaw_str,",",".");
                                             data_csv << tar_x_pos_str+","+tar_y_pos_str+","+tar_z_pos_str+","+tar_roll_str+","+tar_pitch_str+","+tar_yaw_str+",";
                                         }else if(mov_type==1 || mov_type==5){ // move movement
-                                            string tar_x_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(0))); boost::replace_all(tar_x_pos_str,",",".");
-                                            string tar_y_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(1))); boost::replace_all(tar_y_pos_str,",",".");
-                                            string tar_z_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(2))); boost::replace_all(tar_z_pos_str,",",".");
-                                            string tar_roll_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(3))); boost::replace_all(tar_roll_str,",",".");
-                                            string tar_pitch_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(4))); boost::replace_all(tar_pitch_str,",",".");
-                                            string tar_yaw_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(5))); boost::replace_all(tar_yaw_str,",",".");
+                                            string tar_x_pos_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(0))); boost::replace_all(tar_x_pos_str,",",".");
+                                            string tar_y_pos_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(1))); boost::replace_all(tar_y_pos_str,",",".");
+                                            string tar_z_pos_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(2))); boost::replace_all(tar_z_pos_str,",",".");
+                                            string tar_roll_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(3))); boost::replace_all(tar_roll_str,",",".");
+                                            string tar_pitch_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(4))); boost::replace_all(tar_pitch_str,",",".");
+                                            string tar_yaw_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(5))); boost::replace_all(tar_yaw_str,",",".");
                                             data_csv << tar_x_pos_str+","+tar_y_pos_str+","+tar_z_pos_str+","+tar_roll_str+","+tar_pitch_str+","+tar_yaw_str+",";
                                         }
                                         // obstacles
                                         std::vector<objectPtr> obsts_new; prob->getObstacles(obsts_new);
                                         for(size_t j=0;j<obsts_new.size();++j){
                                             objectPtr obs = obsts_new.at(j);
-                                            string obs_x_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Xpos)); boost::replace_all(obs_x_pos_str,",",".");
-                                            string obs_y_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Ypos)); boost::replace_all(obs_y_pos_str,",",".");
-                                            string obs_z_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Zpos)); boost::replace_all(obs_z_pos_str,",",".");
-                                            string obs_roll_str =  boost::str(boost::format("%.8f") % (obs->getOr().roll)); boost::replace_all(obs_roll_str,",",".");
-                                            string obs_pitch_str =  boost::str(boost::format("%.8f") % (obs->getOr().pitch)); boost::replace_all(obs_pitch_str,",",".");
-                                            string obs_yaw_str =  boost::str(boost::format("%.8f") % (obs->getOr().yaw)); boost::replace_all(obs_yaw_str,",",".");
+                                            string obs_x_pos_str =  boost::str(boost::format("%.15f") % (obs->getPos().Xpos)); boost::replace_all(obs_x_pos_str,",",".");
+                                            string obs_y_pos_str =  boost::str(boost::format("%.15f") % (obs->getPos().Ypos)); boost::replace_all(obs_y_pos_str,",",".");
+                                            string obs_z_pos_str =  boost::str(boost::format("%.15f") % (obs->getPos().Zpos)); boost::replace_all(obs_z_pos_str,",",".");
+                                            string obs_roll_str =  boost::str(boost::format("%.15f") % (obs->getOr().roll)); boost::replace_all(obs_roll_str,",",".");
+                                            string obs_pitch_str =  boost::str(boost::format("%.15f") % (obs->getOr().pitch)); boost::replace_all(obs_pitch_str,",",".");
+                                            string obs_yaw_str =  boost::str(boost::format("%.15f") % (obs->getOr().yaw)); boost::replace_all(obs_yaw_str,",",".");
                                             data_csv << obs_x_pos_str+","+obs_y_pos_str+","+obs_z_pos_str+","+obs_roll_str+","+obs_pitch_str+","+obs_yaw_str+",";
                                         }
                                         // final posture selections
                                         if(h_results_tmp->final_warm_start_res.size()==3){
                                             // plan
                                             HUMotion::warm_start_params f_plan_res = h_results_tmp->final_warm_start_res.at(1);                                            
-                                            string cpu_time_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
-                                            string iter_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
-                                            string obj_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
-                                            string error_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
+                                            string cpu_time_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
+                                            string iter_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
+                                            string obj_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
+                                            string error_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
                                             data_csv << cpu_time_plan_str+","+iter_plan_str+","+obj_plan_str+","+error_plan_str+",";
                                             for(int h=0;h<f_plan_res.x.size();++h){
-                                                string x_str =  boost::str(boost::format("%.8f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                string x_str =  boost::str(boost::format("%.15f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                 data_csv << x_str+",";
                                             }
                                             for(size_t h=0;h<f_plan_res.zL.size();++h){
-                                                string zL_str =  boost::str(boost::format("%.8f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                string zL_str =  boost::str(boost::format("%.15f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                 data_csv << zL_str+",";
                                             }
                                             for(size_t h=0;h<f_plan_res.zU.size();++h){
-                                                string zU_str =  boost::str(boost::format("%.8f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                string zU_str =  boost::str(boost::format("%.15f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                 data_csv << zU_str+",";
                                             }
                                             for(size_t h=0;h<f_plan_res.dual_vars.size();++h){
-                                                string dual_str =  boost::str(boost::format("%.8f") % (f_plan_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                string dual_str =  boost::str(boost::format("%.15f") % (f_plan_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                                 data_csv << dual_str+",";
                                             }
                                             // approach
                                             HUMotion::warm_start_params f_app_res = h_results_tmp->final_warm_start_res.at(0);
-                                            string cpu_time_app_str =  boost::str(boost::format("%.8f") % (f_app_res.cpu_time)); boost::replace_all(cpu_time_app_str,",",".");
-                                            string iter_app_str =  boost::str(boost::format("%.8f") % (f_app_res.iterations)); boost::replace_all(iter_app_str,",",".");
-                                            string obj_app_str =  boost::str(boost::format("%.8f") % (f_app_res.obj_value)); boost::replace_all(obj_app_str,",",".");
-                                            string error_app_str =  boost::str(boost::format("%.8f") % (f_app_res.error_value)); boost::replace_all(error_app_str,",",".");
+                                            string cpu_time_app_str =  boost::str(boost::format("%.15f") % (f_app_res.cpu_time)); boost::replace_all(cpu_time_app_str,",",".");
+                                            string iter_app_str =  boost::str(boost::format("%.15f") % (f_app_res.iterations)); boost::replace_all(iter_app_str,",",".");
+                                            string obj_app_str =  boost::str(boost::format("%.15f") % (f_app_res.obj_value)); boost::replace_all(obj_app_str,",",".");
+                                            string error_app_str =  boost::str(boost::format("%.15f") % (f_app_res.error_value)); boost::replace_all(error_app_str,",",".");
                                             data_csv << cpu_time_app_str+","+iter_app_str+","+obj_app_str+","+error_app_str+",";
                                             for(int h=0;h<f_app_res.x.size();++h){
-                                                string x_str =  boost::str(boost::format("%.8f") % (f_app_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                string x_str =  boost::str(boost::format("%.15f") % (f_app_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                 data_csv << x_str+",";
                                             }
                                             for(size_t h=0;h<f_app_res.zL.size();++h){
-                                                string zL_str =  boost::str(boost::format("%.8f") % (f_app_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                string zL_str =  boost::str(boost::format("%.15f") % (f_app_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                 data_csv << zL_str+",";
                                             }
                                             for(size_t h=0;h<f_app_res.zU.size();++h){
-                                                string zU_str =  boost::str(boost::format("%.8f") % (f_app_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                string zU_str =  boost::str(boost::format("%.15f") % (f_app_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                 data_csv << zU_str+",";
                                             }
                                             for(size_t h=0;h<f_app_res.dual_vars.size();++h){
-                                                string dual_str =  boost::str(boost::format("%.8f") % (f_app_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                string dual_str =  boost::str(boost::format("%.15f") % (f_app_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                                 data_csv << dual_str+",";
                                             }
                                             //retreat
                                             HUMotion::warm_start_params f_ret_res = h_results_tmp->final_warm_start_res.at(2);
-                                            string cpu_time_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.cpu_time)); boost::replace_all(cpu_time_ret_str,",",".");
-                                            string iter_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.iterations)); boost::replace_all(iter_ret_str,",",".");
-                                            string obj_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.obj_value)); boost::replace_all(obj_ret_str,",",".");
-                                            string error_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.error_value)); boost::replace_all(error_ret_str,",",".");
+                                            string cpu_time_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.cpu_time)); boost::replace_all(cpu_time_ret_str,",",".");
+                                            string iter_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.iterations)); boost::replace_all(iter_ret_str,",",".");
+                                            string obj_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.obj_value)); boost::replace_all(obj_ret_str,",",".");
+                                            string error_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.error_value)); boost::replace_all(error_ret_str,",",".");
                                             data_csv << cpu_time_ret_str+","+iter_ret_str+","+obj_ret_str+","+error_ret_str+",";
                                             for(int h=0;h<f_ret_res.x.size();++h){
-                                                string x_str =  boost::str(boost::format("%.8f") % (f_ret_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                string x_str =  boost::str(boost::format("%.15f") % (f_ret_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                 data_csv << x_str+",";
                                             }
                                             for(size_t h=0;h<f_ret_res.zL.size();++h){
-                                                string zL_str =  boost::str(boost::format("%.8f") % (f_ret_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                string zL_str =  boost::str(boost::format("%.15f") % (f_ret_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                 data_csv << zL_str+",";
                                             }
                                             for(size_t h=0;h<f_ret_res.zU.size();++h){
-                                                string zU_str =  boost::str(boost::format("%.8f") % (f_ret_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                string zU_str =  boost::str(boost::format("%.15f") % (f_ret_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                 data_csv << zU_str+",";
                                             }
                                             for(size_t h=0;h<f_ret_res.dual_vars.size();++h){
-                                                string dual_str =  boost::str(boost::format("%.8f") % (f_ret_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                string dual_str =  boost::str(boost::format("%.15f") % (f_ret_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                                 data_csv << dual_str+",";
                                             }
                                         }else if(h_results_tmp->final_warm_start_res.size()==2){
@@ -9662,135 +9680,135 @@ void MainWindow::on_pushButton_plan_collect_cold_data_clicked()
                                             {
                                                 // plan
                                                 HUMotion::warm_start_params f_plan_res = h_results_tmp->final_warm_start_res.at(1);
-                                                string cpu_time_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
-                                                string iter_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
-                                                string obj_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
-                                                string error_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
+                                                string cpu_time_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
+                                                string iter_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
+                                                string obj_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
+                                                string error_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
                                                 data_csv << cpu_time_plan_str+","+iter_plan_str+","+obj_plan_str+","+error_plan_str+",";
                                                 for(int h=0;h<f_plan_res.x.size();++h){
-                                                    string x_str =  boost::str(boost::format("%.8f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                    string x_str =  boost::str(boost::format("%.15f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                     data_csv << x_str+",";
                                                 }
                                                 for(size_t h=0;h<f_plan_res.zL.size();++h){
-                                                    string zL_str =  boost::str(boost::format("%.8f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                    string zL_str =  boost::str(boost::format("%.15f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                     data_csv << zL_str+",";
                                                 }
                                                 for(size_t h=0;h<f_plan_res.zU.size();++h){
-                                                    string zU_str =  boost::str(boost::format("%.8f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                    string zU_str =  boost::str(boost::format("%.15f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                     data_csv << zU_str+",";
                                                 }
                                                 //approach
                                                 HUMotion::warm_start_params f_app_res = h_results_tmp->final_warm_start_res.at(0);
-                                                string cpu_time_app_str =  boost::str(boost::format("%.8f") % (f_app_res.cpu_time)); boost::replace_all(cpu_time_app_str,",",".");
-                                                string iter_app_str =  boost::str(boost::format("%.8f") % (f_app_res.iterations)); boost::replace_all(iter_app_str,",",".");
-                                                string obj_app_str =  boost::str(boost::format("%.8f") % (f_app_res.obj_value)); boost::replace_all(obj_app_str,",",".");
-                                                string error_app_str =  boost::str(boost::format("%.8f") % (f_app_res.error_value)); boost::replace_all(error_app_str,",",".");
+                                                string cpu_time_app_str =  boost::str(boost::format("%.15f") % (f_app_res.cpu_time)); boost::replace_all(cpu_time_app_str,",",".");
+                                                string iter_app_str =  boost::str(boost::format("%.15f") % (f_app_res.iterations)); boost::replace_all(iter_app_str,",",".");
+                                                string obj_app_str =  boost::str(boost::format("%.15f") % (f_app_res.obj_value)); boost::replace_all(obj_app_str,",",".");
+                                                string error_app_str =  boost::str(boost::format("%.15f") % (f_app_res.error_value)); boost::replace_all(error_app_str,",",".");
                                                 data_csv << cpu_time_app_str+","+iter_app_str+","+obj_app_str+","+error_app_str+",";
                                                 for(int h=0;h<f_app_res.x.size();++h){
-                                                    string x_str =  boost::str(boost::format("%.8f") % (f_app_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                    string x_str =  boost::str(boost::format("%.15f") % (f_app_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                     data_csv << x_str+",";
                                                 }
                                                 for(size_t h=0;h<f_app_res.zL.size();++h){
-                                                    string zL_str =  boost::str(boost::format("%.8f") % (f_app_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                    string zL_str =  boost::str(boost::format("%.15f") % (f_app_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                     data_csv << zL_str+",";
                                                 }
                                                 for(size_t h=0;h<f_app_res.zU.size();++h){
-                                                    string zU_str =  boost::str(boost::format("%.8f") % (f_app_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                    string zU_str =  boost::str(boost::format("%.15f") % (f_app_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                     data_csv << zU_str+",";
                                                 }
                                                 for(size_t h=0;h<f_app_res.dual_vars.size();++h){
-                                                    string dual_str =  boost::str(boost::format("%.8f") % (f_app_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                    string dual_str =  boost::str(boost::format("%.15f") % (f_app_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                                     data_csv << dual_str+",";
                                                 }
                                             }else{
                                                 // plan
                                                 HUMotion::warm_start_params f_plan_res = h_results_tmp->final_warm_start_res.at(0);
-                                                string cpu_time_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
-                                                string iter_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
-                                                string obj_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
-                                                string error_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
+                                                string cpu_time_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
+                                                string iter_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
+                                                string obj_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
+                                                string error_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
                                                 data_csv << cpu_time_plan_str+","+iter_plan_str+","+obj_plan_str+","+error_plan_str+",";
                                                 for(int h=0;h<f_plan_res.x.size();++h){
-                                                    string x_str =  boost::str(boost::format("%.8f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                    string x_str =  boost::str(boost::format("%.15f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                     data_csv << x_str+",";
                                                 }
                                                 for(size_t h=0;h<f_plan_res.zL.size();++h){
-                                                    string zL_str =  boost::str(boost::format("%.8f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                    string zL_str =  boost::str(boost::format("%.15f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                     data_csv << zL_str+",";
                                                 }
                                                 for(size_t h=0;h<f_plan_res.zU.size();++h){
-                                                    string zU_str =  boost::str(boost::format("%.8f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                    string zU_str =  boost::str(boost::format("%.15f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                     data_csv << zU_str+",";
                                                 }
                                                 // retreat
                                                 HUMotion::warm_start_params f_ret_res = h_results_tmp->final_warm_start_res.at(1);
-                                                string cpu_time_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.cpu_time)); boost::replace_all(cpu_time_ret_str,",",".");
-                                                string iter_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.iterations)); boost::replace_all(iter_ret_str,",",".");
-                                                string obj_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.obj_value)); boost::replace_all(obj_ret_str,",",".");
-                                                string error_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.error_value)); boost::replace_all(error_ret_str,",",".");
+                                                string cpu_time_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.cpu_time)); boost::replace_all(cpu_time_ret_str,",",".");
+                                                string iter_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.iterations)); boost::replace_all(iter_ret_str,",",".");
+                                                string obj_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.obj_value)); boost::replace_all(obj_ret_str,",",".");
+                                                string error_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.error_value)); boost::replace_all(error_ret_str,",",".");
                                                 data_csv << cpu_time_ret_str+","+iter_ret_str+","+obj_ret_str+","+error_ret_str+",";
                                                 for(int h=0;h<f_ret_res.x.size();++h){
-                                                    string x_str =  boost::str(boost::format("%.8f") % (f_ret_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                    string x_str =  boost::str(boost::format("%.15f") % (f_ret_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                     data_csv << x_str+",";
                                                 }
                                                 for(size_t h=0;h<f_ret_res.zL.size();++h){
-                                                    string zL_str =  boost::str(boost::format("%.8f") % (f_ret_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                    string zL_str =  boost::str(boost::format("%.15f") % (f_ret_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                     data_csv << zL_str+",";
                                                 }
                                                 for(size_t h=0;h<f_ret_res.zU.size();++h){
-                                                    string zU_str =  boost::str(boost::format("%.8f") % (f_ret_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                    string zU_str =  boost::str(boost::format("%.15f") % (f_ret_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                     data_csv << zU_str+",";
                                                 }
                                                 for(size_t h=0;h<f_ret_res.dual_vars.size();++h){
-                                                    string dual_str =  boost::str(boost::format("%.8f") % (f_ret_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                    string dual_str =  boost::str(boost::format("%.15f") % (f_ret_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                                     data_csv << dual_str+",";
                                                 }
                                             }
                                         }else if(h_results_tmp->final_warm_start_res.size()==1){
                                             // plan
                                             HUMotion::warm_start_params f_res = h_results_tmp->final_warm_start_res.at(0);
-                                            string cpu_time_plan_str =  boost::str(boost::format("%.8f") % (f_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
-                                            string iter_plan_str =  boost::str(boost::format("%.8f") % (f_res.iterations)); boost::replace_all(iter_plan_str,",",".");
-                                            string obj_plan_str =  boost::str(boost::format("%.8f") % (f_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
-                                            string error_plan_str =  boost::str(boost::format("%.8f") % (f_res.error_value)); boost::replace_all(error_plan_str,",",".");
+                                            string cpu_time_plan_str =  boost::str(boost::format("%.15f") % (f_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
+                                            string iter_plan_str =  boost::str(boost::format("%.15f") % (f_res.iterations)); boost::replace_all(iter_plan_str,",",".");
+                                            string obj_plan_str =  boost::str(boost::format("%.15f") % (f_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
+                                            string error_plan_str =  boost::str(boost::format("%.15f") % (f_res.error_value)); boost::replace_all(error_plan_str,",",".");
                                             data_csv << cpu_time_plan_str+","+iter_plan_str+","+obj_plan_str+","+error_plan_str+",";
                                             for(int h=0;h<f_res.x.size();++h){
-                                                string x_str =  boost::str(boost::format("%.8f") % (f_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                string x_str =  boost::str(boost::format("%.15f") % (f_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                 data_csv << x_str+",";
                                             }
                                             for(size_t h=0;h<f_res.zL.size();++h){
-                                                string zL_str =  boost::str(boost::format("%.8f") % (f_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                string zL_str =  boost::str(boost::format("%.15f") % (f_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                 data_csv << zL_str+",";
                                             }
                                             for(size_t h=0;h<f_res.zU.size();++h){
-                                                string zU_str =  boost::str(boost::format("%.8f") % (f_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                string zU_str =  boost::str(boost::format("%.15f") % (f_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                 data_csv << zU_str+",";
                                             }
                                             for(size_t h=0;h<f_res.dual_vars.size();++h){
-                                                string dual_str =  boost::str(boost::format("%.8f") % (f_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                string dual_str =  boost::str(boost::format("%.15f") % (f_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                                 data_csv << dual_str+",";
                                             }
                                         }
                                         // bounce posture selection
-                                        string cpu_time_b_str =  boost::str(boost::format("%.8f") % (b_res.cpu_time)); boost::replace_all(cpu_time_b_str,",",".");
-                                        string iter_b_str =  boost::str(boost::format("%.8f") % (b_res.iterations)); boost::replace_all(iter_b_str,",",".");
-                                        string obj_b_str =  boost::str(boost::format("%.8f") % (b_res.obj_value)); boost::replace_all(obj_b_str,",",".");
-                                        string error_b_str =  boost::str(boost::format("%.8f") % (b_res.error_value)); boost::replace_all(error_b_str,",",".");
+                                        string cpu_time_b_str =  boost::str(boost::format("%.15f") % (b_res.cpu_time)); boost::replace_all(cpu_time_b_str,",",".");
+                                        string iter_b_str =  boost::str(boost::format("%.15f") % (b_res.iterations)); boost::replace_all(iter_b_str,",",".");
+                                        string obj_b_str =  boost::str(boost::format("%.15f") % (b_res.obj_value)); boost::replace_all(obj_b_str,",",".");
+                                        string error_b_str =  boost::str(boost::format("%.15f") % (b_res.error_value)); boost::replace_all(error_b_str,",",".");
                                         data_csv << cpu_time_b_str+","+iter_b_str+","+obj_b_str+","+error_b_str+",";
                                         for(size_t h=0;h<b_res.x.size();++h){
-                                            string x_str =  boost::str(boost::format("%.8f") % (b_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                            string x_str =  boost::str(boost::format("%.15f") % (b_res.x.at(h))); boost::replace_all(x_str,",",".");
                                             data_csv << x_str+",";
                                         }
                                         for(size_t h=0;h<b_res.zL.size();++h){
-                                            string zL_str =  boost::str(boost::format("%.8f") % (b_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                            string zL_str =  boost::str(boost::format("%.15f") % (b_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                             data_csv << zL_str+",";
                                         }
                                         for(size_t h=0;h<b_res.zU.size();++h){
-                                            string zU_str =  boost::str(boost::format("%.8f") % (b_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                            string zU_str =  boost::str(boost::format("%.15f") % (b_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                             data_csv << zU_str+",";
                                         }
                                         for(size_t h=0;h<b_res.dual_vars.size();++h){
-                                            string dual_str =  boost::str(boost::format("%.8f") % (b_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                            string dual_str =  boost::str(boost::format("%.15f") % (b_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                             if(h == b_res.dual_vars.size()-1){
                                                 //last column
                                                 data_csv << dual_str;
@@ -10358,35 +10376,35 @@ void MainWindow::on_pushButton_plan_collect_warm_data_clicked()
                                                 // robot configuration
                                                 // elbow
                                                 std::vector<double> r_e_pos_cold = {cold_data_line["elbow_x_mm"],cold_data_line["elbow_y_mm"],cold_data_line["elbow_z_mm"]};
-                                                string r_e_pos_x_cold_str =  boost::str(boost::format("%.8f") % (r_e_pos_cold.at(0))); boost::replace_all(r_e_pos_x_cold_str,",",".");
-                                                string r_e_pos_y_cold_str =  boost::str(boost::format("%.8f") % (r_e_pos_cold.at(1))); boost::replace_all(r_e_pos_y_cold_str,",",".");
-                                                string r_e_pos_z_cold_str =  boost::str(boost::format("%.8f") % (r_e_pos_cold.at(2))); boost::replace_all(r_e_pos_z_cold_str,",",".");
+                                                string r_e_pos_x_cold_str =  boost::str(boost::format("%.15f") % (r_e_pos_cold.at(0))); boost::replace_all(r_e_pos_x_cold_str,",",".");
+                                                string r_e_pos_y_cold_str =  boost::str(boost::format("%.15f") % (r_e_pos_cold.at(1))); boost::replace_all(r_e_pos_y_cold_str,",",".");
+                                                string r_e_pos_z_cold_str =  boost::str(boost::format("%.15f") % (r_e_pos_cold.at(2))); boost::replace_all(r_e_pos_z_cold_str,",",".");
                                                 data_csv << r_e_pos_x_cold_str+","+r_e_pos_y_cold_str+","+r_e_pos_y_cold_str+",";
                                                 // wrist
                                                 std::vector<double> r_w_pos_cold = {cold_data_line["wrist_x_mm"],cold_data_line["wrist_y_mm"],cold_data_line["wrist_z_mm"]};
-                                                string r_w_pos_x_cold_str =  boost::str(boost::format("%.8f") % (r_w_pos_cold.at(0))); boost::replace_all(r_w_pos_x_cold_str,",",".");
-                                                string r_w_pos_y_cold_str =  boost::str(boost::format("%.8f") % (r_w_pos_cold.at(1))); boost::replace_all(r_w_pos_y_cold_str,",",".");
-                                                string r_w_pos_z_cold_str =  boost::str(boost::format("%.8f") % (r_w_pos_cold.at(2))); boost::replace_all(r_w_pos_z_cold_str,",",".");
+                                                string r_w_pos_x_cold_str =  boost::str(boost::format("%.15f") % (r_w_pos_cold.at(0))); boost::replace_all(r_w_pos_x_cold_str,",",".");
+                                                string r_w_pos_y_cold_str =  boost::str(boost::format("%.15f") % (r_w_pos_cold.at(1))); boost::replace_all(r_w_pos_y_cold_str,",",".");
+                                                string r_w_pos_z_cold_str =  boost::str(boost::format("%.15f") % (r_w_pos_cold.at(2))); boost::replace_all(r_w_pos_z_cold_str,",",".");
                                                 data_csv << r_w_pos_x_cold_str+","+r_w_pos_y_cold_str+","+r_w_pos_y_cold_str+",";
                                                 // hand
                                                 std::vector<double> r_h_pos_cold = {cold_data_line["hand_x_mm"],cold_data_line["hand_y_mm"],cold_data_line["hand_z_mm"]};
-                                                string r_h_pos_x_cold_str =  boost::str(boost::format("%.8f") % (r_h_pos_cold.at(0))); boost::replace_all(r_h_pos_x_cold_str,",",".");
-                                                string r_h_pos_y_cold_str =  boost::str(boost::format("%.8f") % (r_h_pos_cold.at(1))); boost::replace_all(r_h_pos_y_cold_str,",",".");
-                                                string r_h_pos_z_cold_str =  boost::str(boost::format("%.8f") % (r_h_pos_cold.at(2))); boost::replace_all(r_h_pos_z_cold_str,",",".");
+                                                string r_h_pos_x_cold_str =  boost::str(boost::format("%.15f") % (r_h_pos_cold.at(0))); boost::replace_all(r_h_pos_x_cold_str,",",".");
+                                                string r_h_pos_y_cold_str =  boost::str(boost::format("%.15f") % (r_h_pos_cold.at(1))); boost::replace_all(r_h_pos_y_cold_str,",",".");
+                                                string r_h_pos_z_cold_str =  boost::str(boost::format("%.15f") % (r_h_pos_cold.at(2))); boost::replace_all(r_h_pos_z_cold_str,",",".");
                                                 data_csv << r_h_pos_x_cold_str+","+r_h_pos_y_cold_str+","+r_h_pos_y_cold_str+",";
                                                 // thumb
                                                 std::vector<double> r_thumb_pos_1_cold = {cold_data_line["thumb_1_x_mm"],cold_data_line["thumb_1_y_mm"],cold_data_line["thumb_1_z_mm"]};
                                                 std::vector<double> r_thumb_pos_2_cold = {cold_data_line["thumb_2_x_mm"],cold_data_line["thumb_2_y_mm"],cold_data_line["thumb_2_z_mm"]};
                                                 std::vector<double> r_thumb_pos_tip_cold = {cold_data_line["thumb_tip_x_mm"],cold_data_line["thumb_tip_y_mm"],cold_data_line["thumb_tip_z_mm"]};
-                                                string r_thumb_pos_1_x_cold_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_1_cold.at(0))); boost::replace_all(r_thumb_pos_1_x_cold_str,",",".");
-                                                string r_thumb_pos_1_y_cold_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_1_cold.at(1))); boost::replace_all(r_thumb_pos_1_y_cold_str,",",".");
-                                                string r_thumb_pos_1_z_cold_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_1_cold.at(2))); boost::replace_all(r_thumb_pos_1_z_cold_str,",",".");
-                                                string r_thumb_pos_2_x_cold_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_2_cold.at(0))); boost::replace_all(r_thumb_pos_2_x_cold_str,",",".");
-                                                string r_thumb_pos_2_y_cold_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_2_cold.at(1))); boost::replace_all(r_thumb_pos_2_y_cold_str,",",".");
-                                                string r_thumb_pos_2_z_cold_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_2_cold.at(2))); boost::replace_all(r_thumb_pos_2_z_cold_str,",",".");
-                                                string r_thumb_pos_tip_x_cold_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_tip_cold.at(0))); boost::replace_all(r_thumb_pos_tip_x_cold_str,",",".");
-                                                string r_thumb_pos_tip_y_cold_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_tip_cold.at(1))); boost::replace_all(r_thumb_pos_tip_y_cold_str,",",".");
-                                                string r_thumb_pos_tip_z_cold_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_tip_cold.at(2))); boost::replace_all(r_thumb_pos_tip_z_cold_str,",",".");
+                                                string r_thumb_pos_1_x_cold_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_1_cold.at(0))); boost::replace_all(r_thumb_pos_1_x_cold_str,",",".");
+                                                string r_thumb_pos_1_y_cold_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_1_cold.at(1))); boost::replace_all(r_thumb_pos_1_y_cold_str,",",".");
+                                                string r_thumb_pos_1_z_cold_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_1_cold.at(2))); boost::replace_all(r_thumb_pos_1_z_cold_str,",",".");
+                                                string r_thumb_pos_2_x_cold_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_2_cold.at(0))); boost::replace_all(r_thumb_pos_2_x_cold_str,",",".");
+                                                string r_thumb_pos_2_y_cold_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_2_cold.at(1))); boost::replace_all(r_thumb_pos_2_y_cold_str,",",".");
+                                                string r_thumb_pos_2_z_cold_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_2_cold.at(2))); boost::replace_all(r_thumb_pos_2_z_cold_str,",",".");
+                                                string r_thumb_pos_tip_x_cold_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_tip_cold.at(0))); boost::replace_all(r_thumb_pos_tip_x_cold_str,",",".");
+                                                string r_thumb_pos_tip_y_cold_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_tip_cold.at(1))); boost::replace_all(r_thumb_pos_tip_y_cold_str,",",".");
+                                                string r_thumb_pos_tip_z_cold_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_tip_cold.at(2))); boost::replace_all(r_thumb_pos_tip_z_cold_str,",",".");
                                                 data_csv << r_thumb_pos_1_x_cold_str+","+r_thumb_pos_1_y_cold_str+","+r_thumb_pos_1_z_cold_str+","+
                                                             r_thumb_pos_2_x_cold_str+","+r_thumb_pos_2_y_cold_str+","+r_thumb_pos_2_z_cold_str+","+
                                                             r_thumb_pos_tip_x_cold_str+","+r_thumb_pos_tip_y_cold_str+","+r_thumb_pos_tip_z_cold_str+",";
@@ -10394,15 +10412,15 @@ void MainWindow::on_pushButton_plan_collect_warm_data_clicked()
                                                 std::vector<double> r_index_pos_1_cold = {cold_data_line["index_1_x_mm"],cold_data_line["index_1_y_mm"],cold_data_line["index_1_z_mm"]};
                                                 std::vector<double> r_index_pos_2_cold = {cold_data_line["index_2_x_mm"],cold_data_line["index_2_y_mm"],cold_data_line["index_2_z_mm"]};
                                                 std::vector<double> r_index_pos_tip_cold = {cold_data_line["index_tip_x_mm"],cold_data_line["index_tip_y_mm"],cold_data_line["index_tip_z_mm"]};
-                                                string r_index_pos_1_x_cold_str =  boost::str(boost::format("%.8f") % (r_index_pos_1_cold.at(0))); boost::replace_all(r_index_pos_1_x_cold_str,",",".");
-                                                string r_index_pos_1_y_cold_str =  boost::str(boost::format("%.8f") % (r_index_pos_1_cold.at(1))); boost::replace_all(r_index_pos_1_y_cold_str,",",".");
-                                                string r_index_pos_1_z_cold_str =  boost::str(boost::format("%.8f") % (r_index_pos_1_cold.at(2))); boost::replace_all(r_index_pos_1_z_cold_str,",",".");
-                                                string r_index_pos_2_x_cold_str =  boost::str(boost::format("%.8f") % (r_index_pos_2_cold.at(0))); boost::replace_all(r_index_pos_2_x_cold_str,",",".");
-                                                string r_index_pos_2_y_cold_str =  boost::str(boost::format("%.8f") % (r_index_pos_2_cold.at(1))); boost::replace_all(r_index_pos_2_y_cold_str,",",".");
-                                                string r_index_pos_2_z_cold_str =  boost::str(boost::format("%.8f") % (r_index_pos_2_cold.at(2))); boost::replace_all(r_index_pos_2_z_cold_str,",",".");
-                                                string r_index_pos_tip_x_cold_str =  boost::str(boost::format("%.8f") % (r_index_pos_tip_cold.at(0))); boost::replace_all(r_index_pos_tip_x_cold_str,",",".");
-                                                string r_index_pos_tip_y_cold_str =  boost::str(boost::format("%.8f") % (r_index_pos_tip_cold.at(1))); boost::replace_all(r_index_pos_tip_y_cold_str,",",".");
-                                                string r_index_pos_tip_z_cold_str =  boost::str(boost::format("%.8f") % (r_index_pos_tip_cold.at(2))); boost::replace_all(r_index_pos_tip_z_cold_str,",",".");
+                                                string r_index_pos_1_x_cold_str =  boost::str(boost::format("%.15f") % (r_index_pos_1_cold.at(0))); boost::replace_all(r_index_pos_1_x_cold_str,",",".");
+                                                string r_index_pos_1_y_cold_str =  boost::str(boost::format("%.15f") % (r_index_pos_1_cold.at(1))); boost::replace_all(r_index_pos_1_y_cold_str,",",".");
+                                                string r_index_pos_1_z_cold_str =  boost::str(boost::format("%.15f") % (r_index_pos_1_cold.at(2))); boost::replace_all(r_index_pos_1_z_cold_str,",",".");
+                                                string r_index_pos_2_x_cold_str =  boost::str(boost::format("%.15f") % (r_index_pos_2_cold.at(0))); boost::replace_all(r_index_pos_2_x_cold_str,",",".");
+                                                string r_index_pos_2_y_cold_str =  boost::str(boost::format("%.15f") % (r_index_pos_2_cold.at(1))); boost::replace_all(r_index_pos_2_y_cold_str,",",".");
+                                                string r_index_pos_2_z_cold_str =  boost::str(boost::format("%.15f") % (r_index_pos_2_cold.at(2))); boost::replace_all(r_index_pos_2_z_cold_str,",",".");
+                                                string r_index_pos_tip_x_cold_str =  boost::str(boost::format("%.15f") % (r_index_pos_tip_cold.at(0))); boost::replace_all(r_index_pos_tip_x_cold_str,",",".");
+                                                string r_index_pos_tip_y_cold_str =  boost::str(boost::format("%.15f") % (r_index_pos_tip_cold.at(1))); boost::replace_all(r_index_pos_tip_y_cold_str,",",".");
+                                                string r_index_pos_tip_z_cold_str =  boost::str(boost::format("%.15f") % (r_index_pos_tip_cold.at(2))); boost::replace_all(r_index_pos_tip_z_cold_str,",",".");
                                                 data_csv << r_index_pos_1_x_cold_str+","+r_index_pos_1_y_cold_str+","+r_index_pos_1_z_cold_str+","+
                                                             r_index_pos_2_x_cold_str+","+r_index_pos_2_y_cold_str+","+r_index_pos_2_z_cold_str+","+
                                                             r_index_pos_tip_x_cold_str+","+r_index_pos_tip_y_cold_str+","+r_index_pos_tip_z_cold_str+",";
@@ -10410,131 +10428,131 @@ void MainWindow::on_pushButton_plan_collect_warm_data_clicked()
                                                 std::vector<double> r_middle_pos_1_cold = {cold_data_line["middle_1_x_mm"],cold_data_line["middle_1_y_mm"],cold_data_line["middle_1_z_mm"]};
                                                 std::vector<double> r_middle_pos_2_cold = {cold_data_line["middle_2_x_mm"],cold_data_line["middle_2_y_mm"],cold_data_line["middle_2_z_mm"]};
                                                 std::vector<double> r_middle_pos_tip_cold = {cold_data_line["middle_tip_x_mm"],cold_data_line["middle_tip_y_mm"],cold_data_line["middle_tip_z_mm"]};
-                                                string r_middle_pos_1_x_cold_str =  boost::str(boost::format("%.8f") % (r_middle_pos_1_cold.at(0))); boost::replace_all(r_middle_pos_1_x_cold_str,",",".");
-                                                string r_middle_pos_1_y_cold_str =  boost::str(boost::format("%.8f") % (r_middle_pos_1_cold.at(1))); boost::replace_all(r_middle_pos_1_y_cold_str,",",".");
-                                                string r_middle_pos_1_z_cold_str =  boost::str(boost::format("%.8f") % (r_middle_pos_1_cold.at(2))); boost::replace_all(r_middle_pos_1_z_cold_str,",",".");
-                                                string r_middle_pos_2_x_cold_str =  boost::str(boost::format("%.8f") % (r_middle_pos_2_cold.at(0))); boost::replace_all(r_middle_pos_2_x_cold_str,",",".");
-                                                string r_middle_pos_2_y_cold_str =  boost::str(boost::format("%.8f") % (r_middle_pos_2_cold.at(1))); boost::replace_all(r_middle_pos_2_y_cold_str,",",".");
-                                                string r_middle_pos_2_z_cold_str =  boost::str(boost::format("%.8f") % (r_middle_pos_2_cold.at(2))); boost::replace_all(r_middle_pos_2_z_cold_str,",",".");
-                                                string r_middle_pos_tip_x_cold_str =  boost::str(boost::format("%.8f") % (r_middle_pos_tip_cold.at(0))); boost::replace_all(r_middle_pos_tip_x_cold_str,",",".");
-                                                string r_middle_pos_tip_y_cold_str =  boost::str(boost::format("%.8f") % (r_middle_pos_tip_cold.at(1))); boost::replace_all(r_middle_pos_tip_y_cold_str,",",".");
-                                                string r_middle_pos_tip_z_cold_str =  boost::str(boost::format("%.8f") % (r_middle_pos_tip_cold.at(2))); boost::replace_all(r_middle_pos_tip_z_cold_str,",",".");
+                                                string r_middle_pos_1_x_cold_str =  boost::str(boost::format("%.15f") % (r_middle_pos_1_cold.at(0))); boost::replace_all(r_middle_pos_1_x_cold_str,",",".");
+                                                string r_middle_pos_1_y_cold_str =  boost::str(boost::format("%.15f") % (r_middle_pos_1_cold.at(1))); boost::replace_all(r_middle_pos_1_y_cold_str,",",".");
+                                                string r_middle_pos_1_z_cold_str =  boost::str(boost::format("%.15f") % (r_middle_pos_1_cold.at(2))); boost::replace_all(r_middle_pos_1_z_cold_str,",",".");
+                                                string r_middle_pos_2_x_cold_str =  boost::str(boost::format("%.15f") % (r_middle_pos_2_cold.at(0))); boost::replace_all(r_middle_pos_2_x_cold_str,",",".");
+                                                string r_middle_pos_2_y_cold_str =  boost::str(boost::format("%.15f") % (r_middle_pos_2_cold.at(1))); boost::replace_all(r_middle_pos_2_y_cold_str,",",".");
+                                                string r_middle_pos_2_z_cold_str =  boost::str(boost::format("%.15f") % (r_middle_pos_2_cold.at(2))); boost::replace_all(r_middle_pos_2_z_cold_str,",",".");
+                                                string r_middle_pos_tip_x_cold_str =  boost::str(boost::format("%.15f") % (r_middle_pos_tip_cold.at(0))); boost::replace_all(r_middle_pos_tip_x_cold_str,",",".");
+                                                string r_middle_pos_tip_y_cold_str =  boost::str(boost::format("%.15f") % (r_middle_pos_tip_cold.at(1))); boost::replace_all(r_middle_pos_tip_y_cold_str,",",".");
+                                                string r_middle_pos_tip_z_cold_str =  boost::str(boost::format("%.15f") % (r_middle_pos_tip_cold.at(2))); boost::replace_all(r_middle_pos_tip_z_cold_str,",",".");
                                                 data_csv << r_middle_pos_1_x_cold_str+","+r_middle_pos_1_y_cold_str+","+r_middle_pos_1_z_cold_str+","+
                                                             r_middle_pos_2_x_cold_str+","+r_middle_pos_2_y_cold_str+","+r_middle_pos_2_z_cold_str+","+
                                                             r_middle_pos_tip_x_cold_str+","+r_middle_pos_tip_y_cold_str+","+r_middle_pos_tip_z_cold_str+",";
 
                                                 // target
-                                                string tar_x_pos_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["target_x_mm"])); boost::replace_all(tar_x_pos_cold_str,",",".");
-                                                string tar_y_pos_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["target_y_mm"])); boost::replace_all(tar_y_pos_cold_str,",",".");
-                                                string tar_z_pos_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["target_z_mm"])); boost::replace_all(tar_z_pos_cold_str,",",".");
-                                                string tar_roll_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["target_roll_rad"])); boost::replace_all(tar_roll_cold_str,",",".");
-                                                string tar_pitch_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["target_pitch_rad"])); boost::replace_all(tar_pitch_cold_str,",",".");
-                                                string tar_yaw_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["target_yaw_rad"])); boost::replace_all(tar_yaw_cold_str,",",".");
+                                                string tar_x_pos_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["target_x_mm"])); boost::replace_all(tar_x_pos_cold_str,",",".");
+                                                string tar_y_pos_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["target_y_mm"])); boost::replace_all(tar_y_pos_cold_str,",",".");
+                                                string tar_z_pos_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["target_z_mm"])); boost::replace_all(tar_z_pos_cold_str,",",".");
+                                                string tar_roll_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["target_roll_rad"])); boost::replace_all(tar_roll_cold_str,",",".");
+                                                string tar_pitch_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["target_pitch_rad"])); boost::replace_all(tar_pitch_cold_str,",",".");
+                                                string tar_yaw_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["target_yaw_rad"])); boost::replace_all(tar_yaw_cold_str,",",".");
                                                 data_csv << tar_x_pos_cold_str+","+tar_y_pos_cold_str+","+tar_z_pos_cold_str+","+tar_roll_cold_str+","+tar_pitch_cold_str+","+tar_yaw_cold_str+",";
 
                                                 // obstacles
                                                 for(size_t j=0;j<obsts.size();++j){
-                                                    string obs_x_pos_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["obstacle_"+to_string(j+1)+"_x_mm"])); boost::replace_all(obs_x_pos_cold_str,",",".");
-                                                    string obs_y_pos_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["obstacle_"+to_string(j+1)+"_y_mm"])); boost::replace_all(obs_y_pos_cold_str,",",".");
-                                                    string obs_z_pos_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["obstacle_"+to_string(j+1)+"_z_mm"])); boost::replace_all(obs_z_pos_cold_str,",",".");
-                                                    string obs_roll_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["obstacle_"+to_string(j+1)+"_roll_rad"])); boost::replace_all(obs_roll_cold_str,",",".");
-                                                    string obs_pitch_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["obstacle_"+to_string(j+1)+"_pitch_rad"])); boost::replace_all(obs_pitch_cold_str,",",".");
-                                                    string obs_yaw_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["obstacle_"+to_string(j+1)+"_yaw_rad"])); boost::replace_all(obs_yaw_cold_str,",",".");
+                                                    string obs_x_pos_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["obstacle_"+to_string(j+1)+"_x_mm"])); boost::replace_all(obs_x_pos_cold_str,",",".");
+                                                    string obs_y_pos_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["obstacle_"+to_string(j+1)+"_y_mm"])); boost::replace_all(obs_y_pos_cold_str,",",".");
+                                                    string obs_z_pos_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["obstacle_"+to_string(j+1)+"_z_mm"])); boost::replace_all(obs_z_pos_cold_str,",",".");
+                                                    string obs_roll_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["obstacle_"+to_string(j+1)+"_roll_rad"])); boost::replace_all(obs_roll_cold_str,",",".");
+                                                    string obs_pitch_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["obstacle_"+to_string(j+1)+"_pitch_rad"])); boost::replace_all(obs_pitch_cold_str,",",".");
+                                                    string obs_yaw_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["obstacle_"+to_string(j+1)+"_yaw_rad"])); boost::replace_all(obs_yaw_cold_str,",",".");
                                                     data_csv << obs_x_pos_cold_str+","+obs_y_pos_cold_str+","+obs_z_pos_cold_str+","+obs_roll_cold_str+","+obs_pitch_cold_str+","+obs_yaw_cold_str+",";
                                                 }
 
                                                 // final posture selections
                                                 // plan
-                                                string cpu_time_plan_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["cpu_time_plan"])); boost::replace_all(cpu_time_plan_cold_str,",",".");
-                                                string iter_plan_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["iterations_plan"])); boost::replace_all(iter_plan_cold_str,",",".");
-                                                string obj_plan_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["obj_plan"])); boost::replace_all(obj_plan_cold_str,",",".");
-                                                string error_plan_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["error_plan"])); boost::replace_all(error_plan_cold_str,",",".");
+                                                string cpu_time_plan_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["cpu_time_plan"])); boost::replace_all(cpu_time_plan_cold_str,",",".");
+                                                string iter_plan_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["iterations_plan"])); boost::replace_all(iter_plan_cold_str,",",".");
+                                                string obj_plan_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["obj_plan"])); boost::replace_all(obj_plan_cold_str,",",".");
+                                                string error_plan_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["error_plan"])); boost::replace_all(error_plan_cold_str,",",".");
                                                 data_csv << cpu_time_plan_cold_str+","+iter_plan_cold_str+","+obj_plan_cold_str+","+error_plan_cold_str+",";
                                                 for(size_t ix=0;ix<x_plan.size();++ix){
-                                                    string xf_plan_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["xf_plan_"+to_string(ix+1)+"_rad"])); boost::replace_all(xf_plan_cold_str,",",".");
+                                                    string xf_plan_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["xf_plan_"+to_string(ix+1)+"_rad"])); boost::replace_all(xf_plan_cold_str,",",".");
                                                     data_csv << xf_plan_cold_str+",";
                                                 }
                                                 for(size_t ix=0;ix<zL_plan.size();++ix){
-                                                    string zf_L_plan_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["zf_L_plan_"+to_string(ix+1)])); boost::replace_all(zf_L_plan_cold_str,",",".");
+                                                    string zf_L_plan_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["zf_L_plan_"+to_string(ix+1)])); boost::replace_all(zf_L_plan_cold_str,",",".");
                                                     data_csv << zf_L_plan_cold_str+",";
                                                 }
                                                 for(size_t ix=0;ix<zU_plan.size();++ix){
-                                                    string zf_U_plan_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["zf_U_plan_"+to_string(ix+1)])); boost::replace_all(zf_U_plan_cold_str,",",".");
+                                                    string zf_U_plan_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["zf_U_plan_"+to_string(ix+1)])); boost::replace_all(zf_U_plan_cold_str,",",".");
                                                     data_csv << zf_U_plan_cold_str+",";
                                                 }
                                                 for(size_t ix=0;ix<dual_plan.size();++ix){
-                                                    string dual_f_plan_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["dual_f_plan_"+to_string(ix)])); boost::replace_all(dual_f_plan_cold_str,",",".");
+                                                    string dual_f_plan_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["dual_f_plan_"+to_string(ix)])); boost::replace_all(dual_f_plan_cold_str,",",".");
                                                     data_csv << dual_f_plan_cold_str+",";
                                                 }
                                                 // approach
                                                 if(!x_approach.empty()){
-                                                    string cpu_time_app_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["cpu_time_approach"])); boost::replace_all(cpu_time_app_cold_str,",",".");
-                                                    string iter_app_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["iterations_approach"])); boost::replace_all(iter_app_cold_str,",",".");
-                                                    string obj_app_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["obj_approach"])); boost::replace_all(obj_app_cold_str,",",".");
-                                                    string error_app_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["error_approach"])); boost::replace_all(error_app_cold_str,",",".");
+                                                    string cpu_time_app_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["cpu_time_approach"])); boost::replace_all(cpu_time_app_cold_str,",",".");
+                                                    string iter_app_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["iterations_approach"])); boost::replace_all(iter_app_cold_str,",",".");
+                                                    string obj_app_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["obj_approach"])); boost::replace_all(obj_app_cold_str,",",".");
+                                                    string error_app_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["error_approach"])); boost::replace_all(error_app_cold_str,",",".");
                                                     data_csv << cpu_time_app_cold_str+","+iter_app_cold_str+","+obj_app_cold_str+","+error_app_cold_str+",";
                                                     for(size_t ix=0;ix<x_approach.size();++ix){
-                                                        string xf_app_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["xf_approach_"+to_string(ix+1)+"_rad"])); boost::replace_all(xf_app_cold_str,",",".");
+                                                        string xf_app_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["xf_approach_"+to_string(ix+1)+"_rad"])); boost::replace_all(xf_app_cold_str,",",".");
                                                         data_csv << xf_app_cold_str+",";
                                                     }
                                                     for(size_t ix=0;ix<zL_approach.size();++ix){
-                                                        string zf_L_app_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["zf_L_approach_"+to_string(ix+1)])); boost::replace_all(zf_L_app_cold_str,",",".");
+                                                        string zf_L_app_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["zf_L_approach_"+to_string(ix+1)])); boost::replace_all(zf_L_app_cold_str,",",".");
                                                         data_csv << zf_L_app_cold_str+",";
                                                     }
                                                     for(size_t ix=0;ix<zU_approach.size();++ix){
-                                                        string zf_U_app_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["zf_U_approach_"+to_string(ix+1)])); boost::replace_all(zf_U_app_cold_str,",",".");
+                                                        string zf_U_app_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["zf_U_approach_"+to_string(ix+1)])); boost::replace_all(zf_U_app_cold_str,",",".");
                                                         data_csv << zf_U_app_cold_str+",";
                                                     }
                                                     for(size_t ix=0;ix<dual_approach.size();++ix){
-                                                        string dual_f_app_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["dual_f_approach_"+to_string(ix)])); boost::replace_all(dual_f_app_cold_str,",",".");
+                                                        string dual_f_app_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["dual_f_approach_"+to_string(ix)])); boost::replace_all(dual_f_app_cold_str,",",".");
                                                         data_csv << dual_f_app_cold_str+",";
                                                     }
                                                 }
                                                 // retreat
                                                 if(!x_retreat.empty()){
-                                                    string cpu_time_ret_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["cpu_time_retreat"])); boost::replace_all(cpu_time_ret_cold_str,",",".");
-                                                    string iter_ret_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["iterations_retreat"])); boost::replace_all(iter_ret_cold_str,",",".");
-                                                    string obj_ret_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["obj_retreat"])); boost::replace_all(obj_ret_cold_str,",",".");
-                                                    string error_ret_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["error_retreat"])); boost::replace_all(error_ret_cold_str,",",".");
+                                                    string cpu_time_ret_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["cpu_time_retreat"])); boost::replace_all(cpu_time_ret_cold_str,",",".");
+                                                    string iter_ret_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["iterations_retreat"])); boost::replace_all(iter_ret_cold_str,",",".");
+                                                    string obj_ret_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["obj_retreat"])); boost::replace_all(obj_ret_cold_str,",",".");
+                                                    string error_ret_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["error_retreat"])); boost::replace_all(error_ret_cold_str,",",".");
                                                     data_csv << cpu_time_ret_cold_str+","+iter_ret_cold_str+","+obj_ret_cold_str+","+error_ret_cold_str+",";
                                                     for(size_t ix=0;ix<x_retreat.size();++ix){
-                                                        string xf_ret_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["xf_retreat_"+to_string(ix+1)+"_rad"])); boost::replace_all(xf_ret_cold_str,",",".");
+                                                        string xf_ret_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["xf_retreat_"+to_string(ix+1)+"_rad"])); boost::replace_all(xf_ret_cold_str,",",".");
                                                         data_csv << xf_ret_cold_str+",";
                                                     }
                                                     for(size_t ix=0;ix<zL_retreat.size();++ix){
-                                                        string zf_L_ret_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["zf_L_retreat_"+to_string(ix+1)])); boost::replace_all(zf_L_ret_cold_str,",",".");
+                                                        string zf_L_ret_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["zf_L_retreat_"+to_string(ix+1)])); boost::replace_all(zf_L_ret_cold_str,",",".");
                                                         data_csv << zf_L_ret_cold_str+",";
                                                     }
                                                     for(size_t ix=0;ix<zU_retreat.size();++ix){
-                                                        string zf_U_ret_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["zf_U_retreat_"+to_string(ix+1)])); boost::replace_all(zf_U_ret_cold_str,",",".");
+                                                        string zf_U_ret_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["zf_U_retreat_"+to_string(ix+1)])); boost::replace_all(zf_U_ret_cold_str,",",".");
                                                         data_csv << zf_U_ret_cold_str+",";
                                                     }
                                                     for(size_t ix=0;ix<dual_retreat.size();++ix){
-                                                        string dual_f_ret_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["dual_f_retreat_"+to_string(ix)])); boost::replace_all(dual_f_ret_cold_str,",",".");
+                                                        string dual_f_ret_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["dual_f_retreat_"+to_string(ix)])); boost::replace_all(dual_f_ret_cold_str,",",".");
                                                         data_csv << dual_f_ret_cold_str+",";
                                                     }
                                                 }
 
                                                 // bounce posture selection
-                                                string cpu_time_bounce_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["cpu_time_bounce"])); boost::replace_all(cpu_time_bounce_cold_str,",",".");
-                                                string iter_bounce_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["iterations_bounce"])); boost::replace_all(iter_bounce_cold_str,",",".");
-                                                string obj_bounce_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["obj_bounce"])); boost::replace_all(obj_bounce_cold_str,",",".");
-                                                string error_bounce_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["error_bounce"])); boost::replace_all(error_bounce_cold_str,",",".");
+                                                string cpu_time_bounce_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["cpu_time_bounce"])); boost::replace_all(cpu_time_bounce_cold_str,",",".");
+                                                string iter_bounce_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["iterations_bounce"])); boost::replace_all(iter_bounce_cold_str,",",".");
+                                                string obj_bounce_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["obj_bounce"])); boost::replace_all(obj_bounce_cold_str,",",".");
+                                                string error_bounce_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["error_bounce"])); boost::replace_all(error_bounce_cold_str,",",".");
                                                 data_csv << cpu_time_bounce_cold_str+","+iter_bounce_cold_str+","+obj_bounce_cold_str+","+error_bounce_cold_str+",";
                                                 for(size_t ix=0;ix<x_bounce.size();++ix){
-                                                    string x_bounce_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["x_bounce_"+to_string(ix+1)+"_rad"])); boost::replace_all(x_bounce_cold_str,",",".");
+                                                    string x_bounce_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["x_bounce_"+to_string(ix+1)+"_rad"])); boost::replace_all(x_bounce_cold_str,",",".");
                                                     data_csv << x_bounce_cold_str+",";
                                                 }
                                                 for(size_t ix=0;ix<zL_bounce.size();++ix){
-                                                    string z_L_bounce_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["zb_L_"+to_string(ix+1)])); boost::replace_all(z_L_bounce_cold_str,",",".");
+                                                    string z_L_bounce_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["zb_L_"+to_string(ix+1)])); boost::replace_all(z_L_bounce_cold_str,",",".");
                                                     data_csv << z_L_bounce_cold_str+",";
                                                 }
                                                 for(size_t ix=0;ix<zU_bounce.size();++ix){
-                                                    string z_U_bounce_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["zb_U_"+to_string(ix+1)])); boost::replace_all(z_U_bounce_cold_str,",",".");
+                                                    string z_U_bounce_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["zb_U_"+to_string(ix+1)])); boost::replace_all(z_U_bounce_cold_str,",",".");
                                                     data_csv << z_U_bounce_cold_str+",";
                                                 }
                                                 for(size_t ix=0;ix<dual_bounce.size();++ix){
-                                                    string dual_bounce_cold_str =  boost::str(boost::format("%.8f") % (cold_data_line["dual_bounce_"+to_string(ix)])); boost::replace_all(dual_bounce_cold_str,",",".");
+                                                    string dual_bounce_cold_str =  boost::str(boost::format("%.15f") % (cold_data_line["dual_bounce_"+to_string(ix)])); boost::replace_all(dual_bounce_cold_str,",",".");
                                                     data_csv << dual_bounce_cold_str+",";
                                                 }
 
@@ -10543,36 +10561,36 @@ void MainWindow::on_pushButton_plan_collect_warm_data_clicked()
                                                 // robot configuration
                                                 // elbow
                                                 std::vector<double> r_e_pos; curr_scene->getHumanoid()->getRightElbowPos(r_e_pos);
-                                                string r_e_pos_x_str =  boost::str(boost::format("%.8f") % (r_e_pos.at(0))); boost::replace_all(r_e_pos_x_str,",",".");
-                                                string r_e_pos_y_str =  boost::str(boost::format("%.8f") % (r_e_pos.at(1))); boost::replace_all(r_e_pos_y_str,",",".");
-                                                string r_e_pos_z_str =  boost::str(boost::format("%.8f") % (r_e_pos.at(2))); boost::replace_all(r_e_pos_z_str,",",".");
+                                                string r_e_pos_x_str =  boost::str(boost::format("%.15f") % (r_e_pos.at(0))); boost::replace_all(r_e_pos_x_str,",",".");
+                                                string r_e_pos_y_str =  boost::str(boost::format("%.15f") % (r_e_pos.at(1))); boost::replace_all(r_e_pos_y_str,",",".");
+                                                string r_e_pos_z_str =  boost::str(boost::format("%.15f") % (r_e_pos.at(2))); boost::replace_all(r_e_pos_z_str,",",".");
                                                 data_csv << r_e_pos_x_str+","+r_e_pos_y_str+","+r_e_pos_z_str+",";
                                                 // wrist
                                                 std::vector<double> r_w_pos; curr_scene->getHumanoid()->getRightWristPos(r_w_pos);
-                                                string r_w_pos_x_str =  boost::str(boost::format("%.8f") % (r_w_pos.at(0))); boost::replace_all(r_w_pos_x_str,",",".");
-                                                string r_w_pos_y_str =  boost::str(boost::format("%.8f") % (r_w_pos.at(1))); boost::replace_all(r_w_pos_y_str,",",".");
-                                                string r_w_pos_z_str =  boost::str(boost::format("%.8f") % (r_w_pos.at(2))); boost::replace_all(r_w_pos_z_str,",",".");
+                                                string r_w_pos_x_str =  boost::str(boost::format("%.15f") % (r_w_pos.at(0))); boost::replace_all(r_w_pos_x_str,",",".");
+                                                string r_w_pos_y_str =  boost::str(boost::format("%.15f") % (r_w_pos.at(1))); boost::replace_all(r_w_pos_y_str,",",".");
+                                                string r_w_pos_z_str =  boost::str(boost::format("%.15f") % (r_w_pos.at(2))); boost::replace_all(r_w_pos_z_str,",",".");
                                                 data_csv << r_w_pos_x_str+","+r_w_pos_y_str+","+r_w_pos_z_str+",";
                                                 // hand
                                                 std::vector<double> r_h_pos; curr_scene->getHumanoid()->getRightHandPos(r_h_pos);
-                                                string r_h_pos_x_str =  boost::str(boost::format("%.8f") % (r_h_pos.at(0))); boost::replace_all(r_h_pos_x_str,",",".");
-                                                string r_h_pos_y_str =  boost::str(boost::format("%.8f") % (r_h_pos.at(1))); boost::replace_all(r_h_pos_y_str,",",".");
-                                                string r_h_pos_z_str =  boost::str(boost::format("%.8f") % (r_h_pos.at(2))); boost::replace_all(r_h_pos_z_str,",",".");
+                                                string r_h_pos_x_str =  boost::str(boost::format("%.15f") % (r_h_pos.at(0))); boost::replace_all(r_h_pos_x_str,",",".");
+                                                string r_h_pos_y_str =  boost::str(boost::format("%.15f") % (r_h_pos.at(1))); boost::replace_all(r_h_pos_y_str,",",".");
+                                                string r_h_pos_z_str =  boost::str(boost::format("%.15f") % (r_h_pos.at(2))); boost::replace_all(r_h_pos_z_str,",",".");
                                                 data_csv << r_h_pos_x_str+","+r_h_pos_y_str+","+r_h_pos_z_str+",";
                                                 // thumb
                                                 std::vector<double> r_thumb_pos; curr_scene->getHumanoid()->getRightThumbFingerPositions(r_thumb_pos);
                                                 std::vector<double> r_thumb_pos_1(3); std::copy(r_thumb_pos.begin(), r_thumb_pos.begin()+3, r_thumb_pos_1.begin());
                                                 std::vector<double> r_thumb_pos_2(3); std::copy(r_thumb_pos.begin()+3, r_thumb_pos.begin()+6, r_thumb_pos_2.begin());
                                                 std::vector<double> r_thumb_pos_tip(3); std::copy(r_thumb_pos.begin()+6, r_thumb_pos.begin()+9, r_thumb_pos_tip.begin());
-                                                string r_thumb_pos_1_x_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_1.at(0))); boost::replace_all(r_thumb_pos_1_x_str,",",".");
-                                                string r_thumb_pos_1_y_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_1.at(1))); boost::replace_all(r_thumb_pos_1_y_str,",",".");
-                                                string r_thumb_pos_1_z_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_1.at(2))); boost::replace_all(r_thumb_pos_1_z_str,",",".");
-                                                string r_thumb_pos_2_x_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_2.at(0))); boost::replace_all(r_thumb_pos_2_x_str,",",".");
-                                                string r_thumb_pos_2_y_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_2.at(1))); boost::replace_all(r_thumb_pos_2_y_str,",",".");
-                                                string r_thumb_pos_2_z_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_2.at(2))); boost::replace_all(r_thumb_pos_2_z_str,",",".");
-                                                string r_thumb_pos_tip_x_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_tip.at(0))); boost::replace_all(r_thumb_pos_tip_x_str,",",".");
-                                                string r_thumb_pos_tip_y_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_tip.at(1))); boost::replace_all(r_thumb_pos_tip_y_str,",",".");
-                                                string r_thumb_pos_tip_z_str =  boost::str(boost::format("%.8f") % (r_thumb_pos_tip.at(2))); boost::replace_all(r_thumb_pos_tip_z_str,",",".");
+                                                string r_thumb_pos_1_x_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_1.at(0))); boost::replace_all(r_thumb_pos_1_x_str,",",".");
+                                                string r_thumb_pos_1_y_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_1.at(1))); boost::replace_all(r_thumb_pos_1_y_str,",",".");
+                                                string r_thumb_pos_1_z_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_1.at(2))); boost::replace_all(r_thumb_pos_1_z_str,",",".");
+                                                string r_thumb_pos_2_x_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_2.at(0))); boost::replace_all(r_thumb_pos_2_x_str,",",".");
+                                                string r_thumb_pos_2_y_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_2.at(1))); boost::replace_all(r_thumb_pos_2_y_str,",",".");
+                                                string r_thumb_pos_2_z_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_2.at(2))); boost::replace_all(r_thumb_pos_2_z_str,",",".");
+                                                string r_thumb_pos_tip_x_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_tip.at(0))); boost::replace_all(r_thumb_pos_tip_x_str,",",".");
+                                                string r_thumb_pos_tip_y_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_tip.at(1))); boost::replace_all(r_thumb_pos_tip_y_str,",",".");
+                                                string r_thumb_pos_tip_z_str =  boost::str(boost::format("%.15f") % (r_thumb_pos_tip.at(2))); boost::replace_all(r_thumb_pos_tip_z_str,",",".");
                                                 data_csv << r_thumb_pos_1_x_str+","+r_thumb_pos_1_y_str+","+r_thumb_pos_1_z_str+","+
                                                             r_thumb_pos_2_x_str+","+r_thumb_pos_2_y_str+","+r_thumb_pos_2_z_str+","+
                                                             r_thumb_pos_tip_x_str+","+r_thumb_pos_tip_y_str+","+r_thumb_pos_tip_z_str+",";
@@ -10581,15 +10599,15 @@ void MainWindow::on_pushButton_plan_collect_warm_data_clicked()
                                                 std::vector<double> r_index_pos_1(3); std::copy(r_index_pos.begin(), r_index_pos.begin()+3, r_index_pos_1.begin());
                                                 std::vector<double> r_index_pos_2(3); std::copy(r_index_pos.begin()+3, r_index_pos.begin()+6, r_index_pos_2.begin());
                                                 std::vector<double> r_index_pos_tip(3); std::copy(r_index_pos.begin()+6, r_index_pos.begin()+9, r_index_pos_tip.begin());
-                                                string r_index_pos_1_x_str =  boost::str(boost::format("%.8f") % (r_index_pos_1.at(0))); boost::replace_all(r_index_pos_1_x_str,",",".");
-                                                string r_index_pos_1_y_str =  boost::str(boost::format("%.8f") % (r_index_pos_1.at(1))); boost::replace_all(r_index_pos_1_y_str,",",".");
-                                                string r_index_pos_1_z_str =  boost::str(boost::format("%.8f") % (r_index_pos_1.at(2))); boost::replace_all(r_index_pos_1_z_str,",",".");
-                                                string r_index_pos_2_x_str =  boost::str(boost::format("%.8f") % (r_index_pos_2.at(0))); boost::replace_all(r_index_pos_2_x_str,",",".");
-                                                string r_index_pos_2_y_str =  boost::str(boost::format("%.8f") % (r_index_pos_2.at(1))); boost::replace_all(r_index_pos_2_y_str,",",".");
-                                                string r_index_pos_2_z_str =  boost::str(boost::format("%.8f") % (r_index_pos_2.at(2))); boost::replace_all(r_index_pos_2_z_str,",",".");
-                                                string r_index_pos_tip_x_str =  boost::str(boost::format("%.8f") % (r_index_pos_tip.at(0))); boost::replace_all(r_index_pos_tip_x_str,",",".");
-                                                string r_index_pos_tip_y_str =  boost::str(boost::format("%.8f") % (r_index_pos_tip.at(1))); boost::replace_all(r_index_pos_tip_y_str,",",".");
-                                                string r_index_pos_tip_z_str =  boost::str(boost::format("%.8f") % (r_index_pos_tip.at(2))); boost::replace_all(r_index_pos_tip_z_str,",",".");
+                                                string r_index_pos_1_x_str =  boost::str(boost::format("%.15f") % (r_index_pos_1.at(0))); boost::replace_all(r_index_pos_1_x_str,",",".");
+                                                string r_index_pos_1_y_str =  boost::str(boost::format("%.15f") % (r_index_pos_1.at(1))); boost::replace_all(r_index_pos_1_y_str,",",".");
+                                                string r_index_pos_1_z_str =  boost::str(boost::format("%.15f") % (r_index_pos_1.at(2))); boost::replace_all(r_index_pos_1_z_str,",",".");
+                                                string r_index_pos_2_x_str =  boost::str(boost::format("%.15f") % (r_index_pos_2.at(0))); boost::replace_all(r_index_pos_2_x_str,",",".");
+                                                string r_index_pos_2_y_str =  boost::str(boost::format("%.15f") % (r_index_pos_2.at(1))); boost::replace_all(r_index_pos_2_y_str,",",".");
+                                                string r_index_pos_2_z_str =  boost::str(boost::format("%.15f") % (r_index_pos_2.at(2))); boost::replace_all(r_index_pos_2_z_str,",",".");
+                                                string r_index_pos_tip_x_str =  boost::str(boost::format("%.15f") % (r_index_pos_tip.at(0))); boost::replace_all(r_index_pos_tip_x_str,",",".");
+                                                string r_index_pos_tip_y_str =  boost::str(boost::format("%.15f") % (r_index_pos_tip.at(1))); boost::replace_all(r_index_pos_tip_y_str,",",".");
+                                                string r_index_pos_tip_z_str =  boost::str(boost::format("%.15f") % (r_index_pos_tip.at(2))); boost::replace_all(r_index_pos_tip_z_str,",",".");
                                                 data_csv << r_index_pos_1_x_str+","+r_index_pos_1_y_str+","+r_index_pos_1_z_str+","+
                                                             r_index_pos_2_x_str+","+r_index_pos_2_y_str+","+r_index_pos_2_z_str+","+
                                                             r_index_pos_tip_x_str+","+r_index_pos_tip_y_str+","+r_index_pos_tip_z_str+",";
@@ -10598,15 +10616,15 @@ void MainWindow::on_pushButton_plan_collect_warm_data_clicked()
                                                 std::vector<double> r_middle_pos_1(3); std::copy(r_middle_pos.begin(), r_middle_pos.begin()+3, r_middle_pos_1.begin());
                                                 std::vector<double> r_middle_pos_2(3); std::copy(r_middle_pos.begin()+3, r_middle_pos.begin()+6, r_middle_pos_2.begin());
                                                 std::vector<double> r_middle_pos_tip(3); std::copy(r_middle_pos.begin()+6, r_middle_pos.begin()+9, r_middle_pos_tip.begin());
-                                                string r_middle_pos_1_x_str =  boost::str(boost::format("%.8f") % (r_middle_pos_1.at(0))); boost::replace_all(r_middle_pos_1_x_str,",",".");
-                                                string r_middle_pos_1_y_str =  boost::str(boost::format("%.8f") % (r_middle_pos_1.at(1))); boost::replace_all(r_middle_pos_1_y_str,",",".");
-                                                string r_middle_pos_1_z_str =  boost::str(boost::format("%.8f") % (r_middle_pos_1.at(2))); boost::replace_all(r_middle_pos_1_z_str,",",".");
-                                                string r_middle_pos_2_x_str =  boost::str(boost::format("%.8f") % (r_middle_pos_2.at(0))); boost::replace_all(r_middle_pos_2_x_str,",",".");
-                                                string r_middle_pos_2_y_str =  boost::str(boost::format("%.8f") % (r_middle_pos_2.at(1))); boost::replace_all(r_middle_pos_2_y_str,",",".");
-                                                string r_middle_pos_2_z_str =  boost::str(boost::format("%.8f") % (r_middle_pos_2.at(2))); boost::replace_all(r_middle_pos_2_z_str,",",".");
-                                                string r_middle_pos_tip_x_str =  boost::str(boost::format("%.8f") % (r_middle_pos_tip.at(0))); boost::replace_all(r_middle_pos_tip_x_str,",",".");
-                                                string r_middle_pos_tip_y_str =  boost::str(boost::format("%.8f") % (r_middle_pos_tip.at(1))); boost::replace_all(r_middle_pos_tip_y_str,",",".");
-                                                string r_middle_pos_tip_z_str =  boost::str(boost::format("%.8f") % (r_middle_pos_tip.at(2))); boost::replace_all(r_middle_pos_tip_z_str,",",".");
+                                                string r_middle_pos_1_x_str =  boost::str(boost::format("%.15f") % (r_middle_pos_1.at(0))); boost::replace_all(r_middle_pos_1_x_str,",",".");
+                                                string r_middle_pos_1_y_str =  boost::str(boost::format("%.15f") % (r_middle_pos_1.at(1))); boost::replace_all(r_middle_pos_1_y_str,",",".");
+                                                string r_middle_pos_1_z_str =  boost::str(boost::format("%.15f") % (r_middle_pos_1.at(2))); boost::replace_all(r_middle_pos_1_z_str,",",".");
+                                                string r_middle_pos_2_x_str =  boost::str(boost::format("%.15f") % (r_middle_pos_2.at(0))); boost::replace_all(r_middle_pos_2_x_str,",",".");
+                                                string r_middle_pos_2_y_str =  boost::str(boost::format("%.15f") % (r_middle_pos_2.at(1))); boost::replace_all(r_middle_pos_2_y_str,",",".");
+                                                string r_middle_pos_2_z_str =  boost::str(boost::format("%.15f") % (r_middle_pos_2.at(2))); boost::replace_all(r_middle_pos_2_z_str,",",".");
+                                                string r_middle_pos_tip_x_str =  boost::str(boost::format("%.15f") % (r_middle_pos_tip.at(0))); boost::replace_all(r_middle_pos_tip_x_str,",",".");
+                                                string r_middle_pos_tip_y_str =  boost::str(boost::format("%.15f") % (r_middle_pos_tip.at(1))); boost::replace_all(r_middle_pos_tip_y_str,",",".");
+                                                string r_middle_pos_tip_z_str =  boost::str(boost::format("%.15f") % (r_middle_pos_tip.at(2))); boost::replace_all(r_middle_pos_tip_z_str,",",".");
                                                 data_csv << r_middle_pos_1_x_str+","+r_middle_pos_1_y_str+","+r_middle_pos_1_z_str+","+
                                                             r_middle_pos_2_x_str+","+r_middle_pos_2_y_str+","+r_middle_pos_2_z_str+","+
                                                             r_middle_pos_tip_x_str+","+r_middle_pos_tip_y_str+","+r_middle_pos_tip_z_str+",";
@@ -10614,103 +10632,103 @@ void MainWindow::on_pushButton_plan_collect_warm_data_clicked()
                                                 // target
                                                 if(mov_type==0){ // reach-to-grasp movement
                                                     objectPtr obj_tar = prob->getMovement()->getObject();
-                                                    string tar_x_pos_str =  boost::str(boost::format("%.8f") % (obj_tar->getPos().Xpos)); boost::replace_all(tar_x_pos_str,",",".");
-                                                    string tar_y_pos_str =  boost::str(boost::format("%.8f") % (obj_tar->getPos().Ypos)); boost::replace_all(tar_y_pos_str,",",".");
-                                                    string tar_z_pos_str =  boost::str(boost::format("%.8f") % (obj_tar->getPos().Zpos)); boost::replace_all(tar_z_pos_str,",",".");
-                                                    string tar_roll_str =  boost::str(boost::format("%.8f") % (obj_tar->getOr().roll)); boost::replace_all(tar_roll_str,",",".");
-                                                    string tar_pitch_str =  boost::str(boost::format("%.8f") % (obj_tar->getOr().pitch)); boost::replace_all(tar_pitch_str,",",".");
-                                                    string tar_yaw_str =  boost::str(boost::format("%.8f") % (obj_tar->getOr().yaw)); boost::replace_all(tar_yaw_str,",",".");
+                                                    string tar_x_pos_str =  boost::str(boost::format("%.15f") % (obj_tar->getPos().Xpos)); boost::replace_all(tar_x_pos_str,",",".");
+                                                    string tar_y_pos_str =  boost::str(boost::format("%.15f") % (obj_tar->getPos().Ypos)); boost::replace_all(tar_y_pos_str,",",".");
+                                                    string tar_z_pos_str =  boost::str(boost::format("%.15f") % (obj_tar->getPos().Zpos)); boost::replace_all(tar_z_pos_str,",",".");
+                                                    string tar_roll_str =  boost::str(boost::format("%.15f") % (obj_tar->getOr().roll)); boost::replace_all(tar_roll_str,",",".");
+                                                    string tar_pitch_str =  boost::str(boost::format("%.15f") % (obj_tar->getOr().pitch)); boost::replace_all(tar_pitch_str,",",".");
+                                                    string tar_yaw_str =  boost::str(boost::format("%.15f") % (obj_tar->getOr().yaw)); boost::replace_all(tar_yaw_str,",",".");
                                                     data_csv << tar_x_pos_str+","+tar_y_pos_str+","+tar_z_pos_str+","+tar_roll_str+","+tar_pitch_str+","+tar_yaw_str+",";
                                                 }else if(mov_type==1 || mov_type==5){ // move movement
-                                                    string tar_x_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(0))); boost::replace_all(tar_x_pos_str,",",".");
-                                                    string tar_y_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(1))); boost::replace_all(tar_y_pos_str,",",".");
-                                                    string tar_z_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(2))); boost::replace_all(tar_z_pos_str,",",".");
-                                                    string tar_roll_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(3))); boost::replace_all(tar_roll_str,",",".");
-                                                    string tar_pitch_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(4))); boost::replace_all(tar_pitch_str,",",".");
-                                                    string tar_yaw_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(5))); boost::replace_all(tar_yaw_str,",",".");
+                                                    string tar_x_pos_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(0))); boost::replace_all(tar_x_pos_str,",",".");
+                                                    string tar_y_pos_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(1))); boost::replace_all(tar_y_pos_str,",",".");
+                                                    string tar_z_pos_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(2))); boost::replace_all(tar_z_pos_str,",",".");
+                                                    string tar_roll_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(3))); boost::replace_all(tar_roll_str,",",".");
+                                                    string tar_pitch_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(4))); boost::replace_all(tar_pitch_str,",",".");
+                                                    string tar_yaw_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(5))); boost::replace_all(tar_yaw_str,",",".");
                                                     data_csv << tar_x_pos_str+","+tar_y_pos_str+","+tar_z_pos_str+","+tar_roll_str+","+tar_pitch_str+","+tar_yaw_str+",";
                                                 }
                                                 // obstacles
                                                 std::vector<objectPtr> obsts_new; prob->getObstacles(obsts_new);
                                                 for(size_t j=0;j<obsts_new.size();++j){
                                                     objectPtr obs = obsts_new.at(j);
-                                                    string obs_x_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Xpos)); boost::replace_all(obs_x_pos_str,",",".");
-                                                    string obs_y_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Ypos)); boost::replace_all(obs_y_pos_str,",",".");
-                                                    string obs_z_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Zpos)); boost::replace_all(obs_z_pos_str,",",".");
-                                                    string obs_roll_str =  boost::str(boost::format("%.8f") % (obs->getOr().roll)); boost::replace_all(obs_roll_str,",",".");
-                                                    string obs_pitch_str =  boost::str(boost::format("%.8f") % (obs->getOr().pitch)); boost::replace_all(obs_pitch_str,",",".");
-                                                    string obs_yaw_str =  boost::str(boost::format("%.8f") % (obs->getOr().yaw)); boost::replace_all(obs_yaw_str,",",".");
+                                                    string obs_x_pos_str =  boost::str(boost::format("%.15f") % (obs->getPos().Xpos)); boost::replace_all(obs_x_pos_str,",",".");
+                                                    string obs_y_pos_str =  boost::str(boost::format("%.15f") % (obs->getPos().Ypos)); boost::replace_all(obs_y_pos_str,",",".");
+                                                    string obs_z_pos_str =  boost::str(boost::format("%.15f") % (obs->getPos().Zpos)); boost::replace_all(obs_z_pos_str,",",".");
+                                                    string obs_roll_str =  boost::str(boost::format("%.15f") % (obs->getOr().roll)); boost::replace_all(obs_roll_str,",",".");
+                                                    string obs_pitch_str =  boost::str(boost::format("%.15f") % (obs->getOr().pitch)); boost::replace_all(obs_pitch_str,",",".");
+                                                    string obs_yaw_str =  boost::str(boost::format("%.15f") % (obs->getOr().yaw)); boost::replace_all(obs_yaw_str,",",".");
                                                     data_csv << obs_x_pos_str+","+obs_y_pos_str+","+obs_z_pos_str+","+obs_roll_str+","+obs_pitch_str+","+obs_yaw_str+",";
                                                 }
                                                 // final posture selections
                                                 if(h_results_tmp->final_warm_start_res.size()==3){
                                                     // plan
                                                     HUMotion::warm_start_params f_plan_res = h_results_tmp->final_warm_start_res.at(1);
-                                                    string cpu_time_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
-                                                    string iter_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
-                                                    string obj_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
-                                                    string error_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
+                                                    string cpu_time_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
+                                                    string iter_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
+                                                    string obj_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
+                                                    string error_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
                                                     data_csv << cpu_time_plan_str+","+iter_plan_str+","+obj_plan_str+","+error_plan_str+",";
                                                     for(int h=0;h<f_plan_res.x.size();++h){
-                                                        string x_str =  boost::str(boost::format("%.8f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                        string x_str =  boost::str(boost::format("%.15f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                         data_csv << x_str+",";
                                                     }
                                                     for(size_t h=0;h<f_plan_res.zL.size();++h){
-                                                        string zL_str =  boost::str(boost::format("%.8f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                        string zL_str =  boost::str(boost::format("%.15f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                         data_csv << zL_str+",";
                                                     }
                                                     for(size_t h=0;h<f_plan_res.zU.size();++h){
-                                                        string zU_str =  boost::str(boost::format("%.8f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                        string zU_str =  boost::str(boost::format("%.15f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                         data_csv << zU_str+",";
                                                     }
                                                     for(size_t h=0;h<f_plan_res.dual_vars.size();++h){
-                                                        string dual_str =  boost::str(boost::format("%.8f") % (f_plan_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                        string dual_str =  boost::str(boost::format("%.15f") % (f_plan_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                                         data_csv << dual_str+",";
                                                     }
                                                     // approach
                                                     HUMotion::warm_start_params f_app_res = h_results_tmp->final_warm_start_res.at(0);
-                                                    string cpu_time_app_str =  boost::str(boost::format("%.8f") % (f_app_res.cpu_time)); boost::replace_all(cpu_time_app_str,",",".");
-                                                    string iter_app_str =  boost::str(boost::format("%.8f") % (f_app_res.iterations)); boost::replace_all(iter_app_str,",",".");
-                                                    string obj_app_str =  boost::str(boost::format("%.8f") % (f_app_res.obj_value)); boost::replace_all(obj_app_str,",",".");
-                                                    string error_app_str =  boost::str(boost::format("%.8f") % (f_app_res.error_value)); boost::replace_all(error_app_str,",",".");
+                                                    string cpu_time_app_str =  boost::str(boost::format("%.15f") % (f_app_res.cpu_time)); boost::replace_all(cpu_time_app_str,",",".");
+                                                    string iter_app_str =  boost::str(boost::format("%.15f") % (f_app_res.iterations)); boost::replace_all(iter_app_str,",",".");
+                                                    string obj_app_str =  boost::str(boost::format("%.15f") % (f_app_res.obj_value)); boost::replace_all(obj_app_str,",",".");
+                                                    string error_app_str =  boost::str(boost::format("%.15f") % (f_app_res.error_value)); boost::replace_all(error_app_str,",",".");
                                                     data_csv << cpu_time_app_str+","+iter_app_str+","+obj_app_str+","+error_app_str+",";
                                                     for(int h=0;h<f_app_res.x.size();++h){
-                                                        string x_str =  boost::str(boost::format("%.8f") % (f_app_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                        string x_str =  boost::str(boost::format("%.15f") % (f_app_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                         data_csv << x_str+",";
                                                     }
                                                     for(size_t h=0;h<f_app_res.zL.size();++h){
-                                                        string zL_str =  boost::str(boost::format("%.8f") % (f_app_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                        string zL_str =  boost::str(boost::format("%.15f") % (f_app_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                         data_csv << zL_str+",";
                                                     }
                                                     for(size_t h=0;h<f_app_res.zU.size();++h){
-                                                        string zU_str =  boost::str(boost::format("%.8f") % (f_app_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                        string zU_str =  boost::str(boost::format("%.15f") % (f_app_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                         data_csv << zU_str+",";
                                                     }
                                                     for(size_t h=0;h<f_app_res.dual_vars.size();++h){
-                                                        string dual_str =  boost::str(boost::format("%.8f") % (f_app_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                        string dual_str =  boost::str(boost::format("%.15f") % (f_app_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                                         data_csv << dual_str+",";
                                                     }
                                                     //retreat
                                                     HUMotion::warm_start_params f_ret_res = h_results_tmp->final_warm_start_res.at(2);
-                                                    string cpu_time_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.cpu_time)); boost::replace_all(cpu_time_ret_str,",",".");
-                                                    string iter_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.iterations)); boost::replace_all(iter_ret_str,",",".");
-                                                    string obj_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.obj_value)); boost::replace_all(obj_ret_str,",",".");
-                                                    string error_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.error_value)); boost::replace_all(error_ret_str,",",".");
+                                                    string cpu_time_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.cpu_time)); boost::replace_all(cpu_time_ret_str,",",".");
+                                                    string iter_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.iterations)); boost::replace_all(iter_ret_str,",",".");
+                                                    string obj_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.obj_value)); boost::replace_all(obj_ret_str,",",".");
+                                                    string error_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.error_value)); boost::replace_all(error_ret_str,",",".");
                                                     data_csv << cpu_time_ret_str+","+iter_ret_str+","+obj_ret_str+","+error_ret_str+",";
                                                     for(int h=0;h<f_ret_res.x.size();++h){
-                                                        string x_str =  boost::str(boost::format("%.8f") % (f_ret_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                        string x_str =  boost::str(boost::format("%.15f") % (f_ret_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                         data_csv << x_str+",";
                                                     }
                                                     for(size_t h=0;h<f_ret_res.zL.size();++h){
-                                                        string zL_str =  boost::str(boost::format("%.8f") % (f_ret_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                        string zL_str =  boost::str(boost::format("%.15f") % (f_ret_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                         data_csv << zL_str+",";
                                                     }
                                                     for(size_t h=0;h<f_ret_res.zU.size();++h){
-                                                        string zU_str =  boost::str(boost::format("%.8f") % (f_ret_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                        string zU_str =  boost::str(boost::format("%.15f") % (f_ret_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                         data_csv << zU_str+",";
                                                     }
                                                     for(size_t h=0;h<f_ret_res.dual_vars.size();++h){
-                                                        string dual_str =  boost::str(boost::format("%.8f") % (f_ret_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                        string dual_str =  boost::str(boost::format("%.15f") % (f_ret_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                                         data_csv << dual_str+",";
                                                     }
                                                 }else if(h_results_tmp->final_warm_start_res.size()==2){
@@ -10718,135 +10736,135 @@ void MainWindow::on_pushButton_plan_collect_warm_data_clicked()
                                                     {
                                                         // plan
                                                         HUMotion::warm_start_params f_plan_res = h_results_tmp->final_warm_start_res.at(1);
-                                                        string cpu_time_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
-                                                        string iter_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
-                                                        string obj_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
-                                                        string error_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
+                                                        string cpu_time_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
+                                                        string iter_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
+                                                        string obj_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
+                                                        string error_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
                                                         data_csv << cpu_time_plan_str+","+iter_plan_str+","+obj_plan_str+","+error_plan_str+",";
                                                         for(int h=0;h<f_plan_res.x.size();++h){
-                                                            string x_str =  boost::str(boost::format("%.8f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                            string x_str =  boost::str(boost::format("%.15f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                             data_csv << x_str+",";
                                                         }
                                                         for(size_t h=0;h<f_plan_res.zL.size();++h){
-                                                            string zL_str =  boost::str(boost::format("%.8f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                            string zL_str =  boost::str(boost::format("%.15f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                             data_csv << zL_str+",";
                                                         }
                                                         for(size_t h=0;h<f_plan_res.zU.size();++h){
-                                                            string zU_str =  boost::str(boost::format("%.8f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                            string zU_str =  boost::str(boost::format("%.15f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                             data_csv << zU_str+",";
                                                         }
                                                         //approach
                                                         HUMotion::warm_start_params f_app_res = h_results_tmp->final_warm_start_res.at(0);
-                                                        string cpu_time_app_str =  boost::str(boost::format("%.8f") % (f_app_res.cpu_time)); boost::replace_all(cpu_time_app_str,",",".");
-                                                        string iter_app_str =  boost::str(boost::format("%.8f") % (f_app_res.iterations)); boost::replace_all(iter_app_str,",",".");
-                                                        string obj_app_str =  boost::str(boost::format("%.8f") % (f_app_res.obj_value)); boost::replace_all(obj_app_str,",",".");
-                                                        string error_app_str =  boost::str(boost::format("%.8f") % (f_app_res.error_value)); boost::replace_all(error_app_str,",",".");
+                                                        string cpu_time_app_str =  boost::str(boost::format("%.15f") % (f_app_res.cpu_time)); boost::replace_all(cpu_time_app_str,",",".");
+                                                        string iter_app_str =  boost::str(boost::format("%.15f") % (f_app_res.iterations)); boost::replace_all(iter_app_str,",",".");
+                                                        string obj_app_str =  boost::str(boost::format("%.15f") % (f_app_res.obj_value)); boost::replace_all(obj_app_str,",",".");
+                                                        string error_app_str =  boost::str(boost::format("%.15f") % (f_app_res.error_value)); boost::replace_all(error_app_str,",",".");
                                                         data_csv << cpu_time_app_str+","+iter_app_str+","+obj_app_str+","+error_app_str+",";
                                                         for(int h=0;h<f_app_res.x.size();++h){
-                                                            string x_str =  boost::str(boost::format("%.8f") % (f_app_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                            string x_str =  boost::str(boost::format("%.15f") % (f_app_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                             data_csv << x_str+",";
                                                         }
                                                         for(size_t h=0;h<f_app_res.zL.size();++h){
-                                                            string zL_str =  boost::str(boost::format("%.8f") % (f_app_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                            string zL_str =  boost::str(boost::format("%.15f") % (f_app_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                             data_csv << zL_str+",";
                                                         }
                                                         for(size_t h=0;h<f_app_res.zU.size();++h){
-                                                            string zU_str =  boost::str(boost::format("%.8f") % (f_app_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                            string zU_str =  boost::str(boost::format("%.15f") % (f_app_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                             data_csv << zU_str+",";
                                                         }
                                                         for(size_t h=0;h<f_app_res.dual_vars.size();++h){
-                                                            string dual_str =  boost::str(boost::format("%.8f") % (f_app_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                            string dual_str =  boost::str(boost::format("%.15f") % (f_app_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                                             data_csv << dual_str+",";
                                                         }
                                                     }else{
                                                         // plan
                                                         HUMotion::warm_start_params f_plan_res = h_results_tmp->final_warm_start_res.at(0);
-                                                        string cpu_time_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
-                                                        string iter_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
-                                                        string obj_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
-                                                        string error_plan_str =  boost::str(boost::format("%.8f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
+                                                        string cpu_time_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
+                                                        string iter_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.iterations)); boost::replace_all(iter_plan_str,",",".");
+                                                        string obj_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
+                                                        string error_plan_str =  boost::str(boost::format("%.15f") % (f_plan_res.error_value)); boost::replace_all(error_plan_str,",",".");
                                                         data_csv << cpu_time_plan_str+","+iter_plan_str+","+obj_plan_str+","+error_plan_str+",";
                                                         for(int h=0;h<f_plan_res.x.size();++h){
-                                                            string x_str =  boost::str(boost::format("%.8f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                            string x_str =  boost::str(boost::format("%.15f") % (f_plan_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                             data_csv << x_str+",";
                                                         }
                                                         for(size_t h=0;h<f_plan_res.zL.size();++h){
-                                                            string zL_str =  boost::str(boost::format("%.8f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                            string zL_str =  boost::str(boost::format("%.15f") % (f_plan_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                             data_csv << zL_str+",";
                                                         }
                                                         for(size_t h=0;h<f_plan_res.zU.size();++h){
-                                                            string zU_str =  boost::str(boost::format("%.8f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                            string zU_str =  boost::str(boost::format("%.15f") % (f_plan_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                             data_csv << zU_str+",";
                                                         }
                                                         // retreat
                                                         HUMotion::warm_start_params f_ret_res = h_results_tmp->final_warm_start_res.at(1);
-                                                        string cpu_time_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.cpu_time)); boost::replace_all(cpu_time_ret_str,",",".");
-                                                        string iter_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.iterations)); boost::replace_all(iter_ret_str,",",".");
-                                                        string obj_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.obj_value)); boost::replace_all(obj_ret_str,",",".");
-                                                        string error_ret_str =  boost::str(boost::format("%.8f") % (f_ret_res.error_value)); boost::replace_all(error_ret_str,",",".");
+                                                        string cpu_time_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.cpu_time)); boost::replace_all(cpu_time_ret_str,",",".");
+                                                        string iter_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.iterations)); boost::replace_all(iter_ret_str,",",".");
+                                                        string obj_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.obj_value)); boost::replace_all(obj_ret_str,",",".");
+                                                        string error_ret_str =  boost::str(boost::format("%.15f") % (f_ret_res.error_value)); boost::replace_all(error_ret_str,",",".");
                                                         data_csv << cpu_time_ret_str+","+iter_ret_str+","+obj_ret_str+","+error_ret_str+",";
                                                         for(int h=0;h<f_ret_res.x.size();++h){
-                                                            string x_str =  boost::str(boost::format("%.8f") % (f_ret_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                            string x_str =  boost::str(boost::format("%.15f") % (f_ret_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                             data_csv << x_str+",";
                                                         }
                                                         for(size_t h=0;h<f_ret_res.zL.size();++h){
-                                                            string zL_str =  boost::str(boost::format("%.8f") % (f_ret_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                            string zL_str =  boost::str(boost::format("%.15f") % (f_ret_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                             data_csv << zL_str+",";
                                                         }
                                                         for(size_t h=0;h<f_ret_res.zU.size();++h){
-                                                            string zU_str =  boost::str(boost::format("%.8f") % (f_ret_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                            string zU_str =  boost::str(boost::format("%.15f") % (f_ret_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                             data_csv << zU_str+",";
                                                         }
                                                         for(size_t h=0;h<f_ret_res.dual_vars.size();++h){
-                                                            string dual_str =  boost::str(boost::format("%.8f") % (f_ret_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                            string dual_str =  boost::str(boost::format("%.15f") % (f_ret_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                                             data_csv << dual_str+",";
                                                         }
                                                     }
                                                 }else if(h_results_tmp->final_warm_start_res.size()==1){
                                                     // plan
                                                     HUMotion::warm_start_params f_res = h_results_tmp->final_warm_start_res.at(0);
-                                                    string cpu_time_plan_str =  boost::str(boost::format("%.8f") % (f_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
-                                                    string iter_plan_str =  boost::str(boost::format("%.8f") % (f_res.iterations)); boost::replace_all(iter_plan_str,",",".");
-                                                    string obj_plan_str =  boost::str(boost::format("%.8f") % (f_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
-                                                    string error_plan_str =  boost::str(boost::format("%.8f") % (f_res.error_value)); boost::replace_all(error_plan_str,",",".");
+                                                    string cpu_time_plan_str =  boost::str(boost::format("%.15f") % (f_res.cpu_time)); boost::replace_all(cpu_time_plan_str,",",".");
+                                                    string iter_plan_str =  boost::str(boost::format("%.15f") % (f_res.iterations)); boost::replace_all(iter_plan_str,",",".");
+                                                    string obj_plan_str =  boost::str(boost::format("%.15f") % (f_res.obj_value)); boost::replace_all(obj_plan_str,",",".");
+                                                    string error_plan_str =  boost::str(boost::format("%.15f") % (f_res.error_value)); boost::replace_all(error_plan_str,",",".");
                                                     data_csv << cpu_time_plan_str+","+iter_plan_str+","+obj_plan_str+","+error_plan_str+",";
                                                     for(int h=0;h<f_res.x.size();++h){
-                                                        string x_str =  boost::str(boost::format("%.8f") % (f_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                        string x_str =  boost::str(boost::format("%.15f") % (f_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                         data_csv << x_str+",";
                                                     }
                                                     for(size_t h=0;h<f_res.zL.size();++h){
-                                                        string zL_str =  boost::str(boost::format("%.8f") % (f_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                        string zL_str =  boost::str(boost::format("%.15f") % (f_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                         data_csv << zL_str+",";
                                                     }
                                                     for(size_t h=0;h<f_res.zU.size();++h){
-                                                        string zU_str =  boost::str(boost::format("%.8f") % (f_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                        string zU_str =  boost::str(boost::format("%.15f") % (f_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                         data_csv << zU_str+",";
                                                     }
                                                     for(size_t h=0;h<f_res.dual_vars.size();++h){
-                                                        string dual_str =  boost::str(boost::format("%.8f") % (f_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                        string dual_str =  boost::str(boost::format("%.15f") % (f_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                                         data_csv << dual_str+",";
                                                     }
                                                 }
                                                 // bounce posture selection
-                                                string cpu_time_b_str =  boost::str(boost::format("%.8f") % (b_res.cpu_time)); boost::replace_all(cpu_time_b_str,",",".");
-                                                string iter_b_str =  boost::str(boost::format("%.8f") % (b_res.iterations)); boost::replace_all(iter_b_str,",",".");
-                                                string obj_b_str =  boost::str(boost::format("%.8f") % (b_res.obj_value)); boost::replace_all(obj_b_str,",",".");
-                                                string error_b_str =  boost::str(boost::format("%.8f") % (b_res.error_value)); boost::replace_all(error_b_str,",",".");
+                                                string cpu_time_b_str =  boost::str(boost::format("%.15f") % (b_res.cpu_time)); boost::replace_all(cpu_time_b_str,",",".");
+                                                string iter_b_str =  boost::str(boost::format("%.15f") % (b_res.iterations)); boost::replace_all(iter_b_str,",",".");
+                                                string obj_b_str =  boost::str(boost::format("%.15f") % (b_res.obj_value)); boost::replace_all(obj_b_str,",",".");
+                                                string error_b_str =  boost::str(boost::format("%.15f") % (b_res.error_value)); boost::replace_all(error_b_str,",",".");
                                                 data_csv << cpu_time_b_str+","+iter_b_str+","+obj_b_str+","+error_b_str+",";
                                                 for(size_t h=0;h<b_res.x.size();++h){
-                                                    string x_str =  boost::str(boost::format("%.8f") % (b_res.x.at(h))); boost::replace_all(x_str,",",".");
+                                                    string x_str =  boost::str(boost::format("%.15f") % (b_res.x.at(h))); boost::replace_all(x_str,",",".");
                                                     data_csv << x_str+",";
                                                 }
                                                 for(size_t h=0;h<b_res.zL.size();++h){
-                                                    string zL_str =  boost::str(boost::format("%.8f") % (b_res.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                                    string zL_str =  boost::str(boost::format("%.15f") % (b_res.zL.at(h))); boost::replace_all(zL_str,",",".");
                                                     data_csv << zL_str+",";
                                                 }
                                                 for(size_t h=0;h<b_res.zU.size();++h){
-                                                    string zU_str =  boost::str(boost::format("%.8f") % (b_res.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                                    string zU_str =  boost::str(boost::format("%.15f") % (b_res.zU.at(h))); boost::replace_all(zU_str,",",".");
                                                     data_csv << zU_str+",";
                                                 }
                                                 for(size_t h=0;h<b_res.dual_vars.size();++h){
-                                                    string dual_str =  boost::str(boost::format("%.8f") % (b_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                                    string dual_str =  boost::str(boost::format("%.15f") % (b_res.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
                                                     if(h == b_res.dual_vars.size()-1){
                                                         //last column
                                                         data_csv << dual_str;
@@ -11257,12 +11275,12 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                             obj_tar->setOr(obj_or,true);
                             prob->getMovement()->setObject(obj_tar);
 
-                            tar_x_pos_str =  boost::str(boost::format("%.8f") % (obj_pos.Xpos)); boost::replace_all(tar_x_pos_str,",",".");
-                            tar_y_pos_str =  boost::str(boost::format("%.8f") % (obj_pos.Ypos)); boost::replace_all(tar_y_pos_str,",",".");
-                            tar_z_pos_str =  boost::str(boost::format("%.8f") % (obj_pos.Zpos)); boost::replace_all(tar_z_pos_str,",",".");
-                            tar_roll_str =  boost::str(boost::format("%.8f") % (obj_or.roll)); boost::replace_all(tar_roll_str,",",".");
-                            tar_pitch_str =  boost::str(boost::format("%.8f") % (obj_or.pitch)); boost::replace_all(tar_pitch_str,",",".");
-                            tar_yaw_str =  boost::str(boost::format("%.8f") % (obj_or.yaw)); boost::replace_all(tar_yaw_str,",",".");
+                            tar_x_pos_str =  boost::str(boost::format("%.15f") % (obj_pos.Xpos)); boost::replace_all(tar_x_pos_str,",",".");
+                            tar_y_pos_str =  boost::str(boost::format("%.15f") % (obj_pos.Ypos)); boost::replace_all(tar_y_pos_str,",",".");
+                            tar_z_pos_str =  boost::str(boost::format("%.15f") % (obj_pos.Zpos)); boost::replace_all(tar_z_pos_str,",",".");
+                            tar_roll_str =  boost::str(boost::format("%.15f") % (obj_or.roll)); boost::replace_all(tar_roll_str,",",".");
+                            tar_pitch_str =  boost::str(boost::format("%.15f") % (obj_or.pitch)); boost::replace_all(tar_pitch_str,",",".");
+                            tar_yaw_str =  boost::str(boost::format("%.15f") % (obj_or.yaw)); boost::replace_all(tar_yaw_str,",",".");
 
                         }else if(mov_type==1 || mov_type==5){ // move movement
 
@@ -11299,12 +11317,12 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                             }
                             prob->setMoveSettings(move_target_mod,move_final_hand,move_final_arm,use_final);
 
-                            tar_x_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(0))); boost::replace_all(tar_x_pos_str,",",".");
-                            tar_y_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(1))); boost::replace_all(tar_y_pos_str,",",".");
-                            tar_z_pos_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(2))); boost::replace_all(tar_z_pos_str,",",".");
-                            tar_roll_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(3))); boost::replace_all(tar_roll_str,",",".");
-                            tar_pitch_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(4))); boost::replace_all(tar_pitch_str,",",".");
-                            tar_yaw_str =  boost::str(boost::format("%.8f") % (move_target_mod.at(5))); boost::replace_all(tar_yaw_str,",",".");
+                            tar_x_pos_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(0))); boost::replace_all(tar_x_pos_str,",",".");
+                            tar_y_pos_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(1))); boost::replace_all(tar_y_pos_str,",",".");
+                            tar_z_pos_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(2))); boost::replace_all(tar_z_pos_str,",",".");
+                            tar_roll_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(3))); boost::replace_all(tar_roll_str,",",".");
+                            tar_pitch_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(4))); boost::replace_all(tar_pitch_str,",",".");
+                            tar_yaw_str =  boost::str(boost::format("%.15f") % (move_target_mod.at(5))); boost::replace_all(tar_yaw_str,",",".");
                         }
 
                         string input_data_str = tar_x_pos_str + string(",") +
@@ -11360,12 +11378,12 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                             obs_new->setPos(obs_pos,false);
                             obs_new->setOr(obs_or,false);
                             obs_new->setSize(obs->getSize());
-                            string obs_x_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Xpos)); boost::replace_all(obs_x_pos_str,",",".");
-                            string obs_y_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Ypos)); boost::replace_all(obs_y_pos_str,",",".");
-                            string obs_z_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Zpos)); boost::replace_all(obs_z_pos_str,",",".");
-                            string obs_roll_str =  boost::str(boost::format("%.8f") % (obs->getOr().roll)); boost::replace_all(obs_roll_str,",",".");
-                            string obs_pitch_str =  boost::str(boost::format("%.8f") % (obs->getOr().pitch)); boost::replace_all(obs_pitch_str,",",".");
-                            string obs_yaw_str =  boost::str(boost::format("%.8f") % (obs->getOr().yaw)); boost::replace_all(obs_yaw_str,",",".");
+                            string obs_x_pos_str =  boost::str(boost::format("%.15f") % (obs->getPos().Xpos)); boost::replace_all(obs_x_pos_str,",",".");
+                            string obs_y_pos_str =  boost::str(boost::format("%.15f") % (obs->getPos().Ypos)); boost::replace_all(obs_y_pos_str,",",".");
+                            string obs_z_pos_str =  boost::str(boost::format("%.15f") % (obs->getPos().Zpos)); boost::replace_all(obs_z_pos_str,",",".");
+                            string obs_roll_str =  boost::str(boost::format("%.15f") % (obs->getOr().roll)); boost::replace_all(obs_roll_str,",",".");
+                            string obs_pitch_str =  boost::str(boost::format("%.15f") % (obs->getOr().pitch)); boost::replace_all(obs_pitch_str,",",".");
+                            string obs_yaw_str =  boost::str(boost::format("%.15f") % (obs->getOr().yaw)); boost::replace_all(obs_yaw_str,",",".");
                             string obs_str = obs_x_pos_str + string(",") +
                                              obs_y_pos_str + string(",") +
                                              obs_z_pos_str + string(",") +
@@ -11963,12 +11981,12 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                         std::vector<objectPtr> obsts_new; prob->getObstacles(obsts_new);
                         for(size_t j=0;j<obsts_new.size();++j){
                             objectPtr obs = obsts_new.at(j);
-                            string obs_x_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Xpos)); boost::replace_all(obs_x_pos_str,",",".");
-                            string obs_y_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Ypos)); boost::replace_all(obs_y_pos_str,",",".");
-                            string obs_z_pos_str =  boost::str(boost::format("%.8f") % (obs->getPos().Zpos)); boost::replace_all(obs_z_pos_str,",",".");
-                            string obs_roll_str =  boost::str(boost::format("%.8f") % (obs->getOr().roll)); boost::replace_all(obs_roll_str,",",".");
-                            string obs_pitch_str =  boost::str(boost::format("%.8f") % (obs->getOr().pitch)); boost::replace_all(obs_pitch_str,",",".");
-                            string obs_yaw_str =  boost::str(boost::format("%.8f") % (obs->getOr().yaw)); boost::replace_all(obs_yaw_str,",",".");
+                            string obs_x_pos_str =  boost::str(boost::format("%.15f") % (obs->getPos().Xpos)); boost::replace_all(obs_x_pos_str,",",".");
+                            string obs_y_pos_str =  boost::str(boost::format("%.15f") % (obs->getPos().Ypos)); boost::replace_all(obs_y_pos_str,",",".");
+                            string obs_z_pos_str =  boost::str(boost::format("%.15f") % (obs->getPos().Zpos)); boost::replace_all(obs_z_pos_str,",",".");
+                            string obs_roll_str =  boost::str(boost::format("%.15f") % (obs->getOr().roll)); boost::replace_all(obs_roll_str,",",".");
+                            string obs_pitch_str =  boost::str(boost::format("%.15f") % (obs->getOr().pitch)); boost::replace_all(obs_pitch_str,",",".");
+                            string obs_yaw_str =  boost::str(boost::format("%.15f") % (obs->getOr().yaw)); boost::replace_all(obs_yaw_str,",",".");
                             pred_csv << ","+obs_x_pos_str+","+obs_y_pos_str+","+obs_z_pos_str+","+obs_roll_str+","+obs_pitch_str+","+obs_yaw_str;
                         }
 
@@ -11979,12 +11997,12 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                 if(mov_type==1 || mov_type==5){ // move movement
                                     HUMotion::warm_start_params plan_tar = (h_results_cold->final_warm_start_res).at(0);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
-                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
-                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     HUMotion::warm_start_params bounce_ws = h_results_cold->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
-                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
-                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
                                     success_cold_plan.push_back(1); iter_cold_plan.push_back(plan_tar.iterations); cpu_cold_plan.push_back(plan_tar.cpu_time); obj_cold_plan.push_back(plan_tar.obj_value);
                                     success_cold_bounce.push_back(1); iter_cold_bounce.push_back(bounce_ws.iterations); cpu_cold_bounce.push_back(bounce_ws.cpu_time); obj_cold_bounce.push_back(bounce_ws.obj_value);
@@ -11992,23 +12010,23 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     // plan stage
                                     HUMotion::warm_start_params plan_tar = (h_results_cold->final_warm_start_res).at(1);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
-                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
-                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     // approach stage
                                     HUMotion::warm_start_params approach_tar = (h_results_cold->final_warm_start_res).at(0);
                                     string iter_f_approach_str = to_string(approach_tar.iterations);
-                                    string cpu_f_approach_str =  boost::str(boost::format("%.8f") % (approach_tar.cpu_time)); boost::replace_all(cpu_f_approach_str,",",".");
-                                    string obj_f_approach_str =  boost::str(boost::format("%.8f") % (approach_tar.obj_value)); boost::replace_all(obj_f_approach_str,",",".");
+                                    string cpu_f_approach_str =  boost::str(boost::format("%.15f") % (approach_tar.cpu_time)); boost::replace_all(cpu_f_approach_str,",",".");
+                                    string obj_f_approach_str =  boost::str(boost::format("%.15f") % (approach_tar.obj_value)); boost::replace_all(obj_f_approach_str,",",".");
                                     // retreat stage
                                     HUMotion::warm_start_params retreat_tar = (h_results_cold->final_warm_start_res).at(2);
                                     string iter_f_retreat_str = to_string(retreat_tar.iterations);
-                                    string cpu_f_retreat_str =  boost::str(boost::format("%.8f") % (retreat_tar.cpu_time)); boost::replace_all(cpu_f_retreat_str,",",".");
-                                    string obj_f_retreat_str =  boost::str(boost::format("%.8f") % (retreat_tar.obj_value)); boost::replace_all(obj_f_retreat_str,",",".");
+                                    string cpu_f_retreat_str =  boost::str(boost::format("%.15f") % (retreat_tar.cpu_time)); boost::replace_all(cpu_f_retreat_str,",",".");
+                                    string obj_f_retreat_str =  boost::str(boost::format("%.15f") % (retreat_tar.obj_value)); boost::replace_all(obj_f_retreat_str,",",".");
                                     // bounce
                                     HUMotion::warm_start_params bounce_ws = h_results_cold->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
-                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
-                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
 
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+
                                                 ",1,"+iter_f_approach_str+","+cpu_f_approach_str+","+obj_f_approach_str+
@@ -12055,12 +12073,12 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                 if(mov_type==1 || mov_type==5){ // move movement
                                     HUMotion::warm_start_params plan_tar = (h_results_ws_or->final_warm_start_res).at(0);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
-                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
-                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     HUMotion::warm_start_params bounce_ws = h_results_ws_or->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
-                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
-                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
                                     success_ws_or_plan.push_back(1); iter_ws_or_plan.push_back(plan_tar.iterations); cpu_ws_or_plan.push_back(plan_tar.cpu_time); obj_ws_or_plan.push_back(plan_tar.obj_value);
                                     success_ws_or_bounce.push_back(1); iter_ws_or_bounce.push_back(bounce_ws.iterations); cpu_ws_or_bounce.push_back(bounce_ws.cpu_time); obj_ws_or_bounce.push_back(bounce_ws.obj_value);
@@ -12068,23 +12086,23 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     // plan stage
                                     HUMotion::warm_start_params plan_tar = (h_results_ws_or->final_warm_start_res).at(1);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
-                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
-                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     // approach stage
                                     HUMotion::warm_start_params approach_tar = (h_results_ws_or->final_warm_start_res).at(0);
                                     string iter_f_approach_str = to_string(approach_tar.iterations);
-                                    string cpu_f_approach_str =  boost::str(boost::format("%.8f") % (approach_tar.cpu_time)); boost::replace_all(cpu_f_approach_str,",",".");
-                                    string obj_f_approach_str =  boost::str(boost::format("%.8f") % (approach_tar.obj_value)); boost::replace_all(obj_f_approach_str,",",".");
+                                    string cpu_f_approach_str =  boost::str(boost::format("%.15f") % (approach_tar.cpu_time)); boost::replace_all(cpu_f_approach_str,",",".");
+                                    string obj_f_approach_str =  boost::str(boost::format("%.15f") % (approach_tar.obj_value)); boost::replace_all(obj_f_approach_str,",",".");
                                     // retreat stage
                                     HUMotion::warm_start_params retreat_tar = (h_results_ws_or->final_warm_start_res).at(2);
                                     string iter_f_retreat_str = to_string(retreat_tar.iterations);
-                                    string cpu_f_retreat_str =  boost::str(boost::format("%.8f") % (retreat_tar.cpu_time)); boost::replace_all(cpu_f_retreat_str,",",".");
-                                    string obj_f_retreat_str =  boost::str(boost::format("%.8f") % (retreat_tar.obj_value)); boost::replace_all(obj_f_retreat_str,",",".");
+                                    string cpu_f_retreat_str =  boost::str(boost::format("%.15f") % (retreat_tar.cpu_time)); boost::replace_all(cpu_f_retreat_str,",",".");
+                                    string obj_f_retreat_str =  boost::str(boost::format("%.15f") % (retreat_tar.obj_value)); boost::replace_all(obj_f_retreat_str,",",".");
                                     // bounce
                                     HUMotion::warm_start_params bounce_ws = h_results_ws_or->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
-                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
-                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
 
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+
                                                 ",1,"+iter_f_approach_str+","+cpu_f_approach_str+","+obj_f_approach_str+
@@ -12131,12 +12149,12 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                 if(mov_type==1 || mov_type==5){ // move movement
                                     HUMotion::warm_start_params plan_tar = (h_results_ws_rdm_pred->final_warm_start_res).at(0);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
-                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
-                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     HUMotion::warm_start_params bounce_ws = h_results_ws_rdm_pred->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
-                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
-                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
                                     success_ws_rdm_plan.push_back(1); iter_ws_rdm_plan.push_back(plan_tar.iterations); cpu_ws_rdm_plan.push_back(plan_tar.cpu_time); obj_ws_rdm_plan.push_back(plan_tar.obj_value);
                                     success_ws_rdm_bounce.push_back(1); iter_ws_rdm_bounce.push_back(bounce_ws.iterations); cpu_ws_rdm_bounce.push_back(bounce_ws.cpu_time); obj_ws_rdm_bounce.push_back(bounce_ws.obj_value);
@@ -12144,23 +12162,23 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     // plan stage
                                     HUMotion::warm_start_params plan_tar = (h_results_ws_rdm_pred->final_warm_start_res).at(1);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
-                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
-                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     // approach stage
                                     HUMotion::warm_start_params approach_tar = (h_results_ws_rdm_pred->final_warm_start_res).at(0);
                                     string iter_f_approach_str = to_string(approach_tar.iterations);
-                                    string cpu_f_approach_str =  boost::str(boost::format("%.8f") % (approach_tar.cpu_time)); boost::replace_all(cpu_f_approach_str,",",".");
-                                    string obj_f_approach_str =  boost::str(boost::format("%.8f") % (approach_tar.obj_value)); boost::replace_all(obj_f_approach_str,",",".");
+                                    string cpu_f_approach_str =  boost::str(boost::format("%.15f") % (approach_tar.cpu_time)); boost::replace_all(cpu_f_approach_str,",",".");
+                                    string obj_f_approach_str =  boost::str(boost::format("%.15f") % (approach_tar.obj_value)); boost::replace_all(obj_f_approach_str,",",".");
                                     // retreat stage
                                     HUMotion::warm_start_params retreat_tar = (h_results_ws_rdm_pred->final_warm_start_res).at(2);
                                     string iter_f_retreat_str = to_string(retreat_tar.iterations);
-                                    string cpu_f_retreat_str =  boost::str(boost::format("%.8f") % (retreat_tar.cpu_time)); boost::replace_all(cpu_f_retreat_str,",",".");
-                                    string obj_f_retreat_str =  boost::str(boost::format("%.8f") % (retreat_tar.obj_value)); boost::replace_all(obj_f_retreat_str,",",".");
+                                    string cpu_f_retreat_str =  boost::str(boost::format("%.15f") % (retreat_tar.cpu_time)); boost::replace_all(cpu_f_retreat_str,",",".");
+                                    string obj_f_retreat_str =  boost::str(boost::format("%.15f") % (retreat_tar.obj_value)); boost::replace_all(obj_f_retreat_str,",",".");
                                     // bounce
                                     HUMotion::warm_start_params bounce_ws = h_results_ws_rdm_pred->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
-                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
-                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
 
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+
                                                 ",1,"+iter_f_approach_str+","+cpu_f_approach_str+","+obj_f_approach_str+
@@ -12207,12 +12225,12 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                 if(mov_type==1 || mov_type==5){ // move movement
                                     HUMotion::warm_start_params plan_tar = (h_results_ws_nn_pred->final_warm_start_res).at(0);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
-                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
-                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     HUMotion::warm_start_params bounce_ws = h_results_ws_nn_pred->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
-                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
-                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
                                     success_ws_nn_plan.push_back(1); iter_ws_nn_plan.push_back(plan_tar.iterations); cpu_ws_nn_plan.push_back(plan_tar.cpu_time); obj_ws_nn_plan.push_back(plan_tar.obj_value);
                                     success_ws_nn_bounce.push_back(1); iter_ws_nn_bounce.push_back(bounce_ws.iterations); cpu_ws_nn_bounce.push_back(bounce_ws.cpu_time); obj_ws_nn_bounce.push_back(bounce_ws.obj_value);
@@ -12220,23 +12238,23 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     // plan stage
                                     HUMotion::warm_start_params plan_tar = (h_results_ws_nn_pred->final_warm_start_res).at(1);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
-                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
-                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     // approach stage
                                     HUMotion::warm_start_params approach_tar = (h_results_ws_nn_pred->final_warm_start_res).at(0);
                                     string iter_f_approach_str = to_string(approach_tar.iterations);
-                                    string cpu_f_approach_str =  boost::str(boost::format("%.8f") % (approach_tar.cpu_time)); boost::replace_all(cpu_f_approach_str,",",".");
-                                    string obj_f_approach_str =  boost::str(boost::format("%.8f") % (approach_tar.obj_value)); boost::replace_all(obj_f_approach_str,",",".");
+                                    string cpu_f_approach_str =  boost::str(boost::format("%.15f") % (approach_tar.cpu_time)); boost::replace_all(cpu_f_approach_str,",",".");
+                                    string obj_f_approach_str =  boost::str(boost::format("%.15f") % (approach_tar.obj_value)); boost::replace_all(obj_f_approach_str,",",".");
                                     // retreat stage
                                     HUMotion::warm_start_params retreat_tar = (h_results_ws_nn_pred->final_warm_start_res).at(2);
                                     string iter_f_retreat_str = to_string(retreat_tar.iterations);
-                                    string cpu_f_retreat_str =  boost::str(boost::format("%.8f") % (retreat_tar.cpu_time)); boost::replace_all(cpu_f_retreat_str,",",".");
-                                    string obj_f_retreat_str =  boost::str(boost::format("%.8f") % (retreat_tar.obj_value)); boost::replace_all(obj_f_retreat_str,",",".");
+                                    string cpu_f_retreat_str =  boost::str(boost::format("%.15f") % (retreat_tar.cpu_time)); boost::replace_all(cpu_f_retreat_str,",",".");
+                                    string obj_f_retreat_str =  boost::str(boost::format("%.15f") % (retreat_tar.obj_value)); boost::replace_all(obj_f_retreat_str,",",".");
                                     // bounce
                                     HUMotion::warm_start_params bounce_ws = h_results_ws_nn_pred->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
-                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
-                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
 
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+
                                                 ",1,"+iter_f_approach_str+","+cpu_f_approach_str+","+obj_f_approach_str+
@@ -12283,12 +12301,12 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                 if(mov_type==1 || mov_type==5){ // move movement
                                     HUMotion::warm_start_params plan_tar = (h_results_ws_svm_pred->final_warm_start_res).at(0);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
-                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
-                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     HUMotion::warm_start_params bounce_ws = h_results_ws_svm_pred->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
-                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
-                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
                                     success_ws_svm_plan.push_back(1); iter_ws_svm_plan.push_back(plan_tar.iterations); cpu_ws_svm_plan.push_back(plan_tar.cpu_time); obj_ws_svm_plan.push_back(plan_tar.obj_value);
                                     success_ws_svm_bounce.push_back(1); iter_ws_svm_bounce.push_back(bounce_ws.iterations); cpu_ws_svm_bounce.push_back(bounce_ws.cpu_time); obj_ws_svm_bounce.push_back(bounce_ws.obj_value);
@@ -12296,23 +12314,23 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     // plan stage
                                     HUMotion::warm_start_params plan_tar = (h_results_ws_svm_pred->final_warm_start_res).at(1);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
-                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
-                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     // approach stage
                                     HUMotion::warm_start_params approach_tar = (h_results_ws_svm_pred->final_warm_start_res).at(0);
                                     string iter_f_approach_str = to_string(approach_tar.iterations);
-                                    string cpu_f_approach_str =  boost::str(boost::format("%.8f") % (approach_tar.cpu_time)); boost::replace_all(cpu_f_approach_str,",",".");
-                                    string obj_f_approach_str =  boost::str(boost::format("%.8f") % (approach_tar.obj_value)); boost::replace_all(obj_f_approach_str,",",".");
+                                    string cpu_f_approach_str =  boost::str(boost::format("%.15f") % (approach_tar.cpu_time)); boost::replace_all(cpu_f_approach_str,",",".");
+                                    string obj_f_approach_str =  boost::str(boost::format("%.15f") % (approach_tar.obj_value)); boost::replace_all(obj_f_approach_str,",",".");
                                     // retreat stage
                                     HUMotion::warm_start_params retreat_tar = (h_results_ws_svm_pred->final_warm_start_res).at(2);
                                     string iter_f_retreat_str = to_string(retreat_tar.iterations);
-                                    string cpu_f_retreat_str =  boost::str(boost::format("%.8f") % (retreat_tar.cpu_time)); boost::replace_all(cpu_f_retreat_str,",",".");
-                                    string obj_f_retreat_str =  boost::str(boost::format("%.8f") % (retreat_tar.obj_value)); boost::replace_all(obj_f_retreat_str,",",".");
+                                    string cpu_f_retreat_str =  boost::str(boost::format("%.15f") % (retreat_tar.cpu_time)); boost::replace_all(cpu_f_retreat_str,",",".");
+                                    string obj_f_retreat_str =  boost::str(boost::format("%.15f") % (retreat_tar.obj_value)); boost::replace_all(obj_f_retreat_str,",",".");
                                     // bounce
                                     HUMotion::warm_start_params bounce_ws = h_results_ws_svm_pred->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
-                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
-                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
 
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+
                                                 ",1,"+iter_f_approach_str+","+cpu_f_approach_str+","+obj_f_approach_str+
@@ -12359,12 +12377,12 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                 if(mov_type==1 || mov_type==5){ // move movement
                                     HUMotion::warm_start_params plan_tar = (h_results_ws_knn_pred->final_warm_start_res).at(0);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
-                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
-                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     HUMotion::warm_start_params bounce_ws = h_results_ws_knn_pred->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
-                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
-                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str;
                                     success_ws_knn_plan.push_back(1); iter_ws_knn_plan.push_back(plan_tar.iterations); cpu_ws_knn_plan.push_back(plan_tar.cpu_time); obj_ws_knn_plan.push_back(plan_tar.obj_value);
                                     success_ws_knn_bounce.push_back(1); iter_ws_knn_bounce.push_back(bounce_ws.iterations); cpu_ws_knn_bounce.push_back(bounce_ws.cpu_time); obj_ws_knn_bounce.push_back(bounce_ws.obj_value);
@@ -12372,23 +12390,23 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     // plan stage
                                     HUMotion::warm_start_params plan_tar = (h_results_ws_knn_pred->final_warm_start_res).at(1);
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
-                                    string cpu_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
-                                    string obj_f_plan_str =  boost::str(boost::format("%.8f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
+                                    string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     // approach stage
                                     HUMotion::warm_start_params approach_tar = (h_results_ws_knn_pred->final_warm_start_res).at(0);
                                     string iter_f_approach_str = to_string(approach_tar.iterations);
-                                    string cpu_f_approach_str =  boost::str(boost::format("%.8f") % (approach_tar.cpu_time)); boost::replace_all(cpu_f_approach_str,",",".");
-                                    string obj_f_approach_str =  boost::str(boost::format("%.8f") % (approach_tar.obj_value)); boost::replace_all(obj_f_approach_str,",",".");
+                                    string cpu_f_approach_str =  boost::str(boost::format("%.15f") % (approach_tar.cpu_time)); boost::replace_all(cpu_f_approach_str,",",".");
+                                    string obj_f_approach_str =  boost::str(boost::format("%.15f") % (approach_tar.obj_value)); boost::replace_all(obj_f_approach_str,",",".");
                                     // retreat stage
                                     HUMotion::warm_start_params retreat_tar = (h_results_ws_knn_pred->final_warm_start_res).at(2);
                                     string iter_f_retreat_str = to_string(retreat_tar.iterations);
-                                    string cpu_f_retreat_str =  boost::str(boost::format("%.8f") % (retreat_tar.cpu_time)); boost::replace_all(cpu_f_retreat_str,",",".");
-                                    string obj_f_retreat_str =  boost::str(boost::format("%.8f") % (retreat_tar.obj_value)); boost::replace_all(obj_f_retreat_str,",",".");
+                                    string cpu_f_retreat_str =  boost::str(boost::format("%.15f") % (retreat_tar.cpu_time)); boost::replace_all(cpu_f_retreat_str,",",".");
+                                    string obj_f_retreat_str =  boost::str(boost::format("%.15f") % (retreat_tar.obj_value)); boost::replace_all(obj_f_retreat_str,",",".");
                                     // bounce
                                     HUMotion::warm_start_params bounce_ws = h_results_ws_knn_pred->bounce_warm_start_res;
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
-                                    string cpu_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
-                                    string obj_bounce_str =  boost::str(boost::format("%.8f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
+                                    string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
 
                                     pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+
                                                 ",1,"+iter_f_approach_str+","+cpu_f_approach_str+","+obj_f_approach_str+

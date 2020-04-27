@@ -30,6 +30,11 @@ public Q_SLOTS:
      */
     void on_pushButton_save_warm_start_res_clicked();
 
+    /**
+     * @brief on_pushButton_save_warm_start_plots_clicked
+     */
+    void on_pushButton_save_warm_start_plots_clicked();
+
 
 public:
 
@@ -45,6 +50,18 @@ public:
     ~WarmStartResultsDialog();
 
     /**
+     * @brief WarmStartResultsDialog::plotIterStats
+     * @param plot
+     * @param title
+     * @param iter
+     * @param obj
+     * @param dual_inf
+     * @param constr_viol
+     * @param error
+     */
+    void plotIterStats(QCustomPlot *plot, QString title, QVector<double> &iter, QVector<double> &obj, QVector<double> &dual_inf, QVector<double> &constr_viol, QVector<double> &error);
+
+    /**
      * @brief setPlanData
      * @param iter
      * @param cpu_time
@@ -55,8 +72,12 @@ public:
      * @param zU
      * @param dual_vars
      * @param warm_n_steps
+     * @param obj_values
+     * @param dual_inf_values
+     * @param constr_viol_values
+     * @param error_values
      */
-    void setPlanData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps);
+    void setPlanData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps, vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values);
 
     /**
      * @brief setApproachData
@@ -69,8 +90,12 @@ public:
      * @param zU
      * @param dual_vars
      * @param warm_n_steps
+     * @param obj_values
+     * @param dual_inf_values
+     * @param constr_viol_values
+     * @param error_values
      */
-    void setApproachData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps);
+    void setApproachData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps, vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values);
 
     /**
      * @brief setRetreatData
@@ -83,8 +108,12 @@ public:
      * @param zU
      * @param dual_vars
      * @param warm_n_steps
+     * @param obj_values
+     * @param dual_inf_values
+     * @param constr_viol_values
+     * @param error_values
      */
-    void setRetreatData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps);
+    void setRetreatData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps, vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values);
 
     /**
      * @brief setBounceData
@@ -96,8 +125,12 @@ public:
      * @param zL
      * @param zU
      * @param dual_vars
+     * @param obj_values
+     * @param dual_inf_values
+     * @param constr_viol_values
+     * @param error_values
      */
-    void setBounceData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars);
+    void setBounceData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values);
 
     /**
      * @brief enablePlanData
@@ -138,6 +171,10 @@ private:
     vector<double> zU_plan; /**< upper bounds multipliers of the plan data */
     vector<double> dual_plan; /**< constraints multipliers of the plan data */
     int n_plan_steps; /**< steps in the plan stage */
+    vector<double> obj_values_plan; /**< obj values of the plan data */
+    vector<double> dual_inf_values_plan; /**< dual infeasibility values of the plan data */
+    vector<double> constr_viol_values_plan; /**< constraint violation values of the plan data */
+    vector<double> error_values_plan; /**< overall error values of the plan data */
 
     // approach data
     bool en_approach; /**< true if the approach tab is enabled, false otherwise */
@@ -150,6 +187,10 @@ private:
     vector<double> zU_approach; /**< upper bounds multipliers of the approach data */
     vector<double> dual_approach; /**< constraints multipliers of the approach data */
     int n_app_steps; /**< steps in the approach stage */
+    vector<double> obj_values_app; /**< obj values of the approach data */
+    vector<double> dual_inf_values_app; /**< dual infeasibility values of the approach data */
+    vector<double> constr_viol_values_app; /**< constraint violation values of the approach data */
+    vector<double> error_values_app; /**< overall error values of the approach data */
 
     // retreat data
     bool en_retreat; /**< true if the retreat tab is enabled, false otherwise */
@@ -162,6 +203,10 @@ private:
     vector<double> zU_retreat; /**< upper bounds multipliers of the retreat data */
     vector<double> dual_retreat; /**< constraints multipliers of the retreat data */
     int n_ret_steps; /**< steps in the retreat stage */
+    vector<double> obj_values_ret; /**< obj values of the retreat data */
+    vector<double> dual_inf_values_ret; /**< dual infeasibility values of the retreat data */
+    vector<double> constr_viol_values_ret; /**< constraint violation values of the retreat data */
+    vector<double> error_values_ret; /**< overall error values of the retreat data */
 
     //bounce data
     bool en_bounce; /**< true if the bounce tab is enabled, false otherwise */
@@ -173,6 +218,10 @@ private:
     vector<double> zL_bounce; /**< lower bounds multipliers of the bounce data */
     vector<double> zU_bounce; /**< upper bounds multipliers of the bounce data */
     vector<double> dual_bounce; /**< constraints multipliers of the bounce data */
+    vector<double> obj_values_bounce; /**< obj values of the bounce data */
+    vector<double> dual_inf_values_bounce; /**< dual infeasibility values of the bounce data */
+    vector<double> constr_viol_values_bounce; /**< constraint violation values of the bounce data */
+    vector<double> error_values_bounce; /**< overall error values of the bounce data */
 
 
 
