@@ -50,7 +50,7 @@ public:
     ~WarmStartResultsDialog();
 
     /**
-     * @brief WarmStartResultsDialog::plotIterStats
+     * @brief plotIterStats
      * @param plot
      * @param title
      * @param iter
@@ -58,8 +58,9 @@ public:
      * @param dual_inf
      * @param constr_viol
      * @param error
+     * @param der_error
      */
-    void plotIterStats(QCustomPlot *plot, QString title, QVector<double> &iter, QVector<double> &obj, QVector<double> &dual_inf, QVector<double> &constr_viol, QVector<double> &error);
+    void plotIterStats(QCustomPlot *plot, QString title, QVector<double> &iter, QVector<double> &obj, QVector<double> &dual_inf, QVector<double> &constr_viol, QVector<double> &error, QVector<double> &der_error);
 
     /**
      * @brief setPlanData
@@ -76,8 +77,9 @@ public:
      * @param dual_inf_values
      * @param constr_viol_values
      * @param error_values
+     * @param der_error_values
      */
-    void setPlanData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps, vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values);
+    void setPlanData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps, vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values, vector<double> &der_error_values);
 
     /**
      * @brief setApproachData
@@ -94,8 +96,9 @@ public:
      * @param dual_inf_values
      * @param constr_viol_values
      * @param error_values
+     * @param der_error_values
      */
-    void setApproachData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps, vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values);
+    void setApproachData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps, vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values, vector<double> &der_error_values);
 
     /**
      * @brief setRetreatData
@@ -112,8 +115,9 @@ public:
      * @param dual_inf_values
      * @param constr_viol_values
      * @param error_values
+     * @param der_error_values
      */
-    void setRetreatData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps, vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values);
+    void setRetreatData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps, vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values, vector<double> &der_error_values);
 
     /**
      * @brief setBounceData
@@ -129,8 +133,9 @@ public:
      * @param dual_inf_values
      * @param constr_viol_values
      * @param error_values
+     * @param der_error_values
      */
-    void setBounceData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values);
+    void setBounceData(int iter, double cpu_time, double obj, double overall_error, vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values, vector<double> &der_error_values);
 
     /**
      * @brief enablePlanData
@@ -175,6 +180,7 @@ private:
     vector<double> dual_inf_values_plan; /**< dual infeasibility values of the plan data */
     vector<double> constr_viol_values_plan; /**< constraint violation values of the plan data */
     vector<double> error_values_plan; /**< overall error values of the plan data */
+    vector<double> der_error_values_plan; /**< first derivative of the overall error values of the plan data */
 
     // approach data
     bool en_approach; /**< true if the approach tab is enabled, false otherwise */
@@ -191,6 +197,7 @@ private:
     vector<double> dual_inf_values_app; /**< dual infeasibility values of the approach data */
     vector<double> constr_viol_values_app; /**< constraint violation values of the approach data */
     vector<double> error_values_app; /**< overall error values of the approach data */
+    vector<double> der_error_values_app; /**< first derivative of the overall error values of the approach data */
 
     // retreat data
     bool en_retreat; /**< true if the retreat tab is enabled, false otherwise */
@@ -207,6 +214,7 @@ private:
     vector<double> dual_inf_values_ret; /**< dual infeasibility values of the retreat data */
     vector<double> constr_viol_values_ret; /**< constraint violation values of the retreat data */
     vector<double> error_values_ret; /**< overall error values of the retreat data */
+    vector<double> der_error_values_ret; /**< first derivative of the overall error values of the retreat data */
 
     //bounce data
     bool en_bounce; /**< true if the bounce tab is enabled, false otherwise */
@@ -222,6 +230,7 @@ private:
     vector<double> dual_inf_values_bounce; /**< dual infeasibility values of the bounce data */
     vector<double> constr_viol_values_bounce; /**< constraint violation values of the bounce data */
     vector<double> error_values_bounce; /**< overall error values of the bounce data */
+    vector<double> der_error_values_bounce; /**< first derivative of the overall error values of the bounce data */
 
 
 

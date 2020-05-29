@@ -213,27 +213,27 @@ static inline std::istream& readNextRow(std::istream& str,std::vector<std::strin
 }
 
 /**
- * @brief readCSVColdData
- * @param cold_data_path
- * @param csv_cold_data
+ * @brief readCSVData
+ * @param data_path
+ * @param headers
+ * @param csv_data
  * @return
  */
-static inline bool readCSVColdData(std::string& cold_data_path, std::vector<std::map<std::string,double>>& csv_cold_data)
+static inline bool readCSVData(std::string& data_path, std::vector<std::string>& headers,std::vector<std::map<std::string,double>>& csv_data)
 {
-    csv_cold_data.clear();
-    std::ifstream cold_data_file(cold_data_path);
-    if(cold_data_file.is_open()){
-        std::vector<std::string> headers;
-        readNextRow(cold_data_file,headers);
+    csv_data.clear();
+    std::ifstream data_file(data_path);
+    if(data_file.is_open()){
+        readNextRow(data_file,headers);
         std::vector<std::string> line_str;
-        while(readNextRow(cold_data_file,line_str))
+        while(readNextRow(data_file,line_str))
         {
             std::map<std::string,double> csv_line;
             for (size_t i=0; i < line_str.size(); ++i)
             {
                 csv_line[headers.at(i)] = ::atof(line_str.at(i).c_str());
             }
-            csv_cold_data.push_back(csv_line);
+            csv_data.push_back(csv_line);
         }
         return true;
     }else{return false;}

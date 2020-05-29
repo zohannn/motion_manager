@@ -20,8 +20,14 @@ WarmStartResultsDialog::~WarmStartResultsDialog()
 
 
 void WarmStartResultsDialog::plotIterStats(QCustomPlot *plot, QString title, QVector<double> &iter,
-                                           QVector<double> &obj, QVector<double> &dual_inf, QVector<double> &constr_viol,QVector<double> &error)
+                                           QVector<double> &obj, QVector<double> &dual_inf, QVector<double> &constr_viol,QVector<double> &error,QVector<double> &der_error)
 {
+
+    double der_average = 0.0;
+    if(!der_error.empty())
+        der_average = std::accumulate(der_error.begin(),der_error.end(),0.0)/der_error.size();
+    QVector<double> der_err_mean(der_error.size(),der_average);
+
     plot->plotLayout()->clear();
     plot->clearGraphs();
     plot->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
@@ -29,7 +35,7 @@ void WarmStartResultsDialog::plotIterStats(QCustomPlot *plot, QString title, QVe
     wideAxisRect->setupFullAxesBox(true);
     wideAxisRect->addAxis(QCPAxis::atLeft)->setTickLabelColor(QColor(Qt::red));
     wideAxisRect->addAxis(QCPAxis::atLeft)->setTickLabelColor(QColor(Qt::darkGreen));
-    wideAxisRect->addAxis(QCPAxis::atLeft)->setTickLabelColor(QColor(Qt::black));
+    //wideAxisRect->addAxis(QCPAxis::atLeft)->setTickLabelColor(QColor(Qt::black));
     QCPMarginGroup *marginGroup = new QCPMarginGroup(plot);
     wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
     // move newly created axes on "axes" layer and grids on "grid" layer:
@@ -46,44 +52,64 @@ void WarmStartResultsDialog::plotIterStats(QCustomPlot *plot, QString title, QVe
     plot->plotLayout()->addElement(1, 0, wideAxisRect);
 
     // objective function
-    plot->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-    plot->graph(0)->setPen(QPen(Qt::blue));
-    plot->graph(0)->setName("Obj func");
-    plot->graph(0)->valueAxis()->setTickLabelColor(Qt::blue);
-    plot->graph(0)->keyAxis()->setLabel("iterations");
-    plot->graph(0)->setData(iter, obj);
-    plot->graph(0)->valueAxis()->setRange(*std::min_element(obj.begin(), obj.end()),*std::max_element(obj.begin(), obj.end()));
-    plot->graph(0)->rescaleAxes();
+    //plot->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+    //plot->graph(0)->setPen(QPen(Qt::blue));
+    //plot->graph(0)->setName("Obj func");
+    //plot->graph(0)->valueAxis()->setTickLabelColor(Qt::blue);
+    //plot->graph(0)->keyAxis()->setLabel("iterations");
+    //plot->graph(0)->setData(iter, obj);
+    //plot->graph(0)->valueAxis()->setRange(*std::min_element(obj.begin(), obj.end()),*std::max_element(obj.begin(), obj.end()));
+    //plot->graph(0)->rescaleAxes();
 
     // dual infeasibility
-    plot->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft,1));
-    plot->graph(1)->setPen(QPen(Qt::red));
-    plot->graph(1)->setName("Dual inf");
-    plot->graph(1)->valueAxis()->setTickLabelColor(Qt::red);
-    plot->graph(1)->keyAxis()->setLabel("iterations");
-    plot->graph(1)->setData(iter, dual_inf);
-    plot->graph(1)->valueAxis()->setRange(*std::min_element(dual_inf.begin(), dual_inf.end()), *std::max_element(dual_inf.begin(), dual_inf.end()));
-    plot->graph(1)->rescaleAxes();
+    //plot->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft,1));
+    //plot->graph(1)->setPen(QPen(Qt::red));
+    //plot->graph(1)->setName("Dual inf");
+    //plot->graph(1)->valueAxis()->setTickLabelColor(Qt::red);
+    //plot->graph(1)->keyAxis()->setLabel("iterations");
+    //plot->graph(1)->setData(iter, dual_inf);
+    //plot->graph(1)->valueAxis()->setRange(*std::min_element(dual_inf.begin(), dual_inf.end()), *std::max_element(dual_inf.begin(), dual_inf.end()));
+    //plot->graph(1)->rescaleAxes();
 
     // constraint violation
-    plot->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft,2));
-    plot->graph(2)->setPen(QPen(Qt::darkGreen));
-    plot->graph(2)->setName("Constr viol");
-    plot->graph(2)->valueAxis()->setTickLabelColor(Qt::darkGreen);
-    plot->graph(2)->keyAxis()->setLabel("iterations");
-    plot->graph(2)->setData(iter, constr_viol);
-    plot->graph(2)->valueAxis()->setRange(*std::min_element(constr_viol.begin(), constr_viol.end()), *std::max_element(constr_viol.begin(), constr_viol.end()));
-    plot->graph(2)->rescaleAxes();
+    //plot->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft,2));
+    //plot->graph(2)->setPen(QPen(Qt::darkGreen));
+    //plot->graph(2)->setName("Constr viol");
+    //plot->graph(2)->valueAxis()->setTickLabelColor(Qt::darkGreen);
+    //plot->graph(2)->keyAxis()->setLabel("iterations");
+    //plot->graph(2)->setData(iter, constr_viol);
+    //plot->graph(2)->valueAxis()->setRange(*std::min_element(constr_viol.begin(), constr_viol.end()), *std::max_element(constr_viol.begin(), constr_viol.end()));
+    //plot->graph(2)->rescaleAxes();
 
     // overall error
-    plot->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft,3));
-    plot->graph(3)->setPen(QPen(Qt::black));
-    plot->graph(3)->setName("NLP Error");
-    plot->graph(3)->valueAxis()->setTickLabelColor(Qt::black);
-    plot->graph(3)->keyAxis()->setLabel("iterations");
-    plot->graph(3)->setData(iter, error);
-    plot->graph(3)->valueAxis()->setRange(*std::min_element(error.begin(), error.end()), *std::max_element(error.begin(), error.end()));
-    plot->graph(3)->rescaleAxes();
+    plot->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+    plot->graph(0)->setPen(QPen(Qt::blue));
+    plot->graph(0)->setName("NLP Error");
+    plot->graph(0)->valueAxis()->setTickLabelColor(Qt::blue);
+    plot->graph(0)->keyAxis()->setLabel("iterations");
+    plot->graph(0)->setData(iter, error);
+    plot->graph(0)->valueAxis()->setRange(*std::min_element(error.begin(), error.end()), *std::max_element(error.begin(), error.end()));
+    plot->graph(0)->rescaleAxes();
+
+    // derivative of the overall error
+    plot->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft,1));
+    plot->graph(1)->setPen(QPen(Qt::red));
+    plot->graph(1)->setName("Derivative NLP Error");
+    plot->graph(1)->valueAxis()->setTickLabelColor(Qt::red);
+    plot->graph(1)->keyAxis()->setLabel("iterations");
+    plot->graph(1)->setData(iter, der_error);
+    plot->graph(1)->valueAxis()->setRange(*std::min_element(der_error.begin(), der_error.end()), *std::max_element(der_error.begin(), der_error.end()));
+    plot->graph(1)->rescaleAxes();
+
+    // average derivative of the overall error
+    plot->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft,2));
+    plot->graph(2)->setPen(QPen(Qt::darkGreen));
+    plot->graph(2)->setName("Derivative NLP Error Mean");
+    plot->graph(2)->valueAxis()->setTickLabelColor(Qt::darkGreen);
+    plot->graph(2)->keyAxis()->setLabel("iterations");
+    plot->graph(2)->setData(iter, der_err_mean);
+    plot->graph(2)->valueAxis()->setRange(*std::min_element(der_err_mean.begin(), der_err_mean.end()), *std::max_element(der_err_mean.begin(), der_err_mean.end()));
+    plot->graph(2)->rescaleAxes();
 
     // legend
     QCPLegend *legend = new QCPLegend();
@@ -100,12 +126,12 @@ void WarmStartResultsDialog::plotIterStats(QCustomPlot *plot, QString title, QVe
     legend->addElement(0,0,new QCPPlottableLegendItem(legend,plot->graph(0)));
     legend->addElement(0,1,new QCPPlottableLegendItem(legend,plot->graph(1)));
     legend->addElement(0,2,new QCPPlottableLegendItem(legend,plot->graph(2)));
-    legend->addElement(0,3,new QCPPlottableLegendItem(legend,plot->graph(3)));
+    //legend->addElement(0,3,new QCPPlottableLegendItem(legend,plot->graph(3)));
 
     // interactions
     connect(plot->graph(0)->valueAxis(), SIGNAL(rangeChanged(QCPRange)), plot->graph(1)->valueAxis(), SLOT(setRange(QCPRange)));
     connect(plot->graph(0)->valueAxis(), SIGNAL(rangeChanged(QCPRange)), plot->graph(2)->valueAxis(), SLOT(setRange(QCPRange)));
-    connect(plot->graph(0)->valueAxis(), SIGNAL(rangeChanged(QCPRange)), plot->graph(3)->valueAxis(), SLOT(setRange(QCPRange)));
+    //connect(plot->graph(0)->valueAxis(), SIGNAL(rangeChanged(QCPRange)), plot->graph(3)->valueAxis(), SLOT(setRange(QCPRange)));
     plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
 
     plot->replot();
@@ -113,7 +139,7 @@ void WarmStartResultsDialog::plotIterStats(QCustomPlot *plot, QString title, QVe
 
 void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, double overall_error,
                                          vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps,
-                                         vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values)
+                                         vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values, vector<double> &der_error_values)
 {
 
     this->iterations_plan = iter;
@@ -129,6 +155,7 @@ void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, 
     this->dual_inf_values_plan = dual_inf_values;
     this->constr_viol_values_plan = constr_viol_values;
     this->error_values_plan = error_values;
+    this->der_error_values_plan = der_error_values;
 
     this->ui->label_warm_n_plan_steps_value->setText(QString::number(warm_n_steps));
     this->ui->label_iter_count_plan_value->setText(QString::number(iter));
@@ -184,14 +211,15 @@ void WarmStartResultsDialog::setPlanData(int iter, double cpu_time, double obj, 
     QVector<double> qdual_inf_values_plan = QVector<double>::fromStdVector(this->dual_inf_values_plan);
     QVector<double> qconstr_viol_values_plan = QVector<double>::fromStdVector(this->constr_viol_values_plan);
     QVector<double> qerror_values_plan = QVector<double>::fromStdVector(this->error_values_plan);
-    this->plotIterStats(this->ui->plot_plan,QString("Plan"),qiter,qobj_values_plan,qdual_inf_values_plan,qconstr_viol_values_plan,qerror_values_plan);
+    QVector<double> qder_error_values_plan = QVector<double>::fromStdVector(this->der_error_values_plan);
+    this->plotIterStats(this->ui->plot_plan,QString("Plan"),qiter,qobj_values_plan,qdual_inf_values_plan,qconstr_viol_values_plan,qerror_values_plan,qder_error_values_plan);
 
 
 }
 
 void WarmStartResultsDialog::setApproachData(int iter, double cpu_time, double obj, double overall_error,
                                              vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps,
-                                             vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values)
+                                             vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values,vector<double> &der_error_values)
 {
 
     this->iterations_approach = iter;
@@ -207,6 +235,7 @@ void WarmStartResultsDialog::setApproachData(int iter, double cpu_time, double o
     this->dual_inf_values_app = dual_inf_values;
     this->constr_viol_values_app = constr_viol_values;
     this->error_values_app = error_values;
+    this->der_error_values_app = der_error_values;
 
     this->ui->label_warm_n_app_steps_value->setText(QString::number(warm_n_steps));
     this->ui->label_iter_count_app_value->setText(QString::number(iter));
@@ -262,13 +291,14 @@ void WarmStartResultsDialog::setApproachData(int iter, double cpu_time, double o
     QVector<double> qdual_inf_values_app = QVector<double>::fromStdVector(this->dual_inf_values_app);
     QVector<double> qconstr_viol_values_app = QVector<double>::fromStdVector(this->constr_viol_values_app);
     QVector<double> qerror_values_app = QVector<double>::fromStdVector(this->error_values_app);
-    this->plotIterStats(this->ui->plot_app,QString("Approach"),qiter,qobj_values_app,qdual_inf_values_app,qconstr_viol_values_app,qerror_values_app);
+    QVector<double> qder_error_values_app = QVector<double>::fromStdVector(this->der_error_values_app);
+    this->plotIterStats(this->ui->plot_app,QString("Approach"),qiter,qobj_values_app,qdual_inf_values_app,qconstr_viol_values_app,qerror_values_app,qder_error_values_app);
 
 }
 
 void WarmStartResultsDialog::setRetreatData(int iter, double cpu_time, double obj, double overall_error,
                                             vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars, int warm_n_steps,
-                                            vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values)
+                                            vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values, vector<double> &der_error_values)
 {
 
     this->iterations_retreat = iter;
@@ -284,6 +314,7 @@ void WarmStartResultsDialog::setRetreatData(int iter, double cpu_time, double ob
     this->dual_inf_values_ret = dual_inf_values;
     this->constr_viol_values_ret = constr_viol_values;
     this->error_values_ret = error_values;
+    this->der_error_values_ret = der_error_values;
 
     this->ui->label_warm_n_ret_steps_value->setText(QString::number(warm_n_steps));
     this->ui->label_iter_count_retreat_value->setText(QString::number(iter));
@@ -339,13 +370,14 @@ void WarmStartResultsDialog::setRetreatData(int iter, double cpu_time, double ob
     QVector<double> qdual_inf_values_ret = QVector<double>::fromStdVector(this->dual_inf_values_ret);
     QVector<double> qconstr_viol_values_ret = QVector<double>::fromStdVector(this->constr_viol_values_ret);
     QVector<double> qerror_values_ret = QVector<double>::fromStdVector(this->error_values_ret);
-    this->plotIterStats(this->ui->plot_ret,QString("Approach"),qiter,qobj_values_ret,qdual_inf_values_ret,qconstr_viol_values_ret,qerror_values_ret);
+    QVector<double> qder_error_values_ret = QVector<double>::fromStdVector(this->der_error_values_ret);
+    this->plotIterStats(this->ui->plot_ret,QString("Approach"),qiter,qobj_values_ret,qdual_inf_values_ret,qconstr_viol_values_ret,qerror_values_ret,qder_error_values_ret);
 
 }
 
 void WarmStartResultsDialog::setBounceData(int iter, double cpu_time, double obj, double overall_error,
                                            vector<double> &x, vector<double> &zL, vector<double> &zU, vector<double> &dual_vars,
-                                           vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values)
+                                           vector<double> &obj_values, vector<double> &dual_inf_values, vector<double> &constr_viol_values, vector<double> &error_values,vector<double> &der_error_values)
 {
 
     this->iterations_bounce = iter;
@@ -360,6 +392,7 @@ void WarmStartResultsDialog::setBounceData(int iter, double cpu_time, double obj
     this->dual_inf_values_bounce = dual_inf_values;
     this->constr_viol_values_bounce = constr_viol_values;
     this->error_values_bounce = error_values;
+    this->der_error_values_bounce = der_error_values;
 
     this->ui->label_iter_count_bounce_value->setText(QString::number(iter));
     this->ui->label_cpu_time_bounce_value->setText(QString::number(cpu_time));
@@ -414,7 +447,8 @@ void WarmStartResultsDialog::setBounceData(int iter, double cpu_time, double obj
     QVector<double> qdual_inf_values_bounce = QVector<double>::fromStdVector(this->dual_inf_values_bounce);
     QVector<double> qconstr_viol_values_bounce = QVector<double>::fromStdVector(this->constr_viol_values_bounce);
     QVector<double> qerror_values_bounce = QVector<double>::fromStdVector(this->error_values_bounce);
-    this->plotIterStats(this->ui->plot_bounce,QString("Bounce"),qiter,qobj_values_bounce,qdual_inf_values_bounce,qconstr_viol_values_bounce,qerror_values_bounce);
+    QVector<double> qder_error_values_bounce = QVector<double>::fromStdVector(this->der_error_values_bounce);
+    this->plotIterStats(this->ui->plot_bounce,QString("Bounce"),qiter,qobj_values_bounce,qdual_inf_values_bounce,qconstr_viol_values_bounce,qerror_values_bounce,qder_error_values_bounce);
 
 }
 
@@ -690,10 +724,11 @@ void WarmStartResultsDialog::on_pushButton_save_warm_start_plots_clicked()
         if(f.open( QIODevice::WriteOnly )){
             QTextStream stream( &f );
             stream << qSetRealNumberPrecision(6);
-            stream << "iter,obj_func,dual_inf,constr_viol,NLP_error" << endl;
+            stream << "iter,obj_func,dual_inf,constr_viol,NLP_error,der_NLP_error" << endl;
             for(size_t i=0;i<this->obj_values_plan.size();++i)
             {
-                stream << i << "," << this->obj_values_plan.at(i) << "," << this->dual_inf_values_plan.at(i) << "," << this->constr_viol_values_plan.at(i) << "," << this->error_values_plan.at(i) << endl;
+                stream << i << "," << this->obj_values_plan.at(i) << "," << this->dual_inf_values_plan.at(i) << ","
+                       << this->constr_viol_values_plan.at(i) << "," << this->error_values_plan.at(i) << "," << this->der_error_values_plan.at(i) << endl;
             }
             f.close();
         }
@@ -705,10 +740,11 @@ void WarmStartResultsDialog::on_pushButton_save_warm_start_plots_clicked()
         if(f.open( QIODevice::WriteOnly )){
             QTextStream stream( &f );
             stream << qSetRealNumberPrecision(6);
-            stream << "iter,obj_func,dual_inf,constr_viol,NLP_error" << endl;
+            stream << "iter,obj_func,dual_inf,constr_viol,NLP_error,der_NLP_error" << endl;
             for(size_t i=0;i<this->obj_values_app.size();++i)
             {
-                stream << i << "," << this->obj_values_app.at(i) << "," << this->dual_inf_values_app.at(i) << "," << this->constr_viol_values_app.at(i) << "," << this->error_values_app.at(i) << endl;
+                stream << i << "," << this->obj_values_app.at(i) << "," << this->dual_inf_values_app.at(i) << ","
+                       << this->constr_viol_values_app.at(i) << "," << this->error_values_app.at(i) << "," << this->der_error_values_app.at(i) << endl;
             }
             f.close();
         }
@@ -720,10 +756,11 @@ void WarmStartResultsDialog::on_pushButton_save_warm_start_plots_clicked()
         if(f.open( QIODevice::WriteOnly )){
             QTextStream stream( &f );
             stream << qSetRealNumberPrecision(6);
-            stream << "iter,obj_func,dual_inf,constr_viol,NLP_error" << endl;
+            stream << "iter,obj_func,dual_inf,constr_viol,NLP_error,der_NLP_error" << endl;
             for(size_t i=0;i<this->obj_values_ret.size();++i)
             {
-                stream << i << "," << this->obj_values_ret.at(i) << "," << this->dual_inf_values_ret.at(i) << "," << this->constr_viol_values_ret.at(i) << "," << this->error_values_ret.at(i) << endl;
+                stream << i << "," << this->obj_values_ret.at(i) << "," << this->dual_inf_values_ret.at(i) << ","
+                       << this->constr_viol_values_ret.at(i) << "," << this->error_values_ret.at(i) << "," << this->der_error_values_ret.at(i) << endl;
             }
             f.close();
         }
@@ -735,10 +772,11 @@ void WarmStartResultsDialog::on_pushButton_save_warm_start_plots_clicked()
         if(f.open( QIODevice::WriteOnly )){
             QTextStream stream( &f );
             stream << qSetRealNumberPrecision(6);
-            stream << "iter,obj_func,dual_inf,constr_viol,NLP_error" << endl;
+            stream << "iter,obj_func,dual_inf,constr_viol,NLP_error,der_NLP_error" << endl;
             for(size_t i=0;i<this->obj_values_bounce.size();++i)
             {
-                stream << i << "," << this->obj_values_bounce.at(i) << "," << this->dual_inf_values_bounce.at(i) << "," << this->constr_viol_values_bounce.at(i) << "," << this->error_values_bounce.at(i) << endl;
+                stream << i << "," << this->obj_values_bounce.at(i) << "," << this->dual_inf_values_bounce.at(i) << ","
+                       << this->constr_viol_values_bounce.at(i) << "," << this->error_values_bounce.at(i) << "," << this->der_error_values_bounce.at(i) << endl;
             }
             f.close();
         }
