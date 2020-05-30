@@ -11211,7 +11211,7 @@ void MainWindow::on_pushButton_pred_plan_clicked()
         std::vector<double> max_r_posture; curr_scene->getHumanoid()->getRightMaxLimits(max_r_posture);
         std::vector<double> min_r_posture; curr_scene->getHumanoid()->getRightMinLimits(min_r_posture);
 
-        problemPtr prob = curr_task->getProblem(ui.listWidget_movs->currentRow());
+        problemPtr prob = problemPtr(new Problem(*curr_task->getProblem(ui.listWidget_movs->currentRow()).get()));
         // get the obstacles of the scenario
         std::vector<objectPtr> obsts; prob->getObstacles(obsts);
         int planner_id = prob->getPlannerID();
@@ -11364,6 +11364,9 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                     pred_csv.open(pred_dir+string("/")+filename_csv);
                     // headers
                     // robot configuration
+                    for(int i = 0; i < (JOINTS_ARM+JOINTS_HAND); ++i){
+                        pred_csv << "joint_"+to_string(i+1)+string(",");
+                    }
                     pred_csv << "elbow_x_mm,elbow_y_mm,elbow_z_mm";
                     pred_csv << ",wrist_x_mm,wrist_y_mm,wrist_z_mm";
                     pred_csv << ",hand_x_mm,hand_y_mm,hand_z_mm";
@@ -12118,6 +12121,11 @@ void MainWindow::on_pushButton_pred_plan_clicked()
 
                         //  -------------- collection of the results ------------------ //
                         // robot configuration
+                        for(size_t r=0; r < r_posture.size(); ++r){
+                            string joint_str =  boost::str(boost::format("%.15f") % (r_posture.at(r)));
+                            boost::replace_all(joint_str,",",".");
+                            pred_csv << joint_str + ",";
+                        }
                         // elbow
                         pred_csv << r_e_pos_x_str+","+r_e_pos_y_str+","+r_e_pos_z_str+",";
                         // wrist
@@ -12732,7 +12740,8 @@ void MainWindow::on_pushButton_pred_plan_clicked()
             double th = this->ui.lineEdit_th_forget->text().toDouble();
             int m = this->ui.lineEdit_m_forget->text().toInt();
 
-            string warm_data_updated_path = pred_dir+string("/warm_dataset_updated.csv");
+            //string warm_data_updated_path = pred_dir+string("/warm_dataset_updated.csv"); // for testing only
+            string warm_data_updated_path = data_dir+string("/warm_dataset.csv"); // correct one
 
             string pred_data_path = pred_dir+string("/")+filename_csv;
             // read the csv file of the predicted data
@@ -12748,6 +12757,7 @@ void MainWindow::on_pushButton_pred_plan_clicked()
             readCSVData(cold_data_path,cold_headers,csv_cold_data);
             int n_D = csv_cold_data.size();
             int n_Dx = static_cast<int>(csv_warm_data.size()/n_D);
+            int max_iter_plan = 20; int max_iter_bounce = 5;
 
 
             for(size_t i=0; i < csv_pred_data.size(); ++i){
@@ -12888,10 +12898,398 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                 }
             } // loop predicted data
 
-            // TODO: delete samples with weights values less than the given threshold
+            // delete samples with weights values less than the given threshold
+            std::vector<int> idj;
+            for(int j=0; j < n_Dx; ++j){
+                std::map<std::string,double> warm_data_line = csv_warm_data.at(j*n_D);
+                if(warm_data_line["w_forget"] < th){
+                    idj.push_back(j);
+                }
+            }
+            int k = 0;
+            for(size_t jj=0; jj < idj.size(); ++jj){
+                csv_warm_data.erase(csv_warm_data.begin() + ((idj.at(jj)-k)*n_D), csv_warm_data.begin() + ((idj.at(jj)-k)*n_D)+n_D);
+                k++;
+            }
 
 
-            // TODO: append the new experimented samples with weight=1
+            // add the new experimented samples with weight=1
+            // tuning
+            mTolHumpdlg->setInfo(prob->getInfoLine());
+            // --- Tolerances for the final posture selection ---- //
+            tols.tolTarPos = mTolHumpdlg->getTolTarPos(); // target position tolerances
+            tols.tolTarOr = mTolHumpdlg->getTolTarOr(); // target orientation tolerances
+            mTolHumpdlg->getTolsArm(tols.tolsArm);// tolerances of the arm : radius in [mm]
+            mTolHumpdlg->getTolsHand(tols.tolsHand);// tolerances of the hand: radius in [mm]
+            tols.target_avoidance = mTolHumpdlg->getTargetAvoidance();// target avoidance
+            tols.obstacle_avoidance = mTolHumpdlg->getObstacleAvoidance(); //obstacle avoidance
+            mTolHumpdlg->getLambda(tols.lambda_final); // joint expense factors
+            mTolHumpdlg->getLambda(tols.lambda_bounce); // joint expense factors
+            // --- Tolerances for the bounce posture selection ---- //
+            tols.w_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getWMax()*M_PI/180)); // max joint velocity
+            tols.alpha_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getAlphaMax()*M_PI/180)); // max joint acceleration
+            mTolHumpdlg->getInitVel(tols.bounds.vel_0); // initial velocity
+            mTolHumpdlg->getFinalVel(tols.bounds.vel_f); // final velocity
+            mTolHumpdlg->getInitAcc(tols.bounds.acc_0); // initial acceleration
+            mTolHumpdlg->getFinalAcc(tols.bounds.acc_f); // final acceleration
+            // tolerances for the obstacles
+            mTolHumpdlg->getTolsObstacles(tols.final_tolsObstacles); // final posture tols
+            tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
+            tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1));
+            mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(0));
+            mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(1));
+            // tolerances for the target
+            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
+            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+            mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
+            tols.singleArm_tolsTarget.at(1) = tols.singleArm_tolsTarget.at(0)/100;
+            tols.singleArm_tolsTarget.at(2) = 0*tols.singleArm_tolsTarget.at(0);
+            //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
+            //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
+            // pick / place settings
+            tols.mov_specs.approach = mTolHumpdlg->getApproach();
+            tols.mov_specs.retreat = mTolHumpdlg->getRetreat();
+            mTolHumpdlg->getPreGraspApproach(tols.mov_specs.pre_grasp_approach); // pick approach
+            mTolHumpdlg->getPostGraspRetreat(tols.mov_specs.post_grasp_retreat); // pick retreat
+            mTolHumpdlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
+            mTolHumpdlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
+            tols.mov_specs.rand_init = mTolHumpdlg->getRandInit(); // random initialization for "plan" stages
+            tols.mov_specs.coll = mTolHumpdlg->getColl(); // collisions option
+            tols.coll_body = mTolHumpdlg->getCollBody(); // collisions with the body
+            tols.mov_specs.straight_line = mTolHumpdlg->get_straight_line(); // hand straight line trajectory
+            tols.mov_specs.w_red_app_max = mTolHumpdlg->getW_red_app(); // set the max velocity reduction when approaching
+            tols.mov_specs.w_red_ret_max = mTolHumpdlg->getW_red_ret(); // set the max velocity reduction when retreating
+            // move settings
+            mTolHumpdlg->getTargetMove(move_target);
+            move_target_mod.resize(move_target.size());
+            mTolHumpdlg->getFinalHand(move_final_hand);
+            mTolHumpdlg->getFinalArm(move_final_arm);
+            use_final = mTolHumpdlg->get_use_final_posture();
+            prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
+            tols.mov_specs.use_move_plane = mTolHumpdlg->get_add_plane();
+            mTolHumpdlg->getPlaneParameters(tols.mov_specs.plane_params);
+            // maximum iterations option
+            tols.set_max_iter_plan = true;
+            tols.max_iter_plan = max_iter_plan;
+            //tols.set_max_iter_app = mTolHumpdlg->getMaxIterAppOption();
+            //tols.max_iter_app = mTolHumpdlg->getMaxIterApp();
+            //tols.set_max_iter_ret = mTolHumpdlg->getMaxIterRetOption();
+            //tols.max_iter_ret = mTolHumpdlg->getMaxIterRet();
+            tols.set_max_iter_bounce = true;
+            tols.max_iter_bounce = max_iter_bounce;
+
+            for(size_t i=0; i < csv_pred_data.size(); ++i){
+                // loop over situations of the predicted data
+                std::map<std::string,double> pred_data_line = csv_pred_data.at(i);
+                std::vector<double> r_posture = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
+                for(int r=0; r < (JOINTS_ARM+JOINTS_HAND); ++r){
+                    r_posture.at(r) = pred_data_line["joint_"+to_string(r+1)];
+                }
+                prob->setInitialRightPosture(r_posture);
+                curr_scene->getHumanoid()->setRightPosture(r_posture);
+
+                move_target_mod.at(0) = pred_data_line["target_x_mm"];
+                move_target_mod.at(1) = pred_data_line["target_y_mm"];
+                move_target_mod.at(2) = pred_data_line["target_z_mm"];
+                move_target_mod.at(3) = pred_data_line["target_roll_rad"];
+                move_target_mod.at(4) = pred_data_line["target_pitch_rad"];
+                move_target_mod.at(5) = pred_data_line["target_yaw_rad"];
+                prob->setMoveSettings(move_target_mod,move_final_hand,move_final_arm,use_final);
+
+                objectPtr obs_new;
+                for(size_t b=0;b < obsts.size();++b){
+                    objectPtr obs = obsts.at(b);
+                    string obs_name = obs->getName();
+                    if (std::find(obsts_except.begin(), obsts_except.end(), obs_name) != obsts_except.end())
+                    {
+                        continue;
+                    }
+                    obs_new.reset(new Object(obs_name));
+                    motion_manager::pos obs_pos;
+                    motion_manager::orient obs_or;
+                    obs_pos.Xpos = pred_data_line["obstacle_"+to_string(b+1)+"_x_mm"];
+                    obs_pos.Ypos = pred_data_line["obstacle_"+to_string(b+1)+"_y_mm"];
+                    obs_pos.Zpos = pred_data_line["obstacle_"+to_string(b+1)+"_z_mm"];
+                    obs_or.roll = pred_data_line["obstacle_"+to_string(b+1)+"_roll_rad"];
+                    obs_or.pitch = pred_data_line["obstacle_"+to_string(b+1)+"_pitch_rad"];
+                    obs_or.yaw = pred_data_line["obstacle_"+to_string(b+1)+"_yaw_rad"];
+                    obs_new->setPos(obs_pos,false);
+                    obs_new->setOr(obs_or,false);
+                    obs_new->setSize(obs->getSize());
+                    prob->setObstacle(obs_new,b);
+                }
+                bool solved; HUMotion::planning_result_ptr h_results_tmp;
+                for(size_t jj=0; jj < csv_cold_data.size(); ++jj){ // loop this situation with all the cold started data
+                    solved = false;
+                    std::map<std::string,double> warm_data_line_add;
+                    do{
+                        std::map<std::string,double> cold_data_line = csv_cold_data.at(jj);
+                        //warm start settings
+                        tols.mov_specs.warm_start = true;
+                        // plan
+                        if(!this->x_plan.empty()){
+                            HUMotion::warm_start_params final_plan;
+                            final_plan.valid = true;
+                            final_plan.description = "plan";
+                            final_plan.x.resize(x_plan.size());
+                            final_plan.zL.resize(zL_plan.size());
+                            final_plan.zU.resize(zU_plan.size());
+                            final_plan.dual_vars.resize(dual_plan.size());
+                            for(size_t ix=0;ix<final_plan.x.size();++ix){
+                                final_plan.x.at(ix) = cold_data_line["xf_plan_"+to_string(ix+1)+"_rad"];
+                                final_plan.zL.at(ix) = cold_data_line["zf_L_plan_"+to_string(ix+1)];
+                                final_plan.zU.at(ix) = cold_data_line["zf_U_plan_"+to_string(ix+1)];
+                            }
+                            for(size_t ix=0;ix<final_plan.dual_vars.size();++ix){
+                                final_plan.dual_vars.at(ix) = cold_data_line["dual_f_plan_"+to_string(ix)];
+                            }
+                            tols.mov_specs.final_warm_start_params.push_back(final_plan);
+                            tols.mov_specs.warm_n_steps = this->warm_n_plan_steps;
+                        }
+                        // bounce
+                        if(!x_bounce.empty()){
+                            HUMotion::warm_start_params bounce;
+                            bounce.valid = true;
+                            bounce.description = "bounce";
+                            bounce.x.resize(x_bounce.size());
+                            bounce.zL.resize(zL_bounce.size());
+                            bounce.zU.resize(zU_bounce.size());
+                            bounce.dual_vars.resize(dual_bounce.size());
+                            for(size_t ix=0;ix<bounce.x.size();++ix){
+                                bounce.x.at(ix) = cold_data_line["x_bounce_"+to_string(ix+1)+"_rad"];
+                                bounce.zL.at(ix) = cold_data_line["zb_L_"+to_string(ix+1)];
+                                bounce.zU.at(ix) = cold_data_line["zb_U_"+to_string(ix+1)];
+                            }
+                            for(size_t ix=0;ix<bounce.dual_vars.size();++ix){
+                                bounce.dual_vars.at(ix) = cold_data_line["dual_bounce_"+to_string(ix)];
+                            }
+                            tols.mov_specs.bounce_warm_start_params = bounce;
+                        }
+                        h_results_tmp = prob->solve(tols); // plan the movement
+                        if(h_results_tmp!=nullptr){
+                            if(h_results_tmp->status==0){
+                                // movement planned successfully
+                                HUMotion::warm_start_params b_res = h_results_tmp->bounce_warm_start_res;
+                                if(b_res.dual_vars.size() == dual_bounce.size())
+                                {
+                                    qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
+                                    solved=true;
+                                    // --- record the cold started data --- //
+                                    // robot configuration
+                                    // elbow
+                                    warm_data_line_add.insert({"elbow_x_mm",cold_data_line["elbow_x_mm"]});
+                                    warm_data_line_add.insert({"elbow_y_mm",cold_data_line["elbow_y_mm"]});
+                                    warm_data_line_add.insert({"elbow_z_mm",cold_data_line["elbow_z_mm"]});
+                                    // wrist
+                                    warm_data_line_add.insert({"wrist_x_mm",cold_data_line["wrist_x_mm"]});
+                                    warm_data_line_add.insert({"wrist_y_mm",cold_data_line["wrist_y_mm"]});
+                                    warm_data_line_add.insert({"wrist_z_mm",cold_data_line["wrist_z_mm"]});
+                                    // hand
+                                    warm_data_line_add.insert({"hand_x_mm",cold_data_line["hand_x_mm"]});
+                                    warm_data_line_add.insert({"hand_y_mm",cold_data_line["hand_y_mm"]});
+                                    warm_data_line_add.insert({"hand_z_mm",cold_data_line["hand_z_mm"]});
+                                    // thumb
+                                    warm_data_line_add.insert({"thumb_1_x_mm",cold_data_line["thumb_1_x_mm"]});
+                                    warm_data_line_add.insert({"thumb_1_y_mm",cold_data_line["thumb_1_y_mm"]});
+                                    warm_data_line_add.insert({"thumb_1_z_mm",cold_data_line["thumb_1_z_mm"]});
+                                    warm_data_line_add.insert({"thumb_2_x_mm",cold_data_line["thumb_2_x_mm"]});
+                                    warm_data_line_add.insert({"thumb_2_y_mm",cold_data_line["thumb_2_y_mm"]});
+                                    warm_data_line_add.insert({"thumb_2_z_mm",cold_data_line["thumb_2_z_mm"]});
+                                    warm_data_line_add.insert({"thumb_tip_x_mm",cold_data_line["thumb_tip_x_mm"]});
+                                    warm_data_line_add.insert({"thumb_tip_y_mm",cold_data_line["thumb_tip_y_mm"]});
+                                    warm_data_line_add.insert({"thumb_tip_z_mm",cold_data_line["thumb_tip_z_mm"]});
+                                    // index
+                                    warm_data_line_add.insert({"index_1_x_mm",cold_data_line["index_1_x_mm"]});
+                                    warm_data_line_add.insert({"index_1_y_mm",cold_data_line["index_1_y_mm"]});
+                                    warm_data_line_add.insert({"index_1_z_mm",cold_data_line["index_1_z_mm"]});
+                                    warm_data_line_add.insert({"index_2_x_mm",cold_data_line["index_2_x_mm"]});
+                                    warm_data_line_add.insert({"index_2_y_mm",cold_data_line["index_2_y_mm"]});
+                                    warm_data_line_add.insert({"index_2_z_mm",cold_data_line["index_2_z_mm"]});
+                                    warm_data_line_add.insert({"index_tip_x_mm",cold_data_line["index_tip_x_mm"]});
+                                    warm_data_line_add.insert({"index_tip_y_mm",cold_data_line["index_tip_y_mm"]});
+                                    warm_data_line_add.insert({"index_tip_z_mm",cold_data_line["index_tip_z_mm"]});
+                                    // middle
+                                    warm_data_line_add.insert({"middle_1_x_mm",cold_data_line["middle_1_x_mm"]});
+                                    warm_data_line_add.insert({"middle_1_y_mm",cold_data_line["middle_1_y_mm"]});
+                                    warm_data_line_add.insert({"middle_1_z_mm",cold_data_line["middle_1_z_mm"]});
+                                    warm_data_line_add.insert({"middle_2_x_mm",cold_data_line["middle_2_x_mm"]});
+                                    warm_data_line_add.insert({"middle_2_y_mm",cold_data_line["middle_2_y_mm"]});
+                                    warm_data_line_add.insert({"middle_2_z_mm",cold_data_line["middle_2_z_mm"]});
+                                    warm_data_line_add.insert({"middle_tip_x_mm",cold_data_line["middle_tip_x_mm"]});
+                                    warm_data_line_add.insert({"middle_tip_y_mm",cold_data_line["middle_tip_y_mm"]});
+                                    warm_data_line_add.insert({"middle_tip_z_mm",cold_data_line["middle_tip_z_mm"]});
+                                    // target
+                                    warm_data_line_add.insert({"target_x_mm",cold_data_line["target_x_mm"]});
+                                    warm_data_line_add.insert({"target_y_mm",cold_data_line["target_y_mm"]});
+                                    warm_data_line_add.insert({"target_z_mm",cold_data_line["target_z_mm"]});
+                                    warm_data_line_add.insert({"target_roll_rad",cold_data_line["target_roll_rad"]});
+                                    warm_data_line_add.insert({"target_pitch_rad",cold_data_line["target_pitch_rad"]});
+                                    warm_data_line_add.insert({"target_yaw_rad",cold_data_line["target_yaw_rad"]});
+                                    // obstacles
+                                    for(size_t b=0;b < obsts.size();++b){
+                                        warm_data_line_add.insert({"obstacle_"+to_string(b+1)+"_x_mm",cold_data_line["obstacle_"+to_string(b+1)+"_x_mm"]});
+                                        warm_data_line_add.insert({"obstacle_"+to_string(b+1)+"_y_mm",cold_data_line["obstacle_"+to_string(b+1)+"_y_mm"]});
+                                        warm_data_line_add.insert({"obstacle_"+to_string(b+1)+"_z_mm",cold_data_line["obstacle_"+to_string(b+1)+"_z_mm"]});
+                                        warm_data_line_add.insert({"obstacle_"+to_string(b+1)+"_roll_rad",cold_data_line["obstacle_"+to_string(b+1)+"_roll_rad"]});
+                                        warm_data_line_add.insert({"obstacle_"+to_string(b+1)+"_pitch_rad",cold_data_line["obstacle_"+to_string(b+1)+"_pitch_rad"]});
+                                        warm_data_line_add.insert({"obstacle_"+to_string(b+1)+"_yaw_rad",cold_data_line["obstacle_"+to_string(b+1)+"_yaw_rad"]});
+                                    }
+                                    // final posture selections
+                                    // plan
+                                    warm_data_line_add.insert({"cpu_time_plan",cold_data_line["cpu_time_plan"]});
+                                    warm_data_line_add.insert({"iterations_plan",cold_data_line["iterations_plan"]});
+                                    warm_data_line_add.insert({"obj_plan",cold_data_line["obj_plan"]});
+                                    warm_data_line_add.insert({"error_plan",cold_data_line["error_plan"]});
+                                    warm_data_line_add.insert({"mean_der_error_plan",cold_data_line["mean_der_error_plan"]});
+                                    for(size_t ix=0;ix < x_plan.size();++ix){
+                                        warm_data_line_add.insert({"xf_plan_"+to_string(ix+1)+"_rad",cold_data_line["xf_plan_"+to_string(ix+1)+"_rad"]});
+                                    }
+                                    for(size_t ix=0;ix<zL_plan.size();++ix){
+                                        warm_data_line_add.insert({"zf_L_plan_"+to_string(ix+1),cold_data_line["zf_L_plan_"+to_string(ix+1)]});
+                                    }
+                                    for(size_t ix=0;ix<zU_plan.size();++ix){
+                                        warm_data_line_add.insert({"zf_U_plan_"+to_string(ix+1),cold_data_line["zf_U_plan_"+to_string(ix+1)]});
+                                    }
+                                    for(size_t ix=0;ix<dual_plan.size();++ix){
+                                        warm_data_line_add.insert({"dual_f_plan_"+to_string(ix),cold_data_line["dual_f_plan_"+to_string(ix)]});
+                                    }
+                                    // bounce posture selection
+                                    warm_data_line_add.insert({"cpu_time_bounce",cold_data_line["cpu_time_bounce"]});
+                                    warm_data_line_add.insert({"iterations_bounce",cold_data_line["iterations_bounce"]});
+                                    warm_data_line_add.insert({"obj_bounce",cold_data_line["obj_bounce"]});
+                                    warm_data_line_add.insert({"error_bounce",cold_data_line["error_bounce"]});
+                                    warm_data_line_add.insert({"mean_der_error_bounce",cold_data_line["mean_der_error_bounce"]});
+                                    for(size_t ix=0;ix<x_bounce.size();++ix){
+                                        warm_data_line_add.insert({"x_bounce_"+to_string(ix+1)+"_rad",cold_data_line["x_bounce_"+to_string(ix+1)+"_rad"]});
+                                    }
+                                    for(size_t ix=0;ix<zL_bounce.size();++ix){
+                                        warm_data_line_add.insert({"zb_L_"+to_string(ix+1),cold_data_line["zb_L_"+to_string(ix+1)]});
+                                    }
+                                    for(size_t ix=0;ix<zU_bounce.size();++ix){
+                                        warm_data_line_add.insert({"zb_U_"+to_string(ix+1),cold_data_line["zb_U_"+to_string(ix+1)]});
+                                    }
+                                    for(size_t ix=0;ix<dual_bounce.size();++ix){
+                                        warm_data_line_add.insert({"dual_bounce_"+to_string(ix),cold_data_line["dual_bounce_"+to_string(ix)]});
+                                    }
+                                    // --- record the warm started data --- //
+                                    // weight for forgetting
+                                    warm_data_line_add.insert({"w_forget",1.0});
+                                    // robot configuration
+                                    // elbow
+                                    std::vector<double> r_e_pos; curr_scene->getHumanoid()->getRightElbowPos(r_e_pos);
+                                    warm_data_line_add.insert({"elbow_x_warm_mm",r_e_pos.at(0)});
+                                    warm_data_line_add.insert({"elbow_y_warm_mm",r_e_pos.at(1)});
+                                    warm_data_line_add.insert({"elbow_z_warm_mm",r_e_pos.at(2)});
+                                    // wrist
+                                    std::vector<double> r_w_pos; curr_scene->getHumanoid()->getRightWristPos(r_w_pos);
+                                    warm_data_line_add.insert({"wrist_x_warm_mm",r_w_pos.at(0)});
+                                    warm_data_line_add.insert({"wrist_y_warm_mm",r_w_pos.at(1)});
+                                    warm_data_line_add.insert({"wrist_z_warm_mm",r_w_pos.at(2)});
+                                    // hand
+                                    std::vector<double> r_h_pos; curr_scene->getHumanoid()->getRightHandPos(r_h_pos);
+                                    warm_data_line_add.insert({"hand_x_warm_mm",r_h_pos.at(0)});
+                                    warm_data_line_add.insert({"hand_y_warm_mm",r_h_pos.at(1)});
+                                    warm_data_line_add.insert({"hand_z_warm_mm",r_h_pos.at(2)});
+                                    // thumb
+                                    std::vector<double> r_thumb_pos; curr_scene->getHumanoid()->getRightThumbFingerPositions(r_thumb_pos);
+                                    std::vector<double> r_thumb_pos_1(3); std::copy(r_thumb_pos.begin(), r_thumb_pos.begin()+3, r_thumb_pos_1.begin());
+                                    std::vector<double> r_thumb_pos_2(3); std::copy(r_thumb_pos.begin()+3, r_thumb_pos.begin()+6, r_thumb_pos_2.begin());
+                                    std::vector<double> r_thumb_pos_tip(3); std::copy(r_thumb_pos.begin()+6, r_thumb_pos.begin()+9, r_thumb_pos_tip.begin());
+                                    warm_data_line_add.insert({"thumb_1_x_warm_mm",r_thumb_pos_1.at(0)}); warm_data_line_add.insert({"thumb_1_y_warm_mm",r_thumb_pos_1.at(1)}); warm_data_line_add.insert({"thumb_1_z_warm_mm",r_thumb_pos_1.at(2)});
+                                    warm_data_line_add.insert({"thumb_2_x_warm_mm",r_thumb_pos_2.at(0)}); warm_data_line_add.insert({"thumb_2_y_warm_mm",r_thumb_pos_2.at(1)}); warm_data_line_add.insert({"thumb_2_z_warm_mm",r_thumb_pos_2.at(2)});
+                                    warm_data_line_add.insert({"thumb_tip_x_warm_mm",r_thumb_pos_tip.at(0)}); warm_data_line_add.insert({"thumb_tip_y_warm_mm",r_thumb_pos_tip.at(1)}); warm_data_line_add.insert({"thumb_tip_z_warm_mm",r_thumb_pos_tip.at(2)});
+                                    // index
+                                    std::vector<double> r_index_pos; curr_scene->getHumanoid()->getRightIndexFingerPositions(r_index_pos);
+                                    std::vector<double> r_index_pos_1(3); std::copy(r_index_pos.begin(), r_index_pos.begin()+3, r_index_pos_1.begin());
+                                    std::vector<double> r_index_pos_2(3); std::copy(r_index_pos.begin()+3, r_index_pos.begin()+6, r_index_pos_2.begin());
+                                    std::vector<double> r_index_pos_tip(3); std::copy(r_index_pos.begin()+6, r_index_pos.begin()+9, r_index_pos_tip.begin());
+                                    warm_data_line_add.insert({"index_1_x_warm_mm",r_index_pos_1.at(0)}); warm_data_line_add.insert({"index_1_y_warm_mm",r_index_pos_1.at(1)}); warm_data_line_add.insert({"index_1_z_warm_mm",r_index_pos_1.at(2)});
+                                    warm_data_line_add.insert({"index_2_x_warm_mm",r_index_pos_2.at(0)}); warm_data_line_add.insert({"index_2_y_warm_mm",r_index_pos_2.at(1)}); warm_data_line_add.insert({"index_2_z_warm_mm",r_index_pos_2.at(2)});
+                                    warm_data_line_add.insert({"index_tip_x_warm_mm",r_index_pos_tip.at(0)}); warm_data_line_add.insert({"index_tip_y_warm_mm",r_index_pos_tip.at(1)}); warm_data_line_add.insert({"index_tip_z_warm_mm",r_index_pos_tip.at(2)});
+                                    // middle
+                                    std::vector<double> r_middle_pos; curr_scene->getHumanoid()->getRightMiddleFingerPositions(r_middle_pos);
+                                    std::vector<double> r_middle_pos_1(3); std::copy(r_middle_pos.begin(), r_middle_pos.begin()+3, r_middle_pos_1.begin());
+                                    std::vector<double> r_middle_pos_2(3); std::copy(r_middle_pos.begin()+3, r_middle_pos.begin()+6, r_middle_pos_2.begin());
+                                    std::vector<double> r_middle_pos_tip(3); std::copy(r_middle_pos.begin()+6, r_middle_pos.begin()+9, r_middle_pos_tip.begin());
+                                    warm_data_line_add.insert({"middle_1_x_warm_mm",r_middle_pos_1.at(0)}); warm_data_line_add.insert({"middle_1_y_warm_mm",r_middle_pos_1.at(1)}); warm_data_line_add.insert({"middle_1_z_warm_mm",r_middle_pos_1.at(2)});
+                                    warm_data_line_add.insert({"middle_2_x_warm_mm",r_middle_pos_2.at(0)}); warm_data_line_add.insert({"middle_2_y_warm_mm",r_middle_pos_2.at(1)}); warm_data_line_add.insert({"middle_2_z_warm_mm",r_middle_pos_2.at(2)});
+                                    warm_data_line_add.insert({"middle_tip_x_warm_mm",r_middle_pos_tip.at(0)}); warm_data_line_add.insert({"middle_tip_y_warm_mm",r_middle_pos_tip.at(1)}); warm_data_line_add.insert({"middle_tip_z_warm_mm",r_middle_pos_tip.at(2)});
+                                    // target
+                                    warm_data_line_add.insert({"target_x_warm_mm",move_target_mod.at(0)});
+                                    warm_data_line_add.insert({"target_y_warm_mm",move_target_mod.at(1)});
+                                    warm_data_line_add.insert({"target_z_warm_mm",move_target_mod.at(2)});
+                                    warm_data_line_add.insert({"target_roll_warm_rad",move_target_mod.at(3)});
+                                    warm_data_line_add.insert({"target_pitch_warm_rad",move_target_mod.at(4)});
+                                    warm_data_line_add.insert({"target_yaw_warm_rad",move_target_mod.at(5)});
+                                    // obstacles
+                                    std::vector<objectPtr> obsts_new; prob->getObstacles(obsts_new);
+                                    for(size_t b=0;b<obsts_new.size();++b){
+                                        objectPtr obs = obsts_new.at(b);
+                                        warm_data_line_add.insert({"obstacle_"+to_string(b+1)+"_x_warm_mm",obs->getPos().Xpos});
+                                        warm_data_line_add.insert({"obstacle_"+to_string(b+1)+"_y_warm_mm",obs->getPos().Ypos});
+                                        warm_data_line_add.insert({"obstacle_"+to_string(b+1)+"_z_warm_mm",obs->getPos().Zpos});
+                                        warm_data_line_add.insert({"obstacle_"+to_string(b+1)+"_roll_warm_rad",obs->getOr().roll});
+                                        warm_data_line_add.insert({"obstacle_"+to_string(b+1)+"_pitch_warm_rad",obs->getOr().pitch});
+                                        warm_data_line_add.insert({"obstacle_"+to_string(b+1)+"_yaw_warm_rad",obs->getOr().yaw});
+                                    }
+                                    // final posture selections
+                                    if(h_results_tmp->final_warm_start_res.size()==1){
+                                        // plan
+                                        HUMotion::warm_start_params f_res = h_results_tmp->final_warm_start_res.at(0);
+                                        double mean_der_error_value_plan = 0.0;
+                                        if(!f_res.der_error_values.empty()){mean_der_error_value_plan = std::accumulate(f_res.der_error_values.begin(),f_res.der_error_values.end(),0.0)/f_res.der_error_values.size();}
+                                        warm_data_line_add.insert({"cpu_time_plan_warm",f_res.cpu_time});
+                                        warm_data_line_add.insert({"iterations_plan_warm",f_res.iterations});
+                                        warm_data_line_add.insert({"obj_plan_warm",f_res.obj_value});
+                                        warm_data_line_add.insert({"error_plan_warm",f_res.error_value});
+                                        warm_data_line_add.insert({"mean_der_error_plan_warm",mean_der_error_value_plan});
+                                        for(int h=0;h<f_res.x.size();++h){
+                                            warm_data_line_add.insert({"xf_plan_"+to_string(h+1)+"_warm_rad",f_res.x.at(h)});
+                                        }
+                                        for(size_t h=0;h<f_res.zL.size();++h){
+                                            warm_data_line_add.insert({"zf_L_plan_"+to_string(h+1)+"_warm",f_res.zL.at(h)});
+                                        }
+                                        for(size_t h=0;h<f_res.zU.size();++h){
+                                            warm_data_line_add.insert({"zf_U_plan_"+to_string(h+1)+"_warm",f_res.zU.at(h)});
+                                        }
+                                        for(size_t h=0;h<f_res.dual_vars.size();++h){
+                                            warm_data_line_add.insert({"dual_f_plan_"+to_string(h)+"_warm",f_res.dual_vars.at(h)});
+                                        }
+                                    }
+                                    // bounce posture selection
+                                    double mean_der_error_value_b = 0.0;
+                                    if(!b_res.der_error_values.empty()){mean_der_error_value_b = std::accumulate(b_res.der_error_values.begin(),b_res.der_error_values.end(),0.0)/b_res.der_error_values.size();}
+                                    warm_data_line_add.insert({"cpu_time_bounce_warm",b_res.cpu_time});
+                                    warm_data_line_add.insert({"iterations_bounce_warm",b_res.iterations});
+                                    warm_data_line_add.insert({"obj_bounce_warm",b_res.obj_value});
+                                    warm_data_line_add.insert({"error_bounce_warm",b_res.error_value});
+                                    warm_data_line_add.insert({"mean_der_error_bounce_warm",mean_der_error_value_b});
+                                    for(size_t h=0;h<b_res.x.size();++h){
+                                        warm_data_line_add.insert({"x_bounce_"+to_string(h+1)+"_warm_rad",b_res.x.at(h)});
+                                    }
+                                    for(size_t h=0;h<b_res.zL.size();++h){
+                                        warm_data_line_add.insert({"zb_L_"+to_string(h+1)+"_warm",b_res.zL.at(h)});
+                                    }
+                                    for(size_t h=0;h<b_res.zU.size();++h){
+                                        warm_data_line_add.insert({"zb_U_"+to_string(h+1)+"_warm",b_res.zU.at(h)});
+                                    }
+                                    for(size_t h=0;h<b_res.dual_vars.size();++h){
+                                        warm_data_line_add.insert({"dual_bounce_"+to_string(h)+"_warm",b_res.dual_vars.at(h)});
+                                    }
+                                }else{qnode.log(QNode::Info,std::string("Number of steps different than the original"));}
+                            }else{qnode.log(QNode::Info,std::string("Planning failed"));}
+                        }else{qnode.log(QNode::Info,std::string("Planning failed"));}
+                    }while(!solved);
+                    csv_warm_data.push_back(warm_data_line_add);
+                }// for loop on cold started data
+            }//loop append new samples
+
+            // get the updated number of training samples
+            int n_Dx_updated = static_cast<int>(csv_warm_data.size()/n_D);
+            this->ui.label_n_Dx_value->setText(QString::number(n_Dx_updated));
+            n_Dx_vect.push_back(n_Dx_updated);
+            predicted_samples.push_back(n_pred);
 
 
             // write down the updated warm-started dataset
@@ -13342,6 +13740,22 @@ void MainWindow::on_pushButton_save_learning_res_clicked()
     **/
     results.close();
     qnode.log(QNode::Info,std::string("Results of learning saved at ")+pred_dir+std::string("/")+filename);
+
+}
+
+void MainWindow::on_pushButton_save_sample_sizes_clicked()
+{
+    string pred_dir = this->ui.lineEdit_predictions->text().toStdString();
+    string filename("sample_sizes.csv");
+    ofstream sample_csv;
+    sample_csv.open(pred_dir+string("/")+filename);
+    sample_csv << "samples,training set size\n";
+    for(size_t i=0; i <this->n_Dx_vect.size();++i){
+        sample_csv << to_string(this->predicted_samples.at(i))+string(",")+to_string(n_Dx_vect.at(i))+string("\n");
+    }
+    sample_csv.close();
+    qnode.log(QNode::Info,std::string("Results of learning saved at ")+pred_dir+std::string("/")+filename);
+
 
 }
 

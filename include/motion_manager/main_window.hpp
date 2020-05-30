@@ -688,6 +688,11 @@ public Q_SLOTS:
         void on_pushButton_save_learning_res_clicked();
 
         /**
+         * @brief on_pushButton_save_sample_sizes_clicked
+         */
+        void on_pushButton_save_sample_sizes_clicked();
+
+        /**
          * @brief check_tar_x_pos_var
          * @param state
          */
@@ -1461,6 +1466,9 @@ private:
         vector<double> cpu_ws_knn_opt_bounce; /**< cpu time with warm start from the k-nearest neighbors with the optimal kernel solution */
         vector<double> cost_ws_knn_opt_bounce; /**< cost function values with warm start from the k-nearest neighbors with the optimal kernel solution */
         vector<double> diff_ws_knn_opt_bounce; /**< difference initialization-solution with warm start from the random solution */
+
+        vector<int> n_Dx_vect; /**< variations of the number of training samples */
+        vector<int> predicted_samples; /**< number of the predictions */
 
         // ------------------------------------- Controlling -------------------------------------- //
         boost::atomic<bool> get_right_hand_status;
