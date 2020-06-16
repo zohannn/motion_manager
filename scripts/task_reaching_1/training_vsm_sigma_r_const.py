@@ -4,7 +4,6 @@ import pandas as pd
 import sys
 from matplotlib import pyplot as plt
 # HUPL
-from HUPL.hupl import EuclideanModel
 from HUPL.hupl import VSMModel
 from HUPL.hupl import preprocess_features_cold
 from HUPL.hupl import preprocess_features_warm
@@ -73,66 +72,62 @@ Y = D_prime_dataset_df_clipped.iloc[:,-n_out:]
 
 maxiter = 500 # max iterations
 # default initialization
-
+w_init = np.ones(f_dim)
+#r_init = 0.6
 w_init_opt = np.ones(f_dim)
-r_init_opt = 0.6
-
-reg_w = 0.04
-reg_r = 0.1
-
+#r_init_opt = 0.6
+# regularization
+reg_w = 2
+#nn = 10 # number of nearest neighbours
+#reg_r = 10
 tol = 1e-6
 
-if (online):
+if (online or check_loss):
     # retrieve the learned parameters
     weights_df = pd.read_csv(results_dir+"/w_best_df.csv",sep=",")
     w_init_opt = weights_df["weight"].values
     #print(w_init_opt)
+    #file_r = open(results_dir+"/r_best.txt", 'r')
+    #line_r = file_r.readlines()
+    #str = line_r[0].strip()
+    #r_list = str.split(":")
+    #r_init_opt = float(r_list[1])
+    #file_r.close()
 
-if (check_loss):
-    # retrieve the learned parameters
-    weights_df = pd.read_csv(results_dir+"/w_best_df.csv",sep=",")
-    w_init_opt = weights_df["weight"].values
-    #print(w_init_opt)
-    file_r = open(results_dir+"/r_best.txt", 'r')
-    line_r = file_r.readlines()
-    str = line_r[0].strip()
-    r_list = str.split(":")
-    r_init_opt = float(r_list[1])
-    file_r.close()
-
-eucl_model = EuclideanModel(n_D=dim_cold)
-vsm_model = VSMModel(X=X,Y=Y,n_D=dim_cold,weights_init=w_init_opt,r_init=r_init_opt,reg_w=reg_w,reg_r=reg_r,tol=tol)
+vsm_model_unfit = VSMModel(X=X, Y=Y,n_D=dim_cold,weights_init=w_init,reg_w=reg_w)
+vsm_model_opt = VSMModel(X=X, Y=Y,n_D=dim_cold,weights_init=w_init_opt,reg_w=reg_w,tol=tol)
 
 if check_loss:
-    loss_unfit = eucl_model.loss_function(X,Y, dim_cold, eucl_model.M,f_dim)
+    loss_unfit = vsm_model_unfit.loss_function(X,Y, dim_cold, vsm_model_unfit.M,w_init)
     file_untrain_loss = open(results_dir+"/untrain_loss.txt","w")
     print("Untrained Loss: {}".format(loss_unfit),file=file_untrain_loss)
     file_untrain_loss.close()
-    loss_opt = vsm_model.loss_function(X,Y, dim_cold, vsm_model.M,w_init_opt,r_init_opt)
+    loss_opt = vsm_model_opt.loss_function(X,Y, dim_cold, vsm_model_opt.M,w_init_opt)
     file_train_loss = open(results_dir+"/train_loss.txt","w")
     print("Trained Loss: {}".format(loss_opt),file=file_train_loss)
     file_train_loss.close()
     print("Untrained Loss: {}. Trained Loss: {}.".format(loss_unfit,loss_opt))
 else:
-    res = vsm_model.train(maxiter=maxiter) # Training
+    res = vsm_model_opt.fit(maxiter=maxiter) # Training
     print(res.message)
 
-    w_best = vsm_model.weights
-    r_best = vsm_model.r
+    w_best = vsm_model_opt.weights
+    #r_best = vsm_model_opt.r
+    #file_r_best = open(results_dir+"/r_best.txt","w")
+    #print("parameter r: {}.".format(r_best))
+    #print("parameter r: {}".format(r_best),file=file_r_best)
+    #file_r_best.close()
     file_res = open(results_dir+"/result.txt","w")
-    file_r_best = open(results_dir+"/r_best.txt","w")
     print(res,file=file_res)
     file_res.close()
     print("Objective function: {}, Number of iterations: {}.".format(res.fun, res.nit))
-    print("parameter r: {}.".format(r_best))
-    print("parameter r: {}".format(r_best),file=file_r_best)
-    file_r_best.close()
 
-    loss_unfit = eucl_model.loss_function(X,Y, dim_cold, eucl_model.M,f_dim)
+
+    loss_unfit = vsm_model_unfit.loss_function(X,Y, dim_cold, vsm_model_unfit.M,w_init)
     file_untrain_loss = open(results_dir+"/untrain_loss.txt","w")
     print("Untrained Loss: {}".format(loss_unfit),file=file_untrain_loss)
     file_untrain_loss.close()
-    loss_opt = vsm_model.loss_function(X,Y, dim_cold, vsm_model.M,w_best,r_best)
+    loss_opt = vsm_model_opt.loss_function(X,Y, dim_cold, vsm_model_opt.M,w_best)
     file_train_loss = open(results_dir+"/train_loss.txt","w")
     print("Trained Loss: {}".format(loss_opt),file=file_train_loss)
     file_train_loss.close()

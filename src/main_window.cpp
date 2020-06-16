@@ -139,6 +139,9 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(this->ui.checkBox_obsts_pitch_var, SIGNAL(stateChanged(int)), this, SLOT(check_obsts_pitch_var(int)));
     QObject::connect(this->ui.checkBox_obsts_yaw_var, SIGNAL(stateChanged(int)), this, SLOT(check_obsts_yaw_var(int)));
 
+    QObject::connect(this->ui.checkBox_arm_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_arm_pos_var(int)));
+    QObject::connect(this->ui.checkBox_hand_pos_var, SIGNAL(stateChanged(int)), this, SLOT(check_hand_pos_var(int)));
+
     QObject::connect(this->ui.checkBox_enable_forget, SIGNAL(stateChanged(int)), this, SLOT(check_enable_forget(int)));
 
     QObject::connect(this->ui.checkBox_right_hand_status, SIGNAL(stateChanged(int)), this, SLOT(check_right_hand_status(int)));
@@ -321,11 +324,11 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
 
 
     // ---------- threads --------------------------- //
-    get_right_hand_status = true;
-    display_r_hand_status_thrd = boost::thread(boost::bind(&MainWindow::display_r_hand_status, this));
-    exec_control = true; pos_control = false; vel_control = false;
-    execPosControl_thrd = boost::thread(boost::bind(&MainWindow::execPosControl, this));
-    execVelControl_thrd = boost::thread(boost::bind(&MainWindow::execVelControl, this));
+    get_right_hand_status = false;
+    //display_r_hand_status_thrd = boost::thread(boost::bind(&MainWindow::display_r_hand_status, this));
+    exec_control = false; pos_control = false; vel_control = false;
+    //execPosControl_thrd = boost::thread(boost::bind(&MainWindow::execPosControl, this));
+    //execVelControl_thrd = boost::thread(boost::bind(&MainWindow::execVelControl, this));
 
 }
 
@@ -353,8 +356,8 @@ void MainWindow::display_r_hand_status()
 {
     while(get_right_hand_status)
     {
-        if (this->ui.checkBox_right_hand_status->isChecked())
-        {
+        //if (this->ui.checkBox_right_hand_status->isChecked())
+        //{
             boost::unique_lock<boost::mutex> lck(hh_control_mtx);
 
             ros::spinOnce();
@@ -389,7 +392,7 @@ void MainWindow::display_r_hand_status()
                 this->ui.label_comp_right_hand_vel_wy_value->setText(QString::number(r_hand_vel_comp.at(4)));
                 this->ui.label_comp_right_hand_vel_wz_value->setText(QString::number(r_hand_vel_comp.at(5)));
             }
-        }
+        //}
     }
 }
 
@@ -9166,6 +9169,8 @@ void MainWindow::on_pushButton_plan_collect_cold_data_clicked()
     int trials = ui.lineEdit_trials_cold_data->text().toInt();
     ui.pushButton_plan_collect_cold_data->setCheckable(false);
 
+    double w_forget_init = 1.0; // initial forgetting weight of each sample
+
     QList<QListWidgetItem*> obsts_items = this->ui.listWidget_obsts_except->selectedItems();
     vector<string> obsts_except;
     for(int ii=0;ii<obsts_items.count();++ii){
@@ -9271,7 +9276,8 @@ void MainWindow::on_pushButton_plan_collect_cold_data_clicked()
                     data_csv.open(collect_dir+string("/")+filename_csv);
                     // headers
                     // robot configuration
-                    data_csv << "elbow_x_mm,elbow_y_mm,elbow_z_mm";
+                    data_csv << "w_forget";
+                    data_csv << ",elbow_x_mm,elbow_y_mm,elbow_z_mm";
                     data_csv << ",wrist_x_mm,wrist_y_mm,wrist_z_mm";
                     data_csv << ",hand_x_mm,hand_y_mm,hand_z_mm";
                     data_csv << ",thumb_1_x_mm,thumb_1_y_mm,thumb_1_z_mm,thumb_2_x_mm,thumb_2_y_mm,thumb_2_z_mm,thumb_tip_x_mm,thumb_tip_y_mm,thumb_tip_z_mm";
@@ -9367,9 +9373,17 @@ void MainWindow::on_pushButton_plan_collect_cold_data_clicked()
                             for(size_t p=0;p<start_r_posture.size();++p){
                                 //std::cout << dist(mt) << "\n";
                                 if(p<JOINTS_ARM){
-                                    tmp = start_r_posture.at(p) - (arm_pos_var/2) + arm_pos_var*(dist(mt));
+                                    if(this->ui.lineEdit_arm_pos_var->isEnabled()){
+                                        tmp = start_r_posture.at(p) - (arm_pos_var/2) + arm_pos_var*(dist(mt));
+                                    }else{
+                                        tmp = start_r_posture.at(p);
+                                    }
                                 }else{
-                                    tmp = start_r_posture.at(p) - (hand_pos_var/2) + hand_pos_var*(dist(mt));
+                                    if(this->ui.lineEdit_hand_pos_var->isEnabled()){
+                                        tmp = start_r_posture.at(p) - (hand_pos_var/2) + hand_pos_var*(dist(mt));
+                                    }else{
+                                        tmp = start_r_posture.at(p);
+                                    }
                                 }
                                 // check joints limits
                                 if(tmp > max_r_posture.at(p)){
@@ -9516,6 +9530,9 @@ void MainWindow::on_pushButton_plan_collect_cold_data_clicked()
                                         qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
                                         solved=true;
 
+                                        // weight for forgetting
+                                        string w_forget_str =  boost::str(boost::format("%.15f") % (w_forget_init)); boost::replace_all(w_forget_str,",",".");
+                                        data_csv << w_forget_str+",";
                                         // robot configuration
                                         // elbow
                                         std::vector<double> r_e_pos; curr_scene->getHumanoid()->getRightElbowPos(r_e_pos);
@@ -9867,6 +9884,7 @@ void MainWindow::on_pushButton_plan_collect_cold_data_clicked()
                     }// foor loop trials
                     data_csv.close();
                 }
+                this->ui.label_n_D_value->setText(QString::number(trials));
                 ui.pushButton_plan_collect_cold_data->setCheckable(true);
                 curr_scene->getHumanoid()->setRightPosture(start_r_posture);
                 qnode.log(QNode::Info,std::string("Planning and collecting ended"));
@@ -9906,6 +9924,7 @@ void MainWindow::on_pushButton_plan_collect_warm_data_clicked()
     bool use_final;
     HUMotion::planning_result_ptr h_results_tmp;
     int trials = ui.lineEdit_trials_warm_data->text().toInt();
+    ui.label_n_Dx_value->setText(QString::number(trials));
     ui.pushButton_plan_collect_warm_data->setCheckable(false);
 
     QList<QListWidgetItem*> obsts_items = this->ui.listWidget_obsts_except->selectedItems();
@@ -9915,6 +9934,7 @@ void MainWindow::on_pushButton_plan_collect_warm_data_clicked()
     }
 
     double w_forget_init = 1.0; // initial forgetting weight of each sample
+    int max_iter_plan = 20; int max_iter_bounce = 5;
 
     try{
         switch(planner_id){
@@ -9983,14 +10003,14 @@ void MainWindow::on_pushButton_plan_collect_warm_data_clicked()
                 mTolHumpdlg->getPlaneParameters(tols.mov_specs.plane_params);
 
                 // maximum iterations option
-                tols.set_max_iter_plan = mTolHumpdlg->getMaxIterPlanOption();
-                tols.max_iter_plan = mTolHumpdlg->getMaxIterPlan();
-                tols.set_max_iter_app = mTolHumpdlg->getMaxIterAppOption();
-                tols.max_iter_app = mTolHumpdlg->getMaxIterApp();
-                tols.set_max_iter_ret = mTolHumpdlg->getMaxIterRetOption();
-                tols.max_iter_ret = mTolHumpdlg->getMaxIterRet();
-                tols.set_max_iter_bounce = mTolHumpdlg->getMaxIterBounceOption();
-                tols.max_iter_bounce = mTolHumpdlg->getMaxIterBounce();
+                tols.set_max_iter_plan = true;
+                tols.max_iter_plan = max_iter_plan;
+                //tols.set_max_iter_app = mTolHumpdlg->getMaxIterAppOption();
+                //tols.max_iter_app = mTolHumpdlg->getMaxIterApp();
+                //tols.set_max_iter_ret = mTolHumpdlg->getMaxIterRetOption();
+                //tols.max_iter_ret = mTolHumpdlg->getMaxIterRet();
+                tols.set_max_iter_bounce = true;
+                tols.max_iter_bounce = max_iter_bounce;
 
                 // Maximum variations of the target
                 double tar_x_var = ui.lineEdit_tar_x_var->text().toDouble();
@@ -10189,9 +10209,17 @@ void MainWindow::on_pushButton_plan_collect_warm_data_clicked()
                             for(size_t p=0;p<start_r_posture.size();++p){
                                 //std::cout << dist(mt) << "\n";
                                 if(p<JOINTS_ARM){
-                                    tmp = start_r_posture.at(p) - (arm_pos_var/2) + arm_pos_var*(dist(mt));
+                                    if(this->ui.lineEdit_arm_pos_var->isEnabled()){
+                                        tmp = start_r_posture.at(p) - (arm_pos_var/2) + arm_pos_var*(dist(mt));
+                                    }else{
+                                        tmp = start_r_posture.at(p);
+                                    }
                                 }else{
-                                    tmp = start_r_posture.at(p) - (hand_pos_var/2) + hand_pos_var*(dist(mt));
+                                    if(this->ui.lineEdit_hand_pos_var->isEnabled()){
+                                        tmp = start_r_posture.at(p) - (hand_pos_var/2) + hand_pos_var*(dist(mt));
+                                    }else{
+                                        tmp = start_r_posture.at(p);
+                                    }
                                 }
                                 // check joints limits
                                 if(tmp > max_r_posture.at(p)){
@@ -10420,7 +10448,7 @@ void MainWindow::on_pushButton_plan_collect_warm_data_clicked()
                                         if(h_results_tmp->status==0){
                                             // movement planned successfully
                                             HUMotion::warm_start_params b_res = h_results_tmp->bounce_warm_start_res;
-                                            if(b_res.dual_vars.size() == dual_bounce.size())
+                                            if(b_res.dual_vars.size() == this->dual_bounce.size())
                                             {
                                                 qnode.log(QNode::Info,std::string("The movement has been planned successfully"));
                                                 solved=true;
@@ -11059,6 +11087,7 @@ bool MainWindow::on_pushButton_train_clicked()
                 line = f_untrain.readLine();
                 QStringList fields = line.split(":");
                 this->ui.label_untrain_loss_value->setText(fields.at(1));
+                this->untrained_losses.push_back(fields.at(1).toDouble());
             }
             f_untrain.close();
         }
@@ -11070,9 +11099,21 @@ bool MainWindow::on_pushButton_train_clicked()
                 line = f_train.readLine();
                 QStringList fields = line.split(":");
                 this->ui.label_train_loss_value->setText(fields.at(1));
+                this->trained_losses.push_back(fields.at(1).toDouble());
             }
             f_train.close();
         }
+
+        /**
+        string warm_data_path = this->ui.lineEdit_warm_data->text().toStdString();
+        std::vector<std::map<std::string,double>> csv_warm_data; std::vector<std::string> warm_headers;
+        readCSVData(warm_data_path,warm_headers,csv_warm_data);
+        string cold_data_path = this->ui.lineEdit_cold_data->text().toStdString();
+        std::vector<std::map<std::string,double>> csv_cold_data; std::vector<std::string> cold_headers;
+        readCSVData(cold_data_path,cold_headers,csv_cold_data);
+        this->n_Dx_loss_vect.push_back(static_cast<int>(csv_warm_data.size()/csv_cold_data.size()));
+        **/
+
         qnode.log(QNode::Info,std::string("Training ended"));
         return(status==0);        
     }else{
@@ -11119,6 +11160,7 @@ bool MainWindow::on_pushButton_check_loss_clicked()
                 line = f_untrain.readLine();
                 QStringList fields = line.split(":");
                 this->ui.label_untrain_loss_value->setText(fields.at(1));
+                this->untrained_losses.push_back(fields.at(1).toDouble());
             }
             f_untrain.close();
         }
@@ -11130,9 +11172,19 @@ bool MainWindow::on_pushButton_check_loss_clicked()
                 line = f_train.readLine();
                 QStringList fields = line.split(":");
                 this->ui.label_train_loss_value->setText(fields.at(1));
+                this->trained_losses.push_back(fields.at(1).toDouble());
             }
             f_train.close();
         }
+
+        string warm_data_path = this->ui.lineEdit_warm_data->text().toStdString();
+        std::vector<std::map<std::string,double>> csv_warm_data; std::vector<std::string> warm_headers;
+        readCSVData(warm_data_path,warm_headers,csv_warm_data);
+        string cold_data_path = this->ui.lineEdit_cold_data->text().toStdString();
+        std::vector<std::map<std::string,double>> csv_cold_data; std::vector<std::string> cold_headers;
+        readCSVData(cold_data_path,cold_headers,csv_cold_data);
+        this->n_Dx_loss_vect.push_back(static_cast<int>(csv_warm_data.size()/csv_cold_data.size()));
+
         qnode.log(QNode::Info,std::string("Loss values checked"));
         return(status==0);
     }else{
@@ -11383,17 +11435,50 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                     if(mov_type==1 || mov_type==5){ // move movement
 
                         // warm start with the random solution
-                        pred_csv << ",Success_f_ws_rdm,Iterations_f_plan_ws_rdm,Cpu_time_f_plan_ws_rdm,Cost_f_plan_ws_rdm,Diff_f_plan_rdm,";
-                        pred_csv << "Success_b_ws_rdm,Iterations_bounce_ws_rdm,Cpu_time_bounce_ws_rdm,Cost_bounce_ws_rdm,Diff_bounce_rdm,";
-
+                        pred_csv << ",Success_f_ws_rdm,Iterations_f_plan_ws_rdm,Cpu_time_f_plan_ws_rdm,Obj_f_plan_rdm,Cost_f_plan_ws_rdm,Der_Cost_f_plan_ws_rdm,Diff_f_plan_rdm";
+                        pred_csv << ",xf_plan_1_rdm_rad,xf_plan_2_rdm_rad,xf_plan_3_rdm_rad,xf_plan_4_rdm_rad,xf_plan_5_rdm_rad,xf_plan_6_rdm_rad,xf_plan_7_rdm_rad";
+                        pred_csv << ",zf_L_plan_1_rdm,zf_L_plan_2_rdm,zf_L_plan_3_rdm,zf_L_plan_4_rdm,zf_L_plan_5_rdm,zf_L_plan_6_rdm,zf_L_plan_7_rdm";
+                        pred_csv << ",zf_U_plan_1_rdm,zf_U_plan_2_rdm,zf_U_plan_3_rdm,zf_U_plan_4_rdm,zf_U_plan_5_rdm,zf_U_plan_6_rdm,zf_U_plan_7_rdm";
+                        for(size_t j=0;j<dual_plan.size();++j){
+                            pred_csv << ",dual_f_plan_"+to_string(j)+"_rdm";
+                        }
+                        pred_csv << ",Success_b_ws_rdm,Iterations_bounce_ws_rdm,Cpu_time_bounce_ws_rdm,Obj_bounce_rdm,Cost_bounce_ws_rdm,Der_Cost_bounce_ws_rdm,Diff_bounce_rdm";
+                        pred_csv << ",x_bounce_1_rdm_rad,x_bounce_2_rdm_rad,x_bounce_3_rdm_rad,x_bounce_4_rdm_rad,x_bounce_5_rdm_rad,x_bounce_6_rdm_rad,x_bounce_7_rdm_rad,x_bounce_8_rdm_rad,x_bounce_9_rdm_rad";
+                        pred_csv << ",zb_L_1_rdm,zb_L_2_rdm,zb_L_3_rdm,zb_L_4_rdm,zb_L_5_rdm,zb_L_6_rdm,zb_L_7_rdm,zb_L_8_rdm,zb_L_9_rdm";
+                        pred_csv << ",zb_U_1_rdm,zb_U_2_rdm,zb_U_3_rdm,zb_U_4_rdm,zb_U_5_rdm,zb_U_6_rdm,zb_U_7_rdm,zb_U_8_rdm,zb_U_9_rdm";
+                        for(size_t j=0;j<dual_bounce.size();++j){
+                            pred_csv << ",dual_bounce_"+to_string(j)+"_rdm";
+                        }
                         // warm start with the k-nearest neighbors with Euclidean kernel
-                        pred_csv << "Success_f_ws_knn_eucl,Iterations_f_plan_ws_knn_eucl,Cpu_time_f_plan_ws_knn_eucl,Cost_f_plan_ws_knn_eucl,Diff_f_plan_knn_eucl,";
-                        pred_csv << "Success_b_ws_knn_eucl,Iterations_bounce_ws_knn_eucl,Cpu_time_bounce_ws_knn_eucl,Cost_bounce_ws_knn_eucl,Diff_bounce_knn_eucl,";
-
+                        pred_csv << ",Success_f_ws_knn_eucl,Iterations_f_plan_ws_knn_eucl,Cpu_time_f_plan_ws_knn_eucl,Obj_f_plan_knn_eucl,Cost_f_plan_ws_knn_eucl,Der_Cost_f_plan_ws_knn_eucl,Diff_f_plan_knn_eucl";
+                        pred_csv << ",xf_plan_1_knn_eucl_rad,xf_plan_2_knn_eucl_rad,xf_plan_3_knn_eucl_rad,xf_plan_4_knn_eucl_rad,xf_plan_5_knn_eucl_rad,xf_plan_6_knn_eucl_rad,xf_plan_7_knn_eucl_rad";
+                        pred_csv << ",zf_L_plan_1_knn_eucl,zf_L_plan_2_knn_eucl,zf_L_plan_3_knn_eucl,zf_L_plan_4_knn_eucl,zf_L_plan_5_knn_eucl,zf_L_plan_6_knn_eucl,zf_L_plan_7_knn_eucl";
+                        pred_csv << ",zf_U_plan_1_knn_eucl,zf_U_plan_2_knn_eucl,zf_U_plan_3_knn_eucl,zf_U_plan_4_knn_eucl,zf_U_plan_5_knn_eucl,zf_U_plan_6_knn_eucl,zf_U_plan_7_knn_eucl";
+                        for(size_t j=0;j<dual_plan.size();++j){
+                            pred_csv << ",dual_f_plan_"+to_string(j)+"_knn_eucl";
+                        }
+                        pred_csv << ",Success_b_ws_knn_eucl,Iterations_bounce_ws_knn_eucl,Cpu_time_bounce_ws_knn_eucl,Obj_bounce_knn_eucl,Cost_bounce_ws_knn_eucl,Der_Cost_f_plan_ws_knn_eucl,Diff_bounce_knn_eucl";
+                        pred_csv << ",x_bounce_1_knn_eucl_rad,x_bounce_2_knn_eucl_rad,x_bounce_3_knn_eucl_rad,x_bounce_4_knn_eucl_rad,x_bounce_5_knn_eucl_rad,x_bounce_6_knn_eucl_rad,x_bounce_7_knn_eucl_rad,x_bounce_8_knn_eucl_rad,x_bounce_9_knn_eucl_rad";
+                        pred_csv << ",zb_L_1_knn_eucl,zb_L_2_knn_eucl,zb_L_3_knn_eucl,zb_L_4_knn_eucl,zb_L_5_knn_eucl,zb_L_6_knn_eucl,zb_L_7_knn_eucl,zb_L_8_knn_eucl,zb_L_9_knn_eucl";
+                        pred_csv << ",zb_U_1_knn_eucl,zb_U_2_knn_eucl,zb_U_3_knn_eucl,zb_U_4_knn_eucl,zb_U_5_knn_eucl,zb_U_6_knn_eucl,zb_U_7_knn_eucl,zb_U_8_knn_eucl,zb_U_9_knn_eucl";
+                        for(size_t j=0;j<dual_bounce.size();++j){
+                            pred_csv << ",dual_bounce_"+to_string(j)+"_knn_eucl";
+                        }
                         // warm start with the k-nearest neighbors with optimal kernel
-                        pred_csv << "Success_f_ws_knn_opt,Iterations_f_plan_ws_knn_opt,Cpu_time_f_plan_ws_knn_opt,Cost_f_plan_ws_knn_opt,Diff_f_plan_knn_opt,";
-                        pred_csv << "Success_b_ws_knn_opt,Iterations_bounce_ws_knn_opt,Cpu_time_bounce_ws_knn_opt,Cost_bounce_ws_knn_opt,Diff_bounce_knn_opt";
-
+                        pred_csv << ",Success_f_ws_knn_opt,Iterations_f_plan_ws_knn_opt,Cpu_time_f_plan_ws_knn_opt,Obj_f_plan_knn_opt,Cost_f_plan_ws_knn_opt,Der_Cost_f_plan_ws_knn_opt,Diff_f_plan_knn_opt";
+                        pred_csv << ",xf_plan_1_knn_opt_rad,xf_plan_2_knn_opt_rad,xf_plan_3_knn_opt_rad,xf_plan_4_knn_opt_rad,xf_plan_5_knn_opt_rad,xf_plan_6_knn_opt_rad,xf_plan_7_knn_opt_rad";
+                        pred_csv << ",zf_L_plan_1_knn_opt,zf_L_plan_2_knn_opt,zf_L_plan_3_knn_opt,zf_L_plan_4_knn_opt,zf_L_plan_5_knn_opt,zf_L_plan_6_knn_opt,zf_L_plan_7_knn_opt";
+                        pred_csv << ",zf_U_plan_1_knn_opt,zf_U_plan_2_knn_opt,zf_U_plan_3_knn_opt,zf_U_plan_4_knn_opt,zf_U_plan_5_knn_opt,zf_U_plan_6_knn_opt,zf_U_plan_7_knn_opt";
+                        for(size_t j=0;j<dual_plan.size();++j){
+                            pred_csv << ",dual_f_plan_"+to_string(j)+"_knn_opt";
+                        }
+                        pred_csv << ",Success_b_ws_knn_opt,Iterations_bounce_ws_knn_opt,Cpu_time_bounce_ws_knn_opt,Obj_bounce_knn_opt,Cost_bounce_ws_knn_opt,Der_Cost_bounce_ws_knn_opt,Diff_bounce_knn_opt";
+                        pred_csv << ",x_bounce_1_knn_opt_rad,x_bounce_2_knn_opt_rad,x_bounce_3_knn_opt_rad,x_bounce_4_knn_opt_rad,x_bounce_5_knn_opt_rad,x_bounce_6_knn_opt_rad,x_bounce_7_knn_opt_rad,x_bounce_8_knn_opt_rad,x_bounce_9_knn_opt_rad";
+                        pred_csv << ",zb_L_1_knn_opt,zb_L_2_knn_opt,zb_L_3_knn_opt,zb_L_4_knn_opt,zb_L_5_knn_opt,zb_L_6_knn_opt,zb_L_7_knn_opt,zb_L_8_knn_opt,zb_L_9_knn_opt";
+                        pred_csv << ",zb_U_1_knn_opt,zb_U_2_knn_opt,zb_U_3_knn_opt,zb_U_4_knn_opt,zb_U_5_knn_opt,zb_U_6_knn_opt,zb_U_7_knn_opt,zb_U_8_knn_opt,zb_U_9_knn_opt";
+                        for(size_t j=0;j<dual_bounce.size();++j){
+                            pred_csv << ",dual_bounce_"+to_string(j)+"_knn_opt";
+                        }
 
                     }else{
 
@@ -11454,9 +11539,17 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                         for(size_t p=0;p<start_r_posture.size();++p){
                             //std::cout << dist(mt) << "\n";
                             if(p<JOINTS_ARM){
-                                tmp = start_r_posture.at(p) - (arm_pos_var/2) + arm_pos_var*(dist(mt));
+                                if(this->ui.lineEdit_arm_pos_var->isEnabled()){
+                                    tmp = start_r_posture.at(p) - (arm_pos_var/2) + arm_pos_var*(dist(mt));
+                                }else{
+                                    tmp = start_r_posture.at(p);
+                                }
                             }else{
-                                tmp = start_r_posture.at(p) - (hand_pos_var/2) + hand_pos_var*(dist(mt));
+                                if(this->ui.lineEdit_hand_pos_var->isEnabled()){
+                                    tmp = start_r_posture.at(p) - (hand_pos_var/2) + hand_pos_var*(dist(mt));
+                                }else{
+                                    tmp = start_r_posture.at(p);
+                                }
                             }
                             // check joints limits
                             if(tmp > max_r_posture.at(p)){
@@ -11704,10 +11797,10 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                             prob->setObstacle(obs_new,j);
                         }// for loop obstacles
 
-
+                        string dual_bounce_size_str = to_string(this->dual_bounce.size());
                         // predict the initialization
                         string pred_file = pred_dir +string("/pred_sol_")+to_string(i)+string(".dual");
-                        cmdLine = string("python3 ") + py_file + string(" ") + data_dir + string(" ") + res_dir + string(" ") + pred_file + string(" ") + input_data_str;
+                        cmdLine = string("python3 ") + py_file + string(" ") + data_dir + string(" ") + res_dir + string(" ") + pred_file + string(" ") + dual_bounce_size_str + string(" ") + input_data_str;
                         //std::cout << cmdLine << std::endl;
                         int status = system(cmdLine.c_str());
 
@@ -12176,24 +12269,67 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     pred_rdm.insert(pred_rdm.end(), pred_x_rdm_plan.begin(), pred_x_rdm_plan.end() );
                                     pred_rdm.insert(pred_rdm.end(), pred_zL_rdm_plan.begin(), pred_zL_rdm_plan.end() );
                                     pred_rdm.insert(pred_rdm.end(), pred_zU_rdm_plan.begin(), pred_zU_rdm_plan.end() );
-                                    pred_rdm.insert(pred_rdm.end(), pred_dual_rdm_plan.begin(), pred_dual_rdm_plan.end() );
-                                    std::vector<double> diff_rdm_plan;                                    
-                                    std::set_difference(sol_rdm.begin(),sol_rdm.end(),pred_rdm.begin(),pred_rdm.end(),std::back_inserter(diff_rdm_plan));
+                                    pred_rdm.insert(pred_rdm.end(), pred_dual_rdm_plan.begin(), pred_dual_rdm_plan.end() );  
+                                    std::vector<double> diff_rdm_plan(pred_rdm.size(),0.0);
+                                    std::transform(sol_rdm.begin(), sol_rdm.end(), pred_rdm.begin(), diff_rdm_plan.begin(), [](double d1,double d2) { return (d1-d2); });
                                     double diff_rdm_norm_plan = std::sqrt(std::inner_product(diff_rdm_plan.begin(), diff_rdm_plan.end(), diff_rdm_plan.begin(), 0.0));
 
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
                                     string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     string cost_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.error_value)); boost::replace_all(cost_f_plan_str,",",".");
+                                    string der_cost_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.der_error_values.back())); boost::replace_all(der_cost_f_plan_str,",",".");
                                     string diff_rdm_norm_plan_str =  boost::str(boost::format("%.15f") % (diff_rdm_norm_plan)); boost::replace_all(diff_rdm_norm_plan_str,",",".");
                                     HUMotion::warm_start_params bounce_ws = h_results_ws_rdm_pred->bounce_warm_start_res;
-                                    std::vector<double> diff_b_rdm;
-                                    std::set_difference(bounce_ws.x.begin(),bounce_ws.x.end(),pred_x_rdm_bounce.begin(),pred_x_rdm_bounce.end(),std::back_inserter(diff_b_rdm));
+                                    std::vector<double> diff_b_rdm(pred_x_rdm_bounce.size(),0.0);
+                                    std::transform(bounce_ws.x.begin(), bounce_ws.x.end(), pred_x_rdm_bounce.begin(), diff_b_rdm.begin(), [](double d1,double d2) { return (d1-d2); });
                                     double diff_b_rdm_norm = std::sqrt(std::inner_product(diff_b_rdm.begin(), diff_b_rdm.end(), diff_b_rdm.begin(), 0.0));
-                                    string iter_bounce_str = to_string(bounce_ws.iterations);
+                                    string iter_bounce_str = to_string(bounce_ws.iterations);                                   
                                     string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     string cost_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.error_value)); boost::replace_all(cost_bounce_str,",",".");
+                                    string der_cost_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.der_error_values.back())); boost::replace_all(der_cost_bounce_str,",",".");
                                     string diff_b_rdm_norm_str =  boost::str(boost::format("%.15f") % (diff_b_rdm_norm)); boost::replace_all(diff_b_rdm_norm_str,",",".");
-                                    pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+cost_f_plan_str+","+diff_rdm_norm_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+cost_bounce_str+","+diff_b_rdm_norm_str;
+
+                                    pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+","+cost_f_plan_str+","+der_cost_f_plan_str+","+diff_rdm_norm_plan_str+",";
+                                    for(int h=0;h<plan_tar.x.size();++h){
+                                        string x_str =  boost::str(boost::format("%.15f") % (plan_tar.x.at(h))); boost::replace_all(x_str,",",".");
+                                        pred_csv << x_str+",";
+                                    }
+                                    for(size_t h=0;h<plan_tar.zL.size();++h){
+                                        string zL_str =  boost::str(boost::format("%.15f") % (plan_tar.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                        pred_csv << zL_str+",";
+                                    }
+                                    for(size_t h=0;h<plan_tar.zU.size();++h){
+                                        string zU_str =  boost::str(boost::format("%.15f") % (plan_tar.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                        pred_csv << zU_str+",";
+                                    }
+                                    for(size_t h=0;h<plan_tar.dual_vars.size();++h){
+                                        string dual_str =  boost::str(boost::format("%.15f") % (plan_tar.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                        pred_csv << dual_str+",";
+                                    }
+                                    pred_csv << "1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str+","+cost_bounce_str+","+der_cost_bounce_str+","+diff_b_rdm_norm_str+",";
+                                    for(size_t h=0;h<bounce_ws.x.size();++h){
+                                        string x_str =  boost::str(boost::format("%.15f") % (bounce_ws.x.at(h))); boost::replace_all(x_str,",",".");
+                                        pred_csv << x_str+",";
+                                    }
+                                    for(size_t h=0;h<bounce_ws.zL.size();++h){
+                                        string zL_str =  boost::str(boost::format("%.15f") % (bounce_ws.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                        pred_csv << zL_str+",";
+                                    }
+                                    for(size_t h=0;h<bounce_ws.zU.size();++h){
+                                        string zU_str =  boost::str(boost::format("%.15f") % (bounce_ws.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                        pred_csv << zU_str+",";
+                                    }
+                                    for(size_t h=0;h<bounce_ws.dual_vars.size();++h){
+                                        string dual_str =  boost::str(boost::format("%.15f") % (bounce_ws.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                        if(h == bounce_ws.dual_vars.size()-1){
+                                            //last column
+                                            pred_csv << dual_str;
+                                        }else{
+                                            pred_csv << dual_str+",";
+                                        }
+                                    }
                                     success_ws_rdm_plan.push_back(1); iter_ws_rdm_plan.push_back(plan_tar.iterations); cpu_ws_rdm_plan.push_back(plan_tar.cpu_time); cost_ws_rdm_plan.push_back(plan_tar.error_value); diff_ws_rdm_plan.push_back(diff_rdm_norm_plan);
                                     success_ws_rdm_bounce.push_back(1); iter_ws_rdm_bounce.push_back(bounce_ws.iterations); cpu_ws_rdm_bounce.push_back(bounce_ws.cpu_time); cost_ws_rdm_bounce.push_back(bounce_ws.error_value); diff_ws_rdm_bounce.push_back(diff_b_rdm_norm);
                                 }else{
@@ -12247,7 +12383,37 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                 }
                             }else{
                                 if(mov_type==1 || mov_type==5){ // move movement
-                                    pred_csv << ",0,nan,nan,nan,nan,0,nan,nan,nan,nan";
+                                    pred_csv << ",0,nan,nan,nan,nan,nan,nan,";
+                                    for(int h=0;h<this->x_plan.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->zL_plan.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->zU_plan.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->dual_plan.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    pred_csv << "0,nan,nan,nan,nan,nan,nan,";
+                                    for(int h=0;h<this->x_bounce.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->zL_bounce.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->zU_bounce.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->dual_bounce.size();++h){
+                                        if(h == this->dual_bounce.size()-1){
+                                            //last column
+                                            pred_csv << "nan";
+                                        }else{
+                                            pred_csv << "nan,";
+                                        }
+                                    }
                                     success_ws_rdm_plan.push_back(0);
                                     success_ws_rdm_bounce.push_back(0);
                                 }else{
@@ -12263,7 +12429,37 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                             }
                         }else{
                             if(mov_type==1 || mov_type==5){ // move movement
-                                pred_csv << ",0,nan,nan,nan,nan,0,nan,nan,nan,nan";
+                                pred_csv << ",0,nan,nan,nan,nan,nan,nan,";
+                                for(int h=0;h<this->x_plan.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->zL_plan.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->zU_plan.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->dual_plan.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                pred_csv << "0,nan,nan,nan,nan,nan,nan,";
+                                for(int h=0;h<this->x_bounce.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->zL_bounce.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->zU_bounce.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->dual_bounce.size();++h){
+                                    if(h == this->dual_bounce.size()-1){
+                                        //last column
+                                        pred_csv << "nan";
+                                    }else{
+                                        pred_csv << "nan,";
+                                    }
+                                }
                                 success_ws_rdm_plan.push_back(0);
                                 success_ws_rdm_bounce.push_back(0);
                             }else{
@@ -12296,23 +12492,65 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     pred_knn_eucl.insert(pred_knn_eucl.end(), pred_zL_knn_eucl_plan.begin(), pred_zL_knn_eucl_plan.end() );
                                     pred_knn_eucl.insert(pred_knn_eucl.end(), pred_zU_knn_eucl_plan.begin(), pred_zU_knn_eucl_plan.end() );
                                     pred_knn_eucl.insert(pred_knn_eucl.end(), pred_dual_knn_eucl_plan.begin(), pred_dual_knn_eucl_plan.end() );
-                                    std::vector<double> diff_knn_eucl_plan;
-                                    std::set_difference(sol_knn_eucl.begin(),sol_knn_eucl.end(),pred_knn_eucl.begin(),pred_knn_eucl.end(),std::back_inserter(diff_knn_eucl_plan));
+                                    std::vector<double> diff_knn_eucl_plan(pred_knn_eucl.size(),0.0);
+                                    std::transform(sol_knn_eucl.begin(), sol_knn_eucl.end(), pred_knn_eucl.begin(), diff_knn_eucl_plan.begin(), [](double d1,double d2) { return (d1-d2); });
                                     double diff_knn_eucl_norm_plan = std::sqrt(std::inner_product(diff_knn_eucl_plan.begin(), diff_knn_eucl_plan.end(), diff_knn_eucl_plan.begin(), 0.0));
 
                                     string diff_knn_eucl_norm_plan_str =  boost::str(boost::format("%.15f") % (diff_knn_eucl_norm_plan)); boost::replace_all(diff_knn_eucl_norm_plan_str,",",".");
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
                                     string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     string cost_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.error_value)); boost::replace_all(cost_f_plan_str,",",".");
+                                    string der_cost_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.der_error_values.back())); boost::replace_all(der_cost_f_plan_str,",",".");
                                     HUMotion::warm_start_params bounce_ws = h_results_ws_knn_eucl_pred->bounce_warm_start_res;
-                                    std::vector<double> diff_b_knn_eucl;
-                                    std::set_difference(bounce_ws.x.begin(),bounce_ws.x.end(),pred_x_knn_eucl_bounce.begin(),pred_x_knn_eucl_bounce.end(),std::back_inserter(diff_b_knn_eucl));
+                                    std::vector<double> diff_b_knn_eucl(pred_x_knn_eucl_bounce.size(),0.0);
+                                    std::transform(bounce_ws.x.begin(), bounce_ws.x.end(), pred_x_knn_eucl_bounce.begin(), diff_b_knn_eucl.begin(), [](double d1,double d2) { return (d1-d2); });
                                     double diff_b_knn_eucl_norm = std::sqrt(std::inner_product(diff_b_knn_eucl.begin(), diff_b_knn_eucl.end(), diff_b_knn_eucl.begin(), 0.0));
                                     string diff_b_knn_eucl_norm_str =  boost::str(boost::format("%.15f") % (diff_b_knn_eucl_norm)); boost::replace_all(diff_b_knn_eucl_norm_str,",",".");
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
                                     string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     string cost_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.error_value)); boost::replace_all(cost_bounce_str,",",".");
-                                    pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+cost_f_plan_str+","+diff_knn_eucl_norm_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+cost_bounce_str+","+diff_b_knn_eucl_norm_str;
+                                    string der_cost_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.der_error_values.back())); boost::replace_all(der_cost_bounce_str,",",".");
+                                    pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+","+cost_f_plan_str+","+der_cost_f_plan_str+","+diff_knn_eucl_norm_plan_str+",";
+                                    for(int h=0;h<plan_tar.x.size();++h){
+                                        string x_str =  boost::str(boost::format("%.15f") % (plan_tar.x.at(h))); boost::replace_all(x_str,",",".");
+                                        pred_csv << x_str+",";
+                                    }
+                                    for(size_t h=0;h<plan_tar.zL.size();++h){
+                                        string zL_str =  boost::str(boost::format("%.15f") % (plan_tar.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                        pred_csv << zL_str+",";
+                                    }
+                                    for(size_t h=0;h<plan_tar.zU.size();++h){
+                                        string zU_str =  boost::str(boost::format("%.15f") % (plan_tar.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                        pred_csv << zU_str+",";
+                                    }
+                                    for(size_t h=0;h<plan_tar.dual_vars.size();++h){
+                                        string dual_str =  boost::str(boost::format("%.15f") % (plan_tar.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                        pred_csv << dual_str+",";
+                                    }
+                                    pred_csv << "1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str+","+cost_bounce_str+","+der_cost_bounce_str+","+diff_b_knn_eucl_norm_str+",";
+                                    for(size_t h=0;h<bounce_ws.x.size();++h){
+                                        string x_str =  boost::str(boost::format("%.15f") % (bounce_ws.x.at(h))); boost::replace_all(x_str,",",".");
+                                        pred_csv << x_str+",";
+                                    }
+                                    for(size_t h=0;h<bounce_ws.zL.size();++h){
+                                        string zL_str =  boost::str(boost::format("%.15f") % (bounce_ws.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                        pred_csv << zL_str+",";
+                                    }
+                                    for(size_t h=0;h<bounce_ws.zU.size();++h){
+                                        string zU_str =  boost::str(boost::format("%.15f") % (bounce_ws.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                        pred_csv << zU_str+",";
+                                    }
+                                    for(size_t h=0;h<bounce_ws.dual_vars.size();++h){
+                                        string dual_str =  boost::str(boost::format("%.15f") % (bounce_ws.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                        if(h == bounce_ws.dual_vars.size()-1){
+                                            //last column
+                                            pred_csv << dual_str;
+                                        }else{
+                                            pred_csv << dual_str+",";
+                                        }
+                                    }
                                     success_ws_knn_eucl_plan.push_back(1); iter_ws_knn_eucl_plan.push_back(plan_tar.iterations); cpu_ws_knn_eucl_plan.push_back(plan_tar.cpu_time); cost_ws_knn_eucl_plan.push_back(plan_tar.error_value); diff_ws_knn_eucl_plan.push_back(diff_knn_eucl_norm_plan);
                                     success_ws_knn_eucl_bounce.push_back(1); iter_ws_knn_eucl_bounce.push_back(bounce_ws.iterations); cpu_ws_knn_eucl_bounce.push_back(bounce_ws.cpu_time); cost_ws_knn_eucl_bounce.push_back(bounce_ws.error_value); diff_ws_knn_eucl_bounce.push_back(diff_b_knn_eucl_norm);
                                 }else{
@@ -12366,7 +12604,37 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                 }
                             }else{
                                 if(mov_type==1 || mov_type==5){ // move movement
-                                    pred_csv << ",0,nan,nan,nan,nan,0,nan,nan,nan,nan";
+                                    pred_csv << ",0,nan,nan,nan,nan,nan,nan,";
+                                    for(int h=0;h<this->x_plan.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->zL_plan.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->zU_plan.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->dual_plan.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    pred_csv << "0,nan,nan,nan,nan,nan,nan,";
+                                    for(int h=0;h<this->x_bounce.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->zL_bounce.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->zU_bounce.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->dual_bounce.size();++h){
+                                        if(h == this->dual_bounce.size()-1){
+                                            //last column
+                                            pred_csv << "nan";
+                                        }else{
+                                            pred_csv << "nan,";
+                                        }
+                                    }
                                     success_ws_knn_eucl_plan.push_back(0);
                                     success_ws_knn_eucl_bounce.push_back(0);
                                 }else{
@@ -12382,7 +12650,37 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                             }
                         }else{
                             if(mov_type==1 || mov_type==5){ // move movement
-                                pred_csv << ",0,nan,nan,nan,nan,0,nan,nan,nan,nan";
+                                pred_csv << ",0,nan,nan,nan,nan,nan,nan,";
+                                for(int h=0;h<this->x_plan.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->zL_plan.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->zU_plan.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->dual_plan.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                pred_csv << "0,nan,nan,nan,nan,nan,nan,";
+                                for(int h=0;h<this->x_bounce.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->zL_bounce.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->zU_bounce.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->dual_bounce.size();++h){
+                                    if(h == this->dual_bounce.size()-1){
+                                        //last column
+                                        pred_csv << "nan";
+                                    }else{
+                                        pred_csv << "nan,";
+                                    }
+                                }
                                 success_ws_knn_eucl_plan.push_back(0);
                                 success_ws_knn_eucl_bounce.push_back(0);
                             }else{
@@ -12415,23 +12713,65 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                     pred_knn_opt.insert(pred_knn_opt.end(), pred_zL_knn_opt_plan.begin(), pred_zL_knn_opt_plan.end() );
                                     pred_knn_opt.insert(pred_knn_opt.end(), pred_zU_knn_opt_plan.begin(), pred_zU_knn_opt_plan.end() );
                                     pred_knn_opt.insert(pred_knn_opt.end(), pred_dual_knn_opt_plan.begin(), pred_dual_knn_opt_plan.end() );
-                                    std::vector<double> diff_knn_opt_plan;
-                                    std::set_difference(sol_knn_opt.begin(),sol_knn_opt.end(),pred_knn_opt.begin(),pred_knn_opt.end(),std::back_inserter(diff_knn_opt_plan));
+                                    std::vector<double> diff_knn_opt_plan(pred_knn_opt.size(),0.0);
+                                    std::transform(sol_knn_opt.begin(), sol_knn_opt.end(), pred_knn_opt.begin(), diff_knn_opt_plan.begin(), [](double d1,double d2) { return (d1-d2); });
                                     double diff_knn_opt_norm_plan = std::sqrt(std::inner_product(diff_knn_opt_plan.begin(), diff_knn_opt_plan.end(), diff_knn_opt_plan.begin(), 0.0));
 
                                     string diff_knn_opt_norm_plan_str =  boost::str(boost::format("%.15f") % (diff_knn_opt_norm_plan)); boost::replace_all(diff_knn_opt_norm_plan_str,",",".");
                                     string iter_f_plan_str = to_string(plan_tar.iterations);
                                     string cpu_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.cpu_time)); boost::replace_all(cpu_f_plan_str,",",".");
+                                    string obj_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.obj_value)); boost::replace_all(obj_f_plan_str,",",".");
                                     string cost_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.error_value)); boost::replace_all(cost_f_plan_str,",",".");
+                                    string der_cost_f_plan_str =  boost::str(boost::format("%.15f") % (plan_tar.der_error_values.back())); boost::replace_all(der_cost_f_plan_str,",",".");
                                     HUMotion::warm_start_params bounce_ws = h_results_ws_knn_opt_pred->bounce_warm_start_res;
-                                    std::vector<double> diff_b_knn_opt;
-                                    std::set_difference(bounce_ws.x.begin(),bounce_ws.x.end(),pred_x_knn_opt_bounce.begin(),pred_x_knn_opt_bounce.end(),std::back_inserter(diff_b_knn_opt));
+                                    std::vector<double> diff_b_knn_opt(pred_x_knn_opt_bounce.size(),0.0);
+                                    std::transform(bounce_ws.x.begin(), bounce_ws.x.end(), pred_x_knn_opt_bounce.begin(), diff_b_knn_opt.begin(), [](double d1,double d2) { return (d1-d2); });
                                     double diff_b_knn_opt_norm = std::sqrt(std::inner_product(diff_b_knn_opt.begin(), diff_b_knn_opt.end(), diff_b_knn_opt.begin(), 0.0));
                                     string diff_b_knn_opt_norm_str =  boost::str(boost::format("%.15f") % (diff_b_knn_opt_norm)); boost::replace_all(diff_b_knn_opt_norm_str,",",".");
                                     string iter_bounce_str = to_string(bounce_ws.iterations);
                                     string cpu_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.cpu_time)); boost::replace_all(cpu_bounce_str,",",".");
+                                    string obj_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.obj_value)); boost::replace_all(obj_bounce_str,",",".");
                                     string cost_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.error_value)); boost::replace_all(cost_bounce_str,",",".");
-                                    pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+cost_f_plan_str+","+diff_knn_opt_norm_plan_str+",1,"+iter_bounce_str+","+cpu_bounce_str+","+cost_bounce_str+","+diff_b_knn_opt_norm_str;
+                                    string der_cost_bounce_str =  boost::str(boost::format("%.15f") % (bounce_ws.der_error_values.back())); boost::replace_all(der_cost_bounce_str,",",".");
+                                    pred_csv << ",1,"+iter_f_plan_str+","+cpu_f_plan_str+","+obj_f_plan_str+","+cost_f_plan_str+","+der_cost_f_plan_str+","+diff_knn_opt_norm_plan_str+",";
+                                    for(int h=0;h<plan_tar.x.size();++h){
+                                        string x_str =  boost::str(boost::format("%.15f") % (plan_tar.x.at(h))); boost::replace_all(x_str,",",".");
+                                        pred_csv << x_str+",";
+                                    }
+                                    for(size_t h=0;h<plan_tar.zL.size();++h){
+                                        string zL_str =  boost::str(boost::format("%.15f") % (plan_tar.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                        pred_csv << zL_str+",";
+                                    }
+                                    for(size_t h=0;h<plan_tar.zU.size();++h){
+                                        string zU_str =  boost::str(boost::format("%.15f") % (plan_tar.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                        pred_csv << zU_str+",";
+                                    }
+                                    for(size_t h=0;h<plan_tar.dual_vars.size();++h){
+                                        string dual_str =  boost::str(boost::format("%.15f") % (plan_tar.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                        pred_csv << dual_str+",";
+                                    }
+                                    pred_csv << "1,"+iter_bounce_str+","+cpu_bounce_str+","+obj_bounce_str+","+cost_bounce_str+","+der_cost_bounce_str+","+diff_b_knn_opt_norm_str+",";
+                                    for(size_t h=0;h<bounce_ws.x.size();++h){
+                                        string x_str =  boost::str(boost::format("%.15f") % (bounce_ws.x.at(h))); boost::replace_all(x_str,",",".");
+                                        pred_csv << x_str+",";
+                                    }
+                                    for(size_t h=0;h<bounce_ws.zL.size();++h){
+                                        string zL_str =  boost::str(boost::format("%.15f") % (bounce_ws.zL.at(h))); boost::replace_all(zL_str,",",".");
+                                        pred_csv << zL_str+",";
+                                    }
+                                    for(size_t h=0;h<bounce_ws.zU.size();++h){
+                                        string zU_str =  boost::str(boost::format("%.15f") % (bounce_ws.zU.at(h))); boost::replace_all(zU_str,",",".");
+                                        pred_csv << zU_str+",";
+                                    }
+                                    for(size_t h=0;h<bounce_ws.dual_vars.size();++h){
+                                        string dual_str =  boost::str(boost::format("%.15f") % (bounce_ws.dual_vars.at(h))); boost::replace_all(dual_str,",",".");
+                                        if(h == bounce_ws.dual_vars.size()-1){
+                                            //last column
+                                            pred_csv << dual_str;
+                                        }else{
+                                            pred_csv << dual_str+",";
+                                        }
+                                    }
                                     success_ws_knn_opt_plan.push_back(1); iter_ws_knn_opt_plan.push_back(plan_tar.iterations); cpu_ws_knn_opt_plan.push_back(plan_tar.cpu_time); cost_ws_knn_opt_plan.push_back(plan_tar.error_value); diff_ws_knn_opt_plan.push_back(diff_knn_opt_norm_plan);
                                     success_ws_knn_opt_bounce.push_back(1); iter_ws_knn_opt_bounce.push_back(bounce_ws.iterations); cpu_ws_knn_opt_bounce.push_back(bounce_ws.cpu_time); cost_ws_knn_opt_bounce.push_back(bounce_ws.error_value); diff_ws_knn_opt_bounce.push_back(diff_b_knn_opt_norm);
                                 }else{
@@ -12485,7 +12825,37 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                                 }
                             }else{
                                 if(mov_type==1 || mov_type==5){ // move movement
-                                    pred_csv << ",0,nan,nan,nan,nan,0,nan,nan,nan,nan";
+                                    pred_csv << ",0,nan,nan,nan,nan,nan,nan,";
+                                    for(int h=0;h<this->x_plan.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->zL_plan.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->zU_plan.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->dual_plan.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    pred_csv << "0,nan,nan,nan,nan,nan,nan,";
+                                    for(int h=0;h<this->x_bounce.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->zL_bounce.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->zU_bounce.size();++h){
+                                        pred_csv << "nan,";
+                                    }
+                                    for(size_t h=0;h<this->dual_bounce.size();++h){
+                                        if(h == this->dual_bounce.size()-1){
+                                            //last column
+                                            pred_csv << "nan";
+                                        }else{
+                                            pred_csv << "nan,";
+                                        }
+                                    }
                                     success_ws_knn_opt_plan.push_back(0);
                                     success_ws_knn_opt_bounce.push_back(0);
                                 }else{
@@ -12501,7 +12871,37 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                             }
                         }else{
                             if(mov_type==1 || mov_type==5){ // move movement
-                                pred_csv << ",0,nan,nan,nan,nan,0,nan,nan,nan,nan";
+                                pred_csv << ",0,nan,nan,nan,nan,nan,nan,";
+                                for(int h=0;h<this->x_plan.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->zL_plan.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->zU_plan.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->dual_plan.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                pred_csv << "0,nan,nan,nan,nan,nan,nan,";
+                                for(int h=0;h<this->x_bounce.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->zL_bounce.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->zU_bounce.size();++h){
+                                    pred_csv << "nan,";
+                                }
+                                for(size_t h=0;h<this->dual_bounce.size();++h){
+                                    if(h == this->dual_bounce.size()-1){
+                                        //last column
+                                        pred_csv << "nan";
+                                    }else{
+                                        pred_csv << "nan,";
+                                    }
+                                }
                                 success_ws_knn_eucl_plan.push_back(0);
                                 success_ws_knn_eucl_bounce.push_back(0);
                             }else{
@@ -12525,7 +12925,7 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                 break;
             }
 
-            // ----------------------- diplay the results ----------------------------------- //
+            // ----------------------- display the results ----------------------------------- //
             std::unordered_map<int,int> m; int n1;
 
             // ----------------- plan stage ------------------------ //
@@ -12622,6 +13022,7 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                 this->ui.label_cpu_median_ws_knn_eucl_plan_value->setText(QString::number(cpu_ws_knn_eucl_plan_median));
                 double cpu_ws_knn_eucl_plan_max= *std::max_element(cpu_ws_knn_eucl_plan.begin(),cpu_ws_knn_eucl_plan.end());
                 this->ui.label_cpu_max_ws_knn_eucl_plan_value->setText(QString::number(cpu_ws_knn_eucl_plan_max));
+                if(!en_forget){this->untrained_cpu_times.push_back(cpu_ws_knn_eucl_plan_median);}
                 // cost value
                 double cost_ws_knn_eucl_plan_mean = accumulate( cost_ws_knn_eucl_plan.begin(), cost_ws_knn_eucl_plan.end(), 0.0)/cost_ws_knn_eucl_plan.size();
                 this->ui.label_cost_mean_ws_knn_eucl_plan_value->setText(QString::number(cost_ws_knn_eucl_plan_mean));
@@ -12632,6 +13033,7 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                 this->ui.label_cost_median_ws_knn_eucl_plan_value->setText(QString::number(cost_ws_knn_eucl_plan_median));
                 double cost_ws_knn_eucl_plan_max= *std::max_element(cost_ws_knn_eucl_plan.begin(),cost_ws_knn_eucl_plan.end());
                 this->ui.label_cost_max_ws_knn_eucl_plan_value->setText(QString::number(cost_ws_knn_eucl_plan_max));
+                if(!en_forget){this->untrained_median_costs.push_back(cost_ws_knn_eucl_plan_median);}
                 // difference initialization/solution
                 double diff_ws_knn_eucl_plan_mean = accumulate(diff_ws_knn_eucl_plan.begin(),diff_ws_knn_eucl_plan.end(), 0.0)/diff_ws_knn_eucl_plan.size();
                 this->ui.label_diff_mean_ws_knn_eucl_plan_value->setText(QString::number(diff_ws_knn_eucl_plan_mean));
@@ -12688,6 +13090,7 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                 this->ui.label_cpu_median_ws_knn_opt_plan_value->setText(QString::number(cpu_ws_knn_opt_plan_median));
                 double cpu_ws_knn_opt_plan_max= *std::max_element(cpu_ws_knn_opt_plan.begin(),cpu_ws_knn_opt_plan.end());
                 this->ui.label_cpu_max_ws_knn_opt_plan_value->setText(QString::number(cpu_ws_knn_opt_plan_max));
+                if(!en_forget){this->trained_cpu_times.push_back(cpu_ws_knn_opt_plan_median);}
                 // cost value
                 double cost_ws_knn_opt_plan_mean = accumulate( cost_ws_knn_opt_plan.begin(), cost_ws_knn_opt_plan.end(), 0.0)/cost_ws_knn_opt_plan.size();
                 this->ui.label_cost_mean_ws_knn_opt_plan_value->setText(QString::number(cost_ws_knn_opt_plan_mean));
@@ -12698,6 +13101,7 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                 this->ui.label_cost_median_ws_knn_opt_plan_value->setText(QString::number(cost_ws_knn_opt_plan_median));
                 double cost_ws_knn_opt_plan_max= *std::max_element(cost_ws_knn_opt_plan.begin(),cost_ws_knn_opt_plan.end());
                 this->ui.label_cost_max_ws_knn_opt_plan_value->setText(QString::number(cost_ws_knn_opt_plan_max));
+                if(!en_forget){this->trained_median_costs.push_back(cost_ws_knn_opt_plan_median);}
                 // difference initialization/solution
                 double diff_ws_knn_opt_plan_mean = accumulate(diff_ws_knn_opt_plan.begin(),diff_ws_knn_opt_plan.end(), 0.0)/diff_ws_knn_opt_plan.size();
                 this->ui.label_diff_mean_ws_knn_opt_plan_value->setText(QString::number(diff_ws_knn_opt_plan_mean));
@@ -12728,6 +13132,15 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                 this->ui.label_diff_max_ws_knn_opt_plan_value->setText(QString("nan"));
             }
 
+            //string warm_data_path = this->ui.lineEdit_warm_data->text().toStdString();
+            //std::vector<std::map<std::string,double>> csv_warm_data; std::vector<std::string> warm_headers;
+            //readCSVData(warm_data_path,warm_headers,csv_warm_data);
+            //string cold_data_path = this->ui.lineEdit_cold_data->text().toStdString();
+            //std::vector<std::map<std::string,double>> csv_cold_data; std::vector<std::string> cold_headers;
+            //readCSVData(cold_data_path,cold_headers,csv_cold_data);
+            //this->n_D_vect.push_back(csv_cold_data.size());
+
+
         }catch (const std::string message){qnode.log(QNode::Error,std::string("Plan failure: ")+message);
         }catch(const std::exception exc){qnode.log(QNode::Error,std::string("Plan failure: ")+exc.what());}
 
@@ -12738,28 +13151,394 @@ void MainWindow::on_pushButton_pred_plan_clicked()
 
             double tau = this->ui.lineEdit_tau_forget->text().toDouble();
             double th = this->ui.lineEdit_th_forget->text().toDouble();
-            int m = this->ui.lineEdit_m_forget->text().toInt();
+            //double beta = this->ui.lineEdit_beta_forget->text().toDouble();
 
+            //string cold_data_updated_path = pred_dir+string("/cold_dataset_updated.csv"); // for testing only
             //string warm_data_updated_path = pred_dir+string("/warm_dataset_updated.csv"); // for testing only
-            string warm_data_updated_path = data_dir+string("/warm_dataset.csv"); // correct one
+            string cold_data_updated_path = data_dir+string("/cold_dataset.csv"); // correct one
+            //string warm_data_updated_path = data_dir+string("/warm_dataset.csv"); // correct one
 
             string pred_data_path = pred_dir+string("/")+filename_csv;
             // read the csv file of the predicted data
             std::vector<std::map<std::string,double>> csv_pred_data; std::vector<std::string> pred_headers;
             readCSVData(pred_data_path,pred_headers,csv_pred_data);
-            string warm_data_path = this->ui.lineEdit_warm_data->text().toStdString();
-            // read the csv file of the warm started data
-            std::vector<std::map<std::string,double>> csv_warm_data; std::vector<std::string> warm_headers;
-            readCSVData(warm_data_path,warm_headers,csv_warm_data);
             string cold_data_path = this->ui.lineEdit_cold_data->text().toStdString();
             // read the csv file of the cold started data
             std::vector<std::map<std::string,double>> csv_cold_data; std::vector<std::string> cold_headers;
             readCSVData(cold_data_path,cold_headers,csv_cold_data);
             int n_D = csv_cold_data.size();
+            //int mm_cold = static_cast<int>(beta * n_D);
+            //int max_iter_plan = 20; int max_iter_bounce = 5;
+            this->n_D_vect.clear(); this->predicted_samples.clear();
+            this->untrained_losses.clear(); this->trained_losses.clear();
+            bool en_auto_train = ui.checkBox_enable_auto_train->isChecked();
+            //int n_pred_th_min = 20; int n_pred_th_max = 80;
+
+            //update the cold dataset
+            for(size_t i=0; i < csv_pred_data.size(); ++i){
+                // loop over situations of the predicted data
+                std::map<std::string,double> pred_data_line = csv_pred_data.at(i);
+                if (pred_data_line["Success_f_ws_knn_opt"] == 1){
+                /**
+                    std::vector<double> pred_vec;
+                    pred_vec.push_back(pred_data_line["elbow_x_mm"]);
+                    pred_vec.push_back(pred_data_line["elbow_y_mm"]);
+                    pred_vec.push_back(pred_data_line["elbow_z_mm"]);
+                    pred_vec.push_back(pred_data_line["wrist_x_mm"]);
+                    pred_vec.push_back(pred_data_line["wrist_y_mm"]);
+                    pred_vec.push_back(pred_data_line["wrist_z_mm"]);
+                    pred_vec.push_back(pred_data_line["hand_x_mm"]);
+                    pred_vec.push_back(pred_data_line["hand_y_mm"]);
+                    pred_vec.push_back(pred_data_line["hand_z_mm"]);
+                    pred_vec.push_back(pred_data_line["thumb_1_x_mm"]);
+                    pred_vec.push_back(pred_data_line["thumb_1_y_mm"]);
+                    pred_vec.push_back(pred_data_line["thumb_1_z_mm"]);
+                    pred_vec.push_back(pred_data_line["thumb_2_x_mm"]);
+                    pred_vec.push_back(pred_data_line["thumb_2_y_mm"]);
+                    pred_vec.push_back(pred_data_line["thumb_2_z_mm"]);
+                    pred_vec.push_back(pred_data_line["thumb_tip_x_mm"]);
+                    pred_vec.push_back(pred_data_line["thumb_tip_y_mm"]);
+                    pred_vec.push_back(pred_data_line["thumb_tip_z_mm"]);
+                    pred_vec.push_back(pred_data_line["index_1_x_mm"]);
+                    pred_vec.push_back(pred_data_line["index_1_y_mm"]);
+                    pred_vec.push_back(pred_data_line["index_1_z_mm"]);
+                    pred_vec.push_back(pred_data_line["index_2_x_mm"]);
+                    pred_vec.push_back(pred_data_line["index_2_y_mm"]);
+                    pred_vec.push_back(pred_data_line["index_2_z_mm"]);
+                    pred_vec.push_back(pred_data_line["index_tip_x_mm"]);
+                    pred_vec.push_back(pred_data_line["index_tip_y_mm"]);
+                    pred_vec.push_back(pred_data_line["index_tip_z_mm"]);
+                    pred_vec.push_back(pred_data_line["middle_1_x_mm"]);
+                    pred_vec.push_back(pred_data_line["middle_1_y_mm"]);
+                    pred_vec.push_back(pred_data_line["middle_1_z_mm"]);
+                    pred_vec.push_back(pred_data_line["middle_2_x_mm"]);
+                    pred_vec.push_back(pred_data_line["middle_2_y_mm"]);
+                    pred_vec.push_back(pred_data_line["middle_2_z_mm"]);
+                    pred_vec.push_back(pred_data_line["middle_tip_x_mm"]);
+                    pred_vec.push_back(pred_data_line["middle_tip_y_mm"]);
+                    pred_vec.push_back(pred_data_line["middle_tip_z_mm"]);
+                    pred_vec.push_back(pred_data_line["target_x_mm"]);
+                    pred_vec.push_back(pred_data_line["target_y_mm"]);
+                    pred_vec.push_back(pred_data_line["target_z_mm"]);
+                    pred_vec.push_back(pred_data_line["target_roll_rad"]);
+                    pred_vec.push_back(pred_data_line["target_pitch_rad"]);
+                    pred_vec.push_back(pred_data_line["target_yaw_rad"]);
+                    for(size_t b=0;b < obsts.size();++b){
+                        pred_vec.push_back(pred_data_line["obstacle_"+to_string(b+1)+"_x_mm"]);
+                        pred_vec.push_back(pred_data_line["obstacle_"+to_string(b+1)+"_y_mm"]);
+                        pred_vec.push_back(pred_data_line["obstacle_"+to_string(b+1)+"_z_mm"]);
+                        pred_vec.push_back(pred_data_line["obstacle_"+to_string(b+1)+"_roll_rad"]);
+                        pred_vec.push_back(pred_data_line["obstacle_"+to_string(b+1)+"_pitch_rad"]);
+                        pred_vec.push_back(pred_data_line["obstacle_"+to_string(b+1)+"_yaw_rad"]);
+
+                    }
+                    **/
+                    /**
+                    std::vector< std::pair<double,int> > dist2_vec;
+                    std::vector<double> weights_forget;
+                    for(int j=0; j < csv_cold_data.size(); ++j){
+                        std::map<std::string,double> cold_data_line = csv_cold_data.at(j);
+                        weights_forget.push_back(cold_data_line["w_forget"]);
+                        std::vector<double> cold_vec;
+                        cold_vec.push_back(cold_data_line["elbow_x_mm"]);
+                        cold_vec.push_back(cold_data_line["elbow_y_mm"]);
+                        cold_vec.push_back(cold_data_line["elbow_z_mm"]);
+                        cold_vec.push_back(cold_data_line["wrist_x_mm"]);
+                        cold_vec.push_back(cold_data_line["wrist_y_mm"]);
+                        cold_vec.push_back(cold_data_line["wrist_z_mm"]);
+                        cold_vec.push_back(cold_data_line["hand_x_mm"]);
+                        cold_vec.push_back(cold_data_line["hand_y_mm"]);
+                        cold_vec.push_back(cold_data_line["hand_z_mm"]);
+                        cold_vec.push_back(cold_data_line["thumb_1_x_mm"]);
+                        cold_vec.push_back(cold_data_line["thumb_1_y_mm"]);
+                        cold_vec.push_back(cold_data_line["thumb_1_z_mm"]);
+                        cold_vec.push_back(cold_data_line["thumb_2_x_mm"]);
+                        cold_vec.push_back(cold_data_line["thumb_2_y_mm"]);
+                        cold_vec.push_back(cold_data_line["thumb_2_z_mm"]);
+                        cold_vec.push_back(cold_data_line["thumb_tip_x_mm"]);
+                        cold_vec.push_back(cold_data_line["thumb_tip_y_mm"]);
+                        cold_vec.push_back(cold_data_line["thumb_tip_z_mm"]);
+                        cold_vec.push_back(cold_data_line["index_1_x_mm"]);
+                        cold_vec.push_back(cold_data_line["index_1_y_mm"]);
+                        cold_vec.push_back(cold_data_line["index_1_z_mm"]);
+                        cold_vec.push_back(cold_data_line["index_2_x_mm"]);
+                        cold_vec.push_back(cold_data_line["index_2_y_mm"]);
+                        cold_vec.push_back(cold_data_line["index_2_z_mm"]);
+                        cold_vec.push_back(cold_data_line["index_tip_x_mm"]);
+                        cold_vec.push_back(cold_data_line["index_tip_y_mm"]);
+                        cold_vec.push_back(cold_data_line["index_tip_z_mm"]);
+                        cold_vec.push_back(cold_data_line["middle_1_x_mm"]);
+                        cold_vec.push_back(cold_data_line["middle_1_y_mm"]);
+                        cold_vec.push_back(cold_data_line["middle_1_z_mm"]);
+                        cold_vec.push_back(cold_data_line["middle_2_x_mm"]);
+                        cold_vec.push_back(cold_data_line["middle_2_y_mm"]);
+                        cold_vec.push_back(cold_data_line["middle_2_z_mm"]);
+                        cold_vec.push_back(cold_data_line["middle_tip_x_mm"]);
+                        cold_vec.push_back(cold_data_line["middle_tip_y_mm"]);
+                        cold_vec.push_back(cold_data_line["middle_tip_z_mm"]);
+                        cold_vec.push_back(cold_data_line["target_x_mm"]);
+                        cold_vec.push_back(cold_data_line["target_y_mm"]);
+                        cold_vec.push_back(cold_data_line["target_z_mm"]);
+                        cold_vec.push_back(cold_data_line["target_roll_rad"]);
+                        cold_vec.push_back(cold_data_line["target_pitch_rad"]);
+                        cold_vec.push_back(cold_data_line["target_yaw_rad"]);
+                        for(size_t b=0;b < obsts.size();++b){
+                            cold_vec.push_back(cold_data_line["obstacle_"+to_string(b+1)+"_x_mm"]);
+                            cold_vec.push_back(cold_data_line["obstacle_"+to_string(b+1)+"_y_mm"]);
+                            cold_vec.push_back(cold_data_line["obstacle_"+to_string(b+1)+"_z_mm"]);
+                            cold_vec.push_back(cold_data_line["obstacle_"+to_string(b+1)+"_roll_rad"]);
+                            cold_vec.push_back(cold_data_line["obstacle_"+to_string(b+1)+"_pitch_rad"]);
+                            cold_vec.push_back(cold_data_line["obstacle_"+to_string(b+1)+"_yaw_rad"]);
+
+                        }
+                        std::vector<double> diff_vec(pred_vec.size(),0.0); std::vector<double> diff2_vec(pred_vec.size(),0.0);
+                        std::transform(pred_vec.begin(), pred_vec.end(), cold_vec.begin(), diff_vec.begin(), [](double d1,double d2) { return (d1-d2); });
+                        std::transform(diff_vec.begin(), diff_vec.end(), diff2_vec.begin(), [](double d) { return std::pow(d, 2); });
+                        double dist2 = std::accumulate(diff2_vec.begin(),diff2_vec.end(),0.0);
+                        dist2_vec.push_back(std::make_pair(dist2,j));
+                    } // for loop cold-started data
+
+                    if(mm_cold!=0){
+                        // update the weights
+                        std::sort(dist2_vec.begin(), dist2_vec.end()); // sort by distance in ascending order
+                        std::vector< std::pair<double,int> > dist2_near(dist2_vec.begin(),dist2_vec.begin()+mm_cold); // distances of the nearest m samples
+                        double dist2_m = dist2_near.back().first;
+                        for(size_t d=0;d < dist2_near.size();++d){
+                            double dist2_k = dist2_near.at(d).first;
+                            double gamma_k = tau + (1 - tau) * (dist2_k/dist2_m);
+                            int kk = dist2_near.at(d).second;
+                            weights_forget.at(kk) = gamma_k * weights_forget.at(kk);
+                        }
+                        for(size_t w=0;w < weights_forget.size();++w){
+                            csv_cold_data.at(w)["w_forget"] = weights_forget.at(w);
+                        }
+
+                        // delete samples with weights values less than the given threshold
+                        std::vector<int> idj;
+                        for(int j=0; j < csv_cold_data.size(); ++j){
+                            std::map<std::string,double> cold_data_line = csv_cold_data.at(j);
+                            if(cold_data_line["w_forget"] < th){
+                                idj.push_back(j);
+                            }
+                        }
+                        int k = 0;
+                        for(size_t jj=0; jj < idj.size(); ++jj){
+                            csv_cold_data.erase(csv_cold_data.begin() + (idj.at(jj)-k));
+                            k++;
+                        }
+
+                    }
+                    **/
+
+                    // update the weights
+                    for(size_t w=0;w < csv_cold_data.size();++w){
+                        csv_cold_data.at(w)["w_forget"] = tau * csv_cold_data.at(w)["w_forget"];
+                    }
+                    // delete samples with weights values less than the given threshold
+                    std::vector<int> idj;
+                    for(int j=0; j < csv_cold_data.size(); ++j){
+                        std::map<std::string,double> cold_data_line = csv_cold_data.at(j);
+                        if(cold_data_line["w_forget"] < th){
+                            idj.push_back(j);
+                        }
+                    }
+                    int k = 0;
+                    for(size_t jj=0; jj < idj.size(); ++jj){
+                        csv_cold_data.erase(csv_cold_data.begin() + (idj.at(jj)-k));
+                        k++;
+                    }
+
+                    // add the new experimented samples with weight=1
+                    std::map<std::string,double> cold_data_line_add;
+                    cold_data_line_add.insert({"w_forget",1.0});
+                    // robot configuration
+                    // elbow
+                    cold_data_line_add.insert({"elbow_x_mm",pred_data_line["elbow_x_mm"]});
+                    cold_data_line_add.insert({"elbow_y_mm",pred_data_line["elbow_y_mm"]});
+                    cold_data_line_add.insert({"elbow_z_mm",pred_data_line["elbow_z_mm"]});
+                    // wrist
+                    cold_data_line_add.insert({"wrist_x_mm",pred_data_line["wrist_x_mm"]});
+                    cold_data_line_add.insert({"wrist_y_mm",pred_data_line["wrist_y_mm"]});
+                    cold_data_line_add.insert({"wrist_z_mm",pred_data_line["wrist_z_mm"]});
+                    // hand
+                    cold_data_line_add.insert({"hand_x_mm",pred_data_line["hand_x_mm"]});
+                    cold_data_line_add.insert({"hand_y_mm",pred_data_line["hand_y_mm"]});
+                    cold_data_line_add.insert({"hand_z_mm",pred_data_line["hand_z_mm"]});
+                    // thumb
+                    cold_data_line_add.insert({"thumb_1_x_mm",pred_data_line["thumb_1_x_mm"]});
+                    cold_data_line_add.insert({"thumb_1_y_mm",pred_data_line["thumb_1_y_mm"]});
+                    cold_data_line_add.insert({"thumb_1_z_mm",pred_data_line["thumb_1_z_mm"]});
+                    cold_data_line_add.insert({"thumb_2_x_mm",pred_data_line["thumb_2_x_mm"]});
+                    cold_data_line_add.insert({"thumb_2_y_mm",pred_data_line["thumb_2_y_mm"]});
+                    cold_data_line_add.insert({"thumb_2_z_mm",pred_data_line["thumb_2_z_mm"]});
+                    cold_data_line_add.insert({"thumb_tip_x_mm",pred_data_line["thumb_tip_x_mm"]});
+                    cold_data_line_add.insert({"thumb_tip_y_mm",pred_data_line["thumb_tip_y_mm"]});
+                    cold_data_line_add.insert({"thumb_tip_z_mm",pred_data_line["thumb_tip_z_mm"]});
+                    // index
+                    cold_data_line_add.insert({"index_1_x_mm",pred_data_line["index_1_x_mm"]});
+                    cold_data_line_add.insert({"index_1_y_mm",pred_data_line["index_1_y_mm"]});
+                    cold_data_line_add.insert({"index_1_z_mm",pred_data_line["index_1_z_mm"]});
+                    cold_data_line_add.insert({"index_2_x_mm",pred_data_line["index_2_x_mm"]});
+                    cold_data_line_add.insert({"index_2_y_mm",pred_data_line["index_2_y_mm"]});
+                    cold_data_line_add.insert({"index_2_z_mm",pred_data_line["index_2_z_mm"]});
+                    cold_data_line_add.insert({"index_tip_x_mm",pred_data_line["index_tip_x_mm"]});
+                    cold_data_line_add.insert({"index_tip_y_mm",pred_data_line["index_tip_y_mm"]});
+                    cold_data_line_add.insert({"index_tip_z_mm",pred_data_line["index_tip_z_mm"]});
+                    // middle
+                    cold_data_line_add.insert({"middle_1_x_mm",pred_data_line["middle_1_x_mm"]});
+                    cold_data_line_add.insert({"middle_1_y_mm",pred_data_line["middle_1_y_mm"]});
+                    cold_data_line_add.insert({"middle_1_z_mm",pred_data_line["middle_1_z_mm"]});
+                    cold_data_line_add.insert({"middle_2_x_mm",pred_data_line["middle_2_x_mm"]});
+                    cold_data_line_add.insert({"middle_2_y_mm",pred_data_line["middle_2_y_mm"]});
+                    cold_data_line_add.insert({"middle_2_z_mm",pred_data_line["middle_2_z_mm"]});
+                    cold_data_line_add.insert({"middle_tip_x_mm",pred_data_line["middle_tip_x_mm"]});
+                    cold_data_line_add.insert({"middle_tip_y_mm",pred_data_line["middle_tip_y_mm"]});
+                    cold_data_line_add.insert({"middle_tip_z_mm",pred_data_line["middle_tip_z_mm"]});
+                    // target
+                    cold_data_line_add.insert({"target_x_mm",pred_data_line["target_x_mm"]});
+                    cold_data_line_add.insert({"target_y_mm",pred_data_line["target_y_mm"]});
+                    cold_data_line_add.insert({"target_z_mm",pred_data_line["target_z_mm"]});
+                    cold_data_line_add.insert({"target_roll_rad",pred_data_line["target_roll_rad"]});
+                    cold_data_line_add.insert({"target_pitch_rad",pred_data_line["target_pitch_rad"]});
+                    cold_data_line_add.insert({"target_yaw_rad",pred_data_line["target_yaw_rad"]});
+                    // obstacles
+                    for(size_t b=0;b < obsts.size();++b){
+                        cold_data_line_add.insert({"obstacle_"+to_string(b+1)+"_x_mm",pred_data_line["obstacle_"+to_string(b+1)+"_x_mm"]});
+                        cold_data_line_add.insert({"obstacle_"+to_string(b+1)+"_y_mm",pred_data_line["obstacle_"+to_string(b+1)+"_y_mm"]});
+                        cold_data_line_add.insert({"obstacle_"+to_string(b+1)+"_z_mm",pred_data_line["obstacle_"+to_string(b+1)+"_z_mm"]});
+                        cold_data_line_add.insert({"obstacle_"+to_string(b+1)+"_roll_rad",pred_data_line["obstacle_"+to_string(b+1)+"_roll_rad"]});
+                        cold_data_line_add.insert({"obstacle_"+to_string(b+1)+"_pitch_rad",pred_data_line["obstacle_"+to_string(b+1)+"_pitch_rad"]});
+                        cold_data_line_add.insert({"obstacle_"+to_string(b+1)+"_yaw_rad",pred_data_line["obstacle_"+to_string(b+1)+"_yaw_rad"]});
+                    }
+                    // final posture solution
+                    cold_data_line_add.insert({"cpu_time_plan",pred_data_line["Cpu_time_f_plan_ws_knn_opt"]});
+                    cold_data_line_add.insert({"iterations_plan",pred_data_line["Iterations_f_plan_ws_knn_opt"]});
+                    cold_data_line_add.insert({"obj_plan",pred_data_line["Obj_f_plan_knn_opt"]});
+                    cold_data_line_add.insert({"error_plan",pred_data_line["Cost_f_plan_ws_knn_opt"]});
+                    cold_data_line_add.insert({"mean_der_error_plan",pred_data_line["Der_Cost_f_plan_ws_knn_opt"]});
+                    for(size_t ix=0;ix < this->x_plan.size();++ix){
+                        cold_data_line_add.insert({"xf_plan_"+to_string(ix+1)+"_rad",pred_data_line["xf_plan_"+to_string(ix+1)+"_knn_opt_rad"]});
+                    }
+                    for(size_t ix=0;ix< this->zL_plan.size();++ix){
+                        cold_data_line_add.insert({"zf_L_plan_"+to_string(ix+1),pred_data_line["zf_L_plan_"+to_string(ix+1)+"_knn_opt"]});
+                    }
+                    for(size_t ix=0;ix< this->zU_plan.size();++ix){
+                        cold_data_line_add.insert({"zf_U_plan_"+to_string(ix+1),pred_data_line["zf_U_plan_"+to_string(ix+1)+"_knn_opt"]});
+                    }
+                    for(size_t ix=0;ix<this->dual_plan.size();++ix){
+                        cold_data_line_add.insert({"dual_f_plan_"+to_string(ix),pred_data_line["dual_f_plan_"+to_string(ix)+"_knn_opt"]});
+                    }
+                    // bounce posture solution
+                    cold_data_line_add.insert({"cpu_time_bounce",pred_data_line["Cpu_time_bounce_ws_knn_opt"]});
+                    cold_data_line_add.insert({"iterations_bounce",pred_data_line["Iterations_bounce_ws_knn_opt"]});
+                    cold_data_line_add.insert({"obj_bounce",pred_data_line["Obj_bounce_knn_opt"]});
+                    cold_data_line_add.insert({"error_bounce",pred_data_line["Cost_bounce_ws_knn_opt"]});
+                    cold_data_line_add.insert({"mean_der_error_bounce",pred_data_line["Der_Cost_bounce_ws_knn_opt"]});
+                    for(size_t ix=0;ix < this->x_bounce.size();++ix){
+                        cold_data_line_add.insert({"x_bounce_"+to_string(ix+1)+"_rad",pred_data_line["x_bounce_"+to_string(ix+1)+"_knn_opt_rad"]});
+                    }
+                    for(size_t ix=0;ix< this->zL_bounce.size();++ix){
+                        cold_data_line_add.insert({"zb_L_"+to_string(ix+1),pred_data_line["zb_L_"+to_string(ix+1)+"_knn_opt"]});
+                    }
+                    for(size_t ix=0;ix< this->zU_plan.size();++ix){
+                        cold_data_line_add.insert({"zb_U_"+to_string(ix+1),pred_data_line["zb_U_"+to_string(ix+1)+"_knn_opt"]});
+                    }
+                    for(size_t ix=0;ix<this->dual_bounce.size();++ix){
+                        cold_data_line_add.insert({"dual_bounce_"+to_string(ix),pred_data_line["dual_bounce_"+to_string(ix)+"_knn_opt"]});
+                    }
+                    csv_cold_data.push_back(cold_data_line_add);
+                }// if success
+                n_D = csv_cold_data.size();
+                //mm_cold = static_cast<int>(beta * n_D);
+
+                // check the loss and update the graphs
+                int rem = i % 10;
+                if (rem == 0){
+                    qnode.log(QNode::Info,std::string("Updating sample: ")+to_string(i));
+                    // write down the updated cold-started dataset
+                    ofstream cold_data_updated_csv;
+                    cold_data_updated_csv.open(cold_data_updated_path);
+                    for(size_t h=0;h < cold_headers.size();++h){
+                        if(h == (cold_headers.size()-1)){
+                            cold_data_updated_csv << cold_headers.at(h) + string("\n");
+                        }else{
+                            cold_data_updated_csv << cold_headers.at(h) + string(",");
+                        }
+                    }
+                    for(size_t j=0; j < csv_cold_data.size(); ++j){
+                        std::map<std::string,double> cold_data_line = csv_cold_data.at(j);
+                        for(size_t h=0;h < cold_headers.size();++h){
+                            string cold_data_d_str =  boost::str(boost::format("%.15f") % (cold_data_line[cold_headers.at(h)]));
+                            boost::replace_all(cold_data_d_str,",",".");
+                            if(h == (cold_headers.size()-1)){
+                                cold_data_updated_csv << cold_data_d_str + string("\n");
+                            }else{
+                                cold_data_updated_csv << cold_data_d_str + string(",");
+                            }
+                        }
+                    }
+                    cold_data_updated_csv.close();
+
+                    // update the initial warm dataset with the new cold data
+                    n_D = csv_cold_data.size();
+                    this->ui.label_n_D_value->setText(QString::number(n_D));
+                    this->on_pushButton_plan_collect_warm_data_pressed();
+                    this->on_pushButton_plan_collect_warm_data_clicked();
+
+                    this->predicted_samples.push_back(i+1);
+                    this->n_D_vect.push_back(n_D);
+                    if(en_auto_train){
+                        this->on_pushButton_train_pressed();
+                        this->on_pushButton_train_clicked();
+                    }else{
+                        this->on_pushButton_check_loss_pressed();
+                        this->on_pushButton_check_loss_clicked();
+                    }
+                }
+
+            }// for loop update the cold dataset
+
+            /**
+            // write down the updated cold-started dataset
+            ofstream cold_data_updated_csv;
+            cold_data_updated_csv.open(cold_data_updated_path);
+            for(size_t h=0;h < cold_headers.size();++h){
+                if(h == (cold_headers.size()-1)){
+                    cold_data_updated_csv << cold_headers.at(h) + string("\n");
+                }else{
+                    cold_data_updated_csv << cold_headers.at(h) + string(",");
+                }
+            }
+            for(size_t j=0; j < csv_cold_data.size(); ++j){
+                std::map<std::string,double> cold_data_line = csv_cold_data.at(j);
+                for(size_t h=0;h < cold_headers.size();++h){
+                    string cold_data_d_str =  boost::str(boost::format("%.15f") % (cold_data_line[cold_headers.at(h)]));
+                    boost::replace_all(cold_data_d_str,",",".");
+                    if(h == (cold_headers.size()-1)){
+                        cold_data_updated_csv << cold_data_d_str + string("\n");
+                    }else{
+                        cold_data_updated_csv << cold_data_d_str + string(",");
+                    }
+                }
+            }
+            cold_data_updated_csv.close();
+
+            // update the initial warm dataset with the new cold data
+            n_D = csv_cold_data.size();
+            this->ui.label_n_D_value->setText(QString::number(n_D));
+            this->on_pushButton_plan_collect_warm_data_pressed();
+            this->on_pushButton_plan_collect_warm_data_clicked();
+            **/
+
+            /**
+            // read the csv file of the warm started data
+            string warm_data_path = this->ui.lineEdit_warm_data->text().toStdString();
+            std::vector<std::map<std::string,double>> csv_warm_data; std::vector<std::string> warm_headers;
+            readCSVData(warm_data_path,warm_headers,csv_warm_data);
             int n_Dx = static_cast<int>(csv_warm_data.size()/n_D);
-            int max_iter_plan = 20; int max_iter_bounce = 5;
+            int mm = static_cast<int>(beta * n_Dx);
 
-
+            // update the warm dataset
             for(size_t i=0; i < csv_pred_data.size(); ++i){
                 // loop over situations of the predicted data
                 std::map<std::string,double> pred_data_line = csv_pred_data.at(i);
@@ -12815,6 +13594,8 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                     pred_vec.push_back(pred_data_line["obstacle_"+to_string(b+1)+"_yaw_rad"]);
 
                 }
+                **/
+                /**
                 std::vector< std::pair<double,int> > dist2_vec;
                 std::vector<double> weights_forget;
                 for(int j=0; j < n_Dx; ++j){
@@ -12880,108 +13661,130 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                     dist2_vec.push_back(std::make_pair(dist2,j));
                 } // loop warm started data
 
-                std::sort(dist2_vec.begin(), dist2_vec.end()); // sort by distance in ascending order
-                std::vector< std::pair<double,int> > dist2_near(dist2_vec.begin(),dist2_vec.begin()+m); // distances of the nearest m samples
-                double dist2_m = dist2_near.back().first;
-                for(size_t d=0;d < dist2_near.size();++d){
-                    double dist2_k = dist2_near.at(d).first;
-                    double gamma_k = tau + (1 - tau) * (dist2_k/dist2_m);
-                    int kk = dist2_near.at(d).second;
-                    weights_forget.at(kk) = gamma_k * weights_forget.at(kk);
+                if(mm!=0){
+                    // update the weights
+                    std::sort(dist2_vec.begin(), dist2_vec.end()); // sort by distance in ascending order
+                    std::vector< std::pair<double,int> > dist2_near(dist2_vec.begin(),dist2_vec.begin()+mm); // distances of the nearest m samples
+                    double dist2_m = dist2_near.back().first;
+                    for(size_t d=0;d < dist2_near.size();++d){
+                        double dist2_k = dist2_near.at(d).first;
+                        double gamma_k = tau + (1 - tau) * (dist2_k/dist2_m);
+                        int kk = dist2_near.at(d).second;
+                        weights_forget.at(kk) = gamma_k * weights_forget.at(kk);
+                    }
+                    for(size_t w=0;w < weights_forget.size();++w){
+                        std::vector< std::map< std::string,double > >csv_warm_data_n_D(csv_warm_data.begin()+(w*n_D),csv_warm_data.begin()+(w*n_D)+n_D);
+                        for(int ww=0;ww < n_D;++ww){
+                            csv_warm_data_n_D.at(ww)["w_forget"] = weights_forget.at(w);
+                        }
+                        std::copy_n(csv_warm_data_n_D.begin(), n_D, csv_warm_data.begin()+(w*n_D));
+                    }
+
+                    // delete samples with weights values less than the given threshold
+                    std::vector<int> idj;
+                    for(int j=0; j < n_Dx; ++j){
+                        std::map<std::string,double> warm_data_line = csv_warm_data.at(j*n_D);
+                        if(warm_data_line["w_forget"] < th){
+                            idj.push_back(j);
+                        }
+                    }
+                    int k = 0;
+                    for(size_t jj=0; jj < idj.size(); ++jj){
+                        csv_warm_data.erase(csv_warm_data.begin() + ((idj.at(jj)-k)*n_D), csv_warm_data.begin() + ((idj.at(jj)-k)*n_D)+n_D);
+                        k++;
+                    }
                 }
-                for(size_t w=0;w < weights_forget.size();++w){
+                **/
+                /**
+                // update the weights
+                for(size_t w=0;w < n_Dx;++w){
                     std::vector< std::map< std::string,double > >csv_warm_data_n_D(csv_warm_data.begin()+(w*n_D),csv_warm_data.begin()+(w*n_D)+n_D);
                     for(int ww=0;ww < n_D;++ww){
-                        csv_warm_data_n_D.at(ww)["w_forget"] = weights_forget.at(w);
+                        csv_warm_data_n_D.at(ww)["w_forget"] = tau * csv_warm_data_n_D.at(ww)["w_forget"];
                     }
                     std::copy_n(csv_warm_data_n_D.begin(), n_D, csv_warm_data.begin()+(w*n_D));
                 }
-            } // loop predicted data
-
-            // delete samples with weights values less than the given threshold
-            std::vector<int> idj;
-            for(int j=0; j < n_Dx; ++j){
-                std::map<std::string,double> warm_data_line = csv_warm_data.at(j*n_D);
-                if(warm_data_line["w_forget"] < th){
-                    idj.push_back(j);
+                // delete samples with weights values less than the given threshold
+                std::vector<int> idj;
+                for(int j=0; j < n_Dx; ++j){
+                    std::map<std::string,double> warm_data_line = csv_warm_data.at(j*n_D);
+                    if(warm_data_line["w_forget"] < th){
+                        idj.push_back(j);
+                    }
                 }
-            }
-            int k = 0;
-            for(size_t jj=0; jj < idj.size(); ++jj){
-                csv_warm_data.erase(csv_warm_data.begin() + ((idj.at(jj)-k)*n_D), csv_warm_data.begin() + ((idj.at(jj)-k)*n_D)+n_D);
-                k++;
-            }
+                int k = 0;
+                for(size_t jj=0; jj < idj.size(); ++jj){
+                    csv_warm_data.erase(csv_warm_data.begin() + ((idj.at(jj)-k)*n_D), csv_warm_data.begin() + ((idj.at(jj)-k)*n_D)+n_D);
+                    k++;
+                }
 
+                // add the new experimented samples with weight=1
+                // tuning
+                mTolHumpdlg->setInfo(prob->getInfoLine());
+                // --- Tolerances for the final posture selection ---- //
+                tols.tolTarPos = mTolHumpdlg->getTolTarPos(); // target position tolerances
+                tols.tolTarOr = mTolHumpdlg->getTolTarOr(); // target orientation tolerances
+                mTolHumpdlg->getTolsArm(tols.tolsArm);// tolerances of the arm : radius in [mm]
+                mTolHumpdlg->getTolsHand(tols.tolsHand);// tolerances of the hand: radius in [mm]
+                tols.target_avoidance = mTolHumpdlg->getTargetAvoidance();// target avoidance
+                tols.obstacle_avoidance = mTolHumpdlg->getObstacleAvoidance(); //obstacle avoidance
+                mTolHumpdlg->getLambda(tols.lambda_final); // joint expense factors
+                mTolHumpdlg->getLambda(tols.lambda_bounce); // joint expense factors
+                // --- Tolerances for the bounce posture selection ---- //
+                tols.w_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getWMax()*M_PI/180)); // max joint velocity
+                tols.alpha_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getAlphaMax()*M_PI/180)); // max joint acceleration
+                mTolHumpdlg->getInitVel(tols.bounds.vel_0); // initial velocity
+                mTolHumpdlg->getFinalVel(tols.bounds.vel_f); // final velocity
+                mTolHumpdlg->getInitAcc(tols.bounds.acc_0); // initial acceleration
+                mTolHumpdlg->getFinalAcc(tols.bounds.acc_f); // final acceleration
+                // tolerances for the obstacles
+                mTolHumpdlg->getTolsObstacles(tols.final_tolsObstacles); // final posture tols
+                tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
+                tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1));
+                mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(0));
+                mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(1));
+                // tolerances for the target
+                tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
+                tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+                tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
+                mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
+                tols.singleArm_tolsTarget.at(1) = tols.singleArm_tolsTarget.at(0)/100;
+                tols.singleArm_tolsTarget.at(2) = 0*tols.singleArm_tolsTarget.at(0);
+                //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
+                //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
+                // pick / place settings
+                tols.mov_specs.approach = mTolHumpdlg->getApproach();
+                tols.mov_specs.retreat = mTolHumpdlg->getRetreat();
+                mTolHumpdlg->getPreGraspApproach(tols.mov_specs.pre_grasp_approach); // pick approach
+                mTolHumpdlg->getPostGraspRetreat(tols.mov_specs.post_grasp_retreat); // pick retreat
+                mTolHumpdlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
+                mTolHumpdlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
+                tols.mov_specs.rand_init = mTolHumpdlg->getRandInit(); // random initialization for "plan" stages
+                tols.mov_specs.coll = mTolHumpdlg->getColl(); // collisions option
+                tols.coll_body = mTolHumpdlg->getCollBody(); // collisions with the body
+                tols.mov_specs.straight_line = mTolHumpdlg->get_straight_line(); // hand straight line trajectory
+                tols.mov_specs.w_red_app_max = mTolHumpdlg->getW_red_app(); // set the max velocity reduction when approaching
+                tols.mov_specs.w_red_ret_max = mTolHumpdlg->getW_red_ret(); // set the max velocity reduction when retreating
+                // move settings
+                mTolHumpdlg->getTargetMove(move_target);
+                move_target_mod.resize(move_target.size());
+                mTolHumpdlg->getFinalHand(move_final_hand);
+                mTolHumpdlg->getFinalArm(move_final_arm);
+                use_final = mTolHumpdlg->get_use_final_posture();
+                prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
+                tols.mov_specs.use_move_plane = mTolHumpdlg->get_add_plane();
+                mTolHumpdlg->getPlaneParameters(tols.mov_specs.plane_params);
+                // maximum iterations option
+                tols.set_max_iter_plan = true;
+                tols.max_iter_plan = max_iter_plan;
+                //tols.set_max_iter_app = mTolHumpdlg->getMaxIterAppOption();
+                //tols.max_iter_app = mTolHumpdlg->getMaxIterApp();
+                //tols.set_max_iter_ret = mTolHumpdlg->getMaxIterRetOption();
+                //tols.max_iter_ret = mTolHumpdlg->getMaxIterRet();
+                tols.set_max_iter_bounce = true;
+                tols.max_iter_bounce = max_iter_bounce;
 
-            // add the new experimented samples with weight=1
-            // tuning
-            mTolHumpdlg->setInfo(prob->getInfoLine());
-            // --- Tolerances for the final posture selection ---- //
-            tols.tolTarPos = mTolHumpdlg->getTolTarPos(); // target position tolerances
-            tols.tolTarOr = mTolHumpdlg->getTolTarOr(); // target orientation tolerances
-            mTolHumpdlg->getTolsArm(tols.tolsArm);// tolerances of the arm : radius in [mm]
-            mTolHumpdlg->getTolsHand(tols.tolsHand);// tolerances of the hand: radius in [mm]
-            tols.target_avoidance = mTolHumpdlg->getTargetAvoidance();// target avoidance
-            tols.obstacle_avoidance = mTolHumpdlg->getObstacleAvoidance(); //obstacle avoidance
-            mTolHumpdlg->getLambda(tols.lambda_final); // joint expense factors
-            mTolHumpdlg->getLambda(tols.lambda_bounce); // joint expense factors
-            // --- Tolerances for the bounce posture selection ---- //
-            tols.w_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getWMax()*M_PI/180)); // max joint velocity
-            tols.alpha_max = std::vector<double>(tols.lambda_final.size(),(mTolHumpdlg->getAlphaMax()*M_PI/180)); // max joint acceleration
-            mTolHumpdlg->getInitVel(tols.bounds.vel_0); // initial velocity
-            mTolHumpdlg->getFinalVel(tols.bounds.vel_f); // final velocity
-            mTolHumpdlg->getInitAcc(tols.bounds.acc_0); // initial acceleration
-            mTolHumpdlg->getFinalAcc(tols.bounds.acc_f); // final acceleration
-            // tolerances for the obstacles
-            mTolHumpdlg->getTolsObstacles(tols.final_tolsObstacles); // final posture tols
-            tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
-            tols.singleArm_tolsObstacles.push_back(MatrixXd::Constant(3,6,1));
-            mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(0));
-            mTolHumpdlg->getTolsObstacles(tols.singleArm_tolsObstacles.at(1));
-            // tolerances for the target
-            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1)); // bounce posture tols
-            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
-            tols.singleArm_tolsTarget.push_back(MatrixXd::Constant(3,6,1));
-            mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(0));
-            tols.singleArm_tolsTarget.at(1) = tols.singleArm_tolsTarget.at(0)/100;
-            tols.singleArm_tolsTarget.at(2) = 0*tols.singleArm_tolsTarget.at(0);
-            //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(1));
-            //mTolHumpdlg->getTolsTarget(tols.singleArm_tolsTarget.at(2));
-            // pick / place settings
-            tols.mov_specs.approach = mTolHumpdlg->getApproach();
-            tols.mov_specs.retreat = mTolHumpdlg->getRetreat();
-            mTolHumpdlg->getPreGraspApproach(tols.mov_specs.pre_grasp_approach); // pick approach
-            mTolHumpdlg->getPostGraspRetreat(tols.mov_specs.post_grasp_retreat); // pick retreat
-            mTolHumpdlg->getPrePlaceApproach(tols.mov_specs.pre_place_approach); // place approach
-            mTolHumpdlg->getPostPlaceRetreat(tols.mov_specs.post_place_retreat); // place retreat
-            tols.mov_specs.rand_init = mTolHumpdlg->getRandInit(); // random initialization for "plan" stages
-            tols.mov_specs.coll = mTolHumpdlg->getColl(); // collisions option
-            tols.coll_body = mTolHumpdlg->getCollBody(); // collisions with the body
-            tols.mov_specs.straight_line = mTolHumpdlg->get_straight_line(); // hand straight line trajectory
-            tols.mov_specs.w_red_app_max = mTolHumpdlg->getW_red_app(); // set the max velocity reduction when approaching
-            tols.mov_specs.w_red_ret_max = mTolHumpdlg->getW_red_ret(); // set the max velocity reduction when retreating
-            // move settings
-            mTolHumpdlg->getTargetMove(move_target);
-            move_target_mod.resize(move_target.size());
-            mTolHumpdlg->getFinalHand(move_final_hand);
-            mTolHumpdlg->getFinalArm(move_final_arm);
-            use_final = mTolHumpdlg->get_use_final_posture();
-            prob->setMoveSettings(move_target,move_final_hand,move_final_arm,use_final);
-            tols.mov_specs.use_move_plane = mTolHumpdlg->get_add_plane();
-            mTolHumpdlg->getPlaneParameters(tols.mov_specs.plane_params);
-            // maximum iterations option
-            tols.set_max_iter_plan = true;
-            tols.max_iter_plan = max_iter_plan;
-            //tols.set_max_iter_app = mTolHumpdlg->getMaxIterAppOption();
-            //tols.max_iter_app = mTolHumpdlg->getMaxIterApp();
-            //tols.set_max_iter_ret = mTolHumpdlg->getMaxIterRetOption();
-            //tols.max_iter_ret = mTolHumpdlg->getMaxIterRet();
-            tols.set_max_iter_bounce = true;
-            tols.max_iter_bounce = max_iter_bounce;
-
-            for(size_t i=0; i < csv_pred_data.size(); ++i){
                 // loop over situations of the predicted data
-                std::map<std::string,double> pred_data_line = csv_pred_data.at(i);
                 std::vector<double> r_posture = std::vector<double>(JOINTS_ARM+JOINTS_HAND);
                 for(int r=0; r < (JOINTS_ARM+JOINTS_HAND); ++r){
                     r_posture.at(r) = pred_data_line["joint_"+to_string(r+1)];
@@ -13283,14 +14086,54 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                     }while(!solved);
                     csv_warm_data.push_back(warm_data_line_add);
                 }// for loop on cold started data
-            }//loop append new samples
 
+                // check the loss and update the graphs
+                int rem = i % 10;
+                if (rem == 0){
+                    qnode.log(QNode::Info,std::string("Updating sample: ")+to_string(i));
+                    // write down the updated warm-started dataset
+                    ofstream warm_data_updated_csv;
+                    warm_data_updated_csv.open(warm_data_updated_path);
+                    for(size_t h=0;h < warm_headers.size();++h){
+                        if(h == (warm_headers.size()-1)){
+                            warm_data_updated_csv << warm_headers.at(h) + string("\n");
+                        }else{
+                            warm_data_updated_csv << warm_headers.at(h) + string(",");
+                        }
+                    }
+                    for(size_t j=0; j < csv_warm_data.size(); ++j){
+                        std::map<std::string,double> warm_data_line = csv_warm_data.at(j);
+                        for(size_t h=0;h < warm_headers.size();++h){
+                            string warm_data_d_str =  boost::str(boost::format("%.15f") % (warm_data_line[warm_headers.at(h)]));
+                            boost::replace_all(warm_data_d_str,",",".");
+                            if(h == (warm_headers.size()-1)){
+                                warm_data_updated_csv << warm_data_d_str + string("\n");
+                            }else{
+                                warm_data_updated_csv << warm_data_d_str + string(",");
+                            }
+                        }
+                    }
+                    warm_data_updated_csv.close();
+
+                    this->predicted_samples.push_back(i+1);
+                    this->n_Dx_vect.push_back(n_Dx);
+                    if(en_auto_train){
+                        this->on_pushButton_train_pressed();
+                        this->on_pushButton_train_clicked();
+                    }else{
+                        this->on_pushButton_check_loss_pressed();
+                        this->on_pushButton_check_loss_clicked();
+                    }
+                }
+                n_Dx = static_cast<int>(csv_warm_data.size()/n_D);
+                mm = static_cast<int>(beta * n_Dx);
+
+            } // loop predicted data
+
+            /**
             // get the updated number of training samples
             int n_Dx_updated = static_cast<int>(csv_warm_data.size()/n_D);
             this->ui.label_n_Dx_value->setText(QString::number(n_Dx_updated));
-            n_Dx_vect.push_back(n_Dx_updated);
-            predicted_samples.push_back(n_pred);
-
 
             // write down the updated warm-started dataset
             ofstream warm_data_updated_csv;
@@ -13315,6 +14158,49 @@ void MainWindow::on_pushButton_pred_plan_clicked()
                 }
             }
             warm_data_updated_csv.close();
+            **/
+
+            // write down the updated cold-started dataset
+            ofstream cold_data_updated_csv;
+            cold_data_updated_csv.open(cold_data_updated_path);
+            for(size_t h=0;h < cold_headers.size();++h){
+                if(h == (cold_headers.size()-1)){
+                    cold_data_updated_csv << cold_headers.at(h) + string("\n");
+                }else{
+                    cold_data_updated_csv << cold_headers.at(h) + string(",");
+                }
+            }
+            for(size_t j=0; j < csv_cold_data.size(); ++j){
+                std::map<std::string,double> cold_data_line = csv_cold_data.at(j);
+                for(size_t h=0;h < cold_headers.size();++h){
+                    string cold_data_d_str =  boost::str(boost::format("%.15f") % (cold_data_line[cold_headers.at(h)]));
+                    boost::replace_all(cold_data_d_str,",",".");
+                    if(h == (cold_headers.size()-1)){
+                        cold_data_updated_csv << cold_data_d_str + string("\n");
+                    }else{
+                        cold_data_updated_csv << cold_data_d_str + string(",");
+                    }
+                }
+            }
+            cold_data_updated_csv.close();
+
+            // update the initial warm dataset with the new cold data
+            n_D = csv_cold_data.size();
+            this->ui.label_n_D_value->setText(QString::number(n_D));
+            this->on_pushButton_plan_collect_warm_data_pressed();
+            this->on_pushButton_plan_collect_warm_data_clicked();
+
+            this->predicted_samples.push_back(csv_pred_data.size());
+            this->n_D_vect.push_back(n_D);
+            if(en_auto_train){
+                this->on_pushButton_train_pressed();
+                this->on_pushButton_train_clicked();
+            }else{
+                this->on_pushButton_check_loss_pressed();
+                this->on_pushButton_check_loss_clicked();
+            }
+
+
             qnode.log(QNode::Info,std::string("Forgetting ended."));
         } // forget
 
@@ -13743,19 +14629,329 @@ void MainWindow::on_pushButton_save_learning_res_clicked()
 
 }
 
-void MainWindow::on_pushButton_save_sample_sizes_clicked()
+
+void MainWindow::on_pushButton_plot_learn_res_clicked()
+{
+    // plot the losses
+    if(!this->predicted_samples.empty()){
+        std::vector<double> n_D_vect_d(this->predicted_samples.begin(), this->predicted_samples.end());
+        QVector<double> qn_D_vect = QVector<double>::fromStdVector(n_D_vect_d);
+        QVector<double> quntrained_losses = QVector<double>::fromStdVector(this->untrained_losses);
+        QVector<double> qtrained_losses = QVector<double>::fromStdVector(this->trained_losses);
+        ui.plot_loss_learn->plotLayout()->clear();
+        ui.plot_loss_learn->clearGraphs();
+        ui.plot_loss_learn->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_loss_learn);
+        wideAxisRect->setupFullAxesBox(true);
+        wideAxisRect->addAxis(QCPAxis::atLeft)->setTickLabelColor(QColor(Qt::red));
+        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_loss_learn);
+        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+        // move newly created axes on "axes" layer and grids on "grid" layer:
+        for (QCPAxisRect *rect : ui.plot_loss_learn->axisRects())
+        {
+          for (QCPAxis *axis : rect->axes())
+          {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+          }
+        }
+        QString title("Loss values");
+        ui.plot_loss_learn->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_loss_learn,title));
+        ui.plot_loss_learn->plotLayout()->addElement(1, 0, wideAxisRect);
+
+        // untrained loss
+        ui.plot_loss_learn->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+        ui.plot_loss_learn->graph(0)->setPen(QPen(Qt::blue));
+        ui.plot_loss_learn->graph(0)->setName("Untrained loss value");
+        ui.plot_loss_learn->graph(0)->valueAxis()->setTickLabelColor(Qt::blue);
+        ui.plot_loss_learn->graph(0)->keyAxis()->setLabel("Samples");
+        ui.plot_loss_learn->graph(0)->setData(qn_D_vect, quntrained_losses);
+        ui.plot_loss_learn->graph(0)->valueAxis()->setRange(*std::min_element(quntrained_losses.begin(), quntrained_losses.end()),
+                                                          *std::max_element(quntrained_losses.begin(), quntrained_losses.end()));
+        ui.plot_loss_learn->graph(0)->rescaleAxes();
+
+        // trained loss
+        ui.plot_loss_learn->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft,1));
+        ui.plot_loss_learn->graph(1)->setPen(QPen(Qt::red));
+        ui.plot_loss_learn->graph(1)->setName("Trained loss value");
+        ui.plot_loss_learn->graph(1)->valueAxis()->setTickLabelColor(Qt::red);
+        ui.plot_loss_learn->graph(1)->keyAxis()->setLabel("Samples");
+        ui.plot_loss_learn->graph(1)->setData(qn_D_vect, qtrained_losses);
+        ui.plot_loss_learn->graph(1)->valueAxis()->setRange(*std::min_element(qtrained_losses.begin(), qtrained_losses.end()),
+                                                          *std::max_element(qtrained_losses.begin(), qtrained_losses.end()));
+        ui.plot_loss_learn->graph(1)->rescaleAxes();
+
+        // legend
+        QCPLegend *legend = new QCPLegend();
+        QCPLayoutGrid *subLayout = new QCPLayoutGrid;
+        ui.plot_loss_learn->plotLayout()->addElement(2, 0, subLayout);
+        subLayout->setMargins(QMargins(5, 0, 5, 5));
+        subLayout->addElement(0, 0, legend);
+        // set legend's row stretch factor very small so it ends up with minimum height:
+        ui.plot_loss_learn->plotLayout()->setRowStretchFactor(2, 0.001);
+        legend->setLayer("legend");
+        QFont legendFont = font();  // start out with MainWindow's font..
+        legendFont.setPointSize(9); // and make a bit smaller for legend
+        legend->setFont(legendFont);
+        legend->addElement(0,0,new QCPPlottableLegendItem(legend,ui.plot_loss_learn->graph(0)));
+        legend->addElement(0,1,new QCPPlottableLegendItem(legend,ui.plot_loss_learn->graph(1)));
+
+        //interactions
+        connect(ui.plot_loss_learn->graph(0)->valueAxis(), SIGNAL(rangeChanged(QCPRange)), ui.plot_loss_learn->graph(1)->valueAxis(), SLOT(setRange(QCPRange)));
+        ui.plot_loss_learn->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        ui.plot_loss_learn->replot();
+    }else{
+        ui.plot_loss_learn->plotLayout()->clear();
+        ui.plot_loss_learn->clearGraphs();
+    }
+
+    // plot the median costs
+    if(!this->predicted_samples.empty()){
+        std::vector<double> n_D_vect_d(this->predicted_samples.begin(), this->predicted_samples.end());
+        QVector<double> qn_D_vect = QVector<double>::fromStdVector(n_D_vect_d);
+        QVector<double> quntrained_costs = QVector<double>::fromStdVector(this->untrained_median_costs);
+        QVector<double> qtrained_costs = QVector<double>::fromStdVector(this->trained_median_costs);
+        ui.plot_cost_learn->plotLayout()->clear();
+        ui.plot_cost_learn->clearGraphs();
+        ui.plot_cost_learn->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_cost_learn);
+        wideAxisRect->setupFullAxesBox(true);
+        wideAxisRect->addAxis(QCPAxis::atLeft)->setTickLabelColor(QColor(Qt::red));
+        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_cost_learn);
+        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+        // move newly created axes on "axes" layer and grids on "grid" layer:
+        for (QCPAxisRect *rect : ui.plot_cost_learn->axisRects())
+        {
+          for (QCPAxis *axis : rect->axes())
+          {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+          }
+        }
+        QString title("Median cost values");
+        ui.plot_cost_learn->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_cost_learn,title));
+        ui.plot_cost_learn->plotLayout()->addElement(1, 0, wideAxisRect);
+
+        // untrained median costs
+        ui.plot_cost_learn->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+        ui.plot_cost_learn->graph(0)->setPen(QPen(Qt::blue));
+        ui.plot_cost_learn->graph(0)->setName("Untrained median cost");
+        ui.plot_cost_learn->graph(0)->valueAxis()->setTickLabelColor(Qt::blue);
+        ui.plot_cost_learn->graph(0)->keyAxis()->setLabel("Samples");
+        ui.plot_cost_learn->graph(0)->setData(qn_D_vect, quntrained_costs);
+        ui.plot_cost_learn->graph(0)->valueAxis()->setRange(*std::min_element(quntrained_costs.begin(), quntrained_costs.end()),
+                                                          *std::max_element(quntrained_costs.begin(), quntrained_costs.end()));
+        ui.plot_cost_learn->graph(0)->rescaleAxes();
+
+        // trained median costs
+        ui.plot_cost_learn->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft,1));
+        ui.plot_cost_learn->graph(1)->setPen(QPen(Qt::red));
+        ui.plot_cost_learn->graph(1)->setName("Trained median cost");
+        ui.plot_cost_learn->graph(1)->valueAxis()->setTickLabelColor(Qt::red);
+        ui.plot_cost_learn->graph(1)->keyAxis()->setLabel("Samples");
+        ui.plot_cost_learn->graph(1)->setData(qn_D_vect, qtrained_costs);
+        ui.plot_cost_learn->graph(1)->valueAxis()->setRange(*std::min_element(qtrained_costs.begin(), qtrained_costs.end()),
+                                                          *std::max_element(qtrained_costs.begin(), qtrained_costs.end()));
+        ui.plot_cost_learn->graph(1)->rescaleAxes();
+
+        // legend
+        QCPLegend *legend = new QCPLegend();
+        QCPLayoutGrid *subLayout = new QCPLayoutGrid;
+        ui.plot_cost_learn->plotLayout()->addElement(2, 0, subLayout);
+        subLayout->setMargins(QMargins(5, 0, 5, 5));
+        subLayout->addElement(0, 0, legend);
+        // set legend's row stretch factor very small so it ends up with minimum height:
+        ui.plot_cost_learn->plotLayout()->setRowStretchFactor(2, 0.001);
+        legend->setLayer("legend");
+        QFont legendFont = font();  // start out with MainWindow's font..
+        legendFont.setPointSize(9); // and make a bit smaller for legend
+        legend->setFont(legendFont);
+        legend->addElement(0,0,new QCPPlottableLegendItem(legend,ui.plot_cost_learn->graph(0)));
+        legend->addElement(0,1,new QCPPlottableLegendItem(legend,ui.plot_cost_learn->graph(1)));
+
+        //interactions
+        connect(ui.plot_cost_learn->graph(0)->valueAxis(), SIGNAL(rangeChanged(QCPRange)), ui.plot_cost_learn->graph(1)->valueAxis(), SLOT(setRange(QCPRange)));
+        ui.plot_cost_learn->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        ui.plot_cost_learn->replot();
+    }else{
+        ui.plot_cost_learn->plotLayout()->clear();
+        ui.plot_cost_learn->clearGraphs();
+    }
+
+    // plot the median cpu times
+    if(!this->predicted_samples.empty()){
+        std::vector<double> n_D_vect_d(this->predicted_samples.begin(), this->predicted_samples.end());
+        QVector<double> qn_D_vect = QVector<double>::fromStdVector(n_D_vect_d);
+        QVector<double> quntrained_cpu_times = QVector<double>::fromStdVector(this->untrained_cpu_times);
+        QVector<double> qtrained_cpu_times = QVector<double>::fromStdVector(this->trained_cpu_times);
+        ui.plot_cpu_time_learn->plotLayout()->clear();
+        ui.plot_cpu_time_learn->clearGraphs();
+        ui.plot_cpu_time_learn->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_cpu_time_learn);
+        wideAxisRect->setupFullAxesBox(true);
+        wideAxisRect->addAxis(QCPAxis::atLeft)->setTickLabelColor(QColor(Qt::red));
+        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_cpu_time_learn);
+        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+        // move newly created axes on "axes" layer and grids on "grid" layer:
+        for (QCPAxisRect *rect : ui.plot_cpu_time_learn->axisRects())
+        {
+          for (QCPAxis *axis : rect->axes())
+          {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+          }
+        }
+        QString title("Median cpu time values");
+        ui.plot_cpu_time_learn->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_cpu_time_learn,title));
+        ui.plot_cpu_time_learn->plotLayout()->addElement(1, 0, wideAxisRect);
+
+        // untrained median cpu time values
+        ui.plot_cpu_time_learn->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+        ui.plot_cpu_time_learn->graph(0)->setPen(QPen(Qt::blue));
+        ui.plot_cpu_time_learn->graph(0)->setName("Untrained median cpu times");
+        ui.plot_cpu_time_learn->graph(0)->valueAxis()->setTickLabelColor(Qt::blue);
+        ui.plot_cpu_time_learn->graph(0)->keyAxis()->setLabel("Samples");
+        ui.plot_cpu_time_learn->graph(0)->setData(qn_D_vect, quntrained_cpu_times);
+        ui.plot_cpu_time_learn->graph(0)->valueAxis()->setRange(*std::min_element(quntrained_cpu_times.begin(), quntrained_cpu_times.end()),
+                                                          *std::max_element(quntrained_cpu_times.begin(), quntrained_cpu_times.end()));
+        ui.plot_cpu_time_learn->graph(0)->rescaleAxes();
+
+        // trained median cpu time values
+        ui.plot_cpu_time_learn->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft,1));
+        ui.plot_cpu_time_learn->graph(1)->setPen(QPen(Qt::red));
+        ui.plot_cpu_time_learn->graph(1)->setName("Trained median cpu times");
+        ui.plot_cpu_time_learn->graph(1)->valueAxis()->setTickLabelColor(Qt::red);
+        ui.plot_cpu_time_learn->graph(1)->keyAxis()->setLabel("Samples");
+        ui.plot_cpu_time_learn->graph(1)->setData(qn_D_vect, qtrained_cpu_times);
+        ui.plot_cpu_time_learn->graph(1)->valueAxis()->setRange(*std::min_element(qtrained_cpu_times.begin(), qtrained_cpu_times.end()),
+                                                          *std::max_element(qtrained_cpu_times.begin(), qtrained_cpu_times.end()));
+        ui.plot_cpu_time_learn->graph(1)->rescaleAxes();
+
+        // legend
+        QCPLegend *legend = new QCPLegend();
+        QCPLayoutGrid *subLayout = new QCPLayoutGrid;
+        ui.plot_cpu_time_learn->plotLayout()->addElement(2, 0, subLayout);
+        subLayout->setMargins(QMargins(5, 0, 5, 5));
+        subLayout->addElement(0, 0, legend);
+        // set legend's row stretch factor very small so it ends up with minimum height:
+        ui.plot_cpu_time_learn->plotLayout()->setRowStretchFactor(2, 0.001);
+        legend->setLayer("legend");
+        QFont legendFont = font();  // start out with MainWindow's font..
+        legendFont.setPointSize(9); // and make a bit smaller for legend
+        legend->setFont(legendFont);
+        legend->addElement(0,0,new QCPPlottableLegendItem(legend,ui.plot_cpu_time_learn->graph(0)));
+        legend->addElement(0,1,new QCPPlottableLegendItem(legend,ui.plot_cpu_time_learn->graph(1)));
+
+        //interactions
+        connect(ui.plot_cpu_time_learn->graph(0)->valueAxis(), SIGNAL(rangeChanged(QCPRange)), ui.plot_cpu_time_learn->graph(1)->valueAxis(), SLOT(setRange(QCPRange)));
+        ui.plot_cpu_time_learn->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        ui.plot_cpu_time_learn->replot();
+    }else{
+        ui.plot_cpu_time_learn->plotLayout()->clear();
+        ui.plot_cpu_time_learn->clearGraphs();
+    }
+
+    // plot the dataset size
+    if(!this->n_D_vect.empty()){
+        std::vector<double> n_D_vect_d(this->n_D_vect.begin(), this->n_D_vect.end());
+        std::vector<double> predicted_samples_d(this->predicted_samples.begin(), this->predicted_samples.end());
+        QVector<double> qn_D_vect = QVector<double>::fromStdVector(n_D_vect_d);
+        QVector<double> qpredicted_samples = QVector<double>::fromStdVector(predicted_samples_d);
+        ui.plot_dataset_size_learn->plotLayout()->clear();
+        ui.plot_dataset_size_learn->clearGraphs();
+        ui.plot_dataset_size_learn->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_dataset_size_learn);
+        wideAxisRect->setupFullAxesBox(true);
+        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_dataset_size_learn);
+        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+        // move newly created axes on "axes" layer and grids on "grid" layer:
+        for (QCPAxisRect *rect : ui.plot_dataset_size_learn->axisRects())
+        {
+          for (QCPAxis *axis : rect->axes())
+          {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+          }
+        }
+        QString title("Dataset size");
+        ui.plot_dataset_size_learn->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_dataset_size_learn,title));
+        ui.plot_dataset_size_learn->plotLayout()->addElement(1, 0, wideAxisRect);
+
+        ui.plot_dataset_size_learn->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+        ui.plot_dataset_size_learn->graph(0)->setPen(QPen(Qt::blue));
+        ui.plot_dataset_size_learn->graph(0)->setName(title);
+        ui.plot_dataset_size_learn->graph(0)->valueAxis()->setLabel("Cold-started dataset size");
+        ui.plot_dataset_size_learn->graph(0)->keyAxis()->setLabel("Samples");
+        ui.plot_dataset_size_learn->graph(0)->setData(qpredicted_samples, qn_D_vect);
+        ui.plot_dataset_size_learn->graph(0)->valueAxis()->setRange(*std::min_element(qn_D_vect.begin(), qn_D_vect.end()),
+                                                          *std::max_element(qn_D_vect.begin(), qn_D_vect.end()));
+        ui.plot_dataset_size_learn->graph(0)->rescaleAxes();
+        ui.plot_dataset_size_learn->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        ui.plot_dataset_size_learn->replot();
+    }else{
+        ui.plot_dataset_size_learn->plotLayout()->clear();
+        ui.plot_dataset_size_learn->clearGraphs();
+    }
+}
+
+void MainWindow::on_pushButton_save_plot_learn_clicked()
 {
     string pred_dir = this->ui.lineEdit_predictions->text().toStdString();
-    string filename("sample_sizes.csv");
-    ofstream sample_csv;
-    sample_csv.open(pred_dir+string("/")+filename);
-    sample_csv << "samples,training set size\n";
-    for(size_t i=0; i <this->n_Dx_vect.size();++i){
-        sample_csv << to_string(this->predicted_samples.at(i))+string(",")+to_string(n_Dx_vect.at(i))+string("\n");
-    }
-    sample_csv.close();
-    qnode.log(QNode::Info,std::string("Results of learning saved at ")+pred_dir+std::string("/")+filename);
 
+    // losses
+    if(!this->untrained_losses.empty()){
+        ui.plot_loss_learn->savePdf(QString(pred_dir.c_str())+QString("/losses.pdf"),true,0,0,QString(),QString("Loss values"));
+        string filename_loss("losses.csv");
+        ofstream losses_csv;
+        losses_csv.open(pred_dir+string("/")+filename_loss);
+        losses_csv << "samples,untrained loss,trained loss\n";
+        for(size_t i=0; i < this->predicted_samples.size();++i){
+            losses_csv << to_string(this->predicted_samples.at(i))+string(",")+to_string(this->untrained_losses.at(i))+string(",")+to_string(this->trained_losses.at(i))+string("\n");
+        }
+        losses_csv.close();
+    }
+
+    // median costs
+    if(!this->untrained_median_costs.empty()){
+        ui.plot_cost_learn->savePdf(QString(pred_dir.c_str())+QString("/costs.pdf"),true,0,0,QString(),QString("Median cost values"));
+        string filename_cost("costs.csv");
+        ofstream costs_csv;
+        costs_csv.open(pred_dir+string("/")+filename_cost);
+        costs_csv << "samples,untrained median cost,trained median cost\n";
+        for(size_t i=0; i < this->untrained_median_costs.size();++i){
+            costs_csv << to_string(this->predicted_samples.at(i))+string(",")+to_string(this->untrained_median_costs.at(i))+string(",")+to_string(this->trained_median_costs.at(i))+string("\n");
+        }
+        costs_csv.close();
+    }
+
+    // median cpu times
+    if(!this->untrained_cpu_times.empty()){
+        ui.plot_cpu_time_learn->savePdf(QString(pred_dir.c_str())+QString("/cpu_times.pdf"),true,0,0,QString(),QString("Median cpu time values"));
+        string filename_cpu_times("cpu_times.csv");
+        ofstream cpu_times_csv;
+        cpu_times_csv.open(pred_dir+string("/")+filename_cpu_times);
+        cpu_times_csv << "samples,untrained median cpu times,trained median cpu times\n";
+        for(size_t i=0; i < this->untrained_cpu_times.size();++i){
+            cpu_times_csv << to_string(this->predicted_samples.at(i))+string(",")+to_string(this->untrained_cpu_times.at(i))+string(",")+to_string(this->trained_cpu_times.at(i))+string("\n");
+        }
+        cpu_times_csv.close();
+    }
+
+    // dataset size
+    if(!this->n_D_vect.empty()){
+        ui.plot_dataset_size_learn->savePdf(QString(pred_dir.c_str())+QString("/dataset_size.pdf"),true,0,0,QString(),QString("Dataset size"));
+        string filename_size("sample_sizes.csv");
+        ofstream sample_csv;
+        sample_csv.open(pred_dir+string("/")+filename_size);
+        sample_csv << "samples,training set size\n";
+        for(size_t i=0; i < this->n_D_vect.size();++i){
+            sample_csv << to_string(this->predicted_samples.at(i))+string(",")+to_string(this->n_D_vect.at(i))+string("\n");
+        }
+        sample_csv.close();
+    }
+
+
+    qnode.log(QNode::Info,std::string("Results of learning saved at ")+pred_dir);
 
 }
 
@@ -14909,28 +16105,39 @@ void MainWindow::check_obsts_yaw_var(int state)
     }
 }
 
+void MainWindow::check_arm_pos_var(int state)
+{
+    this->ui.lineEdit_arm_pos_var->setEnabled(state!=0);
+}
+
+void MainWindow::check_hand_pos_var(int state)
+{
+    this->ui.lineEdit_hand_pos_var->setEnabled(state!=0);
+}
+
 void MainWindow::check_enable_forget(int state)
 {
-    this->ui.label_warm_data->setEnabled(state!=0);
-    this->ui.lineEdit_warm_data->setEnabled(state!=0);
-    this->ui.pushButton_warm_data->setEnabled(state!=0);
+    //this->ui.label_warm_data->setEnabled(state!=0);
+    //this->ui.lineEdit_warm_data->setEnabled(state!=0);
+    //this->ui.pushButton_warm_data->setEnabled(state!=0);
     this->ui.label_tau_forget->setEnabled(state!=0);
     this->ui.lineEdit_tau_forget->setEnabled(state!=0);
     this->ui.label_th_forget->setEnabled(state!=0);
     this->ui.lineEdit_th_forget->setEnabled(state!=0);
-    this->ui.label_m_forget->setEnabled(state!=0);
-    this->ui.lineEdit_m_forget->setEnabled(state!=0);
+    //this->ui.label_beta_forget->setEnabled(state!=0);
+    //this->ui.lineEdit_beta_forget->setEnabled(state!=0);
 }
 
 void MainWindow::check_right_hand_status(int state)
 {
-    if(state==0){
-        // unchecked
-        this->ui.groupBox_right_hand_comp->setEnabled(false);
+    this->ui.groupBox_right_hand_comp->setEnabled(state!=0);
+    if(state!=0){
+        get_right_hand_status = true;
+        display_r_hand_status_thrd = boost::thread(boost::bind(&MainWindow::display_r_hand_status, this));
     }else{
-        // checked
-        this->ui.groupBox_right_hand_comp->setEnabled(true);
+        get_right_hand_status = false;
     }
+
 }
 
 void MainWindow::check_use_vel_control(int state)
@@ -15464,7 +16671,7 @@ void MainWindow::on_pushButton_start_control_pressed()
 
 void MainWindow::on_pushButton_start_control_clicked()
 {
-
+    exec_control = true;
     if(this->ui.checkBox_use_vel_control->isChecked())
     {
         pos_control = false;
@@ -15474,6 +16681,8 @@ void MainWindow::on_pushButton_start_control_clicked()
         vel_control = false;
     }
     this->start_time_point = Clock::now();
+    execPosControl_thrd = boost::thread(boost::bind(&MainWindow::execPosControl, this));
+    execVelControl_thrd = boost::thread(boost::bind(&MainWindow::execVelControl, this));
 }
 
 void MainWindow::on_pushButton_stop_control_pressed()
@@ -15502,6 +16711,7 @@ void MainWindow::on_pushButton_stop_control_clicked()
     this->exec_command_ctrl=false;
     this->replanning_succeed=false;
     this->replanning_done=false;
+    exec_control = false;
     pos_control = false;
     vel_control = false;
     this->qnode.stopSim();

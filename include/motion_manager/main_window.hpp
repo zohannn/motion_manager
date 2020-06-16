@@ -688,9 +688,14 @@ public Q_SLOTS:
         void on_pushButton_save_learning_res_clicked();
 
         /**
-         * @brief on_pushButton_save_sample_sizes_clicked
+         * @brief on_pushButton_plot_learn_res_clicked
          */
-        void on_pushButton_save_sample_sizes_clicked();
+        void on_pushButton_plot_learn_res_clicked();
+
+        /**
+         * @brief on_pushButton_save_plot_learn_clicked
+         */
+        void on_pushButton_save_plot_learn_clicked();
 
         /**
          * @brief check_tar_x_pos_var
@@ -763,6 +768,18 @@ public Q_SLOTS:
          * @param state
          */
         void check_obsts_yaw_var(int state);
+
+        /**
+         * @brief check_arm_pos_var
+         * @param state
+         */
+        void check_arm_pos_var(int state);
+
+        /**
+         * @brief check_hand_pos_var
+         * @param state
+         */
+        void check_hand_pos_var(int state);
 
         /**
          * @brief check_enable_forget
@@ -1467,8 +1484,16 @@ private:
         vector<double> cost_ws_knn_opt_bounce; /**< cost function values with warm start from the k-nearest neighbors with the optimal kernel solution */
         vector<double> diff_ws_knn_opt_bounce; /**< difference initialization-solution with warm start from the random solution */
 
-        vector<int> n_Dx_vect; /**< variations of the number of training samples */
+        vector<int> n_D_vect; /**< D dataframe size */
         vector<int> predicted_samples; /**< number of the predictions */
+        vector<double> untrained_losses; /**< untrained losses values */
+        vector<double> trained_losses; /**< trained losses values */
+        vector<int> n_Dx_loss_vect; /**< variations of the number of training samples */
+        vector<double> untrained_median_costs; /**< untrained median costs */
+        vector<double> trained_median_costs; /**< trained median costs */
+        vector<double> untrained_cpu_times; /**< untrained cpu times */
+        vector<double> trained_cpu_times; /**< trained cpu times */
+        vector<double> n_D_pred_vect; /**< D dataframe size */
 
         // ------------------------------------- Controlling -------------------------------------- //
         boost::atomic<bool> get_right_hand_status;

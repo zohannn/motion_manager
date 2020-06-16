@@ -4,7 +4,6 @@ import pandas as pd
 import sys
 from random import randint
 # HUPL
-from HUPL.hupl import EuclideanModel
 from HUPL.hupl import VSMModel
 from HUPL.hupl import preprocess_features_cold
 from HUPL.hupl import preprocess_init_cold
@@ -37,21 +36,16 @@ inputs_dataframe_scaled,inputs_dataframe_median, inputs_dataframe_iqr = scale_ro
 inputs_dataframe_df_scaled = pd.DataFrame(data=inputs_dataframe_scaled,index=inputs_dataframe.index,columns=inputs_dataframe.columns)
 dim_cold = len(inputs_dataframe_df_scaled) # total size of the memory
 #print(inputs_dataframe_df_scaled)
-#print(init_cold_dataframe)
 #print(dim_cold)
 # --- input situation dataframe --- #
-#print(cold_dataframe.columns.values[1:(len(input_str)+1)])
-input_df = pd.DataFrame([input_str],columns = cold_dataframe.columns.values[1:(len(input_str)+1)],dtype=float)
+input_df = pd.DataFrame([input_str],columns = cold_dataframe.columns.values[0:len(input_str)],dtype=float)
 input_new_df = preprocess_features_cold(input_df)
 #print(input_new_df)
 input_new_df_scaled = input_new_df.copy()
 for col in input_new_df.columns:
     median = inputs_dataframe_median[col]
     iqr = inputs_dataframe_iqr[col]
-    if(iqr<=1e-30):
-        input_new_df_scaled[col] = ((float(input_new_df[col]) - median))
-    else:
-        input_new_df_scaled[col] = ((float(input_new_df[col]) - median) / iqr)
+    input_new_df_scaled[col] = ((float(input_new_df[col]) - median) / iqr)
 #print(input_new_df_scaled)
 #sys.exit("OK")
 #D_prime_dataset_df_clipped = pd.read_csv(data_dir+"/D_prime_clipped.csv",sep=",")
@@ -68,11 +62,12 @@ str = line_r[0].strip()
 r_list = str.split(":")
 r_value = float(r_list[1])
 file_r.close()
-#print(r_value)
-#sys.exit("OK")
 
-eucl_model = EuclideanModel(n_D=dim_cold)
-vsm_model = VSMModel(n_D=dim_cold, weights_init=w_values, r_init=r_value)
+w_init = np.ones(len(w_values))
+r_init = 0.6
+
+vsm_model_unfit = VSMModel(n_D=dim_cold, weights_init=w_init, r_init=r_init)
+vsm_model_opt = VSMModel(n_D=dim_cold, weights_init=w_values, r_init=r_value)
 
 
 # --- predicting --- #
@@ -82,9 +77,8 @@ qi_b_pred_rdm = init_b_cold_dataframe.iloc[r,:]
 x_new = input_new_df_scaled.iloc[0,:]
 #print(qi_pred_rdm)
 #print(x_new)
-#sys.exit("OK")
-qi_pred_unfit = eucl_model.predict_init(x_new, inputs_dataframe_df_scaled, init_cold_dataframe)
-qi_pred_opt = vsm_model.predict_init(x_new, inputs_dataframe_df_scaled, init_cold_dataframe)
+qi_pred_unfit = vsm_model_unfit.predict_init(x_new, inputs_dataframe_df_scaled, init_cold_dataframe)
+qi_pred_opt = vsm_model_opt.predict_init(x_new, inputs_dataframe_df_scaled, init_cold_dataframe)
 
 
 # ------------------- Write down the prediction of the results ----------------------------------- #
