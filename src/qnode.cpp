@@ -10492,7 +10492,7 @@ void QNode::run()
     //ros::Rate loop_rate(0.5);
     //ros::NodeHandle node;
 
-    while ( ros::ok() ) {} // infinite loop while ros is running
+    //while ( ros::ok() ) {} // infinite loop while ros is running
 
     ros::spinOnce(); // handles ROS messages
     //std::cout << "Ros shutdown, proceeding to close the gui." << std::endl;

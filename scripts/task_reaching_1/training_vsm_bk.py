@@ -28,12 +28,18 @@ print("Data acquisition ...")
 # --- cold-started dataframe --- #
 cold_dataframe = pd.read_csv(data_dir+"/cold_dataset.csv",sep=",")
 inputs_dataframe = preprocess_features_cold(cold_dataframe) # dataset D
-dim_cold = len(inputs_dataframe) # total size of the memory
+inputs_dataframe_scaled,inputs_dataframe_median, inputs_dataframe_iqr = scale_robust(inputs_dataframe)
+inputs_dataframe_df_scaled = pd.DataFrame(data=inputs_dataframe_scaled,index=inputs_dataframe.index,columns=inputs_dataframe.columns)
+dim_cold = len(inputs_dataframe_df_scaled) # total size of the memory
 # --- warm-started dataframe --- #
 warm_dataframe = pd.read_csv(data_dir+"/warm_dataset.csv",sep=",")
-D_prime_dataset = preprocess_features_warm(warm_dataframe,dim_cold) # dataset Dx input
-n_out = 2
-dim_warm = round(len(D_prime_dataset)/dim_cold) # size of the dataset Dx
+inputs_w_dataframe = preprocess_features_warm(warm_dataframe,dim_cold) # dataset Dx input
+outputs_w_dataframe = preprocess_targets_warm(warm_dataframe)# dataset Dx output
+outputs_w = pd.concat([outputs_w_dataframe[["error_plan_warm"]],outputs_w_dataframe[["mean_der_error_plan_warm"]]],axis=1)
+n_out = outputs_w.shape[1]
+dim_warm = round(len(outputs_w)/dim_cold) # size of the dataset Dx
+# --- D prime dataset --- #
+D_prime_dataset = preprocess_features_complete(inputs_dataframe,inputs_w_dataframe,outputs_w) # dataset D'
 D_prime_dataset_scaled,D_prime_dataset_median,D_prime_dataset_iqr = scale_robust(D_prime_dataset)
 D_prime_dataset_df_scaled = pd.DataFrame(data=D_prime_dataset_scaled,index=D_prime_dataset.index,columns=D_prime_dataset.columns)
 #print(D_prime_dataset_df_scaled["error_plan_warm"].describe())
@@ -66,7 +72,6 @@ Y_test = D_prime_dataset_df_test.iloc[:,-n_out:]
 
 #X = D_prime_dataset_df_clipped.iloc[:,:-n_out]
 #Y = D_prime_dataset_df_clipped.iloc[:,-n_out:]
-
 
 maxiter = 500 # max iterations
 # default initialization
@@ -156,10 +161,10 @@ else:
     print("Untrained Loss: {}. Trained Loss: {}.".format(loss_unfit,loss_opt))
 
     features = np.arange(f_dim)
-    w_df = pd.DataFrame({'feature id':features,'feature name':inputs_dataframe.columns,'weight': w_best})
+    w_df = pd.DataFrame({'feature id':features,'feature name':inputs_dataframe_df_scaled.columns,'weight': w_best})
     w_df.to_csv(results_dir+"/w_best_df.csv", index=False)
     w_df.to_csv(results_dir+"/w_best_df_"+timestampStr+"_.csv", index=False)
-    w2_df = pd.DataFrame({'feature id':features,'feature name':inputs_dataframe.columns,'squared weight': np.square(w_best)})
+    w2_df = pd.DataFrame({'feature id':features,'feature name':inputs_dataframe_df_scaled.columns,'squared weight': np.square(w_best)})
     w2_sorted_df = w2_df.sort(['squared weight'],ascending=False)
     w2_sorted_df.to_csv(results_dir+"/w2_sorted_df_"+timestampStr+"_.csv", index=False)
     w2_sorted_df.iloc[:35,:].plot(x='feature id',y='squared weight',kind='bar') # plot the most 35 significant features

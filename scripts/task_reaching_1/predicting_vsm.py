@@ -11,8 +11,8 @@ from HUPL.hupl import preprocess_init_cold
 from HUPL.hupl import preprocess_init_b_cold
 from HUPL.hupl import preprocess_features_warm
 from HUPL.hupl import preprocess_targets_warm
+from HUPL.hupl import preprocess_features_complete
 from HUPL.hupl import scale_robust
-from HUPL.hupl import prepocess_features_complete
 
 if len(sys.argv) <= 5:
   sys.exit("Not enough args")
@@ -30,6 +30,7 @@ input_str = str(sys.argv[5]).split(",")  # string with the given new situation
 #print("Data acquisition ...")
 # --- cold-started dataframe --- #
 cold_dataframe = pd.read_csv(data_dir+"/cold_dataset.csv",sep=",")
+#cold_dataframe = pd.read_csv(data_dir+"/cold_dataset_v1_to_v2_mixed.csv",sep=",")
 inputs_dataframe = preprocess_features_cold(cold_dataframe) # dataset D (input situations)
 init_cold_dataframe = preprocess_init_cold(cold_dataframe) # plan solutions in the memory
 init_b_cold_dataframe = preprocess_init_b_cold(cold_dataframe) # bounce solutions in the memory
@@ -281,7 +282,7 @@ for i in range(0,dual_bounce_size):
     if(i < len(qi_dual_bounce)):
         pred_file.write("%.15f" % qi_dual_bounce[i])
     else:
-        pred_file.write("%.15f" % 0.0)
+        pred_file.write("%.15f" % 0.0) # the performance of the bounce posture selection is not under examination
     if not (i == dual_bounce_size -1):
         pred_file.write("|")
 pred_file.write("\n")

@@ -683,6 +683,16 @@ public Q_SLOTS:
         void on_pushButton_pred_plan_clicked();
 
         /**
+         * @brief on_pushButton_pred_plan_sessions_pressed
+         */
+        void on_pushButton_pred_plan_sessions_pressed();
+
+        /**
+         * @brief on_pushButton_pred_plan_sessions_clicked
+         */
+        void on_pushButton_pred_plan_sessions_clicked();
+
+        /**
          * @brief on_pushButton_save_learning_res_clicked
          */
         void on_pushButton_save_learning_res_clicked();
@@ -1485,6 +1495,7 @@ private:
         vector<double> diff_ws_knn_opt_bounce; /**< difference initialization-solution with warm start from the random solution */
 
         vector<int> n_D_vect; /**< D dataframe size */
+        vector<double> n_Dx_vect; /**< D prime dataframe size */
         vector<int> predicted_samples; /**< number of the predictions */
         vector<double> untrained_losses; /**< untrained losses values */
         vector<double> trained_losses; /**< trained losses values */
@@ -1494,6 +1505,7 @@ private:
         vector<double> untrained_cpu_times; /**< untrained cpu times */
         vector<double> trained_cpu_times; /**< trained cpu times */
         vector<double> n_D_pred_vect; /**< D dataframe size */
+
 
         // ------------------------------------- Controlling -------------------------------------- //
         boost::atomic<bool> get_right_hand_status;
