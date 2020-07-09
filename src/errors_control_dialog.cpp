@@ -172,10 +172,10 @@ void ErrorsControlDialog::on_pushButton_plot_hand_clicked()
     plotError(ui->plot_error_or_hand,QString("Error in orientation"),qtime,qerrors_or_plot,"q error",Qt::blue);
     plotError(ui->plot_error_pos_or_tot_hand,QString("Error in position and in orientation"),qtime,qerrors_pos_or_tot_plot,"total error",Qt::blue);
     plotError(ui->plot_error_lin_vel_hand,QString("Error in linear velocity"),qtime,qerrors_lin_vel_plot,"[mm/s]",Qt::red);
-    plotError(ui->plot_error_ang_vel_hand,QString("Error in angular velocity"),qtime,qerrors_ang_vel_plot,"q propag error",Qt::red);
+    plotError(ui->plot_error_ang_vel_hand,QString("Error in angular velocity"),qtime,qerrors_ang_vel_plot,"[rad/s]",Qt::red);
     plotError(ui->plot_error_vel_tot_hand,QString("Error in velocity"),qtime,qerrors_vel_tot_plot,"total error",Qt::red);
     plotError(ui->plot_error_lin_acc_hand,QString("Error in linear acceleration"),qtime,qerrors_lin_acc_plot,"[mm/s^2]",Qt::darkGreen);
-    plotError(ui->plot_error_ang_acc_hand,QString("Error in angular acceleration"),qtime,qerrors_ang_acc_plot,"q acc error",Qt::darkGreen);
+    plotError(ui->plot_error_ang_acc_hand,QString("Error in angular acceleration"),qtime,qerrors_ang_acc_plot,"[rad/s^2]",Qt::darkGreen);
     plotError(ui->plot_error_acc_tot_hand,QString("Error in acceleration"),qtime,qerrors_acc_tot_plot,"total error",Qt::darkGreen);
 }
 
@@ -261,10 +261,10 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
     ui->plot_error_or_hand->savePdf(path+QString("error_or_hand.pdf"),true,0,0,QString(),QString("Error in orientation"));
     ui->plot_error_pos_or_tot_hand->savePdf(path+QString("error_pos_or_hand.pdf"),true,0,0,QString(),QString("Error in position and in orientation"));
     ui->plot_error_lin_vel_hand->savePdf(path+QString("error_lin_vel_hand.pdf"),true,0,0,QString(),QString("Error in linear velocity [mm/s]"));
-    ui->plot_error_ang_vel_hand->savePdf(path+QString("error_ang_vel_hand.pdf"),true,0,0,QString(),QString("Error in angular velocity"));
+    ui->plot_error_ang_vel_hand->savePdf(path+QString("error_ang_vel_hand.pdf"),true,0,0,QString(),QString("Error in angular velocity [rad/s]"));
     ui->plot_error_vel_tot_hand->savePdf(path+QString("error_vel_hand.pdf"),true,0,0,QString(),QString("Error in velocity"));
     ui->plot_error_lin_acc_hand->savePdf(path+QString("error_lin_acc_hand.pdf"),true,0,0,QString(),QString("Error in linear acceleration [mm/s^2]"));
-    ui->plot_error_ang_acc_hand->savePdf(path+QString("error_ang_acc_hand.pdf"),true,0,0,QString(),QString("Error in angular acceleration"));
+    ui->plot_error_ang_acc_hand->savePdf(path+QString("error_ang_acc_hand.pdf"),true,0,0,QString(),QString("Error in angular acceleration [rad/s^2]"));
     ui->plot_error_acc_tot_hand->savePdf(path+QString("error_acc_hand.pdf"),true,0,0,QString(),QString("Error in acceleration"));
 
     // save text data files
@@ -338,7 +338,7 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         ofstream error;
         error.open(path.toStdString()+filename);
 
-        error << string("# ERROR IN HAND LINEAR VELOCITY \n");
+        error << string("# ERROR IN HAND LINEAR VELOCITY\n");
         error << string("# error [mm/s], time [s] \n");
 
         for(size_t i=0;i<this->qerrors_lin_vel_plot.size();++i){
@@ -359,8 +359,8 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         ofstream error;
         error.open(path.toStdString()+filename);
 
-        error << string("# ERROR IN HAND ANGULAR VELOCITY (QUATERNIONS)\n");
-        error << string("# error, time [s] \n");
+        error << string("# ERROR IN HAND ANGULAR VELOCITY\n");
+        error << string("# error [rad/s], time [s] \n");
 
         for(size_t i=0;i<this->qerrors_ang_vel_plot.size();++i){
             double err = this->qerrors_ang_vel_plot.at(i);
@@ -380,7 +380,7 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         ofstream error;
         error.open(path.toStdString()+filename);
 
-        error << string("# ERROR IN HAND TOTAL VELOCITY (QUATERNIONS)\n");
+        error << string("# ERROR IN HAND TOTAL VELOCITY\n");
         error << string("# error, time [s] \n");
 
         for(size_t i=0;i<this->qerrors_vel_tot_plot.size();++i){
@@ -401,7 +401,7 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         ofstream error;
         error.open(path.toStdString()+filename);
 
-        error << string("# ERROR IN HAND LINEAR ACCELERATION \n");
+        error << string("# ERROR IN HAND LINEAR ACCELERATION\n");
         error << string("# error [mm/s^2], time [s] \n");
 
         for(size_t i=0;i<this->qerrors_lin_acc_plot.size();++i){
@@ -422,8 +422,8 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         ofstream error;
         error.open(path.toStdString()+filename);
 
-        error << string("# ERROR IN HAND ANGULAR ACCELERATION (QUATERNIONS)\n");
-        error << string("# error, time [s] \n");
+        error << string("# ERROR IN HAND ANGULAR ACCELERATION\n");
+        error << string("# error [rad/s^2], time [s] \n");
 
         for(size_t i=0;i<this->qerrors_ang_acc_plot.size();++i){
             double err = this->qerrors_ang_acc_plot.at(i);
@@ -443,7 +443,7 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         ofstream error;
         error.open(path.toStdString()+filename);
 
-        error << string("# ERROR IN HAND TOTAL ACCELERATION (QUATERNIONS)\n");
+        error << string("# ERROR IN HAND TOTAL ACCELERATION\n");
         error << string("# error, time [s] \n");
 
         for(size_t i=0;i<this->qerrors_acc_tot_plot.size();++i){

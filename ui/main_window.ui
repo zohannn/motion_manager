@@ -3423,7 +3423,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>290</x>
-         <y>570</y>
+         <y>620</y>
          <width>161</width>
          <height>21</height>
         </rect>
@@ -3789,7 +3789,7 @@ p, li { white-space: pre-wrap; }
          <x>290</x>
          <y>30</y>
          <width>301</width>
-         <height>531</height>
+         <height>591</height>
         </rect>
        </property>
        <property name="title">
@@ -3799,7 +3799,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>320</y>
+          <y>370</y>
           <width>191</width>
           <height>27</height>
          </rect>
@@ -3849,7 +3849,7 @@ p, li { white-space: pre-wrap; }
           <x>10</x>
           <y>30</y>
           <width>281</width>
-          <height>141</height>
+          <height>131</height>
          </rect>
         </property>
         <property name="title">
@@ -3992,7 +3992,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>180</y>
+          <y>170</y>
           <width>281</width>
           <height>131</height>
          </rect>
@@ -4137,7 +4137,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>380</y>
+          <y>430</y>
           <width>281</width>
           <height>151</height>
          </rect>
@@ -4216,7 +4216,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>11</x>
-          <y>350</y>
+          <y>400</y>
           <width>271</width>
           <height>27</height>
          </rect>
@@ -4259,6 +4259,67 @@ p, li { white-space: pre-wrap; }
           </layout>
          </item>
         </layout>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_h_alpha">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>300</y>
+          <width>281</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Swivel angle coefficients</string>
+        </property>
+        <widget class="QWidget" name="layoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>261</width>
+           <height>27</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_79">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_77">
+            <item>
+             <widget class="QLabel" name="label_hl_alpha_pos_coeff">
+              <property name="text">
+               <string>Kp alpha</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_hl_alpha_pos_coeff">
+              <property name="text">
+               <string>0.001</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_78">
+            <item>
+             <widget class="QLabel" name="label_hl_alpha_vel_coeff">
+              <property name="text">
+               <string>Kd alpha</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lineEdit_hl_alpha_vel_coeff">
+              <property name="text">
+               <string>15</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </widget>
       <widget class="QCheckBox" name="checkBox_sing_av">
@@ -4339,7 +4400,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>290</x>
-         <y>600</y>
+         <y>650</y>
          <width>249</width>
          <height>25</height>
         </rect>

@@ -2023,7 +2023,7 @@ double Humanoid::getSwivelAngle(int arm, vector<double>& posture)
     Vector3d v_CE = (C-elbowPos)/((C-elbowPos).norm());
     Vector3d u; u << v_SW(1), -v_SW(0), 0.0; u = u/u.norm();
     Vector3d v; v = u.cross(v_SW);
-    double alpha = atan2(v_CE.dot(v),v_CE.dot(u));
+    double alpha = atan2(v_CE.dot(v),v_CE.dot(u)); // See ElianaPhD2011
 
     return alpha;
 }
@@ -5576,11 +5576,14 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
 
     MatrixXd JacobianArm(6,JOINTS_ARM);
 
+    /**
     VectorXd vel_max_vec(JOINTS_ARM);
     for(size_t i=0; i < vel_max_vec.size(); ++i){
         vel_max_vec(i) = vel_max;
     }
     double vel_max_norm = vel_max_vec.norm();
+    **/
+    double vel_max_norm = vel_max;
 
     Vector3d pos0;
     Vector3d z0;
@@ -5693,22 +5696,14 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
         JacobianArm.col(i) = column;
     }
 
-    //double k; // damping factor
-    //MatrixXd I = MatrixXd::Identity(6,6);
     MatrixXd JacobianArmT = JacobianArm.transpose();
     MatrixXd JJ = JacobianArm*JacobianArmT;
-    //if(abs(JJ.determinant()) < 0.01){
-    //    k = 0.01;
-    //}else{
-    //    k=0.0;
-    //}
-    //MatrixXd JJk = (JJ+pow(k,2)*I);
-    //MatrixXd JJk_inv = JJk.inverse();
     MatrixXd JJk_inv = JJ.inverse();
     MatrixXd J_plus = JacobianArmT*JJk_inv; // pseudo-inverse of the Jacobian
     VectorXd hand_acc_xd(6); hand_acc_xd << hand_acc.at(0),hand_acc.at(1),hand_acc.at(2),hand_acc.at(3),hand_acc.at(4),hand_acc.at(5);
     VectorXd hand_vel_xd = hand_acc_xd*timestep;
     VectorXd joint_accelerations = J_plus*hand_acc_xd;
+    // TO DO: add to joint_accelerations the swivel angle contribution
     VectorXd joint_velocities = joint_accelerations*timestep;
 
     double null_th = 0.000001;
@@ -5729,9 +5724,9 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
         VectorXd J_jlim= J_Null*delta_H_jlim_mod;
         double k_jlim = 0;
         if(J_jlim.norm() > null_th){
-            k_jlim = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_jlim.norm())));
+            k_jlim = - ((vel_max_norm - (J_plus*hand_vel_xd).norm())/((J_Null.norm())*(J_jlim.norm()))); // see Liu2010
         }
-        double fd_jlim = jlim_coeff * (1 - exp(-jlim_damping*(J_jlim.norm())));
+        double fd_jlim = jlim_coeff * (1 - exp(-jlim_damping*(J_jlim.norm()))); // see Liu2010
 
         joint_velocities +=  (k_jlim*fd_jlim*J_jlim);        
         null_velocities += (k_jlim*fd_jlim*J_jlim);

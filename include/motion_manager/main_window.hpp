@@ -1130,7 +1130,8 @@ private:
         vector<vector<double>> shoulderPosition_mov; /**< shoulder position during the movement. 0=x,1=y,2=z */
         vector<double> swivel_angle_mov; /**< swivel angle of the trajectory of the movement */
         vector<vector<double>> swivel_angle_mov_stages; /**< swivel angle of the trajectory of the movement divided in stages */
-        vector<vector<double>> der_swivel_angle_mov_stages; /**< derivative of the swivel angle of the trajectory of the movement divided in stages */
+        vector<vector<double>> der_swivel_angle_mov_stages; /**< velocity of the swivel angle of the trajectory of the movement divided in stages */
+        vector<vector<double>> der_der_swivel_angle_mov_stages; /**< acceleration of the swivel angle of the trajectory of the movement divided in stages */
         double swivel_angle_mov_max; /**< max swivel angle of the trajectory of the movement */
         double swivel_angle_mov_min; /**< min swivel angle of the trajectory of the movement */
         double swivel_angle_mov_average; /**< average swivel angle of the trajectory of the movement */
@@ -1523,14 +1524,16 @@ private:
         void execReplanning();
         vector<double> r_hand_init_pos; /**< initial position of the right hand during velocity control */
         // derivation parameters
-        int samples_des_hand_pose; /**< counter to count 5 points for derivation of desired hand position */
-        int samples_des_hand_vel; /**< counter to count 5 points for derivation of desired hand velocity */
-        int samples_pos; /**< counter to count 5 points for derivation of position */
-        int samples_vel; /**< counter to count 5 points for derivation of velocity */
-        int samples_h_vel; /**< counter to count 5 points for derivation of hand velocity */
-        int samples_w_vel; /**< counter to count 5 points for derivation of wrist velocity */
-        int samples_e_vel; /**< counter to count 5 points for derivation of elbow velocity */
-        int samples_s_vel; /**< counter to count 5 points for derivation of shoulder velocity */
+        int samples_des_hand_pose; /**< counter for derivation of desired hand position */
+        int samples_des_hand_vel; /**< counter for derivation of desired hand velocity */
+        int samples_pos; /**< counter for derivation of position */
+        int samples_vel; /**< counter for derivation of velocity */
+        int samples_h_vel; /**< counter for derivation of hand velocity */
+        int samples_w_vel; /**< counter for derivation of wrist velocity */
+        int samples_e_vel; /**< counter for derivation of elbow velocity */
+        int samples_s_vel; /**< counter for derivation of shoulder velocity */
+        int samples_alpha_pos; /**< counter for derivation of swivel angle position */
+        int samples_alpha_vel; /**< counter for derivation of swivel angle velocity */
         int N_filter_length; /**< length of the filter of noise */
         bufferPtr des_hand_pose_buff; /**< buffer of desired hand positions for derivation */
         bufferPtr des_hand_vel_buff; /**< buffer of desired hand velocities for derivation */
@@ -1542,6 +1545,8 @@ private:
         bufferPtr r_wrist_vel_buff; /**< buffer of task space wrist velocities for drivation */
         bufferPtr r_elbow_vel_buff; /**< buffer of task space elbow velocities for drivation */
         bufferPtr r_shoulder_vel_buff; /**< buffer of task space shoulder velocities for drivation */
+        bufferPtr alpha_pos_buff; /**< buffer of swivel angle position derivation */
+        bufferPtr alpha_vel_buff; /**< buffer of swivel angle velocity derivation */
 
         // Jacobians
         MatrixXd Jacobian; /**< current Jacobian matrix */
