@@ -31,8 +31,6 @@ void ErrorsControlDialog::setupHandPlots(vector<double> &errors_pos, vector<doub
     this->qerrors_ang_acc = QVector<double>::fromStdVector(errors_ang_acc);
     this->qerrors_acc_tot = QVector<double>::fromStdVector(errors_acc_tot);
 
-
-
 }
 
 void ErrorsControlDialog::setupFingersPlots(vector<vector<double>> &errors_pos,vector<vector<double>> &errors_vel,vector<vector<double>> &errors_acc, vector<double> &time)
@@ -64,6 +62,16 @@ void ErrorsControlDialog::setupFingersPlots(vector<vector<double>> &errors_pos,v
         this->qerrors_fing_vel_3.push_back(vel.at(3));
         this->qerrors_fing_acc_3.push_back(acc.at(3));
     }
+}
+
+void ErrorsControlDialog::setupAlphaPlots(vector<double> &error_alpha_pos,vector<double> &error_alpha_vel,vector<double> &error_alpha_acc,vector<double> &time)
+{
+
+    this->qtime = QVector<double>::fromStdVector(time);
+    this->qerror_alpha_pos = QVector<double>::fromStdVector(error_alpha_pos);
+    this->qerror_alpha_vel = QVector<double>::fromStdVector(error_alpha_vel);
+    this->qerror_alpha_acc = QVector<double>::fromStdVector(error_alpha_acc);
+
 }
 
 
@@ -125,8 +133,6 @@ void ErrorsControlDialog::plotError(QCustomPlot *plot, QString title, QVector<do
 
 
 // Q_SLOTS
-
-// hand
 
 void ErrorsControlDialog::on_pushButton_plot_hand_clicked()
 {
@@ -235,6 +241,35 @@ void ErrorsControlDialog::on_pushButton_plot_fing_clicked()
     plotError(ui->plot_error_acc_fing_3,QString("Error in acceleration Finger 3"),qtime,qerrors_fing_acc_3_plot,"[deg/s^2]",Qt::darkGreen);
 
 
+}
+
+void ErrorsControlDialog::on_pushButton_plot_alpha_clicked()
+{
+    double f_th_pos = this->ui->lineEdit_f_cutoff_pos->text().toDouble();
+    double timestep_pos = this->ui->lineEdit_time_step_pos->text().toDouble();
+    double f_th_vel = this->ui->lineEdit_f_cutoff_vel->text().toDouble();
+    double timestep_vel = this->ui->lineEdit_time_step_vel->text().toDouble();
+    double f_th_acc = this->ui->lineEdit_f_cutoff_acc->text().toDouble();
+    double timestep_acc = this->ui->lineEdit_time_step_acc->text().toDouble();
+
+    LowPassFilter lpf_err_pos(f_th_pos, timestep_pos); LowPassFilter lpf_err_vel(f_th_vel, timestep_vel); LowPassFilter lpf_err_acc(f_th_acc, timestep_acc);
+
+    this->qerror_alpha_pos_plot.clear();
+    this->qerror_alpha_vel_plot.clear();
+    this->qerror_alpha_acc_plot.clear();
+
+    for(int k=0;k<this->qerror_alpha_pos.size();++k){
+        // pos
+        this->qerror_alpha_pos_plot.push_back(lpf_err_pos.update(this->qerror_alpha_pos.at(k)));
+        // vel
+        this->qerror_alpha_vel_plot.push_back(lpf_err_vel.update(this->qerror_alpha_vel.at(k)));
+        // acc
+        this->qerror_alpha_acc_plot.push_back(lpf_err_acc.update(this->qerror_alpha_acc.at(k)));
+    }
+
+    plotError(ui->plot_error_alpha_pos,QString("Error in position"),qtime,qerror_alpha_pos_plot,"[rad]",Qt::blue);
+    plotError(ui->plot_error_alpha_vel,QString("Error in velocity"),qtime,qerror_alpha_vel_plot,"[rad/s]",Qt::red);
+    plotError(ui->plot_error_alpha_acc,QString("Error in acceleration"),qtime,qerror_alpha_acc_plot,"[rad/s^2]",Qt::darkGreen);
 }
 
 void ErrorsControlDialog::on_pushButton_save_hand_clicked()
@@ -586,6 +621,96 @@ void ErrorsControlDialog::on_pushButton_save_fing_clicked()
             string err_acc_str =  boost::str(boost::format("%.2f") % (err_acc)); boost::replace_all(err_acc_str,",",".");
             string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
             error << err_pos_str+string(", ")+err_vel_str+string(", ")+err_acc_str+string(", ")+t_str+string("\n");
+        }
+        error.close();
+    }
+}
+
+void ErrorsControlDialog::on_pushButton_save_alpha_clicked()
+{
+
+    QString path;
+
+    struct stat st = {0};
+    if (stat("results", &st) == -1) {
+        mkdir("results", 0700);
+    }
+    if (stat("results/controlling", &st) == -1) {
+        mkdir("results/controlling", 0700);
+    }
+    if (stat("results/controlling/errors", &st) == -1) {
+        mkdir("results/controlling/errors", 0700);
+    }
+    if (stat("results/controlling/errors/alpha", &st) == -1) {
+        mkdir("results/controlling/errors/alpha", 0700);
+    }
+    path = QString("results/controlling/errors/alpha/");
+
+    ui->plot_error_alpha_pos->savePdf(path+QString("error_pos_alpha.pdf"),true,0,0,QString(),QString("Error in position [rad]"));
+    ui->plot_error_alpha_vel->savePdf(path+QString("error_vel_alpha.pdf"),true,0,0,QString(),QString("Error in velocity [rad/s]"));
+    ui->plot_error_alpha_acc->savePdf(path+QString("error_acc_alpha.pdf"),true,0,0,QString(),QString("Error in acceleration [rad/s^2]"));
+
+    // save text data files
+
+    // error in position
+    if(!this->qerror_alpha_pos_plot.empty()){
+        string filename("error_pos_alpha.txt");
+        ofstream error;
+        error.open(path.toStdString()+filename);
+
+        error << string("# ALPHA ERROR IN POSITION \n");
+        error << string("# error [rad], time [s] \n");
+
+        for(size_t i=0;i<this->qerror_alpha_pos_plot.size();++i){
+            double err = this->qerror_alpha_pos_plot.at(i);
+            double time = this->qtime.at(i);
+            string err_str =  boost::str(boost::format("%.2f") % (err));
+            boost::replace_all(err_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            error << err_str+string(", ")+t_str+string("\n");
+        }
+        error.close();
+    }
+
+    // error in velocity
+    if(!this->qerror_alpha_vel_plot.empty()){
+        string filename("error_vel_alpha.txt");
+        ofstream error;
+        error.open(path.toStdString()+filename);
+
+        error << string("# ALPHA ERROR IN VELOCITY \n");
+        error << string("# error [rad/s], time [s] \n");
+
+        for(size_t i=0;i<this->qerror_alpha_vel_plot.size();++i){
+            double err = this->qerror_alpha_vel_plot.at(i);
+            double time = this->qtime.at(i);
+            string err_str =  boost::str(boost::format("%.2f") % (err));
+            boost::replace_all(err_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            error << err_str+string(", ")+t_str+string("\n");
+        }
+        error.close();
+    }
+
+    // error in acceleration
+    if(!this->qerror_alpha_acc_plot.empty()){
+        string filename("error_acc_alpha.txt");
+        ofstream error;
+        error.open(path.toStdString()+filename);
+
+        error << string("# ALPHA ERROR IN ACCELERATION \n");
+        error << string("# error [rad/s^2], time [s] \n");
+
+        for(size_t i=0;i<this->qerror_alpha_acc_plot.size();++i){
+            double err = this->qerror_alpha_acc_plot.at(i);
+            double time = this->qtime.at(i);
+            string err_str =  boost::str(boost::format("%.2f") % (err));
+            boost::replace_all(err_str,",",".");
+            string t_str =  boost::str(boost::format("%.2f") % (time));
+            boost::replace_all(t_str,",",".");
+            error << err_str+string(", ")+t_str+string("\n");
         }
         error.close();
     }

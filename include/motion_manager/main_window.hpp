@@ -223,6 +223,11 @@ public:
          */
         void clear_control_variables();
 
+        /**
+         * @brief set_initial_control_variables
+         */
+        void set_initial_control_variables();
+
 
 
 public Q_SLOTS:
@@ -1563,7 +1568,7 @@ private:
         vector<double> bounce_handPosition; /**< bounce hand positions during control*/
         vector<double> bounce_handOrientation; /**< bounce hand orientation (rpy) during control*/
         vector<double> bounce_handOrientation_q; /**< bounce hand orientation (quaternion) during control*/
-        boost::atomic<int> i_ctrl; /**< index of the desired hand pose*/
+        boost::atomic<size_t> i_ctrl; /**< index of the desired hand pose*/
         Clock::time_point start_time_point;
         double curr_time; /**< current elapsed time */
         Clock::time_point curr_time_ctrl; /**< current time during control */
@@ -1579,11 +1584,12 @@ private:
         problemPtr prob_ctrl; /**< problem to solve in re-planning during control */
         std::vector<double> approach_ctrl; /**< approach vector during control */
         std::vector<double> retreat_ctrl; /**< retreat vector during control */
-        size_t i_tar_ctrl; /**< index of the object being manipulated */
+        boost::atomic<size_t> i_tar_ctrl; /**< index of the object being manipulated */
         boost::atomic<bool> exec_command_ctrl; /**< true to execute the command control, false otherwise */
         boost::atomic<bool> replanning_succeed; /**< true if replanning succeed, false otherwise*/
         boost::atomic<bool> replanning_done; /**< true if the replanning has been called, false otherwise */
         VectorXd hand_j_acc; /**< time derivative Jacobian dependant part of the hand accelearion */
+        VectorXd elbow_j_acc; /**< time derivative Jacobian dependant part of the elbow accelearion */
         vector<double> h_hand_pos_end; /**< end hand position during control */
         vector<double> h_hand_or_q_end; /**< end hand orientation (quaternion) during control */
         vector<double> h_hand_pos_init; /**< initial hand position during control */
@@ -1632,6 +1638,9 @@ private:
         vector<vector<double>> shoulderAngularVelocity_ctrl;/**< shoulder angular velocity during control */
         vector<vector<double>> shoulderLinearAcceleration_ctrl; /**< shoulder linear acceleration during control */
         vector<vector<double>> shoulderAngularAcceleration_ctrl;/**< shoulder angular acceleration during control */
+        // swivel angle
+        vector<double> alpha_des_ctrl; /**< desired position of the swivel angle **/
+        vector<double> alpha_ctrl; /**< current position of the swivel angle **/
 
         // hand errors
         vector<double> error_pos_tot_norm; /**< norm of the total error in position */
@@ -1648,6 +1657,11 @@ private:
         vector<vector<double>> error_fing_pos; /**< fingers error in position */
         vector<vector<double>> error_fing_vel; /**< fingers error in velocity */
         vector<vector<double>> error_fing_acc; /**< fingers error in acceleration */
+
+        // swivel angle errors
+        vector<double> error_alpha_pos; /**< swivel angle error in position **/
+        vector<double> error_alpha_vel; /**< swivel angle error in velocity **/
+        vector<double> error_alpha_acc; /**< swivel angle error in acceleration **/
 
         vector<double> pred_swivel_angle_ctrl; /**< predicted swivel angle during control */
         vector<double> pred_der_swivel_angle_ctrl; /**< predicted time derivative of the swivel angle during control */

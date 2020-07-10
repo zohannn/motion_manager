@@ -496,7 +496,7 @@ void MainWindow::execPosControl()
 
 
             Vector3d tar_pos; Quaterniond tar_q;
-            if(this->ui.checkBox_use_plan_hand_pos->isChecked()){
+            if(this->ui.checkBox_use_plan_hand_pos->isChecked() && this->h_results!=nullptr && this->h_results->status==0){
                  follow_tar = this->ui.checkBox_follow_target->isChecked();
                  stages = this->des_handPosition.size();
                  stage_descr = this->h_results->trajectory_descriptions.at(this->i_ctrl);
@@ -1072,9 +1072,9 @@ void MainWindow::execPosControl()
                 vector<double> r_elbow_acc_read(6,0.0);
                 vector<double> r_shoulder_acc_read(6,0.0);
                 // swivel angle
-                vector<double> alpha_pos_read(0,0.0);
-                vector<double> alpha_vel_read(0,0.0);
-                vector<double> alpha_acc_read(0,0.0);
+                vector<double> alpha_pos_read(1,0.0);
+                vector<double> alpha_vel_read(1,0.0);
+                vector<double> alpha_acc_read(1,0.0);
 
 
                 this->curr_scene->getHumanoid()->getRightArmPosture(r_arm_posture_mes);
@@ -1106,6 +1106,14 @@ void MainWindow::execPosControl()
                 vector<double> r_elbow_ang_pos(r_elbow_pos.begin()+3, r_elbow_pos.begin()+6);
                 vector<double> r_shoulder_lin_pos(r_shoulder_pos.begin(), r_shoulder_pos.begin()+3);
                 vector<double> r_shoulder_ang_pos(r_shoulder_pos.begin()+3, r_shoulder_pos.begin()+6);
+                // versor on the elbow point
+                VectorXd r_wrist_lin_pos_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_wrist_lin_pos.data(), r_wrist_lin_pos.size());
+                VectorXd r_elbow_lin_pos_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_elbow_lin_pos.data(), r_elbow_lin_pos.size());
+                VectorXd r_shoulder_lin_pos_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_shoulder_lin_pos.data(), r_shoulder_lin_pos.size());
+                Vector3d r_se_lin_pos_vec = r_shoulder_lin_pos_vec - r_elbow_lin_pos_vec;
+                Vector3d r_ew_lin_pos_vec = r_elbow_lin_pos_vec - r_wrist_lin_pos_vec;
+                Vector3d u_alpha_vec = r_se_lin_pos_vec.cross(r_ew_lin_pos_vec);
+                Vector3d u_alpha = u_alpha_vec/u_alpha_vec.norm();
 
                 // get desired hand velocity
                 VectorXd::Map(&hand_pos_vec_xd[0], hand_pos_vec_x.size()) = hand_pos_vec_x;
@@ -1233,7 +1241,10 @@ void MainWindow::execPosControl()
                 VectorXd r_hand_accelerations_read_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_hand_accelerations_read.data(), r_hand_accelerations_read.size());
                 // Jacobian
                 this->curr_scene->getHumanoid()->getJacobian(1,r_arm_posture,this->Jacobian);
-                this->hand_j_acc = r_hand_acc_read_vec - this->Jacobian*r_arm_accelerations_read_vec;
+                this->hand_j_acc = r_hand_acc_read_vec - this->Jacobian*r_arm_accelerations_read_vec; // dot{J}*dot{q}
+                MatrixXd Jacobian_E = this->Jacobian.block<3,4>(0,0);
+                VectorXd r_arm_acc_E = r_arm_accelerations_read_vec.head(4);
+                this->elbow_j_acc = alpha_acc_read.at(0)*u_alpha - Jacobian_E*r_arm_acc_E; // dot{J_E}*dot{q_E}
 
                 vector<double> r_hand_lin_acc(r_hand_acc_read.begin(), r_hand_acc_read.begin()+3);
                 vector<double> r_hand_ang_acc(r_hand_acc_read.begin()+3, r_hand_acc_read.begin()+6);
@@ -1323,7 +1334,8 @@ void MainWindow::execPosControl()
                 //VectorXd h_hand_ref_vel(6); // human-like reference velocity
                 VectorXd trap_hand_ref_acc(6); // trapezoidal reference acceleration
                 VectorXd h_hand_ref_acc(6); // human-like reference acceleration
-                VectorXd h_fing_ref_acc(JOINTS_HAND); // human-like reference acceleration
+                VectorXd h_fing_ref_acc(JOINTS_HAND); // human-like reference acceleration                
+                double error_alpha_pos = 0.0; double error_alpha_vel = 0.0; double error_alpha_acc = 0.0; // error with the human-like swivel angle
 
                 double g_map = 0.0; double g_map_fing = 0.0; int index = 0;// normalized mapped time
                 double des_alpha_pos, des_alpha_vel, des_alpha_acc; // desired swivel angle references
@@ -1707,6 +1719,10 @@ void MainWindow::execPosControl()
                                 g_map = 1 - exp((-dec_rate*(d_curr_time/1000))/(tau*(1+diff_w*error_tot.squaredNorm())));
                             }
                             index = static_cast<int>(0.5+(n_steps-1)*g_map);
+                            // desired swivel angle references
+                            des_alpha_pos = alpha_positions.at(index);
+                            des_alpha_vel = alpha_velocities.at(index);
+                            des_alpha_acc = alpha_accelerations.at(index);
 
                             //                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping approach ------------------- # ";
                             //                BOOST_LOG_SEV(lg, info) << "g_map = " << g_map;
@@ -1807,6 +1823,10 @@ void MainWindow::execPosControl()
                                 g_map = 1 - exp((-dec_rate*(d_curr_time/1000))/(tau*(1+diff_w*error_tot.squaredNorm())));
                             }
                             index = static_cast<int>(0.5+(n_steps-1)*g_map);
+                            // desired swivel angle references
+                            des_alpha_pos = alpha_positions.at(index);
+                            des_alpha_vel = alpha_velocities.at(index);
+                            des_alpha_acc = alpha_accelerations.at(index);
 
             //                BOOST_LOG_SEV(lg, info) << "# ----------------Time Mapping ------------------- # ";
             //                BOOST_LOG_SEV(lg, info) << "g_map = " << g_map;
@@ -1894,8 +1914,9 @@ void MainWindow::execPosControl()
                         }
 
                     // errors of the swivel angle data
-                    double error_alpha_pos = des_alpha_pos - alpha_pos_read.at(0);
-                    double error_alpha_vel = des_alpha_vel - alpha_vel_read.at(0);
+                    error_alpha_pos = des_alpha_pos - alpha_pos_read.at(0);
+                    error_alpha_vel = des_alpha_vel - alpha_vel_read.at(0);
+                    error_alpha_acc = des_alpha_acc - alpha_acc_read.at(0);
 
                     // hand
                     // error in position
@@ -2301,14 +2322,18 @@ void MainWindow::execPosControl()
                 // closed-loop control
                 //VectorXd hand_vel_xd_vec(6);
                 VectorXd hand_acc_xd_vec(6);
+                Vector3d elbow_acc_xd_vec;
                 if(hl_en){
                     hand_acc_xd_vec = h_hand_ref_acc + Koeff_d*der_error_h_tot + Koeff_p*error_h_tot - this->hand_j_acc;
-                    // TO DO: add the desired acceleration of the swivel angle (it is going to reached in the null space of the Jacobian)
+                    elbow_acc_xd_vec = (des_alpha_acc + hl_alpha_vel_coeff*error_alpha_vel + hl_alpha_pos_coeff*error_alpha_pos)*u_alpha - this->elbow_j_acc;
                 }else{
                     hand_acc_xd_vec = trap_hand_ref_acc + Koeff_d*der_error_trap_tot + Koeff_p*error_trap_tot - this->hand_j_acc;
+                    elbow_acc_xd_vec << 0,0,0;
                 }
                 vector<double> hand_acc_vec; hand_acc_vec.resize(hand_acc_xd_vec.size());
                 VectorXd::Map(&hand_acc_vec[0], hand_acc_xd_vec.size()) = hand_acc_xd_vec;
+                vector<double> elbow_acc_vec; elbow_acc_vec.resize(elbow_acc_xd_vec.size());
+                VectorXd::Map(&elbow_acc_vec[0], elbow_acc_xd_vec.size()) = elbow_acc_xd_vec;
 
                 // check proximity
                 if(this->ui.checkBox_use_plan_hand_pos->isChecked())
@@ -2367,7 +2392,7 @@ void MainWindow::execPosControl()
 
 
                 // inverse algorithm
-                this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,r_arm_velocities,r_arm_null_velocities,time_step,jlim_en,sing_en,obsts_en,
+                this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,elbow_acc_vec,r_arm_velocities,r_arm_null_velocities,time_step,jlim_en,sing_en,obsts_en,
                                                                                 vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,obst_coeff_torso,obst_damping_torso,
                                                                                  jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts_n);
 
@@ -2430,6 +2455,11 @@ void MainWindow::execPosControl()
                 // fingers positions
                 this->fingPosition_ctrl.push_back(r_hand_posture_mes);
 
+                // desired swivel angle
+                this->alpha_des_ctrl.push_back(des_alpha_pos);
+                // current swivel angle
+                this->alpha_ctrl.push_back(alpha_pos_read.at(0));
+
                 // operational space positions
                 this->handPosition_ctrl.push_back(r_hand_lin_pos);
                 this->handOrientation_ctrl.push_back(r_hand_ang_pos);
@@ -2487,6 +2517,11 @@ void MainWindow::execPosControl()
                     vector<double> error_fing_acc_tot_vec;  error_fing_acc_tot_vec.resize(error_fing_acc_tot.size());
                     VectorXd::Map(&error_fing_acc_tot_vec[0], error_fing_acc_tot.size()) = error_fing_acc_tot;
                     this->error_fing_acc.push_back(error_fing_acc_tot_vec);
+                    // swivel angle
+                    this->error_alpha_pos.push_back(error_alpha_pos);
+                    this->error_alpha_vel.push_back(error_alpha_vel);
+                    this->error_alpha_acc.push_back(error_alpha_acc);
+
                 }else{
                     this->error_pos_tot_norm.push_back(error_trap_tot.block<3,1>(0,0).norm());
                     this->error_or_tot_norm.push_back(error_trap_tot.block<3,1>(3,0).norm());
@@ -2716,6 +2751,14 @@ void MainWindow::execVelControl()
                 vector<double> r_elbow_ang_pos(r_elbow_pos.begin()+3, r_elbow_pos.begin()+6);
                 vector<double> r_shoulder_lin_pos(r_shoulder_pos.begin(), r_shoulder_pos.begin()+3);
                 vector<double> r_shoulder_ang_pos(r_shoulder_pos.begin()+3, r_shoulder_pos.begin()+6);
+                // versor on the elbow point
+                VectorXd r_wrist_lin_pos_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_wrist_lin_pos.data(), r_wrist_lin_pos.size());
+                VectorXd r_elbow_lin_pos_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_elbow_lin_pos.data(), r_elbow_lin_pos.size());
+                VectorXd r_shoulder_lin_pos_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_shoulder_lin_pos.data(), r_shoulder_lin_pos.size());
+                Vector3d r_se_lin_pos_vec = r_shoulder_lin_pos_vec - r_elbow_lin_pos_vec;
+                Vector3d r_ew_lin_pos_vec = r_elbow_lin_pos_vec - r_wrist_lin_pos_vec;
+                Vector3d u_alpha_vec = r_se_lin_pos_vec.cross(r_ew_lin_pos_vec);
+                Vector3d u_alpha = u_alpha_vec/u_alpha_vec.norm();
 
                 vector<double> r_hand_vel; vector<double> r_wrist_vel; vector<double> r_elbow_vel; vector<double> r_shoulder_vel;
                 this->curr_scene->getHumanoid()->getAllVel(1,r_hand_vel,r_wrist_vel,r_elbow_vel,r_shoulder_vel,r_arm_posture,r_arm_velocities_read);
@@ -14733,6 +14776,7 @@ void MainWindow::getDerivative(vector<vector<double>> &function, vector<double> 
 
 void MainWindow::getDerivative(vector<double> &function, vector<double> &step_values, vector<double> &derFunction)
 {
+    derFunction.clear();
     const double MIN_STEP_VALUE = 0.1;
 
     // Formula of the numerical differentiation with 5 points
@@ -15520,6 +15564,8 @@ void MainWindow::clear_control_variables()
     this->shoulderAngularVelocity_ctrl.clear();
     this->shoulderLinearAcceleration_ctrl.clear();
     this->shoulderAngularAcceleration_ctrl.clear();
+    this->alpha_des_ctrl.clear();
+    this->alpha_ctrl.clear();
     this->handVelocityNorm_ctrl.clear();
     this->handAccelerationNorm_ctrl.clear();
     this->jointsPosition_ctrl.resize(0,0);
@@ -15540,6 +15586,9 @@ void MainWindow::clear_control_variables()
     this->error_lin_acc_tot_norm.clear();
     this->error_ang_acc_tot_norm.clear();
     this->error_acc_tot_norm.clear();
+    this->error_alpha_pos.clear();
+    this->error_alpha_vel.clear();
+    this->error_alpha_acc.clear();
     this->pred_swivel_angle_ctrl.clear();
     this->pred_der_swivel_angle_ctrl.clear();
     this->i_ctrl=0;
@@ -15574,7 +15623,147 @@ void MainWindow::clear_control_variables()
     this->alpha_pos_buff = boost::make_shared<CircularBuffers<double>>(1, this->N_filter_length);
     this->alpha_vel_buff = boost::make_shared<CircularBuffers<double>>(1, this->N_filter_length);
     this->hand_j_acc = VectorXd::Zero(6);
+    this->elbow_j_acc = VectorXd::Zero(3);
     this->Jacobian = MatrixXd::Zero(6,JOINTS_ARM);
+}
+
+void MainWindow::set_initial_control_variables()
+{
+    this->clear_control_variables();
+    this->qnode.resetSimTime();
+
+    if(this->ui.checkBox_use_plan_hand_pos->isChecked())
+    {
+        this->mov_type_ctrl = this->curr_mov->getType();
+        this->dHO_ctrl = this->tols.mov_specs.dHO;
+        if(this->mov_type_ctrl==0){
+            // pick
+            this->approach_ctrl = this->tols.mov_specs.pre_grasp_approach;
+            this->retreat_ctrl = this->tols.mov_specs.post_grasp_retreat;
+        }else if(this->mov_type_ctrl==2 || this->mov_type_ctrl==3 || this->mov_type_ctrl==4){
+            // place
+            this->approach_ctrl = this->tols.mov_specs.pre_place_approach;
+            this->retreat_ctrl = this->tols.mov_specs.post_place_retreat;
+        }
+
+        int mov_type = this->curr_mov->getType();
+        if(mov_type==0){ // pick
+            vector<objectPtr> objs; this->curr_scene->getObjects(objs);
+            string obj_tar_name = this->curr_mov->getObject()->getName();
+            for(size_t i=0;i<objs.size();++i)
+            {
+                if(obj_tar_name.compare(objs.at(i)->getName())==0)
+                {
+                    this->i_tar_ctrl = i;
+                    break;
+                }
+            }
+            Vector3d tar_pos;
+            targetPtr tar = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight();
+            this->curr_scene->setHandTarget(tar);
+            tar_pos(0) = tar->getPos().Xpos;
+            tar_pos(1) = tar->getPos().Ypos;
+            tar_pos(2) = tar->getPos().Zpos;
+            Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
+            //Quaterniond tar_q(Rot_tar);
+            //this->tar_position= tar_pos;
+            //this->tar_quaternion = tar_q;
+        }else if(mov_type==2 || mov_type==3 || mov_type==4){ // place
+            vector<posePtr> poses; this->curr_scene->getPoses(poses);
+            string tar_name = this->curr_mov->getPose()->getName();
+            for(size_t i=0;i<poses.size();++i)
+            {
+                if(tar_name.compare(poses.at(i)->getName())==0)
+                {
+                    this->i_tar_ctrl = i;
+                    break;
+                }
+            }
+            Vector3d tar_pos;
+            posePtr tar = this->curr_scene->getPose(this->i_tar_ctrl);
+            this->curr_scene->setHandPose(tar);
+            tar_pos(0) = tar->getPos().Xpos;
+            tar_pos(1) = tar->getPos().Ypos;
+            tar_pos(2) = tar->getPos().Zpos;
+            Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
+            //Quaterniond tar_q(Rot_tar);
+            //this->tar_position= tar_pos;
+            //this->tar_quaternion = tar_q;
+        }
+    }
+
+    this->lpf_tar_pos_x.reset(new LowPassFilter());
+    this->lpf_tar_pos_y.reset(new LowPassFilter());
+    this->lpf_tar_pos_z.reset(new LowPassFilter());
+    this->lpf_tar_or_q_x.reset(new LowPassFilter());
+    this->lpf_tar_or_q_y.reset(new LowPassFilter());
+    this->lpf_tar_or_q_z.reset(new LowPassFilter());
+    this->lpf_tar_or_q_w.reset(new LowPassFilter());
+
+    this->lpf_obsts_pos_x.reset(new LowPassFilter());
+    this->lpf_obsts_pos_y.reset(new LowPassFilter());
+    this->lpf_obsts_pos_z.reset(new LowPassFilter());
+    this->lpf_obsts_or_q_x.reset(new LowPassFilter());
+    this->lpf_obsts_or_q_y.reset(new LowPassFilter());
+    this->lpf_obsts_or_q_z.reset(new LowPassFilter());
+    this->lpf_obsts_or_q_w.reset(new LowPassFilter());
+
+    this->lpf_joint_pos_1.reset(new LowPassFilter());
+    this->lpf_joint_pos_2.reset(new LowPassFilter());
+    this->lpf_joint_pos_3.reset(new LowPassFilter());
+    this->lpf_joint_pos_4.reset(new LowPassFilter());
+    this->lpf_joint_pos_5.reset(new LowPassFilter());
+    this->lpf_joint_pos_6.reset(new LowPassFilter());
+    this->lpf_joint_pos_7.reset(new LowPassFilter());
+    this->lpf_joint_pos_8.reset(new LowPassFilter());
+    this->lpf_joint_pos_9.reset(new LowPassFilter());
+    this->lpf_joint_pos_10.reset(new LowPassFilter());
+    this->lpf_joint_pos_11.reset(new LowPassFilter());
+
+    // noise filtering
+    bool obsts_filter_noise = this->ui.checkBox_obsts_filter_noise->isChecked();
+    double filter_obsts_cut_off_freq = 0.1; double filter_obsts_timestep = 0.05;
+    bool tar_filter_noise = this->ui.checkBox_tar_filter_noise->isChecked();
+    double filter_tar_cut_off_freq = 0.1; double filter_tar_timestep = 0.05;
+    if(obsts_filter_noise){
+        filter_obsts_cut_off_freq = this->ui.lineEdit_obsts_f_cutoff->text().toDouble();
+        filter_obsts_timestep = this->ui.lineEdit_obsts_timestep->text().toDouble();
+    }
+    if(tar_filter_noise){
+        filter_tar_cut_off_freq = this->ui.lineEdit_tar_f_cutoff->text().toDouble();
+        filter_tar_timestep = this->ui.lineEdit_tar_timestep->text().toDouble();
+    }
+
+    this->lpf_tar_pos_x->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_pos_x->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_pos_y->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_pos_y->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_pos_z->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_pos_z->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_or_q_x->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_q_x->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_or_q_y->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_q_y->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_or_q_z->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_q_z->setDeltaTime(filter_tar_timestep);
+    this->lpf_tar_or_q_w->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_q_w->setDeltaTime(filter_tar_timestep);
+
+    this->lpf_obsts_pos_x->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_pos_y->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_pos_z->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_or_q_x->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_q_x->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_or_q_y->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_q_y->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_or_q_z->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_q_z->setDeltaTime(filter_obsts_timestep);
+    this->lpf_obsts_or_q_w->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_q_w->setDeltaTime(filter_obsts_timestep);
+
+    double filter_cut_off_freq_j_pos = this->ui.lineEdit_cutoff_freq_joint_pos->text().toDouble();
+    double filter_time_step_j_pos = this->ui.lineEdit_timestep_joint_pos->text().toDouble();
+    this->lpf_joint_pos_1->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_1->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_2->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_2->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_3->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_3->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_4->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_4->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_5->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_5->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_6->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_6->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_7->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_7->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_8->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_8->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_9->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_9->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_10->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_10->setDeltaTime(filter_time_step_j_pos);
+    this->lpf_joint_pos_11->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_11->setDeltaTime(filter_time_step_j_pos);
+
 }
 
 
@@ -16203,6 +16392,8 @@ void MainWindow::on_pushButton_errors_ctrl_clicked()
     if(!this->error_fing_pos.empty())
         this->mErrCtrldlg->setupFingersPlots(this->error_fing_pos,this->error_fing_vel,this->error_fing_acc,this->sim_time);
 
+    if(!this->error_alpha_pos.empty())
+        this->mErrCtrldlg->setupAlphaPlots(this->error_alpha_pos,this->error_alpha_vel,this->error_alpha_acc,this->sim_time);
 
     this->mErrCtrldlg->show();
 }
@@ -16213,6 +16404,7 @@ void MainWindow::on_pushButton_tracking_ctrl_clicked()
     {
         this->mCompTrackCtrldlg->setupPlots(this->handPosition_ctrl,this->handOrientation_q_ctrl,this->handPosition_des_ctrl,
                                             this->fingPosition_ctrl,this->fingPosition_des_ctrl,
+                                            this->alpha_ctrl,this->alpha_des_ctrl,
                                             this->sim_time);
     }
 
@@ -16225,6 +16417,15 @@ void MainWindow::on_pushButton_tracking_ctrl_clicked()
 
 void MainWindow::on_pushButton_start_control_pressed()
 {
+    if(this->ui.radioButton_sim->isChecked()){
+        qnode.log(QNode::Info,string("Simulation Started"));
+    }
+    qnode.log(QNode::Info,string("Control Started"));
+//    BOOST_LOG_SEV(lg, info) << "# ---------------- Control started ------------------- # ";
+}
+
+void MainWindow::on_pushButton_start_control_clicked()
+{
     this->qnode.reset_open_close_BH();
     this->ui.groupBox_sim_real->setEnabled(false);
     if(this->ui.checkBox_use_plan_hand_pos->isChecked())
@@ -16233,151 +16434,7 @@ void MainWindow::on_pushButton_start_control_pressed()
         this->on_pushButton_plan_pressed();
         this->on_pushButton_plan_clicked();
     }
-    if(this->ui.radioButton_sim->isChecked()){
-        qnode.log(QNode::Info,string("Simulation Started"));
-    }
-    qnode.log(QNode::Info,string("Control Started"));
-//    BOOST_LOG_SEV(lg, info) << "# ---------------- Control started ------------------- # ";
-
-
-    this->clear_control_variables();
-    this->qnode.resetSimTime();
-
-    if(this->ui.checkBox_use_plan_hand_pos->isChecked())
-    {
-        this->mov_type_ctrl = this->curr_mov->getType();
-        this->dHO_ctrl = this->tols.mov_specs.dHO;
-        if(this->mov_type_ctrl==0){
-            // pick
-            this->approach_ctrl = this->tols.mov_specs.pre_grasp_approach;
-            this->retreat_ctrl = this->tols.mov_specs.post_grasp_retreat;
-        }else if(this->mov_type_ctrl==2 || this->mov_type_ctrl==3 || this->mov_type_ctrl==4){
-            // place
-            this->approach_ctrl = this->tols.mov_specs.pre_place_approach;
-            this->retreat_ctrl = this->tols.mov_specs.post_place_retreat;
-        }
-
-        int mov_type = this->curr_mov->getType();
-        if(mov_type==0){ // pick
-            vector<objectPtr> objs; this->curr_scene->getObjects(objs);
-            string obj_tar_name = this->curr_mov->getObject()->getName();
-            for(size_t i=0;i<objs.size();++i)
-            {
-                if(obj_tar_name.compare(objs.at(i)->getName())==0)
-                {
-                    this->i_tar_ctrl = i;
-                    break;
-                }
-            }
-            Vector3d tar_pos;
-            targetPtr tar = this->curr_scene->getObject(this->i_tar_ctrl)->getTargetRight();
-            this->curr_scene->setHandTarget(tar);
-            tar_pos(0) = tar->getPos().Xpos;
-            tar_pos(1) = tar->getPos().Ypos;
-            tar_pos(2) = tar->getPos().Zpos;
-            Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
-            Quaterniond tar_q(Rot_tar);
-//            this->tar_position= tar_pos;
-//            this->tar_quaternion = tar_q;
-        }else if(mov_type==2 || mov_type==3 || mov_type==4){ // place
-            vector<posePtr> poses; this->curr_scene->getPoses(poses);
-            string tar_name = this->curr_mov->getPose()->getName();
-            for(size_t i=0;i<poses.size();++i)
-            {
-                if(tar_name.compare(poses.at(i)->getName())==0)
-                {
-                    this->i_tar_ctrl = i;
-                    break;
-                }
-            }
-            Vector3d tar_pos;
-            posePtr tar = this->curr_scene->getPose(this->i_tar_ctrl);
-            this->curr_scene->setHandPose(tar);
-            tar_pos(0) = tar->getPos().Xpos;
-            tar_pos(1) = tar->getPos().Ypos;
-            tar_pos(2) = tar->getPos().Zpos;
-            Matrix3d Rot_tar; tar->RPY_matrix(Rot_tar);
-            Quaterniond tar_q(Rot_tar);
-//            this->tar_position= tar_pos;
-//            this->tar_quaternion = tar_q;
-        }
-    }
-
-    this->lpf_tar_pos_x.reset(new LowPassFilter());
-    this->lpf_tar_pos_y.reset(new LowPassFilter());
-    this->lpf_tar_pos_z.reset(new LowPassFilter());
-    this->lpf_tar_or_q_x.reset(new LowPassFilter());
-    this->lpf_tar_or_q_y.reset(new LowPassFilter());
-    this->lpf_tar_or_q_z.reset(new LowPassFilter());
-    this->lpf_tar_or_q_w.reset(new LowPassFilter());
-
-    this->lpf_obsts_pos_x.reset(new LowPassFilter());
-    this->lpf_obsts_pos_y.reset(new LowPassFilter());
-    this->lpf_obsts_pos_z.reset(new LowPassFilter());
-    this->lpf_obsts_or_q_x.reset(new LowPassFilter());
-    this->lpf_obsts_or_q_y.reset(new LowPassFilter());
-    this->lpf_obsts_or_q_z.reset(new LowPassFilter());
-    this->lpf_obsts_or_q_w.reset(new LowPassFilter());
-
-    this->lpf_joint_pos_1.reset(new LowPassFilter());
-    this->lpf_joint_pos_2.reset(new LowPassFilter());
-    this->lpf_joint_pos_3.reset(new LowPassFilter());
-    this->lpf_joint_pos_4.reset(new LowPassFilter());
-    this->lpf_joint_pos_5.reset(new LowPassFilter());
-    this->lpf_joint_pos_6.reset(new LowPassFilter());
-    this->lpf_joint_pos_7.reset(new LowPassFilter());
-    this->lpf_joint_pos_8.reset(new LowPassFilter());
-    this->lpf_joint_pos_9.reset(new LowPassFilter());
-    this->lpf_joint_pos_10.reset(new LowPassFilter());
-    this->lpf_joint_pos_11.reset(new LowPassFilter());
-
-    // noise filtering
-    bool obsts_filter_noise = this->ui.checkBox_obsts_filter_noise->isChecked();
-    double filter_obsts_cut_off_freq = 0.1; double filter_obsts_timestep = 0.05;
-    bool tar_filter_noise = this->ui.checkBox_tar_filter_noise->isChecked();
-    double filter_tar_cut_off_freq = 0.1; double filter_tar_timestep = 0.05;
-    if(obsts_filter_noise){
-        filter_obsts_cut_off_freq = this->ui.lineEdit_obsts_f_cutoff->text().toDouble();
-        filter_obsts_timestep = this->ui.lineEdit_obsts_timestep->text().toDouble();
-    }
-    if(tar_filter_noise){
-        filter_tar_cut_off_freq = this->ui.lineEdit_tar_f_cutoff->text().toDouble();
-        filter_tar_timestep = this->ui.lineEdit_tar_timestep->text().toDouble();
-    }
-
-    this->lpf_tar_pos_x->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_pos_x->setDeltaTime(filter_tar_timestep);
-    this->lpf_tar_pos_y->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_pos_y->setDeltaTime(filter_tar_timestep);
-    this->lpf_tar_pos_z->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_pos_z->setDeltaTime(filter_tar_timestep);
-    this->lpf_tar_or_q_x->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_q_x->setDeltaTime(filter_tar_timestep);
-    this->lpf_tar_or_q_y->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_q_y->setDeltaTime(filter_tar_timestep);
-    this->lpf_tar_or_q_z->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_q_z->setDeltaTime(filter_tar_timestep);
-    this->lpf_tar_or_q_w->setCutOffFrequency(filter_tar_cut_off_freq); this->lpf_tar_or_q_w->setDeltaTime(filter_tar_timestep);
-
-    this->lpf_obsts_pos_x->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_pos_x->setDeltaTime(filter_obsts_timestep);
-    this->lpf_obsts_pos_y->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_pos_y->setDeltaTime(filter_obsts_timestep);
-    this->lpf_obsts_pos_z->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_pos_z->setDeltaTime(filter_obsts_timestep);
-    this->lpf_obsts_or_q_x->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_q_x->setDeltaTime(filter_obsts_timestep);
-    this->lpf_obsts_or_q_y->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_q_y->setDeltaTime(filter_obsts_timestep);
-    this->lpf_obsts_or_q_z->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_q_z->setDeltaTime(filter_obsts_timestep);
-    this->lpf_obsts_or_q_w->setCutOffFrequency(filter_obsts_cut_off_freq); this->lpf_obsts_or_q_w->setDeltaTime(filter_obsts_timestep);
-
-    double filter_cut_off_freq_j_pos = this->ui.lineEdit_cutoff_freq_joint_pos->text().toDouble();
-    double filter_time_step_j_pos = this->ui.lineEdit_timestep_joint_pos->text().toDouble();
-    this->lpf_joint_pos_1->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_1->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_2->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_2->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_3->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_3->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_4->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_4->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_5->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_5->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_6->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_6->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_7->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_7->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_8->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_8->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_9->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_9->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_10->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_10->setDeltaTime(filter_time_step_j_pos);
-    this->lpf_joint_pos_11->setCutOffFrequency(filter_cut_off_freq_j_pos); this->lpf_joint_pos_11->setDeltaTime(filter_time_step_j_pos);
-}
-
-void MainWindow::on_pushButton_start_control_clicked()
-{
+    this->set_initial_control_variables(); // set initial control variables on the planned movement
     exec_control = true;
     if(this->ui.checkBox_use_vel_control->isChecked())
     {
@@ -16591,6 +16648,8 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         stream << "Hl_add_g_th_rp=" << this->ui.lineEdit_g_th_ret_plan->text().toStdString().c_str() << endl;
         stream << "Hl_fing_p_coeff=" << this->ui.lineEdit_fing_p_coeff->text().toStdString().c_str() << endl;
         stream << "Hl_fing_d_coeff=" << this->ui.lineEdit_fing_d_coeff->text().toStdString().c_str() << endl;
+        stream << "Hl_alpha_p_coeff=" << this->ui.lineEdit_hl_alpha_pos_coeff->text().toStdString().c_str() << endl;
+        stream << "Hl_alpha_d_coeff=" << this->ui.lineEdit_hl_alpha_vel_coeff->text().toStdString().c_str() << endl;
         stream << "# Control coefficients and error threshold #" << endl;
         stream << "Pos_p_control_coeff=" << this->ui.lineEdit_coeff_p_pos->text().toStdString().c_str() << endl;
         stream << "Pos_p_error_th=" << this->ui.lineEdit_err_p_pos->text().toStdString().c_str() << endl;
@@ -16754,6 +16813,10 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     this->ui.lineEdit_fing_p_coeff->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Hl_fing_d_coeff"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_fing_d_coeff->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Hl_alpha_p_coeff"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_hl_alpha_pos_coeff->setText(fields.at(1));
+                }else if(QString::compare(fields.at(0),QString("Hl_alpha_d_coeff"),Qt::CaseInsensitive)==0){
+                    this->ui.lineEdit_hl_alpha_vel_coeff->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Pos_p_control_coeff"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_coeff_p_pos->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Pos_p_error_th"),Qt::CaseInsensitive)==0){

@@ -16,6 +16,7 @@ CompTrackingControlDialog::~CompTrackingControlDialog()
 
 void CompTrackingControlDialog::setupPlots(vector<vector<double>> &pos_hand, vector<vector<double>> &or_hand, vector<vector<double>> &des_pos_hand,
                                            vector<vector<double>> &pos_fing, vector<vector<double>> &des_pos_fing,
+                                           vector<double> &pos_alpha, vector<double> &des_pos_alpha,
                                            vector<double> &time)
 {
     //const double radtodeg = 180.0/static_cast<double>(M_PI);
@@ -25,6 +26,9 @@ void CompTrackingControlDialog::setupPlots(vector<vector<double>> &pos_hand, vec
     this->positions_hand = pos_hand; this->des_positions_hand = des_pos_hand;
     this->orientations_hand = or_hand;
     this->positions_fing = pos_fing; this->des_positions_fing = des_pos_fing;
+
+    this->qalpha_pos = QVector<double>::fromStdVector(pos_alpha);
+    this->qdes_alpha_pos = QVector<double>::fromStdVector(des_pos_alpha);
 
 }
 
@@ -197,6 +201,20 @@ void CompTrackingControlDialog::on_pushButton_plot_fing_clicked()
     plotComp(ui->plot_fing_3,QString("Finger 3 position tracking [deg]"),qtime,pos_fing_3,des_pos_fing_3);
 }
 
+void CompTrackingControlDialog::on_pushButton_plot_alpha_clicked()
+{
+    double f_th_pos = this->ui->lineEdit_f_cutoff_pos->text().toDouble();
+    double timestep_pos = this->ui->lineEdit_time_step_pos->text().toDouble();
+
+    LowPassFilter lpf_alpha(f_th_pos, timestep_pos);
+
+    QVector<double> pos_a;
+    for(size_t i=0;i<qtime.size();++i){
+        pos_a.push_back(lpf_alpha.update(this->qalpha_pos.at(i)));
+    }
+    plotComp(ui->plot_alpha_pos,QString("Swivel angle position tracking [rad]"),qtime,pos_a,this->qdes_alpha_pos);
+}
+
 void CompTrackingControlDialog::on_pushButton_save_hand_clicked()
 {
 
@@ -353,6 +371,54 @@ void CompTrackingControlDialog::on_pushButton_save_fing_clicked()
                            +t_str+string("\n");
         }
         hand_stream.close();
+    }
+
+}
+
+void CompTrackingControlDialog::on_pushButton_save_alpha_clicked()
+{
+    QString path;
+
+    struct stat st = {0};
+    if (stat("results", &st) == -1) {
+        mkdir("results", 0700);
+    }
+    if (stat("results/controlling", &st) == -1) {
+        mkdir("results/controlling", 0700);
+    }
+    if (stat("results/controlling/tracking", &st) == -1) {
+        mkdir("results/controlling/tracking", 0700);
+    }
+    if (stat("results/controlling/tracking/alpha", &st) == -1) {
+        mkdir("results/controlling/tracking/alpha", 0700);
+    }
+    path = QString("results/controlling/tracking/alpha/");
+
+    ui->plot_alpha_pos->savePdf(path+QString("alpha_pos_track.pdf"),true,0,0,QString(),QString("Swivel angle position tracking [rad]"));
+
+    // save data
+    if(!this->qalpha_pos.empty()){
+        string filename("alpha_tracking.txt");
+        ofstream alpha_stream;
+        alpha_stream.open(path.toStdString()+filename);
+        alpha_stream << string("# SWIVEL ANGLE TRACKING \n");
+        alpha_stream << string("# alpha pos [rad], des alpha pos [rad], time [s] \n");
+
+        for(size_t i=0;i<this->qalpha_pos.size();++i){
+
+            string alpha_pos_str =  boost::str(boost::format("%.2f") % (this->qalpha_pos.at(i))); boost::replace_all(alpha_pos_str,",",".");
+            string des_alpha_pos_str =  boost::str(boost::format("%.2f") % (this->qdes_alpha_pos.at(i))); boost::replace_all(des_alpha_pos_str,",",".");
+
+            // time
+            double time = this->qtime.at(i);
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+
+            alpha_stream << alpha_pos_str+string(", ")+des_alpha_pos_str+string(", ")+t_str+string("\n");
+        }
+        alpha_stream.close();
+
+
+
     }
 
 }

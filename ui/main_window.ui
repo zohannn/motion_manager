@@ -3761,7 +3761,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>610</y>
+         <y>680</y>
          <width>168</width>
          <height>25</height>
         </rect>
@@ -4734,7 +4734,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_results_plan">
        <attribute name="title">
@@ -12638,15 +12638,18 @@ p, li { white-space: pre-wrap; }
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
-          <x>393</x>
-          <y>560</y>
-          <width>871</width>
+          <x>494</x>
+          <y>561</y>
+          <width>771</width>
           <height>25</height>
          </rect>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_298">
+        <layout class="QHBoxLayout" name="horizontalLayout_80">
          <item>
           <widget class="QPushButton" name="pushButton_pred_swivel_angle">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>show predicted swivel angle</string>
            </property>

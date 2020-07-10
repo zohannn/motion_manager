@@ -50,6 +50,16 @@ public Q_SLOTS:
      */
     void on_pushButton_save_fing_clicked();
 
+    /**
+     * @brief on_pushButton_plot_alpha_clicked
+     */
+    void on_pushButton_plot_alpha_clicked();
+
+    /**
+     * @brief on_pushButton_save_alpha_clicked
+     */
+    void on_pushButton_save_alpha_clicked();
+
 public:
 
     /**
@@ -86,6 +96,15 @@ public:
      * @param time
      */
     void setupFingersPlots(vector<vector<double>> &errors_pos,vector<vector<double>> &errors_vel,vector<vector<double>> &errors_acc, vector<double> &time);
+
+    /**
+     * @brief setupAlphaPlots
+     * @param error_alpha_pos
+     * @param error_alpha_vel
+     * @param error_alpha_acc
+     * @param time
+     */
+    void setupAlphaPlots(vector<double> &error_alpha_pos,vector<double> &error_alpha_vel,vector<double> &error_alpha_acc,vector<double> &time);
 
 private:
     Ui::ErrorsControlDialog *ui; /**< handle of the user interface */
@@ -141,6 +160,14 @@ private:
     QVector<double> qerrors_fing_vel_3_plot;
     QVector<double> qerrors_fing_acc_3;
     QVector<double> qerrors_fing_acc_3_plot;
+
+    // swivel angle
+    QVector<double> qerror_alpha_pos;
+    QVector<double> qerror_alpha_pos_plot;
+    QVector<double> qerror_alpha_vel;
+    QVector<double> qerror_alpha_vel_plot;
+    QVector<double> qerror_alpha_acc;
+    QVector<double> qerror_alpha_acc_plot;
 
     /**
      * @brief plotError

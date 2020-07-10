@@ -167,6 +167,47 @@
      </layout>
     </widget>
    </widget>
+   <widget class="QWidget" name="tab_alpha">
+    <attribute name="title">
+     <string>Swivel Angle</string>
+    </attribute>
+    <widget class="QCustomPlot" name="plot_alpha_pos" native="true">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>551</width>
+       <height>421</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>1010</x>
+       <y>700</y>
+       <width>168</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QPushButton" name="pushButton_plot_alpha">
+        <property name="text">
+         <string>Plot</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_save_alpha">
+        <property name="text">
+         <string>Save</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_low_pass_pos">
    <property name="geometry">

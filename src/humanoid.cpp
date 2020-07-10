@@ -5563,7 +5563,7 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
 }
 
 
-void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,vector<double> hand_acc, vector<double> &velocities, VectorXd& null_velocities,double timestep,bool jlim_en, bool sing_en, bool obsts_en,
+void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,vector<double> hand_acc, vector<double> elbow_acc, vector<double> &velocities, VectorXd& null_velocities,double timestep,bool jlim_en, bool sing_en, bool obsts_en,
                                               double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping,double obst_coeff_torso, double obst_damping_torso,
                                               double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts)
 {
@@ -5700,10 +5700,24 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
     MatrixXd JJ = JacobianArm*JacobianArmT;
     MatrixXd JJk_inv = JJ.inverse();
     MatrixXd J_plus = JacobianArmT*JJk_inv; // pseudo-inverse of the Jacobian
-    VectorXd hand_acc_xd(6); hand_acc_xd << hand_acc.at(0),hand_acc.at(1),hand_acc.at(2),hand_acc.at(3),hand_acc.at(4),hand_acc.at(5);
+    //VectorXd hand_acc_xd(6); hand_acc_xd << hand_acc.at(0),hand_acc.at(1),hand_acc.at(2),hand_acc.at(3),hand_acc.at(4),hand_acc.at(5);
+    VectorXd hand_acc_xd = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(hand_acc.data(), hand_acc.size());
     VectorXd hand_vel_xd = hand_acc_xd*timestep;
     VectorXd joint_accelerations = J_plus*hand_acc_xd;
-    // TO DO: add to joint_accelerations the swivel angle contribution
+    MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
+    MatrixXd Jpp = J_plus*JacobianArm;
+    MatrixXd J_Null = Id - Jpp; // null space of the Jacobian
+    // add to joint_accelerations the swivel angle contribution
+    MatrixXd JacobianArm_E = JacobianArm.block<3,4>(0,0);
+    MatrixXd JacobianArm_ET = JacobianArm_E.transpose();
+    MatrixXd JJ_E = JacobianArm_E*JacobianArm_ET;
+    MatrixXd JJ_E_inv = JJ_E.inverse();
+    MatrixXd J_plus_E = JacobianArm_ET*JJ_E_inv; // pseudo-inverse of the Jacobian elbow
+    VectorXd elbow_acc_xd = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(elbow_acc.data(), elbow_acc.size());
+    VectorXd q_E = J_plus_E*elbow_acc_xd;
+    VectorXd q_E_a(JOINTS_ARM); q_E_a << q_E.data()[0],q_E.data()[1],q_E.data()[2],q_E.data()[3],0.0,0.0,0.0;
+    joint_accelerations += J_Null*q_E_a;
+    // go to joint velocity space
     VectorXd joint_velocities = joint_accelerations*timestep;
 
     double null_th = 0.000001;
@@ -5717,9 +5731,9 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
             delta_H_jlim(i) = (posture.at(i) - mid_limits.at(i))/(max_limits.at(i) - min_limits.at(i));
             delta_H_jlim_mod(i) = delta_H_jlim(i)*(1+exp((delta_H_jlim(i) - jlim_th)/jlim_rate));
         }
-        MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
-        MatrixXd Jpp = J_plus*JacobianArm;
-        MatrixXd J_Null = Id - Jpp;
+        //MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
+        //MatrixXd Jpp = J_plus*JacobianArm;
+        //MatrixXd J_Null = Id - Jpp;
         //VectorXd J_jlim= J_Null*delta_H_jlim;
         VectorXd J_jlim= J_Null*delta_H_jlim_mod;
         double k_jlim = 0;
@@ -5819,9 +5833,9 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
         for (int i = 0; i < delta_H_sing.size(); ++i){
             delta_H_sing(i) = (H_sing_av_delta - H_sing_av)/delta_theta;
         }
-        MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
-        MatrixXd Jpp = J_plus*JacobianArm;
-        MatrixXd J_Null = Id - Jpp;
+        //MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
+        //MatrixXd Jpp = J_plus*JacobianArm;
+        //MatrixXd J_Null = Id - Jpp;
         VectorXd J_sing= J_Null*delta_H_sing;
         double k_sing = 0;
         if(J_sing.norm() > null_th){
@@ -6061,9 +6075,9 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
 //        BOOST_LOG_SEV(lg, info) << "e_arm_delta 3 = " << e_arm_delta.at(3);
 //        BOOST_LOG_SEV(lg, info) << "e_arm_delta 4 = " << e_arm_delta.at(4);
 
-        MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
-        MatrixXd Jpp = J_plus*JacobianArm;
-        MatrixXd J_Null = Id - Jpp;
+        //MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
+        //MatrixXd Jpp = J_plus*JacobianArm;
+        //MatrixXd J_Null = Id - Jpp;
 
         // ---------- torso ----------------------------------------
 

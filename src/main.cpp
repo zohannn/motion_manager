@@ -13,7 +13,7 @@
 ** Includes
 *****************************************************************************/
 #include <QtGui>
-#include <QApplication>
+#include "../include/motion_manager/main_application.hpp"
 #include "../include/motion_manager/main_window.hpp"
 
 /*****************************************************************************
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     /*********************
     ** Qt
     **********************/
-    QApplication app(argc, argv);
+    MainApplication app(argc, argv);
     motion_manager::MainWindow w(argc,argv);
     w.show();
     app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));

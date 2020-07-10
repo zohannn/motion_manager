@@ -41,6 +41,11 @@ public Q_SLOTS:
     void on_pushButton_plot_fing_clicked();
 
     /**
+     * @brief on_pushButton_plot_alpha_clicked
+     */
+    void on_pushButton_plot_alpha_clicked();
+
+    /**
      * @brief on_pushButton_save_hand_clicked
      */
     void on_pushButton_save_hand_clicked();
@@ -49,6 +54,11 @@ public Q_SLOTS:
      * @brief on_pushButton_save_fing_clicked
      */
     void on_pushButton_save_fing_clicked();
+
+    /**
+     * @brief on_pushButton_save_alpha_clicked
+     */
+    void on_pushButton_save_alpha_clicked();
 
 public:
     /**
@@ -69,10 +79,12 @@ public:
      * @param des_pos_hand
      * @param pos_fing
      * @param des_pos_fing
+     * @param pos_alpha
+     * @param des_pos_alpha
      * @param time
      */
     void setupPlots(vector<vector<double>> &pos_hand, vector<vector<double> > &or_hand, vector<vector<double>> &des_pos_hand,
-                    vector<vector<double>> &pos_fing, vector<vector<double>> &des_pos_fing, vector<double> &time);
+                    vector<vector<double>> &pos_fing, vector<vector<double>> &des_pos_fing, vector<double> &pos_alpha, vector<double> &des_pos_alpha, vector<double> &time);
 
 
 private:
@@ -94,6 +106,10 @@ private:
     QVector<double> pos_fing_1; QVector<double> des_pos_fing_1;
     QVector<double> pos_fing_2; QVector<double> des_pos_fing_2;
     QVector<double> pos_fing_3; QVector<double> des_pos_fing_3;
+    // swivel angle
+    QVector<double> qalpha_pos;
+    QVector<double> qdes_alpha_pos;
+
 
     /**
      * @brief plotComp
