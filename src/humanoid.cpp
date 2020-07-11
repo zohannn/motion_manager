@@ -5716,8 +5716,27 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
     VectorXd elbow_acc_xd = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(elbow_acc.data(), elbow_acc.size());
     VectorXd q_E = J_plus_E*elbow_acc_xd;
     VectorXd q_E_a(JOINTS_ARM); q_E_a << q_E.data()[0],q_E.data()[1],q_E.data()[2],q_E.data()[3],0.0,0.0,0.0;
-    joint_accelerations += J_Null*q_E_a;
+    VectorXd q_acc_alpha = J_Null*q_E_a;
+    joint_accelerations += q_acc_alpha;
     // go to joint velocity space
+    null_velocities += q_acc_alpha*timestep;
+    /**
+            BOOST_LOG_SEV(lg, info) << "# --------------SWIVEL ANGLE--------------- # ";
+            BOOST_LOG_SEV(lg, info) << "q_E_a 0 = " << q_E_a(0);
+            BOOST_LOG_SEV(lg, info) << "q_E_a 1 = " << q_E_a(1);
+            BOOST_LOG_SEV(lg, info) << "q_E_a 2 = " << q_E_a(2);
+            BOOST_LOG_SEV(lg, info) << "q_E_a 3 = " << q_E_a(3);
+            BOOST_LOG_SEV(lg, info) << "q_E_a 4 = " << q_E_a(4);
+            BOOST_LOG_SEV(lg, info) << "q_E_a 5 = " << q_E_a(5);
+            BOOST_LOG_SEV(lg, info) << "q_E_a 6 = " << q_E_a(6);
+            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 0 = " << q_acc_alpha(0);
+            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 1 = " << q_acc_alpha(1);
+            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 2 = " << q_acc_alpha(2);
+            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 3 = " << q_acc_alpha(3);
+            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 4 = " << q_acc_alpha(4);
+            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 5 = " << q_acc_alpha(5);
+            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 6 = " << q_acc_alpha(6);
+    **/
     VectorXd joint_velocities = joint_accelerations*timestep;
 
     double null_th = 0.000001;
@@ -5755,7 +5774,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
 //        BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_jlim(4);
 //        BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_jlim(5);
 //        BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_jlim(6);
-    }
+    }// joint limits avoidance
 
     // Manipulability measure minimization function (Avoidance of singularities)
     if(sing_en){
@@ -5856,7 +5875,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
 //        BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_sing(4);
 //        BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_sing(5);
 //        BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_sing(6);
-    }
+    } // singularities avoidance
 
     // Obstacles avoidance
     if(obsts_en){
@@ -6367,7 +6386,7 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
 //        BOOST_LOG_SEV(lg, info) << "joint 5 = " << J_obst_WH(4);
 //        BOOST_LOG_SEV(lg, info) << "joint 6 = " << J_obst_WH(5);
 //        BOOST_LOG_SEV(lg, info) << "joint 7 = " << J_obst_WH(6);
-    }
+    } // obstacle avoidance
 
 
     velocities.clear();

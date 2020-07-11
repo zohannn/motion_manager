@@ -47,7 +47,7 @@ void ResultsCtrlNullJointsDialog::plotJoint(QCustomPlot *plot, QString title, QV
     // velocity
     plot->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
     plot->graph(0)->setPen(QPen(Qt::red));
-    plot->graph(0)->setName("[deg/s]");
+    plot->graph(0)->valueAxis()->setLabel("[deg/s]");
     plot->graph(0)->valueAxis()->setTickLabelColor(Qt::red);
     plot->graph(0)->keyAxis()->setLabel("time [s]");
     plot->graph(0)->setData(time, vel);

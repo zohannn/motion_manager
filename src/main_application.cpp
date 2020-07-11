@@ -1,18 +1,24 @@
+#include <execinfo.h>
+#include <unistd.h>
+#include <stdexcept>
 #include "../include/motion_manager/main_application.hpp"
-#include <exception>
-#include <iostream>
+
 
 MainApplication::MainApplication(int& argc, char** argv) :
     QApplication(argc, argv) {}
 
-bool MainApplication::notify(QObject* receiver, QEvent* event) {
-    bool done = true;
+bool MainApplication::notify(QObject* receiver, QEvent* event)
+{
     try {
-        done = QApplication::notify(receiver, event);
-    } catch (const std::exception& ex) {
-        std::cerr << ex.what() << std::endl;
-    } catch (const std::runtime_error &ex) {
-        std::cerr << ex.what() << std::endl;
+        return QApplication::notify(receiver, event);
+    } catch (std::exception &e) {
+        qFatal("Error %s sending event %s to object %s (%s)",
+            e.what(), typeid(*event).name(), qPrintable(receiver->objectName()),
+            typeid(*receiver).name());
+    } catch (...) {
+        qFatal("Error <unknown> sending event %s to object %s (%s)",
+            typeid(*event).name(), qPrintable(receiver->objectName()),
+            typeid(*receiver).name());
     }
-    return done;
-} 
+}
+

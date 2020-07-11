@@ -4134,6 +4134,9 @@ p, li { white-space: pre-wrap; }
         </widget>
        </widget>
        <widget class="QGroupBox" name="groupBox_3">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>10</x>
