@@ -788,7 +788,7 @@ void Humanoid::getLeftHandPosture(vector<double> &p)
 void Humanoid::getRightHomePosture(vector<double>& p)
 {
 
-     p = vector<double>(JOINTS_ARM+JOINTS_HAND);
+    p = vector<double>(JOINTS_ARM+JOINTS_HAND);
 
     std::copy(this->rightHomePosture.begin(),this->rightHomePosture.end(),p.begin());
 
@@ -1959,6 +1959,7 @@ void Humanoid::getHandPosMes(int arm, vector<double>& ppos)
 
 double Humanoid::getSwivelAngle(int arm, vector<double>& posture)
 {
+    // see Su2018 DOI:10.1177/1729881418814695
     Matrix4d T;
     Matrix4d T_aux;
     Matrix4d mat_world;
@@ -1966,6 +1967,7 @@ double Humanoid::getSwivelAngle(int arm, vector<double>& posture)
     DHparams m_DH_arm;
     vector<DHparams> m_DH_hand;
 
+    Vector3d basePos;
     Vector3d shoulderPos;
     Vector3d elbowPos;
     Vector3d wristPos;
@@ -1991,6 +1993,10 @@ double Humanoid::getSwivelAngle(int arm, vector<double>& posture)
     }
 
     T = mat_world;
+    // get the base
+    Vector3d v;
+    v = T.block(0,3,3,1);
+    basePos << v[0], v[1], v[2];
 
     for (size_t i = 0; i < posture.size(); ++i){
         this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i), posture.at(i),T_aux);
@@ -2016,18 +2022,23 @@ double Humanoid::getSwivelAngle(int arm, vector<double>& posture)
         }
     }
 
-    double Lu = m_DH_arm.d.at(2); // length of the upper arm
-    Vector3d v_SE = (shoulderPos-elbowPos)/((shoulderPos-elbowPos).norm());
+    Vector3d v_BS = (basePos-shoulderPos)/((basePos-shoulderPos).norm());
     Vector3d v_SW = (shoulderPos-wristPos)/((shoulderPos-wristPos).norm());
-    Vector3d C = shoulderPos + Lu*(v_SW.dot(v_SE))*v_SW;
-    Vector3d v_CE = (C-elbowPos)/((C-elbowPos).norm());
-    Vector3d u; u << v_SW(1), -v_SW(0), 0.0; u = u/u.norm();
-    Vector3d v; v = u.cross(v_SW);
-    double alpha = atan2(v_CE.dot(v),v_CE.dot(u)); // See ElianaPhD2011
+    Vector3d v_BSW = v_BS.cross(v_SW);
+    Vector3d v_SE = (shoulderPos-elbowPos)/((shoulderPos-elbowPos).norm());
+    Vector3d v_EW = (elbowPos-wristPos)/((elbowPos-wristPos).norm());
+    Vector3d v_SEW = v_SE.cross(v_EW);
+
+    int sgn = 0;
+    double sgn_value = ((v_BS.cross(v_SE)).dot(v_SW));
+    if(sgn_value>0){sgn = 1;}else{sgn = -1;};
+
+    double alpha = RADTODEG*sgn*acos(v_BSW.dot(v_SEW));
 
     return alpha;
 }
 
+/**
 double Humanoid::getSwivelAngle(int arm)
 {
 
@@ -2102,6 +2113,7 @@ double Humanoid::getSwivelAngle(int arm)
 
     return alpha;
 }
+**/
 
 void Humanoid::setHandPosMes(int arm, vector<double> &ppos)
 {
@@ -5563,7 +5575,7 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
 }
 
 
-void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,vector<double> hand_acc, vector<double> elbow_acc, vector<double> &velocities, VectorXd& null_velocities,double timestep,bool jlim_en, bool sing_en, bool obsts_en,
+void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,vector<double> hand_acc, vector<double> elbow_acc, vector<double> &velocities, VectorXd& null_velocities,double timestep,bool hl_alpha_en,bool jlim_en, bool sing_en, bool obsts_en,
                                               double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping,double obst_coeff_torso, double obst_damping_torso,
                                               double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts)
 {
@@ -5717,10 +5729,13 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
     VectorXd q_E = J_plus_E*elbow_acc_xd;
     VectorXd q_E_a(JOINTS_ARM); q_E_a << q_E.data()[0],q_E.data()[1],q_E.data()[2],q_E.data()[3],0.0,0.0,0.0;
     VectorXd q_acc_alpha = J_Null*q_E_a;
-    joint_accelerations += q_acc_alpha;
-    // go to joint velocity space
-    null_velocities += q_acc_alpha*timestep;
+
+    if(hl_alpha_en){
+        joint_accelerations += q_acc_alpha;
+        null_velocities += q_acc_alpha*timestep;
+    }
     /**
+
             BOOST_LOG_SEV(lg, info) << "# --------------SWIVEL ANGLE--------------- # ";
             BOOST_LOG_SEV(lg, info) << "q_E_a 0 = " << q_E_a(0);
             BOOST_LOG_SEV(lg, info) << "q_E_a 1 = " << q_E_a(1);
@@ -5737,6 +5752,8 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
             BOOST_LOG_SEV(lg, info) << "q_acc_alpha 5 = " << q_acc_alpha(5);
             BOOST_LOG_SEV(lg, info) << "q_acc_alpha 6 = " << q_acc_alpha(6);
     **/
+
+    // go to joint velocity space
     VectorXd joint_velocities = joint_accelerations*timestep;
 
     double null_th = 0.000001;

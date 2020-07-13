@@ -76,6 +76,10 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mPRMstardlg = new PRMstarDialog(this);
     mPRMstardlg->setModal(true);
 
+    //create the Results Alpha dialog
+    mResultsAlphadlg = new ResultsAlphaDialog(this);
+    mResultsAlphadlg->setModal(false);
+
     //create the Results Joints dialog
     mResultsJointsdlg = new ResultsJointsDialog(this);
     mResultsJointsdlg->setModal(false);
@@ -167,7 +171,8 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     QObject::connect(this->ui.checkBox_sing_av, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_sing_av(int)));
     QObject::connect(this->ui.checkBox_obsts_av, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_obsts_av(int)));
     QObject::connect(this->ui.checkBox_obsts_filter_noise, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_obsts_filter_noise(int)));
-    QObject::connect(this->ui.checkBox_hl_add, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_hl_add(int)));    
+    QObject::connect(this->ui.checkBox_hl_add, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_hl_add(int)));
+    QObject::connect(this->ui.checkBox_hl_add_alpha, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_hl_add_alpha(int)));
     QObject::connect(this->ui.checkBox_draw_ellipse, SIGNAL(stateChanged(int)), this, SLOT(check_draw_ellipse(int)));
     QObject::connect(this->ui.checkBox_tar_filter_noise, SIGNAL(stateChanged(int)), this, SLOT(check_ctrl_tar_filter_noise(int)));
 
@@ -289,6 +294,7 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     scenarios.push_back(QString("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane"));
     scenarios.push_back(QString("Controlling: pick a red column"));
     scenarios.push_back(QString("Controlling: follow a moving red column"));
+    scenarios.push_back(QString("Controlling: swivel angle tracking"));
 
 #endif
 
@@ -952,6 +958,7 @@ void MainWindow::execPosControl()
 
             // human-likeness
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
+            bool hl_alpha_en = this->ui.checkBox_hl_add_alpha->isChecked();
             double hl_p_pos_coeff_plan = 1; double hl_p_or_coeff_plan = 1;
             double hl_p_pos_coeff_app = 1; double hl_p_or_coeff_app = 1;
             double hl_p_pos_coeff_ret = 1; double hl_p_or_coeff_ret = 1;
@@ -964,7 +971,7 @@ void MainWindow::execPosControl()
             double fing_p_coeff = 0.1; double fing_d_coeff = 0.1;
             double phi = 0.0; double tb = 0.0;
             double hl_alpha_pos_coeff = 1.0; double hl_alpha_vel_coeff = 0.1;
-            if(hl_en){
+            if(hl_en && this->h_results!=nullptr && this->h_results->status==0){
                 hl_p_pos_coeff_plan = this->ui.lineEdit_hl_p_pos_coeff_plan->text().toDouble();
                 hl_p_or_coeff_plan = this->ui.lineEdit_hl_p_or_coeff_plan->text().toDouble();
                 hl_p_pos_coeff_app = this->ui.lineEdit_hl_p_pos_coeff_app->text().toDouble();
@@ -1009,6 +1016,9 @@ void MainWindow::execPosControl()
                     jointsBouncePosition_hand << 0.0,jointsBouncePosition_hand_vec.at(0),
                                              jointsBouncePosition_hand_vec.at(0),jointsBouncePosition_hand_vec.at(1);
                 }
+            }else if(hl_en && (this->h_results==nullptr || this->h_results->status!=0)){
+                qnode.log(QNode::Error,string("The planning has failed."));
+                break;
             }
 
             // desired position
@@ -2392,7 +2402,7 @@ void MainWindow::execPosControl()
 
 
                 // inverse algorithm
-                this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,elbow_acc_vec,r_arm_velocities,r_arm_null_velocities,time_step,jlim_en,sing_en,obsts_en,
+                this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,elbow_acc_vec,r_arm_velocities,r_arm_null_velocities,time_step,hl_alpha_en,jlim_en,sing_en,obsts_en,
                                                                                 vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,obst_coeff_torso,obst_damping_torso,
                                                                                  jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts_n);
 
@@ -3619,6 +3629,8 @@ void MainWindow::on_pushButton_loadScenario_clicked()
              string path_vrep_controlling_pick = PATH_SCENARIOS+string("/vrep/Controlling_pick_ToyVehicle_aros.ttt");
              // Controlling: follow a moving red column
              string path_vrep_controlling_follow = PATH_SCENARIOS+string("/vrep/Controlling_pick_ToyVehicle_aros_moving_column.ttt");
+             // Controlling: swivel angle tracking
+             string path_vrep_controlling_alpha = PATH_SCENARIOS+string("/vrep/Controlling_pick_ToyVehicle_aros_alpha.ttt");
 
              switch(i){
              case 0: // Assembly scenario
@@ -4036,6 +4048,30 @@ void MainWindow::on_pushButton_loadScenario_clicked()
 #endif
                  }else{
                      qnode.log(QNode::Error,std::string("Controlling: follow a moving red column HAS NOT BEEN LOADED. You probably have to stop the simulation"));
+                     ui.groupBox_getElements->setEnabled(false);
+                     ui.groupBox_homePosture->setEnabled(false);
+                     ui.pushButton_loadScenario->setEnabled(true);
+                 }
+#endif
+                 break;
+             case 16: // Controlling: test swivel angle tracking
+#if HAND==0
+
+#elif HAND==1
+                this->scenario_id = 17;
+                 if (qnode.loadScenario(path_vrep_controlling_alpha,this->scenario_id)){
+                     qnode.log(QNode::Info,string("Controlling: swivel angle tracking HAS BEEN LOADED"));
+                     ui.groupBox_getElements->setEnabled(true);
+                     ui.groupBox_homePosture->setEnabled(true);
+                     //ui.pushButton_loadScenario->setEnabled(false);
+                     string title = string("Controlling: swivel angle tracking");
+                     init_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+                     curr_scene = scenarioPtr(new Scenario(title,this->scenario_id+1));
+#if MOVEIT==1
+                     //this->m_planner.reset(new moveit_planning::HumanoidPlanner(title));
+#endif
+                 }else{
+                     qnode.log(QNode::Error,std::string("Controlling: swivel angle tracking HAS NOT BEEN LOADED. You probably have to stop the simulation"));
                      ui.groupBox_getElements->setEnabled(false);
                      ui.groupBox_homePosture->setEnabled(false);
                      ui.pushButton_loadScenario->setEnabled(true);
@@ -5371,6 +5407,8 @@ if(solved){
         this->shoulderLinearVelocity_mov.resize(tot_steps); this->shoulderAngularVelocity_mov.resize(tot_steps);
         // swivel angle
         this->swivel_angle_mov.resize(tot_steps);
+        this->der_swivel_angle_mov.resize(tot_steps);
+        this->der_der_swivel_angle_mov.resize(tot_steps);
         this->swivel_angle_mov_stages.resize(this->jointsPosition_mov.size());
         this->der_swivel_angle_mov_stages.resize(this->jointsPosition_mov.size());
         this->der_der_swivel_angle_mov_stages.resize(this->jointsPosition_mov.size());
@@ -5500,6 +5538,9 @@ if(solved){
 
         }// loop stages
 
+        // velocity and acceleration of the swivel angle
+        this->getDerivative(this->swivel_angle_mov,timesteps_mov_tot,this->der_swivel_angle_mov);
+        this->getDerivative(this->der_swivel_angle_mov,timesteps_mov_tot,this->der_der_swivel_angle_mov);
         // max and min swivel angles
         this->swivel_angle_mov_max = *std::max_element(this->swivel_angle_mov.begin(),this->swivel_angle_mov.end());
         this->swivel_angle_mov_min = *std::min_element(this->swivel_angle_mov.begin(),this->swivel_angle_mov.end());
@@ -6126,6 +6167,13 @@ void MainWindow::on_pushButton_stop_mov_clicked()
     qnode.stopSim();
     qnode.resetSimTime();
     qnode.resetGlobals();
+    // reset the robot to its home configuration
+    std::vector<double> r_home; std::vector<double> l_home;
+    this->curr_scene->getHumanoid()->getRightHomePosture(r_home);
+    this->curr_scene->getHumanoid()->getRightHomePosture(l_home);
+    this->curr_scene->getHumanoid()->setRightPosture(r_home);
+    this->curr_scene->getHumanoid()->setLeftPosture(l_home);
+
 }
 
 void MainWindow::on_pushButton_stop_task_clicked()
@@ -6133,6 +6181,12 @@ void MainWindow::on_pushButton_stop_task_clicked()
     qnode.stopSim();
     qnode.resetSimTime();
     qnode.resetGlobals();
+    // reset the robot to its home configuration
+    std::vector<double> r_home; std::vector<double> l_home;
+    this->curr_scene->getHumanoid()->getRightHomePosture(r_home);
+    this->curr_scene->getHumanoid()->getRightHomePosture(l_home);
+    this->curr_scene->getHumanoid()->setRightPosture(r_home);
+    this->curr_scene->getHumanoid()->setLeftPosture(l_home);
 }
 
 void MainWindow::on_pushButton_save_end_posture_clicked()
@@ -6914,7 +6968,6 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     qnode.resetGlobals();
     qnode.log(QNode::Info,std::string("Tha scenario has been reset"));
 
-    int scene_id = this->scenario_id;
     string path;
     string title;
     string success;
@@ -6968,7 +7021,17 @@ void MainWindow::on_pushButton_scene_reset_clicked()
     // Controlling: scenario with one obstacle and drawing an ellipse on the XY plane
     string path_vrep_controlling_obsts_av_ellipse = PATH_SCENARIOS+string("/vrep/Controlling_obsts_av_ellipse.ttt");
 
-    switch(scene_id){
+    // Controlling: pick a red column
+    string path_vrep_controlling_pick = PATH_SCENARIOS+string("/vrep/Controlling_pick_ToyVehicle_aros.ttt");
+
+    // Controlling: follow a moving red column
+    string path_vrep_controlling_follow = PATH_SCENARIOS+string("/vrep/Controlling_pick_ToyVehicle_aros_moving_column.ttt");
+
+    // Controlling: swivel angle tracking
+    string path_vrep_controlling_alpha = PATH_SCENARIOS+string("/vrep/Controlling_pick_ToyVehicle_aros_alpha.ttt");
+
+
+    switch(this->scenario_id){
 
     case 0:
         // Assembly scenario: the Toy vehicle with ARoS
@@ -7074,6 +7137,27 @@ void MainWindow::on_pushButton_scene_reset_clicked()
         title = string("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane");
         success = string("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane HAS BEEN LOADED");
         failure = string("Controlling: scenario with one obstacle and drawing an ellipse on the XY plane HAS NOT BEEN LOADED");
+        break;
+    case 15:
+        // Controlling: pick a red column
+        path = path_vrep_controlling_pick;
+        title = string("Controlling: pick a red column");
+        success = string("Controlling: pick a red column HAS BEEN LOADED");
+        failure = string("Controlling: pick a red column HAS NOT BEEN LOADED");
+        break;
+    case 16:
+        // Controlling: swivel angle tracking
+        path = path_vrep_controlling_follow;
+        title = string("Controlling: follow a moving red column");
+        success = string("Controlling: follow a moving red column HAS BEEN LOADED");
+        failure = string("Controlling: follow a moving red column HAS NOT BEEN LOADED");
+        break;
+    case 17:
+        // Controlling: swivel angle tracking
+        path = path_vrep_controlling_alpha;
+        title = string("Controlling: swivel angle tracking");
+        success = string("Controlling: swivel angle tracking HAS BEEN LOADED");
+        failure = string("Controlling: Controlling: swivel angle tracking HAS NOT BEEN LOADED");
         break;
     }
 
@@ -7994,6 +8078,17 @@ void MainWindow::on_pushButton_plot_task_dual_clicked()
             ui.plot_hand_vel_task_left->clearGraphs();
         }
     }
+}
+
+void MainWindow::on_pushButton_alpha_results_mov_clicked()
+{
+    if(!this->swivel_angle_mov_stages.empty())
+    {
+        this->mResultsAlphadlg->setDual(false);this->mResultsAlphadlg->setRight(true);
+        this->mResultsAlphadlg->setupPlots(this->swivel_angle_mov_stages,this->der_swivel_angle_mov_stages,this->der_der_swivel_angle_mov_stages,this->timesteps_mov);
+    }
+
+    this->mResultsAlphadlg->show();
 }
 
 void MainWindow::on_pushButton_joints_results_mov_clicked()
@@ -16295,6 +16390,11 @@ void MainWindow::check_ctrl_hl_add(int state)
     this->ui.groupBox_hl_add_params->setEnabled(state!=0);
 }
 
+void MainWindow::check_ctrl_hl_add_alpha(int state)
+{
+    this->ui.groupBox_h_alpha->setEnabled(state!=0);
+}
+
 void MainWindow::check_draw_ellipse(int state)
 {
     if(state==0){
@@ -16632,6 +16732,7 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         if (this->ui.checkBox_use_vel_control->isChecked()){ stream << "use_vel_control=true"<< endl;}else{stream << "use_vel_control=false"<< endl;}
         stream << "# Human-likeness addition parameters #" << endl;
         if (this->ui.checkBox_hl_add->isChecked()){ stream << "Hl_add=true"<< endl;}else{stream << "Hl_add=false"<< endl;}
+        if (this->ui.checkBox_hl_add_alpha->isChecked()){ stream << "Hl_alpha_add=true"<< endl;}else{stream << "Hl_alpha_add=false"<< endl;}
         stream << "Hl_add_p_pos_coeff_plan=" << this->ui.lineEdit_hl_p_pos_coeff_plan->text().toStdString().c_str() << endl;
         stream << "Hl_add_p_or_coeff_plan=" << this->ui.lineEdit_hl_p_or_coeff_plan->text().toStdString().c_str() << endl;
         stream << "Hl_add_p_pos_coeff_app=" << this->ui.lineEdit_hl_p_pos_coeff_app->text().toStdString().c_str() << endl;
@@ -16780,6 +16881,14 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     }else{
                         this->ui.checkBox_hl_add->setChecked(false);
                         this->ui.groupBox_hl_add_params->setEnabled(false);
+                    }
+                }else if(QString::compare(fields.at(0),QString("Hl_alpha_add"),Qt::CaseInsensitive)==0){
+                    if(QString::compare(fields.at(1),QString("true\n"),Qt::CaseInsensitive)==0){
+                        this->ui.checkBox_hl_add_alpha->setChecked(true);
+                        this->ui.groupBox_h_alpha->setEnabled(true);
+                    }else{
+                        this->ui.checkBox_hl_add_alpha->setChecked(false);
+                        this->ui.groupBox_h_alpha->setEnabled(false);
                     }
                 }else if(QString::compare(fields.at(0),QString("Hl_add_p_pos_coeff_plan"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_hl_p_pos_coeff_plan->setText(fields.at(1));

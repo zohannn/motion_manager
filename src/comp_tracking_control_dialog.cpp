@@ -212,7 +212,7 @@ void CompTrackingControlDialog::on_pushButton_plot_alpha_clicked()
     for(size_t i=0;i<qtime.size();++i){
         pos_a.push_back(lpf_alpha.update(this->qalpha_pos.at(i)));
     }
-    plotComp(ui->plot_alpha_pos,QString("Swivel angle position tracking [rad]"),qtime,pos_a,this->qdes_alpha_pos);
+    plotComp(ui->plot_alpha_pos,QString("Swivel angle position tracking [deg]"),qtime,pos_a,this->qdes_alpha_pos);
 }
 
 void CompTrackingControlDialog::on_pushButton_save_hand_clicked()
@@ -402,7 +402,7 @@ void CompTrackingControlDialog::on_pushButton_save_alpha_clicked()
         ofstream alpha_stream;
         alpha_stream.open(path.toStdString()+filename);
         alpha_stream << string("# SWIVEL ANGLE TRACKING \n");
-        alpha_stream << string("# alpha pos [rad], des alpha pos [rad], time [s] \n");
+        alpha_stream << string("# alpha pos [deg], des alpha pos [deg], time [s] \n");
 
         for(size_t i=0;i<this->qalpha_pos.size();++i){
 

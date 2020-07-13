@@ -267,9 +267,9 @@ void ErrorsControlDialog::on_pushButton_plot_alpha_clicked()
         this->qerror_alpha_acc_plot.push_back(lpf_err_acc.update(this->qerror_alpha_acc.at(k)));
     }
 
-    plotError(ui->plot_error_alpha_pos,QString("Error in position"),qtime,qerror_alpha_pos_plot,"[rad]",Qt::blue);
-    plotError(ui->plot_error_alpha_vel,QString("Error in velocity"),qtime,qerror_alpha_vel_plot,"[rad/s]",Qt::red);
-    plotError(ui->plot_error_alpha_acc,QString("Error in acceleration"),qtime,qerror_alpha_acc_plot,"[rad/s^2]",Qt::darkGreen);
+    plotError(ui->plot_error_alpha_pos,QString("Error in position"),qtime,qerror_alpha_pos_plot,"[deg]",Qt::blue);
+    plotError(ui->plot_error_alpha_vel,QString("Error in velocity"),qtime,qerror_alpha_vel_plot,"[deg/s]",Qt::red);
+    plotError(ui->plot_error_alpha_acc,QString("Error in acceleration"),qtime,qerror_alpha_acc_plot,"[deg/s^2]",Qt::darkGreen);
 }
 
 void ErrorsControlDialog::on_pushButton_save_hand_clicked()
@@ -659,7 +659,7 @@ void ErrorsControlDialog::on_pushButton_save_alpha_clicked()
         error.open(path.toStdString()+filename);
 
         error << string("# ALPHA ERROR IN POSITION \n");
-        error << string("# error [rad], time [s] \n");
+        error << string("# error [deg], time [s] \n");
 
         for(size_t i=0;i<this->qerror_alpha_pos_plot.size();++i){
             double err = this->qerror_alpha_pos_plot.at(i);
@@ -680,7 +680,7 @@ void ErrorsControlDialog::on_pushButton_save_alpha_clicked()
         error.open(path.toStdString()+filename);
 
         error << string("# ALPHA ERROR IN VELOCITY \n");
-        error << string("# error [rad/s], time [s] \n");
+        error << string("# error [deg/s], time [s] \n");
 
         for(size_t i=0;i<this->qerror_alpha_vel_plot.size();++i){
             double err = this->qerror_alpha_vel_plot.at(i);
@@ -701,7 +701,7 @@ void ErrorsControlDialog::on_pushButton_save_alpha_clicked()
         error.open(path.toStdString()+filename);
 
         error << string("# ALPHA ERROR IN ACCELERATION \n");
-        error << string("# error [rad/s^2], time [s] \n");
+        error << string("# error [deg/s^2], time [s] \n");
 
         for(size_t i=0;i<this->qerror_alpha_acc_plot.size();++i){
             double err = this->qerror_alpha_acc_plot.at(i);

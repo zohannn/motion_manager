@@ -76,7 +76,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QPushButton" name="pushButton_loadScenario">
          <property name="text">
-          <string>Load the scenario</string>
+          <string>Load the selected scenario</string>
          </property>
         </widget>
        </item>
@@ -101,7 +101,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QPushButton" name="pushButton_getElements">
          <property name="text">
-          <string>Get the elements</string>
+          <string>Get the elements of the loaded scenario</string>
          </property>
         </widget>
        </item>
@@ -3423,7 +3423,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>290</x>
-         <y>620</y>
+         <y>650</y>
          <width>161</width>
          <height>21</height>
         </rect>
@@ -3789,7 +3789,7 @@ p, li { white-space: pre-wrap; }
          <x>290</x>
          <y>30</y>
          <width>301</width>
-         <height>591</height>
+         <height>621</height>
         </rect>
        </property>
        <property name="title">
@@ -3799,7 +3799,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>370</y>
+          <y>400</y>
           <width>191</width>
           <height>27</height>
          </rect>
@@ -4140,7 +4140,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>430</y>
+          <y>460</y>
           <width>281</width>
           <height>151</height>
          </rect>
@@ -4219,7 +4219,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>11</x>
-          <y>400</y>
+          <y>430</y>
           <width>271</width>
           <height>27</height>
          </rect>
@@ -4324,6 +4324,22 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </widget>
+       <widget class="QCheckBox" name="checkBox_hl_add_alpha">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>370</y>
+          <width>211</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>add human-like swivel angle</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
       </widget>
       <widget class="QCheckBox" name="checkBox_sing_av">
        <property name="geometry">
@@ -4402,7 +4418,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>290</x>
+         <x>10</x>
          <y>650</y>
          <width>249</width>
          <height>25</height>
@@ -4737,7 +4753,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_results_plan">
        <attribute name="title">
@@ -4888,9 +4904,9 @@ p, li { white-space: pre-wrap; }
            <widget class="QWidget" name="layoutWidget">
             <property name="geometry">
              <rect>
-              <x>519</x>
+              <x>218</x>
               <y>420</y>
-              <width>691</width>
+              <width>991</width>
               <height>25</height>
              </rect>
             </property>
@@ -4913,6 +4929,13 @@ p, li { white-space: pre-wrap; }
               <widget class="QPushButton" name="pushButton_joints_results_mov">
                <property name="text">
                 <string>show results of the joints</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_alpha_results_mov">
+               <property name="text">
+                <string>show results of the swivel angle</string>
                </property>
               </widget>
              </item>

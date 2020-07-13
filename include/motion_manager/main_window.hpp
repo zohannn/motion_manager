@@ -29,6 +29,7 @@
 #include "prmdialog.hpp"
 #include "prmstardialog.hpp"
 #include "results_plan_joints_dialog.hpp"
+#include "results_plan_alpha_dialog.hpp"
 #include "results_control_joints_dialog.hpp"
 #include "results_control_pred_swivel_angle_dialog.hpp"
 #include "results_warm_start_dialog.hpp"
@@ -503,6 +504,11 @@ public Q_SLOTS:
         void on_pushButton_plot_task_dual_clicked();
 
         /**
+         * @brief on_pushButton_alpha_results_mov_clicked
+         */
+        void on_pushButton_alpha_results_mov_clicked();
+
+        /**
          * @brief on_pushButton_joints_results_mov_clicked
          */
         void on_pushButton_joints_results_mov_clicked();
@@ -968,6 +974,12 @@ public Q_SLOTS:
         void check_ctrl_hl_add(int state);
 
         /**
+         * @brief check_ctrl_hl_add_alpha
+         * @param state
+         */
+        void check_ctrl_hl_add_alpha(int state);
+
+        /**
          * @brief check_draw_ellipse
          * @param state
          */
@@ -1077,6 +1089,7 @@ private:
         PRMDialog *mPRMdlg; /**< handle of the PRM tuning dialog */
         PRMstarDialog *mPRMstardlg; /**< handle of the PRM star tuning dlg */
         ResultsJointsDialog *mResultsJointsdlg;/**< handle of the results joints dlg*/
+        ResultsAlphaDialog *mResultsAlphadlg;/**< handle of the results alpha dlg*/
         PowerLawDialog *mPowerLawdlg; /**< handle of the 2/3 power law dialog*/
         PowerLaw3DDialog *mPowerLaw3Ddlg; /**< handle of the 1/6 power law dialog*/
         CompVelocityDialog *mCompVeldlg; /**< handle of the velocity components dlg */
@@ -1134,6 +1147,8 @@ private:
         vector<vector<double>> elbowOrientation_mov; /**< elbow orientation (rpy) during the movement. */
         vector<vector<double>> shoulderPosition_mov; /**< shoulder position during the movement. 0=x,1=y,2=z */
         vector<double> swivel_angle_mov; /**< swivel angle of the trajectory of the movement */
+        vector<double> der_swivel_angle_mov; /**< swivel angle velocity of the trajectory of the movement */
+        vector<double> der_der_swivel_angle_mov; /**< swivel angle acceleration of the trajectory of the movement */
         vector<vector<double>> swivel_angle_mov_stages; /**< swivel angle of the trajectory of the movement divided in stages */
         vector<vector<double>> der_swivel_angle_mov_stages; /**< velocity of the swivel angle of the trajectory of the movement divided in stages */
         vector<vector<double>> der_der_swivel_angle_mov_stages; /**< acceleration of the swivel angle of the trajectory of the movement divided in stages */
