@@ -41,10 +41,11 @@ Hl_add_g_th_pa=0.88
 Hl_add_g_th_rp=0.95
 
 Hl_fing_p_coeff=200
+
 Hl_fing_d_coeff=15
 
-Hl_alpha_p_coeff=0.1
-Hl_alpha_d_coeff=0.01
+Hl_alpha_p_coeff=200
+Hl_alpha_d_coeff=20
 # Control coefficients and error threshold #
 Pos_p_control_coeff=20
 

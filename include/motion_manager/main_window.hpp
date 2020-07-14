@@ -43,6 +43,7 @@
 #include "handposplot.hpp"
 #include "circular_vector_buffer.hpp"
 #include "time_map_dialog.hpp"
+#include "coeffs_dialog.hpp"
 
 #include <boost/atomic.hpp>
 #include <boost/thread.hpp>
@@ -1070,6 +1071,21 @@ public Q_SLOTS:
          */
         void on_pushButton_time_map_clicked();
 
+        /**
+         * @brief on_pushButton_plan_coeffs_clicked
+         */
+        void on_pushButton_plan_coeffs_clicked();
+
+        /**
+         * @brief on_pushButton_app_coeffs_clicked
+         */
+        void on_pushButton_app_coeffs_clicked();
+
+        /**
+         * @brief on_pushButton_ret_coeffs_clicked
+         */
+        void on_pushButton_ret_coeffs_clicked();
+
 
 private:
         src::severity_logger< severity_level > lg; /**< logger */
@@ -1094,6 +1110,9 @@ private:
         PowerLaw3DDialog *mPowerLaw3Ddlg; /**< handle of the 1/6 power law dialog*/
         CompVelocityDialog *mCompVeldlg; /**< handle of the velocity components dlg */
         TimeMapDialog *mTimeMapdlg; /**< handle of the time mapping dlg */
+        CoeffsDialog *mPlanCoeffsdlg; /**< handle of the plan coefficients dlg */
+        CoeffsDialog *mAppCoeffsdlg; /**< handle of the approach coefficients dlg */
+        CoeffsDialog *mRetCoeffsdlg; /**< handle of the retreat coefficients dlg */
 
         NatCollAvDialog *mNatCollAvdlg; /**< handle of the natural collision avoidance dlg */
         WarmStartResultsDialog *mWarmdlg; /**< handle of the warm start results dialog */

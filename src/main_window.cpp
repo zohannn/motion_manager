@@ -124,6 +124,18 @@ MainWindow::MainWindow(int argc, char** argv, QWidget *parent)
     mTimeMapdlg = new TimeMapDialog(this);
     mTimeMapdlg->setModal(false);
 
+    // create the Plan coefficients dialog
+    mPlanCoeffsdlg = new CoeffsDialog(this);
+    mPlanCoeffsdlg->setModal(false);
+
+    // create the Approach coefficients dialog
+    mAppCoeffsdlg = new CoeffsDialog(this);
+    mAppCoeffsdlg->setModal(false);
+
+    // create the Retreat coefficients dialog
+    mRetCoeffsdlg = new CoeffsDialog(this);
+    mRetCoeffsdlg->setModal(false);
+
     //create the Results Control Predicted Swivel Angle dialog
     mResultsCtrlPredSwivelAngledlg = new ResultsCtrlPredSwivelAngleDialog(this);
     mResultsCtrlPredSwivelAngledlg->setModal(false);
@@ -879,9 +891,9 @@ void MainWindow::execPosControl()
             // reading the user interface
             double vel_max = this->ui.lineEdit_vel_max->text().toDouble()*M_PI/180;
             bool joints_arm_vel_ctrl = this->ui.checkBox_joints_velocity_ctrl->isChecked();
-            double swivel_angle_th = this->ui.lineEdit_swivel_angle_th->text().toDouble();
-            double g_map_th_max_replan = this->ui.lineEdit_g_th_max_replan->text().toDouble();
-            double g_map_th_min_replan = this->ui.lineEdit_g_th_min_replan->text().toDouble();
+            //double swivel_angle_th = this->ui.lineEdit_swivel_angle_th->text().toDouble();
+            //double g_map_th_max_replan = this->ui.lineEdit_g_th_max_replan->text().toDouble();
+            //double g_map_th_min_replan = this->ui.lineEdit_g_th_min_replan->text().toDouble();
             double t_f_trap = this->ui.lineEdit_t_f_trap->text().toDouble();
 
             bool jlim_en = this->ui.checkBox_joints_limits_av->isChecked();
@@ -959,33 +971,57 @@ void MainWindow::execPosControl()
             // human-likeness
             bool hl_en = this->ui.checkBox_hl_add->isChecked();
             bool hl_alpha_en = this->ui.checkBox_hl_add_alpha->isChecked();
-            double hl_p_pos_coeff_plan = 1; double hl_p_or_coeff_plan = 1;
-            double hl_p_pos_coeff_app = 1; double hl_p_or_coeff_app = 1;
-            double hl_p_pos_coeff_ret = 1; double hl_p_or_coeff_ret = 1;
-            double hl_d_pos_coeff_plan = 1; double hl_d_or_coeff_plan = 1;
-            double hl_d_pos_coeff_app = 1; double hl_d_or_coeff_app = 1;
-            double hl_d_pos_coeff_ret = 1; double hl_d_or_coeff_ret = 1;
-            double hl_p_pos_coeff = 1; double hl_p_or_coeff = 1;
-            double hl_d_pos_coeff = 1; double hl_d_or_coeff = 1;
-            double g_map_th_pa = 0.99; double g_map_th_rp = 0.99;
-            double fing_p_coeff = 0.1; double fing_d_coeff = 0.1;
-            double phi = 0.0; double tb = 0.0;
+            // Plan
+            double hl_p_x_pos_coeff_plan = 1; double hl_p_y_pos_coeff_plan = 1; double hl_p_z_pos_coeff_plan = 1;
+            double hl_p_x_or_coeff_plan = 1; double hl_p_y_or_coeff_plan = 1; double hl_p_z_or_coeff_plan = 1;
+            double hl_d_x_pos_coeff_plan = 1; double hl_d_y_pos_coeff_plan = 1; double hl_d_z_pos_coeff_plan = 1;
+            double hl_d_x_or_coeff_plan = 1; double hl_d_y_or_coeff_plan = 1; double hl_d_z_or_coeff_plan = 1;
+            // Approach
+            double hl_p_x_pos_coeff_app = 1; double hl_p_y_pos_coeff_app = 1; double hl_p_z_pos_coeff_app = 1;
+            double hl_p_x_or_coeff_app = 1; double hl_p_y_or_coeff_app = 1; double hl_p_z_or_coeff_app = 1;
+            double hl_d_x_pos_coeff_app = 1; double hl_d_y_pos_coeff_app = 1; double hl_d_z_pos_coeff_app = 1;
+            double hl_d_x_or_coeff_app = 1; double hl_d_y_or_coeff_app = 1; double hl_d_z_or_coeff_app = 1;
+            // Retreat
+            double hl_p_x_pos_coeff_ret = 1; double hl_p_y_pos_coeff_ret = 1; double hl_p_z_pos_coeff_ret = 1;
+            double hl_p_x_or_coeff_ret = 1; double hl_p_y_or_coeff_ret = 1; double hl_p_z_or_coeff_ret = 1;
+            double hl_d_x_pos_coeff_ret = 1; double hl_d_y_pos_coeff_ret = 1; double hl_d_z_pos_coeff_ret = 1;
+            double hl_d_x_or_coeff_ret = 1; double hl_d_y_or_coeff_ret = 1; double hl_d_z_or_coeff_ret = 1;
+            //Swivel angle
             double hl_alpha_pos_coeff = 1.0; double hl_alpha_vel_coeff = 0.1;
+            // Finger
+            double fing_p_coeff = 0.1; double fing_d_coeff = 0.1;
+
+            // Stage related coefficients
+            double hl_p_x_pos_coeff = 1; double hl_p_y_pos_coeff = 1; double hl_p_z_pos_coeff = 1;
+            double hl_p_x_or_coeff = 1; double hl_p_y_or_coeff = 1; double hl_p_z_or_coeff = 1;
+            double hl_d_x_pos_coeff = 1; double hl_d_y_pos_coeff = 1; double hl_d_z_pos_coeff = 1;
+            double hl_d_x_or_coeff = 1; double hl_d_y_or_coeff = 1; double hl_d_z_or_coeff = 1;
+
+            double g_map_th_pa = 0.99; double g_map_th_rp = 0.99;            
+            double phi = 0.0; double tb = 0.0;
+
             if(hl_en && this->h_results!=nullptr && this->h_results->status==0){
-                hl_p_pos_coeff_plan = this->ui.lineEdit_hl_p_pos_coeff_plan->text().toDouble();
-                hl_p_or_coeff_plan = this->ui.lineEdit_hl_p_or_coeff_plan->text().toDouble();
-                hl_p_pos_coeff_app = this->ui.lineEdit_hl_p_pos_coeff_app->text().toDouble();
-                hl_p_or_coeff_app = this->ui.lineEdit_hl_p_or_coeff_app->text().toDouble();
-                hl_p_pos_coeff_ret = this->ui.lineEdit_hl_p_pos_coeff_ret->text().toDouble();
-                hl_p_or_coeff_ret = this->ui.lineEdit_hl_p_or_coeff_ret->text().toDouble();
-                hl_d_pos_coeff_plan = this->ui.lineEdit_hl_d_pos_coeff_plan->text().toDouble();
-                hl_d_or_coeff_plan = this->ui.lineEdit_hl_d_or_coeff_plan->text().toDouble();
-                hl_d_pos_coeff_app = this->ui.lineEdit_hl_d_pos_coeff_app->text().toDouble();
-                hl_d_or_coeff_app = this->ui.lineEdit_hl_d_or_coeff_app->text().toDouble();
-                hl_d_pos_coeff_ret = this->ui.lineEdit_hl_d_pos_coeff_ret->text().toDouble();
-                hl_d_or_coeff_ret = this->ui.lineEdit_hl_d_or_coeff_ret->text().toDouble();
+                // Plan
+                this->mPlanCoeffsdlg->getPositionCoeffs(hl_p_x_pos_coeff_plan,hl_p_y_pos_coeff_plan,hl_p_z_pos_coeff_plan,
+                                                        hl_p_x_or_coeff_plan,hl_p_y_or_coeff_plan,hl_p_z_or_coeff_plan);
+                this->mPlanCoeffsdlg->getVelocityCoeffs(hl_d_x_pos_coeff_plan,hl_d_y_pos_coeff_plan,hl_d_z_pos_coeff_plan,
+                                                        hl_d_x_or_coeff_plan,hl_d_y_or_coeff_plan,hl_d_z_or_coeff_plan);
+                // Approach
+                this->mAppCoeffsdlg->getPositionCoeffs(hl_p_x_pos_coeff_app,hl_p_y_pos_coeff_app,hl_p_z_pos_coeff_app,
+                                                        hl_p_x_or_coeff_app,hl_p_y_or_coeff_app,hl_p_z_or_coeff_app);
+                this->mAppCoeffsdlg->getVelocityCoeffs(hl_d_x_pos_coeff_app,hl_d_y_pos_coeff_app,hl_d_z_pos_coeff_app,
+                                                        hl_d_x_or_coeff_app,hl_d_y_or_coeff_app,hl_d_z_or_coeff_app);
+                // Retreat
+                this->mRetCoeffsdlg->getPositionCoeffs(hl_p_x_pos_coeff_ret,hl_p_y_pos_coeff_ret,hl_p_z_pos_coeff_ret,
+                                                        hl_p_x_or_coeff_ret,hl_p_y_or_coeff_ret,hl_p_z_or_coeff_ret);
+                this->mRetCoeffsdlg->getVelocityCoeffs(hl_d_x_pos_coeff_ret,hl_d_y_pos_coeff_ret,hl_d_z_pos_coeff_ret,
+                                                        hl_d_x_or_coeff_ret,hl_d_y_or_coeff_ret,hl_d_z_or_coeff_ret);
+                // Swivel angle
                 hl_alpha_pos_coeff = this->ui.lineEdit_hl_alpha_pos_coeff->text().toDouble();
                 hl_alpha_vel_coeff = this->ui.lineEdit_hl_alpha_vel_coeff->text().toDouble();
+                // Fingers
+                fing_p_coeff = this->ui.lineEdit_fing_p_coeff->text().toDouble();
+                fing_d_coeff = this->ui.lineEdit_fing_d_coeff->text().toDouble();
 
                 g_map_th_pa = this->ui.lineEdit_g_th_plan_app->text().toDouble();
                 if(follow_tar){
@@ -993,8 +1029,7 @@ void MainWindow::execPosControl()
                 }else{
                     g_map_th_rp = this->ui.lineEdit_g_th_ret_plan->text().toDouble();
                 }
-                fing_p_coeff = this->ui.lineEdit_fing_p_coeff->text().toDouble();
-                fing_d_coeff = this->ui.lineEdit_fing_d_coeff->text().toDouble();
+
                 phi = this->curr_task->getProblem(ui.listWidget_movs->currentRow())->getHUMPlanner()->getPHI();
                 tb = this->curr_task->getProblem(ui.listWidget_movs->currentRow())->getHUMPlanner()->getTB();
                 vector<double> bounce_hand_pos = this->bounce_handPosition;
@@ -1379,8 +1414,12 @@ void MainWindow::execPosControl()
                             //                BOOST_LOG_SEV(lg, info) << "n_steps = " << n_steps;
                             //                BOOST_LOG_SEV(lg, info) << "error_tot_squared_norm = " << error_tot.squaredNorm();
 
-                            hl_p_pos_coeff = hl_p_pos_coeff_plan; hl_p_or_coeff = hl_p_or_coeff_plan;
-                            hl_d_pos_coeff = hl_d_pos_coeff_plan; hl_d_or_coeff = hl_d_or_coeff_plan;
+                            // position
+                            hl_p_x_pos_coeff = hl_p_x_pos_coeff_plan; hl_p_y_pos_coeff = hl_p_y_pos_coeff_plan; hl_p_z_pos_coeff = hl_p_z_pos_coeff_plan;
+                            hl_p_x_or_coeff = hl_p_x_or_coeff_plan; hl_p_y_or_coeff = hl_p_y_or_coeff_plan; hl_p_z_or_coeff = hl_p_z_or_coeff_plan;
+                            // velocity
+                            hl_d_x_pos_coeff = hl_d_x_pos_coeff_plan; hl_d_y_pos_coeff = hl_d_y_pos_coeff_plan; hl_d_z_pos_coeff = hl_d_z_pos_coeff_plan;
+                            hl_d_x_or_coeff = hl_d_x_or_coeff_plan; hl_d_y_or_coeff = hl_d_y_or_coeff_plan; hl_d_z_or_coeff = hl_d_z_or_coeff_plan;
 
                             Vector3d bounce_hand_pos; bounce_hand_pos << bounce_hand_pos_x,bounce_hand_pos_y,bounce_hand_pos_z;
                             Vector3d error_b_pos = bounce_hand_pos - hand_pos_init_vec;
@@ -1741,8 +1780,12 @@ void MainWindow::execPosControl()
                             //                BOOST_LOG_SEV(lg, info) << "n_steps = " << n_steps;
                             //                BOOST_LOG_SEV(lg, info) << "error_tot_squared_norm = " << error_tot.squaredNorm();
 
-                            hl_p_pos_coeff = hl_p_pos_coeff_app; hl_p_or_coeff = hl_p_or_coeff_app;
-                            hl_d_pos_coeff = hl_d_pos_coeff_app; hl_d_or_coeff = hl_d_or_coeff_app;
+                            // position
+                            hl_p_x_pos_coeff = hl_p_x_pos_coeff_app; hl_p_y_pos_coeff = hl_p_y_pos_coeff_app; hl_p_z_pos_coeff = hl_p_z_pos_coeff_app;
+                            hl_p_x_or_coeff = hl_p_x_or_coeff_app; hl_p_y_or_coeff = hl_p_y_or_coeff_app; hl_p_z_or_coeff = hl_p_z_or_coeff_app;
+                            // velocity
+                            hl_d_x_pos_coeff = hl_d_x_pos_coeff_app; hl_d_y_pos_coeff = hl_d_y_pos_coeff_app; hl_d_z_pos_coeff = hl_d_z_pos_coeff_app;
+                            hl_d_x_or_coeff = hl_d_x_or_coeff_app; hl_d_y_or_coeff = hl_d_y_or_coeff_app; hl_d_z_or_coeff = hl_d_z_or_coeff_app;
 
                             // human-like desired hand pose
                             h_hand_pose(0) = hand_pos_init_vec(0) + 0.25*error_f_tot(0)*(5*g_map-pow(g_map,5));
@@ -1845,8 +1888,12 @@ void MainWindow::execPosControl()
             //                BOOST_LOG_SEV(lg, info) << "n_steps = " << n_steps;
             //                BOOST_LOG_SEV(lg, info) << "error_tot_squared_norm = " << error_tot.squaredNorm();
 
-                            hl_p_pos_coeff = hl_p_pos_coeff_ret; hl_p_or_coeff = hl_p_or_coeff_ret;
-                            hl_d_pos_coeff = hl_d_pos_coeff_ret; hl_d_or_coeff = hl_d_or_coeff_ret;
+                            // position
+                            hl_p_x_pos_coeff = hl_p_x_pos_coeff_ret; hl_p_y_pos_coeff = hl_p_y_pos_coeff_ret; hl_p_z_pos_coeff = hl_p_z_pos_coeff_ret;
+                            hl_p_x_or_coeff = hl_p_x_or_coeff_ret; hl_p_y_or_coeff = hl_p_y_or_coeff_ret; hl_p_z_or_coeff = hl_p_z_or_coeff_ret;
+                            // velocity
+                            hl_d_x_pos_coeff = hl_d_x_pos_coeff_ret; hl_d_y_pos_coeff = hl_d_y_pos_coeff_ret; hl_d_z_pos_coeff = hl_d_z_pos_coeff_ret;
+                            hl_d_x_or_coeff = hl_d_x_or_coeff_ret; hl_d_y_or_coeff = hl_d_y_or_coeff_ret; hl_d_z_or_coeff = hl_d_z_or_coeff_ret;
 
                             // human-like desired hand pose
                             h_hand_pose(0) = hand_pos_init_vec(0) + 0.33*error_f_tot(0)*(5*pow(g_map,4)-2*pow(g_map,5));
@@ -2228,7 +2275,7 @@ void MainWindow::execPosControl()
                 //if((this->ui.checkBox_des_right_hand_pos_x->isChecked()) && (error_abs_pos(0) > error_pos_th)){
                 if((this->ui.checkBox_des_right_hand_pos_x->isChecked())){
                     if(hl_en){
-                        Koeff_p(0,0) = hl_p_pos_coeff;
+                        Koeff_p(0,0) = hl_p_x_pos_coeff;
                     }else{
                         Koeff_p(0,0) = coeff_p_pos;
                     }
@@ -2236,7 +2283,7 @@ void MainWindow::execPosControl()
                 //if((this->ui.checkBox_des_right_hand_pos_y->isChecked()) && (error_abs_pos(1) > error_pos_th)){
                 if((this->ui.checkBox_des_right_hand_pos_y->isChecked())){
                     if(hl_en){
-                        Koeff_p(1,1) = hl_p_pos_coeff;
+                        Koeff_p(1,1) = hl_p_y_pos_coeff;
                     }else{
                         Koeff_p(1,1) = coeff_p_pos;
                     }
@@ -2244,7 +2291,7 @@ void MainWindow::execPosControl()
                 //if((this->ui.checkBox_des_right_hand_pos_z->isChecked()) && (error_abs_pos(2) > error_pos_th)){
                 if((this->ui.checkBox_des_right_hand_pos_z->isChecked())){
                     if(hl_en){
-                        Koeff_p(2,2) = hl_p_pos_coeff;
+                        Koeff_p(2,2) = hl_p_z_pos_coeff;
                     }else{
                         Koeff_p(2,2) = coeff_p_pos;
                     }
@@ -2252,7 +2299,7 @@ void MainWindow::execPosControl()
                 //if((this->ui.checkBox_des_right_hand_q_x->isChecked()) && (error_abs_or(0) > error_or_th)){
                 if((this->ui.checkBox_des_right_hand_q_x->isChecked())){
                     if(hl_en){
-                        Koeff_p(3,3) = hl_p_or_coeff;
+                        Koeff_p(3,3) = hl_p_x_or_coeff;
                     }else{
                         Koeff_p(3,3) = coeff_p_or;
                     }
@@ -2260,7 +2307,7 @@ void MainWindow::execPosControl()
                 //if((this->ui.checkBox_des_right_hand_q_y->isChecked()) && (error_abs_or(1) > error_or_th)){
                 if((this->ui.checkBox_des_right_hand_q_y->isChecked())){
                     if(hl_en){
-                        Koeff_p(4,4) = hl_p_or_coeff;
+                        Koeff_p(4,4) = hl_p_y_or_coeff;
                     }else{
                         Koeff_p(4,4) = coeff_p_or;
                     }
@@ -2268,7 +2315,7 @@ void MainWindow::execPosControl()
                 //if((this->ui.checkBox_des_right_hand_q_z->isChecked()) && (error_abs_or(2) > error_or_th)){
                 if((this->ui.checkBox_des_right_hand_q_z->isChecked())){
                     if(hl_en){
-                        Koeff_p(5,5) = hl_p_or_coeff;
+                        Koeff_p(5,5) = hl_p_z_or_coeff;
                     }else{
                         Koeff_p(5,5) = coeff_p_or;
                     }
@@ -2282,7 +2329,7 @@ void MainWindow::execPosControl()
 //                if((this->ui.checkBox_des_right_hand_pos_x->isChecked()) && (error_abs_lin_vel(0) > error_lin_vel_th)){
                 if((this->ui.checkBox_des_right_hand_pos_x->isChecked())){
                     if(hl_en){
-                        Koeff_d(0,0) = hl_d_pos_coeff;
+                        Koeff_d(0,0) = hl_d_x_pos_coeff;
                     }else{
                         Koeff_d(0,0) = coeff_d_pos;
                     }
@@ -2290,7 +2337,7 @@ void MainWindow::execPosControl()
 //                if((this->ui.checkBox_des_right_hand_pos_y->isChecked()) && (error_abs_lin_vel(1) > error_lin_vel_th)){
                 if((this->ui.checkBox_des_right_hand_pos_y->isChecked())){
                     if(hl_en){
-                        Koeff_d(1,1) = hl_d_pos_coeff;
+                        Koeff_d(1,1) = hl_d_y_pos_coeff;
                     }else{
                         Koeff_d(1,1) = coeff_d_pos;
                     }
@@ -2298,7 +2345,7 @@ void MainWindow::execPosControl()
 //                if((this->ui.checkBox_des_right_hand_pos_z->isChecked()) && (error_abs_lin_vel(2) > error_lin_vel_th)){
                 if((this->ui.checkBox_des_right_hand_pos_z->isChecked())){
                     if(hl_en){
-                        Koeff_d(2,2) = hl_d_pos_coeff;
+                        Koeff_d(2,2) = hl_d_z_pos_coeff;
                     }else{
                         Koeff_d(2,2) = coeff_d_pos;
                     }
@@ -2306,7 +2353,7 @@ void MainWindow::execPosControl()
 //                if((this->ui.checkBox_des_right_hand_q_x->isChecked()) && (error_abs_ang_vel(0) > error_ang_vel_th)){
                 if((this->ui.checkBox_des_right_hand_q_x->isChecked())){
                     if(hl_en){
-                        Koeff_d(3,3) = hl_d_or_coeff;
+                        Koeff_d(3,3) = hl_d_x_or_coeff;
                     }else{
                         Koeff_d(3,3) = coeff_d_or;
                     }
@@ -2314,7 +2361,7 @@ void MainWindow::execPosControl()
 //                if((this->ui.checkBox_des_right_hand_q_y->isChecked()) && (error_abs_ang_vel(1) > error_ang_vel_th)){
                 if((this->ui.checkBox_des_right_hand_q_y->isChecked())){
                     if(hl_en){
-                        Koeff_d(4,4) = hl_d_or_coeff;
+                        Koeff_d(4,4) = hl_d_y_or_coeff;
                     }else{
                         Koeff_d(4,4) = coeff_d_or;
                     }
@@ -2322,7 +2369,7 @@ void MainWindow::execPosControl()
 //                if((this->ui.checkBox_des_right_hand_q_z->isChecked()) && (error_abs_ang_vel(2) > error_ang_vel_th)){
                 if((this->ui.checkBox_des_right_hand_q_z->isChecked())){
                     if(hl_en){
-                        Koeff_d(5,5) = hl_d_or_coeff;
+                        Koeff_d(5,5) = hl_d_z_or_coeff;
                     }else{
                         Koeff_d(5,5) = coeff_d_or;
                     }
@@ -16433,6 +16480,24 @@ void MainWindow::on_pushButton_time_map_clicked()
     this->mTimeMapdlg->show();
 }
 
+void MainWindow::on_pushButton_plan_coeffs_clicked()
+{
+    this->mPlanCoeffsdlg->setWindowTitle("Plan stage control coefficients dialog");
+    this->mPlanCoeffsdlg->show();
+}
+
+void MainWindow::on_pushButton_app_coeffs_clicked()
+{
+    this->mAppCoeffsdlg->setWindowTitle("Approach stage control coefficients dialog");
+    this->mAppCoeffsdlg->show();
+}
+
+void MainWindow::on_pushButton_ret_coeffs_clicked()
+{
+    this->mRetCoeffsdlg->setWindowTitle("Retreat stage control coefficients dialog");
+    this->mRetCoeffsdlg->show();
+}
+
 void MainWindow::on_pushButton_control_plot_joints_clicked()
 {
     if(this->jointsVelocity_ctrl.rows()!=0){
@@ -16733,18 +16798,6 @@ void MainWindow::on_pushButton_save_ctrl_params_clicked()
         stream << "# Human-likeness addition parameters #" << endl;
         if (this->ui.checkBox_hl_add->isChecked()){ stream << "Hl_add=true"<< endl;}else{stream << "Hl_add=false"<< endl;}
         if (this->ui.checkBox_hl_add_alpha->isChecked()){ stream << "Hl_alpha_add=true"<< endl;}else{stream << "Hl_alpha_add=false"<< endl;}
-        stream << "Hl_add_p_pos_coeff_plan=" << this->ui.lineEdit_hl_p_pos_coeff_plan->text().toStdString().c_str() << endl;
-        stream << "Hl_add_p_or_coeff_plan=" << this->ui.lineEdit_hl_p_or_coeff_plan->text().toStdString().c_str() << endl;
-        stream << "Hl_add_p_pos_coeff_app=" << this->ui.lineEdit_hl_p_pos_coeff_app->text().toStdString().c_str() << endl;
-        stream << "Hl_add_p_or_coeff_app=" << this->ui.lineEdit_hl_p_or_coeff_app->text().toStdString().c_str() << endl;
-        stream << "Hl_add_p_pos_coeff_ret=" << this->ui.lineEdit_hl_p_pos_coeff_ret->text().toStdString().c_str() << endl;
-        stream << "Hl_add_p_or_coeff_ret=" << this->ui.lineEdit_hl_p_or_coeff_ret->text().toStdString().c_str() << endl;
-        stream << "Hl_add_d_pos_coeff_plan=" << this->ui.lineEdit_hl_d_pos_coeff_plan->text().toStdString().c_str() << endl;
-        stream << "Hl_add_d_or_coeff_plan=" << this->ui.lineEdit_hl_d_or_coeff_plan->text().toStdString().c_str() << endl;
-        stream << "Hl_add_d_pos_coeff_app=" << this->ui.lineEdit_hl_d_pos_coeff_app->text().toStdString().c_str() << endl;
-        stream << "Hl_add_d_or_coeff_app=" << this->ui.lineEdit_hl_d_or_coeff_app->text().toStdString().c_str() << endl;
-        stream << "Hl_add_d_pos_coeff_ret=" << this->ui.lineEdit_hl_d_pos_coeff_ret->text().toStdString().c_str() << endl;
-        stream << "Hl_add_d_or_coeff_ret=" << this->ui.lineEdit_hl_d_or_coeff_ret->text().toStdString().c_str() << endl;
         stream << "Hl_add_g_th_pa=" << this->ui.lineEdit_g_th_plan_app->text().toStdString().c_str() << endl;
         stream << "Hl_add_g_th_rp=" << this->ui.lineEdit_g_th_ret_plan->text().toStdString().c_str() << endl;
         stream << "Hl_fing_p_coeff=" << this->ui.lineEdit_fing_p_coeff->text().toStdString().c_str() << endl;
@@ -16889,31 +16942,7 @@ void MainWindow::on_pushButton_load_ctrl_params_clicked()
                     }else{
                         this->ui.checkBox_hl_add_alpha->setChecked(false);
                         this->ui.groupBox_h_alpha->setEnabled(false);
-                    }
-                }else if(QString::compare(fields.at(0),QString("Hl_add_p_pos_coeff_plan"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_hl_p_pos_coeff_plan->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_add_p_or_coeff_plan"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_hl_p_or_coeff_plan->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_add_p_pos_coeff_app"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_hl_p_pos_coeff_app->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_add_p_or_coeff_app"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_hl_p_or_coeff_app->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_add_p_pos_coeff_ret"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_hl_p_pos_coeff_ret->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_add_p_or_coeff_ret"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_hl_p_or_coeff_ret->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_add_d_pos_coeff_plan"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_hl_d_pos_coeff_plan->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_add_d_or_coeff_plan"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_hl_d_or_coeff_plan->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_add_d_pos_coeff_app"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_hl_d_pos_coeff_app->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_add_d_or_coeff_app"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_hl_d_or_coeff_app->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_add_d_pos_coeff_ret"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_hl_d_pos_coeff_ret->setText(fields.at(1));
-                }else if(QString::compare(fields.at(0),QString("Hl_add_d_or_coeff_ret"),Qt::CaseInsensitive)==0){
-                    this->ui.lineEdit_hl_d_or_coeff_ret->setText(fields.at(1));
+                    }                    
                 }else if(QString::compare(fields.at(0),QString("Hl_add_g_th_pa"),Qt::CaseInsensitive)==0){
                     this->ui.lineEdit_g_th_plan_app->setText(fields.at(1));
                 }else if(QString::compare(fields.at(0),QString("Hl_add_g_th_rp"),Qt::CaseInsensitive)==0){

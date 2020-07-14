@@ -1,0 +1,25 @@
+### Coefficients of the control ###
+# Position #
+kpx=10
+kpy=10
+kpz=10
+
+kox=5
+
+koy=5
+
+koz=5
+
+# Velocity #
+kdx=1
+
+kdy=1
+
+kdz=1
+
+kwx=1
+
+kwy=1
+
+kwz=1
+
