@@ -187,6 +187,7 @@ void ErrorsControlDialog::on_pushButton_plot_hand_clicked()
 
 void ErrorsControlDialog::on_pushButton_plot_fing_clicked()
 {
+    const double radtodeg = 180.0/static_cast<double>(M_PI);
     double f_th_pos = this->ui->lineEdit_f_cutoff_pos->text().toDouble();
     double timestep_pos = this->ui->lineEdit_time_step_pos->text().toDouble();
     double f_th_vel = this->ui->lineEdit_f_cutoff_vel->text().toDouble();
@@ -206,21 +207,21 @@ void ErrorsControlDialog::on_pushButton_plot_fing_clicked()
 
     for(int k=0;k<this->qerrors_fing_pos_0.size();++k){
         // finger 0
-        this->qerrors_fing_pos_0_plot.push_back(lpf_err_pos_fing_0.update(this->qerrors_fing_pos_0.at(k)));
-        this->qerrors_fing_vel_0_plot.push_back(lpf_err_vel_fing_0.update(this->qerrors_fing_vel_0.at(k)));
-        this->qerrors_fing_acc_0_plot.push_back(lpf_err_acc_fing_0.update(this->qerrors_fing_acc_0.at(k)));
+        this->qerrors_fing_pos_0_plot.push_back(lpf_err_pos_fing_0.update(radtodeg*this->qerrors_fing_pos_0.at(k)));
+        this->qerrors_fing_vel_0_plot.push_back(lpf_err_vel_fing_0.update(radtodeg*this->qerrors_fing_vel_0.at(k)));
+        this->qerrors_fing_acc_0_plot.push_back(lpf_err_acc_fing_0.update(radtodeg*this->qerrors_fing_acc_0.at(k)));
         // finger 1
-        this->qerrors_fing_pos_1_plot.push_back(lpf_err_pos_fing_1.update(this->qerrors_fing_pos_1.at(k)));
-        this->qerrors_fing_vel_1_plot.push_back(lpf_err_vel_fing_1.update(this->qerrors_fing_vel_1.at(k)));
-        this->qerrors_fing_acc_1_plot.push_back(lpf_err_acc_fing_1.update(this->qerrors_fing_acc_1.at(k)));
+        this->qerrors_fing_pos_1_plot.push_back(lpf_err_pos_fing_1.update(radtodeg*this->qerrors_fing_pos_1.at(k)));
+        this->qerrors_fing_vel_1_plot.push_back(lpf_err_vel_fing_1.update(radtodeg*this->qerrors_fing_vel_1.at(k)));
+        this->qerrors_fing_acc_1_plot.push_back(lpf_err_acc_fing_1.update(radtodeg*this->qerrors_fing_acc_1.at(k)));
         // finger 2
-        this->qerrors_fing_pos_2_plot.push_back(lpf_err_pos_fing_2.update(this->qerrors_fing_pos_2.at(k)));
-        this->qerrors_fing_vel_2_plot.push_back(lpf_err_vel_fing_2.update(this->qerrors_fing_vel_2.at(k)));
-        this->qerrors_fing_acc_2_plot.push_back(lpf_err_acc_fing_2.update(this->qerrors_fing_acc_2.at(k)));
+        this->qerrors_fing_pos_2_plot.push_back(lpf_err_pos_fing_2.update(radtodeg*this->qerrors_fing_pos_2.at(k)));
+        this->qerrors_fing_vel_2_plot.push_back(lpf_err_vel_fing_2.update(radtodeg*this->qerrors_fing_vel_2.at(k)));
+        this->qerrors_fing_acc_2_plot.push_back(lpf_err_acc_fing_2.update(radtodeg*this->qerrors_fing_acc_2.at(k)));
         // finger 3
-        this->qerrors_fing_pos_3_plot.push_back(lpf_err_pos_fing_3.update(this->qerrors_fing_pos_3.at(k)));
-        this->qerrors_fing_vel_3_plot.push_back(lpf_err_vel_fing_3.update(this->qerrors_fing_vel_3.at(k)));
-        this->qerrors_fing_acc_3_plot.push_back(lpf_err_acc_fing_3.update(this->qerrors_fing_acc_3.at(k)));
+        this->qerrors_fing_pos_3_plot.push_back(lpf_err_pos_fing_3.update(radtodeg*this->qerrors_fing_pos_3.at(k)));
+        this->qerrors_fing_vel_3_plot.push_back(lpf_err_vel_fing_3.update(radtodeg*this->qerrors_fing_vel_3.at(k)));
+        this->qerrors_fing_acc_3_plot.push_back(lpf_err_acc_fing_3.update(radtodeg*this->qerrors_fing_acc_3.at(k)));
     }
 
     // finger 0
@@ -245,6 +246,7 @@ void ErrorsControlDialog::on_pushButton_plot_fing_clicked()
 
 void ErrorsControlDialog::on_pushButton_plot_alpha_clicked()
 {
+    const double radtodeg = 180.0/static_cast<double>(M_PI);
     double f_th_pos = this->ui->lineEdit_f_cutoff_pos->text().toDouble();
     double timestep_pos = this->ui->lineEdit_time_step_pos->text().toDouble();
     double f_th_vel = this->ui->lineEdit_f_cutoff_vel->text().toDouble();
@@ -260,11 +262,11 @@ void ErrorsControlDialog::on_pushButton_plot_alpha_clicked()
 
     for(int k=0;k<this->qerror_alpha_pos.size();++k){
         // pos
-        this->qerror_alpha_pos_plot.push_back(lpf_err_pos.update(this->qerror_alpha_pos.at(k)));
+        this->qerror_alpha_pos_plot.push_back(lpf_err_pos.update(radtodeg*this->qerror_alpha_pos.at(k)));
         // vel
-        this->qerror_alpha_vel_plot.push_back(lpf_err_vel.update(this->qerror_alpha_vel.at(k)));
+        this->qerror_alpha_vel_plot.push_back(lpf_err_vel.update(radtodeg*this->qerror_alpha_vel.at(k)));
         // acc
-        this->qerror_alpha_acc_plot.push_back(lpf_err_acc.update(this->qerror_alpha_acc.at(k)));
+        this->qerror_alpha_acc_plot.push_back(lpf_err_acc.update(radtodeg*this->qerror_alpha_acc.at(k)));
     }
 
     plotError(ui->plot_error_alpha_pos,QString("Error in position"),qtime,qerror_alpha_pos_plot,"[deg]",Qt::blue);

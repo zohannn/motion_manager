@@ -19,7 +19,6 @@ void CompTrackingControlDialog::setupPlots(vector<vector<double>> &pos_hand, vec
                                            vector<double> &pos_alpha, vector<double> &des_pos_alpha,
                                            vector<double> &time)
 {
-    //const double radtodeg = 180.0/static_cast<double>(M_PI);
 
     this->qtime = QVector<double>::fromStdVector(time);
 
@@ -165,6 +164,7 @@ void CompTrackingControlDialog::on_pushButton_plot_hand_clicked()
 
 void CompTrackingControlDialog::on_pushButton_plot_fing_clicked()
 {
+    const double radtodeg = 180.0/static_cast<double>(M_PI);
     double f_th_pos = this->ui->lineEdit_f_cutoff_pos->text().toDouble();
     double timestep_pos = this->ui->lineEdit_time_step_pos->text().toDouble();
 
@@ -183,15 +183,15 @@ void CompTrackingControlDialog::on_pushButton_plot_fing_clicked()
         vector<double> pos_fing = positions_fing.at(i);
         vector<double> des_pos_fing = des_positions_fing.at(i);
 
-        pos_fing_0.push_back(lpf_fing_0.update(pos_fing.at(0)));
-        pos_fing_1.push_back(lpf_fing_1.update(pos_fing.at(1)));
-        pos_fing_2.push_back(lpf_fing_2.update(pos_fing.at(2)));
-        pos_fing_3.push_back(lpf_fing_3.update(pos_fing.at(3)));
+        pos_fing_0.push_back(lpf_fing_0.update(radtodeg*pos_fing.at(0)));
+        pos_fing_1.push_back(lpf_fing_1.update(radtodeg*pos_fing.at(1)));
+        pos_fing_2.push_back(lpf_fing_2.update(radtodeg*pos_fing.at(2)));
+        pos_fing_3.push_back(lpf_fing_3.update(radtodeg*pos_fing.at(3)));
 
-        des_pos_fing_0.push_back(des_pos_fing.at(0));
-        des_pos_fing_1.push_back(des_pos_fing.at(1));
-        des_pos_fing_2.push_back(des_pos_fing.at(2));
-        des_pos_fing_3.push_back(des_pos_fing.at(3));
+        des_pos_fing_0.push_back(radtodeg*des_pos_fing.at(0));
+        des_pos_fing_1.push_back(radtodeg*des_pos_fing.at(1));
+        des_pos_fing_2.push_back(radtodeg*des_pos_fing.at(2));
+        des_pos_fing_3.push_back(radtodeg*des_pos_fing.at(3));
 
     }
 
@@ -203,16 +203,19 @@ void CompTrackingControlDialog::on_pushButton_plot_fing_clicked()
 
 void CompTrackingControlDialog::on_pushButton_plot_alpha_clicked()
 {
+    const double radtodeg = 180.0/static_cast<double>(M_PI);
     double f_th_pos = this->ui->lineEdit_f_cutoff_pos->text().toDouble();
     double timestep_pos = this->ui->lineEdit_time_step_pos->text().toDouble();
 
     LowPassFilter lpf_alpha(f_th_pos, timestep_pos);
 
     QVector<double> pos_a;
+    QVector<double> des_pos_a;
     for(size_t i=0;i<qtime.size();++i){
-        pos_a.push_back(lpf_alpha.update(this->qalpha_pos.at(i)));
+        pos_a.push_back(lpf_alpha.update(radtodeg*this->qalpha_pos.at(i)));
+        des_pos_a.push_back(lpf_alpha.update(radtodeg*this->qdes_alpha_pos.at(i)));
     }
-    plotComp(ui->plot_alpha_pos,QString("Swivel angle position tracking [deg]"),qtime,pos_a,this->qdes_alpha_pos);
+    plotComp(ui->plot_alpha_pos,QString("Swivel angle position tracking [deg]"),qtime,pos_a,des_pos_a);
 }
 
 void CompTrackingControlDialog::on_pushButton_save_hand_clicked()

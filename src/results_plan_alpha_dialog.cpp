@@ -28,6 +28,7 @@ void ResultsAlphaDialog::setRight(bool r)
 void ResultsAlphaDialog::setupPlots(vector<vector<double>> &pos,vector<vector<double>> &vel,vector<vector<double>> &acc,vector<vector<double>> &timesteps)
 {
 
+    const double radtodeg = 180.0/static_cast<double>(M_PI);
     vector<double> time;
     qtime.clear(); pos_alpha.clear(); vel_alpha.clear(); acc_alpha.clear();
 
@@ -47,9 +48,9 @@ void ResultsAlphaDialog::setupPlots(vector<vector<double>> &pos,vector<vector<do
         time_stage.at(0) = time_init;
 
         for(size_t j=0; j<pos_stage.size();++j){
-            pos_alpha.push_back(pos_stage.at(j));
-            vel_alpha.push_back(vel_stage.at(j));
-            acc_alpha.push_back(acc_stage.at(j));
+            pos_alpha.push_back(radtodeg*pos_stage.at(j));
+            vel_alpha.push_back(radtodeg*vel_stage.at(j));
+            acc_alpha.push_back(radtodeg*acc_stage.at(j));
             if(j>0){time_stage.at(j) = time_stage.at(j-1) + tsteps_stage.at(j-1);}
         }
         time.reserve(time_stage.size());

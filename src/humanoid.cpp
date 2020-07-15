@@ -1960,6 +1960,7 @@ void Humanoid::getHandPosMes(int arm, vector<double>& ppos)
 double Humanoid::getSwivelAngle(int arm, vector<double>& posture)
 {
     // see Su2018 DOI:10.1177/1729881418814695
+    // see Zanchettin2011 DOI:10.1109/ICRA.2011.5979654
     Matrix4d T;
     Matrix4d T_aux;
     Matrix4d mat_world;
@@ -2023,6 +2024,7 @@ double Humanoid::getSwivelAngle(int arm, vector<double>& posture)
         }
     }
 
+    /**
     // see Su2018
     Vector3d v_BS = (basePos-shoulderPos)/((basePos-shoulderPos).norm());
     Vector3d v_SW = (shoulderPos-wristPos)/((shoulderPos-wristPos).norm());
@@ -2035,20 +2037,210 @@ double Humanoid::getSwivelAngle(int arm, vector<double>& posture)
     double sgn_value = ((v_BS.cross(v_SE)).dot(v_SW));
     if(sgn_value>0){sgn = 1;}else{sgn = -1;};
 
-    double alpha = RADTODEG*sgn*acos(v_BSW.dot(v_SEW));
+    double alpha = sgn*acos(v_BSW.dot(v_SEW));
+    **/
 
     // see Zanchettin 2011
-    //Vector3d v_WS = (wristPos-shoulderPos)/((wristPos-shoulderPos).norm());
-    //Vector3d v_ES = (elbowPos-shoulderPos)/((elbowPos-shoulderPos).norm());
-    //Matrix3d I = Matrix3d::Identity();
-    //Vector3d p = (I - v_WS*v_WS.transpose())*v_ES;
-    //Vector3d v_EW = (elbowPos-wristPos)/((elbowPos-wristPos).norm());
-    //Vector3d v_SEW = v_SE.cross(v_EW);
-
-    //double alpha = RADTODEG*atan2(v_WS.transpose()*(basez.cross(p)),(basez.transpose()*p));
+    Vector3d WS = (wristPos-shoulderPos); Vector3d v_WS = WS/(WS.norm());
+    Vector3d ES = (elbowPos-shoulderPos); //Vector3d v_ES = ES/(ES.norm());
+    Matrix3d I = Matrix3d::Identity();
+    Vector3d p = (I - v_WS*v_WS.transpose())*ES;
+    double alpha = atan2(v_WS.transpose()*(basez.cross(p)),(basez.transpose()*p));
 
 
     return alpha;
+}
+
+void Humanoid::getJacobianSwivel(int arm,std::vector<double>& posture,MatrixXd& JacobianSwivel)
+{
+
+    // Kreutz-Delgado1990 DOI: 10.1109/ROBOT.1990.126090
+
+    Matrix4d T;
+    Matrix4d T_aux;
+    Matrix4d mat_world;
+    Matrix4d mat_hand;
+    DHparams m_DH_arm;
+    vector<DHparams> m_DH_hand;
+
+    JacobianSwivel.resize(1,JOINTS_ARM);
+
+    Vector3d pos0;
+    Vector3d z0;
+    Vector3d pos1;
+    Vector3d z1;
+    Vector3d pos2;
+    Vector3d z2;
+    Vector3d pos3;
+    Vector3d z3;
+    Vector3d pos4;
+    Vector3d z4;
+    //Vector3d pos5;
+    //Vector3d z5;
+    //Vector3d pos6;
+    //Vector3d z6;
+
+    Vector3d basePos;
+    Vector3d shoulderPos;
+    Vector3d elbowPos;
+    Vector3d wristPos;
+    //Vector3d handPos;
+
+    vector<double> pos_elbow; this->getElbowPos(arm,pos_elbow,posture);
+    elbowPos << pos_elbow.at(0), pos_elbow.at(1), pos_elbow.at(2);
+    vector<double> pos_wrist; this->getWristPos(arm,pos_wrist,posture);
+    wristPos << pos_wrist.at(0), pos_wrist.at(1), pos_wrist.at(2);
+
+
+    switch (arm) {
+    case 1: // right arm
+        mat_world = this->mat_right;
+        mat_hand = this->mat_r_hand;
+        this->computeRightArmDHparams();
+        this->computeRightHandDHparams();
+        m_DH_arm = this->m_DH_rightArm;
+        m_DH_hand = this->m_DH_rightHand;
+        break;
+    case 2: //left arm
+        mat_world = this->mat_left;
+        mat_hand = this->mat_l_hand;
+        this->computeLeftArmDHparams();
+        this->computeLeftHandDHparams();
+        m_DH_arm = this->m_DH_leftArm;
+        m_DH_hand = this->m_DH_leftHand;
+        break;
+    }
+
+    T = mat_world;
+    // get the base
+    Vector3d v; Vector3d basez;
+    v = T.block(0,3,3,1);
+    basez = T.block(0,2,3,1);
+    basePos << v[0], v[1], v[2];
+
+    // Jacobian E
+    MatrixXd Jacobian_E(6,JOINTS_ARM);
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i),posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d diff;
+        Vector3d cross;
+        Vector3d zi;
+        VectorXd column(6);
+        switch(i){
+        case 0:
+            z0 = T.block(0,2,3,1);
+            pos0 = T.block(0,3,3,1);
+            diff = elbowPos - pos0;
+            cross = z0.cross(diff);
+            zi=z0;
+            column << cross, zi;
+            break;
+        case 1:
+            z1 = T.block(0,2,3,1);
+            pos1 = T.block(0,3,3,1);
+            diff = elbowPos - pos1;
+            cross = z1.cross(diff);
+            zi=z1;
+            column << cross, zi;
+            break;
+        case 2:
+            z2 = T.block(0,2,3,1);
+            pos2 = T.block(0,3,3,1);
+            diff = elbowPos - pos2;
+            cross = z2.cross(diff);
+            zi=z2;
+            column << cross, zi;
+            break;
+        case 3:
+            column << 0,0,0,0,0,0;
+            break;
+        case 4:
+            column << 0,0,0,0,0,0;
+            break;
+        case 5:
+            column << 0,0,0,0,0,0;
+            break;
+        case 6:
+            column << 0,0,0,0,0,0;
+            break;
+        }
+        Jacobian_E.col(i) = column;
+    }
+    MatrixXd Jacobian_E_alpha = Jacobian_E.block<3,JOINTS_ARM>(0,0);
+
+    // Jacobian W
+    MatrixXd Jacobian_W(6,JOINTS_ARM);
+    for (size_t i = 0; i < posture.size(); ++i){
+        this->transfMatrix(m_DH_arm.alpha.at(i),m_DH_arm.a.at(i),m_DH_arm.d.at(i),posture.at(i),T_aux);
+        T = T * T_aux;
+        Vector3d diff;
+        Vector3d cross;
+        Vector3d zi;
+        VectorXd column(6);
+        switch(i){
+        case 0:
+            z0 = T.block(0,2,3,1);
+            pos0 = T.block(0,3,3,1);
+            diff = wristPos - pos0;
+            cross = z0.cross(diff);
+            zi=z0;
+            column << cross, zi;
+            break;
+        case 1:
+            z1 = T.block(0,2,3,1);
+            pos1 = T.block(0,3,3,1);
+            diff = wristPos - pos1;
+            cross = z1.cross(diff);
+            zi=z1;
+            column << cross, zi;
+            break;
+        case 2:
+            z2 = T.block(0,2,3,1);
+            pos2 = T.block(0,3,3,1);
+            diff = wristPos - pos2;
+            cross = z2.cross(diff);
+            zi=z2;
+            column << cross, zi;
+            break;
+        case 3:
+            z3 = T.block(0,2,3,1);
+            pos3 = T.block(0,3,3,1);
+            diff = wristPos - pos3;
+            cross = z3.cross(diff);
+            zi=z3;
+            column << cross, zi;
+            break;
+        case 4:
+            z4 = T.block(0,2,3,1);
+            pos4 = T.block(0,3,3,1);
+            diff = wristPos - pos4;
+            cross = z4.cross(diff);
+            zi=z4;
+            column << cross, zi;
+            break;
+        case 5:
+            column << 0,0,0,0,0,0;
+            break;
+        case 6:
+            column << 0,0,0,0,0,0;
+            break;
+        }
+        Jacobian_W.col(i) = column;
+    }
+    MatrixXd Jacobian_W_alpha = Jacobian_W.block<3,JOINTS_ARM>(0,0);
+
+    Vector3d WS = (wristPos-shoulderPos); Vector3d v_WS = WS/(WS.norm());
+    Vector3d ES = (elbowPos-shoulderPos); //Vector3d v_ES = ES/(ES.norm());
+    Matrix3d I = Matrix3d::Identity();
+    Vector3d p = (I - v_WS*v_WS.transpose())*ES; Vector3d v_p = p/(p.norm());
+    Vector3d l = (WS.cross(basez)).cross(WS); Vector3d v_l = l/(l.norm());
+
+    MatrixXd JacobianSwivel_E = (((v_WS.cross(v_p)).transpose())*Jacobian_E_alpha)/p.norm();
+    MatrixXd JacobianSwivel_W_1 = (((v_WS.cross(v_l)).transpose())*Jacobian_W_alpha)*((basez.transpose()*WS)(0)/l.norm());
+    MatrixXd JacobianSwivel_W_2 = (((v_WS.cross(v_p)).transpose())*Jacobian_W_alpha)*((v_WS.transpose()*ES)(0)/(WS.norm()*p.norm()));
+
+    JacobianSwivel = JacobianSwivel_E + JacobianSwivel_W_1 - JacobianSwivel_W_2;
 }
 
 /**
@@ -5588,7 +5780,7 @@ void Humanoid::inverseDiffKinematicsSingleArm(int arm, vector<double> posture, v
 }
 
 
-void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,vector<double> hand_acc, vector<double> elbow_acc, vector<double> &velocities, VectorXd& null_velocities,double timestep,bool hl_alpha_en,bool jlim_en, bool sing_en, bool obsts_en,
+void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,vector<double> hand_acc, double alpha_acc, vector<double> &velocities, VectorXd& null_velocities,double timestep,bool hl_alpha_en,bool jlim_en, bool sing_en, bool obsts_en,
                                               double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping,double obst_coeff_torso, double obst_damping_torso,
                                               double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts)
 {
@@ -5725,53 +5917,42 @@ void Humanoid::inverseDiffKinematicsSingleArm2(int arm, vector<double> posture,v
     MatrixXd JJ = JacobianArm*JacobianArmT;
     MatrixXd JJk_inv = JJ.inverse();
     MatrixXd J_plus = JacobianArmT*JJk_inv; // pseudo-inverse of the Jacobian
-    //VectorXd hand_acc_xd(6); hand_acc_xd << hand_acc.at(0),hand_acc.at(1),hand_acc.at(2),hand_acc.at(3),hand_acc.at(4),hand_acc.at(5);
     VectorXd hand_acc_xd = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(hand_acc.data(), hand_acc.size());
     VectorXd hand_vel_xd = hand_acc_xd*timestep;
     VectorXd joint_accelerations = J_plus*hand_acc_xd;
     MatrixXd Id = MatrixXd::Identity(JOINTS_ARM,JOINTS_ARM);
     MatrixXd Jpp = J_plus*JacobianArm;
     MatrixXd J_Null = Id - Jpp; // null space of the Jacobian
+
     // add to joint_accelerations the swivel angle contribution
-    MatrixXd JacobianArm_E = JacobianArm.block<3,4>(0,0);
-    MatrixXd JacobianArm_ET = JacobianArm_E.transpose();
-    MatrixXd JJ_E = JacobianArm_E*JacobianArm_ET;
-    MatrixXd JJ_E_inv = JJ_E.inverse();
-    MatrixXd J_plus_E = JacobianArm_ET*JJ_E_inv; // pseudo-inverse of the Jacobian elbow
-    VectorXd elbow_acc_xd = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(elbow_acc.data(), elbow_acc.size());
-    VectorXd q_E = J_plus_E*elbow_acc_xd;
-    VectorXd q_E_a(JOINTS_ARM); q_E_a << q_E.data()[0],q_E.data()[1],q_E.data()[2],q_E.data()[3],0.0,0.0,0.0;
-    VectorXd q_acc_alpha = J_Null*q_E_a;
+    MatrixXd Jacobian_alpha; this->getJacobianSwivel(arm,posture,Jacobian_alpha);
+    MatrixXd Jacobian_alphaT = Jacobian_alpha.transpose();
+    MatrixXd JJ_alpha = Jacobian_alpha*Jacobian_alphaT;
+    MatrixXd JJ_alpha_inv = JJ_alpha.inverse();
+    MatrixXd J_alpha_plus = Jacobian_alphaT*JJ_alpha_inv; // pseudo-inverse of the Jacobian alpha
+    VectorXd q_acc_alpha = J_Null*J_alpha_plus*alpha_acc;
 
     if(hl_alpha_en){
         joint_accelerations += q_acc_alpha;
         null_velocities += q_acc_alpha*timestep;
     }
 /**
-            FullPivLU<MatrixXd> lu_decomp_n(J_Null);
-            double rank_n = lu_decomp_n.rank();
-            FullPivLU<MatrixXd> lu_decomp(JacobianArm);
-            double rank = lu_decomp.rank();
-            FullPivLU<MatrixXd> lu_decomp_E(JacobianArm_E);
-            double rank_E = lu_decomp_E.rank();
-            BOOST_LOG_SEV(lg, info) << "# --------------SWIVEL ANGLE--------------- # ";
-            BOOST_LOG_SEV(lg, info) << "J rank = " << rank;
-            BOOST_LOG_SEV(lg, info) << "J_E rank = " << rank_E;
-            BOOST_LOG_SEV(lg, info) << "Jnull rank = " << rank_n;
-            BOOST_LOG_SEV(lg, info) << "q_E_a 0 = " << q_E_a(0);
-            BOOST_LOG_SEV(lg, info) << "q_E_a 1 = " << q_E_a(1);
-            BOOST_LOG_SEV(lg, info) << "q_E_a 2 = " << q_E_a(2);
-            BOOST_LOG_SEV(lg, info) << "q_E_a 3 = " << q_E_a(3);
-            BOOST_LOG_SEV(lg, info) << "q_E_a 4 = " << q_E_a(4);
-            BOOST_LOG_SEV(lg, info) << "q_E_a 5 = " << q_E_a(5);
-            BOOST_LOG_SEV(lg, info) << "q_E_a 6 = " << q_E_a(6);
-            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 0 = " << q_acc_alpha(0);
-            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 1 = " << q_acc_alpha(1);
-            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 2 = " << q_acc_alpha(2);
-            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 3 = " << q_acc_alpha(3);
-            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 4 = " << q_acc_alpha(4);
-            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 5 = " << q_acc_alpha(5);
-            BOOST_LOG_SEV(lg, info) << "q_acc_alpha 6 = " << q_acc_alpha(6);
+    FullPivLU<MatrixXd> lu_decomp(JacobianArm);
+    double rank = lu_decomp.rank();
+    FullPivLU<MatrixXd> lu_decomp_alpha(Jacobian_alpha);
+    double rank_alpha = lu_decomp_alpha.rank();
+
+    BOOST_LOG_SEV(lg, info) << "# --------------SWIVEL ANGLE--------------- # ";
+    BOOST_LOG_SEV(lg, info) << "J rank = " << rank;
+    BOOST_LOG_SEV(lg, info) << "J_alpha rank = " << rank_alpha;
+    BOOST_LOG_SEV(lg, info) << "JJ_alpha determinant = " << JJ_alpha.determinant();
+    BOOST_LOG_SEV(lg, info) << "q_acc_alpha 0 = " << q_acc_alpha(0);
+    BOOST_LOG_SEV(lg, info) << "q_acc_alpha 1 = " << q_acc_alpha(1);
+    BOOST_LOG_SEV(lg, info) << "q_acc_alpha 2 = " << q_acc_alpha(2);
+    BOOST_LOG_SEV(lg, info) << "q_acc_alpha 3 = " << q_acc_alpha(3);
+    BOOST_LOG_SEV(lg, info) << "q_acc_alpha 4 = " << q_acc_alpha(4);
+    BOOST_LOG_SEV(lg, info) << "q_acc_alpha 5 = " << q_acc_alpha(5);
+    BOOST_LOG_SEV(lg, info) << "q_acc_alpha 6 = " << q_acc_alpha(6);
 **/
 
     // go to joint velocity space

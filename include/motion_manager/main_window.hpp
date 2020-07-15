@@ -1623,7 +1623,7 @@ private:
         boost::atomic<bool> replanning_succeed; /**< true if replanning succeed, false otherwise*/
         boost::atomic<bool> replanning_done; /**< true if the replanning has been called, false otherwise */
         VectorXd hand_j_acc; /**< time derivative Jacobian dependant part of the hand accelearion */
-        VectorXd elbow_j_acc; /**< time derivative Jacobian dependant part of the elbow accelearion */
+        double alpha_j_acc; /**< time derivative Jacobian dependant part of the alpha accelearion */
         vector<double> h_hand_pos_end; /**< end hand position during control */
         vector<double> h_hand_or_q_end; /**< end hand orientation (quaternion) during control */
         vector<double> h_hand_pos_init; /**< initial hand position during control */

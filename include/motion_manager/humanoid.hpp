@@ -1064,7 +1064,7 @@ public:
      * @param arm
      * @param posture
      * @param hand_acc
-     * @param elbow_acc
+     * @param alpha_acc
      * @param velocities
      * @param null_velocities
      * @param timestep
@@ -1085,7 +1085,7 @@ public:
      * @param jlim_damping
      * @param obsts
      */
-    void inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, vector<double> hand_acc, vector<double> elbow_acc, vector<double>& velocities, VectorXd &null_velocities, double timestep, bool hl_alpha_en, bool jlim_en, bool sing_en, bool obsts_en,
+    void inverseDiffKinematicsSingleArm2(int arm, vector<double> posture, vector<double> hand_acc, double alpha_acc, vector<double>& velocities, VectorXd &null_velocities, double timestep, bool hl_alpha_en, bool jlim_en, bool sing_en, bool obsts_en,
                                         double vel_max, double sing_coeff, double sing_damping, double obst_coeff, double obst_damping, double obst_coeff_torso, double obst_damping_torso, double jlim_th, double jlim_rate, double jlim_coeff, double jlim_damping, vector<objectPtr>& obsts);
 
 
@@ -1125,6 +1125,14 @@ public:
      * @param Jacobian
      */
     void getJacobian(int arm,std::vector<double>& posture,MatrixXd& Jacobian);
+
+    /**
+     * @brief getJacobianSwivel
+     * @param arm
+     * @param posture
+     * @param JacobianSwivel
+     */
+    void getJacobianSwivel(int arm, std::vector<double>& posture, MatrixXd& JacobianSwivel);
 
     /**
      * @brief getTimeDerivativeJacobian

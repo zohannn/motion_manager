@@ -1151,6 +1151,7 @@ void MainWindow::execPosControl()
                 vector<double> r_elbow_ang_pos(r_elbow_pos.begin()+3, r_elbow_pos.begin()+6);
                 vector<double> r_shoulder_lin_pos(r_shoulder_pos.begin(), r_shoulder_pos.begin()+3);
                 vector<double> r_shoulder_ang_pos(r_shoulder_pos.begin()+3, r_shoulder_pos.begin()+6);
+                /**
                 // versor on the elbow point
                 VectorXd r_wrist_lin_pos_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_wrist_lin_pos.data(), r_wrist_lin_pos.size());
                 VectorXd r_elbow_lin_pos_vec = Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(r_elbow_lin_pos.data(), r_elbow_lin_pos.size());
@@ -1159,6 +1160,7 @@ void MainWindow::execPosControl()
                 Vector3d r_ew_lin_pos_vec = r_elbow_lin_pos_vec - r_wrist_lin_pos_vec;
                 Vector3d u_alpha_vec = r_se_lin_pos_vec.cross(r_ew_lin_pos_vec);
                 Vector3d u_alpha = u_alpha_vec/u_alpha_vec.norm();
+                **/
 
                 // get desired hand velocity
                 VectorXd::Map(&hand_pos_vec_xd[0], hand_pos_vec_x.size()) = hand_pos_vec_x;
@@ -1287,9 +1289,8 @@ void MainWindow::execPosControl()
                 // Jacobian
                 this->curr_scene->getHumanoid()->getJacobian(1,r_arm_posture,this->Jacobian);
                 this->hand_j_acc = r_hand_acc_read_vec - this->Jacobian*r_arm_accelerations_read_vec; // dot{J}*dot{q}
-                MatrixXd Jacobian_E = this->Jacobian.block<3,4>(0,0);
-                VectorXd r_arm_acc_E = r_arm_accelerations_read_vec.head(4);
-                this->elbow_j_acc = alpha_acc_read.at(0)*u_alpha - Jacobian_E*r_arm_acc_E; // dot{J_E}*dot{q_E}
+                MatrixXd Jacobian_alpha; this->curr_scene->getHumanoid()->getJacobianSwivel(1,r_arm_posture,Jacobian_alpha);
+                this->alpha_j_acc = alpha_acc_read.at(0) - (Jacobian_alpha*r_arm_accelerations_read_vec)(0); // dot{J_alpha}*dot{q}
 
                 vector<double> r_hand_lin_acc(r_hand_acc_read.begin(), r_hand_acc_read.begin()+3);
                 vector<double> r_hand_ang_acc(r_hand_acc_read.begin()+3, r_hand_acc_read.begin()+6);
@@ -1971,9 +1972,9 @@ void MainWindow::execPosControl()
                         }
 
                     // errors of the swivel angle data
-                    error_alpha_pos = des_alpha_pos - alpha_pos_read.at(0);
-                    error_alpha_vel = des_alpha_vel - alpha_vel_read.at(0);
-                    error_alpha_acc = des_alpha_acc - alpha_acc_read.at(0);
+                    error_alpha_pos = alpha_pos_read.at(0) - des_alpha_pos;
+                    error_alpha_vel = alpha_vel_read.at(0) - des_alpha_vel;
+                    error_alpha_acc = alpha_acc_read.at(0) - des_alpha_acc;
 
                     // hand
                     // error in position
@@ -2379,18 +2380,15 @@ void MainWindow::execPosControl()
                 // closed-loop control
                 //VectorXd hand_vel_xd_vec(6);
                 VectorXd hand_acc_xd_vec(6);
-                Vector3d elbow_acc_xd_vec;
+                double alpha_acc_xd = 0.0;
                 if(hl_en){
                     hand_acc_xd_vec = h_hand_ref_acc + Koeff_d*der_error_h_tot + Koeff_p*error_h_tot - this->hand_j_acc;
-                    elbow_acc_xd_vec = (des_alpha_acc + hl_alpha_vel_coeff*error_alpha_vel + hl_alpha_pos_coeff*error_alpha_pos)*u_alpha - this->elbow_j_acc;
+                    alpha_acc_xd = (des_alpha_acc + hl_alpha_vel_coeff*error_alpha_vel + hl_alpha_pos_coeff*error_alpha_pos) - this->alpha_j_acc;
                 }else{
                     hand_acc_xd_vec = trap_hand_ref_acc + Koeff_d*der_error_trap_tot + Koeff_p*error_trap_tot - this->hand_j_acc;
-                    elbow_acc_xd_vec << 0,0,0;
                 }
                 vector<double> hand_acc_vec; hand_acc_vec.resize(hand_acc_xd_vec.size());
                 VectorXd::Map(&hand_acc_vec[0], hand_acc_xd_vec.size()) = hand_acc_xd_vec;
-                vector<double> elbow_acc_vec; elbow_acc_vec.resize(elbow_acc_xd_vec.size());
-                VectorXd::Map(&elbow_acc_vec[0], elbow_acc_xd_vec.size()) = elbow_acc_xd_vec;
 
                 // check proximity
                 if(this->ui.checkBox_use_plan_hand_pos->isChecked())
@@ -2449,7 +2447,7 @@ void MainWindow::execPosControl()
 
 
                 // inverse algorithm
-                this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,elbow_acc_vec,r_arm_velocities,r_arm_null_velocities,time_step,hl_alpha_en,jlim_en,sing_en,obsts_en,
+                this->curr_scene->getHumanoid()->inverseDiffKinematicsSingleArm2(1,r_arm_posture_mes,hand_acc_vec,alpha_acc_xd,r_arm_velocities,r_arm_null_velocities,time_step,hl_alpha_en,jlim_en,sing_en,obsts_en,
                                                                                 vel_max,sing_coeff,sing_damping,obst_coeff,obst_damping,obst_coeff_torso,obst_damping_torso,
                                                                                  jlim_th,jlim_rate,jlim_coeff,jlim_damping,obsts_n);
 
@@ -15765,7 +15763,7 @@ void MainWindow::clear_control_variables()
     this->alpha_pos_buff = boost::make_shared<CircularBuffers<double>>(1, this->N_filter_length);
     this->alpha_vel_buff = boost::make_shared<CircularBuffers<double>>(1, this->N_filter_length);
     this->hand_j_acc = VectorXd::Zero(6);
-    this->elbow_j_acc = VectorXd::Zero(3);
+    this->alpha_j_acc = 0.0;
     this->Jacobian = MatrixXd::Zero(6,JOINTS_ARM);
 }
 
