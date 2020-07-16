@@ -1640,12 +1640,15 @@ private:
 
         vector<vector<double>> fingPosition_ctrl; /**< fingers real positions during control */
         vector<vector<double>> fingPosition_des_ctrl; /**< fingers desired positions */
+        vector<vector<double>> fingVelocity_ctrl; /**< fingers real velocities during control */
+        vector<vector<double>> fingVelocity_des_ctrl; /**< fingers desired velocities */
         vector<vector<double>> handPosition_ctrl; /**< hand position during control. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_ctrl; /**< hand orientation during control. 0=roll,1=pitch,2=yaw */
         vector<vector<double>> handOrientation_q_ctrl; /**< hand orientation desired during control. 0=qx,1=qy,2=qz,3=qw */
         vector<vector<double>> handPosition_des_ctrl; /**< desired hand positions during control 0=x, 1=y, 2=z, 3=qx, 4=qy, 5=qz, 6=qw*/
         vector<vector<double>> handLinearVelocity_ctrl; /**< hand linear velocity during control */
         vector<vector<double>> handAngularVelocity_ctrl;/**< hand angular velocity during control */
+        vector<vector<double>> handVelocity_des_ctrl; /**< desired hand velocities during control 0=x, 1=y, 2=z, 3=wx, 4=wy, 5=wz */
         vector<double> handVelocityNorm_ctrl; /**< hand linear velocity norm during control */
         QVector<double> handVelocityNorm_ctrl_plot; /**< hand linear velocity norm during control to plot */
         vector<vector<double>> handLinearAcceleration_ctrl; /**< hand linear acceleration during control */
@@ -1675,6 +1678,8 @@ private:
         // swivel angle
         vector<double> alpha_des_ctrl; /**< desired position of the swivel angle **/
         vector<double> alpha_ctrl; /**< current position of the swivel angle **/
+        vector<double> alpha_des_vel_ctrl; /**< desired velocity of the swivel angle **/
+        vector<double> alpha_vel_ctrl; /**< current velocity of the swivel angle **/
 
         // hand errors
         vector<double> error_pos_tot_norm; /**< norm of the total error in position */

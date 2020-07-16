@@ -466,7 +466,7 @@ void MainWindow::execPosControl()
             // desired pose
             double des_hand_pos_x = 0.0; double des_hand_pos_y = 0.0; double des_hand_pos_z = 0.0;
             double des_hand_or_q_x = 0.0; double des_hand_or_q_y = 0.0; double des_hand_or_q_z = 0.0; double des_hand_or_q_w = 0.0;
-            VectorXd des_hand_pose(7); vector<double> des_hand_pose_vec(7,0.0);
+            //VectorXd des_hand_pose(7); vector<double> des_hand_pose_vec(7,0.0);
             VectorXd hand_pos_vec_x = VectorXd::Zero(7); vector<double> hand_pos_vec_xd(7,0.0);
 
             // desired velocity
@@ -1061,8 +1061,8 @@ void MainWindow::execPosControl()
             des_hand_pos << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z;
             des_hand_or_q_e << des_hand_or_q_x,des_hand_or_q_y,des_hand_or_q_z;
             des_hand_or_q << des_hand_or_q_x,des_hand_or_q_y,des_hand_or_q_z,des_hand_or_q_w;
-            des_hand_pose << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z,des_hand_or_q_x,des_hand_or_q_y,des_hand_or_q_z,des_hand_or_q_w;
-            VectorXd::Map(&des_hand_pose_vec[0], des_hand_pose.size()) = des_hand_pose;
+            //des_hand_pose << des_hand_pos_x,des_hand_pos_y,des_hand_pos_z,des_hand_or_q_x,des_hand_or_q_y,des_hand_or_q_z,des_hand_or_q_w;
+            //VectorXd::Map(&des_hand_pose_vec[0], des_hand_pose.size()) = des_hand_pose;
 
             double error_pos_th = this->ui.lineEdit_err_p_pos->text().toDouble();
             double error_or_th = this->ui.lineEdit_err_p_or->text().toDouble();
@@ -1453,7 +1453,7 @@ void MainWindow::execPosControl()
                                              +0.5*h_hand_lin_acc_end.at(1)*pow(period_T,2)*(pow(g_map,3)-2*pow(g_map,4)+pow(g_map,5))
                                              +error_b_tot(1)*((g_map*(1-g_map))/(tb*(1-tb)))*pow(sin(M_PI*pow(g_map,phi)),2);
 
-                            h_hand_pose(2) = hand_pos_init_vec(2) +error_f_tot(2)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
+                            h_hand_pose(2) = hand_pos_init_vec(2) + error_f_tot(2)*(10*pow(g_map,3)-15*pow(g_map,4)+6*pow(g_map,5))
                                              +h_hand_lin_vel_init.at(2)*period_T*(g_map-6*pow(g_map,3)+8*pow(g_map,4)-3*pow(g_map,5))
                                              +h_hand_lin_vel_end.at(2)*period_T*(-4*pow(g_map,3)+7*pow(g_map,4)-3*pow(g_map,5))
                                              +0.5*h_hand_lin_acc_init.at(2)*pow(period_T,2)*(pow(g_map,2)-3*pow(g_map,3)+3*pow(g_map,4)-pow(g_map,5))
@@ -2002,6 +2002,12 @@ void MainWindow::execPosControl()
                     error_h_lin_vel(1) = h_hand_vel(1) - r_hand_lin_vel_vec(1);
                     error_h_lin_vel(2) = h_hand_vel(2) - r_hand_lin_vel_vec(2);
                     /**
+                                        BOOST_LOG_SEV(lg, info) << "# ---------------- linear velocity z ------------------- # ";
+                                        BOOST_LOG_SEV(lg, info) << "des hand lin vel z = " << h_hand_vel(2);
+                                        BOOST_LOG_SEV(lg, info) << "curr hand lin vel z = " << r_hand_lin_vel_vec(2);
+                                        BOOST_LOG_SEV(lg, info) << "error lin vel z = " << error_h_lin_vel(2);
+                    **/
+                    /**
                     // error in orientation velocity (quaternion)
                     Vector3d h_hand_ang_vel_q_e; h_hand_ang_vel_q_e << h_hand_vel(3),h_hand_vel(4),h_hand_vel(5); double h_hand_ang_vel_q_w = h_hand_vel(6);
                     Vector3d error_h_der_or = r_hand_ang_vel_q_w*h_hand_or_q_e + r_hand_q_w*h_hand_ang_vel_q_e - h_hand_ang_vel_q_w*r_hand_or_q_e
@@ -2498,22 +2504,35 @@ void MainWindow::execPosControl()
                     this->jointsAcceleration_ctrl(this->jointsAcceleration_ctrl.rows()-1,r_arm_accelerations_read.size()+jj) = r_hand_accelerations_read.at(jj);
 
                 // desired hand pose
-                vector<double> std_h_hand_des_pose;  std_h_hand_des_pose.resize(h_hand_pose.size());
+                vector<double> std_h_hand_des_pose(h_hand_pose.size());
                 VectorXd::Map(&std_h_hand_des_pose[0], h_hand_pose.size()) = h_hand_pose;
                 this->handPosition_des_ctrl.push_back(std_h_hand_des_pose);
+                // desired hand velocity
+                vector<double> std_h_hand_des_vel(h_hand_vel.size());
+                VectorXd::Map(&std_h_hand_des_vel[0], h_hand_vel.size()) = h_hand_vel;
+                this->handVelocity_des_ctrl.push_back(std_h_hand_des_vel);
 
                 // desired fingers positions
-                vector<double> std_h_fing_pos;  std_h_fing_pos.resize(h_fing_pos.size());
+                vector<double> std_h_fing_pos(h_fing_pos.size());
                 VectorXd::Map(&std_h_fing_pos[0], h_fing_pos.size()) = h_fing_pos;
                 this->fingPosition_des_ctrl.push_back(std_h_fing_pos);
-
                 // fingers positions
                 this->fingPosition_ctrl.push_back(r_hand_posture_mes);
+                // desired fingers velocities
+                vector<double> std_h_fing_vel(h_fing_vel.size());
+                VectorXd::Map(&std_h_fing_vel[0], h_fing_vel.size()) = h_fing_vel;
+                this->fingVelocity_des_ctrl.push_back(std_h_fing_vel);
+                // fingers velocities
+                this->fingVelocity_ctrl.push_back(r_hand_velocities);
 
-                // desired swivel angle
+                // desired swivel angle position
                 this->alpha_des_ctrl.push_back(des_alpha_pos);
-                // current swivel angle
+                // current swivel angle position
                 this->alpha_ctrl.push_back(alpha_pos_read.at(0));
+                // desired swivel angle velocity
+                this->alpha_des_vel_ctrl.push_back(des_alpha_vel);
+                // current swivel angle velocity
+                this->alpha_vel_ctrl.push_back(alpha_vel_read.at(0));
 
                 // operational space positions
                 this->handPosition_ctrl.push_back(r_hand_lin_pos);
@@ -15680,8 +15699,11 @@ void MainWindow::clear_control_variables()
     this->handOrientation_ctrl.clear();
     this->handOrientation_q_ctrl.clear();
     this->handPosition_des_ctrl.clear();
+    this->handVelocity_des_ctrl.clear();
     this->fingPosition_ctrl.clear();
+    this->fingVelocity_ctrl.clear();
     this->fingPosition_des_ctrl.clear();
+    this->fingVelocity_des_ctrl.clear();
     this->handLinearVelocity_ctrl.clear();
     this->handAngularVelocity_ctrl.clear();
     this->handLinearAcceleration_ctrl.clear();
@@ -15706,6 +15728,8 @@ void MainWindow::clear_control_variables()
     this->shoulderAngularAcceleration_ctrl.clear();
     this->alpha_des_ctrl.clear();
     this->alpha_ctrl.clear();
+    this->alpha_des_vel_ctrl.clear();
+    this->alpha_vel_ctrl.clear();
     this->handVelocityNorm_ctrl.clear();
     this->handAccelerationNorm_ctrl.clear();
     this->jointsPosition_ctrl.resize(0,0);
@@ -16566,8 +16590,11 @@ void MainWindow::on_pushButton_tracking_ctrl_clicked()
     if(!this->handPosition_ctrl.empty())
     {
         this->mCompTrackCtrldlg->setupPlots(this->handPosition_ctrl,this->handOrientation_q_ctrl,this->handPosition_des_ctrl,
+                                            this->handLinearVelocity_ctrl,this->handAngularVelocity_ctrl,this->handVelocity_des_ctrl,
                                             this->fingPosition_ctrl,this->fingPosition_des_ctrl,
+                                            this->fingVelocity_ctrl,this->fingVelocity_des_ctrl,
                                             this->alpha_ctrl,this->alpha_des_ctrl,
+                                            this->alpha_vel_ctrl,this->alpha_des_vel_ctrl,
                                             this->sim_time);
     }
 

@@ -15,19 +15,26 @@ CompTrackingControlDialog::~CompTrackingControlDialog()
 }
 
 void CompTrackingControlDialog::setupPlots(vector<vector<double>> &pos_hand, vector<vector<double>> &or_hand, vector<vector<double>> &des_pos_hand,
+                                           vector<vector<double>> &lin_vel_hand, vector<vector<double>> &ang_vel_hand, vector<vector<double>> &des_vel_hand,
                                            vector<vector<double>> &pos_fing, vector<vector<double>> &des_pos_fing,
+                                           vector<vector<double>> &vel_fing, vector<vector<double>> &des_vel_fing,
                                            vector<double> &pos_alpha, vector<double> &des_pos_alpha,
+                                           vector<double> &vel_alpha, vector<double> &des_vel_alpha,
                                            vector<double> &time)
 {
 
     this->qtime = QVector<double>::fromStdVector(time);
-
-    this->positions_hand = pos_hand; this->des_positions_hand = des_pos_hand;
-    this->orientations_hand = or_hand;
+    // hand
+    this->positions_hand = pos_hand; this->orientations_hand = or_hand; this->des_positions_hand = des_pos_hand;
+    this->lin_vel_hand = lin_vel_hand; this->ang_vel_hand = ang_vel_hand; this->des_vel_hand = des_vel_hand;
+    // fingers
     this->positions_fing = pos_fing; this->des_positions_fing = des_pos_fing;
-
+    this->velocities_fing = vel_fing; this->des_velocities_fing = des_vel_fing;
+    // swivel angle
     this->qalpha_pos = QVector<double>::fromStdVector(pos_alpha);
     this->qdes_alpha_pos = QVector<double>::fromStdVector(des_pos_alpha);
+    this->qalpha_vel = QVector<double>::fromStdVector(vel_alpha);
+    this->qdes_alpha_vel = QVector<double>::fromStdVector(des_vel_alpha);
 
 }
 
@@ -104,8 +111,7 @@ void CompTrackingControlDialog::plotComp(QCustomPlot *plot, QString title, QVect
 
 // Q_SLOTS
 
-
-void CompTrackingControlDialog::on_pushButton_plot_hand_clicked()
+void CompTrackingControlDialog::on_pushButton_plot_hand_pos_clicked()
 {
     double f_th_pos = this->ui->lineEdit_f_cutoff_pos->text().toDouble();
     double timestep_pos = this->ui->lineEdit_time_step_pos->text().toDouble();
@@ -134,27 +140,29 @@ void CompTrackingControlDialog::on_pushButton_plot_hand_clicked()
         vector<double> or_hand = orientations_hand.at(i);
         vector<double> des_pos_hand = des_positions_hand.at(i);
 
-        hand_pos_x.push_back(pos_hand.at(0));
-        hand_pos_y.push_back(pos_hand.at(1));
-        hand_pos_z.push_back(pos_hand.at(2));
-        hand_or_qx.push_back(or_hand.at(0));
-        hand_or_qy.push_back(or_hand.at(1));
-        hand_or_qz.push_back(or_hand.at(2));
-        hand_or_qw.push_back(or_hand.at(3));
 
-        des_hand_pos_x.push_back(lpf_pos_x.update(des_pos_hand.at(0)));
-        des_hand_pos_y.push_back(lpf_pos_y.update(des_pos_hand.at(1)));
-        des_hand_pos_z.push_back(lpf_pos_z.update(des_pos_hand.at(2)));
-        des_hand_or_qx.push_back(lpf_or_qx.update(des_pos_hand.at(3)));
-        des_hand_or_qy.push_back(lpf_or_qy.update(des_pos_hand.at(4)));
-        des_hand_or_qz.push_back(lpf_or_qz.update(des_pos_hand.at(5)));
-        des_hand_or_qw.push_back(lpf_or_qw.update(des_pos_hand.at(6)));
+        hand_pos_x.push_back(lpf_pos_x.update(pos_hand.at(0)));
+        hand_pos_y.push_back(lpf_pos_y.update(pos_hand.at(1)));
+        hand_pos_z.push_back(lpf_pos_z.update(pos_hand.at(2)));
+        hand_or_qx.push_back(lpf_or_qx.update(or_hand.at(0)));
+        hand_or_qy.push_back(lpf_or_qy.update(or_hand.at(1)));
+        hand_or_qz.push_back(lpf_or_qz.update(or_hand.at(2)));
+        hand_or_qw.push_back(lpf_or_qw.update(or_hand.at(3)));
+
+        des_hand_pos_x.push_back(des_pos_hand.at(0));
+        des_hand_pos_y.push_back(des_pos_hand.at(1));
+        des_hand_pos_z.push_back(des_pos_hand.at(2));
+        des_hand_or_qx.push_back(des_pos_hand.at(3));
+        des_hand_or_qy.push_back(des_pos_hand.at(4));
+        des_hand_or_qz.push_back(des_pos_hand.at(5));
+        des_hand_or_qw.push_back(des_pos_hand.at(6));
+
     }
 
 
-    plotComp(ui->plot_hand_x,QString("Hand tracking position x [mm]"),qtime,hand_pos_x,des_hand_pos_x);
-    plotComp(ui->plot_hand_y,QString("Hand tracking position y [mm]"),qtime,hand_pos_y,des_hand_pos_y);
-    plotComp(ui->plot_hand_z,QString("Hand tracking position z [mm]"),qtime,hand_pos_z,des_hand_pos_z);
+    plotComp(ui->plot_hand_pos_x,QString("Hand tracking position x [mm]"),qtime,hand_pos_x,des_hand_pos_x);
+    plotComp(ui->plot_hand_pos_y,QString("Hand tracking position y [mm]"),qtime,hand_pos_y,des_hand_pos_y);
+    plotComp(ui->plot_hand_pos_z,QString("Hand tracking position z [mm]"),qtime,hand_pos_z,des_hand_pos_z);
     plotComp(ui->plot_hand_qx,QString("Hand tracking orientation qx"),qtime,hand_or_qx,des_hand_or_qx);
     plotComp(ui->plot_hand_qy,QString("Hand tracking orientation qy"),qtime,hand_or_qy,des_hand_or_qy);
     plotComp(ui->plot_hand_qz,QString("Hand tracking orientation qz"),qtime,hand_or_qz,des_hand_or_qz);
@@ -162,7 +170,58 @@ void CompTrackingControlDialog::on_pushButton_plot_hand_clicked()
 
 }
 
-void CompTrackingControlDialog::on_pushButton_plot_fing_clicked()
+void CompTrackingControlDialog::on_pushButton_plot_hand_vel_clicked()
+{
+    double f_th_vel = this->ui->lineEdit_f_cutoff_vel->text().toDouble();
+    double timestep_vel = this->ui->lineEdit_time_step_vel->text().toDouble();
+    LowPassFilter lpf_lin_vel_x(f_th_vel, timestep_vel);
+    LowPassFilter lpf_lin_vel_y(f_th_vel, timestep_vel);
+    LowPassFilter lpf_lin_vel_z(f_th_vel, timestep_vel);
+    LowPassFilter lpf_ang_vel_x(f_th_vel, timestep_vel);
+    LowPassFilter lpf_ang_vel_y(f_th_vel, timestep_vel);
+    LowPassFilter lpf_ang_vel_z(f_th_vel, timestep_vel);
+
+    // clear
+    hand_lin_vel_x.clear(); des_hand_lin_vel_x.clear();
+    hand_lin_vel_y.clear(); des_hand_lin_vel_y.clear();
+    hand_lin_vel_z.clear(); des_hand_lin_vel_z.clear();
+    hand_ang_vel_x.clear(); des_hand_ang_vel_x.clear();
+    hand_ang_vel_y.clear(); des_hand_ang_vel_y.clear();
+    hand_ang_vel_z.clear(); des_hand_ang_vel_z.clear();
+
+    for(size_t i=0;i<qtime.size();++i){
+        vector<double> vel_hand = lin_vel_hand.at(i);
+        vector<double> w_hand = ang_vel_hand.at(i);
+        vector<double> des_v_hand = des_vel_hand.at(i);
+
+        hand_lin_vel_x.push_back(lpf_lin_vel_x.update(vel_hand.at(0)));
+        hand_lin_vel_y.push_back(lpf_lin_vel_y.update(vel_hand.at(1)));
+        hand_lin_vel_z.push_back(lpf_lin_vel_z.update(vel_hand.at(2)));
+        hand_ang_vel_x.push_back(lpf_ang_vel_x.update(w_hand.at(0)));
+        hand_ang_vel_y.push_back(lpf_ang_vel_y.update(w_hand.at(1)));
+        hand_ang_vel_z.push_back(lpf_ang_vel_z.update(w_hand.at(2)));
+
+        des_hand_lin_vel_x.push_back(des_v_hand.at(0));
+        des_hand_lin_vel_y.push_back(des_v_hand.at(1));
+        des_hand_lin_vel_z.push_back(des_v_hand.at(2));
+        des_hand_ang_vel_x.push_back(des_v_hand.at(3));
+        des_hand_ang_vel_y.push_back(des_v_hand.at(4));
+        des_hand_ang_vel_z.push_back(des_v_hand.at(5));
+
+    }
+
+
+    plotComp(ui->plot_hand_vel_x,QString("Hand tracking velocity x [mm/s]"),qtime,hand_lin_vel_x,des_hand_lin_vel_x);
+    plotComp(ui->plot_hand_vel_y,QString("Hand tracking velocity y [mm/s]"),qtime,hand_lin_vel_y,des_hand_lin_vel_y);
+    plotComp(ui->plot_hand_vel_z,QString("Hand tracking velocity z [mm/s]"),qtime,hand_lin_vel_z,des_hand_lin_vel_z);
+    plotComp(ui->plot_hand_w_x,QString("Hand tracking velocity x [rad/s]"),qtime,hand_ang_vel_x,des_hand_ang_vel_x);
+    plotComp(ui->plot_hand_w_y,QString("Hand tracking velocity y [rad/s]"),qtime,hand_ang_vel_y,des_hand_ang_vel_y);
+    plotComp(ui->plot_hand_w_z,QString("Hand tracking velocity z [rad/s]"),qtime,hand_ang_vel_z,des_hand_ang_vel_z);
+
+
+}
+
+void CompTrackingControlDialog::on_pushButton_plot_fing_pos_clicked()
 {
     const double radtodeg = 180.0/static_cast<double>(M_PI);
     double f_th_pos = this->ui->lineEdit_f_cutoff_pos->text().toDouble();
@@ -195,10 +254,50 @@ void CompTrackingControlDialog::on_pushButton_plot_fing_clicked()
 
     }
 
-    plotComp(ui->plot_fing_0,QString("Finger 0 position tracking [deg]"),qtime,pos_fing_0,des_pos_fing_0);
-    plotComp(ui->plot_fing_1,QString("Finger 1 position tracking [deg]"),qtime,pos_fing_1,des_pos_fing_1);
-    plotComp(ui->plot_fing_2,QString("Finger 2 position tracking [deg]"),qtime,pos_fing_2,des_pos_fing_2);
-    plotComp(ui->plot_fing_3,QString("Finger 3 position tracking [deg]"),qtime,pos_fing_3,des_pos_fing_3);
+    plotComp(ui->plot_fing_0_pos,QString("Finger 0 position tracking [deg]"),qtime,pos_fing_0,des_pos_fing_0);
+    plotComp(ui->plot_fing_1_pos,QString("Finger 1 position tracking [deg]"),qtime,pos_fing_1,des_pos_fing_1);
+    plotComp(ui->plot_fing_2_pos,QString("Finger 2 position tracking [deg]"),qtime,pos_fing_2,des_pos_fing_2);
+    plotComp(ui->plot_fing_3_pos,QString("Finger 3 position tracking [deg]"),qtime,pos_fing_3,des_pos_fing_3);
+}
+
+void CompTrackingControlDialog::on_pushButton_plot_fing_vel_clicked()
+{
+    const double radtodeg = 180.0/static_cast<double>(M_PI);
+    double f_th_vel = this->ui->lineEdit_f_cutoff_vel->text().toDouble();
+    double timestep_vel = this->ui->lineEdit_time_step_vel->text().toDouble();
+
+    LowPassFilter lpf_fing_0(f_th_vel, timestep_vel);
+    LowPassFilter lpf_fing_1(f_th_vel, timestep_vel);
+    LowPassFilter lpf_fing_2(f_th_vel, timestep_vel);
+    LowPassFilter lpf_fing_3(f_th_vel, timestep_vel);
+
+    // clear
+    vel_fing_0.clear(); des_vel_fing_0.clear();
+    vel_fing_1.clear(); des_vel_fing_1.clear();
+    vel_fing_2.clear(); des_vel_fing_2.clear();
+    vel_fing_3.clear(); des_vel_fing_3.clear();
+
+    for(size_t i=0;i<qtime.size();++i){
+        vector<double> vel_fing = velocities_fing.at(i);
+        vector<double> des_vel_fing = des_velocities_fing.at(i);
+
+        vel_fing_0.push_back(lpf_fing_0.update(radtodeg*vel_fing.at(0)));
+        vel_fing_1.push_back(lpf_fing_1.update(radtodeg*vel_fing.at(1)));
+        vel_fing_2.push_back(lpf_fing_2.update(radtodeg*vel_fing.at(2)));
+        vel_fing_3.push_back(lpf_fing_3.update(radtodeg*vel_fing.at(3)));
+
+        des_vel_fing_0.push_back(radtodeg*des_vel_fing.at(0));
+        des_vel_fing_1.push_back(radtodeg*des_vel_fing.at(1));
+        des_vel_fing_2.push_back(radtodeg*des_vel_fing.at(2));
+        des_vel_fing_3.push_back(radtodeg*des_vel_fing.at(3));
+
+    }
+
+    plotComp(ui->plot_fing_0_vel,QString("Finger 0 velocity tracking [deg/s]"),qtime,vel_fing_0,des_vel_fing_0);
+    plotComp(ui->plot_fing_1_vel,QString("Finger 1 velocity tracking [deg/s]"),qtime,vel_fing_1,des_vel_fing_1);
+    plotComp(ui->plot_fing_2_vel,QString("Finger 2 velocity tracking [deg/s]"),qtime,vel_fing_2,des_vel_fing_2);
+    plotComp(ui->plot_fing_3_vel,QString("Finger 3 velocity tracking [deg/s]"),qtime,vel_fing_3,des_vel_fing_3);
+
 }
 
 void CompTrackingControlDialog::on_pushButton_plot_alpha_clicked()
@@ -206,19 +305,24 @@ void CompTrackingControlDialog::on_pushButton_plot_alpha_clicked()
     const double radtodeg = 180.0/static_cast<double>(M_PI);
     double f_th_pos = this->ui->lineEdit_f_cutoff_pos->text().toDouble();
     double timestep_pos = this->ui->lineEdit_time_step_pos->text().toDouble();
+    double f_th_vel = this->ui->lineEdit_f_cutoff_vel->text().toDouble();
+    double timestep_vel = this->ui->lineEdit_time_step_vel->text().toDouble();
 
-    LowPassFilter lpf_alpha(f_th_pos, timestep_pos);
+    LowPassFilter lpf_alpha_pos(f_th_pos, timestep_pos);
+    LowPassFilter lpf_alpha_vel(f_th_vel, timestep_vel);
 
-    QVector<double> pos_a;
-    QVector<double> des_pos_a;
+    QVector<double> pos_a, des_pos_a, vel_a, des_vel_a;
     for(size_t i=0;i<qtime.size();++i){
-        pos_a.push_back(lpf_alpha.update(radtodeg*this->qalpha_pos.at(i)));
-        des_pos_a.push_back(lpf_alpha.update(radtodeg*this->qdes_alpha_pos.at(i)));
+        pos_a.push_back(lpf_alpha_pos.update(radtodeg*this->qalpha_pos.at(i)));
+        des_pos_a.push_back(radtodeg*this->qdes_alpha_pos.at(i));
+        vel_a.push_back(lpf_alpha_vel.update(radtodeg*this->qalpha_vel.at(i)));
+        des_vel_a.push_back(radtodeg*this->qdes_alpha_vel.at(i));
     }
     plotComp(ui->plot_alpha_pos,QString("Swivel angle position tracking [deg]"),qtime,pos_a,des_pos_a);
+    plotComp(ui->plot_alpha_vel,QString("Swivel angle velocity tracking [deg/s]"),qtime,vel_a,des_vel_a);
 }
 
-void CompTrackingControlDialog::on_pushButton_save_hand_clicked()
+void CompTrackingControlDialog::on_pushButton_save_hand_pos_clicked()
 {
 
     QString path;
@@ -238,9 +342,9 @@ void CompTrackingControlDialog::on_pushButton_save_hand_clicked()
     }
     path = QString("results/controlling/tracking/hand/");
 
-    ui->plot_hand_x->savePdf(path+QString("hand_track_pos_x.pdf"),true,0,0,QString(),QString("Hand tracking position x [mm]"));
-    ui->plot_hand_y->savePdf(path+QString("hand_track_pos_y.pdf"),true,0,0,QString(),QString("Hand tracking position y [mm]"));
-    ui->plot_hand_z->savePdf(path+QString("hand_track_pos_z.pdf"),true,0,0,QString(),QString("Hand tracking position z [mm]"));
+    ui->plot_hand_pos_x->savePdf(path+QString("hand_track_pos_x.pdf"),true,0,0,QString(),QString("Hand tracking position x [mm]"));
+    ui->plot_hand_pos_y->savePdf(path+QString("hand_track_pos_y.pdf"),true,0,0,QString(),QString("Hand tracking position y [mm]"));
+    ui->plot_hand_pos_z->savePdf(path+QString("hand_track_pos_z.pdf"),true,0,0,QString(),QString("Hand tracking position z [mm]"));
     ui->plot_hand_qx->savePdf(path+QString("hand_track_or_qx.pdf"),true,0,0,QString(),QString("Hand tracking orientation qx"));
     ui->plot_hand_qy->savePdf(path+QString("hand_track_or_qy.pdf"),true,0,0,QString(),QString("Hand tracking orientation qy"));
     ui->plot_hand_qz->savePdf(path+QString("hand_track_or_qz.pdf"),true,0,0,QString(),QString("Hand tracking orientation qz"));
@@ -248,11 +352,11 @@ void CompTrackingControlDialog::on_pushButton_save_hand_clicked()
 
     // save data
     if(!this->hand_pos_x.empty()){
-        string filename("hand_tracking.txt");
+        string filename("hand_pos_tracking.txt");
         ofstream hand_stream;
         hand_stream.open(path.toStdString()+filename);
 
-        hand_stream << string("# HAND TRACKING \n");
+        hand_stream << string("# HAND POSITION TRACKING \n");
         hand_stream << string("# position x [mm], position y [mm], position z [mm], orientation qx, orientation qy, orientation qz, orientation qw, "
                               " des position x [mm], des position y [mm], des position z [mm], des orientation qx, des orientation qy, des orientation qz, des orientation qw,"
                               "time [s] \n");
@@ -306,7 +410,88 @@ void CompTrackingControlDialog::on_pushButton_save_hand_clicked()
 
 }
 
-void CompTrackingControlDialog::on_pushButton_save_fing_clicked()
+void CompTrackingControlDialog::on_pushButton_save_hand_vel_clicked()
+{
+    QString path;
+
+    struct stat st = {0};
+    if (stat("results", &st) == -1) {
+        mkdir("results", 0700);
+    }
+    if (stat("results/controlling", &st) == -1) {
+        mkdir("results/controlling", 0700);
+    }
+    if (stat("results/controlling/tracking", &st) == -1) {
+        mkdir("results/controlling/tracking", 0700);
+    }
+    if (stat("results/controlling/tracking/hand", &st) == -1) {
+        mkdir("results/controlling/tracking/hand", 0700);
+    }
+    path = QString("results/controlling/tracking/hand/");
+
+    ui->plot_hand_vel_x->savePdf(path+QString("hand_track_vel_x.pdf"),true,0,0,QString(),QString("Hand tracking velocity x [mm/s]"));
+    ui->plot_hand_vel_y->savePdf(path+QString("hand_track_vel_y.pdf"),true,0,0,QString(),QString("Hand tracking velocity y [mm/s]"));
+    ui->plot_hand_vel_z->savePdf(path+QString("hand_track_vel_z.pdf"),true,0,0,QString(),QString("Hand tracking velocity z [mm/s]"));
+    ui->plot_hand_w_x->savePdf(path+QString("hand_track_w_x.pdf"),true,0,0,QString(),QString("Hand tracking velocity x [rad/s]"));
+    ui->plot_hand_w_y->savePdf(path+QString("hand_track_w_y.pdf"),true,0,0,QString(),QString("Hand tracking velocity y [rad/s]"));
+    ui->plot_hand_w_z->savePdf(path+QString("hand_track_w_z.pdf"),true,0,0,QString(),QString("Hand tracking velocity z [rad/s]"));
+
+    // save data
+    if(!this->hand_lin_vel_x.empty()){
+        string filename("hand_vel_tracking.txt");
+        ofstream hand_stream;
+        hand_stream.open(path.toStdString()+filename);
+
+        hand_stream << string("# HAND VELOCITY TRACKING \n");
+        hand_stream << string("# velocity x [mm/s], velocity y [mm/s], velocity z [mm/s], velocity x [rad/s], velocity y [rad/s], velocity z [rad/s], "
+                              " des velocity x [mm/s], des velocity y [mm/s], des velocity z [mm/s], des velocity x [rad/s], des velocity y [rad/s], des velocity z [rad/s],"
+                              "time [s] \n");
+
+        for(size_t i=0;i<this->hand_lin_vel_x.size();++i){
+
+            double lin_vel_x = this->hand_lin_vel_x.at(i);
+            double lin_vel_y = this->hand_lin_vel_y.at(i);
+            double lin_vel_z = this->hand_lin_vel_z.at(i);
+            double ang_vel_x = this->hand_ang_vel_x.at(i);
+            double ang_vel_y = this->hand_ang_vel_y.at(i);
+            double ang_vel_z = this->hand_ang_vel_z.at(i);
+
+            string lin_vel_x_str =  boost::str(boost::format("%.2f") % (lin_vel_x)); boost::replace_all(lin_vel_x_str,",",".");
+            string lin_vel_y_str =  boost::str(boost::format("%.2f") % (lin_vel_y)); boost::replace_all(lin_vel_y_str,",",".");
+            string lin_vel_z_str =  boost::str(boost::format("%.2f") % (lin_vel_z)); boost::replace_all(lin_vel_z_str,",",".");
+            string ang_vel_x_str =  boost::str(boost::format("%.2f") % (ang_vel_x)); boost::replace_all(ang_vel_x_str,",",".");
+            string ang_vel_y_str =  boost::str(boost::format("%.2f") % (ang_vel_y)); boost::replace_all(ang_vel_y_str,",",".");
+            string ang_vel_z_str =  boost::str(boost::format("%.2f") % (ang_vel_z)); boost::replace_all(ang_vel_z_str,",",".");
+
+
+            double des_lin_vel_x = this->des_hand_lin_vel_x.at(i);
+            double des_lin_vel_y = this->des_hand_lin_vel_y.at(i);
+            double des_lin_vel_z = this->des_hand_lin_vel_z.at(i);
+            double des_ang_vel_x = this->des_hand_ang_vel_x.at(i);
+            double des_ang_vel_y = this->des_hand_ang_vel_y.at(i);
+            double des_ang_vel_z = this->des_hand_ang_vel_z.at(i);
+
+            string des_lin_vel_x_str =  boost::str(boost::format("%.2f") % (des_lin_vel_x)); boost::replace_all(des_lin_vel_x_str,",",".");
+            string des_lin_vel_y_str =  boost::str(boost::format("%.2f") % (des_lin_vel_y)); boost::replace_all(des_lin_vel_y_str,",",".");
+            string des_lin_vel_z_str =  boost::str(boost::format("%.2f") % (des_lin_vel_z)); boost::replace_all(des_lin_vel_z_str,",",".");
+            string des_ang_vel_x_str =  boost::str(boost::format("%.2f") % (des_ang_vel_x)); boost::replace_all(des_ang_vel_x_str,",",".");
+            string des_ang_vel_y_str =  boost::str(boost::format("%.2f") % (des_ang_vel_y)); boost::replace_all(des_ang_vel_y_str,",",".");
+            string des_ang_vel_z_str =  boost::str(boost::format("%.2f") % (des_ang_vel_z)); boost::replace_all(des_ang_vel_z_str,",",".");
+
+
+            // time
+            double time = this->qtime.at(i);
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+
+            hand_stream << lin_vel_x_str+string(", ")+lin_vel_y_str+string(", ")+lin_vel_z_str+string(", ")+ang_vel_x_str+string(", ")+ang_vel_y_str+string(", ")+ang_vel_z_str+string(", ")
+                           +des_lin_vel_x_str+string(", ")+des_lin_vel_y_str+string(", ")+des_lin_vel_z_str+string(", ")+des_ang_vel_x_str+string(", ")+des_ang_vel_y_str+string(", ")+des_ang_vel_z_str+string(", ")
+                           +t_str+string("\n");
+        }
+        hand_stream.close();
+    }
+}
+
+void CompTrackingControlDialog::on_pushButton_save_fing_pos_clicked()
 {
     QString path;
 
@@ -325,19 +510,19 @@ void CompTrackingControlDialog::on_pushButton_save_fing_clicked()
     }
     path = QString("results/controlling/tracking/fingers/");
 
-    ui->plot_fing_0->savePdf(path+QString("fing_0_pos_track.pdf"),true,0,0,QString(),QString("Finger 0 position tracking [deg]"));
-    ui->plot_fing_1->savePdf(path+QString("fing_1_pos_track.pdf"),true,0,0,QString(),QString("Finger 1 position tracking [deg]"));
-    ui->plot_fing_2->savePdf(path+QString("fing_2_pos_track.pdf"),true,0,0,QString(),QString("Finger 2 position tracking [deg]"));
-    ui->plot_fing_3->savePdf(path+QString("fing_3_pos_track.pdf"),true,0,0,QString(),QString("Finger 3 position tracking [deg]"));
+    ui->plot_fing_0_pos->savePdf(path+QString("fing_0_pos_track.pdf"),true,0,0,QString(),QString("Finger 0 position tracking [deg]"));
+    ui->plot_fing_1_pos->savePdf(path+QString("fing_1_pos_track.pdf"),true,0,0,QString(),QString("Finger 1 position tracking [deg]"));
+    ui->plot_fing_2_pos->savePdf(path+QString("fing_2_pos_track.pdf"),true,0,0,QString(),QString("Finger 2 position tracking [deg]"));
+    ui->plot_fing_3_pos->savePdf(path+QString("fing_3_pos_track.pdf"),true,0,0,QString(),QString("Finger 3 position tracking [deg]"));
 
     // save data
     if(!this->pos_fing_0.empty()){
-        string filename("fingers_tracking.txt");
-        ofstream hand_stream;
-        hand_stream.open(path.toStdString()+filename);
+        string filename("fingers_pos_tracking.txt");
+        ofstream fing_stream;
+        fing_stream.open(path.toStdString()+filename);
 
-        hand_stream << string("# FINGERS TRACKING \n");
-        hand_stream << string("# finger 0 [deg], finger 1 [deg], finger 2 [deg], finger 3 [deg],"
+        fing_stream << string("# FINGERS POSITION TRACKING \n");
+        fing_stream << string("# finger 0 [deg], finger 1 [deg], finger 2 [deg], finger 3 [deg],"
                               " des finger 0 [deg], des finger 1 [deg], des finger 2 [deg], des finger 3 [deg],"
                               "time [s] \n");
 
@@ -369,13 +554,84 @@ void CompTrackingControlDialog::on_pushButton_save_fing_clicked()
             double time = this->qtime.at(i);
             string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
 
-            hand_stream << fing_pos_0_str+string(", ")+fing_pos_1_str+string(", ")+fing_pos_2_str+string(", ")+fing_pos_3_str+string(", ")
+            fing_stream << fing_pos_0_str+string(", ")+fing_pos_1_str+string(", ")+fing_pos_2_str+string(", ")+fing_pos_3_str+string(", ")
                            +des_fing_pos_0_str+string(", ")+des_fing_pos_1_str+string(", ")+des_fing_pos_2_str+string(", ")+des_fing_pos_3_str+string(", ")
                            +t_str+string("\n");
         }
-        hand_stream.close();
+        fing_stream.close();
     }
 
+}
+
+void CompTrackingControlDialog::on_pushButton_save_fing_vel_clicked()
+{
+    QString path;
+
+    struct stat st = {0};
+    if (stat("results", &st) == -1) {
+        mkdir("results", 0700);
+    }
+    if (stat("results/controlling", &st) == -1) {
+        mkdir("results/controlling", 0700);
+    }
+    if (stat("results/controlling/tracking", &st) == -1) {
+        mkdir("results/controlling/tracking", 0700);
+    }
+    if (stat("results/controlling/tracking/fingers", &st) == -1) {
+        mkdir("results/controlling/tracking/fingers", 0700);
+    }
+    path = QString("results/controlling/tracking/fingers/");
+
+    ui->plot_fing_0_vel->savePdf(path+QString("fing_0_vel_track.pdf"),true,0,0,QString(),QString("Finger 0 velocity tracking [deg/s]"));
+    ui->plot_fing_1_vel->savePdf(path+QString("fing_1_vel_track.pdf"),true,0,0,QString(),QString("Finger 1 velocity tracking [deg/s]"));
+    ui->plot_fing_2_vel->savePdf(path+QString("fing_2_vel_track.pdf"),true,0,0,QString(),QString("Finger 2 velocity tracking [deg/s]"));
+    ui->plot_fing_3_vel->savePdf(path+QString("fing_3_vel_track.pdf"),true,0,0,QString(),QString("Finger 3 velocity tracking [deg/s]"));
+
+    // save data
+    if(!this->vel_fing_0.empty()){
+        string filename("fingers_vel_tracking.txt");
+        ofstream fing_stream;
+        fing_stream.open(path.toStdString()+filename);
+
+        fing_stream << string("# FINGERS VELOCITY TRACKING \n");
+        fing_stream << string("# finger 0 [deg/s], finger 1 [deg/s], finger 2 [deg/s], finger 3 [deg/s],"
+                              " des finger 0 [deg/s], des finger 1 [deg/s], des finger 2 [deg/s], des finger 3 [deg/s],"
+                              "time [s] \n");
+
+        for(size_t i=0;i<this->vel_fing_0.size();++i){
+
+            double fing_vel_0 = this->vel_fing_0.at(i);
+            double fing_vel_1 = this->vel_fing_1.at(i);
+            double fing_vel_2 = this->vel_fing_2.at(i);
+            double fing_vel_3 = this->vel_fing_3.at(i);
+
+            string fing_vel_0_str =  boost::str(boost::format("%.2f") % (fing_vel_0)); boost::replace_all(fing_vel_0_str,",",".");
+            string fing_vel_1_str =  boost::str(boost::format("%.2f") % (fing_vel_1)); boost::replace_all(fing_vel_1_str,",",".");
+            string fing_vel_2_str =  boost::str(boost::format("%.2f") % (fing_vel_2)); boost::replace_all(fing_vel_2_str,",",".");
+            string fing_vel_3_str =  boost::str(boost::format("%.2f") % (fing_vel_3)); boost::replace_all(fing_vel_3_str,",",".");
+
+
+            double des_fing_vel_0 = this->des_vel_fing_0.at(i);
+            double des_fing_vel_1 = this->des_vel_fing_1.at(i);
+            double des_fing_vel_2 = this->des_vel_fing_2.at(i);
+            double des_fing_vel_3 = this->des_vel_fing_3.at(i);
+
+            string des_fing_vel_0_str =  boost::str(boost::format("%.2f") % (des_fing_vel_0)); boost::replace_all(des_fing_vel_0_str,",",".");
+            string des_fing_vel_1_str =  boost::str(boost::format("%.2f") % (des_fing_vel_1)); boost::replace_all(des_fing_vel_1_str,",",".");
+            string des_fing_vel_2_str =  boost::str(boost::format("%.2f") % (des_fing_vel_2)); boost::replace_all(des_fing_vel_2_str,",",".");
+            string des_fing_vel_3_str =  boost::str(boost::format("%.2f") % (des_fing_vel_3)); boost::replace_all(des_fing_vel_3_str,",",".");
+
+
+            // time
+            double time = this->qtime.at(i);
+            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+
+            fing_stream << fing_vel_0_str+string(", ")+fing_vel_1_str+string(", ")+fing_vel_2_str+string(", ")+fing_vel_3_str+string(", ")
+                           +des_fing_vel_0_str+string(", ")+des_fing_vel_1_str+string(", ")+des_fing_vel_2_str+string(", ")+des_fing_vel_3_str+string(", ")
+                           +t_str+string("\n");
+        }
+        fing_stream.close();
+    }
 }
 
 void CompTrackingControlDialog::on_pushButton_save_alpha_clicked()
@@ -397,7 +653,8 @@ void CompTrackingControlDialog::on_pushButton_save_alpha_clicked()
     }
     path = QString("results/controlling/tracking/alpha/");
 
-    ui->plot_alpha_pos->savePdf(path+QString("alpha_pos_track.pdf"),true,0,0,QString(),QString("Swivel angle position tracking [rad]"));
+    ui->plot_alpha_pos->savePdf(path+QString("alpha_pos_track.pdf"),true,0,0,QString(),QString("Swivel angle position tracking [deg]"));
+    ui->plot_alpha_vel->savePdf(path+QString("alpha_vel_track.pdf"),true,0,0,QString(),QString("Swivel angle velocity tracking [deg/s]"));
 
     // save data
     if(!this->qalpha_pos.empty()){
@@ -405,18 +662,20 @@ void CompTrackingControlDialog::on_pushButton_save_alpha_clicked()
         ofstream alpha_stream;
         alpha_stream.open(path.toStdString()+filename);
         alpha_stream << string("# SWIVEL ANGLE TRACKING \n");
-        alpha_stream << string("# alpha pos [deg], des alpha pos [deg], time [s] \n");
+        alpha_stream << string("# alpha pos [deg], des alpha pos [deg], alpha vel [deg/s], des alpha vel [deg/s], time [s] \n");
 
-        for(size_t i=0;i<this->qalpha_pos.size();++i){
+        for(size_t i=0;i<this->qalpha_vel.size();++i){
 
             string alpha_pos_str =  boost::str(boost::format("%.2f") % (this->qalpha_pos.at(i))); boost::replace_all(alpha_pos_str,",",".");
             string des_alpha_pos_str =  boost::str(boost::format("%.2f") % (this->qdes_alpha_pos.at(i))); boost::replace_all(des_alpha_pos_str,",",".");
+            string alpha_vel_str =  boost::str(boost::format("%.2f") % (this->qalpha_vel.at(i))); boost::replace_all(alpha_vel_str,",",".");
+            string des_alpha_vel_str =  boost::str(boost::format("%.2f") % (this->qdes_alpha_vel.at(i))); boost::replace_all(des_alpha_vel_str,",",".");
 
             // time
             double time = this->qtime.at(i);
             string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
 
-            alpha_stream << alpha_pos_str+string(", ")+des_alpha_pos_str+string(", ")+t_str+string("\n");
+            alpha_stream << alpha_pos_str+string(", ")+des_alpha_pos_str+string(", ")+alpha_vel_str+string(", ")+des_alpha_vel_str+string(", ")+t_str+string("\n");
         }
         alpha_stream.close();
 

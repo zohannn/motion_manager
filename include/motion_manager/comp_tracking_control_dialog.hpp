@@ -31,14 +31,24 @@ public Q_SLOTS:
 
 
     /**
-     * @brief on_pushButton_plot_hand_clicked
+     * @brief on_pushButton_plot_hand_pos_clicked
      */
-    void on_pushButton_plot_hand_clicked();
+    void on_pushButton_plot_hand_pos_clicked();
 
     /**
-     * @brief on_pushButton_plot_fing_clicked
+     * @brief on_pushButton_plot_hand_vel_clicked
      */
-    void on_pushButton_plot_fing_clicked();
+    void on_pushButton_plot_hand_vel_clicked();
+
+    /**
+     * @brief on_pushButton_plot_fing_pos_clicked
+     */
+    void on_pushButton_plot_fing_pos_clicked();
+
+    /**
+     * @brief on_pushButton_plot_fing_vel_clicked
+     */
+    void on_pushButton_plot_fing_vel_clicked();
 
     /**
      * @brief on_pushButton_plot_alpha_clicked
@@ -46,14 +56,24 @@ public Q_SLOTS:
     void on_pushButton_plot_alpha_clicked();
 
     /**
-     * @brief on_pushButton_save_hand_clicked
+     * @brief on_pushButton_save_hand_pos_clicked
      */
-    void on_pushButton_save_hand_clicked();
+    void on_pushButton_save_hand_pos_clicked();
 
     /**
-     * @brief on_pushButton_save_fing_clicked
+     * @brief on_pushButton_save_hand_vel_clicked
      */
-    void on_pushButton_save_fing_clicked();
+    void on_pushButton_save_hand_vel_clicked();
+
+    /**
+     * @brief on_pushButton_save_fing_pos_clicked
+     */
+    void on_pushButton_save_fing_pos_clicked();
+
+    /**
+     * @brief on_pushButton_save_fing_vel_clicked
+     */
+    void on_pushButton_save_fing_vel_clicked();
 
     /**
      * @brief on_pushButton_save_alpha_clicked
@@ -77,22 +97,28 @@ public:
      * @param pos_hand
      * @param or_hand
      * @param des_pos_hand
+     * @param lin_vel_hand
+     * @param ang_vel_hand
+     * @param des_vel_hand
      * @param pos_fing
      * @param des_pos_fing
+     * @param vel_fing
+     * @param des_vel_fing
      * @param pos_alpha
      * @param des_pos_alpha
+     * @param vel_alpha
+     * @param des_vel_alpha
      * @param time
      */
-    void setupPlots(vector<vector<double>> &pos_hand, vector<vector<double> > &or_hand, vector<vector<double>> &des_pos_hand,
-                    vector<vector<double>> &pos_fing, vector<vector<double>> &des_pos_fing, vector<double> &pos_alpha, vector<double> &des_pos_alpha, vector<double> &time);
+    void setupPlots(vector<vector<double>> &pos_hand, vector<vector<double> > &or_hand, vector<vector<double>> &des_pos_hand, vector<vector<double> > &lin_vel_hand, vector<vector<double> > &ang_vel_hand, vector<vector<double> > &des_vel_hand,
+                    vector<vector<double>> &pos_fing, vector<vector<double>> &des_pos_fing, vector<vector<double> > &vel_fing, vector<vector<double> > &des_vel_fing, vector<double> &pos_alpha, vector<double> &des_pos_alpha, vector<double> &vel_alpha, vector<double> &des_vel_alpha, vector<double> &time);
 
 
 private:
     Ui::CompTrackingControlDialog *ui; /**< handle of the user interface */
     QVector<double> qtime;
     // hand
-    vector<vector<double>> positions_hand, des_positions_hand;
-    vector<vector<double>> orientations_hand;
+    vector<vector<double>> positions_hand,orientations_hand,des_positions_hand;
     QVector<double> hand_pos_x; QVector<double> des_hand_pos_x;
     QVector<double> hand_pos_y; QVector<double> des_hand_pos_y;
     QVector<double> hand_pos_z; QVector<double> des_hand_pos_z;
@@ -100,15 +126,27 @@ private:
     QVector<double> hand_or_qy; QVector<double> des_hand_or_qy;
     QVector<double> hand_or_qz; QVector<double> des_hand_or_qz;
     QVector<double> hand_or_qw; QVector<double> des_hand_or_qw;
+    vector<vector<double>> lin_vel_hand,ang_vel_hand,des_vel_hand;
+    QVector<double> hand_lin_vel_x; QVector<double> des_hand_lin_vel_x;
+    QVector<double> hand_lin_vel_y; QVector<double> des_hand_lin_vel_y;
+    QVector<double> hand_lin_vel_z; QVector<double> des_hand_lin_vel_z;
+    QVector<double> hand_ang_vel_x; QVector<double> des_hand_ang_vel_x;
+    QVector<double> hand_ang_vel_y; QVector<double> des_hand_ang_vel_y;
+    QVector<double> hand_ang_vel_z; QVector<double> des_hand_ang_vel_z;
     // fingers
     vector<vector<double>> positions_fing, des_positions_fing;
     QVector<double> pos_fing_0; QVector<double> des_pos_fing_0;
     QVector<double> pos_fing_1; QVector<double> des_pos_fing_1;
     QVector<double> pos_fing_2; QVector<double> des_pos_fing_2;
     QVector<double> pos_fing_3; QVector<double> des_pos_fing_3;
+    vector<vector<double>> velocities_fing, des_velocities_fing;
+    QVector<double> vel_fing_0; QVector<double> des_vel_fing_0;
+    QVector<double> vel_fing_1; QVector<double> des_vel_fing_1;
+    QVector<double> vel_fing_2; QVector<double> des_vel_fing_2;
+    QVector<double> vel_fing_3; QVector<double> des_vel_fing_3;
     // swivel angle
-    QVector<double> qalpha_pos;
-    QVector<double> qdes_alpha_pos;
+    QVector<double> qalpha_pos, qdes_alpha_pos;
+    QVector<double> qalpha_vel, qdes_alpha_vel;
 
 
     /**
