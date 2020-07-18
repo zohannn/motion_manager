@@ -1643,6 +1643,8 @@ private:
         vector<vector<double>> fingPosition_des_ctrl; /**< fingers desired positions */
         vector<vector<double>> fingVelocity_ctrl; /**< fingers real velocities during control */
         vector<vector<double>> fingVelocity_des_ctrl; /**< fingers desired velocities */
+        vector<vector<double>> fingAcceleration_ctrl; /**< fingers real accelerations during control */
+        vector<vector<double>> fingAcceleration_des_ctrl; /**< fingers desired accelerations */
         vector<vector<double>> handPosition_ctrl; /**< hand position during control. 0=x,1=y,2=z */
         vector<vector<double>> handOrientation_ctrl; /**< hand orientation during control. 0=roll,1=pitch,2=yaw */
         vector<vector<double>> handOrientation_q_ctrl; /**< hand orientation desired during control. 0=qx,1=qy,2=qz,3=qw */
@@ -1650,6 +1652,7 @@ private:
         vector<vector<double>> handLinearVelocity_ctrl; /**< hand linear velocity during control */
         vector<vector<double>> handAngularVelocity_ctrl;/**< hand angular velocity during control */
         vector<vector<double>> handVelocity_des_ctrl; /**< desired hand velocities during control 0=x, 1=y, 2=z, 3=wx, 4=wy, 5=wz */
+        vector<vector<double>> handAcceleration_des_ctrl; /**< desired hand acceleration during control 0=x, 1=y, 2=z, 3=ax, 4=ay, 5=az */
         vector<double> handVelocityNorm_ctrl; /**< hand linear velocity norm during control */
         QVector<double> handVelocityNorm_ctrl_plot; /**< hand linear velocity norm during control to plot */
         vector<vector<double>> handLinearAcceleration_ctrl; /**< hand linear acceleration during control */
@@ -1681,6 +1684,8 @@ private:
         vector<double> alpha_ctrl; /**< current position of the swivel angle **/
         vector<double> alpha_des_vel_ctrl; /**< desired velocity of the swivel angle **/
         vector<double> alpha_vel_ctrl; /**< current velocity of the swivel angle **/
+        vector<double> alpha_des_acc_ctrl; /**< desired acceleration of the swivel angle **/
+        vector<double> alpha_acc_ctrl; /**< current acceleration of the swivel angle **/
 
         // hand errors
         vector<double> error_pos_tot_norm; /**< norm of the total error in position */

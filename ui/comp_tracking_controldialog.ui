@@ -134,7 +134,7 @@
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -172,12 +172,77 @@
       </item>
      </layout>
     </widget>
+    <zorder>layoutWidget</zorder>
     <zorder>layoutWidget_2</zorder>
-    <zorder>plot_hand_vel_z</zorder>
-    <zorder>plot_hand_vel_y</zorder>
-    <zorder>plot_hand_vel_x</zorder>
-    <zorder>plot_hand_vel_x</zorder>
-    <zorder>layoutWidget_3</zorder>
+   </widget>
+   <widget class="QWidget" name="tab_hand_acc">
+    <attribute name="title">
+     <string>Hand accelerations</string>
+    </attribute>
+    <widget class="QWidget" name="layoutWidget_3">
+     <property name="geometry">
+      <rect>
+       <x>1010</x>
+       <y>700</y>
+       <width>168</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_13">
+      <item>
+       <widget class="QPushButton" name="pushButton_plot_hand_acc">
+        <property name="text">
+         <string>Plot</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_save_hand_acc">
+        <property name="text">
+         <string>Save</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="layoutWidget_6">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>971</width>
+       <height>711</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_14">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_acc_x" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_acc_y" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_acc_z" native="true"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_8">
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_a_x" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_a_y" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_hand_a_z" native="true"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </widget>
    <widget class="QWidget" name="tab_fingers_pos">
     <attribute name="title">
@@ -305,6 +370,69 @@
      </layout>
     </widget>
    </widget>
+   <widget class="QWidget" name="tab_fingers_acc">
+    <attribute name="title">
+     <string>Fingers accelerations</string>
+    </attribute>
+    <widget class="QWidget" name="layoutWidget_7">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>1171</width>
+       <height>681</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_9">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_15">
+        <item>
+         <widget class="QCustomPlot" name="plot_fing_0_acc" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_fing_1_acc" native="true"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_16">
+        <item>
+         <widget class="QCustomPlot" name="plot_fing_2_acc" native="true"/>
+        </item>
+        <item>
+         <widget class="QCustomPlot" name="plot_fing_3_acc" native="true"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="layoutWidget_8">
+     <property name="geometry">
+      <rect>
+       <x>1010</x>
+       <y>700</y>
+       <width>168</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_17">
+      <item>
+       <widget class="QPushButton" name="pushButton_plot_fing_acc">
+        <property name="text">
+         <string>Plot</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_save_fing_acc">
+        <property name="text">
+         <string>Save</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
    <widget class="QWidget" name="tab_alpha">
     <attribute name="title">
      <string>Swivel Angle</string>
@@ -339,17 +467,22 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
+       <y>12</y>
        <width>1171</width>
-       <height>571</height>
+       <height>441</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_12">
       <item>
-       <widget class="QCustomPlot" name="plot_alpha_pos" native="true"/>
+       <widget class="QCustomPlot" name="plot_alpha_pos" native="true">
+        <zorder>plot_alpha_vel</zorder>
+       </widget>
       </item>
       <item>
        <widget class="QCustomPlot" name="plot_alpha_vel" native="true"/>
+      </item>
+      <item>
+       <widget class="QCustomPlot" name="plot_alpha_acc" native="true"/>
       </item>
      </layout>
     </widget>
@@ -467,6 +600,67 @@
        </item>
        <item>
         <widget class="QLineEdit" name="lineEdit_time_step_vel">
+         <property name="text">
+          <string>0.05</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_low_pass_acc">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>780</y>
+     <width>191</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Acceleration Low Pass Filter </string>
+   </property>
+   <widget class="QWidget" name="layoutWidget_17">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>161</width>
+      <height>58</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_18">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_35">
+       <item>
+        <widget class="QLabel" name="label_f_cutoff_acc">
+         <property name="text">
+          <string>CutOff Freq. [Hz]:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_f_cutoff_acc">
+         <property name="text">
+          <string>1000</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_36">
+       <item>
+        <widget class="QLabel" name="label_time_step_acc">
+         <property name="text">
+          <string> Time step [s] :</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_time_step_acc">
          <property name="text">
           <string>0.05</string>
          </property>
