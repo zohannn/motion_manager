@@ -218,7 +218,7 @@ public:
          * @param prob
          * @param results
          */
-        void updatePlanningResults(problemPtr prob, HUMotion::planning_result_ptr results);
+        //void updatePlanningResults(problemPtr prob, HUMotion::planning_result_ptr results);
 
         /**
          * @brief clear_control_variables
@@ -1625,6 +1625,7 @@ private:
         VectorXd hand_j_acc; /**< time derivative Jacobian dependant part of the hand accelearion */
         double alpha_j_acc; /**< time derivative Jacobian dependant part of the alpha accelearion */
         vector<double> h_hand_pos_end; /**< end hand position during control */
+        vector<double> h_hand_or_end; /**< end hand orientation (rpy) during control */
         vector<double> h_hand_or_q_end; /**< end hand orientation (quaternion) during control */
         vector<double> h_hand_pos_init; /**< initial hand position during control */
         vector<double> h_hand_or_init; /**< initial hand orientation (rpy) during control */
