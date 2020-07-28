@@ -6647,6 +6647,8 @@ void Humanoid::get_distances_arm_torso(vector<vector<double>>& points_arm,vector
 
 void Humanoid::get_distances_arm_obstacles(vector<vector<double>>& points_arm,vector<double>& obst_pos,Matrix3d& L_obst,vector<double>& dist_arm)
 {
+    // see https://math.stackexchange.com/questions/3309397/line-ellipsoid-intersection
+    // see https://johannesbuchner.github.io/intersection/intersection_line_ellipsoid.html
     // see octave workspace obstacle_avoidance
     Vector3d sol_1; Vector3d sol_2;
 
