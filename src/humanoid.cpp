@@ -2145,12 +2145,7 @@ void Humanoid::getJacobianSwivel(int arm,std::vector<double>& posture,MatrixXd& 
             column << cross, zi;
             break;
         case 2:
-            z2 = T.block(0,2,3,1);
-            pos2 = T.block(0,3,3,1);
-            diff = elbowPos - pos2;
-            cross = z2.cross(diff);
-            zi=z2;
-            column << cross, zi;
+            column << 0,0,0,0,0,0;
             break;
         case 3:
             column << 0,0,0,0,0,0;
@@ -2169,6 +2164,7 @@ void Humanoid::getJacobianSwivel(int arm,std::vector<double>& posture,MatrixXd& 
     }
     MatrixXd Jacobian_E_alpha = Jacobian_E.block<3,JOINTS_ARM>(0,0);
 
+    T = mat_world;
     // Jacobian W
     MatrixXd Jacobian_W(6,JOINTS_ARM);
     for (size_t i = 0; i < posture.size(); ++i){
@@ -2212,12 +2208,7 @@ void Humanoid::getJacobianSwivel(int arm,std::vector<double>& posture,MatrixXd& 
             column << cross, zi;
             break;
         case 4:
-            z4 = T.block(0,2,3,1);
-            pos4 = T.block(0,3,3,1);
-            diff = wristPos - pos4;
-            cross = z4.cross(diff);
-            zi=z4;
-            column << cross, zi;
+            column << 0,0,0,0,0,0;
             break;
         case 5:
             column << 0,0,0,0,0,0;
@@ -6666,7 +6657,6 @@ void Humanoid::get_distances_arm_obstacles(vector<vector<double>>& points_arm,ve
     for(size_t i=0;i<points_arm.size();++i){
         vector<double> pt = points_arm.at(i);
         xp = pt.at(0); yp = pt.at(1); zp = pt.at(2);
-        Vector3d pt_arm(xp,yp,zp);
 
         // sol 1: x
         //        __________________________________________________________________________________________________________________________________________________________________________________________________________
@@ -6790,7 +6780,7 @@ void Humanoid::get_distances_arm_obstacles(vector<vector<double>>& points_arm,ve
         sol_2(2) = zc + (zc-zp)/(sqrt(l11*pow(xc,2)-2*l11*xc*xp+l11*pow(xp,2)+l12*xc*yc-l12*xc*yp-l12*xp*yc+l12*xp*yp+l13*xc*zc-l13*xc*zp-l13*xp*zc+l13*xp*zp+l21*xc*yc-l21*xc*yp-l21*xp*yc+l21*xp*yp+l22*pow(yc,2)-2*l22*yc*yp+
                                       l22*pow(yp,2)+l23*yc*zc-l23*yc*zp-l23*yp*zc+l23*yp*zp+l31*xc*zc-l31*xc*zp-l31*xp*zc+l31*xp*zp+l32*yc*zc-l32*yc*zp-l32*yp*zc+l32*yp*zp+l33*pow(zc,2)-2*l33*zc*zp+l33*pow(zp,2)));
 
-
+        Vector3d pt_arm(xp,yp,zp);
         Vector3d dist_vec_1 = pt_arm - sol_1; double dist_1 = dist_vec_1.norm();
         Vector3d dist_vec_2 = pt_arm - sol_2; double dist_2 = dist_vec_2.norm();
         double dist_obst = std::min(dist_1,dist_2);
