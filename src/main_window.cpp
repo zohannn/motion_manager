@@ -855,10 +855,10 @@ void MainWindow::execPosControl()
                  this->h_hand_lin_acc_end = hand_h_lin_accelerations.at(n_steps-1); // end human-like hand linear accelerations
                  this->h_hand_ang_acc_end = hand_h_ang_accelerations.at(n_steps-1); // end human-like hand angular accelerations
 
-                h_hand_ang_vel_init_vec << this->h_hand_ang_vel_init.at(0), this->h_hand_ang_vel_init.at(1), this->h_hand_ang_vel_init.at(2);
-                h_hand_ang_vel_end_vec << this->h_hand_ang_vel_end.at(0), this->h_hand_ang_vel_end.at(1), this->h_hand_ang_vel_end.at(2);
-                h_hand_ang_acc_init_vec << this->h_hand_ang_acc_init.at(0), this->h_hand_ang_acc_init.at(1), this->h_hand_ang_acc_init.at(2);
-                h_hand_ang_acc_end_vec << this->h_hand_ang_acc_end.at(0), this->h_hand_ang_acc_end.at(1), this->h_hand_ang_acc_end.at(2);
+                 h_hand_ang_vel_init_vec << this->h_hand_ang_vel_init.at(0), this->h_hand_ang_vel_init.at(1), this->h_hand_ang_vel_init.at(2);
+                 h_hand_ang_vel_end_vec << this->h_hand_ang_vel_end.at(0), this->h_hand_ang_vel_end.at(1), this->h_hand_ang_vel_end.at(2);
+                 h_hand_ang_acc_init_vec << this->h_hand_ang_acc_init.at(0), this->h_hand_ang_acc_init.at(1), this->h_hand_ang_acc_init.at(2);
+                 h_hand_ang_acc_end_vec << this->h_hand_ang_acc_end.at(0), this->h_hand_ang_acc_end.at(1), this->h_hand_ang_acc_end.at(2);
 
                  // initial angular velocity (quaternion)
                  h_hand_ang_vel_q_e_init = 0.5*(h_hand_or_q_w_init*I_3*h_hand_ang_vel_init_vec-h_hand_or_q_e_init.cross(h_hand_ang_vel_init_vec));

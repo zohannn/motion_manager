@@ -192,10 +192,10 @@ void ResultsAlphaDialog::on_pushButton_save_clicked()
             double vel = this->vel_alpha.at(i);
             double acc = this->acc_alpha.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
         }
         stream.close();

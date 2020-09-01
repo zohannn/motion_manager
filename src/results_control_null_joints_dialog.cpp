@@ -195,9 +195,9 @@ void ResultsCtrlNullJointsDialog::on_pushButton_save_joints_plots_clicked()
         for(size_t i=0;i<this->vel_joint1.size();++i){
             double vel = this->vel_joint1.at(i);
             double time = this->qtime.at(i);
-            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            string vel_str =  boost::str(boost::format("%.15f") % (vel));
             boost::replace_all(vel_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             vel_stream << vel_str+string(", ")+t_str+string("\n");
         }
@@ -216,9 +216,9 @@ void ResultsCtrlNullJointsDialog::on_pushButton_save_joints_plots_clicked()
         for(size_t i=0;i<this->vel_joint2.size();++i){
             double vel = this->vel_joint2.at(i);
             double time = this->qtime.at(i);
-            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            string vel_str =  boost::str(boost::format("%.15f") % (vel));
             boost::replace_all(vel_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             vel_stream << vel_str+string(", ")+t_str+string("\n");
         }
@@ -237,9 +237,9 @@ void ResultsCtrlNullJointsDialog::on_pushButton_save_joints_plots_clicked()
         for(size_t i=0;i<this->vel_joint3.size();++i){
             double vel = this->vel_joint3.at(i);
             double time = this->qtime.at(i);
-            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            string vel_str =  boost::str(boost::format("%.15f") % (vel));
             boost::replace_all(vel_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             vel_stream << vel_str+string(", ")+t_str+string("\n");
         }
@@ -258,9 +258,9 @@ void ResultsCtrlNullJointsDialog::on_pushButton_save_joints_plots_clicked()
         for(size_t i=0;i<this->vel_joint4.size();++i){
             double vel = this->vel_joint4.at(i);
             double time = this->qtime.at(i);
-            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            string vel_str =  boost::str(boost::format("%.15f") % (vel));
             boost::replace_all(vel_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             vel_stream << vel_str+string(", ")+t_str+string("\n");
         }
@@ -279,9 +279,9 @@ void ResultsCtrlNullJointsDialog::on_pushButton_save_joints_plots_clicked()
         for(size_t i=0;i<this->vel_joint5.size();++i){
             double vel = this->vel_joint5.at(i);
             double time = this->qtime.at(i);
-            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            string vel_str =  boost::str(boost::format("%.15f") % (vel));
             boost::replace_all(vel_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             vel_stream << vel_str+string(", ")+t_str+string("\n");
         }
@@ -300,9 +300,9 @@ void ResultsCtrlNullJointsDialog::on_pushButton_save_joints_plots_clicked()
         for(size_t i=0;i<this->vel_joint6.size();++i){
             double vel = this->vel_joint6.at(i);
             double time = this->qtime.at(i);
-            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            string vel_str =  boost::str(boost::format("%.15f") % (vel));
             boost::replace_all(vel_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             vel_stream << vel_str+string(", ")+t_str+string("\n");
         }
@@ -321,9 +321,9 @@ void ResultsCtrlNullJointsDialog::on_pushButton_save_joints_plots_clicked()
         for(size_t i=0;i<this->vel_joint7.size();++i){
             double vel = this->vel_joint7.at(i);
             double time = this->qtime.at(i);
-            string vel_str =  boost::str(boost::format("%.2f") % (vel));
+            string vel_str =  boost::str(boost::format("%.15f") % (vel));
             boost::replace_all(vel_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             vel_stream << vel_str+string(", ")+t_str+string("\n");
         }

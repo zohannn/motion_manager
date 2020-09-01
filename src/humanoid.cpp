@@ -2045,10 +2045,13 @@ double Humanoid::getSwivelAngle(int arm, vector<double>& posture)
     Vector3d ES = (elbowPos-shoulderPos); //Vector3d v_ES = ES/(ES.norm());
     Matrix3d I = Matrix3d::Identity();
     Vector3d p = (I - v_WS*v_WS.transpose())*ES;
-    double alpha = atan2(v_WS.transpose()*(basez.cross(p)),(basez.transpose()*p));
-
+    double x = (basez.transpose()*p);
+    double y = v_WS.transpose()*(basez.cross(p));
+    double alpha = atan2(y,x);
 
     return alpha;
+
+
 }
 
 void Humanoid::getJacobianSwivel(int arm,std::vector<double>& posture,MatrixXd& JacobianSwivel)

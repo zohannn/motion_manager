@@ -135,8 +135,8 @@ void ResultsCtrlPredSwivelAngleDialog::on_pushButton_save_clicked()
         for(size_t i=0;i<this->swivel_angle_pos.size();++i){
             double sw = this->swivel_angle_pos.at(i);
             double time = this->time.at(i);
-            string sw_str =  boost::str(boost::format("%.2f") % (sw)); boost::replace_all(sw_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string sw_str =  boost::str(boost::format("%.15f") % (sw)); boost::replace_all(sw_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             swivel_stream << sw_str+string(", ")+t_str+string("\n");
         }
         swivel_stream.close();
@@ -154,8 +154,8 @@ void ResultsCtrlPredSwivelAngleDialog::on_pushButton_save_clicked()
         for(size_t i=0;i<this->swivel_angle_vel.size();++i){
             double sw = this->swivel_angle_vel.at(i);
             double time = this->time.at(i);
-            string sw_str =  boost::str(boost::format("%.2f") % (sw)); boost::replace_all(sw_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string sw_str =  boost::str(boost::format("%.15f") % (sw)); boost::replace_all(sw_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             swivel_stream << sw_str+string(", ")+t_str+string("\n");
         }
         swivel_stream.close();

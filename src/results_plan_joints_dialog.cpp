@@ -539,10 +539,10 @@ void ResultsJointsDialog::on_pushButton_save_joints_plots_clicked()
             double vel = this->vel_joint1.at(i);
             double acc = this->acc_joint1.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -562,10 +562,10 @@ void ResultsJointsDialog::on_pushButton_save_joints_plots_clicked()
             double vel = this->vel_joint2.at(i);
             double acc = this->acc_joint2.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -585,10 +585,10 @@ void ResultsJointsDialog::on_pushButton_save_joints_plots_clicked()
             double vel = this->vel_joint3.at(i);
             double acc = this->acc_joint3.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -608,10 +608,10 @@ void ResultsJointsDialog::on_pushButton_save_joints_plots_clicked()
             double vel = this->vel_joint4.at(i);
             double acc = this->acc_joint4.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -631,10 +631,10 @@ void ResultsJointsDialog::on_pushButton_save_joints_plots_clicked()
             double vel = this->vel_joint5.at(i);
             double acc = this->acc_joint5.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -654,10 +654,10 @@ void ResultsJointsDialog::on_pushButton_save_joints_plots_clicked()
             double vel = this->vel_joint6.at(i);
             double acc = this->acc_joint6.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -677,10 +677,10 @@ void ResultsJointsDialog::on_pushButton_save_joints_plots_clicked()
             double vel = this->vel_joint7.at(i);
             double acc = this->acc_joint7.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -700,10 +700,10 @@ void ResultsJointsDialog::on_pushButton_save_joints_plots_clicked()
             double vel = this->vel_joint8.at(i);
             double acc = this->acc_joint8.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -723,10 +723,10 @@ void ResultsJointsDialog::on_pushButton_save_joints_plots_clicked()
             double vel = this->vel_joint9.at(i);
             double acc = this->acc_joint9.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -746,10 +746,10 @@ void ResultsJointsDialog::on_pushButton_save_joints_plots_clicked()
             double vel = this->vel_joint10.at(i);
             double acc = this->acc_joint10.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -769,10 +769,10 @@ void ResultsJointsDialog::on_pushButton_save_joints_plots_clicked()
             double vel = this->vel_joint11.at(i);
             double acc = this->acc_joint11.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();

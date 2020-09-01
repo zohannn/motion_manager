@@ -396,12 +396,12 @@ void ResultsCtrlJointsDialog::on_pushButton_save_joints_plots_clicked()
             double max_l = this->max_limits_joint1.at(i);
             double min_l = this->min_limits_joint1.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string max_str =  boost::str(boost::format("%.2f") % (max_l)); boost::replace_all(max_str,",",".");
-            string min_str =  boost::str(boost::format("%.2f") % (min_l)); boost::replace_all(min_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string max_str =  boost::str(boost::format("%.15f") % (max_l)); boost::replace_all(max_str,",",".");
+            string min_str =  boost::str(boost::format("%.15f") % (min_l)); boost::replace_all(min_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+max_str+string(", ")+min_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -423,12 +423,12 @@ void ResultsCtrlJointsDialog::on_pushButton_save_joints_plots_clicked()
             double max_l = this->max_limits_joint2.at(i);
             double min_l = this->min_limits_joint2.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string max_str =  boost::str(boost::format("%.2f") % (max_l)); boost::replace_all(max_str,",",".");
-            string min_str =  boost::str(boost::format("%.2f") % (min_l)); boost::replace_all(min_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string max_str =  boost::str(boost::format("%.15f") % (max_l)); boost::replace_all(max_str,",",".");
+            string min_str =  boost::str(boost::format("%.15f") % (min_l)); boost::replace_all(min_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+max_str+string(", ")+min_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -450,12 +450,12 @@ void ResultsCtrlJointsDialog::on_pushButton_save_joints_plots_clicked()
             double max_l = this->max_limits_joint3.at(i);
             double min_l = this->min_limits_joint3.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string max_str =  boost::str(boost::format("%.2f") % (max_l)); boost::replace_all(max_str,",",".");
-            string min_str =  boost::str(boost::format("%.2f") % (min_l)); boost::replace_all(min_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string max_str =  boost::str(boost::format("%.15f") % (max_l)); boost::replace_all(max_str,",",".");
+            string min_str =  boost::str(boost::format("%.15f") % (min_l)); boost::replace_all(min_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+max_str+string(", ")+min_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -477,12 +477,12 @@ void ResultsCtrlJointsDialog::on_pushButton_save_joints_plots_clicked()
             double max_l = this->max_limits_joint4.at(i);
             double min_l = this->min_limits_joint4.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string max_str =  boost::str(boost::format("%.2f") % (max_l)); boost::replace_all(max_str,",",".");
-            string min_str =  boost::str(boost::format("%.2f") % (min_l)); boost::replace_all(min_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string max_str =  boost::str(boost::format("%.15f") % (max_l)); boost::replace_all(max_str,",",".");
+            string min_str =  boost::str(boost::format("%.15f") % (min_l)); boost::replace_all(min_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+max_str+string(", ")+min_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -504,12 +504,12 @@ void ResultsCtrlJointsDialog::on_pushButton_save_joints_plots_clicked()
             double max_l = this->max_limits_joint5.at(i);
             double min_l = this->min_limits_joint5.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string max_str =  boost::str(boost::format("%.2f") % (max_l)); boost::replace_all(max_str,",",".");
-            string min_str =  boost::str(boost::format("%.2f") % (min_l)); boost::replace_all(min_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string max_str =  boost::str(boost::format("%.15f") % (max_l)); boost::replace_all(max_str,",",".");
+            string min_str =  boost::str(boost::format("%.15f") % (min_l)); boost::replace_all(min_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+max_str+string(", ")+min_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -531,12 +531,12 @@ void ResultsCtrlJointsDialog::on_pushButton_save_joints_plots_clicked()
             double max_l = this->max_limits_joint6.at(i);
             double min_l = this->min_limits_joint6.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string max_str =  boost::str(boost::format("%.2f") % (max_l)); boost::replace_all(max_str,",",".");
-            string min_str =  boost::str(boost::format("%.2f") % (min_l)); boost::replace_all(min_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string max_str =  boost::str(boost::format("%.15f") % (max_l)); boost::replace_all(max_str,",",".");
+            string min_str =  boost::str(boost::format("%.15f") % (min_l)); boost::replace_all(min_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+max_str+string(", ")+min_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -558,12 +558,12 @@ void ResultsCtrlJointsDialog::on_pushButton_save_joints_plots_clicked()
             double max_l = this->max_limits_joint7.at(i);
             double min_l = this->min_limits_joint7.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string max_str =  boost::str(boost::format("%.2f") % (max_l)); boost::replace_all(max_str,",",".");
-            string min_str =  boost::str(boost::format("%.2f") % (min_l)); boost::replace_all(min_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string max_str =  boost::str(boost::format("%.15f") % (max_l)); boost::replace_all(max_str,",",".");
+            string min_str =  boost::str(boost::format("%.15f") % (min_l)); boost::replace_all(min_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+max_str+string(", ")+min_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -585,12 +585,12 @@ void ResultsCtrlJointsDialog::on_pushButton_save_joints_plots_clicked()
             double max_l = this->max_limits_joint8.at(i);
             double min_l = this->min_limits_joint8.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string max_str =  boost::str(boost::format("%.2f") % (max_l)); boost::replace_all(max_str,",",".");
-            string min_str =  boost::str(boost::format("%.2f") % (min_l)); boost::replace_all(min_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string max_str =  boost::str(boost::format("%.15f") % (max_l)); boost::replace_all(max_str,",",".");
+            string min_str =  boost::str(boost::format("%.15f") % (min_l)); boost::replace_all(min_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+max_str+string(", ")+min_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -612,12 +612,12 @@ void ResultsCtrlJointsDialog::on_pushButton_save_joints_plots_clicked()
             double max_l = this->max_limits_joint9.at(i);
             double min_l = this->min_limits_joint9.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string max_str =  boost::str(boost::format("%.2f") % (max_l)); boost::replace_all(max_str,",",".");
-            string min_str =  boost::str(boost::format("%.2f") % (min_l)); boost::replace_all(min_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string max_str =  boost::str(boost::format("%.15f") % (max_l)); boost::replace_all(max_str,",",".");
+            string min_str =  boost::str(boost::format("%.15f") % (min_l)); boost::replace_all(min_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+max_str+string(", ")+min_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -639,12 +639,12 @@ void ResultsCtrlJointsDialog::on_pushButton_save_joints_plots_clicked()
             double max_l = this->max_limits_joint10.at(i);
             double min_l = this->min_limits_joint10.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string max_str =  boost::str(boost::format("%.2f") % (max_l)); boost::replace_all(max_str,",",".");
-            string min_str =  boost::str(boost::format("%.2f") % (min_l)); boost::replace_all(min_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string max_str =  boost::str(boost::format("%.15f") % (max_l)); boost::replace_all(max_str,",",".");
+            string min_str =  boost::str(boost::format("%.15f") % (min_l)); boost::replace_all(min_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+max_str+string(", ")+min_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();
@@ -666,12 +666,12 @@ void ResultsCtrlJointsDialog::on_pushButton_save_joints_plots_clicked()
             double max_l = this->max_limits_joint11.at(i);
             double min_l = this->min_limits_joint11.at(i);
             double time = this->qtime.at(i);
-            string pos_str =  boost::str(boost::format("%.2f") % (pos)); boost::replace_all(pos_str,",",".");
-            string vel_str =  boost::str(boost::format("%.2f") % (vel)); boost::replace_all(vel_str,",",".");
-            string acc_str =  boost::str(boost::format("%.2f") % (acc)); boost::replace_all(acc_str,",",".");
-            string max_str =  boost::str(boost::format("%.2f") % (max_l)); boost::replace_all(max_str,",",".");
-            string min_str =  boost::str(boost::format("%.2f") % (min_l)); boost::replace_all(min_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string pos_str =  boost::str(boost::format("%.15f") % (pos)); boost::replace_all(pos_str,",",".");
+            string vel_str =  boost::str(boost::format("%.15f") % (vel)); boost::replace_all(vel_str,",",".");
+            string acc_str =  boost::str(boost::format("%.15f") % (acc)); boost::replace_all(acc_str,",",".");
+            string max_str =  boost::str(boost::format("%.15f") % (max_l)); boost::replace_all(max_str,",",".");
+            string min_str =  boost::str(boost::format("%.15f") % (min_l)); boost::replace_all(min_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             joint_stream << pos_str+string(", ")+vel_str+string(", ")+acc_str+string(", ")+max_str+string(", ")+min_str+string(", ")+t_str+string("\n");
         }
         joint_stream.close();

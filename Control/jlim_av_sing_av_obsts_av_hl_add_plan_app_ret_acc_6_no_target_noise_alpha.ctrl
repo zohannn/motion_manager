@@ -44,8 +44,8 @@ Hl_fing_p_coeff=200
 
 Hl_fing_d_coeff=15
 
-Hl_alpha_p_coeff=150
-Hl_alpha_d_coeff=20
+Hl_alpha_p_coeff=60
+Hl_alpha_d_coeff=0.5
 # Control coefficients and error threshold #
 Pos_p_control_coeff=20
 

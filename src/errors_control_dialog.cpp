@@ -318,9 +318,9 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         for(size_t i=0;i<this->qerrors_pos_plot.size();++i){
             double err = this->qerrors_pos_plot.at(i);
             double time = this->qtime.at(i);
-            string err_str =  boost::str(boost::format("%.2f") % (err));
+            string err_str =  boost::str(boost::format("%.15f") % (err));
             boost::replace_all(err_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             error << err_str+string(", ")+t_str+string("\n");
         }
@@ -339,9 +339,9 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         for(size_t i=0;i<this->qerrors_or_plot.size();++i){
             double err = this->qerrors_or_plot.at(i);
             double time = this->qtime.at(i);
-            string err_str =  boost::str(boost::format("%.2f") % (err));
+            string err_str =  boost::str(boost::format("%.15f") % (err));
             boost::replace_all(err_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             error << err_str+string(", ")+t_str+string("\n");
         }
@@ -360,9 +360,9 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         for(size_t i=0;i<this->qerrors_pos_or_tot_plot.size();++i){
             double err = this->qerrors_pos_or_tot_plot.at(i);
             double time = this->qtime.at(i);
-            string err_str =  boost::str(boost::format("%.2f") % (err));
+            string err_str =  boost::str(boost::format("%.15f") % (err));
             boost::replace_all(err_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             error << err_str+string(", ")+t_str+string("\n");
         }
@@ -381,9 +381,9 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         for(size_t i=0;i<this->qerrors_lin_vel_plot.size();++i){
             double err = this->qerrors_lin_vel_plot.at(i);
             double time = this->qtime.at(i);
-            string err_str =  boost::str(boost::format("%.2f") % (err));
+            string err_str =  boost::str(boost::format("%.15f") % (err));
             boost::replace_all(err_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             error << err_str+string(", ")+t_str+string("\n");
         }
@@ -402,9 +402,9 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         for(size_t i=0;i<this->qerrors_ang_vel_plot.size();++i){
             double err = this->qerrors_ang_vel_plot.at(i);
             double time = this->qtime.at(i);
-            string err_str =  boost::str(boost::format("%.2f") % (err));
+            string err_str =  boost::str(boost::format("%.15f") % (err));
             boost::replace_all(err_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             error << err_str+string(", ")+t_str+string("\n");
         }
@@ -423,9 +423,9 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         for(size_t i=0;i<this->qerrors_vel_tot_plot.size();++i){
             double err = this->qerrors_vel_tot_plot.at(i);
             double time = this->qtime.at(i);
-            string err_str =  boost::str(boost::format("%.2f") % (err));
+            string err_str =  boost::str(boost::format("%.15f") % (err));
             boost::replace_all(err_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             error << err_str+string(", ")+t_str+string("\n");
         }
@@ -444,9 +444,9 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         for(size_t i=0;i<this->qerrors_lin_acc_plot.size();++i){
             double err = this->qerrors_lin_acc_plot.at(i);
             double time = this->qtime.at(i);
-            string err_str =  boost::str(boost::format("%.2f") % (err));
+            string err_str =  boost::str(boost::format("%.15f") % (err));
             boost::replace_all(err_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             error << err_str+string(", ")+t_str+string("\n");
         }
@@ -465,9 +465,9 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         for(size_t i=0;i<this->qerrors_ang_acc_plot.size();++i){
             double err = this->qerrors_ang_acc_plot.at(i);
             double time = this->qtime.at(i);
-            string err_str =  boost::str(boost::format("%.2f") % (err));
+            string err_str =  boost::str(boost::format("%.15f") % (err));
             boost::replace_all(err_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             error << err_str+string(", ")+t_str+string("\n");
         }
@@ -486,9 +486,9 @@ void ErrorsControlDialog::on_pushButton_save_hand_clicked()
         for(size_t i=0;i<this->qerrors_acc_tot_plot.size();++i){
             double err = this->qerrors_acc_tot_plot.at(i);
             double time = this->qtime.at(i);
-            string err_str =  boost::str(boost::format("%.2f") % (err));
+            string err_str =  boost::str(boost::format("%.15f") % (err));
             boost::replace_all(err_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             error << err_str+string(", ")+t_str+string("\n");
         }
@@ -549,10 +549,10 @@ void ErrorsControlDialog::on_pushButton_save_fing_clicked()
             double err_vel = this->qerrors_fing_vel_0_plot.at(i);
             double err_acc = this->qerrors_fing_acc_0_plot.at(i);
             double time = this->qtime.at(i);
-            string err_pos_str =  boost::str(boost::format("%.2f") % (err_pos)); boost::replace_all(err_pos_str,",",".");
-            string err_vel_str =  boost::str(boost::format("%.2f") % (err_vel)); boost::replace_all(err_vel_str,",",".");
-            string err_acc_str =  boost::str(boost::format("%.2f") % (err_acc)); boost::replace_all(err_acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string err_pos_str =  boost::str(boost::format("%.15f") % (err_pos)); boost::replace_all(err_pos_str,",",".");
+            string err_vel_str =  boost::str(boost::format("%.15f") % (err_vel)); boost::replace_all(err_vel_str,",",".");
+            string err_acc_str =  boost::str(boost::format("%.15f") % (err_acc)); boost::replace_all(err_acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             error << err_pos_str+string(", ")+err_vel_str+string(", ")+err_acc_str+string(", ")+t_str+string("\n");
         }
         error.close();
@@ -572,10 +572,10 @@ void ErrorsControlDialog::on_pushButton_save_fing_clicked()
             double err_vel = this->qerrors_fing_vel_1_plot.at(i);
             double err_acc = this->qerrors_fing_acc_1_plot.at(i);
             double time = this->qtime.at(i);
-            string err_pos_str =  boost::str(boost::format("%.2f") % (err_pos)); boost::replace_all(err_pos_str,",",".");
-            string err_vel_str =  boost::str(boost::format("%.2f") % (err_vel)); boost::replace_all(err_vel_str,",",".");
-            string err_acc_str =  boost::str(boost::format("%.2f") % (err_acc)); boost::replace_all(err_acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string err_pos_str =  boost::str(boost::format("%.15f") % (err_pos)); boost::replace_all(err_pos_str,",",".");
+            string err_vel_str =  boost::str(boost::format("%.15f") % (err_vel)); boost::replace_all(err_vel_str,",",".");
+            string err_acc_str =  boost::str(boost::format("%.15f") % (err_acc)); boost::replace_all(err_acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             error << err_pos_str+string(", ")+err_vel_str+string(", ")+err_acc_str+string(", ")+t_str+string("\n");
         }
         error.close();
@@ -595,10 +595,10 @@ void ErrorsControlDialog::on_pushButton_save_fing_clicked()
             double err_vel = this->qerrors_fing_vel_2_plot.at(i);
             double err_acc = this->qerrors_fing_acc_2_plot.at(i);
             double time = this->qtime.at(i);
-            string err_pos_str =  boost::str(boost::format("%.2f") % (err_pos)); boost::replace_all(err_pos_str,",",".");
-            string err_vel_str =  boost::str(boost::format("%.2f") % (err_vel)); boost::replace_all(err_vel_str,",",".");
-            string err_acc_str =  boost::str(boost::format("%.2f") % (err_acc)); boost::replace_all(err_acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string err_pos_str =  boost::str(boost::format("%.15f") % (err_pos)); boost::replace_all(err_pos_str,",",".");
+            string err_vel_str =  boost::str(boost::format("%.15f") % (err_vel)); boost::replace_all(err_vel_str,",",".");
+            string err_acc_str =  boost::str(boost::format("%.15f") % (err_acc)); boost::replace_all(err_acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             error << err_pos_str+string(", ")+err_vel_str+string(", ")+err_acc_str+string(", ")+t_str+string("\n");
         }
         error.close();
@@ -618,10 +618,10 @@ void ErrorsControlDialog::on_pushButton_save_fing_clicked()
             double err_vel = this->qerrors_fing_vel_3_plot.at(i);
             double err_acc = this->qerrors_fing_acc_3_plot.at(i);
             double time = this->qtime.at(i);
-            string err_pos_str =  boost::str(boost::format("%.2f") % (err_pos)); boost::replace_all(err_pos_str,",",".");
-            string err_vel_str =  boost::str(boost::format("%.2f") % (err_vel)); boost::replace_all(err_vel_str,",",".");
-            string err_acc_str =  boost::str(boost::format("%.2f") % (err_acc)); boost::replace_all(err_acc_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string err_pos_str =  boost::str(boost::format("%.15f") % (err_pos)); boost::replace_all(err_pos_str,",",".");
+            string err_vel_str =  boost::str(boost::format("%.15f") % (err_vel)); boost::replace_all(err_vel_str,",",".");
+            string err_acc_str =  boost::str(boost::format("%.15f") % (err_acc)); boost::replace_all(err_acc_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
             error << err_pos_str+string(", ")+err_vel_str+string(", ")+err_acc_str+string(", ")+t_str+string("\n");
         }
         error.close();
@@ -666,9 +666,9 @@ void ErrorsControlDialog::on_pushButton_save_alpha_clicked()
         for(size_t i=0;i<this->qerror_alpha_pos_plot.size();++i){
             double err = this->qerror_alpha_pos_plot.at(i);
             double time = this->qtime.at(i);
-            string err_str =  boost::str(boost::format("%.2f") % (err));
+            string err_str =  boost::str(boost::format("%.15f") % (err));
             boost::replace_all(err_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             error << err_str+string(", ")+t_str+string("\n");
         }
@@ -687,9 +687,9 @@ void ErrorsControlDialog::on_pushButton_save_alpha_clicked()
         for(size_t i=0;i<this->qerror_alpha_vel_plot.size();++i){
             double err = this->qerror_alpha_vel_plot.at(i);
             double time = this->qtime.at(i);
-            string err_str =  boost::str(boost::format("%.2f") % (err));
+            string err_str =  boost::str(boost::format("%.15f") % (err));
             boost::replace_all(err_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             error << err_str+string(", ")+t_str+string("\n");
         }
@@ -708,9 +708,9 @@ void ErrorsControlDialog::on_pushButton_save_alpha_clicked()
         for(size_t i=0;i<this->qerror_alpha_acc_plot.size();++i){
             double err = this->qerror_alpha_acc_plot.at(i);
             double time = this->qtime.at(i);
-            string err_str =  boost::str(boost::format("%.2f") % (err));
+            string err_str =  boost::str(boost::format("%.15f") % (err));
             boost::replace_all(err_str,",",".");
-            string t_str =  boost::str(boost::format("%.2f") % (time));
+            string t_str =  boost::str(boost::format("%.15f") % (time));
             boost::replace_all(t_str,",",".");
             error << err_str+string(", ")+t_str+string("\n");
         }

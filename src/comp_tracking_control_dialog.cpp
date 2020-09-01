@@ -475,13 +475,13 @@ void CompTrackingControlDialog::on_pushButton_save_hand_pos_clicked()
             double or_qz = this->hand_or_qz.at(i);
             double or_qw = this->hand_or_qw.at(i);
 
-            string pos_x_str =  boost::str(boost::format("%.2f") % (pos_x)); boost::replace_all(pos_x_str,",",".");
-            string pos_y_str =  boost::str(boost::format("%.2f") % (pos_y)); boost::replace_all(pos_y_str,",",".");
-            string pos_z_str =  boost::str(boost::format("%.2f") % (pos_z)); boost::replace_all(pos_z_str,",",".");
-            string or_qx_str =  boost::str(boost::format("%.2f") % (or_qx)); boost::replace_all(or_qx_str,",",".");
-            string or_qy_str =  boost::str(boost::format("%.2f") % (or_qy)); boost::replace_all(or_qy_str,",",".");
-            string or_qz_str =  boost::str(boost::format("%.2f") % (or_qz)); boost::replace_all(or_qz_str,",",".");
-            string or_qw_str =  boost::str(boost::format("%.2f") % (or_qw)); boost::replace_all(or_qw_str,",",".");
+            string pos_x_str =  boost::str(boost::format("%.15f") % (pos_x)); boost::replace_all(pos_x_str,",",".");
+            string pos_y_str =  boost::str(boost::format("%.15f") % (pos_y)); boost::replace_all(pos_y_str,",",".");
+            string pos_z_str =  boost::str(boost::format("%.15f") % (pos_z)); boost::replace_all(pos_z_str,",",".");
+            string or_qx_str =  boost::str(boost::format("%.15f") % (or_qx)); boost::replace_all(or_qx_str,",",".");
+            string or_qy_str =  boost::str(boost::format("%.15f") % (or_qy)); boost::replace_all(or_qy_str,",",".");
+            string or_qz_str =  boost::str(boost::format("%.15f") % (or_qz)); boost::replace_all(or_qz_str,",",".");
+            string or_qw_str =  boost::str(boost::format("%.15f") % (or_qw)); boost::replace_all(or_qw_str,",",".");
 
 
             double des_pos_x = this->des_hand_pos_x.at(i);
@@ -492,18 +492,18 @@ void CompTrackingControlDialog::on_pushButton_save_hand_pos_clicked()
             double des_or_qz = this->des_hand_or_qz.at(i);
             double des_or_qw = this->des_hand_or_qw.at(i);
 
-            string des_pos_x_str =  boost::str(boost::format("%.2f") % (des_pos_x)); boost::replace_all(des_pos_x_str,",",".");
-            string des_pos_y_str =  boost::str(boost::format("%.2f") % (des_pos_y)); boost::replace_all(des_pos_y_str,",",".");
-            string des_pos_z_str =  boost::str(boost::format("%.2f") % (des_pos_z)); boost::replace_all(des_pos_z_str,",",".");
-            string des_or_qx_str =  boost::str(boost::format("%.2f") % (des_or_qx)); boost::replace_all(des_or_qx_str,",",".");
-            string des_or_qy_str =  boost::str(boost::format("%.2f") % (des_or_qy)); boost::replace_all(des_or_qy_str,",",".");
-            string des_or_qz_str =  boost::str(boost::format("%.2f") % (des_or_qz)); boost::replace_all(des_or_qz_str,",",".");
-            string des_or_qw_str =  boost::str(boost::format("%.2f") % (des_or_qw)); boost::replace_all(des_or_qw_str,",",".");
+            string des_pos_x_str =  boost::str(boost::format("%.15f") % (des_pos_x)); boost::replace_all(des_pos_x_str,",",".");
+            string des_pos_y_str =  boost::str(boost::format("%.15f") % (des_pos_y)); boost::replace_all(des_pos_y_str,",",".");
+            string des_pos_z_str =  boost::str(boost::format("%.15f") % (des_pos_z)); boost::replace_all(des_pos_z_str,",",".");
+            string des_or_qx_str =  boost::str(boost::format("%.15f") % (des_or_qx)); boost::replace_all(des_or_qx_str,",",".");
+            string des_or_qy_str =  boost::str(boost::format("%.15f") % (des_or_qy)); boost::replace_all(des_or_qy_str,",",".");
+            string des_or_qz_str =  boost::str(boost::format("%.15f") % (des_or_qz)); boost::replace_all(des_or_qz_str,",",".");
+            string des_or_qw_str =  boost::str(boost::format("%.15f") % (des_or_qw)); boost::replace_all(des_or_qw_str,",",".");
 
 
             // time
             double time = this->qtime.at(i);
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
 
             hand_stream << pos_x_str+string(", ")+pos_y_str+string(", ")+pos_z_str+string(", ")+or_qx_str+string(", ")+or_qy_str+string(", ")+or_qz_str+string(", ")+or_qw_str+string(", ")
                            +des_pos_x_str+string(", ")+des_pos_y_str+string(", ")+des_pos_z_str+string(", ")+des_or_qx_str+string(", ")+des_or_qy_str+string(", ")+des_or_qz_str+string(", ")+des_or_qw_str+string(", ")
@@ -560,12 +560,12 @@ void CompTrackingControlDialog::on_pushButton_save_hand_vel_clicked()
             double ang_vel_y = this->hand_ang_vel_y.at(i);
             double ang_vel_z = this->hand_ang_vel_z.at(i);
 
-            string lin_vel_x_str =  boost::str(boost::format("%.2f") % (lin_vel_x)); boost::replace_all(lin_vel_x_str,",",".");
-            string lin_vel_y_str =  boost::str(boost::format("%.2f") % (lin_vel_y)); boost::replace_all(lin_vel_y_str,",",".");
-            string lin_vel_z_str =  boost::str(boost::format("%.2f") % (lin_vel_z)); boost::replace_all(lin_vel_z_str,",",".");
-            string ang_vel_x_str =  boost::str(boost::format("%.2f") % (ang_vel_x)); boost::replace_all(ang_vel_x_str,",",".");
-            string ang_vel_y_str =  boost::str(boost::format("%.2f") % (ang_vel_y)); boost::replace_all(ang_vel_y_str,",",".");
-            string ang_vel_z_str =  boost::str(boost::format("%.2f") % (ang_vel_z)); boost::replace_all(ang_vel_z_str,",",".");
+            string lin_vel_x_str =  boost::str(boost::format("%.15f") % (lin_vel_x)); boost::replace_all(lin_vel_x_str,",",".");
+            string lin_vel_y_str =  boost::str(boost::format("%.15f") % (lin_vel_y)); boost::replace_all(lin_vel_y_str,",",".");
+            string lin_vel_z_str =  boost::str(boost::format("%.15f") % (lin_vel_z)); boost::replace_all(lin_vel_z_str,",",".");
+            string ang_vel_x_str =  boost::str(boost::format("%.15f") % (ang_vel_x)); boost::replace_all(ang_vel_x_str,",",".");
+            string ang_vel_y_str =  boost::str(boost::format("%.15f") % (ang_vel_y)); boost::replace_all(ang_vel_y_str,",",".");
+            string ang_vel_z_str =  boost::str(boost::format("%.15f") % (ang_vel_z)); boost::replace_all(ang_vel_z_str,",",".");
 
 
             double des_lin_vel_x = this->des_hand_lin_vel_x.at(i);
@@ -575,17 +575,17 @@ void CompTrackingControlDialog::on_pushButton_save_hand_vel_clicked()
             double des_ang_vel_y = this->des_hand_ang_vel_y.at(i);
             double des_ang_vel_z = this->des_hand_ang_vel_z.at(i);
 
-            string des_lin_vel_x_str =  boost::str(boost::format("%.2f") % (des_lin_vel_x)); boost::replace_all(des_lin_vel_x_str,",",".");
-            string des_lin_vel_y_str =  boost::str(boost::format("%.2f") % (des_lin_vel_y)); boost::replace_all(des_lin_vel_y_str,",",".");
-            string des_lin_vel_z_str =  boost::str(boost::format("%.2f") % (des_lin_vel_z)); boost::replace_all(des_lin_vel_z_str,",",".");
-            string des_ang_vel_x_str =  boost::str(boost::format("%.2f") % (des_ang_vel_x)); boost::replace_all(des_ang_vel_x_str,",",".");
-            string des_ang_vel_y_str =  boost::str(boost::format("%.2f") % (des_ang_vel_y)); boost::replace_all(des_ang_vel_y_str,",",".");
-            string des_ang_vel_z_str =  boost::str(boost::format("%.2f") % (des_ang_vel_z)); boost::replace_all(des_ang_vel_z_str,",",".");
+            string des_lin_vel_x_str =  boost::str(boost::format("%.15f") % (des_lin_vel_x)); boost::replace_all(des_lin_vel_x_str,",",".");
+            string des_lin_vel_y_str =  boost::str(boost::format("%.15f") % (des_lin_vel_y)); boost::replace_all(des_lin_vel_y_str,",",".");
+            string des_lin_vel_z_str =  boost::str(boost::format("%.15f") % (des_lin_vel_z)); boost::replace_all(des_lin_vel_z_str,",",".");
+            string des_ang_vel_x_str =  boost::str(boost::format("%.15f") % (des_ang_vel_x)); boost::replace_all(des_ang_vel_x_str,",",".");
+            string des_ang_vel_y_str =  boost::str(boost::format("%.15f") % (des_ang_vel_y)); boost::replace_all(des_ang_vel_y_str,",",".");
+            string des_ang_vel_z_str =  boost::str(boost::format("%.15f") % (des_ang_vel_z)); boost::replace_all(des_ang_vel_z_str,",",".");
 
 
             // time
             double time = this->qtime.at(i);
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
 
             hand_stream << lin_vel_x_str+string(", ")+lin_vel_y_str+string(", ")+lin_vel_z_str+string(", ")+ang_vel_x_str+string(", ")+ang_vel_y_str+string(", ")+ang_vel_z_str+string(", ")
                            +des_lin_vel_x_str+string(", ")+des_lin_vel_y_str+string(", ")+des_lin_vel_z_str+string(", ")+des_ang_vel_x_str+string(", ")+des_ang_vel_y_str+string(", ")+des_ang_vel_z_str+string(", ")
@@ -641,12 +641,12 @@ void CompTrackingControlDialog::on_pushButton_save_hand_acc_clicked()
             double ang_acc_y = this->hand_ang_acc_y.at(i);
             double ang_acc_z = this->hand_ang_acc_z.at(i);
 
-            string lin_acc_x_str =  boost::str(boost::format("%.2f") % (lin_acc_x)); boost::replace_all(lin_acc_x_str,",",".");
-            string lin_acc_y_str =  boost::str(boost::format("%.2f") % (lin_acc_y)); boost::replace_all(lin_acc_y_str,",",".");
-            string lin_acc_z_str =  boost::str(boost::format("%.2f") % (lin_acc_z)); boost::replace_all(lin_acc_z_str,",",".");
-            string ang_acc_x_str =  boost::str(boost::format("%.2f") % (ang_acc_x)); boost::replace_all(ang_acc_x_str,",",".");
-            string ang_acc_y_str =  boost::str(boost::format("%.2f") % (ang_acc_y)); boost::replace_all(ang_acc_y_str,",",".");
-            string ang_acc_z_str =  boost::str(boost::format("%.2f") % (ang_acc_z)); boost::replace_all(ang_acc_z_str,",",".");
+            string lin_acc_x_str =  boost::str(boost::format("%.15f") % (lin_acc_x)); boost::replace_all(lin_acc_x_str,",",".");
+            string lin_acc_y_str =  boost::str(boost::format("%.15f") % (lin_acc_y)); boost::replace_all(lin_acc_y_str,",",".");
+            string lin_acc_z_str =  boost::str(boost::format("%.15f") % (lin_acc_z)); boost::replace_all(lin_acc_z_str,",",".");
+            string ang_acc_x_str =  boost::str(boost::format("%.15f") % (ang_acc_x)); boost::replace_all(ang_acc_x_str,",",".");
+            string ang_acc_y_str =  boost::str(boost::format("%.15f") % (ang_acc_y)); boost::replace_all(ang_acc_y_str,",",".");
+            string ang_acc_z_str =  boost::str(boost::format("%.15f") % (ang_acc_z)); boost::replace_all(ang_acc_z_str,",",".");
 
 
             double des_lin_acc_x = this->des_hand_lin_acc_x.at(i);
@@ -656,17 +656,17 @@ void CompTrackingControlDialog::on_pushButton_save_hand_acc_clicked()
             double des_ang_acc_y = this->des_hand_ang_acc_y.at(i);
             double des_ang_acc_z = this->des_hand_ang_acc_z.at(i);
 
-            string des_lin_acc_x_str =  boost::str(boost::format("%.2f") % (des_lin_acc_x)); boost::replace_all(des_lin_acc_x_str,",",".");
-            string des_lin_acc_y_str =  boost::str(boost::format("%.2f") % (des_lin_acc_y)); boost::replace_all(des_lin_acc_y_str,",",".");
-            string des_lin_acc_z_str =  boost::str(boost::format("%.2f") % (des_lin_acc_z)); boost::replace_all(des_lin_acc_z_str,",",".");
-            string des_ang_acc_x_str =  boost::str(boost::format("%.2f") % (des_ang_acc_x)); boost::replace_all(des_ang_acc_x_str,",",".");
-            string des_ang_acc_y_str =  boost::str(boost::format("%.2f") % (des_ang_acc_y)); boost::replace_all(des_ang_acc_y_str,",",".");
-            string des_ang_acc_z_str =  boost::str(boost::format("%.2f") % (des_ang_acc_z)); boost::replace_all(des_ang_acc_z_str,",",".");
+            string des_lin_acc_x_str =  boost::str(boost::format("%.15f") % (des_lin_acc_x)); boost::replace_all(des_lin_acc_x_str,",",".");
+            string des_lin_acc_y_str =  boost::str(boost::format("%.15f") % (des_lin_acc_y)); boost::replace_all(des_lin_acc_y_str,",",".");
+            string des_lin_acc_z_str =  boost::str(boost::format("%.15f") % (des_lin_acc_z)); boost::replace_all(des_lin_acc_z_str,",",".");
+            string des_ang_acc_x_str =  boost::str(boost::format("%.15f") % (des_ang_acc_x)); boost::replace_all(des_ang_acc_x_str,",",".");
+            string des_ang_acc_y_str =  boost::str(boost::format("%.15f") % (des_ang_acc_y)); boost::replace_all(des_ang_acc_y_str,",",".");
+            string des_ang_acc_z_str =  boost::str(boost::format("%.15f") % (des_ang_acc_z)); boost::replace_all(des_ang_acc_z_str,",",".");
 
 
             // time
             double time = this->qtime.at(i);
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
 
             hand_stream << lin_acc_x_str+string(", ")+lin_acc_y_str+string(", ")+lin_acc_z_str+string(", ")+ang_acc_x_str+string(", ")+ang_acc_y_str+string(", ")+ang_acc_z_str+string(", ")
                            +des_lin_acc_x_str+string(", ")+des_lin_acc_y_str+string(", ")+des_lin_acc_z_str+string(", ")+des_ang_acc_x_str+string(", ")+des_ang_acc_y_str+string(", ")+des_ang_acc_z_str+string(", ")
@@ -718,10 +718,10 @@ void CompTrackingControlDialog::on_pushButton_save_fing_pos_clicked()
             double fing_pos_2 = this->pos_fing_2.at(i);
             double fing_pos_3 = this->pos_fing_3.at(i);
 
-            string fing_pos_0_str =  boost::str(boost::format("%.2f") % (fing_pos_0)); boost::replace_all(fing_pos_0_str,",",".");
-            string fing_pos_1_str =  boost::str(boost::format("%.2f") % (fing_pos_1)); boost::replace_all(fing_pos_1_str,",",".");
-            string fing_pos_2_str =  boost::str(boost::format("%.2f") % (fing_pos_2)); boost::replace_all(fing_pos_2_str,",",".");
-            string fing_pos_3_str =  boost::str(boost::format("%.2f") % (fing_pos_3)); boost::replace_all(fing_pos_3_str,",",".");
+            string fing_pos_0_str =  boost::str(boost::format("%.15f") % (fing_pos_0)); boost::replace_all(fing_pos_0_str,",",".");
+            string fing_pos_1_str =  boost::str(boost::format("%.15f") % (fing_pos_1)); boost::replace_all(fing_pos_1_str,",",".");
+            string fing_pos_2_str =  boost::str(boost::format("%.15f") % (fing_pos_2)); boost::replace_all(fing_pos_2_str,",",".");
+            string fing_pos_3_str =  boost::str(boost::format("%.15f") % (fing_pos_3)); boost::replace_all(fing_pos_3_str,",",".");
 
 
             double des_fing_pos_0 = this->des_pos_fing_0.at(i);
@@ -729,15 +729,15 @@ void CompTrackingControlDialog::on_pushButton_save_fing_pos_clicked()
             double des_fing_pos_2 = this->des_pos_fing_2.at(i);
             double des_fing_pos_3 = this->des_pos_fing_3.at(i);
 
-            string des_fing_pos_0_str =  boost::str(boost::format("%.2f") % (des_fing_pos_0)); boost::replace_all(des_fing_pos_0_str,",",".");
-            string des_fing_pos_1_str =  boost::str(boost::format("%.2f") % (des_fing_pos_1)); boost::replace_all(des_fing_pos_1_str,",",".");
-            string des_fing_pos_2_str =  boost::str(boost::format("%.2f") % (des_fing_pos_2)); boost::replace_all(des_fing_pos_2_str,",",".");
-            string des_fing_pos_3_str =  boost::str(boost::format("%.2f") % (des_fing_pos_3)); boost::replace_all(des_fing_pos_3_str,",",".");
+            string des_fing_pos_0_str =  boost::str(boost::format("%.15f") % (des_fing_pos_0)); boost::replace_all(des_fing_pos_0_str,",",".");
+            string des_fing_pos_1_str =  boost::str(boost::format("%.15f") % (des_fing_pos_1)); boost::replace_all(des_fing_pos_1_str,",",".");
+            string des_fing_pos_2_str =  boost::str(boost::format("%.15f") % (des_fing_pos_2)); boost::replace_all(des_fing_pos_2_str,",",".");
+            string des_fing_pos_3_str =  boost::str(boost::format("%.15f") % (des_fing_pos_3)); boost::replace_all(des_fing_pos_3_str,",",".");
 
 
             // time
             double time = this->qtime.at(i);
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
 
             fing_stream << fing_pos_0_str+string(", ")+fing_pos_1_str+string(", ")+fing_pos_2_str+string(", ")+fing_pos_3_str+string(", ")
                            +des_fing_pos_0_str+string(", ")+des_fing_pos_1_str+string(", ")+des_fing_pos_2_str+string(", ")+des_fing_pos_3_str+string(", ")
@@ -790,10 +790,10 @@ void CompTrackingControlDialog::on_pushButton_save_fing_vel_clicked()
             double fing_vel_2 = this->vel_fing_2.at(i);
             double fing_vel_3 = this->vel_fing_3.at(i);
 
-            string fing_vel_0_str =  boost::str(boost::format("%.2f") % (fing_vel_0)); boost::replace_all(fing_vel_0_str,",",".");
-            string fing_vel_1_str =  boost::str(boost::format("%.2f") % (fing_vel_1)); boost::replace_all(fing_vel_1_str,",",".");
-            string fing_vel_2_str =  boost::str(boost::format("%.2f") % (fing_vel_2)); boost::replace_all(fing_vel_2_str,",",".");
-            string fing_vel_3_str =  boost::str(boost::format("%.2f") % (fing_vel_3)); boost::replace_all(fing_vel_3_str,",",".");
+            string fing_vel_0_str =  boost::str(boost::format("%.15f") % (fing_vel_0)); boost::replace_all(fing_vel_0_str,",",".");
+            string fing_vel_1_str =  boost::str(boost::format("%.15f") % (fing_vel_1)); boost::replace_all(fing_vel_1_str,",",".");
+            string fing_vel_2_str =  boost::str(boost::format("%.15f") % (fing_vel_2)); boost::replace_all(fing_vel_2_str,",",".");
+            string fing_vel_3_str =  boost::str(boost::format("%.15f") % (fing_vel_3)); boost::replace_all(fing_vel_3_str,",",".");
 
 
             double des_fing_vel_0 = this->des_vel_fing_0.at(i);
@@ -801,15 +801,15 @@ void CompTrackingControlDialog::on_pushButton_save_fing_vel_clicked()
             double des_fing_vel_2 = this->des_vel_fing_2.at(i);
             double des_fing_vel_3 = this->des_vel_fing_3.at(i);
 
-            string des_fing_vel_0_str =  boost::str(boost::format("%.2f") % (des_fing_vel_0)); boost::replace_all(des_fing_vel_0_str,",",".");
-            string des_fing_vel_1_str =  boost::str(boost::format("%.2f") % (des_fing_vel_1)); boost::replace_all(des_fing_vel_1_str,",",".");
-            string des_fing_vel_2_str =  boost::str(boost::format("%.2f") % (des_fing_vel_2)); boost::replace_all(des_fing_vel_2_str,",",".");
-            string des_fing_vel_3_str =  boost::str(boost::format("%.2f") % (des_fing_vel_3)); boost::replace_all(des_fing_vel_3_str,",",".");
+            string des_fing_vel_0_str =  boost::str(boost::format("%.15f") % (des_fing_vel_0)); boost::replace_all(des_fing_vel_0_str,",",".");
+            string des_fing_vel_1_str =  boost::str(boost::format("%.15f") % (des_fing_vel_1)); boost::replace_all(des_fing_vel_1_str,",",".");
+            string des_fing_vel_2_str =  boost::str(boost::format("%.15f") % (des_fing_vel_2)); boost::replace_all(des_fing_vel_2_str,",",".");
+            string des_fing_vel_3_str =  boost::str(boost::format("%.15f") % (des_fing_vel_3)); boost::replace_all(des_fing_vel_3_str,",",".");
 
 
             // time
             double time = this->qtime.at(i);
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
 
             fing_stream << fing_vel_0_str+string(", ")+fing_vel_1_str+string(", ")+fing_vel_2_str+string(", ")+fing_vel_3_str+string(", ")
                            +des_fing_vel_0_str+string(", ")+des_fing_vel_1_str+string(", ")+des_fing_vel_2_str+string(", ")+des_fing_vel_3_str+string(", ")
@@ -861,10 +861,10 @@ void CompTrackingControlDialog::on_pushButton_save_fing_acc_clicked()
             double fing_acc_2 = this->acc_fing_2.at(i);
             double fing_acc_3 = this->acc_fing_3.at(i);
 
-            string fing_acc_0_str =  boost::str(boost::format("%.2f") % (fing_acc_0)); boost::replace_all(fing_acc_0_str,",",".");
-            string fing_acc_1_str =  boost::str(boost::format("%.2f") % (fing_acc_1)); boost::replace_all(fing_acc_1_str,",",".");
-            string fing_acc_2_str =  boost::str(boost::format("%.2f") % (fing_acc_2)); boost::replace_all(fing_acc_2_str,",",".");
-            string fing_acc_3_str =  boost::str(boost::format("%.2f") % (fing_acc_3)); boost::replace_all(fing_acc_3_str,",",".");
+            string fing_acc_0_str =  boost::str(boost::format("%.15f") % (fing_acc_0)); boost::replace_all(fing_acc_0_str,",",".");
+            string fing_acc_1_str =  boost::str(boost::format("%.15f") % (fing_acc_1)); boost::replace_all(fing_acc_1_str,",",".");
+            string fing_acc_2_str =  boost::str(boost::format("%.15f") % (fing_acc_2)); boost::replace_all(fing_acc_2_str,",",".");
+            string fing_acc_3_str =  boost::str(boost::format("%.15f") % (fing_acc_3)); boost::replace_all(fing_acc_3_str,",",".");
 
 
             double des_fing_acc_0 = this->des_acc_fing_0.at(i);
@@ -872,15 +872,15 @@ void CompTrackingControlDialog::on_pushButton_save_fing_acc_clicked()
             double des_fing_acc_2 = this->des_acc_fing_2.at(i);
             double des_fing_acc_3 = this->des_acc_fing_3.at(i);
 
-            string des_fing_acc_0_str =  boost::str(boost::format("%.2f") % (des_fing_acc_0)); boost::replace_all(des_fing_acc_0_str,",",".");
-            string des_fing_acc_1_str =  boost::str(boost::format("%.2f") % (des_fing_acc_1)); boost::replace_all(des_fing_acc_1_str,",",".");
-            string des_fing_acc_2_str =  boost::str(boost::format("%.2f") % (des_fing_acc_2)); boost::replace_all(des_fing_acc_2_str,",",".");
-            string des_fing_acc_3_str =  boost::str(boost::format("%.2f") % (des_fing_acc_3)); boost::replace_all(des_fing_acc_3_str,",",".");
+            string des_fing_acc_0_str =  boost::str(boost::format("%.15f") % (des_fing_acc_0)); boost::replace_all(des_fing_acc_0_str,",",".");
+            string des_fing_acc_1_str =  boost::str(boost::format("%.15f") % (des_fing_acc_1)); boost::replace_all(des_fing_acc_1_str,",",".");
+            string des_fing_acc_2_str =  boost::str(boost::format("%.15f") % (des_fing_acc_2)); boost::replace_all(des_fing_acc_2_str,",",".");
+            string des_fing_acc_3_str =  boost::str(boost::format("%.15f") % (des_fing_acc_3)); boost::replace_all(des_fing_acc_3_str,",",".");
 
 
             // time
             double time = this->qtime.at(i);
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
 
             fing_stream << fing_acc_0_str+string(", ")+fing_acc_1_str+string(", ")+fing_acc_2_str+string(", ")+fing_acc_3_str+string(", ")
                            +des_fing_acc_0_str+string(", ")+des_fing_acc_1_str+string(", ")+des_fing_acc_2_str+string(", ")+des_fing_acc_3_str+string(", ")
@@ -913,7 +913,8 @@ void CompTrackingControlDialog::on_pushButton_save_alpha_clicked()
     ui->plot_alpha_vel->savePdf(path+QString("alpha_vel_track.pdf"),true,0,0,QString(),QString("Swivel angle velocity tracking [deg/s]"));
     ui->plot_alpha_acc->savePdf(path+QString("alpha_acc_track.pdf"),true,0,0,QString(),QString("Swivel angle acceleration tracking [deg/s^2]"));
 
-    // save data
+    // save data    
+    const double radtodeg = 180.0/static_cast<double>(M_PI);
     if(!this->qalpha_pos.empty()){
         string filename("alpha_tracking.txt");
         ofstream alpha_stream;
@@ -923,16 +924,16 @@ void CompTrackingControlDialog::on_pushButton_save_alpha_clicked()
 
         for(size_t i=0;i<this->qalpha_vel.size();++i){
 
-            string alpha_pos_str =  boost::str(boost::format("%.2f") % (this->qalpha_pos.at(i))); boost::replace_all(alpha_pos_str,",",".");
-            string des_alpha_pos_str =  boost::str(boost::format("%.2f") % (this->qdes_alpha_pos.at(i))); boost::replace_all(des_alpha_pos_str,",",".");
-            string alpha_vel_str =  boost::str(boost::format("%.2f") % (this->qalpha_vel.at(i))); boost::replace_all(alpha_vel_str,",",".");
-            string des_alpha_vel_str =  boost::str(boost::format("%.2f") % (this->qdes_alpha_vel.at(i))); boost::replace_all(des_alpha_vel_str,",",".");
-            string alpha_acc_str =  boost::str(boost::format("%.2f") % (this->qalpha_acc.at(i))); boost::replace_all(alpha_acc_str,",",".");
-            string des_alpha_acc_str =  boost::str(boost::format("%.2f") % (this->qdes_alpha_acc.at(i))); boost::replace_all(des_alpha_acc_str,",",".");
+            string alpha_pos_str =  boost::str(boost::format("%.15f") % (radtodeg*this->qalpha_pos.at(i))); boost::replace_all(alpha_pos_str,",",".");
+            string des_alpha_pos_str =  boost::str(boost::format("%.15f") % (radtodeg*this->qdes_alpha_pos.at(i))); boost::replace_all(des_alpha_pos_str,",",".");
+            string alpha_vel_str =  boost::str(boost::format("%.15f") % (radtodeg*this->qalpha_vel.at(i))); boost::replace_all(alpha_vel_str,",",".");
+            string des_alpha_vel_str =  boost::str(boost::format("%.15f") % (radtodeg*this->qdes_alpha_vel.at(i))); boost::replace_all(des_alpha_vel_str,",",".");
+            string alpha_acc_str =  boost::str(boost::format("%.15f") % (radtodeg*this->qalpha_acc.at(i))); boost::replace_all(alpha_acc_str,",",".");
+            string des_alpha_acc_str =  boost::str(boost::format("%.15f") % (radtodeg*this->qdes_alpha_acc.at(i))); boost::replace_all(des_alpha_acc_str,",",".");
 
             // time
             double time = this->qtime.at(i);
-            string t_str =  boost::str(boost::format("%.2f") % (time)); boost::replace_all(t_str,",",".");
+            string t_str =  boost::str(boost::format("%.15f") % (time)); boost::replace_all(t_str,",",".");
 
             alpha_stream << alpha_pos_str+string(", ")+des_alpha_pos_str+string(", ")
                             +alpha_vel_str+string(", ")+des_alpha_vel_str+string(", ")
