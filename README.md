@@ -10,29 +10,36 @@ to do
 ### Scenario
 to do
 
-The Motion Manager main window | A V-REP simulated scenario
+The Scenario tab | A V-REP simulated scenario
 ------------ | -------------
 ![Tab Scenario](/resources/images/scenario.png) | ![V-REP](/resources/images/vrep.png)
 
 
 ### Planning
 to do
-
-![Tab Planning](/resources/images/plan.png) 
+The Planning tab |
+-----------------|
+![Tab Planning](/resources/images/plan.png) |
 
 ### Learning
 to do
-![Tab Learning](/resources/images/learn.png) 
+The Learning tab |
+-----------------|
+![Tab Learning](/resources/images/learn.png) |
 
 ### Controlling
 to do
 
-![Tab Controlling](/resources/images/control.png) 
+The Controlling tab |
+--------------------|
+![Tab Controlling](/resources/images/control.png) |
 
 ### Results
 to do
 
-![Tab Results](/resources/images/results.png) 
+The Results tab |
+--------------------|
+![Tab Results](/resources/images/results.png) |
 
 ## Upgrades
 * The Motion Manager has been upgraded by [Sara Sá](https://github.com/sarasa22) to support the collaborative robot Sawyer by Rethink Robotics&copy; (see [https://github.com/sarasa22/motion_manager](https://github.com/sarasa22/motion_manager))  
