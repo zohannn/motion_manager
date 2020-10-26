@@ -10,9 +10,13 @@ to do
 ### Scenario
 to do
 
-The Scenario tab | A V-REP simulated scenario
------------- | -------------
-![Tab Scenario](/resources/images/scenario.png) | ![V-REP](/resources/images/vrep.png)
+A V-REP simulated scenario|
+------------- |
+![V-REP](/resources/images/vrep.png)|
+
+The Scenario tab | 
+------------ | 
+![Tab Scenario](/resources/images/scenario.png) | 
 
 
 ### Planning
@@ -39,7 +43,9 @@ to do
 
 The Results tab |
 --------------------|
-![Tab Results](/resources/images/results.png) |
+![Tab Results Hand](/resources/images/results_hand.png) |
+![Tab Results Joints](/resources/images/results_joints.png) |
+![Tab Results Track](/resources/images/results_track.png) |
 
 ## Upgrades
 * The Motion Manager has been upgraded by [Sara Sá](https://github.com/sarasa22) to support the collaborative robot Sawyer by Rethink Robotics&copy; (see [https://github.com/sarasa22/motion_manager](https://github.com/sarasa22/motion_manager))  
