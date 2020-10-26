@@ -282,39 +282,13 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>10</x>
          <y>610</y>
-         <width>111</width>
+         <width>171</width>
          <height>31</height>
         </rect>
        </property>
        <property name="text">
-        <string>Add Movement</string>
+        <string>Add this movement</string>
        </property>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>340</x>
-         <y>610</y>
-         <width>193</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QPushButton" name="pushButton_scene_reset">
-          <property name="text">
-           <string>Reset the scene</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_load_task">
-          <property name="text">
-           <string>Load a task</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
       </widget>
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
@@ -673,9 +647,9 @@ p, li { white-space: pre-wrap; }
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>400</x>
-         <y>410</y>
-         <width>141</width>
+         <x>390</x>
+         <y>470</y>
+         <width>149</width>
          <height>171</height>
         </rect>
        </property>
@@ -683,7 +657,7 @@ p, li { white-space: pre-wrap; }
         <item>
          <widget class="QGroupBox" name="groupBox_power_law">
           <property name="title">
-           <string>2D power law</string>
+           <string>Power law planning</string>
           </property>
           <widget class="QWidget" name="layoutWidget">
            <property name="geometry">
@@ -1064,6 +1038,32 @@ p, li { white-space: pre-wrap; }
       <property name="text">
        <string>execute in velocity mode</string>
       </property>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>975</x>
+        <y>684</y>
+        <width>291</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="pushButton_scene_reset">
+         <property name="text">
+          <string>Reset the current scenario</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_load_task">
+         <property name="text">
+          <string>Load a task</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_learn">
