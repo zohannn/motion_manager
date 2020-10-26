@@ -8,7 +8,7 @@ Currently supported robots:
 
 The Motion Manager main window | A V-REP simulated scenario
 ------------ | -------------
-![Main window](/resources/images/intro.png) | ![Main window](/resources/images/intro.png)
+![Tab Scenario](/resources/images/scenario.png) | ![V-REP](/resources/images/vrep.png)
 
 
 ### Scenario
