@@ -119,11 +119,6 @@ set (HAND 1)
 set (OPEN_CLOSE_HAND 0)
 
 
-## Execution of the trajectory
-# VEL=0. Execution with position
-# VEL=1. Execution with velocity
-# set (VEL 0)
-
 set(MAIN_PATH ${PROJECT_SOURCE_DIR}) ## Path of the main directory
 set(PATH_SCENARIOS /home/$ENV{USER}/scenarios) ## Path of the scenarios
 
@@ -274,11 +269,11 @@ if(TEST)
     set(PROJECT_NAME_LIB ${PROJECT_NAME}_lib)
     add_library(${PROJECT_NAME_LIB} STATIC ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
     target_link_libraries(${PROJECT_NAME_LIB} ${QT_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-
+    message("Test build started")
 
     # ********** link external libraries ********
-    # Human-like Upper-limbs Motion Library (HUML)
-    target_link_libraries(${PROJECT_NAME_LIB} HUML)
+    # Human-like Upper-limbs Motion Planner (HUMP)
+    target_link_libraries(${PROJECT_NAME_LIB} HUMP)
     # -- IPOPT Solver
     target_link_libraries(${PROJECT_NAME_LIB} libipopt.a)
     target_link_libraries(${PROJECT_NAME_LIB} libcoinmumps.a)
@@ -323,12 +318,22 @@ endif()
 if(DOC)
     find_package(Doxygen)
     if(NOT DOXYGEN_FOUND)
-        message(WARNING "Doxygen not found, unable to generate documentation")
+        message(WARNING "Doxygen need to be installed to generate the doxygen documentation")
     else()
-        add_custom_target(doc_${PROJECT_NAME} COMMAND ${DOXYGEN_EXECUTABLE} "doxyconfig/doxyfile.ini"
-            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-            COMMENT "Building user's documentation into the doc directory ..."
-        )
+        # set input and output files
+        set(DOXYGEN_IN ${CMAKE_CURRENT_SOURCE_DIR}/doxyconfig/doxyfile.ini)
+        set(DOXYGEN_OUT ${CMAKE_CURRENT_SOURCE_DIR}/../../devel/lib/${PROJECT_NAME}/Doxyfile)
+
+        # request to configure the file
+        configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+        message("Doxygen build started")
+
+        # note the option ALL which allows to build the docs together with the application
+        add_custom_target(${PROJECT_NAME}_docs ALL
+            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMENT "Generating API documentation with Doxygen ..."
+            VERBATIM )
     endif()
 endif()
 ##############################################################################

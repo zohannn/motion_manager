@@ -33,9 +33,6 @@
 #include "scenario.hpp"
 
 
-
-
-
 namespace motion_manager {
 
 using namespace std;
