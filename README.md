@@ -5,26 +5,34 @@ Currently supported robots:
 * the **A**nthropomorphic **Ro**botic **S**ystem **ARoS**: see its [URDF model](https://github.com/zohannn/aros_description)
 
 ## Overview
+to do
+
+### Scenario
+to do
 
 The Motion Manager main window | A V-REP simulated scenario
 ------------ | -------------
 ![Tab Scenario](/resources/images/scenario.png) | ![V-REP](/resources/images/vrep.png)
 
 
-### Scenario
-to do
-
 ### Planning
 to do
 
+![Tab Planning](/resources/images/plan.png) 
+
 ### Learning
 to do
+![Tab Learning](/resources/images/learn.png) 
 
 ### Controlling
 to do
 
+![Tab Controlling](/resources/images/control.png) 
+
 ### Results
 to do
+
+![Tab Results](/resources/images/results.png) 
 
 ## Upgrades
 * The Motion Manager has been upgraded by [Sara Sá](https://github.com/sarasa22) to support the collaborative robot Sawyer by Rethink Robotics&copy; (see [https://github.com/sarasa22/motion_manager](https://github.com/sarasa22/motion_manager))  
