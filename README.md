@@ -5,7 +5,7 @@ Currently supported robots:
 * the **A**nthropomorphic **Ro**botic **S**ystem **ARoS**: see its [URDF model](https://github.com/zohannn/aros_description)
 
 ## Overview
-The purpose of this document is to provide a brief overview of the main features, while more technical details are described in deticated Wiki pages. The Motion Manager GUI is composed by four tabs with independent functionalities, namely: **Scenario**, **Planning**, **Learning**, **Controlling** and **Results**.    
+The purpose of this document is to provide a brief overview of the main features, while more technical details are described in the [Wiki pages](https://github.com/zohannn/motion_manager/wiki). The Motion Manager GUI is composed by four tabs with independent functionalities, namely: **Scenario**, **Planning**, **Learning**, **Controlling** and **Results**.    
 
 ### Scenario
 
