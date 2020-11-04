@@ -132,12 +132,12 @@ configure_file (
 ## Tests
 # TEST=0. do not run the tests
 # TEST=1, run the tests
-set(TEST 0)
+set(TEST 1)
 
 ## Documentation
 # DOC=0. do not make the documentation
 # DOC=1, make the documentation
-set(DOC 0)
+set(DOC 1)
 
 
 ##############################################################################
@@ -237,7 +237,7 @@ target_link_libraries(${PROJECT_NAME} libcoinasl.a)
 target_link_libraries(${PROJECT_NAME} libcoinblas.a)
 target_link_libraries(${PROJECT_NAME} libcoinmetis.a)
 target_link_libraries(${PROJECT_NAME} libipoptamplinterface.a)
-target_link_libraries(${PROJECT_NAME} dl) # this has to be the last one
+target_link_libraries(${PROJECT_NAME} dl) 
 target_link_libraries(${PROJECT_NAME} gfortran)# this has to be the last one
 
 # -- QCustomPlot and QCPDocumentObject
@@ -264,8 +264,7 @@ target_link_libraries(${PROJECT_NAME} LPF)
 ##############################################################################
 # Testing
 ##############################################################################
-if(TEST)
-
+if(TEST AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
     set(PROJECT_NAME_LIB ${PROJECT_NAME}_lib)
     add_library(${PROJECT_NAME_LIB} STATIC ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
     target_link_libraries(${PROJECT_NAME_LIB} ${QT_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
@@ -309,8 +308,6 @@ if(TEST)
     SET( TEST_LIBRARIES ${QT_QTTEST_LIBRARY} ${QT_LIBRARIES} )
     target_link_libraries(${PROJECT_TEST_NAME} ${TEST_LIBRARIES} ${PROJECT_NAME_LIB})
     add_test (NAME Test_ros_comm_dlg COMMAND ${PROJECT_TEST_NAME})
-
-
 endif()
 ##############################################################################
 # Documenting
