@@ -166,10 +166,10 @@ link_directories(
 add_definitions(-DQCUSTOMPLOT_USE_LIBRARY)
 set(QCUSTOMPLOT_HOME /home/$ENV{USER}/qcustomplot)
 include_directories(
-    ${QCUSTOMPLOT_HOME}/${CMAKE_BUILD_TYPE}/include
+    ${QCUSTOMPLOT_HOME}/include
 )
 link_directories(
-    ${QCUSTOMPLOT_HOME}/${CMAKE_BUILD_TYPE}/lib
+    ${QCUSTOMPLOT_HOME}/build
 )
 
 # -- QwtPlot3D
