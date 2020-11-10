@@ -184,19 +184,19 @@ link_directories(
 # -- QCPDocumentObject
 set(QCPDOCUMENTOBJECT_HOME /home/$ENV{USER}/qcpdocumentobject)
 include_directories(
-    ${QCPDOCUMENTOBJECT_HOME}/${CMAKE_BUILD_TYPE}/include
+    ${QCPDOCUMENTOBJECT_HOME}/include
 )
 link_directories(
-    ${QCPDOCUMENTOBJECT_HOME}/${CMAKE_BUILD_TYPE}/lib
+    ${QCPDOCUMENTOBJECT_HOME}/build
 )
 
 # -- EigenPCA
 set(EIGENPCA_HOME /home/$ENV{USER}/EigenPCA)
 include_directories(
-    ${EIGENPCA_HOME}/${CMAKE_BUILD_TYPE}/include
+    ${EIGENPCA_HOME}/include
 )
 link_directories(
-    ${EIGENPCA_HOME}/${CMAKE_BUILD_TYPE}/lib
+    ${EIGENPCA_HOME}/build
 )
 
 # -- Persistence1D
@@ -252,7 +252,11 @@ target_link_libraries(${PROJECT_NAME} qwtplot3d)
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} ${QT_QTOPENGL_LIBRARY} GLU)
 
 # -- EigenPCA
-target_link_libraries(${PROJECT_NAME} EigenPCA)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_link_libraries(${PROJECT_NAME} EigenPCAd)
+else()
+    target_link_libraries(${PROJECT_NAME} EigenPCA)
+endif()
 
 # -- Persistence1D
 target_link_libraries(${PROJECT_NAME} Persistence1D)
