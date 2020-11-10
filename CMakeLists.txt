@@ -202,10 +202,10 @@ link_directories(
 # -- Persistence1D
 set(PERSISTENCE1D_HOME /home/$ENV{USER}/Persistence1D)
 include_directories(
-    ${PERSISTENCE1D_HOME}/${CMAKE_BUILD_TYPE}/include
+    ${PERSISTENCE1D_HOME}/include
 )
 link_directories(
-    ${PERSISTENCE1D_HOME}/${CMAKE_BUILD_TYPE}/lib
+    ${PERSISTENCE1D_HOME}/build
 )
 
 # ----- Low Pass Filter -------- #
@@ -259,7 +259,12 @@ else()
 endif()
 
 # -- Persistence1D
-target_link_libraries(${PROJECT_NAME} Persistence1D)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_link_libraries(${PROJECT_NAME} Persistence1Dd)
+else()
+    target_link_libraries(${PROJECT_NAME} Persistence1D)
+endif()
+
 
 # Low Pass Filter
 target_link_libraries(${PROJECT_NAME} LPF)
@@ -277,6 +282,7 @@ if(TEST AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
     # ********** link external libraries ********
     # Human-like Upper-limbs Motion Planner (HUMP)
     target_link_libraries(${PROJECT_NAME_LIB} HUMP)
+
     # -- IPOPT Solver
     target_link_libraries(${PROJECT_NAME_LIB} libipopt.a)
     target_link_libraries(${PROJECT_NAME_LIB} libcoinmumps.a)
@@ -287,6 +293,7 @@ if(TEST AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
     target_link_libraries(${PROJECT_NAME_LIB} libipoptamplinterface.a)
     target_link_libraries(${PROJECT_NAME_LIB} dl) # this has to be the last one
     target_link_libraries(${PROJECT_NAME_LIB} gfortran)# this has to be the last one
+
     # -- QCustomPlot and QCPDocumentObject
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         target_link_libraries(${PROJECT_NAME} qcustomplotd qcpdocumentobjectd)
@@ -295,11 +302,20 @@ if(TEST AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
     endif()
     # -- QwtPlot3D
     target_link_libraries(${PROJECT_NAME} qwtplot3d)
+
     # -- EigenPCA
-    target_link_libraries(${PROJECT_NAME} EigenPCA)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_link_libraries(${PROJECT_NAME} EigenPCAd)
+    else()
+        target_link_libraries(${PROJECT_NAME} EigenPCA)
+    endif()
 
     # -- Persistence1D
-    target_link_libraries(${PROJECT_NAME} Persistence1D)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_link_libraries(${PROJECT_NAME} Persistence1Dd)
+    else()
+        target_link_libraries(${PROJECT_NAME} Persistence1D)
+    endif()
 
     enable_testing ()
 
