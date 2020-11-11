@@ -82,6 +82,9 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 # Settings
 ##############################################################################
 
+## V-REP simulator
+find_package(vrep_common REQUIRED)
+
 ## MoveIt! configuration
 # MOVEIT=0. do not use the moveit planner
 # MOVEIT=1, use the moveit planner
@@ -114,6 +117,9 @@ endif()
 # HAND=0. Human hand
 # HAND=1. Barrett hand
 set (HAND 1)
+if(HAND)
+   find_package(open_close_BH REQUIRED) # open/close service for Barrett Hand
+endif()
 # OPEN_CLOSE_HAND=0. do not use the open and close hand functions
 # OPEN_CLOSE_HAND=1. use the open and close hand functions
 set (OPEN_CLOSE_HAND 0)
