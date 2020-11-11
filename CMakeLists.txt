@@ -85,7 +85,7 @@ file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINK
 ## MoveIt! configuration
 # MOVEIT=0. do not use the moveit planner
 # MOVEIT=1, use the moveit planner
-set (MOVEIT 0)
+set (MOVEIT 1)
 
 if(MOVEIT)
     find_package(aros_moveit_planner REQUIRED COMPONENTS
@@ -277,11 +277,15 @@ if(TEST AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
     set(PROJECT_NAME_LIB ${PROJECT_NAME}_lib)
     add_library(${PROJECT_NAME_LIB} STATIC ${QT_SOURCES} ${QT_RESOURCES_CPP} ${QT_FORMS_HPP} ${QT_MOC_HPP})
     target_link_libraries(${PROJECT_NAME_LIB} ${QT_LIBRARIES} ${catkin_LIBRARIES} ${Boost_LIBRARIES})
-    message("Test build started")
 
     # ********** link external libraries ********
     # Human-like Upper-limbs Motion Planner (HUMP)
     target_link_libraries(${PROJECT_NAME_LIB} HUMP)
+
+    if(MOVEIT)
+      # Humanoid moveit planner Library
+      target_link_libraries(${PROJECT_NAME_LIB} humanoid_planner)
+    endif()
 
     # -- IPOPT Solver
     target_link_libraries(${PROJECT_NAME_LIB} libipopt.a)
@@ -296,28 +300,31 @@ if(TEST AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
 
     # -- QCustomPlot and QCPDocumentObject
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_link_libraries(${PROJECT_NAME} qcustomplotd qcpdocumentobjectd)
+        target_link_libraries(${PROJECT_NAME_LIB} qcustomplotd qcpdocumentobjectd)
     else()
-        target_link_libraries(${PROJECT_NAME} qcustomplot qcpdocumentobject)
+        target_link_libraries(${PROJECT_NAME_LIB} qcustomplot qcpdocumentobject)
     endif()
     # -- QwtPlot3D
-    target_link_libraries(${PROJECT_NAME} qwtplot3d)
+    target_link_libraries(${PROJECT_NAME_LIB} qwtplot3d)
 
     # -- EigenPCA
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_link_libraries(${PROJECT_NAME} EigenPCAd)
+        target_link_libraries(${PROJECT_NAME_LIB} EigenPCAd)
     else()
-        target_link_libraries(${PROJECT_NAME} EigenPCA)
+        target_link_libraries(${PROJECT_NAME_LIB} EigenPCA)
     endif()
 
     # -- Persistence1D
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        target_link_libraries(${PROJECT_NAME} Persistence1Dd)
+        target_link_libraries(${PROJECT_NAME_LIB} Persistence1Dd)
     else()
-        target_link_libraries(${PROJECT_NAME} Persistence1D)
+        target_link_libraries(${PROJECT_NAME_LIB} Persistence1D)
     endif()
 
-    enable_testing ()
+    enable_testing()
+
+
+    message("Test build started ...")
 
     ## Test suite ros communication dialog
     set(CMAKE_AUTOMOC ON)

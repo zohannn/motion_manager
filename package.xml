@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>motion_manager</name>
-  <version>0.1.0</version>
+  <version>1.0.0</version>
   <description>
 
         This is the Motion Manager. This software is meant to contain several movement planners, a movement learner and a movement controller.
@@ -10,7 +10,11 @@
   </description>
   <maintainer email="gianpaologulletta@gmail.com">Gianpaolo Gulletta</maintainer>
   <author>Gianpaolo Gulletta</author>
-  <license>MIT</license>
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <!-- Commonly used license strings: -->
+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+  <license>GPLv3</license>
+
   <url type="repository">https://github.com/zohannn/motion_manager.git</url>
 
   <buildtool_depend>catkin</buildtool_depend>
