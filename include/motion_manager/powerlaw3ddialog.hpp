@@ -57,9 +57,13 @@ public:
 
 private:
     Ui::powerLaw3DDialog *ui; /**< handle of the user interface */
-    std::vector<double> slopes; /**< slopes of the linear regression to be print */
-    std::vector<double> r_squared; /**< R^2 of the linear regression to be print */
-    std::vector<double> n_points; /**< number of points of each regression to be print */
+    std::vector<double> slopes; /**< slopes of the linear regression to be printed */
+    std::vector<double> r_squared; /**< R^2 of the linear regression to be printed */
+    std::vector<double> n_points; /**< number of points of each regression to be printed */
+    std::vector<std::vector<double>> vel_task; /**< hand velocity of the task for each movement */
+    std::vector<std::vector<double>> acc_task; /**< hand acceleration of the task for each movement */
+    std::vector<std::vector<double>> K_task; /**< hand curvature of the task for each movement */
+    std::vector<std::vector<double>> T_task; /**< hand torsion of the task for each movement */
 
     /**
      * @brief getDerivative

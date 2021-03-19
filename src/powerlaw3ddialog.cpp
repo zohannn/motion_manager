@@ -29,7 +29,10 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     double coeff_tot=0; // sum of the coefficient
     int n_coeff=0; // number of the non-zero coefficient
     int offset=0; // offset to go trough the stages of hand_position
+    // clear
     this->slopes.clear(); this->r_squared.clear(); this->n_points.clear();
+    this->vel_task.clear(); this->acc_task.clear();
+    this->K_task.clear(); this->T_task.clear();
 
     for(size_t i=0; i<timesteps.size();++i){
         vector<vector<double>> tsteps_mov = timesteps.at(i);
@@ -90,7 +93,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
                 pos_y.push_back(hand_point.at(1)/1000); // [m]
                 pos_z.push_back(hand_point.at(2)/1000); // [m]
             }//stage
-        } // mov
+        }// mov
 
         // first derivatives
         QVector<double> der_pos_x_1; QVector<double> der_pos_y_1; QVector<double> der_pos_z_1;
@@ -102,29 +105,32 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
         this->getDerivative(der_pos_x_1,timesteps_mov,der_pos_x_2);
         this->getDerivative(der_pos_y_1,timesteps_mov,der_pos_y_2);
         this->getDerivative(der_pos_z_1,timesteps_mov,der_pos_z_2);
-        //third derivatives
+        // third derivatives
         QVector<double> der_pos_x_3; QVector<double> der_pos_y_3; QVector<double> der_pos_z_3;
         this->getDerivative(der_pos_x_2,timesteps_mov,der_pos_x_3);
         this->getDerivative(der_pos_y_2,timesteps_mov,der_pos_y_3);
         this->getDerivative(der_pos_z_2,timesteps_mov,der_pos_z_3);
 
         // --- Velocity --- //
-        QVector<double> vel_mov; // velocity of the movement
+        vector<double> vel_mov; // velocity of the movement
         for(int i=0; i<der_pos_x_1.size();++i){
             Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
             vel.push_back(der_1.norm());
             vel_mov.push_back(der_1.norm());
         }
+        this->vel_task.push_back(vel_mov);
+
         // --- Acceleration --- //
-        QVector<double> acc_mov; // acceleration of the movement
+        vector<double> acc_mov; // acceleration of the movement
         for(int i=0; i<der_pos_x_2.size();++i){
             Vector3d der_2(der_pos_x_2.at(i),der_pos_y_2.at(i),der_pos_z_2.at(i));
             acc.push_back(der_2.norm());
             acc_mov.push_back(der_2.norm());
         }
+        this->acc_task.push_back(acc_mov);
 
         // --- Curvature --- //
-        QVector<double> K_mov; // curvature of the movement
+        vector<double> K_mov; // curvature of the movement
         //double curv_th = 10; // curvature threshold
         for(int i=0; i<der_pos_x_1.size();++i){
             Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
@@ -142,9 +148,10 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
             K_mov.push_back(curv);
             //}
         }
+        this->K_task.push_back(K_mov);
 
         // --- Torsion --- //
-        QVector<double> T_mov; // torsion of the movement
+        vector<double> T_mov; // torsion of the movement
         for(int i=0; i<der_pos_x_1.size();++i){
             Vector3d der_1(der_pos_x_1.at(i),der_pos_y_1.at(i),der_pos_z_1.at(i));
             Vector3d der_2(der_pos_x_2.at(i),der_pos_y_2.at(i),der_pos_z_2.at(i));
@@ -158,8 +165,9 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
             T.push_back((double)num/den);
             T_mov.push_back((double)num/den);
         }
+        this->T_task.push_back(T_mov);
 
-        // --- Curvature and Torsion , Velocity--- //
+        // --- Curvature and Torsion , Velocity --- //
         QVector<double> ln_vel_mov; QVector<double> ln_x_mov;
         //QVector<int> index_t(index.size()); int k=0; int h=0; int hh;
         for(int i=0; i<der_pos_x_1.size();++i){
@@ -671,7 +679,29 @@ void PowerLaw3DDialog::on_pushButton_save_clicked()
     cmdLine = string("pdftocairo -svg ")+pdf_str+string(" ")+svg_str;
     system(cmdLine.c_str());
 
-    // csv
+    // hand velocity, acceleration, curvature, torsion csv
+    string hand_filename_csv("hand.csv");
+    ofstream hand_csv;
+    hand_csv.open(path.toStdString()+hand_filename_csv);
+    hand_csv << "TRAJ,VELOCITY,ACCELERATION,CURVATURE,TORSION \n";
+    for(size_t i=0;i<this->vel_task.size();++i){
+        std::string traj_str = QString::number(i+1).toStdString();
+        std::vector<double> vel_mov = this->vel_task.at(i);
+        std::vector<double> acc_mov = this->acc_task.at(i);
+        std::vector<double> K_mov = this->K_task.at(i);
+        std::vector<double> T_mov = this->T_task.at(i);
+        for(size_t j=0;j<vel_mov.size();++j){
+            string vel_str =  boost::str(boost::format("%.8f") % (vel_mov.at(j)));
+            string acc_str =  boost::str(boost::format("%.8f") % (acc_mov.at(j)));
+            string k_str =  boost::str(boost::format("%.8f") % (K_mov.at(j)));
+            string t_str =  boost::str(boost::format("%.8f") % (T_mov.at(j)));
+            boost::replace_all(vel_str,",","."); boost::replace_all(acc_str,",","."); boost::replace_all(k_str,",","."); boost::replace_all(t_str,",",".");
+            hand_csv << traj_str+","+vel_str+","+acc_str+","+k_str+","+t_str+" \n";
+        }
+    }
+    hand_csv.close();
+
+    // results csv
     string filename_csv("results.csv");
     ofstream results_csv;
     results_csv.open(path.toStdString()+filename_csv);
