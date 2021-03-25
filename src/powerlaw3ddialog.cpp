@@ -233,12 +233,18 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     double sq_sum_r = std::accumulate(r_tot_2w.begin(), r_tot_2w.end(), 0.0);
     double stdev_r = std::sqrt(norm*((((double)sq_sum_r) / coeff_tot) - pow(mean_r,2)));
 
-    QVector<double> ln_vel_tot_fit; QVector<double> best_line;
+    // total linear regression
+    double q_tot_all,m_tot_all,r_tot_all;
+    this->linreg(ln_x_tot,ln_vel_tot,&q_tot_all,&m_tot_all,&r_tot_all);
+    QVector<double> ln_vel_tot_fit_tot; QVector<double> ln_vel_tot_fit; QVector<double> best_line;
     double m_best = ((double)-1)/6;
     for(int i=0; i < ln_x_tot.size(); ++i){
         ln_vel_tot_fit.push_back(mean_m*ln_x_tot.at(i)+mean_q);
+        ln_vel_tot_fit_tot.push_back(m_tot_all*ln_x_tot.at(i)+q_tot_all);
         best_line.push_back(m_best*ln_x_tot.at(i)+mean_q);
     }
+
+
 
 
     // plot the curvature
@@ -301,9 +307,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_vel->graph(0)->valueAxis()->setLabel("velocity [m/s]");
     ui->plot_vel->graph(0)->keyAxis()->setLabel("time [s]");
     ui->plot_vel->graph(0)->setData(qtime, vel);
-
-    ui->plot_vel->graph(0)->valueAxis()->setRange(*std::min_element(vel.begin(), vel.end()),
-                                                  *std::max_element(vel.begin(), vel.end()));
+    ui->plot_vel->graph(0)->valueAxis()->setRange(*std::min_element(vel.begin(), vel.end()),*std::max_element(vel.begin(), vel.end()));
     ui->plot_vel->graph(0)->rescaleAxes();
 
 
@@ -425,17 +429,23 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     string stdev_r_str =  boost::str(boost::format("%.2f") % (stdev_r)); boost::replace_all(stdev_r_str,",",".");
     QString name = QString::fromStdString(string("slope=")+mean_m_str+string("(")+stdev_m_str+string(")")+string(" R^2=")+mean_r_str+string("(")+stdev_r_str+string(")"));
     ui->plot_16->graph(1)->setName(name);
-
     ui->plot_16->graph(1)->setData(ln_x_tot, ln_vel_tot_fit);
-
     ui->plot_16->graph(1)->rescaleAxes();
 
     ui->plot_16->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-    ui->plot_16->graph(2)->setPen(QPen(Qt::blue));
-    ui->plot_16->graph(2)->setName(QString("best fit slope: ")+QString::number(m_best,'f',2));
-
-    ui->plot_16->graph(2)->setData(ln_x_tot, best_line);
+    ui->plot_16->graph(2)->setPen(QPen(Qt::darkGreen));
+    string m_str_tot =  boost::str(boost::format("%.2f") % (m_tot_all)); boost::replace_all(m_str_tot,",",".");
+    string r_str_tot =  boost::str(boost::format("%.2f") % (r_tot_all)); boost::replace_all(r_str_tot,",",".");
+    QString name_tot = QString::fromStdString(string("slope=")+m_str_tot+string(" R^2=")+r_str_tot);
+    ui->plot_16->graph(2)->setName(name_tot);
+    ui->plot_16->graph(2)->setData(ln_x_tot, ln_vel_tot_fit_tot);
     ui->plot_16->graph(2)->rescaleAxes();
+
+    ui->plot_16->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+    ui->plot_16->graph(3)->setPen(QPen(Qt::blue));
+    ui->plot_16->graph(3)->setName(QString("best fit slope: ")+QString::number(m_best,'f',2));
+    ui->plot_16->graph(3)->setData(ln_x_tot, best_line);
+    ui->plot_16->graph(3)->rescaleAxes();
 
 
     // legend
@@ -453,6 +463,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     legend->addElement(0,0,new QCPPlottableLegendItem(legend,ui->plot_16->graph(0)));
     legend->addElement(0,1,new QCPPlottableLegendItem(legend,ui->plot_16->graph(1)));
     legend->addElement(0,2,new QCPPlottableLegendItem(legend,ui->plot_16->graph(2)));
+    legend->addElement(0,3,new QCPPlottableLegendItem(legend,ui->plot_16->graph(3)));
 
 
     ui->plot_16->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
