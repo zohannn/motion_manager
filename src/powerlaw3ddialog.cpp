@@ -30,7 +30,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     int n_coeff=0; // number of the non-zero coefficient
     int offset=0; // offset to go trough the stages of hand_position
     // clear
-    this->slopes.clear(); this->r_squared.clear(); this->n_points.clear();
+    this->slopes.clear(); this->qs.clear(); this->r_squared.clear(); this->n_points.clear();
     this->vel_task.clear(); this->acc_task.clear();
     this->K_task.clear(); this->T_task.clear();
 
@@ -195,12 +195,14 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
             coeff_tot +=coeff;
 
             this->slopes.push_back(m);
+            this->qs.push_back(q);
             this->r_squared.push_back(r);
             this->n_points.push_back(ln_x_mov.size());
 
         }else{
             // no relevant data
             this->slopes.push_back(9999);
+            this->qs.push_back(9999);
             this->r_squared.push_back(9999);
             this->n_points.push_back(9999);
         }
@@ -424,10 +426,14 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_16->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
     ui->plot_16->graph(1)->setPen(QPen(Qt::red));
     string mean_m_str =  boost::str(boost::format("%.2f") % (mean_m)); boost::replace_all(mean_m_str,",",".");
+    string mean_q_str =  boost::str(boost::format("%.2f") % (mean_q)); boost::replace_all(mean_q_str,",",".");
     string mean_r_str =  boost::str(boost::format("%.2f") % (mean_r)); boost::replace_all(mean_r_str,",",".");
     string stdev_m_str =  boost::str(boost::format("%.2f") % (stdev_m)); boost::replace_all(stdev_m_str,",",".");
+    string stdev_q_str =  boost::str(boost::format("%.2f") % (stdev_q)); boost::replace_all(stdev_q_str,",",".");
     string stdev_r_str =  boost::str(boost::format("%.2f") % (stdev_r)); boost::replace_all(stdev_r_str,",",".");
-    QString name = QString::fromStdString(string("slope=")+mean_m_str+string("(")+stdev_m_str+string(")")+string(" R^2=")+mean_r_str+string("(")+stdev_r_str+string(")"));
+    QString name = QString::fromStdString(string("slope=")+mean_m_str+string("(")+stdev_m_str+string(")")+
+                                          string(" q=")+mean_q_str+string("(")+stdev_q_str+string(")")+
+                                          string(" R^2=")+mean_r_str+string("(")+stdev_r_str+string(")"));
     ui->plot_16->graph(1)->setName(name);
     ui->plot_16->graph(1)->setData(ln_x_tot, ln_vel_tot_fit);
     ui->plot_16->graph(1)->rescaleAxes();
@@ -435,8 +441,9 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_16->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
     ui->plot_16->graph(2)->setPen(QPen(Qt::darkGreen));
     string m_str_tot =  boost::str(boost::format("%.2f") % (m_tot_all)); boost::replace_all(m_str_tot,",",".");
+    string q_str_tot =  boost::str(boost::format("%.2f") % (q_tot_all)); boost::replace_all(q_str_tot,",",".");
     string r_str_tot =  boost::str(boost::format("%.2f") % (r_tot_all)); boost::replace_all(r_str_tot,",",".");
-    QString name_tot = QString::fromStdString(string("slope=")+m_str_tot+string(" R^2=")+r_str_tot);
+    QString name_tot = QString::fromStdString(string("slope=")+m_str_tot+string(" q=")+q_str_tot+string(" R^2=")+r_str_tot);
     ui->plot_16->graph(2)->setName(name_tot);
     ui->plot_16->graph(2)->setData(ln_x_tot, ln_vel_tot_fit_tot);
     ui->plot_16->graph(2)->rescaleAxes();
@@ -716,13 +723,14 @@ void PowerLaw3DDialog::on_pushButton_save_clicked()
     string filename_csv("results.csv");
     ofstream results_csv;
     results_csv.open(path.toStdString()+filename_csv);
-    results_csv << "TRAJ,SLOPES,R^2,NUMBER OF POINTS \n";
+    results_csv << "TRAJ,SLOPES,Q,R^2,NUMBER OF POINTS \n";
     for(size_t i=0;i<this->slopes.size();++i){
         string slope_str =  boost::str(boost::format("%.8f") % (this->slopes.at(i)));
+        string q_str =  boost::str(boost::format("%.8f") % (this->qs.at(i)));
         string r_str =  boost::str(boost::format("%.8f") % (this->r_squared.at(i)));
         string points_str =  boost::str(boost::format("%.8f") % (this->n_points.at(i)));
-        boost::replace_all(slope_str,",","."); boost::replace_all(r_str,",","."); boost::replace_all(points_str,",",".");
-        results_csv << QString::number(i+1).toStdString()+","+slope_str+","+r_str+","+points_str+" \n";
+        boost::replace_all(slope_str,",","."); boost::replace_all(q_str,",","."); boost::replace_all(r_str,",","."); boost::replace_all(points_str,",",".");
+        results_csv << QString::number(i+1).toStdString()+","+slope_str+","+q_str+","+r_str+","+points_str+" \n";
     }
     results_csv.close();
 

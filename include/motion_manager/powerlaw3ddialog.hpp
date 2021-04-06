@@ -58,6 +58,7 @@ public:
 private:
     Ui::powerLaw3DDialog *ui; /**< handle of the user interface */
     std::vector<double> slopes; /**< slopes of the linear regression to be printed */
+    std::vector<double> qs; /**< bias of the linear regression to be printed */
     std::vector<double> r_squared; /**< R^2 of the linear regression to be printed */
     std::vector<double> n_points; /**< number of points of each regression to be printed */
     std::vector<std::vector<double>> vel_task; /**< hand velocity of the task for each movement */
