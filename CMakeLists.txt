@@ -88,7 +88,7 @@ find_package(vrep_common REQUIRED)
 ## MoveIt! configuration
 # MOVEIT=0. do not use the moveit planner
 # MOVEIT=1, use the moveit planner
-set (MOVEIT 1)
+set (MOVEIT 0)
 
 if(MOVEIT)
     find_package(aros_moveit_planner REQUIRED COMPONENTS

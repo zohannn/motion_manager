@@ -649,15 +649,26 @@ public Q_SLOTS:
         bool on_pushButton_train_clicked();
 
         /**
-         * @brief on_pushButton_check_loss_pressed
+         * @brief on_pushButton_check_loss_plan_pressed
          */
-        void on_pushButton_check_loss_pressed();
+        void on_pushButton_check_loss_plan_pressed();
 
         /**
-         * @brief on_pushButton_check_loss_clicked
+         * @brief on_pushButton_check_loss_plan_clicked
          * @return
          */
-        bool on_pushButton_check_loss_clicked();
+        bool on_pushButton_check_loss_plan_clicked();
+
+        /**
+         * @brief on_pushButton_check_loss_bounce_pressed
+         */
+        void on_pushButton_check_loss_bounce_pressed();
+
+        /**
+         * @brief on_pushButton_check_loss_bounce_clicked
+         * @return
+         */
+        bool on_pushButton_check_loss_bounce_clicked();
 
         /**
          * @brief on_pushButton_py_pred_file_clicked
@@ -710,14 +721,14 @@ public Q_SLOTS:
         void on_pushButton_save_learning_res_clicked();
 
         /**
-         * @brief on_pushButton_plot_learn_res_clicked
+         * @brief on_pushButton_plot_learn_plan_clicked
          */
-        void on_pushButton_plot_learn_res_clicked();
+        void on_pushButton_plot_learn_plan_clicked();
 
         /**
-         * @brief on_pushButton_save_plot_learn_clicked
+         * @brief on_pushButton_save_plot_learn_plan_clicked
          */
-        void on_pushButton_save_plot_learn_clicked();
+        void on_pushButton_save_plot_learn_plan_clicked();
 
         /**
          * @brief check_tar_x_pos_var
@@ -1339,6 +1350,14 @@ private:
         // Joint 10 = 70.0
 
         // ---------------------------- Learning ------------------------------------- //
+
+
+        /**
+         * @brief check_losses
+         * @return
+         */
+        bool check_losses();
+
         /**
          * @brief count_occurrence
          * @param m
@@ -1537,13 +1556,22 @@ private:
         vector<int> n_D_vect; /**< D dataframe size */
         vector<double> n_Dx_vect; /**< D prime dataframe size */
         vector<int> predicted_samples; /**< number of the predictions */
-        vector<double> untrained_losses; /**< untrained losses values */
-        vector<double> trained_losses; /**< trained losses values */
+        vector<double> untrained_plan_losses; /**< untrained losses values for plan stage */
+        vector<double> trained_plan_losses; /**< trained losses values for plan stage */
+        vector<double> untrained_bounce_losses; /**< untrained losses values for bounce stage */
+        vector<double> trained_bounce_losses; /**< trained losses values for bounce stage */
         vector<int> n_Dx_loss_vect; /**< variations of the number of training samples */
-        vector<double> untrained_median_costs; /**< untrained median costs */
-        vector<double> trained_median_costs; /**< trained median costs */
-        vector<double> untrained_cpu_times; /**< untrained cpu times */
-        vector<double> trained_cpu_times; /**< trained cpu times */
+
+        vector<double> untrained_plan_median_costs; /**< untrained median costs for plan stage */
+        vector<double> trained_plan_median_costs; /**< trained median costs for plan stage */
+        vector<double> untrained_plan_cpu_times; /**< untrained cpu times for plan stage */
+        vector<double> trained_plan_cpu_times; /**< trained cpu times for plan stage */
+
+        vector<double> untrained_bounce_median_costs; /**< untrained median costs for bounce stage */
+        vector<double> trained_bounce_median_costs; /**< trained median costs for bounce stage */
+        vector<double> untrained_bounce_cpu_times; /**< untrained cpu times for bounce stage */
+        vector<double> trained_bounce_cpu_times; /**< trained cpu times for bounce stage */
+
         vector<double> n_D_pred_vect; /**< D dataframe size */
 
 

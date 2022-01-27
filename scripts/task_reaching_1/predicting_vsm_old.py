@@ -4,15 +4,15 @@ import pandas as pd
 import sys
 from random import randint
 # HUPL
-from hupl import EuclideanModel
-from hupl import VSMModel
-from hupl import preprocess_features_cold
-from hupl import preprocess_init_cold
-from hupl import preprocess_init_b_cold
-from hupl import preprocess_features_warm
-from hupl import preprocess_targets_warm
-from hupl import preprocess_features_complete
-from hupl import scale_robust
+from HUPL.hupl import EuclideanModel
+from HUPL.hupl import VSMModel
+from HUPL.hupl import preprocess_features_cold
+from HUPL.hupl import preprocess_init_cold
+from HUPL.hupl import preprocess_init_b_cold
+from HUPL.hupl import preprocess_features_warm
+from HUPL.hupl import preprocess_targets_warm
+from HUPL.hupl import preprocess_features_complete
+from HUPL.hupl import scale_robust
 
 if len(sys.argv) <= 5:
   sys.exit("Not enough args")

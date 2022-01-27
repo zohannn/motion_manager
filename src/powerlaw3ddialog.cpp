@@ -422,7 +422,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
                                                  *std::max_element(ln_vel_tot.begin(), ln_vel_tot.end()));
     ui->plot_16->graph(0)->rescaleAxes();
 
-
+    /**
     ui->plot_16->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
     ui->plot_16->graph(1)->setPen(QPen(Qt::red));
     string mean_m_str =  boost::str(boost::format("%.2f") % (mean_m)); boost::replace_all(mean_m_str,",",".");
@@ -437,22 +437,25 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     ui->plot_16->graph(1)->setName(name);
     ui->plot_16->graph(1)->setData(ln_x_tot, ln_vel_tot_fit);
     ui->plot_16->graph(1)->rescaleAxes();
+    **/
+
 
     ui->plot_16->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-    ui->plot_16->graph(2)->setPen(QPen(Qt::darkGreen));
+    ui->plot_16->graph(1)->setPen(QPen(Qt::red));
     string m_str_tot =  boost::str(boost::format("%.2f") % (m_tot_all)); boost::replace_all(m_str_tot,",",".");
     string q_str_tot =  boost::str(boost::format("%.2f") % (q_tot_all)); boost::replace_all(q_str_tot,",",".");
     string r_str_tot =  boost::str(boost::format("%.2f") % (r_tot_all)); boost::replace_all(r_str_tot,",",".");
     QString name_tot = QString::fromStdString(string("slope=")+m_str_tot+string(" q=")+q_str_tot+string(" R^2=")+r_str_tot);
-    ui->plot_16->graph(2)->setName(name_tot);
-    ui->plot_16->graph(2)->setData(ln_x_tot, ln_vel_tot_fit_tot);
-    ui->plot_16->graph(2)->rescaleAxes();
+    ui->plot_16->graph(1)->setName(name_tot);
+    ui->plot_16->graph(1)->setData(ln_x_tot, ln_vel_tot_fit_tot);
+    ui->plot_16->graph(1)->rescaleAxes();
+
 
     ui->plot_16->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
-    ui->plot_16->graph(3)->setPen(QPen(Qt::blue));
-    ui->plot_16->graph(3)->setName(QString("best fit slope: ")+QString::number(m_best,'f',2));
-    ui->plot_16->graph(3)->setData(ln_x_tot, best_line);
-    ui->plot_16->graph(3)->rescaleAxes();
+    ui->plot_16->graph(2)->setPen(QPen(Qt::blue));
+    ui->plot_16->graph(2)->setName(QString("best fit slope: ")+QString::number(m_best,'f',2));
+    ui->plot_16->graph(2)->setData(ln_x_tot, best_line);
+    ui->plot_16->graph(2)->rescaleAxes();
 
 
     // legend
@@ -470,7 +473,7 @@ void PowerLaw3DDialog::setupPlots(vector<vector<double> > &hand_position, vector
     legend->addElement(0,0,new QCPPlottableLegendItem(legend,ui->plot_16->graph(0)));
     legend->addElement(0,1,new QCPPlottableLegendItem(legend,ui->plot_16->graph(1)));
     legend->addElement(0,2,new QCPPlottableLegendItem(legend,ui->plot_16->graph(2)));
-    legend->addElement(0,3,new QCPPlottableLegendItem(legend,ui->plot_16->graph(3)));
+    //legend->addElement(0,3,new QCPPlottableLegendItem(legend,ui->plot_16->graph(3)));
 
 
     ui->plot_16->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);

@@ -34,7 +34,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_scenario">
      <property name="enabled">
@@ -1078,7 +1078,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>10</x>
         <y>220</y>
-        <width>1201</width>
+        <width>1221</width>
         <height>221</height>
        </rect>
       </property>
@@ -1151,7 +1151,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>410</x>
          <y>60</y>
-         <width>781</width>
+         <width>801</width>
          <height>151</height>
         </rect>
        </property>
@@ -1541,72 +1541,11 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>191</y>
-         <width>271</width>
-         <height>61</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_23">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_66">
-          <item>
-           <widget class="QLabel" name="label_untrain_loss">
-            <property name="text">
-             <string>Untrained Loss value:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_untrain_loss_value">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_67">
-          <item>
-           <widget class="QLabel" name="label_train_loss">
-            <property name="text">
-             <string>Trained Loss value:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_train_loss_value">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QPushButton" name="pushButton_check_loss">
-       <property name="geometry">
-        <rect>
-         <x>340</x>
-         <y>200</y>
-         <width>121</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Check loss</string>
-       </property>
-      </widget>
       <widget class="QCheckBox" name="checkBox_enable_auto_train">
        <property name="geometry">
         <rect>
-         <x>320</x>
-         <y>130</y>
+         <x>10</x>
+         <y>230</y>
          <width>131</width>
          <height>21</height>
         </rect>
@@ -1775,7 +1714,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_obsts_var">
       <property name="geometry">
        <rect>
-        <x>370</x>
+        <x>380</x>
         <y>20</y>
         <width>521</width>
         <height>161</height>
@@ -2147,7 +2086,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_robot_var">
       <property name="geometry">
        <rect>
-        <x>900</x>
+        <x>920</x>
         <y>20</y>
         <width>311</width>
         <height>161</height>
@@ -2279,7 +2218,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>500</x>
         <y>590</y>
-        <width>711</width>
+        <width>731</width>
         <height>131</height>
        </rect>
       </property>
@@ -4489,11 +4428,11 @@ p, li { white-space: pre-wrap; }
         <x>-4</x>
         <y>-1</y>
         <width>1281</width>
-        <height>681</height>
+        <height>721</height>
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_results_plan">
        <attribute name="title">
@@ -5354,7 +5293,7 @@ p, li { white-space: pre-wrap; }
            </rect>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_plan_learn">
            <attribute name="title">
@@ -5723,7 +5662,7 @@ p, li { white-space: pre-wrap; }
               </rect>
              </property>
              <property name="title">
-              <string>Difference norm initialization/solution</string>
+              <string>Norm(initialization-solution)</string>
              </property>
              <widget class="QWidget" name="layoutWidget_58">
               <property name="geometry">
@@ -6182,7 +6121,7 @@ p, li { white-space: pre-wrap; }
               </rect>
              </property>
              <property name="title">
-              <string>Difference norm initialization/solution</string>
+              <string>Norm(initialization-solution)</string>
              </property>
              <widget class="QWidget" name="layoutWidget_53">
               <property name="geometry">
@@ -6641,7 +6580,7 @@ p, li { white-space: pre-wrap; }
               </rect>
              </property>
              <property name="title">
-              <string>Difference norm initialization/solution</string>
+              <string>Norm(initialization-solution)</string>
              </property>
              <widget class="QWidget" name="layoutWidget_63">
               <property name="geometry">
@@ -6737,25 +6676,73 @@ p, li { white-space: pre-wrap; }
              </widget>
             </widget>
            </widget>
-           <widget class="QPushButton" name="pushButton_save_learning_res">
+           <widget class="QPushButton" name="pushButton_check_loss_plan">
             <property name="geometry">
              <rect>
               <x>10</x>
               <y>550</y>
-              <width>80</width>
+              <width>121</width>
               <height>23</height>
              </rect>
             </property>
             <property name="text">
-             <string>Save</string>
+             <string>Check loss</string>
             </property>
+           </widget>
+           <widget class="QWidget" name="layoutWidget">
+            <property name="geometry">
+             <rect>
+              <x>720</x>
+              <y>540</y>
+              <width>501</width>
+              <height>31</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_81">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_66">
+               <item>
+                <widget class="QLabel" name="label_untrain_loss_plan">
+                 <property name="text">
+                  <string>Untrained Loss value:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_untrain_loss_plan_value">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_67">
+               <item>
+                <widget class="QLabel" name="label_train_loss_plan">
+                 <property name="text">
+                  <string>Trained Loss value:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_train_loss_plan_value">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </widget>
           </widget>
           <widget class="QWidget" name="tab_plan_learn_graphs">
            <attribute name="title">
             <string>Graphs</string>
            </attribute>
-           <widget class="QCustomPlot" name="plot_loss_learn" native="true">
+           <widget class="QCustomPlot" name="plot_loss_learn_plan" native="true">
             <property name="geometry">
              <rect>
               <x>10</x>
@@ -6765,7 +6752,7 @@ p, li { white-space: pre-wrap; }
              </rect>
             </property>
            </widget>
-           <widget class="QCustomPlot" name="plot_cost_learn" native="true">
+           <widget class="QCustomPlot" name="plot_cost_learn_plan" native="true">
             <property name="geometry">
              <rect>
               <x>470</x>
@@ -6775,7 +6762,7 @@ p, li { white-space: pre-wrap; }
              </rect>
             </property>
            </widget>
-           <widget class="QCustomPlot" name="plot_dataset_size_learn" native="true">
+           <widget class="QCustomPlot" name="plot_dataset_size_learn_plan" native="true">
             <property name="geometry">
              <rect>
               <x>10</x>
@@ -6785,7 +6772,7 @@ p, li { white-space: pre-wrap; }
              </rect>
             </property>
            </widget>
-           <widget class="QPushButton" name="pushButton_plot_learn_res">
+           <widget class="QPushButton" name="pushButton_plot_learn_plan">
             <property name="geometry">
              <rect>
               <x>1130</x>
@@ -6798,7 +6785,7 @@ p, li { white-space: pre-wrap; }
              <string>Plot</string>
             </property>
            </widget>
-           <widget class="QPushButton" name="pushButton_save_plot_learn">
+           <widget class="QPushButton" name="pushButton_save_plot_learn_plan">
             <property name="geometry">
              <rect>
               <x>1130</x>
@@ -6811,7 +6798,7 @@ p, li { white-space: pre-wrap; }
              <string>Save</string>
             </property>
            </widget>
-           <widget class="QCustomPlot" name="plot_cpu_time_learn" native="true">
+           <widget class="QCustomPlot" name="plot_cpu_time_learn_plan" native="true">
             <property name="geometry">
              <rect>
               <x>470</x>
@@ -11138,7 +11125,7 @@ p, li { white-space: pre-wrap; }
             <x>6</x>
             <y>0</y>
             <width>1231</width>
-            <height>451</height>
+            <height>611</height>
            </rect>
           </property>
           <property name="currentIndex">
@@ -11148,19 +11135,19 @@ p, li { white-space: pre-wrap; }
            <attribute name="title">
             <string>Solutions</string>
            </attribute>
-           <widget class="QGroupBox" name="groupBox_cold_bounce">
+           <widget class="QGroupBox" name="groupBox_ws_knn_opt_bounce">
             <property name="geometry">
              <rect>
               <x>10</x>
               <y>10</y>
               <width>391</width>
-              <height>401</height>
+              <height>521</height>
              </rect>
             </property>
             <property name="title">
-             <string>Cold start</string>
+             <string>Warm start with the kNN Optimal kernel solution</string>
             </property>
-            <widget class="QGroupBox" name="groupBox_iter_cold_bounce">
+            <widget class="QGroupBox" name="groupBox_iter_ws_knn_opt_bounce">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -11187,14 +11174,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_276">
                    <item>
-                    <widget class="QLabel" name="label_iter_mean_cold_bounce">
+                    <widget class="QLabel" name="label__iter_mean_ws_knn_opt_bounce">
                      <property name="text">
                       <string>Mean</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_iter_mean_cold_bounce_value">
+                    <widget class="QLabel" name="label_iter_mean_ws_knn_opt_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11205,14 +11192,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_277">
                    <item>
-                    <widget class="QLabel" name="label_iter_std_cold_bounce">
+                    <widget class="QLabel" name="label_iter_std_ws_knn_opt_bounce">
                      <property name="text">
                       <string>Std</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_iter_std_cold_bounce_value">
+                    <widget class="QLabel" name="label_iter_std_ws_knn_opt_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11227,14 +11214,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_279">
                    <item>
-                    <widget class="QLabel" name="label_iter_median_cold_bounce">
+                    <widget class="QLabel" name="label_iter_median_ws_knn_opt_bounce">
                      <property name="text">
                       <string>Median</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_iter_median_cold_bounce_value">
+                    <widget class="QLabel" name="label_iter_median_ws_knn_opt_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11245,14 +11232,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_280">
                    <item>
-                    <widget class="QLabel" name="label_iter_max_cold_bounce">
+                    <widget class="QLabel" name="label_iter_max_ws_knn_opt_bounce">
                      <property name="text">
                       <string>Max</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_iter_max_cold_bounce_value">
+                    <widget class="QLabel" name="label_iter_max_ws_knn_opt_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11265,7 +11252,7 @@ p, li { white-space: pre-wrap; }
               </layout>
              </widget>
             </widget>
-            <widget class="QGroupBox" name="groupBox_cpu_cold_bounce">
+            <widget class="QGroupBox" name="groupBox_cpu_ws_knn_opt_bounce">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -11292,14 +11279,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_282">
                    <item>
-                    <widget class="QLabel" name="label_cpu_mean_cold_bounce">
+                    <widget class="QLabel" name="label_cpu_mean_ws_knn_opt_bounce">
                      <property name="text">
                       <string>Mean</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_cpu_mean_cold_bounce_value">
+                    <widget class="QLabel" name="label_cpu_mean_ws_knn_opt_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11310,14 +11297,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_283">
                    <item>
-                    <widget class="QLabel" name="label_cpu_std_cold_bounce">
+                    <widget class="QLabel" name="label_cpu_std_ws_knn_opt_bounce">
                      <property name="text">
                       <string>Std</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_cpu_std_cold_bounce_value">
+                    <widget class="QLabel" name="label_cpu_std_ws_knn_opt_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11332,14 +11319,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_285">
                    <item>
-                    <widget class="QLabel" name="label_cpu_median_cold_bounce">
+                    <widget class="QLabel" name="label_cpu_median_ws_knn_opt_bounce">
                      <property name="text">
                       <string>Median</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_cpu_median_cold_bounce_value">
+                    <widget class="QLabel" name="label_cpu_median_ws_knn_opt_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11350,119 +11337,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_286">
                    <item>
-                    <widget class="QLabel" name="label_cpu_max_cold_bounce">
+                    <widget class="QLabel" name="label_cpu_max_ws_knn_opt_bounce">
                      <property name="text">
                       <string>Max</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_cpu_max_cold_bounce_value">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-            <widget class="QGroupBox" name="groupBox_obj_cold_bounce">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>280</y>
-               <width>371</width>
-               <height>101</height>
-              </rect>
-             </property>
-             <property name="title">
-              <string>Objective function value</string>
-             </property>
-             <widget class="QWidget" name="layoutWidget_51">
-              <property name="geometry">
-               <rect>
-                <x>20</x>
-                <y>30</y>
-                <width>331</width>
-                <height>61</height>
-               </rect>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_57">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_287">
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_288">
-                   <item>
-                    <widget class="QLabel" name="label_obj_mean_cold_bounce">
-                     <property name="text">
-                      <string>Mean</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_obj_mean_cold_bounce_value">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_289">
-                   <item>
-                    <widget class="QLabel" name="label_obj_std_cold_bounce">
-                     <property name="text">
-                      <string>Std</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_obj_std_cold_bounce_value">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_290">
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_291">
-                   <item>
-                    <widget class="QLabel" name="label_obj_median_cold_bounce">
-                     <property name="text">
-                      <string>Median</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_obj_median_cold_bounce_value">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_292">
-                   <item>
-                    <widget class="QLabel" name="label_obj_max_cold_bounce">
-                     <property name="text">
-                      <string>Max</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_obj_max_cold_bounce_value">
+                    <widget class="QLabel" name="label_cpu_max_ws_knn_opt_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11486,14 +11368,14 @@ p, li { white-space: pre-wrap; }
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_293">
               <item>
-               <widget class="QLabel" name="label_rate_cold_bounce">
+               <widget class="QLabel" name="label_rate_ws_knn_opt_bounce">
                 <property name="text">
                  <string>Success rate</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="label_rate_cold_bounce_value">
+               <widget class="QLabel" name="label_rate_ws_knn_opt_bounce_value">
                 <property name="text">
                  <string/>
                 </property>
@@ -11501,18 +11383,228 @@ p, li { white-space: pre-wrap; }
               </item>
              </layout>
             </widget>
+            <widget class="QGroupBox" name="groupBox_cost_ws_knn_opt_bounce">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>280</y>
+               <width>371</width>
+               <height>101</height>
+              </rect>
+             </property>
+             <property name="title">
+              <string>NLP error value</string>
+             </property>
+             <widget class="QWidget" name="layoutWidget_65">
+              <property name="geometry">
+               <rect>
+                <x>20</x>
+                <y>30</y>
+                <width>331</width>
+                <height>61</height>
+               </rect>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_91">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_358">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_359">
+                   <item>
+                    <widget class="QLabel" name="label_cost_mean_ws_knn_opt_bounce">
+                     <property name="text">
+                      <string>Mean</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_cost_mean_ws_knn_opt_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_360">
+                   <item>
+                    <widget class="QLabel" name="label_cost_std_ws_knn_opt_bounce">
+                     <property name="text">
+                      <string>Std</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_cost_std_ws_knn_opt_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_361">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_362">
+                   <item>
+                    <widget class="QLabel" name="label_cost_median_ws_knn_opt_bounce">
+                     <property name="text">
+                      <string>Median</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_cost_median_ws_knn_opt_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_363">
+                   <item>
+                    <widget class="QLabel" name="label_cost_max_ws_knn_opt_bounce">
+                     <property name="text">
+                      <string>Max</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_cost_max_ws_knn_opt_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+            <widget class="QGroupBox" name="groupBox_diff_ws_knn_opt_bounce">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>400</y>
+               <width>371</width>
+               <height>101</height>
+              </rect>
+             </property>
+             <property name="title">
+              <string>Norm(initialization-solution)</string>
+             </property>
+             <widget class="QWidget" name="layoutWidget_64">
+              <property name="geometry">
+               <rect>
+                <x>20</x>
+                <y>30</y>
+                <width>331</width>
+                <height>61</height>
+               </rect>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_90">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_352">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_353">
+                   <item>
+                    <widget class="QLabel" name="label_diff_mean_ws_knn_opt_bounce">
+                     <property name="text">
+                      <string>Mean</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_diff_mean_ws_knn_opt_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_354">
+                   <item>
+                    <widget class="QLabel" name="label_diff_std_ws_knn_opt_bounce">
+                     <property name="text">
+                      <string>Std</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_diff_std_ws_knn_opt_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_355">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_356">
+                   <item>
+                    <widget class="QLabel" name="label_diff_median_ws_knn_opt_bounce">
+                     <property name="text">
+                      <string>Median</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_diff_median_ws_knn_opt_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_357">
+                   <item>
+                    <widget class="QLabel" name="label_diff_max_ws_knn_opt_bounce">
+                     <property name="text">
+                      <string>Max</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_diff_max_ws_knn_opt_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </widget>
            </widget>
-           <widget class="QGroupBox" name="groupBox_ws_or_bounce">
+           <widget class="QGroupBox" name="groupBox_ws_knn_eucl_bounce">
             <property name="geometry">
              <rect>
               <x>420</x>
               <y>10</y>
               <width>391</width>
-              <height>401</height>
+              <height>521</height>
              </rect>
             </property>
             <property name="title">
-             <string>Warm start with the original solution</string>
+             <string>Warm start with the kNN Euclidean kernel solution</string>
             </property>
             <widget class="QWidget" name="layoutWidget_41">
              <property name="geometry">
@@ -11532,7 +11624,7 @@ p, li { white-space: pre-wrap; }
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="label_rate_ws_or_bounce_value">
+               <widget class="QLabel" name="label_rate_ws_knn_eucl_bounce_value">
                 <property name="text">
                  <string/>
                 </property>
@@ -11540,7 +11632,7 @@ p, li { white-space: pre-wrap; }
               </item>
              </layout>
             </widget>
-            <widget class="QGroupBox" name="groupBox_iter_ws_or_bounce">
+            <widget class="QGroupBox" name="groupBox_iter_ws_knn_eucl_bounce">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -11551,6 +11643,111 @@ p, li { white-space: pre-wrap; }
              </property>
              <property name="title">
               <string>Iterations</string>
+             </property>
+             <widget class="QWidget" name="layoutWidget_44">
+              <property name="geometry">
+               <rect>
+                <x>20</x>
+                <y>30</y>
+                <width>331</width>
+                <height>61</height>
+               </rect>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_51">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_250">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_251">
+                   <item>
+                    <widget class="QLabel" name="label__iter_mean_ws_knn_eucl_bounce">
+                     <property name="text">
+                      <string>Mean</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_iter_mean_ws_knn_eucl_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_252">
+                   <item>
+                    <widget class="QLabel" name="label_iter_std_ws_knn_eucl_bounce">
+                     <property name="text">
+                      <string>Std</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_iter_std_ws_knn_eucl_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_253">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_254">
+                   <item>
+                    <widget class="QLabel" name="label_iter_median_ws_knn_eucl_bounce">
+                     <property name="text">
+                      <string>Median</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_iter_median_ws_knn_eucl_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_255">
+                   <item>
+                    <widget class="QLabel" name="label_iter_max_ws_knn_eucl_bounce">
+                     <property name="text">
+                      <string>Max</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_iter_max_ws_knn_eucl_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+            <widget class="QGroupBox" name="groupBox_cost_ws_knn_eucl_bounce">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>280</y>
+               <width>371</width>
+               <height>101</height>
+              </rect>
+             </property>
+             <property name="title">
+              <string>NLP error value</string>
              </property>
              <widget class="QWidget" name="layoutWidget_42">
               <property name="geometry">
@@ -11567,14 +11764,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_239">
                    <item>
-                    <widget class="QLabel" name="label__iter_mean_ws_or_bounce">
+                    <widget class="QLabel" name="label_cost_mean_ws_knn_eucl_bounce">
                      <property name="text">
                       <string>Mean</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_iter_mean_ws_or_bounce_value">
+                    <widget class="QLabel" name="label_cost_mean_ws_knn_eucl_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11585,14 +11782,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_240">
                    <item>
-                    <widget class="QLabel" name="label_iter_std_ws_or_bounce">
+                    <widget class="QLabel" name="label_cost_std_ws_knn_eucl_bounce">
                      <property name="text">
                       <string>Std</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_iter_std_ws_or_bounce_value">
+                    <widget class="QLabel" name="label_cost_std_ws_knn_eucl_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11607,14 +11804,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_242">
                    <item>
-                    <widget class="QLabel" name="label_iter_median_ws_or_bounce">
+                    <widget class="QLabel" name="label_cost_median_ws_knn_eucl_bounce">
                      <property name="text">
                       <string>Median</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_iter_median_ws_or_bounce_value">
+                    <widget class="QLabel" name="label_cost_median_ws_knn_eucl_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11625,14 +11822,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_243">
                    <item>
-                    <widget class="QLabel" name="label_iter_max_ws_or_bounce">
+                    <widget class="QLabel" name="label_cost_max_ws_knn_eucl_bounce">
                      <property name="text">
                       <string>Max</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_iter_max_ws_or_bounce_value">
+                    <widget class="QLabel" name="label_cost_max_ws_knn_eucl_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11645,7 +11842,112 @@ p, li { white-space: pre-wrap; }
               </layout>
              </widget>
             </widget>
-            <widget class="QGroupBox" name="groupBox_cpu_ws_or_bounce">
+            <widget class="QGroupBox" name="groupBox_diff_ws_knn_eucl_bounce">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>400</y>
+               <width>371</width>
+               <height>101</height>
+              </rect>
+             </property>
+             <property name="title">
+              <string>Norm(initialization-solution)</string>
+             </property>
+             <widget class="QWidget" name="layoutWidget_66">
+              <property name="geometry">
+               <rect>
+                <x>20</x>
+                <y>30</y>
+                <width>331</width>
+                <height>61</height>
+               </rect>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_92">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_364">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_365">
+                   <item>
+                    <widget class="QLabel" name="label_diff_mean_ws_knn_eucl_bounce">
+                     <property name="text">
+                      <string>Mean</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_diff_mean_ws_knn_eucl_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_366">
+                   <item>
+                    <widget class="QLabel" name="label_diff_std_ws_knn_eucl_bounce">
+                     <property name="text">
+                      <string>Std</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_diff_std_ws_knn_eucl_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_367">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_368">
+                   <item>
+                    <widget class="QLabel" name="label_diff_median_ws_knn_eucl_bounce">
+                     <property name="text">
+                      <string>Median</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_diff_median_ws_knn_eucl_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_369">
+                   <item>
+                    <widget class="QLabel" name="label_diff_max_ws_knn_eucl_bounce">
+                     <property name="text">
+                      <string>Max</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_diff_max_ws_knn_eucl_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+            <widget class="QGroupBox" name="groupBox_cpu_ws_knn_eucl_bounce">
              <property name="geometry">
               <rect>
                <x>10</x>
@@ -11672,14 +11974,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_245">
                    <item>
-                    <widget class="QLabel" name="label_cpu_mean_ws_or_bounce">
+                    <widget class="QLabel" name="label_cpu_mean_ws_knn_eucl_bounce">
                      <property name="text">
                       <string>Mean</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_cpu_mean_ws_or_bounce_value">
+                    <widget class="QLabel" name="label_cpu_mean_ws_knn_eucl_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11690,14 +11992,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_246">
                    <item>
-                    <widget class="QLabel" name="label_cpu_std_ws_or_bounce">
+                    <widget class="QLabel" name="label_cpu_std_ws_knn_eucl_bounce">
                      <property name="text">
                       <string>Std</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_cpu_std_ws_or_bounce_value">
+                    <widget class="QLabel" name="label_cpu_std_ws_knn_eucl_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11712,14 +12014,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_248">
                    <item>
-                    <widget class="QLabel" name="label_cpu_median_ws_or_bounce">
+                    <widget class="QLabel" name="label_cpu_median_ws_knn_eucl_bounce">
                      <property name="text">
                       <string>Median</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_cpu_median_ws_or_bounce_value">
+                    <widget class="QLabel" name="label_cpu_median_ws_knn_eucl_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11730,119 +12032,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_249">
                    <item>
-                    <widget class="QLabel" name="label_cpu_max_ws_or_bounce">
+                    <widget class="QLabel" name="label_cpu_max_ws_knn_eucl_bounce">
                      <property name="text">
                       <string>Max</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_cpu_max_ws_or_bounce_value">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-            <widget class="QGroupBox" name="groupBox_obj_ws_or_bounce">
-             <property name="geometry">
-              <rect>
-               <x>10</x>
-               <y>280</y>
-               <width>371</width>
-               <height>101</height>
-              </rect>
-             </property>
-             <property name="title">
-              <string>Objective function value</string>
-             </property>
-             <widget class="QWidget" name="layoutWidget_44">
-              <property name="geometry">
-               <rect>
-                <x>20</x>
-                <y>30</y>
-                <width>331</width>
-                <height>61</height>
-               </rect>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_51">
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_250">
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_251">
-                   <item>
-                    <widget class="QLabel" name="label_obj_mean_ws_or_bounce">
-                     <property name="text">
-                      <string>Mean</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_obj_mean_ws_or_bounce_value">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_252">
-                   <item>
-                    <widget class="QLabel" name="label_obj_std_ws_or_bounce">
-                     <property name="text">
-                      <string>Std</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_obj_std_ws_or_bounce_value">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_253">
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_254">
-                   <item>
-                    <widget class="QLabel" name="label_obj_median_ws_or_bounce">
-                     <property name="text">
-                      <string>Median</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_obj_median_ws_or_bounce_value">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_255">
-                   <item>
-                    <widget class="QLabel" name="label_obj_max_ws_or_bounce">
-                     <property name="text">
-                      <string>Max</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_obj_max_ws_or_bounce_value">
+                    <widget class="QLabel" name="label_cpu_max_ws_knn_eucl_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -11862,7 +12059,7 @@ p, li { white-space: pre-wrap; }
               <x>830</x>
               <y>10</y>
               <width>391</width>
-              <height>401</height>
+              <height>521</height>
              </rect>
             </property>
             <property name="title">
@@ -12104,17 +12301,122 @@ p, li { white-space: pre-wrap; }
               </layout>
              </widget>
             </widget>
-            <widget class="QGroupBox" name="groupBox_obj_ws_rdm_bounce">
+            <widget class="QGroupBox" name="groupBox_diff_ws_rdm_bounce">
              <property name="geometry">
               <rect>
                <x>10</x>
-               <y>280</y>
+               <y>400</y>
                <width>371</width>
                <height>101</height>
               </rect>
              </property>
              <property name="title">
-              <string>Objective function value</string>
+              <string>Norm(initialization-solution)</string>
+             </property>
+             <widget class="QWidget" name="layoutWidget_57">
+              <property name="geometry">
+               <rect>
+                <x>20</x>
+                <y>30</y>
+                <width>331</width>
+                <height>61</height>
+               </rect>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_93">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_370">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_371">
+                   <item>
+                    <widget class="QLabel" name="label_diff_mean_ws_rdm_bounce">
+                     <property name="text">
+                      <string>Mean</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_diff_mean_ws_rdm_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_486">
+                   <item>
+                    <widget class="QLabel" name="label_diff_std_ws_rdm_bounce">
+                     <property name="text">
+                      <string>Std</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_diff_std_ws_rdm_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_487">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_488">
+                   <item>
+                    <widget class="QLabel" name="label_diff_median_ws_rdm_bounce">
+                     <property name="text">
+                      <string>Median</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_diff_median_ws_rdm_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_489">
+                   <item>
+                    <widget class="QLabel" name="label_diff_max_ws_rdm_bounce">
+                     <property name="text">
+                      <string>Max</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_diff_max_ws_rdm_bounce_value">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+            <widget class="QGroupBox" name="groupBox_cost_ws_rdm_bounce">
+             <property name="geometry">
+              <rect>
+               <x>10</x>
+               <y>290</y>
+               <width>371</width>
+               <height>101</height>
+              </rect>
+             </property>
+             <property name="title">
+              <string>NLP error value</string>
              </property>
              <widget class="QWidget" name="layoutWidget_48">
               <property name="geometry">
@@ -12131,14 +12433,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_270">
                    <item>
-                    <widget class="QLabel" name="label_obj_mean_ws_rdm_bounce">
+                    <widget class="QLabel" name="label_cost_mean_ws_rdm_bounce">
                      <property name="text">
                       <string>Mean</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_obj_mean_ws_rdm_bounce_value">
+                    <widget class="QLabel" name="label_cost_mean_ws_rdm_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -12149,14 +12451,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_271">
                    <item>
-                    <widget class="QLabel" name="label_obj_std_ws_rdm_bounce">
+                    <widget class="QLabel" name="label_cost_std_ws_rdm_bounce">
                      <property name="text">
                       <string>Std</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_obj_std_ws_rdm_bounce_value">
+                    <widget class="QLabel" name="label_cost_std_ws_rdm_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -12171,14 +12473,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_273">
                    <item>
-                    <widget class="QLabel" name="label_obj_median_ws_rdm_bounce">
+                    <widget class="QLabel" name="label_cost_median_ws_rdm_bounce">
                      <property name="text">
                       <string>Median</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_obj_median_ws_rdm_bounce_value">
+                    <widget class="QLabel" name="label_cost_median_ws_rdm_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -12189,14 +12491,14 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_274">
                    <item>
-                    <widget class="QLabel" name="label_obj_max_ws_rdm_bounce">
+                    <widget class="QLabel" name="label_cost_max_ws_rdm_bounce">
                      <property name="text">
                       <string>Max</string>
                      </property>
                     </widget>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_obj_max_ws_rdm_bounce_value">
+                    <widget class="QLabel" name="label_cost_max_ws_rdm_bounce_value">
                      <property name="text">
                       <string/>
                      </property>
@@ -12210,9 +12512,154 @@ p, li { white-space: pre-wrap; }
              </widget>
             </widget>
            </widget>
+           <widget class="QPushButton" name="pushButton_check_loss_bounce">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>550</y>
+              <width>121</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Check loss</string>
+            </property>
+           </widget>
+           <widget class="QWidget" name="layoutWidget_51">
+            <property name="geometry">
+             <rect>
+              <x>720</x>
+              <y>540</y>
+              <width>501</width>
+              <height>31</height>
+             </rect>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_82">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_83">
+               <item>
+                <widget class="QLabel" name="label_untrain_loss_bounce">
+                 <property name="text">
+                  <string>Untrained Loss value:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_untrain_loss_bounce_value">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_84">
+               <item>
+                <widget class="QLabel" name="label_train_loss_bounce">
+                 <property name="text">
+                  <string>Trained Loss value:</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_train_loss_bounce_value">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </widget>
+          <widget class="QWidget" name="tab_bounce_learn_graphs">
+           <attribute name="title">
+            <string>Graphs</string>
+           </attribute>
+           <widget class="QCustomPlot" name="plot_cost_learn_bounce" native="true">
+            <property name="geometry">
+             <rect>
+              <x>470</x>
+              <y>20</y>
+              <width>441</width>
+              <height>261</height>
+             </rect>
+            </property>
+           </widget>
+           <widget class="QCustomPlot" name="plot_cpu_time_learn_bounce" native="true">
+            <property name="geometry">
+             <rect>
+              <x>470</x>
+              <y>300</y>
+              <width>441</width>
+              <height>261</height>
+             </rect>
+            </property>
+           </widget>
+           <widget class="QCustomPlot" name="plot_dataset_size_learn_bounce" native="true">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>300</y>
+              <width>441</width>
+              <height>261</height>
+             </rect>
+            </property>
+           </widget>
+           <widget class="QCustomPlot" name="plot_loss_learn_bounce" native="true">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>20</y>
+              <width>441</width>
+              <height>261</height>
+             </rect>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_plot_learn_bounce">
+            <property name="geometry">
+             <rect>
+              <x>1140</x>
+              <y>520</y>
+              <width>80</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Plot</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButton_save_plot_learn_bounce">
+            <property name="geometry">
+             <rect>
+              <x>1140</x>
+              <y>550</y>
+              <width>80</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Save</string>
+            </property>
+           </widget>
           </widget>
          </widget>
         </widget>
+       </widget>
+       <widget class="QPushButton" name="pushButton_save_learning_res">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>660</y>
+          <width>80</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Save</string>
+        </property>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_results_control">
