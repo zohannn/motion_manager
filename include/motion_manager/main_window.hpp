@@ -731,6 +731,16 @@ public Q_SLOTS:
         void on_pushButton_save_plot_learn_plan_clicked();
 
         /**
+         * @brief on_pushButton_plot_learn_bounce_clicked
+         */
+        void on_pushButton_plot_learn_bounce_clicked();
+
+        /**
+         * @brief on_pushButton_save_plot_learn_bounce_clicked
+         */
+        void on_pushButton_save_plot_learn_bounce_clicked();
+
+        /**
          * @brief check_tar_x_pos_var
          * @param state
          */

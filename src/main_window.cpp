@@ -11420,6 +11420,7 @@ bool MainWindow::on_pushButton_train_clicked()
         string check_loss = "False";
 
         cmdLine = string("python3 ") + py_file + string(" ") + data_dir + string(" ") + res_dir + string(" ") + online + string(" ") + check_loss;
+        //cout << "COMMAND: " << cmdLine << endl;
 
         int status = system(cmdLine.c_str());
         // read loss values
@@ -14775,39 +14776,11 @@ void MainWindow::on_pushButton_save_learning_res_clicked()
         results << string("obj_ws_knn_ret_max =")+this->ui.label_obj_max_ws_knn_ret_value->text().toStdString()+string(";\n");
 
     }
-    /**
+
     // bounce
     if(this->ui.tabWidget_learning_res->isTabEnabled(3))
     {
         results << string("# Bounce target posture selection results  \n");
-        results << string(" # Cold start\n");
-        results << string("success_rate_cold_bounce =")+this->ui.label_rate_cold_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_cold_bounce_mean =")+this->ui.label_iter_mean_cold_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_cold_bounce_std =")+this->ui.label_iter_std_cold_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_cold_bounce_median =")+this->ui.label_iter_median_cold_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_cold_bounce_max =")+this->ui.label_iter_max_cold_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_cold_bounce_mean =")+this->ui.label_cpu_mean_cold_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_cold_bounce_std =")+this->ui.label_cpu_std_cold_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_cold_bounce_median =")+this->ui.label_cpu_median_cold_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_cold_bounce_max =")+this->ui.label_cpu_max_cold_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_cold_bounce_mean =")+this->ui.label_obj_mean_cold_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_cold_bounce_std =")+this->ui.label_obj_std_cold_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_cold_bounce_median =")+this->ui.label_obj_median_cold_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_cold_bounce_max =")+this->ui.label_obj_max_cold_bounce_value->text().toStdString()+string(";\n");
-        results << string(" # Warm start with the original solution \n");
-        results << string("success_rate_ws_or_bounce =")+this->ui.label_rate_ws_or_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_or_bounce_mean =")+this->ui.label_iter_mean_ws_or_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_or_bounce_std =")+this->ui.label_iter_std_ws_or_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_or_bounce_median =")+this->ui.label_iter_median_ws_or_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_or_bounce_max =")+this->ui.label_iter_max_ws_or_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_or_bounce_mean =")+this->ui.label_cpu_mean_ws_or_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_or_bounce_std =")+this->ui.label_cpu_std_ws_or_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_or_bounce_median =")+this->ui.label_cpu_median_ws_or_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_or_bounce_max =")+this->ui.label_cpu_max_ws_or_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_or_bounce_mean =")+this->ui.label_obj_mean_ws_or_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_or_bounce_std =")+this->ui.label_obj_std_ws_or_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_or_bounce_median =")+this->ui.label_obj_median_ws_or_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_or_bounce_max =")+this->ui.label_obj_max_ws_or_bounce_value->text().toStdString()+string(";\n");
         results << string(" # Warm start with the random solution \n");
         results << string("success_rate_ws_rdm_bounce =")+this->ui.label_rate_ws_rdm_bounce_value->text().toStdString()+string(";\n");
         results << string("iterations_ws_rdm_bounce_mean =")+this->ui.label_iter_mean_ws_rdm_bounce_value->text().toStdString()+string(";\n");
@@ -14818,54 +14791,54 @@ void MainWindow::on_pushButton_save_learning_res_clicked()
         results << string("cpu_ws_rdm_bounce_std =")+this->ui.label_cpu_std_ws_rdm_bounce_value->text().toStdString()+string(";\n");
         results << string("cpu_ws_rdm_bounce_median =")+this->ui.label_cpu_median_ws_rdm_bounce_value->text().toStdString()+string(";\n");
         results << string("cpu_ws_rdm_bounce_max =")+this->ui.label_cpu_max_ws_rdm_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_rdm_bounce_mean =")+this->ui.label_obj_mean_ws_rdm_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_rdm_bounce_std =")+this->ui.label_obj_std_ws_rdm_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_rdm_bounce_median =")+this->ui.label_obj_median_ws_rdm_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_rdm_bounce_max =")+this->ui.label_obj_max_ws_rdm_bounce_value->text().toStdString()+string(";\n");
-        results << string(" # Warm start with Neural Network \n");
-        results << string("success_rate_ws_nn_bounce =")+this->ui.label_rate_ws_nn_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_nn_bounce_mean =")+this->ui.label_iter_mean_ws_nn_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_nn_bounce_std =")+this->ui.label_iter_std_ws_nn_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_nn_bounce_median =")+this->ui.label_iter_median_ws_nn_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_nn_bounce_max =")+this->ui.label_iter_max_ws_nn_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_nn_bounce_mean =")+this->ui.label_cpu_mean_ws_nn_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_nn_bounce_std =")+this->ui.label_cpu_std_ws_nn_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_nn_bounce_median =")+this->ui.label_cpu_median_ws_nn_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_nn_bounce_max =")+this->ui.label_cpu_max_ws_nn_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_nn_bounce_mean =")+this->ui.label_obj_mean_ws_nn_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_nn_bounce_std =")+this->ui.label_obj_std_ws_nn_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_nn_bounce_median =")+this->ui.label_obj_median_ws_nn_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_nn_bounce_max =")+this->ui.label_obj_max_ws_nn_bounce_value->text().toStdString()+string(";\n");
-        results << string(" # Warm start with Support Vector Machines \n");
-        results << string("success_rate_ws_svm_bounce =")+this->ui.label_rate_ws_svm_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_svm_bounce_mean =")+this->ui.label_iter_mean_ws_svm_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_svm_bounce_std =")+this->ui.label_iter_std_ws_svm_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_svm_bounce_median =")+this->ui.label_iter_median_ws_svm_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_svm_bounce_max =")+this->ui.label_iter_max_ws_svm_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_svm_bounce_mean =")+this->ui.label_cpu_mean_ws_svm_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_svm_bounce_std =")+this->ui.label_cpu_std_ws_svm_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_svm_bounce_median =")+this->ui.label_cpu_median_ws_svm_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_svm_bounce_max =")+this->ui.label_cpu_max_ws_svm_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_svm_bounce_mean =")+this->ui.label_obj_mean_ws_svm_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_svm_bounce_std =")+this->ui.label_obj_std_ws_svm_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_svm_bounce_median =")+this->ui.label_obj_median_ws_svm_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_svm_bounce_max =")+this->ui.label_obj_max_ws_svm_bounce_value->text().toStdString()+string(";\n");
-        results << string(" # Warm start with K-Nearest Neighbors \n");
-        results << string("success_rate_ws_knn_bounce =")+this->ui.label_rate_ws_knn_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_knn_bounce_mean =")+this->ui.label_iter_mean_ws_knn_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_knn_bounce_std =")+this->ui.label_iter_std_ws_knn_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_knn_bounce_median =")+this->ui.label_iter_median_ws_knn_bounce_value->text().toStdString()+string(";\n");
-        results << string("iterations_ws_knn_bounce_max =")+this->ui.label_iter_max_ws_knn_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_knn_bounce_mean =")+this->ui.label_cpu_mean_ws_knn_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_knn_bounce_std =")+this->ui.label_cpu_std_ws_knn_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_knn_bounce_median =")+this->ui.label_cpu_median_ws_knn_bounce_value->text().toStdString()+string(";\n");
-        results << string("cpu_ws_knn_bounce_max =")+this->ui.label_cpu_max_ws_knn_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_knn_bounce_mean =")+this->ui.label_obj_mean_ws_knn_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_knn_bounce_std =")+this->ui.label_obj_std_ws_knn_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_knn_bounce_median =")+this->ui.label_obj_median_ws_knn_bounce_value->text().toStdString()+string(";\n");
-        results << string("obj_ws_knn_bounce_max =")+this->ui.label_obj_max_ws_knn_bounce_value->text().toStdString()+string(";\n");
+        results << string("cost_ws_rdm_bounce_mean =")+this->ui.label_cost_mean_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("cost_ws_rdm_bounce_std =")+this->ui.label_cost_std_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("cost_ws_rdm_bounce_median =")+this->ui.label_cost_median_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("cost_ws_rdm_bounce_max =")+this->ui.label_cost_max_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("diff_ws_rdm_bounce_mean =")+this->ui.label_diff_mean_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("diff_ws_rdm_bounce_std =")+this->ui.label_diff_std_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("diff_ws_rdm_bounce_median =")+this->ui.label_diff_median_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+        results << string("diff_ws_rdm_bounce_max =")+this->ui.label_diff_max_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+
+        results << string(" # Warm start with the kNN with the Euclidean kernel solution \n");
+        results << string("success_rate_ws_knn_eucl_bounce =")+this->ui.label_rate_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_eucl_bounce_mean =")+this->ui.label_iter_mean_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_eucl_bounce_std =")+this->ui.label_iter_std_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_eucl_bounce_median =")+this->ui.label_iter_median_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_eucl_bounce_max =")+this->ui.label_iter_max_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_eucl_bounce_mean =")+this->ui.label_cpu_mean_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_eucl_bounce_std =")+this->ui.label_cpu_std_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_eucl_bounce_median =")+this->ui.label_cpu_median_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_eucl_bounce_max =")+this->ui.label_cpu_max_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("cost_ws_knn_eucl_bounce_mean =")+this->ui.label_cost_mean_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("cost_ws_knn_eucl_bounce_std =")+this->ui.label_cost_std_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("cost_ws_knn_eucl_bounce_median =")+this->ui.label_cost_median_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("cost_ws_knn_eucl_bounce_max =")+this->ui.label_cost_max_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("diff_ws_knn_eucl_bounce_mean =")+this->ui.label_diff_mean_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("diff_ws_knn_eucl_bounce_std =")+this->ui.label_diff_std_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("diff_ws_knn_eucl_bounce_median =")+this->ui.label_diff_median_ws_knn_eucl_bounce_value->text().toStdString()+string(";\n");
+        results << string("diff_ws_knn_eucl_bounce_max =")+this->ui.label_diff_max_ws_rdm_bounce_value->text().toStdString()+string(";\n");
+
+        results << string(" # Warm start with the kNN with the optimal kernel solution \n");
+        results << string("success_rate_ws_knn_opt_bounce =")+this->ui.label_rate_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_opt_bounce_mean =")+this->ui.label_iter_mean_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_opt_bounce_std =")+this->ui.label_iter_std_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_opt_bounce_median =")+this->ui.label_iter_median_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("iterations_ws_knn_opt_bounce_max =")+this->ui.label_iter_max_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_opt_bounce_mean =")+this->ui.label_cpu_mean_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_opt_bounce_std =")+this->ui.label_cpu_std_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_opt_bounce_median =")+this->ui.label_cpu_median_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("cpu_ws_knn_opt_bounce_max =")+this->ui.label_cpu_max_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("cost_ws_knn_opt_bounce_mean =")+this->ui.label_cost_mean_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("cost_ws_knn_opt_bounce_std =")+this->ui.label_cost_std_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("cost_ws_knn_opt_bounce_median =")+this->ui.label_cost_median_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("cost_ws_knn_opt_bounce_max =")+this->ui.label_cost_max_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("diff_ws_knn_opt_bounce_mean =")+this->ui.label_diff_mean_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("diff_ws_knn_opt_bounce_std =")+this->ui.label_diff_std_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("diff_ws_knn_opt_bounce_median =")+this->ui.label_diff_median_ws_knn_opt_bounce_value->text().toStdString()+string(";\n");
+        results << string("diff_ws_knn_opt_bounce_max =")+this->ui.label_diff_max_ws_rdm_bounce_value->text().toStdString()+string(";\n");
     }
-    **/
+
     results.close();
     qnode.log(QNode::Info,std::string("Results of learning saved at ")+pred_dir+std::string("/")+filename);
 
@@ -15197,6 +15170,330 @@ void MainWindow::on_pushButton_save_plot_learn_plan_clicked()
 
 }
 
+void MainWindow::on_pushButton_plot_learn_bounce_clicked()
+{
+    // plot the losses
+    if(!this->predicted_samples.empty()){
+        std::vector<double> n_D_vect_d(this->predicted_samples.begin(), this->predicted_samples.end());
+        QVector<double> qn_D_vect = QVector<double>::fromStdVector(n_D_vect_d);
+        QVector<double> quntrained_losses = QVector<double>::fromStdVector(this->untrained_bounce_losses);
+        QVector<double> qtrained_losses = QVector<double>::fromStdVector(this->trained_bounce_losses);
+        ui.plot_loss_learn_bounce->plotLayout()->clear();
+        ui.plot_loss_learn_bounce->clearGraphs();
+        ui.plot_loss_learn_bounce->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_loss_learn_bounce);
+        wideAxisRect->setupFullAxesBox(true);
+        wideAxisRect->addAxis(QCPAxis::atLeft)->setTickLabelColor(QColor(Qt::red));
+        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_loss_learn_bounce);
+        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+        // move newly created axes on "axes" layer and grids on "grid" layer:
+        for (QCPAxisRect *rect : ui.plot_loss_learn_bounce->axisRects())
+        {
+          for (QCPAxis *axis : rect->axes())
+          {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+          }
+        }
+        QString title("Loss values");
+        ui.plot_loss_learn_bounce->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_loss_learn_bounce,title));
+        ui.plot_loss_learn_bounce->plotLayout()->addElement(1, 0, wideAxisRect);
+
+        // untrained loss
+        ui.plot_loss_learn_bounce->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+        ui.plot_loss_learn_bounce->graph(0)->setPen(QPen(Qt::blue));
+        ui.plot_loss_learn_bounce->graph(0)->setName("Untrained loss value");
+        ui.plot_loss_learn_bounce->graph(0)->valueAxis()->setTickLabelColor(Qt::blue);
+        ui.plot_loss_learn_bounce->graph(0)->keyAxis()->setLabel("Samples");
+        ui.plot_loss_learn_bounce->graph(0)->setData(qn_D_vect, quntrained_losses);
+        ui.plot_loss_learn_bounce->graph(0)->valueAxis()->setRange(*std::min_element(quntrained_losses.begin(), quntrained_losses.end()),
+                                                          *std::max_element(quntrained_losses.begin(), quntrained_losses.end()));
+        ui.plot_loss_learn_bounce->graph(0)->rescaleAxes();
+
+        // trained loss
+        ui.plot_loss_learn_bounce->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft,1));
+        ui.plot_loss_learn_bounce->graph(1)->setPen(QPen(Qt::red));
+        ui.plot_loss_learn_bounce->graph(1)->setName("Trained loss value");
+        ui.plot_loss_learn_bounce->graph(1)->valueAxis()->setTickLabelColor(Qt::red);
+        ui.plot_loss_learn_bounce->graph(1)->keyAxis()->setLabel("Samples");
+        ui.plot_loss_learn_bounce->graph(1)->setData(qn_D_vect, qtrained_losses);
+        ui.plot_loss_learn_bounce->graph(1)->valueAxis()->setRange(*std::min_element(qtrained_losses.begin(), qtrained_losses.end()),
+                                                          *std::max_element(qtrained_losses.begin(), qtrained_losses.end()));
+        ui.plot_loss_learn_bounce->graph(1)->rescaleAxes();
+
+        // legend
+        QCPLegend *legend = new QCPLegend();
+        QCPLayoutGrid *subLayout = new QCPLayoutGrid;
+        ui.plot_loss_learn_bounce->plotLayout()->addElement(2, 0, subLayout);
+        subLayout->setMargins(QMargins(5, 0, 5, 5));
+        subLayout->addElement(0, 0, legend);
+        // set legend's row stretch factor very small so it ends up with minimum height:
+        ui.plot_loss_learn_bounce->plotLayout()->setRowStretchFactor(2, 0.001);
+        legend->setLayer("legend");
+        QFont legendFont = font();  // start out with MainWindow's font..
+        legendFont.setPointSize(9); // and make a bit smaller for legend
+        legend->setFont(legendFont);
+        legend->addElement(0,0,new QCPPlottableLegendItem(legend,ui.plot_loss_learn_bounce->graph(0)));
+        legend->addElement(0,1,new QCPPlottableLegendItem(legend,ui.plot_loss_learn_bounce->graph(1)));
+
+        //interactions
+        connect(ui.plot_loss_learn_bounce->graph(0)->valueAxis(), SIGNAL(rangeChanged(QCPRange)), ui.plot_loss_learn_bounce->graph(1)->valueAxis(), SLOT(setRange(QCPRange)));
+        ui.plot_loss_learn_bounce->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        ui.plot_loss_learn_bounce->replot();
+    }else{
+        ui.plot_loss_learn_bounce->plotLayout()->clear();
+        ui.plot_loss_learn_bounce->clearGraphs();
+    }
+
+    // plot the median costs
+    if(!this->predicted_samples.empty()){
+        std::vector<double> n_D_vect_d(this->predicted_samples.begin(), this->predicted_samples.end());
+        QVector<double> qn_D_vect = QVector<double>::fromStdVector(n_D_vect_d);
+        QVector<double> quntrained_costs = QVector<double>::fromStdVector(this->untrained_bounce_median_costs);
+        QVector<double> qtrained_costs = QVector<double>::fromStdVector(this->trained_bounce_median_costs);
+        ui.plot_cost_learn_bounce->plotLayout()->clear();
+        ui.plot_cost_learn_bounce->clearGraphs();
+        ui.plot_cost_learn_bounce->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_cost_learn_bounce);
+        wideAxisRect->setupFullAxesBox(true);
+        wideAxisRect->addAxis(QCPAxis::atLeft)->setTickLabelColor(QColor(Qt::red));
+        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_cost_learn_bounce);
+        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+        // move newly created axes on "axes" layer and grids on "grid" layer:
+        for (QCPAxisRect *rect : ui.plot_cost_learn_bounce->axisRects())
+        {
+          for (QCPAxis *axis : rect->axes())
+          {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+          }
+        }
+        QString title("Median cost values");
+        ui.plot_cost_learn_bounce->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_cost_learn_bounce,title));
+        ui.plot_cost_learn_bounce->plotLayout()->addElement(1, 0, wideAxisRect);
+
+        // untrained median costs
+        ui.plot_cost_learn_bounce->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+        ui.plot_cost_learn_bounce->graph(0)->setPen(QPen(Qt::blue));
+        ui.plot_cost_learn_bounce->graph(0)->setName("Untrained median cost");
+        ui.plot_cost_learn_bounce->graph(0)->valueAxis()->setTickLabelColor(Qt::blue);
+        ui.plot_cost_learn_bounce->graph(0)->keyAxis()->setLabel("Samples");
+        ui.plot_cost_learn_bounce->graph(0)->setData(qn_D_vect, quntrained_costs);
+        ui.plot_cost_learn_bounce->graph(0)->valueAxis()->setRange(*std::min_element(quntrained_costs.begin(), quntrained_costs.end()),
+                                                          *std::max_element(quntrained_costs.begin(), quntrained_costs.end()));
+        ui.plot_cost_learn_bounce->graph(0)->rescaleAxes();
+
+        // trained median costs
+        ui.plot_cost_learn_bounce->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft,1));
+        ui.plot_cost_learn_bounce->graph(1)->setPen(QPen(Qt::red));
+        ui.plot_cost_learn_bounce->graph(1)->setName("Trained median cost");
+        ui.plot_cost_learn_bounce->graph(1)->valueAxis()->setTickLabelColor(Qt::red);
+        ui.plot_cost_learn_bounce->graph(1)->keyAxis()->setLabel("Samples");
+        ui.plot_cost_learn_bounce->graph(1)->setData(qn_D_vect, qtrained_costs);
+        ui.plot_cost_learn_bounce->graph(1)->valueAxis()->setRange(*std::min_element(qtrained_costs.begin(), qtrained_costs.end()),
+                                                          *std::max_element(qtrained_costs.begin(), qtrained_costs.end()));
+        ui.plot_cost_learn_bounce->graph(1)->rescaleAxes();
+
+        // legend
+        QCPLegend *legend = new QCPLegend();
+        QCPLayoutGrid *subLayout = new QCPLayoutGrid;
+        ui.plot_cost_learn_bounce->plotLayout()->addElement(2, 0, subLayout);
+        subLayout->setMargins(QMargins(5, 0, 5, 5));
+        subLayout->addElement(0, 0, legend);
+        // set legend's row stretch factor very small so it ends up with minimum height:
+        ui.plot_cost_learn_bounce->plotLayout()->setRowStretchFactor(2, 0.001);
+        legend->setLayer("legend");
+        QFont legendFont = font();  // start out with MainWindow's font..
+        legendFont.setPointSize(9); // and make a bit smaller for legend
+        legend->setFont(legendFont);
+        legend->addElement(0,0,new QCPPlottableLegendItem(legend,ui.plot_cost_learn_bounce->graph(0)));
+        legend->addElement(0,1,new QCPPlottableLegendItem(legend,ui.plot_cost_learn_bounce->graph(1)));
+
+        //interactions
+        connect(ui.plot_cost_learn_bounce->graph(0)->valueAxis(), SIGNAL(rangeChanged(QCPRange)), ui.plot_cost_learn_bounce->graph(1)->valueAxis(), SLOT(setRange(QCPRange)));
+        ui.plot_cost_learn_bounce->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        ui.plot_cost_learn_bounce->replot();
+    }else{
+        ui.plot_cost_learn_bounce->plotLayout()->clear();
+        ui.plot_cost_learn_bounce->clearGraphs();
+    }
+
+    // plot the median cpu times
+    if(!this->predicted_samples.empty()){
+        std::vector<double> n_D_vect_d(this->predicted_samples.begin(), this->predicted_samples.end());
+        QVector<double> qn_D_vect = QVector<double>::fromStdVector(n_D_vect_d);
+        QVector<double> quntrained_cpu_times = QVector<double>::fromStdVector(this->untrained_bounce_cpu_times);
+        QVector<double> qtrained_cpu_times = QVector<double>::fromStdVector(this->trained_bounce_cpu_times);
+        ui.plot_cpu_time_learn_bounce->plotLayout()->clear();
+        ui.plot_cpu_time_learn_bounce->clearGraphs();
+        ui.plot_cpu_time_learn_bounce->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_cpu_time_learn_bounce);
+        wideAxisRect->setupFullAxesBox(true);
+        wideAxisRect->addAxis(QCPAxis::atLeft)->setTickLabelColor(QColor(Qt::red));
+        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_cpu_time_learn_bounce);
+        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+        // move newly created axes on "axes" layer and grids on "grid" layer:
+        for (QCPAxisRect *rect : ui.plot_cpu_time_learn_bounce->axisRects())
+        {
+          for (QCPAxis *axis : rect->axes())
+          {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+          }
+        }
+        QString title("Median cpu time values");
+        ui.plot_cpu_time_learn_bounce->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_cpu_time_learn_bounce,title));
+        ui.plot_cpu_time_learn_bounce->plotLayout()->addElement(1, 0, wideAxisRect);
+
+        // untrained median cpu time values
+        ui.plot_cpu_time_learn_bounce->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+        ui.plot_cpu_time_learn_bounce->graph(0)->setPen(QPen(Qt::blue));
+        ui.plot_cpu_time_learn_bounce->graph(0)->setName("Untrained median cpu times");
+        ui.plot_cpu_time_learn_bounce->graph(0)->valueAxis()->setTickLabelColor(Qt::blue);
+        ui.plot_cpu_time_learn_bounce->graph(0)->keyAxis()->setLabel("Samples");
+        ui.plot_cpu_time_learn_bounce->graph(0)->setData(qn_D_vect, quntrained_cpu_times);
+        ui.plot_cpu_time_learn_bounce->graph(0)->valueAxis()->setRange(*std::min_element(quntrained_cpu_times.begin(), quntrained_cpu_times.end()),
+                                                          *std::max_element(quntrained_cpu_times.begin(), quntrained_cpu_times.end()));
+        ui.plot_cpu_time_learn_bounce->graph(0)->rescaleAxes();
+
+        // trained median cpu time values
+        ui.plot_cpu_time_learn_bounce->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft,1));
+        ui.plot_cpu_time_learn_bounce->graph(1)->setPen(QPen(Qt::red));
+        ui.plot_cpu_time_learn_bounce->graph(1)->setName("Trained median cpu times");
+        ui.plot_cpu_time_learn_bounce->graph(1)->valueAxis()->setTickLabelColor(Qt::red);
+        ui.plot_cpu_time_learn_bounce->graph(1)->keyAxis()->setLabel("Samples");
+        ui.plot_cpu_time_learn_bounce->graph(1)->setData(qn_D_vect, qtrained_cpu_times);
+        ui.plot_cpu_time_learn_bounce->graph(1)->valueAxis()->setRange(*std::min_element(qtrained_cpu_times.begin(), qtrained_cpu_times.end()),
+                                                          *std::max_element(qtrained_cpu_times.begin(), qtrained_cpu_times.end()));
+        ui.plot_cpu_time_learn_bounce->graph(1)->rescaleAxes();
+
+        // legend
+        QCPLegend *legend = new QCPLegend();
+        QCPLayoutGrid *subLayout = new QCPLayoutGrid;
+        ui.plot_cpu_time_learn_bounce->plotLayout()->addElement(2, 0, subLayout);
+        subLayout->setMargins(QMargins(5, 0, 5, 5));
+        subLayout->addElement(0, 0, legend);
+        // set legend's row stretch factor very small so it ends up with minimum height:
+        ui.plot_cpu_time_learn_bounce->plotLayout()->setRowStretchFactor(2, 0.001);
+        legend->setLayer("legend");
+        QFont legendFont = font();  // start out with MainWindow's font..
+        legendFont.setPointSize(9); // and make a bit smaller for legend
+        legend->setFont(legendFont);
+        legend->addElement(0,0,new QCPPlottableLegendItem(legend,ui.plot_cpu_time_learn_bounce->graph(0)));
+        legend->addElement(0,1,new QCPPlottableLegendItem(legend,ui.plot_cpu_time_learn_bounce->graph(1)));
+
+        //interactions
+        connect(ui.plot_cpu_time_learn_bounce->graph(0)->valueAxis(), SIGNAL(rangeChanged(QCPRange)), ui.plot_cpu_time_learn_bounce->graph(1)->valueAxis(), SLOT(setRange(QCPRange)));
+        ui.plot_cpu_time_learn_bounce->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        ui.plot_cpu_time_learn_bounce->replot();
+    }else{
+        ui.plot_cpu_time_learn_bounce->plotLayout()->clear();
+        ui.plot_cpu_time_learn_bounce->clearGraphs();
+    }
+
+    // plot the dataset size
+    if(!this->n_D_vect.empty()){
+        std::vector<double> n_D_vect_d(this->n_D_vect.begin(), this->n_D_vect.end());
+        std::vector<double> predicted_samples_d(this->predicted_samples.begin(), this->predicted_samples.end());
+        QVector<double> qn_D_vect = QVector<double>::fromStdVector(n_D_vect_d);
+        QVector<double> qpredicted_samples = QVector<double>::fromStdVector(predicted_samples_d);
+        ui.plot_dataset_size_learn_bounce->plotLayout()->clear();
+        ui.plot_dataset_size_learn_bounce->clearGraphs();
+        ui.plot_dataset_size_learn_bounce->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+        QCPAxisRect *wideAxisRect = new QCPAxisRect(ui.plot_dataset_size_learn_bounce);
+        wideAxisRect->setupFullAxesBox(true);
+        QCPMarginGroup *marginGroup = new QCPMarginGroup(ui.plot_dataset_size_learn_bounce);
+        wideAxisRect->setMarginGroup(QCP::msLeft | QCP::msRight, marginGroup);
+        // move newly created axes on "axes" layer and grids on "grid" layer:
+        for (QCPAxisRect *rect : ui.plot_dataset_size_learn_bounce->axisRects())
+        {
+          for (QCPAxis *axis : rect->axes())
+          {
+            axis->setLayer("axes");
+            axis->grid()->setLayer("grid");
+          }
+        }
+        QString title("Dataset size");
+        ui.plot_dataset_size_learn_bounce->plotLayout()->addElement(0,0, new QCPPlotTitle(ui.plot_dataset_size_learn_bounce,title));
+        ui.plot_dataset_size_learn_bounce->plotLayout()->addElement(1, 0, wideAxisRect);
+
+        ui.plot_dataset_size_learn_bounce->addGraph(wideAxisRect->axis(QCPAxis::atBottom), wideAxisRect->axis(QCPAxis::atLeft));
+        ui.plot_dataset_size_learn_bounce->graph(0)->setPen(QPen(Qt::blue));
+        ui.plot_dataset_size_learn_bounce->graph(0)->setName(title);
+        ui.plot_dataset_size_learn_bounce->graph(0)->valueAxis()->setLabel("Cold-started dataset size");
+        ui.plot_dataset_size_learn_bounce->graph(0)->keyAxis()->setLabel("Samples");
+        ui.plot_dataset_size_learn_bounce->graph(0)->setData(qpredicted_samples, qn_D_vect);
+        ui.plot_dataset_size_learn_bounce->graph(0)->valueAxis()->setRange(*std::min_element(qn_D_vect.begin(), qn_D_vect.end()),
+                                                          *std::max_element(qn_D_vect.begin(), qn_D_vect.end()));
+        ui.plot_dataset_size_learn_bounce->graph(0)->rescaleAxes();
+        ui.plot_dataset_size_learn_bounce->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+        ui.plot_dataset_size_learn_bounce->replot();
+    }else{
+        ui.plot_dataset_size_learn_bounce->plotLayout()->clear();
+        ui.plot_dataset_size_learn_bounce->clearGraphs();
+    }
+}
+
+void MainWindow::on_pushButton_save_plot_learn_bounce_clicked()
+{
+    string pred_dir = this->ui.lineEdit_predictions->text().toStdString();
+
+    // losses
+    if(!this->untrained_bounce_losses.empty()){
+        ui.plot_loss_learn_bounce->savePdf(QString(pred_dir.c_str())+QString("/losses.pdf"),true,0,0,QString(),QString("Loss values"));
+        string filename_loss("losses.csv");
+        ofstream losses_csv;
+        losses_csv.open(pred_dir+string("/")+filename_loss);
+        losses_csv << "samples,untrained loss,trained loss\n";
+        for(size_t i=0; i < this->predicted_samples.size();++i){
+            losses_csv << to_string(this->predicted_samples.at(i))+string(",")+to_string(this->untrained_bounce_losses.at(i))+string(",")+to_string(this->trained_bounce_losses.at(i))+string("\n");
+        }
+        losses_csv.close();
+    }
+
+    // median costs
+    if(!this->untrained_bounce_median_costs.empty()){
+        ui.plot_cost_learn_bounce->savePdf(QString(pred_dir.c_str())+QString("/costs.pdf"),true,0,0,QString(),QString("Median cost values"));
+        string filename_cost("costs.csv");
+        ofstream costs_csv;
+        costs_csv.open(pred_dir+string("/")+filename_cost);
+        costs_csv << "samples,untrained median cost,trained median cost\n";
+        for(size_t i=0; i < this->untrained_bounce_median_costs.size();++i){
+            costs_csv << to_string(this->predicted_samples.at(i))+string(",")+to_string(this->untrained_bounce_median_costs.at(i))+string(",")+to_string(this->trained_bounce_median_costs.at(i))+string("\n");
+        }
+        costs_csv.close();
+    }
+
+    // median cpu times
+    if(!this->untrained_bounce_cpu_times.empty()){
+        ui.plot_cpu_time_learn_bounce->savePdf(QString(pred_dir.c_str())+QString("/cpu_times.pdf"),true,0,0,QString(),QString("Median cpu time values"));
+        string filename_cpu_times("cpu_times.csv");
+        ofstream cpu_times_csv;
+        cpu_times_csv.open(pred_dir+string("/")+filename_cpu_times);
+        cpu_times_csv << "samples,untrained median cpu times,trained median cpu times\n";
+        for(size_t i=0; i < this->untrained_bounce_cpu_times.size();++i){
+            cpu_times_csv << to_string(this->predicted_samples.at(i))+string(",")+to_string(this->untrained_bounce_cpu_times.at(i))+string(",")+to_string(this->trained_bounce_cpu_times.at(i))+string("\n");
+        }
+        cpu_times_csv.close();
+    }
+
+    // dataset size
+    if(!this->n_D_vect.empty()){
+        ui.plot_dataset_size_learn_bounce->savePdf(QString(pred_dir.c_str())+QString("/dataset_size.pdf"),true,0,0,QString(),QString("Dataset size"));
+        string filename_size("sample_sizes.csv");
+        ofstream sample_csv;
+        sample_csv.open(pred_dir+string("/")+filename_size);
+        sample_csv << "samples,training set size\n";
+        for(size_t i=0; i < this->n_D_vect.size();++i){
+            sample_csv << to_string(this->predicted_samples.at(i))+string(",")+to_string(this->n_D_vect.at(i))+string("\n");
+        }
+        sample_csv.close();
+    }
+
+
+    qnode.log(QNode::Info,std::string("Results of learning saved at ")+pred_dir);
+
+}
 
 void MainWindow::ReadSettings()
 {
